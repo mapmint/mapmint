@@ -1,0 +1,39 @@
+[registerUser]
+ Title = Registering new user
+ Abstract = Registering a new user.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [fields]
+   Title = Any parameter to define new user
+   Abstract = Any parameter to define new user.
+   minOccurs = 2
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [values]
+   Title = The corresponding values for fields
+   Abstract = The corresponding values for fields.
+   minOccurs = 2
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The success or failure message
+   Abstract = The success or failure message.
+   <ComplexData>
+    <Default>
+     mimeType = text/html
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

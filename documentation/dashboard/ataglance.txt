@@ -1,0 +1,24 @@
+.. _dashboard-ataglance:
+
+Panneau "d'un coup d'oeil"
+==========================
+
+Le panneau "d'un coup d'oeil" du :doc:`../dashboard/index` fournit une vision d'ensemble de l'instance MapMint à son/ses administrateurs.
+
+La date et l'heure de votre dernière connexion à l'instance est premièrement indiquée en haut du panneau.
+
+Des informations relatives au :doc:`../data/index` sont disponibles:
+ * Le nombre d'espaces de stockages crée par les utilisateurs
+ * Le nombre de sources de données importées par les utilisateurs
+ * Le nombre de projections cartographiques actives disponibles dans l'instance 
+
+
+Le nombre de cartes crées dans le :doc:`../maps/index` ainsi que le nombres de projets publiés dans le :doc:`../apps/index` sont par ailleur indiqués en dessous.
+
+
+
+Statistiques du serveur
+L'adresse IP du serveur est : 161.3.155.73
+Version de MapServer : 6.2.0
+Version de GDAL : 1.10.0
+Disk usage

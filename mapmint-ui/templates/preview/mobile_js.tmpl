@@ -1,0 +1,182 @@
+function isiPad(){
+    return ((navigator.platform.indexOf("iP") != -1)||(navigator.platform.indexOf("arm") != -1));
+}
+
+function fixContentHeight() {
+  var header = \$("div[data-role='header']:visible"),
+  footer = \$("div[data-role='footer']:visible"),
+  content = \$("div[data-role='content']:visible"),
+  viewHeight = \$(window).height(),
+  contentHeight = viewHeight - (isiPad()?45:(45+68));
+  if(\$("div[data-role='content']:visible").parent().attr("data-role")=="page"){
+	if ((content.outerHeight() + (isiPad()?45:(45+68))) !== viewHeight) {
+	   contentHeight -= (content.outerHeight() - content.height() + 1);
+	   if(\$("div[data-role='content']:visible").parent().attr("id")=="mapPage")
+		content.height(contentHeight);
+	   else
+		content.height(contentHeight+(isiPad()?45:(45+68)));
+	   \$("#map").height(contentHeight);
+	}
+	if (window.map && window.map instanceof OpenLayers.Map) {
+	   if(\$("div[data-role='content']:visible").parent().attr("id")=="mapPage")
+		content.height(contentHeight);
+	   else
+		content.height(contentHeight+(isiPad()?60:(45+68)));
+	   map.updateSize();
+	 }
+  }
+  //$.mobile.silentScroll(39);
+}
+
+function tinit(){
+
+  //scroll(0, 0);
+  var header = \$(".ui-header");
+  var footer = \$(".ui-footer");
+  var content = \$(".ui-content");
+  var viewport_height = \$(window).height()+(isIphone()?header.height()+16:header.height()+10);//+header.height()+(isIphone()?20:15);
+  //scroll(0, header.height());
+
+  /*alert(\$(window).height()+ " - "+\$(window).width());
+    alert(header.height()+ " - "+footer.height());*/
+  
+  var content_height = viewport_height - (header.height()+footer.height());
+          
+  /* Trim margin/border/padding height */
+  content.height(content_height);
+  
+  \$(window).bind("orientationchange resize pageshow", fixContentHeight);
+  fixContentHeight();
+
+
+  \$('#layersPage').page();
+  \$('#routingPage').page();
+  \$('#routingDetailsPage').page();
+  System.window=true;
+
+  \$("#searchFieldGeocoding").change(function() {
+    codeAddress(\$("#searchFieldGeocoding").val()+", Morbihan, France ");
+  });
+
+  /**
+   * COMPASS
+   */
+  var compass = document.getElementById("mmCompassContainer").appendChild(document.createElement('article'));
+  compass.id='compass';
+  var spinner = compass.appendChild(document.createElement('article'));
+  spinner.id='spinner';
+  var pin = spinner.appendChild(document.createElement('article'));
+  pin.id='pin';
+  
+  /*for (var degrees=0, degree; degrees<360; degrees+=30) {
+    degree = spinner.appendChild(document.createElement('label'));
+    degree.className='degree';
+    degree.innerText = degrees;
+    degree.style.webkitTransform = 'rotateZ(' + degrees + 'deg)'
+    }*/
+  ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'].forEach(function(label, index) {
+      var main = ((index % 2)?'':' main');
+      if(main!=''){
+	point = spinner.appendChild(document.createElement('label'));
+	point.className='point' + main;
+	point.innerText = label;
+	point.style.webkitTransform = 'rotateZ(' + (index * 45) + 'deg)'
+	  arrow = spinner.appendChild(document.createElement('div'));
+	arrow.className='arrow' + main;
+	arrow.style.webkitTransform = 'rotateZ(' + (index * 45) + 'deg)'
+	  }
+    });
+  
+  var lastHeading = 0;
+  window.addEventListener('deviceorientation', function(e) {
+      var heading = e.webkitCompassHeading + window.orientation;
+      if (Math.abs(heading - lastHeading)<180) {
+	spinner.style.webkitTransition = 'all 0.2s ease-in-out';
+      } else {
+	spinner.style.webkitTransition = 'none';
+      }
+      spinner.style.webkitTransform = 'rotateZ(-' + heading + 'deg)';
+      lastHeading = heading;
+    }, false);
+
+  /**
+   * /COMPASS
+   */
+  
+}
+
+System.sliderVal=0;
+function tend(){
+  //initLayerList();
+
+  //alert(map.zoom+" "+map.numZoomLevels);
+  \$( "#slider-0" ).val(map.zoom);
+  if(map.restrictedExtent!=null)
+    \$( "#slider-0" ).attr("min",map.zoom);
+  \$( "#slider-0" ).slider('refresh');
+  \$( "#slider-0" ).bind( "change", function(event, ui) { 
+      if(System.sliderVal==0) 
+	System.sliderVal=\$(this).val(); 
+      if(System.sliderVal!=\$(this).val()){ 
+	map.zoomTo(\$(this).val());
+	//alert(\$(this).val()); 
+	System.sliderVal=\$(this).val(); 
+      } 
+    });
+
+  map.events.register('zoomend',map,function(){
+      \$( "#slider-0" ).val(map.zoom);
+      \$( "#slider-0" ).slider('refresh');
+    });
+}
+
+function initLayerList() {
+
+        \$('<li>', {
+            "data-role": "list-divider",
+            text: "Fonds de Plan"
+        })
+        .appendTo('#baselayerslist');
+
+    var baseLayers = map.getLayersBy("isBaseLayer", true);
+    \$.each(baseLayers, function() {
+        addLayerToList(this);
+    });
+    
+
+
+}
+
+function addLayerToList(layer) {
+    var item = \$('<li>', {
+            "data-icon": "check",
+            "class": layer.getVisibility() ? "checked" : ""
+        })
+        .append(\$('<a />', {
+            text: layer.name
+        })
+            .click(function() {
+                \$.mobile.changePage('#mapPage');
+                if (layer.isBaseLayer) {
+                    layer.map.setBaseLayer(layer);
+                } else {
+                    layer.setVisibility(!layer.getVisibility());
+                }
+            })
+        )
+        .appendTo('#baselayerslist');
+    layer.events.on({
+        'visibilitychanged': function() {
+            \$(item).toggleClass('checked');
+        }
+    });
+    
+    
+    
+}
+
+function isIphone(){
+var agent=navigator.userAgent.toLowerCase();
+return (agent.indexOf('iphone')!=-1);
+}
+

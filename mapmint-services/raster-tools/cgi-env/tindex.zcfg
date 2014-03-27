@@ -1,0 +1,53 @@
+[tindex]
+ Title = Create an index using raster files 
+ Abstract = Compute the index of a raster files set.
+ processVersion = 1
+ serviceProvider = service.zo
+ serviceType = C
+ <DataInputs>
+  [dir]
+   Title = The directory
+   Abstract = The directory containing the raster files
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+     dataType = string
+    <Default/>
+   </LiteralData>
+  [idir]
+   Title = The DataStore name
+   Abstract = The DataStore name used to create the index.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+     dataType = string
+    <Default/>
+   </LiteralData>
+  [iname]
+   Title = The index name
+   Abstract = The name of the output shapefile storing the tile index.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+     dataType = string
+    <Default/>
+   </LiteralData>
+  [ext]
+   Title = The format name
+   Abstract = The name of the format for file to index (tiff, jpeg ....).
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+     dataType = string
+    <Default/>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The index creation success message
+   Abstract = The index creation success message
+   <LiteralData>
+     dataType=string
+    <Default />
+   </LiteralData>
+ </DataOutputs>  

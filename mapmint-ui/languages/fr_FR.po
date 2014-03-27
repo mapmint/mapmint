@@ -1,0 +1,1823 @@
+# MapMint User Interface Translation File.
+# Copyright (C) 2012 Cartoworks Inc.
+# This file is distributed under the same license as the MapMint package.
+# Gérald Fenoy <gerald.fenoy@cartoworks.com>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-11-03 16:12+0100\n"
+"PO-Revision-Date: 2012-11-03 16:14+0100\n"
+"Last-Translator: Gérald Fenoy <gerald.fenoy@cartoworks.com>\n"
+"Language-Team: French\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: ..\wwwroot\mm\templates\Configuration.tmpl:3
+msgid "Configuration"
+msgstr "Configuration"
+
+#: ..\wwwroot\mm\templates\Configuration.tmpl:10
+#: ..\wwwroot\mm\templates\Manager\LayerProperties.tmpl:99
+msgid "Save"
+msgstr "Sauver"
+
+#: ..\wwwroot\mm\templates\Dashboard.tmpl:24
+msgid "At a glance"
+msgstr "Vue d'ensemble"
+
+#: ..\wwwroot\mm\templates\Dashboard.tmpl:25
+msgid "Last connected on "
+msgstr "Dernière connexion le "
+
+#: ..\wwwroot\mm\templates\Dashboard.tmpl:32
+msgid "Manage data stores and data sources"
+msgstr "Gérer vos stockages et vos source de données"
+
+#: ..\wwwroot\mm\templates\Dashboard.tmpl:81
+msgid "data source"
+msgstr "Source de données"
+
+#: ..\wwwroot\mm\templates\Dashboard.tmpl:98
+msgid "Edit, style and process data layers"
+msgstr "Editez, modifier le style visualiser vos sources de données"
+
+#: ..\wwwroot\mm\templates\Dashboard.tmpl:115
+msgid "Publish webmapping applications"
+msgstr "Publiez vos applications de webmapping"
+
+#: ..\wwwroot\mm\templates\Dashboard.tmpl:136
+msgid "Server statistics"
+msgstr "Statistiques du serveur"
+
+#: ..\wwwroot\mm\templates\Dashboard.tmpl:140
+msgid "Server IP is"
+msgstr "L'adresse IP du serveur est : "
+
+#: ..\wwwroot\mm\templates\Dashboard.tmpl:203
+msgid "Recent Projects"
+msgstr "Projets récents"
+
+#: ..\wwwroot\mm\templates\Distiller.tmpl:21
+msgid "Data Sources"
+msgstr "Sources de données"
+
+#: ..\wwwroot\mm\templates\Distiller.tmpl:40
+msgid "Data Stores"
+msgstr "Espaces de stockages"
+
+msgid "data stores"
+msgstr "Espaces de stockages"
+
+msgid "Data store"
+msgstr "Espace de stockages"
+
+msgid "data sources"
+msgstr "Sources de données"
+
+msgid "Actives SRS"
+msgstr "Projections actives"
+
+msgid "Active SRS"
+msgstr "Projection active"
+
+msgid "maps"
+msgstr "cartes"
+
+msgid "projects"
+msgstr "projets"
+
+msgid "MapServer version:"
+msgstr "Version de MapServer :"
+
+msgid "GDAL version:"
+msgstr "Version de GDAL :"
+
+
+#: ..\wwwroot\mm\templates\Distiller.tmpl:54
+msgid "MySQL connections"
+msgstr "Connexions MySQL"
+
+msgid "PostGIS connections"
+msgstr "Connexions PostGIS"
+
+#: ..\wwwroot\mm\templates\Distiller.tmpl:70
+msgid "Directories"
+msgstr "Répertoires"
+
+#: ..\wwwroot\mm\templates\Distiller.tmpl:74
+msgid "WFS Servers"
+msgstr "Serveurs WFS"
+
+#: ..\wwwroot\mm\templates\Distiller.tmpl:82
+#: ..\wwwroot\mm\templates\Distiller.tmpl:92
+msgid "Refresh"
+msgstr "Rafraichir"
+
+#: ..\wwwroot\mm\templates\Distiller.tmpl:83
+#: ..\wwwroot\mm\templates\Distiller.tmpl:93
+#: ..\wwwroot\mm\templates\Manager.tmpl:37
+#: ..\wwwroot\mm\templates\Manager.tmpl:72
+msgid "Edit"
+msgstr "Editer"
+
+#: ..\wwwroot\mm\templates\Distiller.tmpl:85
+#: ..\wwwroot\mm\templates\Distiller.tmpl:95
+#: ..\wwwroot\mm\templates\Manager.tmpl:57
+#: ..\wwwroot\mm\templates\Manager.tmpl:73
+#: ..\wwwroot\mm\templates\Distiller\removeDs.tmpl:23
+msgid "Remove"
+msgstr "Supprimer"
+
+#: ..\wwwroot\mm\templates\Distiller.tmpl:91
+msgid "Access"
+msgstr "Accéder"
+
+#: ..\wwwroot\mm\templates\Distiller_db_display.tmpl:6
+#: ..\wwwroot\mm\templates\Distiller_db_remove.tmpl:10
+#: ..\wwwroot\mm\templates\Distiller\removeDs.tmpl:10
+#: ..\wwwroot\mm\templates\Manager\addGridWindow.tmpl:3
+#: ..\wwwroot\mm\templates\Manager\LayerProperties.tmpl:6
+#: ..\wwwroot\mm\templates\Distiller\wfs\display.tmpl:5
+msgid "Name:"
+msgstr "Nom :"
+
+#: ..\wwwroot\mm\templates\Distiller_db_display.tmpl:11
+msgid "Host:"
+msgstr "Hôte :"
+
+#: ..\wwwroot\mm\templates\Distiller_db_display.tmpl:15
+msgid "Port:"
+msgstr "Port :"
+
+#: ..\wwwroot\mm\templates\Distiller_db_display.tmpl:20
+msgid "Login:"
+msgstr "Nom d'utilisateur :"
+
+msgid "login"
+msgstr "Nom d'utilisateur"
+
+msgid "Last Name"
+msgstr "Nom"
+
+msgid "First Name"
+msgstr "Prénom"
+
+msgid "Email"
+msgstr "Courriel"
+
+msgid "globe"
+msgstr "globe"
+msgid "country"
+msgstr "continent"
+msgid "state"
+msgstr "pays"
+msgid "city"
+msgstr "ville"
+msgid "street"
+msgstr "rue"
+msgid "house"
+msgstr "maison"
+
+msgid "and"
+msgstr "et"
+
+msgid "Zoom: "
+msgstr "Zoom : "
+
+msgid "Logout"
+msgstr "Quiter"
+
+msgid "Phone"
+msgstr "Téléphone"
+
+#: ..\wwwroot\mm\templates\Distiller_db_display.tmpl:24
+msgid "Password:"
+msgstr "Mot de passe :"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "password"
+msgstr "mot de passe"
+
+msgid "password:"
+msgstr "mot de passe :"
+
+msgid "Lastname:"
+msgstr "Nom :"
+
+msgid "Firstname:"
+msgstr "Prénom :"
+
+msgid "Last name:"
+msgstr "Nom :"
+
+msgid "First name:"
+msgstr "Prénom :"
+
+msgid "Register"
+msgstr "S'inscrire"
+
+msgid " authentified."
+msgstr " connecté."
+
+msgid "Permalink"
+msgstr "Partager un lien"
+
+msgid "Facebook sharing"
+msgstr "Partage Facebook"
+
+msgid "Zoom To Max Extent"
+msgstr "Zommer sur l'étendue maximale"
+
+msgid "Titter sharing"
+msgstr "Partage Twitter"
+
+msgid " authenticated."
+msgstr " connecté."
+
+msgid "Unable to connect with the provided login and password"
+msgstr "Impossible de se connecter avec le login et le mot de passe fournis"
+
+msgid "Error when processing SQL query: "
+msgstr "Impossible d'exécuter la requête SQL : "
+
+msgid "Unable to register the user: "
+msgstr "Impossible d'enregistrer l'utilisateur : "
+
+msgid "User not authenticated"
+msgstr "Utilisateur non identifié"
+
+msgid "User preferences saved."
+msgstr "Préférences utilisateur enregistrées."
+
+msgid "Unable to update user preferences: "
+msgstr "Impossible de mettre à jour les préférences utilisateur : "
+
+msgid "Confirm"
+msgstr "Confirmer"
+
+msgid "Confirm "
+msgstr "Confirmation du "
+
+msgid "User disconnected"
+msgstr "Utilisateur déconnecté"
+
+msgid "User "
+msgstr "Utilisateur "
+
+msgid "Saved Paths"
+msgstr "Itinéraires sauvegardés"
+
+msgid " authenticated"
+msgstr " authentifié"
+
+msgid "authentified"
+msgstr "authentifié"
+
+msgid "Save configuration"
+msgstr "Sauver la configuration"
+
+msgid "Error occurs"
+msgstr "Une erreur est survenue"
+
+msgid "Requested page could not be loaded"
+msgstr "La page ne peut pas être affichée"
+
+msgid "Go back to Dashboard"
+msgstr "Retour au Dashboard"
+
+msgid "Display On Map"
+msgstr "Afficher sur la carte"
+
+msgid "green"
+msgstr "vert"
+
+msgid "blue"
+msgstr "bleu"
+
+msgid "purple"
+msgstr "pourpre"
+
+msgid "pink"
+msgstr "rose"
+
+msgid "Comments"
+msgstr "Commentaires"
+
+msgid "Location"
+msgstr "Localisation"
+
+msgid "French"
+msgstr "Français"
+
+msgid "Breton"
+msgstr "Breton"
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "Start search"
+msgstr "Lancer la recherche"
+
+msgid "Send"
+msgstr "Envoyer"
+
+msgid "Do you really want to remove this path ?"
+msgstr "Voulez-vous vraiment supprimer cet itinéraire ?"
+
+
+msgid "Layer "
+msgstr "Couche "
+
+msgid "Layer Access: "
+msgstr "Droits d'accès à la couche : "
+
+msgid "Groups"
+msgstr "Groupes"
+
+msgid "Users"
+msgstr "Utilisateurs"
+
+msgid "Users management"
+msgstr "Gestion des utilisateurs"
+
+msgid "Set privileges"
+msgstr "Gestion des droits d'accès"
+
+msgid "Admin privileges"
+msgstr "Gestion des droits d'accès administrateur"
+
+msgid "Privileges"
+msgstr "Droits d'accès"
+
+msgid "Valid"
+msgstr "Valider"
+
+msgid "Title: "
+msgstr "Titre : "
+
+msgid "Your news was successfully inserted."
+msgstr "Votre déclaration a été réalisée avec succès."
+
+msgid "Please select a public project"
+msgstr "Merci de sélectionner un projet public dans la liste"
+
+#: ..\wwwroot\mm\templates\Distiller_db_display.tmpl:28
+msgid "Type:"
+msgstr "Type :"
+
+#: ..\wwwroot\mm\templates\Distiller_db_display.tmpl:38
+msgid "Database:"
+msgstr "Base de données"
+
+#: ..\wwwroot\mm\templates\Distiller_db_display.tmpl:46
+msgid "Test"
+msgstr "Tester"
+
+#: ..\wwwroot\mm\templates\Distiller_db_display.tmpl:47
+#: ..\wwwroot\mm\templates\Distiller\removeDs.tmpl:22
+#: ..\wwwroot\mm\templates\Distiller\wfs\display.tmpl:19
+msgid "Cancel"
+msgstr "Annuler"
+
+#: ..\wwwroot\mm\templates\Distiller_db_display.tmpl:48
+#: ..\wwwroot\mm\templates\Distiller\wfs\display.tmpl:20
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:22
+msgid "Add"
+msgstr "Ajouter"
+
+#: ..\wwwroot\mm\templates\Distiller_db_remove.tmpl:4
+msgid "Please, confirm that you want to remove the following DataStore:"
+msgstr "Merci de confirmer que vous voulez supprimer le stockage suivant :"
+
+#: ..\wwwroot\mm\templates\Georeferencer.tmpl:21
+msgid "Image to georeference:"
+msgstr "Image à géoréférencer"
+
+#: ..\wwwroot\mm\templates\Georeferencer.tmpl:25
+msgid "Save Project"
+msgstr "Sauver le projet"
+
+#: ..\wwwroot\mm\templates\Georeferencer.tmpl:26
+msgid "Georeference"
+msgstr "Géréférencer"
+
+#: ..\wwwroot\mm\templates\Georeferencer.tmpl:61
+#: ..\wwwroot\mm\templates\Manager.tmpl:81
+msgid "Map Viewer"
+msgstr "Visualisateur de carte"
+
+#: ..\wwwroot\mm\templates\Georeferencer.tmpl:109
+msgid "Select Project:"
+msgstr "Selectionner un projet :"
+
+#: ..\wwwroot\mm\templates\Georeferencer.tmpl:111
+#: ..\wwwroot\mm\templates\Manager.tmpl:146
+msgid "Select Map"
+msgstr "Selectionner une carte"
+
+#: ..\wwwroot\mm\templates\Georeferencer.tmpl:114
+#: ..\wwwroot\mm\templates\Manager.tmpl:149
+msgid "Open"
+msgstr "Ouvrir"
+
+msgid "Open Map"
+msgstr "Ouvrir la carte"
+
+msgid "Zoom to max extent"
+msgstr "Zoomer sur l'étendue maximale"
+
+msgid "Zoom to Max Extent"
+msgstr "Zoomer sur l'étendue maximale"
+
+msgid "Zoom Box"
+msgstr "Zoomer via un rectangle"
+
+msgid "Zoom In"
+msgstr "Zoomer"
+
+msgid "Pan"
+msgstr "Déplacement"
+
+msgid "Create"
+msgstr "Créer"
+
+msgid "Top"
+msgstr "Haut"
+
+msgid "Bottom"
+msgstr "Bas"
+
+msgid "Center"
+msgstr "Centre"
+
+msgid "Left"
+msgstr "Gauche"
+
+msgid "Right"
+msgstr "Droite"
+
+msgid "Total Size:"
+msgstr "Taille totale :"
+
+msgid "Maps"
+msgstr "Cartes"
+
+msgid "map"
+msgstr "carte"
+
+msgid "project"
+msgstr "projet"
+
+msgid "You can access your saved route from "
+msgstr "Vous pouvez télécharger votre itinéraire depuis "
+
+msgid "this link"
+msgstr "ce lien"
+
+msgid "Routing Service"
+msgstr "Recherche d'itinéraires"
+
+msgid "Security"
+msgstr "Sécurité"
+
+msgid "Distance"
+msgstr "Distance"
+
+msgid "Authenticate"
+msgstr "Authentification"
+
+msgid "Path distance:"
+msgstr "Distance de parcour :"
+
+msgid "Driving Distance"
+msgstr "Distance de parcours"
+
+msgid "Print"
+msgstr "Imprimer"
+
+msgid "Identify"
+msgstr "Interroger"
+
+msgid "Identify Circle"
+msgstr "Interroger par cercle"
+
+msgid "Unable to connect to "
+msgstr "Impossible de se connecter à "
+
+msgid "Unable to parse the file"
+msgstr "Impossible de lire le fichier"
+
+msgid "Unable to access the database configuration file to remove"
+msgstr "Impossible de lire le fichier de configuration de la base de données à supprimer"
+
+msgid " was successfully removed from the Datastores"
+msgstr " a été supprimé avec succès de l'espace de stockage"
+
+msgid "Connection to "
+msgstr "Connexion à "
+
+msgid " successfull"
+msgstr " réalisée avec succès"
+
+msgid "Add new directory"
+msgstr "Ajouter un nouveau répertoire"
+
+msgid "Temp"
+msgstr "Fichiers temporaires"
+
+msgid "Convert"
+msgstr "Convertir"
+
+msgid "Preview"
+msgstr "Prévisualiser"
+
+msgid "Set projection"
+msgstr "Définir la projection"
+
+msgid "Open in Manager"
+msgstr "Ouvrir dans le Manager"
+
+msgid "Databases"
+msgstr "Bases de données"
+
+msgid "Zoom Out"
+msgstr "Dé-zoomer"
+
+msgid "Login"
+msgstr "Identification"
+
+msgid "Path:"
+msgstr "Chemin:"
+
+msgid "Vector Converter"
+msgstr "Convertisseur de données vectorielles"
+
+msgid "Database Access"
+msgstr "Accès à la base de données"
+
+msgid "Processing, please wait ..."
+msgstr "Traitement en cours, merci de patienter ..."
+
+msgid "Displaying {from} to {to} of {total} items"
+msgstr "Affichage de {from} à {to} sur {total} éléments"
+
+msgid "Add Data"
+msgstr "Ajouter des données"
+
+msgid "Create Tileindex"
+msgstr "Créer un index de tuiles"
+
+msgid "Add DB Connection"
+msgstr "Ajouter une connexion à une base"
+
+msgid "Add Database"
+msgstr "Ajouter une base de données"
+
+msgid "Add Directory"
+msgstr "Ajouter un répertoire"
+
+msgid "Navigation Toolbar"
+msgstr "Barre d'outils de navigation"
+
+msgid "Add WFS"
+msgstr "Ajouter un serveur WFS"
+
+msgid "Add tileindex"
+msgstr "Ajouter un index de tuiles"
+
+msgid "User Preferences"
+msgstr "Paramètres utilisateur"
+
+msgid "Upload Files"
+msgstr "Envoyer des fichiers"
+
+msgid "DataStore destination for your files:"
+msgstr "Espace de stockage pour vos fichiers :"
+
+msgid "Add a FID Column"
+msgstr "Ajouter une colonne FID"
+
+msgid "Publish"
+msgstr "Publier"
+
+msgid "Geolocate"
+msgstr "Ma position"
+
+msgid "Track my position"
+msgstr "Suivre ma position"
+
+msgid "Mesure Distance"
+msgstr "Mesure de distances"
+
+msgid "Mesure Area"
+msgstr "Mesure d'aires"
+
+msgid "Choose encoding:"
+msgstr "Choisir un encodage :"
+
+msgid "Import OSM from Extent"
+msgstr "Import de données OSM pour une étendue"
+
+msgid "Wait loading datasources from datastore ..."
+msgstr "Merci de patienter le temps de charger les sources de données de cet espace de stockage ..."
+
+#: ..\wwwroot\mm\templates\Georeferencer.tmpl:121
+msgid "Image"
+msgstr "Image"
+
+#: ..\wwwroot\mm\templates\Georeferencer.tmpl:128
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:53
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:80
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:120
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:134
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:184
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:197
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:219
+msgid "Map"
+msgstr "Carte"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:19
+msgid "Data Layers"
+msgstr "Couches de données"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:35
+#: ..\wwwroot\mm\templates\preview\layerswitcher.tmpl:26
+#: ..\wwwroot\mm\templates\preview\leftcol.tmpl:63
+msgid "Zoom to"
+msgstr "Zoom sur"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:36
+#: ..\wwwroot\mm\templates\preview\layerswitcher.tmpl:27
+#: ..\wwwroot\mm\templates\preview\leftcol.tmpl:64
+msgid "Table"
+msgstr "Table"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:38
+msgid "Style"
+msgstr "Style"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:39
+msgid "Properties"
+msgstr "Propriétés"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:42
+msgid "Header"
+msgstr "Entête"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:43
+msgid "Content"
+msgstr "Contenu"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:44
+msgid "Footer"
+msgstr "Pied de page"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:47
+msgid "Scales"
+msgstr "Echelle"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:49
+msgid "Min"
+msgstr "Min"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:50
+msgid "Max"
+msgstr "Max"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:51
+msgid "Label Min"
+msgstr "Etiquette min"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:52
+msgid "Label Max"
+msgstr "Etiquette max"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:56
+#: ..\wwwroot\mm\templates\Manager.tmpl:71
+msgid "Move"
+msgstr "Déplacer"
+
+msgid "Add Layer"
+msgstr "Ajouter une couche"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:62
+msgid "Add grid"
+msgstr "Ajouter une grille"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:63
+msgid "Add dir."
+msgstr "Ajouter un répertoire."
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:64
+msgid "Set layer order"
+msgstr "Définir l'ordre des couches"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:66
+msgid "Set Master Fly"
+msgstr "Définir le Fly mère"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:144
+msgid "Select Map:"
+msgstr "Selectionner une carte :"
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:154
+msgid "Group name:"
+msgstr "Nom du groupe : "
+
+#: ..\wwwroot\mm\templates\Manager.tmpl:158
+msgid "Ok"
+msgstr "Ok"
+
+#: ..\wwwroot\mm\templates\ProjectsList.tmpl:33
+msgid "Last modified on:"
+msgstr "Dernière modification le :"
+
+msgid "Published on "
+msgstr "Publié le "
+
+msgid " by Admin"
+msgstr " par Admin"
+
+#: ..\wwwroot\mm\templates\Skeleton.tmpl:88
+msgid "Themes"
+msgstr "Thèmes"
+
+#: ..\wwwroot\mm\templates\Skeleton.tmpl:98
+msgid "Preferences"
+msgstr "Préférences"
+
+#: ..\wwwroot\mm\templates\Skeleton.tmpl:99
+msgid "User-guide"
+msgstr "Guide utilisateur"
+
+#: ..\wwwroot\mm\templates\Skeleton.tmpl:100
+msgid "Log out"
+msgstr "Se déconnecter"
+
+#: ..\wwwroot\mm\templates\Skeleton.tmpl:120
+msgid "About MapMint"
+msgstr "A propos de MapMint"
+
+#: ..\wwwroot\mm\templates\Skeleton.tmpl:121
+msgid "Terms of use"
+msgstr "Règles d'utilisation"
+
+#: ..\wwwroot\mm\templates\Distiller\Projection.tmpl:2
+msgid "Projection System:"
+msgstr "Système de Projections :"
+
+#: ..\wwwroot\mm\templates\Distiller\removeDs.tmpl:4
+msgid "Please, confirm that you want to remove the following DataSource."
+msgstr "Merci de confirmer que vous voulez supprimer la source de données suivante :"
+
+#: ..\wwwroot\mm\templates\Distiller\SetGeometryType.tmpl:4
+msgid "Geometry Type:"
+msgstr "Type de Géométrie :"
+
+#: ..\wwwroot\mm\templates\Distiller\TileWindow.tmpl:4
+msgid "TileIndex name:"
+msgstr "Nom de l'index de tuiles :"
+
+#: ..\wwwroot\mm\templates\Distiller\TileWindow.tmpl:14
+msgid "Targeted DataStore:"
+msgstr "Stockage cible :"
+
+#: ..\wwwroot\mm\templates\Distiller\TileWindow.tmpl:16
+msgid "Choose"
+msgstr "Choisissez"
+
+#: ..\wwwroot\mm\templates\Distiller\TileWindow.tmpl:25
+msgid "Directories list:"
+msgstr "Liste des répertoires :"
+
+#: ..\wwwroot\mm\templates\Distiller\TileWindow.tmpl:38
+msgid "Filename extension:"
+msgstr "Extension des fichiers :"
+
+#: ..\wwwroot\mm\templates\Distiller\VectorConverter.tmpl:4
+msgid "Source"
+msgstr "Source"
+
+#: ..\wwwroot\mm\templates\Distiller\VectorConverter.tmpl:18
+msgid "SRS:"
+msgstr "SRS"
+
+#: ..\wwwroot\mm\templates\Distiller\VectorConverter.tmpl:28
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:9
+msgid "Target"
+msgstr "Cible"
+
+#: ..\wwwroot\mm\templates\Distiller\VectorConverter.tmpl:35
+msgid "Datastore:"
+msgstr "Stockage :"
+
+#: ..\wwwroot\mm\templates\Distiller\VectorConverter.tmpl:48
+msgid "Datasource Name:"
+msgstr "Nom du stockage :"
+
+#: ..\wwwroot\mm\templates\Distiller\VectorConverter.tmpl:59
+msgid "Format:"
+msgstr "Format :"
+
+#: ..\wwwroot\mm\templates\Distiller\VectorConverter.tmpl:67
+msgid "Override:"
+msgstr "Ecraser :"
+
+#: ..\wwwroot\mm\templates\Distiller\VectorConverter.tmpl:68
+msgid "Append:"
+msgstr "Ajouter au fichier :"
+
+#: ..\wwwroot\mm\templates\Distiller\VectorConverter.tmpl:72
+msgid "SQL"
+msgstr "SQL"
+
+#: ..\wwwroot\mm\templates\Manager\ImportOSMWindow.tmpl:5
+msgid "Choose type:"
+msgstr "Choisissez un type :"
+
+#: ..\wwwroot\mm\templates\Manager\ImportOSMWindow.tmpl:8
+msgid "Point"
+msgstr "Point"
+
+#: ..\wwwroot\mm\templates\Manager\ImportOSMWindow.tmpl:9
+msgid "Line"
+msgstr "Ligne"
+
+#: ..\wwwroot\mm\templates\Manager\ImportOSMWindow.tmpl:14
+msgid "Select a DataStore:"
+msgstr "Selectionner un stockage :"
+
+#: ..\wwwroot\mm\templates\Manager\ImportOSMWindow.tmpl:36
+msgid "Select a file name:"
+msgstr "Selectionner un nom de fichier :"
+
+#: ..\wwwroot\mm\templates\Manager\ImportOSMWindow.tmpl:44
+msgid "Data under"
+msgstr "Données sous licence "
+
+#: ..\wwwroot\mm\templates\Manager\LayerProperties.tmpl:16
+msgid "TE Fly URL:"
+msgstr "URL du fly TE :"
+
+#: ..\wwwroot\mm\templates\Manager\LayerProperties.tmpl:25
+msgid "Title:"
+msgstr "Titre"
+
+#: ..\wwwroot\mm\templates\Manager\LayerProperties.tmpl:33
+msgid "Abstract:"
+msgstr "Description :"
+
+#: ..\wwwroot\mm\templates\Manager\LayerProperties.tmpl:41
+msgid "Keywords:"
+msgstr "Mots clef :"
+
+#: ..\wwwroot\mm\templates\Manager\LayerProperties.tmpl:49
+msgid "Fees:"
+msgstr "Fees :"
+
+#: ..\wwwroot\mm\templates\Manager\LayerProperties.tmpl:57
+msgid "Query:"
+msgstr "Requête :"
+
+#: ..\wwwroot\mm\templates\Manager\LayerProperties.tmpl:65
+msgid "Export:"
+msgstr "Export :"
+
+#: ..\wwwroot\mm\templates\Manager\LayerProperties.tmpl:73
+msgid "Search:"
+msgstr "Recherche :"
+
+#: ..\wwwroot\mm\templates\Manager\LayerProperties.tmpl:84
+msgid "Spatial Query:"
+msgstr "Requêtes spatiales :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:7
+msgid "Symbology"
+msgstr "Symbologie"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:8
+msgid "Labels"
+msgstr "Etiquettes"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:11
+msgid "Grid"
+msgstr "Grille"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:20
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:359
+msgid "Opacity:"
+msgstr "Opacité"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:26
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:363
+msgid "Legend Type:"
+msgstr "Type de légende :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:31
+msgid "Unique Symbol"
+msgstr "Symbole unique"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:32
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:384
+msgid "Graduated Symbol"
+msgstr "Symboles gradués"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:33
+msgid "Continuous Color"
+msgstr "Couleur continue"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:34
+msgid "Unique Value"
+msgstr "Valeur unique"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:55
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:150
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:398
+msgid "Min / Max color:"
+msgstr "Couleur Min / Max"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:62
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:106
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:157
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:405
+msgid "Classification:"
+msgstr "Classification :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:67
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:110
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:161
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:231
+msgid "Select field"
+msgstr "Selectionner un champ"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:85
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:419
+msgid "Classes:"
+msgstr "Classe :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:88
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:167
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:422
+msgid "Classify"
+msgstr "Classer"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:115
+msgid "Min value:"
+msgstr "Valeur min :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:121
+msgid "Max value:"
+msgstr "Valeur max:"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:127
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:147
+msgid "Width:"
+msgstr "Largeur :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:133
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:161
+msgid "Legend:"
+msgstr "Légende :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:141
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:210
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:335
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:448
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:168
+msgid "Apply"
+msgstr "Appliquer"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:190
+msgid "Label Format:"
+msgstr "Format des étquettes"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:219
+msgid "Show labels"
+msgstr "Afficher les étiquettes"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:227
+msgid "Labeling field:"
+msgstr "Champ d'étiquette :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:238
+msgid "Orientation:"
+msgstr "Orientation :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:243
+msgid "Clean size"
+msgstr "Zone de nétoyage"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:253
+msgid "Font:"
+msgstr "Font :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:287
+msgid "Buffered label:"
+msgstr "Cache autour de l'étiquette :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:294
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:63
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:101
+msgid "Size:"
+msgstr "Taille :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:308
+msgid "Position:"
+msgstr "Position :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:349
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:442
+msgid "Resampling method:"
+msgstr "Méthode de resampling :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:379
+#: ..\wwwroot\mm\templates\Manager\Styler\ClassLegend.tmpl:17
+msgid "Colors"
+msgstr "Couleurs"
+
+#: ..\wwwroot\mm\templates\Manager\Styler.tmpl:381
+msgid "GreyScale"
+msgstr "Noir et blanc"
+
+#: ..\wwwroot\mm\templates\Manager\TemplateEditor.tmpl:16
+msgid "Choose case:"
+msgstr "Choisisser un cas :"
+
+#: ..\wwwroot\mm\templates\Manager\TemplateEditor.tmpl:18
+msgid "Default"
+msgstr "Défaut"
+
+#: ..\wwwroot\mm\templates\Manager\TemplateEditor.tmpl:19
+msgid "Click"
+msgstr "Click"
+
+#: ..\wwwroot\mm\templates\Manager\TemplateEditor.tmpl:24
+msgid "Available fields:"
+msgstr "Champs disponibles :"
+
+#: ..\wwwroot\mm\templates\Distiller\wfs\display.tmpl:10
+msgid "URL:"
+msgstr "Lien URL :"
+
+#: ..\wwwroot\mm\templates\preview\default_header.tmpl:15
+msgid "Powered by MapMint"
+msgstr "Propulsé par MapMint"
+
+#: ..\wwwroot\mm\templates\preview\fullscreen.tmpl:54
+#: ..\wwwroot\mm\templates\preview\largemap.tmpl:55
+#: ..\wwwroot\mm\templates\preview\leftcol.tmpl:37
+#: ..\wwwroot\mm\templates\preview\nudemap.tmpl:41
+#: ..\wwwroot\mm\templates\preview\rightcol.tmpl:33
+msgid "Powered by"
+msgstr "Propulsé par"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:23
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:70
+msgid "Toolbar"
+msgstr "Barre d'outils"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:25
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:54
+msgid "Layers"
+msgstr "Couches"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:81
+#: ..\wwwroot\mm\templates\preview\modules\routing\ddview.html:11
+#: ..\wwwroot\mm\templates\preview\modules\routing\ddview.html:26
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:11
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:27
+msgid "Search"
+msgstr "Rechercher"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:88
+msgid "Layer:"
+msgstr "Couche :"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:118
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:132
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:144
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:165
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:178
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:195
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:217
+msgid "Back"
+msgstr "Retour"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:146
+msgid "View"
+msgstr "Voir"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:158
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:208
+msgid "Prev."
+msgstr "Préc."
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:159
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:209
+msgid "Next"
+msgstr "Suiv."
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:166
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:30
+msgid "Download"
+msgstr "Télécharger"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:170
+msgid "You can download "
+msgstr "Vous pouvez télécharger"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:170
+msgid "the KML file"
+msgstr "le fichier au format KML"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:170
+msgid " (require Google Earth application)."
+msgstr " (requière l'application Google Earth)."
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:179
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:196
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:233
+msgid "Details"
+msgstr "Détails"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:182
+msgid "On Map"
+msgstr "Sur la carte"
+
+#: ..\wwwroot\mm\templates\preview\mobile.tmpl:218
+msgid "Search an address"
+msgstr "Rechercher une adresse"
+
+#: ..\wwwroot\mm\templates\preview\SearchBox.tmpl:6
+msgid "Search layers:"
+msgstr "Recherche dans la couche :"
+
+#: ..\wwwroot\mm\templates\Georeferencer\LoadGCP.tmpl:3
+msgid "CSV File:"
+msgstr "Fichier CSV :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\ClassLegend.tmpl:14
+msgid "Legend"
+msgstr "Légende"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\ClassLegend.tmpl:16
+msgid "Name"
+msgstr "Nom"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\SymbolManager.tmpl:2
+msgid "Activated Symbols:"
+msgstr "Symbols activés :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\SymbolManager.tmpl:5
+msgid "Symbol to Add:"
+msgstr "Symbol à ajouter :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\SymbolManager.tmpl:7
+msgid "Select a font"
+msgstr "Selectionner un fichier de font"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:44
+msgid "Symbol:"
+msgstr "Symbol :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:69
+msgid "Fill:"
+msgstr "Remplissage :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:88
+msgid "Symbol Fill:"
+msgstr "Remplissage avec un Symbol :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:95
+msgid "Hatch Fill:"
+msgstr "Remplissage hachuré :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:98
+msgid "Angle:"
+msgstr "Angle :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:104
+msgid "Dash Width:"
+msgstr "Epaisseur du trait"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:112
+msgid "Pattern:"
+msgstr "Model :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:123
+msgid "Outline Width:"
+msgstr "Largeur de bordure :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:132
+msgid "Stroke:"
+msgstr "Bordure :"
+
+#: ..\wwwroot\mm\templates\Manager\Styler\UniqSymb.tmpl:154
+msgid "Gap:"
+msgstr "Saut :"
+
+#: ..\wwwroot\mm\templates\Publisher\confirmRemove.tmpl:4
+msgid "Do you really want to remove"
+msgstr "Voulez-vous vraiment supprimer"
+
+#: ..\wwwroot\mm\templates\Publisher\confirmRemove.tmpl:5
+msgid ""
+"Once removed, you cannot access the project anymore. You cannot recover a "
+"removed project. Deleting a project may destroy important data and make "
+"other projects unstable."
+msgstr ""
+"Une fois supprimé, vous ne pourrez plus accéder au projet. Vous ne pourrez "
+"pas récupérer le projet supprimé. Supprimer un projet peut supprimer des "
+"données importantes et rendre d'autre projets instable.x"
+
+#: ..\wwwroot\mm\templates\Publisher\confirmRemove.tmpl:6
+msgid "Yes"
+msgstr "Oui"
+
+#: ..\wwwroot\mm\templates\Publisher\confirmRemove.tmpl:7
+msgid "No"
+msgstr "Non"
+
+#: ..\wwwroot\mm\templates\preview\modules\routing\ddview.html:12
+msgid "On the map"
+msgstr "Sur lacarte"
+
+#: ..\wwwroot\mm\templates\preview\modules\routing\ddview.html:13
+msgid "Use my position"
+msgstr "Utiliser ma position"
+
+#: ..\wwwroot\mm\templates\preview\modules\routing\ddview.html:21
+msgid "Distance:"
+msgstr "Distance :"
+
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:9
+msgid "Start"
+msgstr "Départ"
+
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:12
+msgid "On map"
+msgstr "Sur la carte"
+
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:13
+msgid "Use my geolocation"
+msgstr "Utiliser ma position"
+
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:20
+msgid "Step"
+msgstr "Etape"
+
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:23
+msgid "Delete"
+msgstr "Supprimer"
+
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:28
+msgid "Informations"
+msgstr "Information"
+
+#: ..\wwwroot\mm\templates\preview\modules\routing\view.html:29
+msgid "Profile"
+msgstr "Elévation"
+
+msgid "Last published maps"
+msgstr "Dernière cartes publiées"
+
+msgid "Latest maps"
+msgstr "Dernière cartes"
+
+msgid "Latest news from "
+msgstr "Dernière nouvelles de "
+
+msgid "Published maps"
+msgstr "Cartes publiées"
+
+msgid "All themes"
+msgstr "Tout les thèmes"
+
+msgid "Home"
+msgstr "Accueil"
+
+msgid "News"
+msgstr "Informations"
+
+msgid "Links"
+msgstr "Liens"
+
+msgid "All maps"
+msgstr "Toutes les cartes"
+
+msgid "Disk usage"
+msgstr "Espace disque"
+
+msgid "Mosaic a set of images"
+msgstr "Créer une mozaïque d'images"
+
+msgid "New file name:"
+msgstr "Nouveau nom de fichier :"
+
+msgid "Available documents"
+msgstr "Documents disponibles"
+
+msgid "Enter few letters"
+msgstr "Entrez quelque lettres"
+
+msgid "Welcome"
+msgstr "Bienvenu"
+
+msgid "This mode outputs an 8-bit raster with a nice shaded relief effect. It's very useful for visualizing the terrain. You can optionally specify the azimuth and altitude of the light source, a vertical exaggeration factor and a scaling factor to account for differences between vertical and horizontal units."
+msgstr "Cette commande renvoie un raster de 8 bit avec un bel effet de relief ombragé. Cela est très utile pour visualiser le terrain. Vous pouvez en option définir l’azymuth et l’altitude la source de lumière, un facteur d’exagération vertical et un facteur d’échelle à tenir compte pour les différences entre les unités verticales et horizontales."
+
+msgid "Vertical exaggeration used to pre-multiply the elevations"
+msgstr "Exagération verticale utilisée pour multiplier les élévations"
+
+msgid "Azimuth of the light, in degrees. 0 if it comes from the top of the raster, 90 from the east, ... The default value, 315, should rarely be changed as it is the value generally used to generate shaded maps."
+msgstr "azymuth de la lumière, en degrés. 0 si elle arrive d’en haut du raster, 90 de l’est, ... La valeur par défaut, 315, devrait rarement être changée puisque c’est la valeur généralement utilisé pour générer des cartes de relief."
+
+msgid "Altitude of the light, in degrees. 90 if the light comes from above the DEM, 0 if it is raking light. "
+msgstr "Altitude de la lumière, en degrés. 90 si la lumière arrive au dessus du MNT. 0 si c’est une lumière rasante."
+
+msgid "Ratio of vertical units to horizontal. If the horizontal unit of the source DEM is degrees (e.g Lat/Long WGS84 projection), you can use scale=111120 if the vertical units are meters (or scale=370400 if they are in feet)"
+msgstr "Rapport des unités verticales et horizontale. Si l’unité horizontale du MNT source est le degrés (par exemple la projection Lat/Long WGS84), vous pouvez utiliser scale=111120 si l’unité vertical sont les mètres (ou scale=370400 si elles sont en pied)."
+
+msgid "This mode will take a DEM raster and output a 32-bit float raster with slope values. You have the option of specifying the type of slope value you want: degrees or percent slope. In cases where the horizontal units differ from the vertical units, you can also supply a scaling factor."
+msgstr "Cette commande utilise un raster MNT et renvoie un raster en float 32 bit avec des valeurs de pente. Vous avez la possibilité de définir le type de pente que vous voulez : degrés ou pourcentage. Dans le cas où les unités horizontales diffèrent des unités verticales vous pouvez également fournie un facteur d’échelle."
+
+msgid "This command outputs a 32-bit float raster with values between 0° and 360° representing the azimuth that slopes are facing. The definition of the azimuth is such that : 0° means that the slope is facing the North, 90° it's facing the East, 180° it's facing the South and 270° it's facing the West (provided that the top of your input raster is north oriented). The aspect value -9999 is used as the nodata value to indicate undefined aspect in flat areas with slope=0."
+msgstr "Cette commande renvoie un raster float 32 bit avec des valeurs entre 0° et 360° représentant l’azymuth dont les pentes font face. La définition de l’azymuth est : 0° signifie que la pente est face au Nord, 90° face à l’Est, 180° face au sud et 270° face à l’Ouest (en supposant que le haut du raster en entrée est orienté au Nord). La valeur -9999 de l’aspect est utilisé comme valeur nodata pour indiquer un aspect indéfinie dans les zones plates avec la pente = 0."
+
+msgid "Terrain Ruggedness Index, which is defined as the mean difference between a central pixel and its surrounding cells (see Wilson et al 2007, Marine Geodesy 30:3-35)."
+msgstr "Cette commande renvoie un raster à une seule bande avec des valeurs calculées à partir de l’élévation. TRI signifie Terrain Ruggedness Index, qui est définie comme la différence moyenne entre un pixel central et ses cellules l’entourant (voir Wilson et al 2007, Marine Geodesy 30:3-35)."
+
+msgid "Topographic Position Index, which is defined as the difference between a central pixel and the mean of its surrounding cells (see Wilson et al 2007, Marine Geodesy 30:3-35)."
+msgstr "Cette commande renvoie un raste à une seule bande avec des valeurs calculées à partir de l’élévation. TPI signifie Topographic Position Index, qui est définie comme la différence entre un pixel central et la moyenne des cellules l’entourant (voir Wilson et al 2007, Marine Geodesy 30:3-35)."
+
+msgid "Roughness is the largest inter-cell difference of a central pixel and its surrounding cell, as defined in Wilson et al (2007, Marine Geodesy 30:3-35)."
+msgstr "Cette commande renvoie un raster à une seule bande calculé à partir de l’élévation. La rugosité est la plus grande différence inter-cellule d’un pixel central et ses cellules l’entourant, comme définie dans Wilson et al (2007, Marine Geodesy 30:3-35)."
+
+msgid "Data Source:"
+msgstr "Source de données :"
+
+msgid "Filename"
+msgstr "Nom de fichier"
+
+msgid "Method:"
+msgstr "Méthode :"
+
+msgid "Band:"
+msgstr "Bande :"
+
+msgid "Scale"
+msgstr "Echelle"
+
+msgid "This command builds vector contour lines from a raster elevation model"
+msgstr "Construit un fichier vecteur contenant les courbes de niveaux créées à partir d’un modèle d’élévation raster."
+
+msgid "Elevation interval between contours"
+msgstr "Intervalle des élévations entre les contours."
+
+msgid "Name for the attribute in which to put the elevation. If not provided no elevation attribute is attached."
+msgstr "Nom pour l’attribut dans lequel placer l’élévation. S’il n’est pas fourni, aucun attribut d’élévation n’est attaché."
+
+msgid "Load"
+msgstr "Charger"
+
+msgid "Ground Control Points"
+msgstr "Points d'appui"
+
+msgid "Load GCPs"
+msgstr "Chargement de point d'appui"
+
+msgid "Replace existing files:"
+msgstr "Remplacer les fichiers existants:"
+
+msgid "Filename:"
+msgstr "Nom de fichier :"
+
+msgid "Save GCPs"
+msgstr "Sauvegarde des points d'appui"
+
+msgid "GCP Editor"
+msgstr "Edition de point d'appui"
+
+msgid "Terrain Tools"
+msgstr "Outils de traitement terrain"
+
+msgid "Destination file"
+msgstr "Fichier créé"
+
+msgid "Current table is"
+msgstr "La table actuelle est "
+
+msgid "Please, fill the fields you would like to use to search on this layer"
+msgstr "Merci de choisir les champs que vous souhaitez mettre à disposition dans le moteur de recherche"
+
+msgid "In the first array you can use any table from the database as definition of a dynamic legend"
+msgstr "Dans le prmier tableau vous pouvez utilisez n'importe quelle table de votre base de données qui sera utilisée pour générer dynamiquement une légende."
+
+msgid "The table name defining the legend to use dynamically"
+msgstr "Le nom de la table définissant la légende utilisée dynamiquement"
+
+msgid "A link should exists between one entity of the actual datasource and the legend table"
+msgstr "Un lien doit exister entre une entitée de la source de données actuelle et une de la table légende"
+
+msgid "Link column"
+msgstr "Colone de lien"
+
+msgid "The column name containing the hexa code used to defin the internal color"
+msgstr "Le nom de la colonne contenant le code héxadécimal à utiliser comme couleur intérieure."
+
+msgid "Define min and max value"
+msgstr "Valeur minimum et maximum de la colonne valuée"
+
+msgid "Values"
+msgstr "Valeurs"
+
+msgid "First choose a schema"
+msgstr "Choisissez d'abord un schéma"
+
+msgid "First choose a table"
+msgstr "Choisissez d'abord une table"
+
+msgid "Color"
+msgstr "Couleur"
+
+msgid "Complexe Search:"
+msgstr "Recherche complexe :"
+
+msgid "Settings"
+msgstr "Parmètres"
+
+msgid "You can define yourself the session variables specified for each field in the search engine, or ask the application to automatically fill it by selecting this option"
+msgstr "Vous pouvez remplir vous même les variables de sessions spécifiées pour chaque champ du moteur de recherche, ou demander à l'application de les remplir automatiquement en sélectionnant cette option."
+
+msgid "Select the table (view) that you want to use for filling the session variables."
+msgstr "Sélectionnez la table/vue que vous souhaitez utiliser pour remplir les variables de session."
+
+msgid "Subsciption table"
+msgstr "Table abonnements"
+
+msgid "Select the name of the field from the table (view) and the name of the session variable storing the value to use for filtering the results list."
+msgstr "Sélectionnez le nom de la colonne de la table/vue et le nom de la variable de session stockant la valeur à utiliser pour filtrer la liste de résultats."
+
+msgid "Field"
+msgstr "Champ"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Label"
+msgstr "Libellé"
+
+msgid "Identifier"
+msgstr "Identifiant"
+
+msgid "Filter"
+msgstr "Filtre"
+
+msgid "Order"
+msgstr "Ordre"
+
+msgid "The field used to classify re result set."
+msgstr "La colonne utilisée pour classifier les éléments de la table."
+
+msgid "Filtering:"
+msgstr "Filtrage:"
+
+msgid "Filtered Zoom:"
+msgstr "Filtrage et Zoom:"
+
+msgid "Fees: "
+msgstr "Propriétés : "
+
+msgid "Save Label"
+msgstr "Sauver les libellés"
+
+msgid "Save Get Feature Info"
+msgstr "Sauver la configuration de la table"
+
+msgid "Save Export"
+msgstr "Sauver la configuration de l'export"
+
+msgid "Name of the selected theme"
+msgstr "Nom du thème sélectionné"
+
+msgid "Name of the selected document"
+msgstr "Nom du document sélectionné"
+
+msgid "Groups:"
+msgstr "Groupes d'utilisateurs "
+
+msgid "File:"
+msgstr "Fichier :"
+
+msgid "Project Name:"
+msgstr "Nom du projet :"
+
+msgid "Project Title:"
+msgstr "Titre du projet :"
+
+msgid "Access privileges:"
+msgstr "Droits d'accès :"
+
+msgid "Classify in theme:"
+msgstr "Classification par thème:"
+
+msgid "Project URL:"
+msgstr "URL du projet :"
+
+msgid "Creation Date:"
+msgstr "Date de création :"
+
+msgid "Search: "
+msgstr "Rechercher : "
+
+msgid "Publish Map Preview"
+msgstr "Publier la vignette du projet"
+
+msgid "Layout"
+msgstr "Gâbarit"
+
+msgid "General"
+msgstr "Général"
+
+msgid "Author:"
+msgstr "Auteur :"
+
+msgid "Text settings:"
+msgstr "Paramètres du texte :"
+
+msgid "Select template:"
+msgstr "Selectionnez un gâbarit"
+
+msgid "Select a logo image:"
+msgstr "Selectionnez une image pour logo "
+
+msgid "Base Layers"
+msgstr "Couches de base"
+
+msgid "Created layers:"
+msgstr "Couches existantes"
+
+msgid "Proprietary:"
+msgstr "Propriétaire :"
+
+msgid "Default:"
+msgstr "Défaut :"
+
+msgid "Controls"
+msgstr "Outils"
+
+msgid "Other Tools"
+msgstr "Autres outils"
+
+msgid "Toolbars"
+msgstr "Barres d'outils"
+
+msgid "Vector"
+msgstr "Vecteur"
+
+msgid "Overview Map"
+msgstr "Vue d'ensemble"
+
+msgid "Overview Map (Fixed)"
+msgstr "Vue d'ensemble (étendue fixe)"
+
+msgid "Pan and Zoom"
+msgstr "Déplacement et Zoom"
+
+msgid "Scale Bar"
+msgstr "Barre d'échelle"
+
+msgid "None"
+msgstr "Aucun"
+
+msgid "Mouse position"
+msgstr "Position de la souris"
+
+msgid "Add WMS Layer"
+msgstr "Ajouter une couche WMS"
+
+msgid "First"
+msgstr "Premier"
+
+msgid "Last"
+msgstr "Dernier"
+
+msgid "Key Words:" 
+msgstr "Mots clés :"
+
+msgid "Simplify"
+msgstr "Simplifier"
+
+msgid "Run convertion"
+msgstr "Lancer la conversion"
+
+msgid "Minimize/Maximize Table"
+msgstr "Fermer/Afficher la table de données"
+
+msgid "Z-Factor"
+msgstr "Facteur-Z"
+
+msgid "Azimuth / Altitude parameters:"
+msgstr "Paramètres Azimuth / Altitude :"
+
+msgid "Run"
+msgstr "Lancer"
+
+msgid "Elevation Profile"
+msgstr "Profile d'élévation"
+
+msgid "Elevation profile"
+msgstr "Profile d'élévation"
+
+msgid "Search layers"
+msgstr "Recherche par couche"
+
+msgid "Layer Tree"
+msgstr "Arbre de couches"
+
+msgid "A4 landscape"
+msgstr "A4 paysage"
+
+msgid "A4"
+msgstr "A4"
+
+msgid "Select template"
+msgstr "Selectionnez une présentation"
+
+msgid "Overlay Layers"
+msgstr "Couches superposées"
+
+msgid "Layer Name"
+msgstr "Nom de la couche"
+
+msgid "Popup"
+msgstr "Bulle"
+
+msgid "Window"
+msgstr "Fenêtre"
+
+msgid "Activated"
+msgstr "Activée"
+
+msgid "Min Zoom"
+msgstr "Zoom Min"
+
+msgid "Max Zoom"
+msgstr "Zoom Max"
+
+msgid "Extent"
+msgstr "Eténdue"
+
+msgid "Restricted"
+msgstr "Restriction"
+
+msgid "Display"
+msgstr "Affichage"
+
+msgid "Twitter sharing"
+msgstr "Partage Twitter"
+
+msgid "Class name: "
+msgstr "Nom de la classe : "
+
+msgid "Expression settings"
+msgstr "Paramètres de filtre" 
+
+msgid "Legend Type for this step:"
+msgstr "Type de légende pour cette étape :"
+
+msgid "Steps:"
+msgstr "Etapes :"
+
+msgid "Select one step"
+msgstr "Selectionnez une étape"
+
+msgid "Add a step"
+msgstr "Ajouter une étape"
+
+msgid "Time line"
+msgstr "Série temporelle"
+
+msgid "Step name: "
+msgstr "Nom de l'étape"
+
+msgid "Add step in timeline"
+msgstr "Ajouter une étape dans la série"
+
+msgid "Buffer color"
+msgstr "Couleur du tampon"
+
+msgid "WMS Servers"
+msgstr "Serveurs WMS"
+
+msgid "Browse"
+msgstr "Naviguer"
+
+msgid "New"
+msgstr "Créer"
+
+msgid "Select theme:"
+msgstr "Selectionnez un thème :"
+
+msgid "Renderer Method:"
+msgstr "Méthode de rendu :"
+
+msgid "Unit Of Measure:"
+msgstr "Unités de mesures :"
+
+msgid "Meter"
+msgstr "Mètres"
+
+msgid "Foot"
+msgstr "Pieds"
+
+msgid "Deegree"
+msgstr "Degrés"
+
+msgid "Projection Systems"
+msgstr "Systèmes de projection"
+
+msgid "SRS Manager"
+msgstr "Gestionaire de SRS"
+
+msgid "Large Map"
+msgstr "Pleine largeur"
+
+msgid "Full Screen"
+msgstr "Plein écran"
+
+msgid "Left Column"
+msgstr "Colonne à gauche"
+
+msgid "Right Column"
+msgstr "Colonne à droite"
+
+msgid "Nude"
+msgstr "Nue"
+
+msgid "Font-family"
+msgstr "Famille de police"
+
+msgid "Font-size"
+msgstr "Taille de police"
+
+msgid "Font-color"
+msgstr "Couleur	 de police"
+
+msgid "Lost password"
+msgstr "Mot de passe perdu"
+
+msgid "Ask for a new password"
+msgstr "Demander un nouveau mot de passe"
+
+msgid "Please, fill in the following your login or your email address:"
+msgstr "Merci de saisir ci-dessous votre identifiant ou votre adresse mail :"
+
+msgid "Add WMS Server"
+msgstr "Ajouter un serveur WMS"
+
+msgid "Add a WMS Server"
+msgstr "Ajouter un serveur WMS"
+
+msgid "Add a WFS Server"
+msgstr "Ajouter un serveur WFS"
+
+msgid "Select a DataSource:"
+msgstr "Choisissez une source de données :"
+
+msgid "OSM Importer"
+msgstr "Import de données OSM"
+
+msgid "Colored Base Layer"
+msgstr "Couche de base colorée"
+
+msgid "Select a theme"
+msgstr "Choisissez un thème"
+
+msgid "Themes:"
+msgstr "Thèmes :"
+
+msgid "Color:"
+msgstr "Couleur :"
+
+msgid "Not found"
+msgstr "Non trouvé"
+
+msgid "Add a document"
+msgstr "Ajouter un document"
+
+msgid "Delete a document"
+msgstr "Supprimer un document"
+
+msgid "Add a theme"
+msgstr "Ajouter un thème"
+
+msgid "Delete a theme"
+msgstr "Supprimer un thème"
+

@@ -1,0 +1,55 @@
+[convert]
+ Title = Convert
+ Abstract = Convert ODT file.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [oDoc]
+   Title = Input string
+   Abstract = The name of the map to extract values from.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [tDoc]
+   Title = Input string
+   Abstract = The name of the layer to extract values from.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <ComplexData>
+    <Default>
+	mimeType=application/pdf
+	extension=pdf
+    </Default>
+    <Supported>
+	mimeType=text/html
+	extension=html
+    </Supported>
+    <Supported>
+	mimeType=application/vnd.oasis.opendocument.text
+	extension=odt
+    </Supported>
+    <Supported>
+	mimeType=application/vnd.msword
+	extension=doc
+    </Supported>
+    <Supported>
+	mimeType=application/rtf
+	extension=rtf
+    </Supported>
+   </ComplexData>
+ </DataOutputs>

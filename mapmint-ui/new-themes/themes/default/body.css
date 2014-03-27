@@ -1,0 +1,9 @@
+body{font-family:Arial,Lucida Grande, Trebuchet MS;font-size:1em;}
+a { outline: none;}
+a.help-link{color:#707070;text-decoration:none;}
+.log-out{width:350px;height:auto;}
+#logout-message p{margin:0;padding:0 0 0 0;}
+p.credits{float:left;margin:12px 0 0 10px;color:#E9E9E9;font-size:.8em;}
+p.credits a{text-decoration:none;color:#E9E9E9;}
+#map{width:100%;height:92%;}
+textarea.bigtarea{width: 540px;height: 230px;}

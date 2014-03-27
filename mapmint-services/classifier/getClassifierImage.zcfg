@@ -1,0 +1,53 @@
+[getClassifierImage]
+ Title = Get the classifier image. 
+ Abstract = Compute color gradient between two given values.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [from]
+   Title = The color in hexa to start with
+   Abstract = The color in hexa to start with for gradient calculation.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+     dataType = string
+    <Default>
+      value = 808000
+    </Default>
+   </LiteralData>
+  [to]
+   Title = The color in hexa to end with
+   Abstract = The color in hexa to end the gradient calculation.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+     dataType = string
+    <Default>
+      value = 808080
+    </Default>
+   </LiteralData>
+  [nbClass]
+   Title = The number of color
+   Abstract = The number of color to use in the gradient.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+     dataType = string
+    <Default>
+      value = 15
+    </Default>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The Gradient image
+   Abstract = A PNG image containing the color gradient
+   <ComplexData>
+    <Default>
+     mimeType = image/png
+    </Default>
+   </ComplexData>
+ </DataOutputs>  

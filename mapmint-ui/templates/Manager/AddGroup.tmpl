@@ -1,0 +1,25 @@
+#import zoo
+<form>
+<table>
+<tr>
+<td>
+$zoo._("Group name:")
+</td>
+<td>
+<input type="text" name="addGroupName" id="addGroupName" value="" />
+</td>
+</tr>
+<tr>
+<td>
+$zoo._("Parent:")
+</td>
+<td>
+<select id="addGroupInherit">
+#for i in range(0,len($groups))
+     <option value="$groups[i]["id"]">$groups[i]["value"]</option>
+#end for
+</select>
+</td>
+</tr>
+</table>
+</form>

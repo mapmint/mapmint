@@ -1,0 +1,97 @@
+[BufferPy]
+ Title = Create a buffer around a polygon. 
+ Abstract = Create a buffer around a single polygon. Accepts the polygon as GML and provides GML output for the buffered feature. 
+ Profile = urn:ogc:wps:1.0.0:buffer
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = vector-tools.service
+ serviceType = Python
+ <MetaData>
+   title = Demo
+ </MetaData>
+ <DataInputs>
+  [InputPolygon]
+   Title = Polygon to be buffered
+   Abstract = URI to a set of GML that describes the polygon.
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = Mon test  
+   </MetaData>   
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+    </Default>
+    <Supported>
+     mimeType = application/json
+     encoding = UTF-8
+    </Supported>
+   </ComplexData>
+  [BufferDistance]
+   Title = Buffer Distance
+   Abstract = Distance to be used to calculate buffer.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = float
+    <Default>
+     uom = meters
+     value = 0.015
+    </Default>
+    <Supported>
+     uom = feet
+    </Supported>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = Buffered Polygon
+   Abstract = GML stream describing the buffered polygon feature.
+   <MetaData>
+    title = Mon test  
+   </MetaData>   
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     schema = http://schemas.opengis.net/kml/2.2.0/ogckml22.xsd
+     useMapserver = true
+     msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 3 END
+    </Default>
+    <Supported>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+     useMapserver = true
+    </Supported>
+    <Supported>
+     mimeType = application/json
+     encoding = UTF-8
+    </Supported>
+    <Supported>
+     mimeType = application/vnd.google-earth.kml
+     encoding = UTF-8
+     extension = kml
+    </Supported>
+    <Supported>
+     mimeType = image/png
+     useMapserver = true
+     asReference = true
+     msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 3 END
+    </Supported>
+    <Supported>
+     mimeType = image/tif
+     useMapserver = true
+     asReference = true
+     msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 3 END
+    </Supported>
+    <Supported>
+     mimeType = application/vnd.google-earth.kmz
+     useMapserver = true
+     asReference = true
+     msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 3 END
+    </Supported>
+   </ComplexData>
+ </DataOutputs>  

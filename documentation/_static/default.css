@@ -1,0 +1,499 @@
+/*
+ * default.css_t
+ * ~~~~~~~~~~~~~
+ *
+ * Sphinx stylesheet -- default theme.
+ *
+ * :copyright: Copyright 2007-2011 by the Sphinx team, see AUTHORS.
+ * :license: BSD, see LICENSE for details.
+ *
+ */
+
+@import url("basic.css");
+
+/* -- page layout ----------------------------------------------------------- */
+
+body {
+    font-family: "Helvetica Neue",Verdana, Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    background-color: #ffffff;
+    color: #000;
+    margin: 0;
+    padding: 0;
+}
+
+div.document {
+    background-color: white;
+    width:100%;
+    max-width:1170px;
+    margin:0 auto;
+}
+
+div.documentwrapper {
+    float: left;
+    width: 100%;
+}
+
+
+
+div.body {
+    background-color: #ffffff;
+    color: #333333;
+    padding: 0 20px 30px 20px;
+}
+div.bodywrapper {
+    margin: 0 30% 0 0;
+}
+
+div.related ul {
+    margin: 0 auto;
+    max-width: 1170px;
+    padding: 0 0 0 10px;
+    font-size:1.2em;
+}
+
+div.footer {
+    display:none;
+}
+
+div.footer a {
+    color: #646464;
+    text-decoration: underline;
+}
+
+div.related {
+    background-color: #83c849;
+    line-height: 40px;
+    color: #ffffff;
+}
+
+div.related a {
+    color: #ffffff;
+}
+
+div.sphinxsidebar {
+    float: right;
+    width:28%;
+    position:relative;
+    top:20px;
+    right:0;
+}
+
+
+
+/* -- Custom Sidebar styles ----------------------------------------------------------- */
+
+.categories{
+	background: #563404;
+        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ee920c', endColorstr='#ffcd0b'); /* for IE */
+        background:-webkit-gradient(linear, left top, left bottom, from(#ee920c), to(#ffcd0b)); /* for webkit browsers */
+        background:-moz-linear-gradient(top,  #ee920c,  #ffcd0b); /* for firefox 3.6+ */
+	font-size: 1.3em;
+	width: 98%;
+	margin-bottom: 1em;
+	border:0;
+	padding:1%;
+	text-shadow: 1px 1px 1px #E0E0E0;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+        border-radius: 5px;
+}
+
+.twitts, .donate {
+    -moz-border-radius: 5px 5px 5px 5px;
+    background: -moz-linear-gradient(center top , #FFFFFF, #FFCD0B) repeat scroll 0 0 transparent;
+    border: 0 none;
+    height: 180px;
+    margin-bottom: 1em;
+    padding: 1%;
+    width: 98%;
+}
+
+p.version{
+color:#FFFFFF;
+text-shadow: none;
+margin:0 0 10px 10px ;
+padding:0;
+}
+
+/* -- End Custom Sidebar styles ----------------------------------------------------------- */
+
+div.sphinxsidebar h3  {
+   	font-family: 'Helvetica Neue', Arial;
+	color:#83c849;
+	font-size:1.4em;
+	margin:0;padding:0;
+}
+
+
+
+div.sphinxsidebar h4 {
+    font-family: 'Verdana, Arial, Helvetica, sans-serif';
+    color: #663e05;
+    font-size: 1.3em;
+    font-weight: normal;
+    margin: 5px 0 0 0;
+    padding: 0;
+}
+
+div.sphinxsidebar p {
+    color: #333333;
+    display:none;
+}
+
+div.sphinxsidebar p.topless {
+    margin: 5px 10px 10px 10px;
+}
+
+div.sphinxsidebar ul {
+    margin: 10px;
+    padding: 0;
+    color: #ffffff;
+}
+
+div.sphinxsidebar ul li.current  a, div.sphinxsidebar ul ul.current li a {
+    	color:#83c849;
+}
+
+div.sphinxsidebar a {
+    color: #333333;
+}
+
+div.sphinxsidebar input {
+    border: 1px solid #ccc;
+    font-family: sans-serif;
+    font-size: 1em;
+    margin:0 0 20px 0;
+}
+
+
+
+/* -- hyperlink styles ------------------------------------------------------ */
+
+a {
+    color: #83c849;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #83c849;
+    text-decoration: none;
+}
+
+a:hover {
+	color:#707070;
+    text-decoration: underline;
+}
+
+
+
+/* -- body styles ----------------------------------------------------------- */
+
+div.body h1,
+div.body h2,
+div.body h3,
+div.body h4,
+div.body h5,
+div.body h6 {
+    font-family: 'Helvetica Neue', Verdana, Arial, Helvetica, sans-serif';
+    background-color: #ffffff;
+    font-weight: normal;
+    color: #83c849;
+    margin: 10px 0 0 -20px;
+    padding: 2px 0 2px 10px;
+}
+
+div.body h1 { margin-top: 20px; font-size:18px;font-weight:bold;color:#707070;line-height:27px;}
+div.body h2 { font-size: 120%; }
+div.body h3 { font-size: 100%; }
+div.body h4 { font-size: 90%; }
+div.body h5 { font-size: 80%; }
+div.body h6 { font-size: 70%; }
+
+a.headerlink {
+    color: #83c849;
+    font-size: 0.8em;
+    padding:5px;
+    margin:0 0 0 3px;
+    line-height:.9em;
+    text-decoration: none;
+}
+
+a.headerlink:hover {
+    background-color: #83c849;
+    color: white;
+}
+
+div.body p, div.body dd, div.body li {
+    text-align: justify;
+    line-height: 130%;
+}
+
+div.admonition p.admonition-title + p {
+    display: inline;
+}
+
+div.admonition p {
+    margin-bottom: 5px;
+}
+
+div.admonition pre {
+    margin-bottom: 5px;
+}
+
+div.admonition ul, div.admonition ol {
+    margin-bottom: 5px;
+}
+
+div.note {
+    background-color: #eee;
+    border: 1px solid #ccc;
+}
+
+div.seealso {
+    background-color: #ffc;
+    border: 1px solid #ff6;
+}
+
+div.topic {
+    background-color: #eee;
+}
+
+div.warning {
+    background-color: #ffe4e4;
+    border: 1px solid #f66;
+}
+
+p.admonition-title {
+    display: inline;
+}
+
+p.admonition-title:after {
+    content: ":";
+}
+
+pre {
+    padding: 5px;
+    background-color: #eeffcc;
+    color: #333333;
+    line-height: 120%;
+    border: 1px solid #ac9;
+    border-left: none;
+    border-right: none;
+}
+
+tt {
+    background-color: #ecf0f3;
+    padding: 0 1px 0 1px;
+    font-size: 0.95em;
+}
+
+th {
+    background-color: #ede;
+}
+
+.warning tt {
+    background: #efc2c2;
+}
+
+.note tt {
+    background: #d6d6d6;
+}
+
+.viewcode-back {
+    font-family: sans-serif;
+}
+
+div.viewcode-block:target {
+    background-color: #f4debf;
+    border-top: 1px solid #ac9;
+    border-bottom: 1px solid #ac9;
+}
+
+
+/*  Custom Header ---------------------------------------- */
+
+#wrapper { 
+ margin: 0;
+ padding: 0;
+ width: 100%;
+}
+
+#myheader {
+ color: #333;
+ width:100%;
+ max-width: 1170px;
+ height: 115px;
+ margin: 0 auto;
+ background: #FFFFFF;}
+
+.hleft{
+float:left;
+margin:0;
+width:380px;
+background:#FFFFFF}
+
+h1.title {
+font-family: "Helvetica Neue", Arial;
+color:#707070;
+text-decoration: none;
+font-size: 47px;
+margin:35px 0 0 0;
+padding:0;
+text-transform:none;
+min-width:300px;
+}
+
+h1.title span.logo{
+background:url(http://mapmint.com/assets/images/mapmint-logo.png) no-repeat;
+width:48px;
+height:48px;
+display:inline-block;
+margin:0;
+padding:0;
+position:relative;
+top:7px;
+left:0;
+}
+
+h1.title a {
+color:#707070;
+letter-spacing:1px;
+padding:0 0 0 10px;
+text-decoration:none;
+}
+
+h1.title a span{
+color:#83c849;
+}
+
+#mysubheader {
+ color: #333;
+ width:100%;
+ height: 100px;
+ margin: 0 auto;
+background-color: #F8F8F8;
+    border-bottom: 1px solid #EFEFEF;
+    border-top: 1px solid #EFEFEF;
+    }
+
+h1.msg{
+  font-family:Arial !important;
+  font-size:32px;
+  font-weight:normal;
+  line-height:40px;
+  padding: 10px 0 0 0;
+  text-align:center;
+  color:#707070
+}
+
+h1.msg span{
+  color:#83c849;
+}
+#searchbox{
+	border-bottom:1px solid #ccc;margin:0 0 20px 0;}
+#searchbox h3{
+	font-family: 'Helvetica Neue', Arial;
+	color:#83c849;
+}	
+.orange{color:#ffaa17;display:block;padding:5px;}
+
+.hright{
+float:right;
+margin:0;
+width:533px;
+background:#FFFFFF;
+
+}
+
+/*  Custom Footer ---------------------------------------- */
+
+
+
+#footer { 
+
+ width:99.99%;
+ height:155px;
+background:#303030; color:#cacaca;
+margin: 0;
+ padding: 0 0 30px 0;
+ border-top:1px solid #444; border-bottom:1px solid #444;
+}
+
+.container{width:100%;max-width:1170px;height:100%;margin:0 auto;}
+
+
+h1.titleb {
+font-family: "Helvetica Neue", Arial;
+color:#707070;
+text-decoration: none;
+font-size: 47px;
+margin:10px 0 0 0;
+padding:0;
+text-transform:none;
+min-width:300px;
+}
+
+h1.titleb span.logo{
+background:url(http://mapmint.com/assets/images/mapmint-logo.png) no-repeat;
+width:48px;
+height:48px;
+display:inline-block;
+margin:0;
+padding:0;
+position:relative;
+top:7px;
+left:0;
+}
+
+h1.titleb a {
+color:#707070;
+letter-spacing:1px;
+padding:0 0 0 10px;
+text-decoration:none;
+}
+
+h1.titleb a span{
+color:#83c849;
+}
+
+
+.lft{float:left;margin:20px 0 20px 0;display:block;padding:0}
+.rgt{float:right;margin:20px 0 20px 0;width:auto;display:block}
+.rgt img {float:right;margin-bottom:20px;}
+
+#footer hr {
+  border-bottom-color:#444444;
+  border-bottom-style:solid;
+  border-top-color:#222222;
+  border-top-style:solid;
+  border-width:1px 0;
+  margin:13px 0 10px 0;
+}
+
+a.ftr:hover{text-decoration:none;}
+span.mmw{color:#FFFFFF !important;text-decoration:none;font-weight:bold;}
+span.mmg{color:#83c849;text-decoration:none;font-weight:bold;}
+
+.bottom-block {
+  background-color:#3A3A3A;
+  background-position:initial initial;
+  background-repeat:initial initial;
+  color:#999999;
+  font-size:11px;
+  padding:10px 0 0 0;
+  height:30px;
+  margin:0 auto;
+  bottom:0;
+  left:0;
+}
+.btm-cnt{
+  max-width:1170px;
+  width:100%;
+  margin:0 auto;
+  }
+  
+.btm-cnt p{
+	padding: 0;
+	margin: 0;
+}

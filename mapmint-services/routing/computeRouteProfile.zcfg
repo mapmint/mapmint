@@ -1,0 +1,47 @@
+[computeRouteProfile]
+ Title = Shortest Path
+ Abstract =  Similar to do but compute and return shortest path using pgRouting library as a single feature
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service.js
+ serviceType = JS
+ <MetaData>
+   title = Demo
+ </MetaData>
+ <DataInputs>
+  [startPoint]
+   Title = Starting Point
+   Abstract = The Point to use as starting of the path
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    datatype = string
+    <Default>
+    </Default>
+   </LiteralData>
+  [endPoint]
+   Title = End Point
+   Abstract = The Point to use as ending point of the path
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    datatype = string
+    <Default>
+    </Default>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = Buffered Polygon
+   Abstract = GML stream describing the buffered polygon feature.
+   <MetaData>
+    title = Mon test  
+   </MetaData>   
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>  

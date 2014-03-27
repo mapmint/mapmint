@@ -1,0 +1,62 @@
+#import zoo
+#import mapscript
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$conf["senv"]["last_map"]+".map")
+#if $m.web.metadata.get('mmNav')
+#set mmNav=$m.web.metadata.get('mmNav').split(',')
+#else
+#set mmNav=[]
+#end if
+<div class="dsContainer">
+<table id="mmAccessNav" class="flexigrid">
+<thead>
+#set tmp=$m.web.metadata.get("mm_access_groups")
+#if $tmp is not None
+#set $tmp=$tmp.split(",")
+#else
+#set $tmp=["public"]
+#end if
+#set tn=$conf["mm"]["navName"].split(',')
+#set tv=$conf["mm"]["navId"].split(',')
+#set tmp1=$m.web.metadata.get("mm_access_nav")
+#if $tmp1 is not None
+#set tmp2=$tmp1.split("|")
+#set $tmp1=[]
+#for kl in $tmp2
+#set $tmp1+=[$kl.split(",")]
+#end for
+#else
+#set tmp1=[]
+#for ij in $tmp
+#set $tmp1+=[[]]
+#for i in range(0,len(tv))
+#set $tmp1[len($tmp1)-1]+=["1"]
+#end for
+#end for
+#end if
+
+<tr>
+<th width="150">$zoo._("Tool")</th>
+<th width="50">$zoo._("Activated")</th>
+#for i in $tmp
+<th width="75">$i</th>
+#end for
+</tr>
+</thead>
+<tbody>
+#for i in range(0,len(tv))
+<tr>
+<td>$zoo._($tn[$i])</td>
+<td><input type="checkbox" value="$tv[$i]" class="mm_access_nav" #if $mmNav.count($tv[$i])#checked="true"#end if# disabled="true"/></td>
+#set cnt0=0
+#for ij in $tmp
+<td><input value="${tv[$i]}|${ij}" class="mm_access_${ij}" type="checkbox" #if $tmp1[$cnt0][$i]=="1"#checked="true"#end if#/></td>
+#set $cnt0+=1
+#end for
+</tr>
+#end for
+</tbody>
+</table>
+
+<input type="submit" value="$zoo._("Valid")" onclick="MapMintNavPriv.confirm($tmp);return false;" />
+
+</div>

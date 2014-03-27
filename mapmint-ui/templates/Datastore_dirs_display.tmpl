@@ -1,0 +1,20 @@
+#import zoo
+<div class="dialog-directory-new" title="$zoo._("Add new directory")" >
+<form action="" method="#" class="dialogs">
+<p style="font-size:0.9em" float:left>$zoo._("Name:") <input type="text" id="Distiller.form.name"  class="name"/></p>
+<table>
+<tr><td>
+<input type="radio" name="Distiller.form.type" id="Distiller.form.type"  value="use" onclick="\$mj('Distiller.form.path').disabled=true;" checked="true"/>$zoo._("Browse")
+</td><td>
+<input type="radio" name="Distiller.form.type" id="Distiller.form.type" value="new" onclick="\$mj('Distiller.form.path').disabled=false;" />$zoo._("New")
+</td></tr>
+</table>
+<p style="font-size:0.9em">$zoo._("Path:") <input type="text" id="Distiller.form.path" disabled="true" class="name" value="/"/></p>
+<div id="browseDirectoriesList__"></div>
+</form>
+
+	<div id="ddlg-buttons">
+		<a href="#" class="easyui-linkbutton"  onclick="\$('.dialog-directory-new').window('close')">$zoo._("Cancel")</a>
+		<a href="#" class="easyui-linkbutton"  onclick="Distiller.DatasourceDirCommit('add');">$zoo._("Add")</a>
+	</div>
+</div>

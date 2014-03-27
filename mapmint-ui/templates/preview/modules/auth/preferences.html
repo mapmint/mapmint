@@ -1,0 +1,21 @@
+#import zoo
+<h3 class="lgn">$conf["senv"]["login"]</h3>
+<ul data-role="listview"  data-inset="true" data-theme="d" data-dividertheme="c" >
+  <li data-role="fieldcontain">
+    <label for="upass">$zoo._("Password:")</label>
+    <input type="password" id="upass" />
+  </li>
+  <li data-role="fieldcontain">
+    <label for="upass1">$zoo._("Confirm ")</label>
+    <input type="password" id="upass1" />
+  </li>
+  <li data-role="fieldcontain">
+    <label for="umail">$zoo._("Mail:")</label>
+    <input type="text" id="umail" value="$res[0][0]" />
+  </li>
+</ul>
+<input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Save")" onclick="try{saveUserPreferences();}catch(e){alert(e)}return false;" />   
+#if not($inputs.has_key("pcancel"))
+<input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Cancel")" onclick="try{cancelUserPreferences();}catch(e){alert(e)}return false;" />
+#end if   
+<input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Logout")" onclick="try{logoutUser();}catch(e){alert(e)}return false;" />

@@ -1,0 +1,35 @@
+<wps:Execute service="WPS" version="1.0.0" metaPath="sqlite" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsExecute_request.xsd">
+<ows:Identifier>Update</ows:Identifier>
+<wps:DataInputs>
+<wps:Input>
+<ows:Identifier>table</ows:Identifier>
+<ows:Title>table name</ows:Title>
+<ows:Data>
+<wps:LiteralData>users</wps:LiteralData>
+</ows:Data>
+</wps:Input>
+<wps:Input>
+<ows:Identifier>set</ows:Identifier>
+<ows:Title> set </ows:Title>
+<ows:Data>
+<wps:LiteralData><![CDATA[{"nom":"update2","prenom": "update2"}]]>
+</wps:LiteralData>
+</ows:Data>
+</wps:Input>	
+<wps:Input>
+<ows:Identifier>search</ows:Identifier>
+<ows:Title> search </ows:Title>
+<ows:Data>
+<wps:LiteralData><![CDATA[{"login":"test1","tel": "00000000"}]]>
+</wps:LiteralData>
+</ows:Data>
+</wps:Input>	
+</wps:DataInputs>
+<wps:ResponseForm>
+<wps:RawDataOutput>
+<wps:Output asReference="false">
+<ows:Identifier>Result</ows:Identifier>
+</wps:Output>
+</wps:RawDataOutput>
+</wps:ResponseForm>
+</wps:Execute>

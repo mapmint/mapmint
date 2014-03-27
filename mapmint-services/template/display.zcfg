@@ -1,0 +1,34 @@
+[display]
+ Title = Print Cheetah templates as HTML
+ Abstract = Print Cheetah templates as HTML.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [tmpl]
+   Title = Template name
+   Abstract = The name of the template to fill.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The HTML content out of the template.
+   <ComplexData>
+    <Default>
+     mimeType = text/html
+     encoding = utf-8
+    </Default>
+    <Default>
+     mimeType = text/plain
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

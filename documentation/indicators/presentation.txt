@@ -1,0 +1,34 @@
+.. _indicators-presentation:
+
+Présentation
+============
+
+Qu'est ce qu'un indicateur ?
+---------------------------------
+
+Un indicateur MapMint constitue une carte (mapfile) regroupant des information statistiques et géométriques issues de sources de données variées. Il est crée par l'utilisateur grâce aux étapes de la :doc:`indicatorspanel`.
+
+Un indicateur est définit par les éléments suivants, tous accessible depuis l'interface publique une fois l'indicateur publié:
+
+======================== =============================================
+**Eléments**             **Description**    
+------------------------ ---------------------------------------------  
+Titre					 Chaine de caractère décrivant brièvement l'indicateur
+Carte				     Représentation cartographique de l'indicateur (mapfile)
+Table					 Tables des attributs de l'indicateur
+Graphique			     Graphique (histogramme ou camembert) de l'indicateur
+Rapport                  Document rassemblant des informations sur l'indicateur (cartes, tables, graphiques...)
+======================== =============================================
+
+Fonctionnement général du module
+---------------------------------
+
+Le module de création d'indicateurs permet à l'utilisateur de configurer et de publier des indicateurs. 
+
+Il enregistre les paramètres renseignés par l'utilisateur, réalise des jointure entre source de données spatiales et statistiques, calcule l'indicateur et enregistre la source de données résultante dans un projet MapMint (mapfile).
+
+L'indicateur est finallement automatiquement diffusé en WMS et en WFS dans une visualiseur cartographique spécifique.
+
+Prérequis techniques
+---------------------------------
+

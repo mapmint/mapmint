@@ -1,0 +1,32 @@
+#import mapscript
+#import mapfile.service as mmap
+#if $layer.metadata.get("ows_title") is not None and $layer.metadata.get("ows_title")!=""
+#set title=$layer.metadata.get("ows_title")
+#else
+#set title=$layer.name
+#end if
+#try
+#set p=$prefix
+#except
+#set p=""
+#end try
+#if $layer.metadata.get("cstep") is not None
+#set prefix="_step"+$layer.metadata.get("cstep")
+#set hasStep=True
+#else
+#set prefix=""
+#set hasStep=False
+#end if
+#if $layer.metadata.get('mm_group')!="Layers"
+#if $layer.numclasses > 1 and $layer.metadata.get('mmClass')!="tl"
+	  <li id="layer_$(layer.index)$prefix" iconCls="tree$(p)_layer$(layer.index)$prefix" #if not(hasStep)#state="closed"#end if#><span>$title</span>
+	    <ul>
+#for j in range(0,$layer.numclasses)
+	      <li iconCls="tree_layer_class tree$(p)_layer$(layer.index)$(prefix)_class$j">$layer.getClass($j).name</li>
+#end for
+	    </ul>
+	  </li>
+#else
+	  <li id="layer_$(layer.index)" iconCls="tree$(p)_layer$(layer.index)$prefix">$title</li>
+#end if
+#end if

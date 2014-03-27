@@ -1,0 +1,24 @@
+#GDAL_SRC=./gdal_src/
+
+#include $(GDAL_SRC)GDALmake.opt
+
+CPPFLAGS        :=      $(GDAL_INCLUDE) -I$(GDAL_ROOT)/frmts $(CPPFLAGS) -DUSE_CAIRO -DUSE_KML -DUSE_MS -DDEBUGMS `/Library/Frameworks/MapServer.framework/Programs/mapserver-config --includes` -I/Users/djay/CartoWorks/zoo-project-release-201100601/trunk/zoo-kernel-ms-deliver -I/Users/djay/CartoWorks/zoo-project-release-201100601/trunk/thirds/cgic206 -I/Library/Frameworks/MapServer.framework/Versions/Current/Headers/ -I/Users/djay/Downloads/mapserver-6.0.0 
+DEP_LIBS        =       $(EXE_DEP_LIBS) $(XTRAOBJ)
+BIN_LIST = cgi-env/service.zo
+
+default:        $(BIN_LIST)
+
+all: default
+
+lib-depend:
+	(cd $(GDAL_SRC)/gcore ; $(MAKE) )
+	(cd $(GDAL_SRC)/port ; $(MAKE) )
+
+CFLAGS=-DZOO_SERVICE -I/Users/djay/CartoWorks/zoo-project/zoo-kernel/
+
+
+cgi-env/service.zo: service.c $(DEP_LIBS)
+	g++ `xml2-config --cflags` `/Library/Frameworks/GDAL.framework/unix/bin/gdal-config --cflags` $(CFLAGS) $(CPPFLAGS) -shared -fpic $< `xslt-config --libs` `xml2-config --libs` `/Library/Frameworks/GDAL.framework/unix/bin/gdal-config --libs` /Users/djay/CartoWorks/zoo-project-release-201100601/trunk/zoo-kernel-ms-deliver/ulinet.o /Users/djay/CartoWorks/zoo-project-release-201100601/trunk/zoo-kernel-ms-deliver/service_internal_ms.o /Users/djay/CartoWorks/zoo-project-release-201100601/trunk/zoo-kernel-ms-deliver/service_internal.o -lc -lintl -lcrypto /Library/Frameworks/MapServer.framework//Versions/6.0/MapServer -lintl -lcurl -lfcgi -framework SystemConfiguration -framework CoreFoundation -o $@
+
+clean:
+	rm -f cgi-env/*zo

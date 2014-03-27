@@ -1,0 +1,46 @@
+[copyLayerFile]
+ Title = Copy a MapMint Georeferencing Project mapfile
+ Abstract = Copy a MapMint Georeferencing Project mapfile at its final location.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [layer]
+   Title = The name of the MapMint georeferencing project
+   Abstract = The name of your MapMint georeferencing project.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [lfile]
+   Title = The file
+   Abstract = The file to copy.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [target]
+   Title = The target directory
+   Abstract = The target directory where to copy file.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting message
+   Abstract = The resulting message created by service.
+   <LiteralData>
+   dataType=string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

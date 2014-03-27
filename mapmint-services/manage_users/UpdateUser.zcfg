@@ -1,0 +1,47 @@
+[UpdateUser]
+ Title = update user on users database.
+ Abstract = update user on users database.
+ processVersion = 2
+ storeSupported = false
+ statusSupported = true
+ serviceProvider = service_users
+ serviceType = Python
+ <DataInputs>
+  [id]
+   Title = Input string
+   Abstract = id user to update.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [set]
+   Title = Input string
+   Abstract = user to update as a json object.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [group]
+   Title = Input string
+   Abstract = user to insert as a json object.
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = result of the request
+   Abstract = Result row if success.
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>
+

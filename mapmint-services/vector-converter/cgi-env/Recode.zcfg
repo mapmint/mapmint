@@ -1,0 +1,49 @@
+[Recode]
+ Title = Recode a file.
+ Abstract = Recode a file from one encoding to another.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceType = Python
+ serviceProvider = service
+ <DataInputs>
+  [file]
+   Title = The input file
+   Abstract = The input file to recode.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [sEncoding]
+   Title = The input encoding
+   Abstract = The input encoding.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [tEncoding]
+   Title = The target encoding
+   Abstract = The target encoding.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>	
+    <Supported>
+    </Supported>
+   </LiteralData>
+ </DataOutputs>  

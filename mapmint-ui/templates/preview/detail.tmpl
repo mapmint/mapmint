@@ -1,0 +1,5 @@
+#import json,mapscript
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$inputs["map"]["value"]+".map")
+#set l=$m.getLayer(int($inputs["layer"]["value"]))
+#set tmp=$l.metadata.get("mmEFields")
+["$l.connection","SELECT #if tmp is not None#$l.metadata.get("mmEFields")#else#*#end if# from $l.data"];

@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /np-bin/zoo_loader.cgi?metapath=template&request=Execute&service=WPS&version=1.0.0&Identifier=compress&DataInputs=type=js;filename=$1&RawDataOutput=Result [L,QSA]

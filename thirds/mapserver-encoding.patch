@@ -1,0 +1,254 @@
+--- ../mapserver-6.0.1/mapfile.c	2011-07-08 06:03:49.000000000 +0200
++++ ./mapfile.c	2011-12-15 04:55:21.000000000 +0100
+@@ -3315,6 +3315,7 @@
+   
+   layer->name = NULL;
+   layer->group = NULL;
++  layer->encoding = NULL;
+   layer->status = MS_OFF;
+   layer->data = NULL;
+ 
+@@ -3433,6 +3434,7 @@
+ 
+   msFree(layer->name);
+   msFree(layer->group);
++  msFree(layer->encoding);
+   msFree(layer->data);
+   msFree(layer->classitem);
+   msFree(layer->labelitem);
+@@ -3689,6 +3691,16 @@
+       initGrid((graticuleObj *) layer->layerinfo);
+       loadGrid(layer);
+       break;
++    case(ENCODING):
++      if((getString(&layer->encoding)) == MS_FAILURE) return(-1);
++      if(msyysource == MS_URL_TOKENS) {
++        if(msValidateParameter(layer->encoding, msLookupHashTable(&(layer->validation), "encoding"), msLookupHashTable(&(map->web.validation), "encoding"), NULL, NULL) != MS_SUCCESS) {
++          msSetError(MS_MISCERR, "URL-based ENCODING configuration failed pattern validation." , "loadLayer()");
++          msFree(layer->encoding); layer->encoding=NULL;
++          return(-1);
++        }
++      }
++      break;
+     case(GROUP):
+       if(getString(&layer->group) == MS_FAILURE) return(-1); /* getString() cleans up previously allocated string */
+       if(msyysource == MS_URL_TOKENS) {
+@@ -3989,6 +4001,7 @@
+   writeString(stream, indent, "FILTERITEM", NULL, layer->filteritem);
+   writeString(stream, indent, "FOOTER", NULL, layer->footer);
+   writeString(stream, indent, "GROUP", NULL, layer->group);
++  writeString(stream, indent, "ENCODING", NULL, layer->encoding);
+   writeString(stream, indent, "HEADER", NULL, layer->header);
+   /* join - see below */
+   writeKeyword(stream, indent, "LABELCACHE", layer->labelcache, 1, MS_OFF, "OFF");
+--- ../mapserver-6.0.1/mapserver.h	2011-07-12 15:17:28.000000000 +0200
++++ ./mapserver.h	2011-12-15 04:51:50.000000000 +0100
+@@ -1360,6 +1360,7 @@
+ 
+   char *name; /* should be unique */
+   char *group; /* shouldn't be unique it's supposed to be a group right? */
++  char *encoding; /* layer encoding */
+ 
+   int status; /* on or off */
+   char *data; /* filename, can be relative or full path */
+--- ../mapserver-6.0.1/maptemplate.c	2011-05-05 07:05:35.000000000 +0200
++++ ./maptemplate.c	2011-12-15 00:00:02.000000000 +0100
+@@ -1267,8 +1267,18 @@
+           itemValue = (char *) msSmallMalloc(64); /* plenty big */
+           snprintf(numberFormat, sizeof(numberFormat), "%%.%dlf", precision);
+           snprintf(itemValue, 64, numberFormat, atof(shape->values[i]));
+-        } else
+-          itemValue = msStrdup(shape->values[i]);
++        } else{
++	  /**
++	   * Use correct encoding to extract a string
++	   */
++	  if(layer->encoding!=NULL && strncasecmp("utf-8",layer->encoding,5)!=0){
++	    char* tmp=msGetEncodedString(shape->values[i],layer->encoding);
++	    itemValue = msStrdup(tmp);
++	    free(tmp);
++	  }
++	  else
++	    itemValue = msStrdup(shape->values[i]);
++	}
+ 
+         if(commify == MS_TRUE)
+           itemValue = msCommifyString(itemValue);
+--- ../mapserver-6.0.1/mapgml.c	2011-04-12 14:38:18.000000000 +0200
++++ ./mapgml.c	2011-12-15 05:31:07.000000000 +0100
+@@ -30,6 +30,7 @@
+ #include "mapserver.h"
+ #include "maperror.h"
+ #include "mapgml.h"
++#include "iconv.h"
+ 
+ MS_CVSID("$Id: mapgml.c 11544 2011-04-12 12:38:18Z aboudreault $")
+ 
+@@ -838,6 +839,7 @@
+   return;
+ }
+ 
++
+ gmlNamespaceListObj *msGMLGetNamespaces(webObj *web, const char *metadata_namespaces)
+ {
+   int i;
+@@ -1409,12 +1411,12 @@
+   for(i=0; i<map->numlayers; i++) {
+ 
+     lp = GET_LAYER(map, map->layerorder[i]);
+-
++  
+     if(lp->resultcache && lp->resultcache->numresults > 0)  { /* found results */
+       char *layerName;      
+       const char *value;
+       int featureIdIndex=-1; /* no feature id */
+-
++      char *encoding;
+       
+       /* setup namespace, a layer can override the default */
+       namespace_prefix = (char*) msOWSLookupMetadata(&(lp->metadata), "OFG", "namespace_prefix");
+@@ -1478,10 +1480,15 @@
+         if(msIsXMLTagValid(layerName) == MS_FALSE)
+           msIO_fprintf(stream, "<!-- WARNING: The value '%s' is not valid in a XML tag context. -->\n", layerName);
+         if(featureIdIndex != -1) {
+-          if(outputformat == OWS_GML2)
+-            msIO_fprintf(stream, "      <%s fid=\"%s.%s\">\n", layerName, lp->name, shape.values[featureIdIndex]);
+-          else  /* OWS_GML3 */
+-            msIO_fprintf(stream, "      <%s gml:id=\"%s.%s\">\n", layerName, lp->name, shape.values[featureIdIndex]);
++	  if(lp->encoding!=NULL && strncasecmp("utf-8",lp->encoding,5)!=0){
++	    char* tmp=msGetEncodedString(shape.values[featureIdIndex],lp->encoding);
++	    if(outputformat == OWS_GML2)
++	      msIO_fprintf(stream, "      <%s fid=\"%s.%s\">\n", layerName, lp->name, tmp);
++	    else  /* OWS_GML3 */
++	      msIO_fprintf(stream, "      <%s gml:id=\"%s.%s\">\n", layerName, lp->name, tmp);
++	    free(tmp);
++	  }else
++	    msIO_fprintf(stream, "      <%s gml:id=\"%s.%s\">\n", layerName, lp->name, shape.values[featureIdIndex]);
+         } else
+           msIO_fprintf(stream, "      <%s>\n", layerName);
+               
+@@ -1510,8 +1517,18 @@
+         /* write any item/values */
+         for(k=0; k<itemList->numitems; k++) {
+           item = &(itemList->items[k]);  
+-          if(msItemInGroups(item->name, groupList) == MS_FALSE) 
+-            msGMLWriteItem(stream, item, shape.values[k], namespace_prefix, "        ");
++          if(msItemInGroups(item->name, groupList) == MS_FALSE){ 
++
++	    /**
++	     * Use correct encoding to extract a string
++	     */
++	    if(lp->encoding!=NULL && strncasecmp("utf-8",lp->encoding,5)!=0){
++	      char* tmp=msGetEncodedString(shape.values[k],lp->encoding);
++	      msGMLWriteItem(stream, item, tmp, namespace_prefix, "        ");
++	      free(tmp);
++	    }else
++	      msGMLWriteItem(stream, item, shape.values[k], namespace_prefix, "        ");
++	  }
+         }
+ 
+         /* write any constants */
+--- ../mapserver-6.0.1/mapcopy.c	2011-03-06 13:15:20.000000000 +0100
++++ ./mapcopy.c	2011-12-20 19:27:41.000000000 +0100
+@@ -815,6 +815,8 @@
+     MS_COPYSTRING(dst->name, src->name); 
+     MS_COPYSTRING(dst->group, src->group); 
+     MS_COPYSTRING(dst->data, src->data); 
++
++    MS_COPYSTRING(dst->encoding, src->encoding); 
+     
+     MS_COPYSTELEM(status);
+     MS_COPYSTELEM(type);
+diff -ru ../mapserver-6.0.1/mapscript/python/mapscript.py ./mapscript/python/mapscript.py
+--- ../mapserver-6.0.1/mapscript/python/mapscript.py	2011-07-12 20:18:12.000000000 +0200
++++ ./mapscript/python/mapscript.py	2011-12-15 02:02:55.000000000 +0100
+@@ -1191,6 +1191,9 @@
+     __swig_getmethods__ = {}
+     __getattr__ = lambda self, name: _swig_getattr(self, layerObj, name)
+     __repr__ = _swig_repr
++    __swig_setmethods__["encoding"] = _mapscript.layerObj_encoding_set
++    __swig_getmethods__["encoding"] = _mapscript.layerObj_encoding_get
++    if _newclass:encoding = _swig_property(_mapscript.layerObj_encoding_get, _mapscript.layerObj_encoding_set)
+     __swig_setmethods__["classitem"] = _mapscript.layerObj_classitem_set
+     __swig_getmethods__["classitem"] = _mapscript.layerObj_classitem_get
+     if _newclass:classitem = _swig_property(_mapscript.layerObj_classitem_get, _mapscript.layerObj_classitem_set)
+diff -ru ../mapserver-6.0.1/mapscript/python/mapscript_wrap.c ./mapscript/python/mapscript_wrap.c
+--- ../mapserver-6.0.1/mapscript/python/mapscript_wrap.c	2011-07-12 20:18:12.000000000 +0200
++++ ./mapscript/python/mapscript_wrap.c	2011-12-20 19:25:39.000000000 +0100
+@@ -19970,6 +19970,59 @@
+   return SWIG_Py_Void();
+ }
+ 
++
++SWIGINTERN PyObject *_wrap_layerObj_encoding_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
++  PyObject *resultobj = 0;
++  layerObj *arg1 = (layerObj *) 0 ;
++  char *arg2 = (char *) 0 ;
++  void *argp1 = 0 ;
++  int res1 = 0 ;
++  PyObject * obj0 = 0 ;
++  
++  if (!PyArg_ParseTuple(args,(char *)"Oz:layerObj_encoding_set",&obj0,&arg2)) SWIG_fail;
++  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_layer_obj, 0 |  0 );
++  if (!SWIG_IsOK(res1)) {
++    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "layerObj_encoding_set" "', argument " "1"" of type '" "layerObj *""'"); 
++  }
++  arg1 = (layerObj *)(argp1);
++  {
++    if (arg1->encoding) free((char*)arg1->encoding);
++    if (arg2) {
++      arg1->encoding = (char *) malloc(strlen(arg2)+1);
++      strcpy((char*)arg1->encoding,arg2);
++    } else {
++      arg1->encoding = 0;
++    }
++  }
++  resultobj = SWIG_Py_Void();
++  return resultobj;
++fail:
++  return NULL;
++}
++
++
++SWIGINTERN PyObject *_wrap_layerObj_encoding_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
++  PyObject *resultobj = 0;
++  layerObj *arg1 = (layerObj *) 0 ;
++  void *argp1 = 0 ;
++  int res1 = 0 ;
++  PyObject * obj0 = 0 ;
++  char *result = 0 ;
++  
++  if (!PyArg_ParseTuple(args,(char *)"O:layerObj_encoding_get",&obj0)) SWIG_fail;
++  res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_layer_obj, 0 |  0 );
++  if (!SWIG_IsOK(res1)) {
++    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "layerObj_encoding_get" "', argument " "1"" of type '" "layerObj *""'"); 
++  }
++  arg1 = (layerObj *)(argp1);
++  result = (char *) ((arg1)->encoding);
++  resultobj = SWIG_FromCharPtr((const char *)result);
++  return resultobj;
++fail:
++  return NULL;
++}
++
++
+ SWIGINTERN PyObject *_wrap_layerObj_classitem_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+   PyObject *resultobj = 0;
+   layerObj *arg1 = (layerObj *) 0 ;
+@@ -22633,7 +22686,6 @@
+   return NULL;
+ }
+ 
+-
+ SWIGINTERN PyObject *_wrap_layerObj_updateFromString(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+   PyObject *resultobj = 0;
+   layerObj *arg1 = (layerObj *) 0 ;
+@@ -44512,6 +44564,8 @@
+ 	 { (char *)"new_legendObj", _wrap_new_legendObj, METH_VARARGS, NULL},
+ 	 { (char *)"delete_legendObj", _wrap_delete_legendObj, METH_VARARGS, NULL},
+ 	 { (char *)"legendObj_swigregister", legendObj_swigregister, METH_VARARGS, NULL},
++	 { (char *)"layerObj_encoding_set", _wrap_layerObj_encoding_set, METH_VARARGS, NULL},
++	 { (char *)"layerObj_encoding_get", _wrap_layerObj_encoding_get, METH_VARARGS, NULL},
+ 	 { (char *)"layerObj_classitem_set", _wrap_layerObj_classitem_set, METH_VARARGS, NULL},
+ 	 { (char *)"layerObj_classitem_get", _wrap_layerObj_classitem_get, METH_VARARGS, NULL},
+ 	 { (char *)"layerObj_refcount_get", _wrap_layerObj_refcount_get, METH_VARARGS, NULL},

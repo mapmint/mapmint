@@ -1,0 +1,28 @@
+<mapcache>
+
+   <source name="$inputs["mmProjectName"]["value"]" type="wms">
+      <getmap>
+         <params>
+            <FORMAT>image/png</FORMAT>
+            <LAYERS>$layers</LAYERS>
+	    <VERSION>1.0.0</VERSION>
+	    <SRS>EPSG:900913</SRS>
+	    <MAP>$conf["main"]["dataPath"]/maps/project_${conf["senv"]["last_map"]}.map</MAP>
+         </params>
+      </getmap>      
+      <http>
+         <url>$conf["main"]["mapserverAddress"]</url>
+      </http>
+   </source>
+   
+   <tileset name="${inputs["mmProjectName"]["value"]}Tile">
+      <source>$inputs["mmProjectName"]["value"]</source>
+      <cache>disk</cache>
+      <grid>g</grid>
+      <format>mmJPEG</format>
+      <metatile>5 5</metatile>
+      <metabuffer>10</metabuffer>
+      <expires>3600</expires>
+   </tileset>
+
+</mapcache>

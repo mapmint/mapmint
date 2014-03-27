@@ -1,0 +1,30 @@
+#import mapscript
+#import osgeo.gdal
+#set m=mapscript.mapObj($inputs["dst"]["value"]+"/ds_ows.map")
+#set l=m.getLayerByName($inputs["dso"]["value"])
+#set tmp=$l.metadata.get("ows_extent")
+#set tmp1=$tmp.split(' ')
+#set p1=mapscript.pointObj(float($tmp1[0]),float($tmp1[1]))
+#set p2=mapscript.pointObj(float($tmp1[2]),float($tmp1[3]))
+#set q1=$p1.project(mapscript.projectionObj(l.getProjection()),mapscript.projectionObj("epsg:4326"))
+#set q2=$p2.project(mapscript.projectionObj(l.getProjection()),mapscript.projectionObj("epsg:4326"))
+#if $inputs.keys().count("basic")==0
+#set d1=$p2.x-$p1.x
+#set d2=$p2.x-$p1.x
+#if $d1>$d2
+#set width=400
+#set height=(400*$d2)/$d1
+#else
+#set height=400
+#set width=(400*$d1)/$d2
+#end if
+#set f="image/png"
+#else
+#set r=osgeo.gdal.Open($l.data)
+#set p1=mapscript.pointObj($p1.x-1,$p1.y)
+#set p2=mapscript.pointObj($p2.x,$p2.y+1)
+#set width=$r.RasterXSize
+#set height=$r.RasterYSize
+#set f="image/tiff"
+#end if
+$conf["main"]["mapserverAddress"]?map=$inputs["dst"]["value"]/ds_ows.map&service=WMS&version=1.0.0&request=GetMap&srs=epsg:4326&bbox=$p1.x,$p1.y,$p2.x,$p2.y&layers=$inputs["dso"]["value"]&width=$width&height=$height&format=$f

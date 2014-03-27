@@ -1,0 +1,19 @@
+#encoding UTF-8
+#import mapscript
+#from Cheetah.Template import Template
+    <ul data-role="listview" data-inset="true" data-theme="d" data-dividertheme="c" id="baselayerslist">
+<li data-role="list-divider">Fonds de plan</li>
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayers_html5.tmpl",searchList={"m": $m,"conf": $conf})
+    </ul>
+    <ul data-role="listview" data-inset="true" data-theme="d" data-dividertheme="c" id="layerslist">
+#from mapfile.service import getMapList
+#set linputs={"name": {"value": $conf["senv"]["last_map"]},"prefix": {"value": "public_"}}
+#set loutputs={"Result": {"value": ""}}
+#set a=getMapList($conf,$linputs,$loutputs)
+#set a=eval($loutputs["Result"]["value"])
+
+#for i in range(0,len($a[0]["children"]))
+$Template(file=$conf['main']['templatesPath']+"/preview/layer_tree_html5.tmpl",searchList={"m": $m,"elem": $a[0]["children"],"i": $i,"conf": $conf,"cls":"root"})
+#end for
+     <li></li>
+    </ul>

@@ -1,0 +1,167 @@
+#import zoo
+<!DOCTYPE html>
+<html>
+<head>
+#if $m.web.metadata.get("mmTitle") is not None and $m.web.metadata.get("mmTitle")!=""
+#set title=$m.web.metadata.get("mmTitle")
+#else
+#set title="Preview"
+#end if
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+#if $tmpl=="nudemap"
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE8" />
+#end if
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>$title</title>
+<meta name="keywords" content="$m.web.metadata.get('mmKeywords')">
+<meta name="description" content="$m.web.metadata.get('mmDescription')">
+<meta name="author" content="$m.web.metadata.get('mmAuthor')">
+<meta name="copyright" content="$m.web.metadata.get('mmCopyright')">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<link rel="shortcut icon" href="$conf["main"]["mmAddress"]/favicon.ico" />
+#set lcss=[]
+
+<link type="text/css" href="$conf["main"]["publicationUrl"]/jquery-ui-1.8.13.custom/css/custom-theme/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
+<link type="text/css" href="$conf["main"]["mmAddress"]/css/flexigrid.css" rel="stylesheet" />
+
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,800,700' rel='stylesheet' type='text/css'>
+#if $tmpl=='mobile'
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/jquery.mobile-1.1.0/jquery.mobile-1.1.0.min.css" />
+#end if
+#set mmHasSteps=False
+#if $tmpl=='natureparif-indicateurs'
+#set mmHasSteps=True
+#else
+#for i in range(0,$m.numlayers)
+#if $m.getLayer(i).metadata.get("mmClass")=="tl"
+#set mmHasSteps=True
+#break
+#end if
+#end for
+#end if
+#if $mmHasSteps
+#set $lcss+=["timelinr_style.css"]
+#end if
+<!--[if lt IE 9]>
+<link type="text/css" href="$conf["main"]["publicationUrl"]/oldbrowser.css" rel="stylesheet" />
+<![endif]-->
+
+#set $lcss+=["mapmint-default.css"]
+#if $tmpl=='natureparif-indicateurs'
+#set $lcss+=["mapmint-default-indicateurs.css"]
+#end if
+#if $m.web.metadata.get('mmOT')
+#set f=$m.web.metadata.get('mmOT').split(',')
+#if f.count('ScaleBar')>0
+<link type="text/css" href="$conf["main"]["mmAddress"]/css/scalebar.css" rel="stylesheet" />	
+#end if
+#end if
+#set $lcss+=["window.css","tree.css","mapmint-"+$tmpl+".css"]
+
+#if $conf["main"].has_key("cssCache") and $conf["main"]["cssCache"]=="prod"
+<link type="text/css" href="$conf["main"]["publicationUrl"]/#for i in $lcss#$i,#end for#" rel="stylesheet" />
+#else
+#for i in $lcss
+<link type="text/css" href="$conf["main"]["publicationUrl"]/$i" rel="stylesheet" />
+#end for
+#end if
+
+<link rel="stylesheet" href="./index_css" type="text/css" />
+
+#if $m.web.metadata.get('mmProprietaryBaseLayers')=="Google" and $m.web.metadata.get('mmPBaseLayers')
+<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+#end if
+
+#if $tmpl!='mobile'
+#set ljs=['jquery-2.0.3.min.js','jquery.tipsy.js','jquery-ui-1.10.3.js','jquery-migrate-1.2.1.js','jquery.easyui.min.js','jquery.layout-latest.js','flexigrid.js','jquery.xml2json.pack.js','wps.js','flipls.js', 'jquery.raty.min.js']
+#else
+#set ljs=['jquery-2.0.3.min.js','jquery-ui-1.10.3.js','jquery-migrate-1.2.1.js','wps.js']
+#end if
+
+#if $tmpl!='natureparif-indicateurs.js'
+#set $ljs+=["Graphs.js"]
+#end if
+
+#set $ljs+=["Meta.js"]
+#if $conf["main"].has_key("jsCache") and $conf["main"]["jsCache"]=="prod"
+<script src="$conf["main"]["mmAddress"]/js/#for i in $ljs#$i,#end for#"></script>
+#else
+#for i in $ljs
+<script src="$conf["main"]["mmAddress"]/js/$i"></script>
+#end for
+#end if 
+
+
+<script type="text/javascript">var a=navigator,b="userAgent",c="indexOf",f="&m=1",g="(^|&)m=",h=";",i=";m=1";function j(){var d=window.location.href,e=d.split(h);switch(e.length){case 1:return d+i;case 2:return 0<=e[1].search(g)?null:d+f;default:return null}}if(-1!=a[b][c]("Mobile")&&-1!=a[b][c]("WebKit")&&-1==a[b][c]("iPad")||-1!=a[b][c]("Opera Mini")||-1!=a[b][c]("IEMobile")){var k=j();k&&window.location.replace(k)};</script>
+
+#set others=""
+#for i in $inputs
+#if $i!="tmpl"
+#set others+=";"+i+"="+$inputs[i]["value"]
+#end if
+#end for
+<script src="../main1_js$others?language=$conf["main"]["language"]"></script>
+
+#if $tmpl!='planvelo3d'
+
+#if $tmpl!='mobile'
+#set ljs=['progress-bar.js','ui.selectmenu.js','proj4js-compressed.js']
+#else
+#set ljs=['OpenLayers.min.js','progress-bar.js','proj4js-compressed.js']
+#end if
+
+#if $m.web.metadata.get('mmOT')
+#set f=$m.web.metadata.get('mmOT').split(',')
+#if f.count('ScaleBar')>0
+#set ljs+=['ScaleBar.js']
+#end if
+#if f.count('MMPanZoom')>0
+#set ljs+=['MMMap/mmlib/mmmap.js','MMMap/mmlib/MMPanZoom.js']
+#end if
+#end if
+
+#if $mmHasSteps
+#set ljs+=['jquery.timelinr-0.9.52.js']
+#end if
+
+#if $tmpl=='natureparif-indicateurs'
+#set $ljs+=["mapmint-indicateurs.js"]
+#end if
+
+#set $ljs=$ljs+["/highchart/js/highcharts.min.js"]
+<script src="$conf["main"]["publicationUrl"]/OpenLayers.min.js?language=$conf["main"]["language"]"></script>
+
+#if $conf["main"].has_key("jsCache") and $conf["main"]["jsCache"]=="prod"
+<script src="$conf["main"]["publicationUrl"]/#for i in $ljs##if $i.count("MMMap")==0#$i,#end if##end for#?language=$conf["main"]["language"]"></script>
+#else
+#for i in $ljs
+<script src="$conf["main"]["publicationUrl"]/$i?language=$conf["main"]["language"]"></script>
+#end for
+#end if
+#for i in $ljs
+#if $i.count("MMMap")!=0
+<script src="$conf["main"]["publicationUrl"]/$i?language=$conf["main"]["language"]"></script>
+#end if
+#end for
+
+#if $tmpl=='mobile'
+<script src="$conf["main"]["publicationUrl"]/jquery.mobile-1.3.2.min.js"></script>
+<!-- <script src="$conf["main"]["publicationUrl"]/browser.js"></script> -->
+#end if
+<script src="./init_js$others?language=$conf["main"]["language"]"></script>
+<script src="./index_js$others?language=$conf["main"]["language"]"></script>
+<script src="./${tmpl}_js$others?language=$conf["main"]["language"]"></script>
+#else
+<script src="./init3d_js$others?language=$conf["main"]["language"]"></script>
+<script src="./index3d_js$others?language=$conf["main"]["language"]"></script>
+<script src="./${tmpl}_js$others?language=$conf["main"]["language"]"></script>
+#end if
+#try
+#for i in $ljs1
+<script src="./$i"></script>
+#end for
+#except
+#pass
+#end try
+</head>

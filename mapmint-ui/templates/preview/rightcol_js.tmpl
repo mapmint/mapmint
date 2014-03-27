@@ -1,0 +1,41 @@
+#import zoo
+
+function tinit(){
+  \$("#layerswitcher").css({height: (\$(window).height()-210)+"px"});
+  \$("#layers_list").css({height: (\$(window).height()-210)+"px"});
+
+\$(".base_layer").tipsy({fade: true, offset:5, opacity: 1, gravity: 'ne'});
+}
+
+#include $conf['main']['templatesPath']+"/preview/default_pre_js.tmpl"
+
+	mmLayout =\$('body').layout({ 
+		west__showOverflowOnHover: true,
+		north__showOverflowOnHover:	true,
+		north__minSize:90,
+		north__closable:false,
+		north__slidable:false,
+		north__resizable:false,
+		north__spacing_open:0,
+		south__resizable:false,
+		south__closable:false,
+		south__spacing_open:0,
+		south__minSize:36,
+		east__minSize:350,
+		east__resizable:false,
+		east__spacing_closed:0,
+                east__spacing_open:0,
+		onopen: function() {if(updateSize) updateSize();},
+		onclose: function() {if(updateSize) updateSize();},
+		onresize: function() {if(updateSize) updateSize();}
+	});
+
+	\$(".close").live('click', function() {
+                mmLayout.close('east');
+		\$("#map").before('<span class="open" onclick="mmLayout.open(\'east\')" title="$zoo._('Open')"></span>');
+    	});
+
+	\$("#layers_list").css({"height":(\$(document).height()-220)+"px"});
+
+#include $conf['main']['templatesPath']+"/preview/default_post_js.tmpl"
+

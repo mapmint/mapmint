@@ -1,0 +1,152 @@
+#from Skeleton import Skeleton
+#extends Skeleton
+
+#attr $mmodule = "Georeferencer"
+
+#attr $ocss = []
+
+#attr $js = ['../openlayers/OpenLayers.js','jquery.tipsy.js','jquery.hoverIntent.min.js','progress-bar.js','jquery.jgrowl.js','stylesheetToggle.js','jquery.colorPicker.js','flexigrid.js','Meta.js','jquery.cookie.js','jquery.xml2json.pack.js','wps.js']
+
+#attr $js1 = ["main_js","Georeferencer_js","wfst_js"] 
+
+#attr $js2 = ["http://maps.google.com/maps/api/js?sensor=false"] 
+
+#def page_title
+MapMint: Georefencer
+#end def
+
+#def body
+#import zoo
+<div class="ui-layout-west">
+	<h1 class="pane-title">$zoo._("Image to georeference:") $conf["senv"]["mmGeoImg"]<span class="close" onclick="myLayout.close('west')" title=""></span></h1>
+	<div class="toolbar">
+		<a class="fg-button ui-state-default ui-corner-all open-map"  href="#" title="$zoo._("Open Map")"></a>
+		<span class="ui-state-default ui-button-text-only ui-corner-all save-as-map"  href="#" title=""><input type="text" id="mapName" name="mapName" value="$conf["senv"]["mmGeoMap"]" /><input type="hidden" id="hgeodst" value="$conf["senv"]["mmGeoDST"]" /><input type="hidden" id="hgeodso" value="$conf["senv"]["mmGeoDSO"]" /><input type="hidden" id="hgeomap" value="$conf["senv"]["mmGeoMap"]" /><input type="hidden" id="hgeomap1" value="" /></span>
+		<a class="fg-button ui-corner-all zoom-to-max-extent ui-state-active"  href="#" title="$zoo._("Zoom to max extent")" onclick="geoMap.zoomToMaxExtent();"></a>
+		<a class="fg-button ui-corner-all pan ui-state-active gbutton0"  href="#" title="$zoo._("Pan")" onclick="activateControl0(0);"></a>
+		<a class="fg-button ui-state-default ui-corner-all zoom-box gbutton0"  href="#" title="$zoo._("Zoom Box")" onclick="activateControl0(1);"></a>
+		<a class="ui-state-default ui-button-text-only ui-corner-all save-as-map"  href="#" title="" onclick="saveGeorefProject();return false;">$zoo._("Save Project")</a>
+		<a class="ui-state-default ui-button-text-only ui-corner-all save-as-map"  href="#" title="" onclick="try{georeferenceWindow();}catch(e){alert(e);};return false;">$zoo._("Georeference")</a>
+
+	</div>
+	<div id="georefImg" style="width: 100%;height: 50%">
+		<ul class="nav-toolbar">
+		<li>
+		<a class="fg-button-s ui-state-default ui-corner-all zoom-in" href="javascript: void geoMap.zoomIn();" title="$zoo._("Zoom In")"></a>
+        </li>
+
+		<li>
+        <a class="fg-button-s ui-state-default ui-corner-all zoom-out" href="javascript: void geoMap.zoomOut();" title="$zoo._("Zoom Out")"> </a>
+        </li>
+        </ul>
+	</div>
+	<div id="georefPoints" style="width: 100%;height: 50%">
+	<table class="flexiGCP">
+	<thead>
+	<th width="20">id</th>
+	<th width="150">Image X</th>
+	<th width="150">Image Y</th>
+	<th width="150">Map X</th>
+	<th width="150">Map Y</th>
+	<thead>
+	<tbody>
+	<td>1</td>
+	<td>0</td>
+	<td>0</td>
+	<td>0</td>
+	<td>0</td>
+	<tbody>
+	</table>
+	</div>	
+</div>	
+	<div class="west-container">
+
+	
+		<ul id="tt2"></ul>
+	
+
+    </div>
+
+</div>
+
+<div class="ui-layout-center">
+	<h1 class="pane-title">$zoo._("Map Viewer")</h1>
+		<div class="toolbar">
+		<a class="fg-button ui-corner-all zoom-to-max-extent ui-state-active"  href="#" title="$zoo._("Zoom to max extent")" onclick="map.zoomToMaxExtent();"></a>
+		<a class="fg-button ui-corner-all pan ui-state-active gbutton"  href="#" title="$zoo._("Pan")" onclick="activateControl(0);"></a>
+		<a class="fg-button ui-state-default ui-corner-all zoom-box gbutton"  href="#" title="$zoo._("Zoom Box")" onclick="activateControl(1);"></a>
+		<a class="fg-button ui-state-default ui-corner-all crop-box gbutton hidden"  href="#" title="$zoo._("Crop Raster")" onclick="activateControl(2);"></a>
+		<a class="fg-button ui-state-default ui-corner-all openInManager hidden"  href="#" title="$zoo._("Open in Manager")" ></a>
+		<div id="slider-opacity" class="hidden" style="top:5px;left: 160px;width: 100px;"></div>
+	</div>
+
+	<div id="scales">
+	     <select id="scalesList" onchange="map.zoomTo(this.value)">
+#set a=$conf["mm"]["scales"].split(',')
+#set b=0
+#for i in a
+		<option value="$b">1:$i</option>
+#set b=$b + 1
+#end for
+	     </select>
+	</div>
+
+	<div id="base_layers">
+#set a=$conf["mm"]["bmLayerAlias"].split(',')
+#set b=$conf["mm"]["bmLayers"].split(',')
+#set a2=$conf["mm"]["bgLayerAlias"].split(',')
+#set b2=$conf["mm"]["bgLayers"].split(',')
+#set a1=$b+[$conf["mm"]["boLayers"]]+[a2[1]]
+#set b1=$a+[$conf["mm"]["boLayerAlias"]]+[b2[1]]
+#for i in range(0,len(a1))
+			<div onclick="map.setBaseLayer(map.layers[$i],true);" class="bl-layer base_layer #if $b1[$i]!=$conf["mm"]["boLayerAlias"]#base_layer_selected#end if#" id="base_layer_$a1[$i]" title="#if $i+1==len(a1)#Google Satelite#else##if $b1[$i]!=$conf["mm"]["boLayerAlias"]#$conf["mm"]["bmName"] #end if# $b1[$i]#end if#"></div>
+#end for
+		</div>
+
+	<div id="map" class="smallmap">
+		<ul class="nav-toolbar">
+		<li>
+		<a class="fg-button-s ui-state-default ui-corner-all zoom-in" href="javascript: void map.zoomIn();" title="$zoo._("Zoom In")"></a>
+        </li>
+
+		<li>
+        <a class="fg-button-s ui-state-default ui-corner-all zoom-out" href="javascript: void map.zoomOut();" title="$zoo._("Zoom Out")"> </a>
+        </li>
+        </ul>
+        </div>
+	    
+</div>
+
+<div id="open-map-dialog" title="$zoo._("Open Georeferencing Project")">
+		<p>$zoo._("Select Project:")</p>
+		<select id="selectMap" class="select-window">
+			<option value="$zoo._("Select Data Store")" selected="selected">$zoo._("Select Map")</option>
+		</select>
+	<div id="dlg-buttons">
+		<a href="#" class="easyui-linkbutton"  onclick="saveGeorefProject(\$('#selectMap').val());">$zoo._("Open")</a>
+	</div>
+</div>
+
+<div id="gcp-editor-dialog" title="$zoo._("GCP Editor")">
+<form id="gcp_editor">
+<fieldset>
+<legend>$zoo._("Image")</legend>
+<label for="gcp_editor_imgx">X: </label>
+<input id="gcp_editor_imgx" value=""/>
+<label for="gcp_editor_imgy">Y: </label>
+<input id="gcp_editor_imgy"/>
+</fieldset>
+<fieldset>
+<legend>$zoo._("Map")</legend>
+<label for="gcp_editor_mapx">X: </label>
+<input id="gcp_editor_mapx" value=""/>
+<label for="gcp_editor_mapy">Y: </label>
+<input id="gcp_editor_mapy"  />
+</fieldset>
+<input type="submit" value="$zoo._("save")" onclick="try{saveGCPEditing();}catch(e){alert(e);}return false;" />
+</form>
+</div>
+
+<div id="one" class="jGrowl bottom-right"></div>
+
+#end def

@@ -1,0 +1,14 @@
+.tree-node-selected{
+background: #f630f8; /* for non-css3 browsers */
+filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#f869ec', endColorstr='#f630f8'); /* for IE */
+background: -webkit-gradient(linear, left top, left bottom, from(#f869ec), to(#f630f8)); /* for webkit browsers */
+background: -moz-linear-gradient(top,  #f869ec, #f630f8 ); /* for firefox 3.6+ */
+}
+
+.menu-active{
+	border:1px solid #f982f5;
+	background:#fafafa;
+	border-radius:4px;
+	-moz-border-radius:4px;
+	-webkit-border-radius: 4px;
+}

@@ -1,0 +1,26 @@
+#encoding UTF-8
+#import zoo
+#import mapscript
+#import mm_access
+#from Cheetah.Template import Template
+<div id="wms_layerswitcher">
+
+  <ul id="wms_list">
+#import glob
+#for files in glob.glob($conf["main"]["dataPath"]+"/WMS/*.map"):
+#set file=$files.replace($conf["main"]["dataPath"]+"/WMS/","").replace("ds_ows.map","")
+    <li iconCls="tree_group" closed="true"><span>$file</span>
+
+#set m=mapscript.mapObj($files)
+      <ul>
+#for l in range($m.numlayers)
+#if $mm_access.checkLayerPriv($conf,$m,$m.getLayer($l).name,"r")
+	<li id="$m.getLayer($l).name">$m.getLayer($l).metadata.get('ows_title')</li>
+#end if
+#end for
+      </ul>
+
+    </li>
+#end for
+  </ul>
+</div>

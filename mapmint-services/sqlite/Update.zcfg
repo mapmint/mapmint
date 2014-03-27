@@ -1,0 +1,57 @@
+[Update]
+ Title = update row on sqlite database.
+ Abstract = update row on sqlite database.
+ processVersion = 2
+ storeSupported = false
+ statusSupported = true
+ serviceProvider = sqlite_service
+ serviceType = Python
+ <MetaData>
+   title = Demo
+ </MetaData>
+ <DataInputs>
+  [table]
+   Title = Input string
+   Abstract = Table name.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+   </LiteralData>
+  [set]
+   Title = Input string
+   Abstract = row to update as a json object.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+   </LiteralData>
+  [search]
+   Title = Input string
+   Abstract = where clause  as a json object.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = result of the request
+   Abstract = Result row if success.
+   <MetaData>
+    title = My test
+   </MetaData>
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+   </LiteralData>
+ </DataOutputs>
+

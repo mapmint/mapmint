@@ -1,0 +1,31 @@
+#import zoo
+#if $m.web.metadata.get('mmOT')
+#set f=$m.web.metadata.get('mmOT').split(',')
+#if f.count('SearchBox')>0
+<div id="search-container">
+<p>$zoo._("Search layers")</p>
+<select id="slayer">
+#for kk in range($m.numlayers)
+#try
+#if $m.getLayer(kk).getMetaData("mmSearchField")
+#try
+#set label=$m.getLayer(kk).getMetaData("ows_title")
+#if label==""
+#set label=$m.getLayer(kk).name
+#end if
+#except
+#set label=$m.getLayer(kk).name
+#end try
+    <option value="$m.getLayer(kk).name">$label</option>
+#end if
+#except
+#pass
+#end try
+
+#end for
+</select>
+     <input id="sfield" class="sfield" style="z-index:1000;position: relative;" onclick="this.value='';"/>
+</div>
+#end if
+
+#end if

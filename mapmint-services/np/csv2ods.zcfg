@@ -1,0 +1,36 @@
+[csv2ods]
+ Title = Convert CSV file into ODS
+ Abstract = List all the key value pairs from the main configuration file.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service.js
+ serviceType = JS
+ <DataInputs>
+  [file]
+   Title = Fields used to joind the two dataSources
+   Abstract = Fields used to joind the two dataSources
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <ComplexData>
+    <Default>
+     mimeType = application/vnd.oasis.opendocument.spreadsheet
+     encoding = utf-8
+     extension = ods
+    </Default>
+    <Default>
+     mimeType = application/vnd.ms-excel
+     encoding = utf-8
+     extension = xls
+    </Default>
+   </ComplexData>
+ </DataOutputs>

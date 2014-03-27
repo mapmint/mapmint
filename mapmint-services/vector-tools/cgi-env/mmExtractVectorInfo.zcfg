@@ -1,0 +1,43 @@
+[mmExtractVectorInfo]
+ Title = Get the centroid of a polygon. 
+ Abstract = Compute the geometry centroid.
+ Profile = urn:ogc:wps:1.0.0:centroid
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service.zo
+ serviceType = C
+ <DataInputs>
+  [dataSource]
+   Title = Polygon to get the centroid
+   Abstract = The centroid which is not necessarily within the geometry.
+   minOccurs = 1
+   maxOccurs = 1
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://fooa/gml/3.1.0/polygon.xsd
+    </Default>
+    <Supported>
+     mimeType = text/xml
+     encoding = base64
+     schema = http://fooa/gml/3.1.0/polygon.xsd
+    </Supported>
+   </ComplexData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The Centroid
+   Abstract = XML File representing the vector informations
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+    </Default>
+    <Supported>
+     mimeType = text/xml
+     encoding = UTF-8
+    </Supported>
+   </ComplexData>
+ </DataOutputs>  

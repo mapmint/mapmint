@@ -1,0 +1,55 @@
+function tinit(){
+  \$("#layerswitcher").css({height: (\$(window).height()-210)+"px"});
+  \$("#layers_list").css({height: (\$(window).height()-210)+"px"});
+}
+
+#include $conf['main']['templatesPath']+"/preview/default_pre_js.tmpl"
+
+	mmLayout =\$('body').layout({ 
+		west__showOverflowOnHover: true,
+		north__showOverflowOnHover:	true,
+		north__minSize:80,
+		north__closable:false,
+		west__closable:false,
+		east__closable:false,
+		north__slidable:false,
+		north__resizable:false,
+		north__spacing_open:0,
+		south__resizable:false,
+		south__closable:false,
+		south__spacing_open:0,
+		south__minSize:100,
+		west__resizable:false,
+		west__minSize:260,
+		east__minSize:260,
+		west__spacing_closed:0,
+		onopen: function() {if(updateSize) updateSize();},
+		onclose: function() {if(updateSize) updateSize();},
+		onresize: function() {if(updateSize) updateSize();}
+	})
+
+	//\$('#loading').fixedCenter();
+
+
+	/*\$(".close").live('click', function() {
+                mmLayout.close('west');
+		\$("#map").before('<span class="open" onclick="mmLayout.open(\'west\')" title="Open"></span>');
+    	});*/
+	
+	\$("#layers_list").css({"height":"0px"});
+	\$('.ui-layout-resizer').css({"display": "none"});
+	\$('#feuillederoute').css({"height": (\$(document).height()-200)+"px"});
+
+	\$(".ui-layout-east").css({"z-index": "0"});
+	
+	\$('.ui-layout-resizer').css({"display":"none"});
+
+#include $conf['main']['templatesPath']+"/preview/default_post_js.tmpl"
+
+function afficher_cacher(){
+	 if(state)
+            document.getElementById(id).style.visibility="visible";
+        else
+            document.getElementById(id).style.visibility="hidden";
+        return true;
+}

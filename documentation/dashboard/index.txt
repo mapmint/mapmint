@@ -1,0 +1,20 @@
+.. _dashboard:
+
+Tableau de bord
+===============
+
+Cette section regroupe la documentation relative au tableau de bord de MapMint.
+
+.. toctree::
+   :maxdepth: 2
+
+   configuration
+   ataglance
+   recentprojects
+   
+.. |mmdhsb| image:: ../../_static/images/dashboard-module-preview.png
+   :height: 385
+   :width: 700
+   :alt: Dashboard module preview image
+   
+|mmdhsb|

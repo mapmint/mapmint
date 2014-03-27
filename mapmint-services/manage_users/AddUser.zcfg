@@ -1,0 +1,39 @@
+[AddUser]
+ Title = Add user on database.
+ Abstract = insert user on user database.
+ processVersion = 2
+ storeSupported = false
+ statusSupported = true
+ serviceProvider = service_users
+ serviceType = Python
+ <DataInputs>
+  [user]
+   Title = Input string
+   Abstract = User informations to insert as a json object.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+   </LiteralData>
+  [group]
+   Title = Input string
+   Abstract = Group name.
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = JSON Object representing the created user
+   Abstract = JSON Object representing the created user.
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>
+

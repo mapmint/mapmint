@@ -1,0 +1,46 @@
+[convertTo]
+ Title = Convert vector data from one format to another.
+ Abstract = Converts vector data between different formats.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceType = JS
+ serviceProvider = service.js
+ <DataInputs>
+  [InputDSTN]
+   Title = The input datastore name
+   Abstract = The input datastore name to use as source for convertion.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+    <Supported>
+    </Supported>
+   </LiteralData>
+  [format]
+   Title = The input datastore name
+   Abstract = The input datastore name to use as source for convertion.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+    <Supported>
+    </Supported>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+    <Supported>
+    </Supported>
+   </LiteralData>
+ </DataOutputs>

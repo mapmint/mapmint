@@ -1,0 +1,46 @@
+#import zoo
+      <div id="chart1" style="height:250px; width:500px;"></div>
+<script>
+#from datastores.directories.service import *
+#try
+#set ftpSize=getDirSize($conf["main"]["dataPath"]+"/ftp")
+#set mapSize=getDirSize($conf["main"]["dataPath"]+"/maps")
+#set mapSize=$mapSize+getDirSize($conf["main"]["dataPath"]+"/public_maps")
+#set fontSize=getDirSize($conf["main"]["dataPath"]+"/fonts")
+#*set cacheSize=getDirSize($conf["main"]["cacheDir"])*#
+#set tmpSize=getDirSize($conf["main"]["tmpPath"])
+
+
+\$(document).ready(function(){
+  var data = [
+    ['FTP ($(getFormatedSize($ftpSize)))', $ftpSize],
+    ['$zoo._("Temp") ($(getFormatedSize($tmpSize)))', $tmpSize],
+    ['$zoo._("Maps") ($(getFormatedSize($mapSize)))', $mapSize], 
+    ['$zoo._("Fonts") ($(getFormatedSize($fontSize)))', $fontSize]#*, 
+    ['$zoo._("Cache") ($(getFormatedSize($cacheSize)))', $cacheSize]*#
+  ];
+  var plot1 = jQuery.jqplot ('chart1', [data], 
+    { 
+      //title: 'Disk usage',
+      series:[{color:'#5FAB78'}],
+      seriesDefaults: {
+        // Make this a pie chart.
+        renderer: jQuery.jqplot.PieRenderer, 
+        rendererOptions: {
+          // Put data labels on the pie slices.
+          // By default, labels show the percentage of the slice.
+          showDataLabels: true
+        }
+      }, 
+      legend: { show:true, location: 'e' }
+    }
+  );
+
+  \$(".jqplot-table-legend").find("tbody").append('<tr class="jqplot-table-legend"><td colspan="2"  class="jqplot-table-legend">$zoo._("Total Size:") $(getFormatedSize(ftpSize+mapSize+fontSize+tmpSize))#*+cacheSize*#</td></tr>');
+})
+
+#except
+alert('unable to load graph')
+#end try
+</script>
+

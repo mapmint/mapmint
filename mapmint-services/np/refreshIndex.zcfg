@@ -1,0 +1,20 @@
+[refreshIndex]
+ Title = Create a view on tables created from two different datasources.
+ Abstract = Create a view on tables created from two different datasources.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service.js
+ serviceType = JS
+ <DataInputs />
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

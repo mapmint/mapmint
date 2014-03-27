@@ -1,0 +1,31 @@
+[cleanup]
+ Title = Clean a directory datastore.
+ Abstract = Clean a directory datastore.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [dsName]
+   Title = Input string
+   Abstract = The name of the directory to clean.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <MetaData lang="en">
+    title = My test
+   </MetaData>
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

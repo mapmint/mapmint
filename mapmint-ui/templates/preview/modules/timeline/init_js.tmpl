@@ -1,0 +1,6 @@
+#import zoo
+#import mapscript
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/indexes_maps/project_PIndex"+$conf["senv"]["last_index"]+".map")
+#set inp=$inputs
+#set inp["prefix"]={"value":"indexes"}
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/timeline/_init.js",searchList={"m": $m,"conf":$conf,"inputs": $inp}))

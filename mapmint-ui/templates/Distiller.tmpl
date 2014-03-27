@@ -1,0 +1,120 @@
+#from Skeleton import Skeleton
+#extends Skeleton
+
+#attr $mmodule = "Distiller"
+
+#attr $ocss = []
+
+#attr $js = ['jquery.tipsy.js','jquery.hoverIntent.min.js','progress-bar.js','jquery.jgrowl.js','Meta.js','jquery.cookie.js','jquery.jqplot.min.js','plugins/jqplot.dateAxisRenderer.js','plugins/jqplot.highlighter.js','plugins/jqplot.cursor.js','plupload.js','plupload.html5.js','jquery.plupload.queue/jquery.plupload.queue.js','jquery.xml2json.pack.js','wps.js','ckeditor.js','upload.js']
+
+#attr $js1 = ['main_js']
+
+#def page_title
+MapMint: Distiller
+#end def
+
+#def body
+#import zoo
+<div class="ui-layout-center">
+<div id="Distiller" class="inner-layout-container"> 
+  <div class="inner-center">
+    <h1 class="pane-title">$zoo._("Data Sources")</h1>
+     <div class="toolbar">
+      <a onclick="startUploadWindow()" class="fg-button ui-state-default ui-corner-all add-vector"  id="add-vector" href="#" title="$zoo._("Add Data")"></a>
+      <a onclick="startTileWindow()" class="fg-button ui-state-default ui-corner-all add-raster" id="add-raster"  href="#" title="$zoo._("Create Tileindex")"></a>
+      <a onclick="startMergeWindow()" class="fg-button ui-state-default ui-corner-all add-raster" id="add-raster"  href="#" title="$zoo._("Mosaic a set of images")"></a>
+    </div>
+
+    
+    <div class="datasources-container lcontent" id="datasources-container-id">
+
+    </div>
+    
+    
+    
+  </div>   
+  <div class="inner-west">
+    <h1 class="pane-title">$zoo._("Data Stores")</h1> 
+         <div class="toolbar">
+      <a class="fg-button ui-state-default ui-corner-all db add-database" id="add-database" href="#" title="$zoo._("Add DB Connection")"></a>
+      <a class="fg-button ui-state-default ui-corner-all dir add-directory" id="add-directory" href="#" title="$zoo._("Add Directory")"></a>
+      <a class="fg-button ui-state-default ui-corner-all wms add-wms"  id="add-wms" href="#" title="$zoo._("Add WMS Server")"></a>
+      <a class="fg-button ui-state-default ui-corner-all wfs add-wfs"  id="add-wfs" href="#" title="$zoo._("Add WFS")"></a>
+    </div>
+
+    
+    <ul id="browser" class="tree lcontent">
+      <li iconCls="icon-db">
+	<span>$zoo._("Databases")</span>
+	<ul>
+	  <li id="mysqlList" iconCls="icon-db"><span>$zoo._("MySQL connections")</span>
+#if $inputs.keys().count("dbs")
+	  $inputs["dbs"]["value"]["MySQL"]
+#end if
+	  </li>
+	</ul>
+	<ul>
+
+	  <li id="postgisList" iconCls="icon-db"><span>$zoo._("PostGIS connections")</span>
+#if $inputs.keys().count("dbs")
+	  $inputs["dbs"]["value"]["PostGIS"]
+#end if
+	  </li>
+	</ul>
+      </li>
+      <li id="mainDirectoriesList">
+	<span>$zoo._("Directories")</span>
+#if $inputs.has_key('dirs')
+	  $inputs["dirs"]["value"]
+#end if
+      </li>
+      <li id="wfsList" iconCls="icon-wfs">
+	<span>$zoo._("WFS Servers")</span>
+#if $inputs.keys().count("wfs")
+	  $inputs["wfs"]["value"]
+#end if
+      </li>
+      <li id="wmsList" iconCls="icon-wms">
+	<span>$zoo._("WMS Servers")</span>
+#if $inputs.keys().count("wms")
+	  $inputs["wms"]["value"]
+#end if
+      </li>
+      </ul>
+
+  <div id="browser_menu" class="easyui-emenu" style="width:120px;">
+       <div onclick="Distiller.userManagement()" iconCls="icon-umanage">$zoo._("Privileges")</div>
+       <div onclick="Distiller.cleanDataStore()" iconCls="icon-refresh">$zoo._("Refresh")</div>
+       <div id="" onclick="Distiller.editDataStore();" iconCls="icon-edit">$zoo._("Edit")</div>
+       <div class="menu-sep"></div>
+       <div onclick="MapMintDBManager.initializeRemoveWindow()" iconCls="icon-remove">$zoo._("Remove")</div>
+       <input type="hidden" id="browser_selected_type" value="" />
+       <input type="hidden" id="browser_selected_dsName" value="" />
+   </div>
+
+  <div id="browser_db_menu" class="easyui-emenu" style="width:120px;">
+       <div onclick="Distiller.userManagement()" iconCls="icon-umanage">$zoo._("Privileges")</div>
+       <div id="db_menu_item" onclick="MapMintDBManager.accessDST()" iconCls="icon-table">$zoo._("Access")</div>
+       <div onclick="Distiller.cleanDataStore()" iconCls="icon-refresh">$zoo._("Refresh")</div>
+       <div onclick="Distiller.editDataStore();" iconCls="icon-edit">$zoo._("Edit")</div>
+       <div class="menu-sep"></div>
+       <div onclick="MapMintDBManager.initializeRemoveWindow()" iconCls="icon-remove">$zoo._("Remove")</div>
+       <input type="hidden" id="browser_selected_type" value="" />
+       <input type="hidden" id="browser_selected_dsName" value="" />
+   </div>
+
+  <div id="browser_ows_menu" class="easyui-emenu" style="width:120px;">
+       <div onclick="Distiller.userManagement()" iconCls="icon-umanage">$zoo._("Privileges")</div>
+       <div onclick="Distiller.cleanDataStore()" iconCls="icon-refresh">$zoo._("Refresh")</div>
+       <div onclick="OWService.editDataStore();" iconCls="icon-edit">$zoo._("Edit")</div>
+       <div class="menu-sep"></div>
+       <div onclick="MapMintDBManager.initializeRemoveWindow()" iconCls="icon-remove">$zoo._("Remove")</div>
+       <input type="hidden" id="browser_selected_type" value="" />
+       <input type="hidden" id="browser_selected_dsName" value="" />
+   </div>
+
+  </div> 
+</div>
+</div> 
+
+#end def

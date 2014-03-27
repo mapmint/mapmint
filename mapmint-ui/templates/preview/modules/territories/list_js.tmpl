@@ -1,0 +1,10 @@
+#import zoo,json
+#import np.service as np
+#import authenticate.service as auth
+#set con=$auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#set lt=np.listTerritoires($cur,$prefix,$conf["senv"]["group"])
+#set res0={}
+#set t=np.flatTerritoires($lt,$res0)
+$json.dumps($res0,ensure_ascii=False).encode("utf-8")

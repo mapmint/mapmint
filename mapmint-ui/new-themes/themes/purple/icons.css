@@ -1,0 +1,71 @@
+/*
+ *	MapMint Icons CSS
+ */
+ 
+.maincfg1 {border:1px solid #8f8f8f;background-image:url(../img/monitor-purple.png) !important;}
+.maincfg2 {border:1px solid #8f8f8f;background-image:url(../img/security-purple.png) !important;}
+.maincfg3 {border:1px solid #8f8f8f;background-image:url(../img/user-purple.png) !important;}
+
+.projects {border:1px solid #8f8f8f;background-image:url(../img/process-purple.png) !important;}
+.documents {border:1px solid #8f8f8f;background-image:url(../img/docs-purple.png) !important;}
+
+.add-database {border:1px solid #8f8f8f;background-image:url(../img/add-database-default-purple.png) !important;}
+.add-directory {border:1px solid #8f8f8f;background-image:url(../img/add-directory-default-purple.png) !important;}
+.add-vector {border:1px solid #8f8f8f;background-image:url(../img/add-vector-purple.png) !important;}
+.add-raster {border:1px solid #8f8f8f;background-image:url(../img/add-raster-purple.png) !important;}
+.add-wms {border:1px solid #8f8f8f;background-image:url(../img/add-wms-purple.png) !important;}
+.add-wfs {border:1px solid #8f8f8f;background-image:url(../img/add-wfs-purple.png) !important;}
+.add-wcs {border:1px solid #8f8f8f;background-image:url(../img/add-wcs-purple.png) !important;}
+
+.add-layer {border:1px solid #8f8f8f;background-image:url(../img/add-layer-purple.png) !important;}
+.open-map {border:1px solid #8f8f8f;background-image:url(../img/open-map-purple.png) !important;}
+
+.pan {border:1px solid #8f8f8f;background-image:url(../img/pan-purple.png) !important;}
+.zoom-box {border:1px solid #8f8f8f;background-image:url(../img/zoom-in-purple.png) !important;}
+.zoom-in {border:1px solid #8f8f8f;background-image:url(../img/zoomin-purple.png) !important;}
+.zoom-in:hover {border:1px solid #8f8f8f;background: #73C354 url(../img/zoomin-hover-purple.png) !important; 
+}
+.zoom-to-max-extent {border:1px solid #8f8f8f;background-image:url(../img/zoomtomaxextent-purple.png) !important;}
+.zoom-to-max-extent:hover {border:1px solid #8f8f8f;background-image:url(../img/zoomtomaxextent-hover-purple.png) !important;}
+.zoom-out {border:1px solid #8f8f8f;background-image:url(../img/zoomout-purple.png) !important;}
+.zoom-out:hover {border:1px solid #8f8f8f;background: #73C354 url(../img/zoomout-hover-purple.png) !important;}
+.zoom-to-point {border:1px solid #8f8f8f;background-image:url(../img/zoom-to-point-purple.png) !important;}
+.identify {border:1px solid #8f8f8f;background-image:url(../img/identify-purple.png) !important;}
+.mesure-distance {border:1px solid #8f8f8f;background-image:url(../img/ruler-purple.png) !important;}
+.mesure-area {border:1px solid #8f8f8f;background-image:url(../img/ruler-crop-purple.png) !important;}
+
+.select {border:1px solid #8f8f8f;background-image:url(../img/select-purple.png) !important;}
+.edit-point {border:1px solid #8f8f8f;background-image:url(../img/edit-point-purple.png) !important;}
+.edit-line {border:1px solid #8f8f8f;background-image:url(../img/edit-line-purple.png) !important;}
+.edit-polygon {border:1px solid #8f8f8f;background-image:url(../img/edit-polygon-purple.png) !important;}
+.delete-feature {border:1px solid #8f8f8f;background-image:url(../img/delete-feature-purple.png) !important;}
+
+.buffer {border:1px solid #8f8f8f;background-image:url(../img/buffer-purple.png) !important;}
+.centroid {border:1px solid #8f8f8f;background-image:url(../img/centroid-purple.png) !important;}
+.boundary {border:1px solid #8f8f8f;background-image:url(../img/boundary-purple.png) !important;}
+.convexhull {border:1px solid #8f8f8f;background-image:url(../img/convexhull-purple.png) !important;}
+.simplify {border:1px solid #8f8f8f;background-image:url(../img/simplify-purple.png) !important;}
+.union {border:1px solid #8f8f8f;background-image:url(../img/union-purple.png) !important;}
+.intersection {border:1px solid #8f8f8f;background-image:url(../img/intersection-purple.png) !important;}
+.symdifference {border:1px solid #8f8f8f;background-image:url(../img/symdifference-purple.png) !important;}
+.difference {border:1px solid #8f8f8f;background-image:url(../img/difference-purple.png) !important;}
+
+.raster-histogram {border:1px solid #8f8f8f;background-image:url(../img/raster-histogram-purple.png) !important;}
+.clip-raster {border:1px solid #8f8f8f;background-image:url(../img/clip-layer-purple.png) !important;}
+.merge-rasters {border:1px solid #8f8f8f;background-image:url(../img/merge-layer-purple.png) !important;}
+.polygons-from-raster {border:1px solid #8f8f8f;background-image:url(../img/polygons-from-raster-purple.png) !important;}
+.raster-from-csv {border:1px solid #8f8f8f;background-image:url(../img/raster-from-csv-purple.png) !important;}
+
+.terrain-profile {border:1px solid #8f8f8f;background-image:url(../img/terrain-profile-purple.png) !important;}
+.contours-from-dem {border:1px solid #8f8f8f;background-image:url(../img/contours-from-dem-purple.png) !important;}
+.shaded-relief {border:1px solid #8f8f8f;background-image:url(../img/shaded-relief-purple.png) !important;}
+.color-relief {border:1px solid #8f8f8f;background-image:url(../img/color-relief-purple.png) !important;}
+.slope-map {border:1px solid #8f8f8f;background-image:url(../img/slope-map-purple.png) !important;}
+
+.main-configuration {border:1px solid #8f8f8f;background-image:url(../img/process-purple.png) !important;}
+.layout-settings {border:1px solid #8f8f8f;background-image:url(../img/layout-settings-purple.png) !important;}
+.map-settings {border:1px solid #8f8f8f;background-image:url(../img/map-settings-purple.png) !important;}
+.layers-settings {border:1px solid #8f8f8f;background-image:url(../img/layers-settings-purple.png) !important;}
+.controls-settings {border:1px solid #8f8f8f;background-image:url(../img/controls-settings-purple.png) !important;}
+
+

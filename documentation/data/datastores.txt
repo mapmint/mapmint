@@ -1,0 +1,127 @@
+.. _datadatastores:
+
+Espaces de stockage
+===================
+
+.. contents:: Table des matières
+    :depth: 4
+    :backlinks: top
+
+Un espace de stockage contient des sources de données, locales ou distantes. Il est défini par un nom (sans accents ou caractères spéciaux), ainsi que par différents paramètres selon son type. Il existe quatre types d'espace de stockage dans MapMint:
+
+.. |adddb| image:: ../../_static/images/add-database.png
+   :height: 24
+   :width: 24
+   :alt: PDF icon
+   :target: /ZOOProject.pdf
+
+.. |adddir| image:: ../../_static/images/add-directory.png
+   :height: 24
+   :width: 24
+   :alt: PDF icon
+   :target: /ZOOProject.pdf
+
+.. |addwfs| image:: ../../_static/images/add-wfs.png
+   :height: 24
+   :width: 24
+   :alt: PDF icon
+   :target: /ZOOProject.pdf
+
+.. |addwms| image:: ../../_static/images/add-wms.png
+   :height: 24
+   :width: 24
+   :alt: PDF icon
+   :target: /ZOOProject.pdf
+   
+============ ================== ============================================
+**Icône**    **Type** 		    **Action**       
+------------ ------------------ --------------------------------------------
+|adddb|      Base de données    Ajout d'une connexion à une base de données 	           
+|adddir|     Répertoire         Ajout d'un répertoire de données 			 
+|addwfs| 	 Serveur WFS 	 	Ajout d'un serveur WFS externe 	          
+|addwms| 	 Serveur WMS 	 	Ajout d'une serveur WMS externe 	           
+============ ================== ============================================							
+
+.. warning::
+   Le nom d'un espace de stockage ne doit contenir ni espace, accent ou caractères spéciaux
+   
+Base de données
+-------------------------------
+
+Un espace de stockage de type base de données permet d'établir une connexion avec une base de données PostGIS ou MySQL. Cliquez sur l'icône "Ajouter une base de données" se trouvant dans la barre d'outil en haut du panneau des espaces de stockages. Cela entraine l'ouverture d'une fenêtre contenant le formulaire d'ajout d'une connexion à une base de données.
+
+.. |adddbw| image:: ../../_static/images/add-database-window.png
+	:scale: 100%
+	:alt: add database window
+
+|adddbw|
+
+Renseignez tout les champs puis cliquez sur le bouton "Tester". 
+
+Si le test renvoi un message de succès, vous pouvez alors cliquer sur le bouton "Ajouter". Cela entraîne la fermeture de la fenêtre et l'ajout du nouvel espace de stockage dans l'abre de gauche, dans la section PostGIS ou MySQL.
+
+.. note::
+   Une fois l'espace de stockage crée, procéder à un clic droit sur ce dernier et cliquer sur "Rafraichir".
+   
+Le clic sur l'espace de stockage entraine l'affichage des tables de la base de données dans le panneau des :doc:`datasources`.
+
+Répertoires
+-------------
+
+Un espace de stockage de type répertoire permet d'établir un lien symbolique vers un répertoire de données du serveur. Cliquez sur l'icône "Ajouter un répertoire" se trouvant dans la barre d'outil en haut du panneau des espaces de stockages. Cela entraine l'ouverture d'une fenêtre contenant le formulaire d'ajout d'un répertoire.
+
+.. |adddirw| image:: ../../_static/images/add-directory-window.png
+	:scale: 100%
+	:alt: add directory window
+
+|adddirw|
+
+Renseignez le nom de l'espace de stockage puis sélectionnez un répertoire du serveur dans l'arbre des répertoires (arborescence du repértoire /data de l'instance MapMint). 
+
+.. warning::
+   Le répertoire ciblé ne doit pas contenir de sous-répertoires.
+   
+.. warning::
+   Le repertoire ciblé doit contenir uniquement des formats de données supportés par MapMint.
+
+Cela entraîne la fermeture de la fenêtre et l'ajout du nouvel espace de stockage dans l'abre de gauche, dans la section Répertoires.
+
+.. note::
+   Une fois l'espace de stockage crée, procéder à un clic droit sur ce dernier et cliquer sur "Rafraichir".
+   
+Le clic sur l'espace de stockage entraine l'affichage des sources de données qu'il contient dans le panneau des :doc:`datasources`.
+
+Serveurs WFS
+---------------
+
+Un espace de stockage de type serveur WFS permet d'établir une connexion à un serveur WFS externe. Cliquez sur l'icône "Ajouter un serveur WFS" se trouvant dans la barre d'outil en haut du panneau des espaces de stockages. Cela entraine l'ouverture d'une fenêtre contenant le formulaire d'ajout d'un serveur WFS.
+
+.. |addwfsw| image:: ../../_static/images/add-wfs-window.png
+	:scale: 100%
+	:alt: add database window
+
+|addwfsw|
+
+Renseignez le nom de l'espace de stockage ainsi que l'URL du serveur WFS ciblé, puis cliquez sur le bouton "Tester". 
+
+Si le test renvoi un message de succès, vous pouvez alors cliquer sur le bouton "Ajouter". Cela entraîne la fermeture de la fenêtre et l'ajout du nouvel espace de stockage dans l'abre de gauche, dans la section Serveur WFS.
+
+Le clic sur l'espace de stockage entraine l'affichage des couches WFS du serveur externe dans le panneau des :doc:`datasources`.
+
+Serveurs WMS
+--------------
+
+Un espace de stockage de type serveur WMS permet d'établir une connexion à un serveur WMS externe. Cliquez sur l'icône "Ajouter un serveur WMS" se trouvant dans la barre d'outil en haut du panneau des espaces de stockages. Cela entraine l'ouverture d'une fenêtre contenant le formulaire d'ajout d'un serveur WMS.
+
+.. |addwmsw| image:: ../../_static/images/add-wms-window.png
+	:scale: 100%
+	:alt: add database window
+
+|addwmsw|
+
+Renseignez le nom de l'espace de stockage ainsi que l'URL du serveur WMS ciblé, puis cliquez sur le bouton "Tester". 
+
+Si le test renvoi un message de succès, vous pouvez alors cliquer sur le bouton "Ajouter". Cela entraîne la fermeture de la fenêtre et l'ajout du nouvel espace de stockage dans l'abre de gauche, dans la section Serveur WMS.
+
+Le clic sur l'espace de stockage entraine l'affichage des couches WMS du serveur externe dans le panneau des :doc:`datasources`.
+

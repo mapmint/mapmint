@@ -1,0 +1,30 @@
+[getIndexQuote]
+ Title = Get Index Quote.
+ Abstract = Get Index Quote.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [id]
+   Title = Fields used to joind the two dataSources
+   Abstract = Fields used to joind the two dataSources
+   minOccurs = 1
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting message
+   Abstract = The resulting message
+   <ComplexData>
+    <Default>
+     mimeType = application/json
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

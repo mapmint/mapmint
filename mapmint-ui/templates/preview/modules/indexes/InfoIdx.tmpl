@@ -1,0 +1,35 @@
+#encoding utf-8
+#import zoo
+<h3 class="idx">$zoo._("Index")</h3>
+<ul>
+  <li><span class="idx-name">$zoo._("The index name")</span>
+  <div class="starc starc0" id="vote_$conf["senv"]["last_index"]"></div>
+  </li>
+</ul>
+<p>$zoo._("Published on:")<span class="idx-date">test</span></p>
+<p><span>$zoo._("Description: ")</span><span class="idx-desc">Nombre d'études naturparif par commune d'Ile-de-France.</span></p>
+<p class="idx-up"><input type="checkbox" id="#" name="idx_up" onclick="if(this.checked)\$('#idx_agregation').show();else {\$('#idx_agregation').hide();\$('#idx_agregation').val('-1');showAgregatedLevel();} "/><label for="#">$zoo._("Display agregated level")</label>
+<select id="it0" class="gselect rounded" style="display:none">
+  <option value="-1">Selectionnez un territoire</option>
+#set res=$cur.execute("SELECT id,name as val,datasource from territoires order by name")
+#set vals=$cur.fetchall()
+#for i in range(0,len(vals))
+  <option value="$vals[i][0]">$vals[i][1]</option>
+#end for
+</select>
+<select id="it1" class="gselect rounded" style="display:none"">
+#for i in range(0,len(vals))
+#if $vals[i][2] is not None
+  <option value="$vals[i][0]">$($vals[i][2].replace("public.",""))</option>
+#end if
+#end for
+</select>
+<select id="idx_agregation" style="display:none" onchange="showAgregatedLevel();"></select>
+</p>
+<p>$zoo._("Download index"):</p>
+<ul class="dwl">
+<li class="kml"><a href="#">Format KML (.kml)</a></li>
+<li class="csv"><a href="#">Format CSV (.csv)</a></li>
+<li class="ods"><a href="#">Format ODS (.ods)</a></li>
+</ul>
+<a target="_blank" href="./indicateurs" id="idx-file-link" class="vsource">Voir la fiche</a>

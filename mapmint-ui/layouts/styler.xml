@@ -1,0 +1,293 @@
+<div id="styler" class="inner-layout-container"> 
+  <div class="inner-center">     
+    <h1>Symbology</h1>
+     <div class="toolbar">
+      <a class="fg-button ui-state-default ui-corner-all point"  href="#point" title="Point"></a>
+      <a class="fg-button ui-state-default ui-corner-all line"  href="#line" title="Line"></a>
+      <a class="fg-button ui-state-default ui-corner-all polygon"  href="#polygon" title="Polygon"></a>
+     
+    </div>
+    
+    <div class="tabs-styler">
+      
+      <div id="point">
+      <div class="point-sub">
+      		<h2 class="point-title">Point</h2>
+		<div class="point-top">
+
+		<dl id="#" class="dropdown">
+        <dt><a href="#" class="ui-corner-all"><span>Legend type</span></a></dt>
+        <dd>
+            <ul>
+                <li><a href="#">Unique symbol</a></li>
+                <li><a href="#">Graduated symbol</a></li>
+                <li><a href="#">Continuous color</a></li>
+                <li><a href="#">Unique value</a></li>
+                <li><a href="#">Unsdsalue</a></li>
+            </ul>
+        </dd>
+    	</dl>
+		<p class="opacity-title">Opacity:</p>
+	<div id="slider-opacity"></div>
+	<input type="text" id="amount" class="percent" />
+	</div>
+	
+	<div class="point-symbol">
+	<div class="point-symbol-container">
+		<h3>Point symbol:</h3>
+		<a href="#" ><img class="active" src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+	    <a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+	    <a href="#"><img src="img/test-square.png" /></a>	
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+	    <a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+	    <a href="#"><img src="img/test-square.png" /></a>	
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-square.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+		<a href="#"><img src="img/test-circle.png" /></a>
+
+	
+
+	
+		<p class="size"> Point size: <input type="text" class="size" name="size" value="2,00"/> <input type="checkbox" name="mapunits" /><span> Use map unit</span></p>
+	
+		</div>
+	</div>
+	
+		<div class="point-fill">
+		<div class="point-symbol-container">
+		<h3>Point fill: </h3>
+		<table>
+		<tr>
+		<td>
+		<dl id="#" class="dropdown-fill">
+        <dt><a href="#" class="ui-corner-all"><span>Texture</span></a></dt>
+        <dd>
+            <ul>
+                <li><a href="#">None</a></li>
+                <li><a href="#"></a></li>
+                <li><a href="#"></a></li>
+                <li><a href="#"></a></li>
+            </ul>
+        </dd>
+    	</dl>
+    	</td>
+    	<td>
+    	
+    			<div id="customWidget">
+
+					<div id="colorSelector2"><div style="background-color: #00ff00"></div></div>
+	                <div id="colorpickerHolder2">
+	                </div>
+				</div>
+	   </td>
+	   </tr>
+	   </table>
+
+		</div>
+		</div>
+		
+		<div class="point-stroke">
+		<div class="point-stroke-container">
+		<h3>Point stroke</h3>
+		
+		<table>
+		<tr>
+		<td>
+		<dl id="#" class="dropdown-stroke">
+        <dt><a href="#" class="ui-corner-all"><span>Border</span></a></dt>
+        <dd>
+            <ul>
+                <li><a href="#">None</a></li>
+                <li><a href="#"></a></li>
+                <li><a href="#"></a></li>
+                <li><a href="#"></a></li>
+            </ul>
+        </dd>
+    	</dl>
+    	</td>
+    	<td>
+    			<div id="customWidget">
+
+					<div id="colorSelector3">
+					<div style="background-color: #00ff00"></div>
+					</div>
+	                <div id="colorpickerHolder3"></div>
+				</div>
+		</td>
+	   </tr>
+	   </table>
+
+		</div>
+		
+		
+		</div>
+
+	 <center><input type="button" class="save-style" style="margin-top:10px;" value="Save style"></input></center>
+	</div>
+	</div>
+      
+      <div id="line">
+ 		<div class="line-sub">
+ 		
+ 		<h2 class="line-title">Line</h2>
+		<div class="line-top">
+		<dl id="#" class="dropdown">
+        <dt><a href="#" class="ui-corner-all"><span>Legend type</span></a></dt>
+        <dd>
+            <ul>
+                <li><a href="#">Unique symbol</a></li>
+                <li><a href="#">Graduated symbol</a></li>
+                <li><a href="#">Continuous color</a></li>
+                <li><a href="#">Unique value</a></li>
+            </ul>
+        </dd>
+    	</dl>
+		<p class="opacity-title">Opacity:</p>
+	<div id="slider-opacity"></div>
+	<input type="text" id="amount" class="percent" />
+	</div>
+
+	
+		<div class="line-fill">
+		<div class="line-fill-container">
+		<h3>Line fill</h3>
+		<table>
+		<tr>
+		<td>
+		<dl id="#" class="dropdown-fill">
+        <dt><a href="#" class="ui-corner-all"><span>Texture</span></a></dt>
+        <dd>
+            <ul>
+                <li><a href="#">None</a></li>
+                <li><a href="#"></a></li>
+                <li><a href="#"></a></li>
+                <li><a href="#"></a></li>
+            </ul>
+        </dd>
+    	</dl>
+    	</td>
+    	<td>
+    	
+    			<div id="customWidget">
+
+					<div id="colorSelector2"><div style="background-color: #00ff00"></div></div>
+	                <div id="colorpickerHolder2">
+	                </div>
+				</div>
+	   </td>
+	   </tr>
+	   </table>
+
+		</div>
+		</div>
+		
+		<div class="line-stroke">
+		<div class="line-stroke-container">
+		<h3>Line stroke</h3>
+		
+		<table>
+		<tr>
+		<td>
+		<dl id="#" class="dropdown-stroke">
+        <dt><a href="#" class="ui-corner-all"><span>Border</span></a></dt>
+        <dd>
+            <ul>
+                <li><a href="#">None</a></li>
+                <li><a href="#"></a></li>
+                <li><a href="#"></a></li>
+                <li><a href="#"></a></li>
+            </ul>
+        </dd>
+    	</dl>
+    	</td>
+    	<td>
+    			<div id="customWidget">
+
+					<div id="colorSelector2">
+					<div style="background-color: #00ff00"></div>
+					</div>
+	                <div id="colorpickerHolder2"></div>
+				</div>
+		</td>
+	   </tr>
+	   </table>
+
+		</div>
+		</div>
+
+	
+	</div>
+
+	
+      </div>
+      
+      <div id="polygon">
+blaba
+      </div>  
+    </div>
+
+    
+  </div>   
+  <div class="inner-west">
+    <h1>Styles</h1> 
+    <div class="toolbar">
+      <a class="fg-button ui-state-default ui-corner-all vector-styles"  href="#" title="Vector styles"></a>
+      <a class="fg-button ui-state-default ui-corner-all raster-styles"  href="#" title="Raster styles"></a>
+    </div>
+    
+    <ul class="styles">
+    <li><input type="checkbox" /><img src="img/test.png" /> green point</li>
+    <li><input type="checkbox" /><img src="img/test.png" /> red square</li>
+    <li><input type="checkbox" /><img src="img/test.png" /> red square</li>
+        <li><input type="checkbox" /><img src="img/test.png" /> red square</li>
+            <li><input type="checkbox" /><img src="img/test.png" /> red square</li>
+                <li><input type="checkbox" /><img src="img/test.png" /> red square</li>
+    </ul>
+
+    
+    
+    
+
+  </div> 
+</div> 

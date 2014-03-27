@@ -1,0 +1,25 @@
+#if $m.web.metadata.get('mmOT')
+#set f0=$m.web.metadata.get('mmOT').split(',')
+#if $f0.count('MMOVMap')>0 or $f0.count('MMOVMapFixed')>0
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/other_tools/overviewmap.html",searchList={"m": $m,"conf":$conf}))
+#end if
+#end if
+#if $nav.count('profile_line')>0
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/profile/display.html",searchList={"m": $m,"conf":$conf}))
+#end if
+#if $nav.count('line')>0
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/measure/line/display.html",searchList={"m": $m,"conf":$conf}))
+#end if
+#if $nav.count('polygon')>0
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/measure/polygon/display.html",searchList={"m": $m,"conf":$conf}))
+#end if
+#if $nav.count('getFeature')>0 or $nav.count('getFeatureCircle')>0
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/getFeature/display.html",searchList={"m": $m,"conf":$conf}))
+#end if
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/export/display.html",searchList={"m": $m,"conf":$conf}))

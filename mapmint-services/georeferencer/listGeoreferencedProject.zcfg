@@ -1,0 +1,28 @@
+[listGeoreferencedProject]
+ Title = List all MapMint GCP CSV files
+ Abstract = List all MapMint GCP CSV files.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [dso]
+   Title = The MapMint GeoReferencing project name
+   Abstract = The MapMint GeoReferencing project name.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting JSON array
+   Abstract = The resulting JSON array.
+   <LiteralData>
+   dataType=string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

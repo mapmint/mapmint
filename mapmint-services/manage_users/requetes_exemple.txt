@@ -1,0 +1,90 @@
+########################################################
+Ajout d'un utilisateur
+
+<wps:Execute service="WPS" version="1.0.0" metaPath="sqlite" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsExecute_request.xsd">
+<ows:Identifier>AddUser</ows:Identifier>
+<wps:DataInputs>
+<wps:Input>
+<ows:Identifier>user</ows:Identifier>
+<ows:Title> user </ows:Title>
+<ows:Data>
+<wps:LiteralData><![CDATA[{"login":"test1","nom":"utilisateur1","prenom":"prenomtest","mail":"test@maildetest.com","passwd" : "chaloupe"}]]>
+</wps:LiteralData>
+</ows:Data>
+</wps:Input>	
+</wps:DataInputs>
+<wps:ResponseForm>
+<wps:RawDataOutput>
+<wps:Output asReference="false">
+<ows:Identifier>Result</ows:Identifier>
+</wps:Output>
+</wps:RawDataOutput>
+</wps:ResponseForm>
+</wps:Execute>
+
+#########################################################
+Ajout d'un groupe
+
+
+<wps:Execute service="WPS" version="1.0.0" metaPath="sqlite" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsExecute_request.xsd">
+<ows:Identifier>AddGroup</ows:Identifier>
+<wps:DataInputs>
+<wps:Input>
+<ows:Identifier>nom</ows:Identifier>
+<ows:Title> nom </ows:Title>
+<ows:Data>
+<wps:LiteralData>best</wps:LiteralData>
+</ows:Data>
+</wps:Input>
+<wps:Input>
+<ows:Identifier>description</ows:Identifier>
+<ows:Title> description</ows:Title>
+<ows:Data>
+<wps:LiteralData>groupe des meilleurs</wps:LiteralData>
+</ows:Data>
+</wps:Input>	
+</wps:DataInputs>
+<wps:ResponseForm>
+<wps:RawDataOutput>
+<wps:Output asReference="false">
+<ows:Identifier>Result</ows:Identifier>
+</wps:Output>
+</wps:RawDataOutput>
+</wps:ResponseForm>
+</wps:Execute>
+
+###########################################################
+Mise a jour d'un utilisateur
+
+<wps:Execute service="WPS" version="1.0.0" metaPath="sqlite" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 http://schemas.opengis.net/wps/1.0.0/wpsExecute_request.xsd">
+<ows:Identifier>UpdateUser</ows:Identifier>
+<wps:DataInputs>
+<wps:Input>
+<ows:Identifier>id</ows:Identifier>
+<ows:Title>id</ows:Title>
+<ows:Data>
+<wps:LiteralData>1</wps:LiteralData>
+</ows:Data>
+</wps:Input>
+<wps:Input>
+<ows:Identifier>set</ows:Identifier>
+<ows:Title> set </ows:Title>
+<ows:Data>
+<wps:LiteralData><![CDATA[{"nom":"poleta","prenom": "pepito"}]]>
+</wps:LiteralData>
+</ows:Data>
+</wps:Input>	
+</wps:DataInputs>
+<wps:ResponseForm>
+<wps:RawDataOutput>
+<wps:Output asReference="false">
+<ows:Identifier>Result</ows:Identifier>
+</wps:Output>
+</wps:RawDataOutput>
+</wps:ResponseForm>
+</wps:Execute>
+
+
+
+
+

@@ -1,0 +1,28 @@
+[dropLayerFile]
+ Title = Remove all files related to a MapMint Georeferencing Project except mapfile
+ Abstract = Remove all files related to a MapMint Georeferencing Project except mapfile.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [layer]
+   Title = The MapMint GeoReferencing project name
+   Abstract = The MapMint GeoReferencing project name.
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The success or failure message including the whole list of removed files
+   Abstract = The success or failure message including the whole list of removed files.
+   <LiteralData>
+   dataType=string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

@@ -1,0 +1,639 @@
+#encoding UTF-8
+#import zoo
+#import mapscript
+#if $m.getLayerByName($inputs["layer"]["value"]).type != mapscript.MS_LAYER_RASTER
+<div class="style-tabs">
+  <ul class="style-tabs-nav">
+    <li><a class="ui-state-default ui-button-text-only ui-corner-all" href="#first">$zoo._("Symbology")</a></li>
+    <li><a class="ui-state-default ui-button-text-only ui-corner-all" href="#second">$zoo._("Labels")</a></li>
+    #if $inputs["layer"]["value"].count("grid_")>  0
+    <li><a class="ui-state-default ui-button-text-only ui-corner-all" href="#third">$zoo._("Grid")</a></li>
+    #end if
+  </ul>
+
+  <div id="first">
+    <table class="classif">
+      <tr>
+	<td class="title">$zoo._("Opacity:")<input type="text" id="opacity" name="opacity" value="$m.getLayerByName($inputs["layer"]["value"]).getClass(0).getStyle(0).opacity%" class="opacity"/></td>
+	<td><div id="slider-opacity"></div>
+      <div id="opacityOnly">
+	<a class="ui-state-default ui-button-text-only ui-corner-all classify opacity" href="#" onclick="setOpacityOnly()">Set opacity for each class</a>
+      </div>
+	</td>
+      </tr>
+      
+      #if $inputs["layer"]["value"].count("grid_")==0
+      <tr>
+	<td class="title">$zoo._("Legend Type:")</td>
+	<td>
+	  <form>
+	    
+	    <select id="dropdown" name="dropdown" class="select-window">
+	      <option value="uniqSymb">$zoo._("Unique Symbol")</option>
+	      <option value="gradSymb" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="gs" and not($inputs.has_key('isStep'))#selected="true"#end if#>$zoo._("Graduated Symbol")</option>
+	      <option value="contCol" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="cc" and not($inputs.has_key('isStep'))#selected="true"#end if#>$zoo._("Continuous Color")</option>
+	      <option value="uniqVal" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="uv" and not($inputs.has_key('isStep'))#selected="true"#end if#>$zoo._("Unique Value")</option>
+	      <option value="timeline" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="tl" or $inputs.has_key('isStep')#selected="true"#end if#>$zoo._("Time line")</option>
+	    </select>
+	  </form>
+	</td>
+      </tr>
+      <tr class="tl" #if not($inputs.has_key('isStep'))#style="display: none"#end if#>
+	<td class="title">$zoo._("Steps:")</td>
+	<td>
+	  #try
+	  #from mapfile.service import *
+	  #set res=listStep($conf,$inputs,$outputs)
+	  #if $res==3
+	  #import json
+	  #set opts=json.loads($outputs["Result"]["value"])
+	  #else
+	  #set opts=[]
+	  #end if
+	  #except
+	  #set opts=[]
+	  #end try
+	  <select id="mmsteps" onchange="if(this.value=='add')MMStyler.Timeline.startStepEditor();if(this.selectedIndex>1){\$('#mmDeleteStep').show();MMStyler.startWindow(true);}else \$('#mmDeleteStep').hide();">
+	    <option value="-1">$zoo._("Select one step")</option>
+	    <option value="add">$zoo._("Add a step")</option>
+	    #set j=0
+	    #for i in $opts
+	    #if $i!=""
+	    <option value="$i" #if $j==0 and not($inputs.has_key('mmStep'))#selected="true"#else##if $inputs.has_key('mmStep') and $inputs["mmStep"]["value"]==str($j)#selected="true"#end if##end if#>$i</option>
+	    #set $j=$j+1
+	    #end if
+	    #end for
+	  </select>
+	  <input id="mmDeleteStep" type="submit" value="$zoo._("Delete")" onclick="try{MMStyler.Timeline.deleteStep();}catch(e){}return false;" />	
+	</td>
+      </tr>
+      <tr class="tl" #if not($inputs.has_key('isStep'))#style="display: none"#end if#>
+      <td class="title">$zoo._("Legend Type for this step:")</td>
+      <td>
+	<form>
+	
+	  <select id="dropdown1" name="dropdown1" class="select-window">
+	    <option value="uniqSymb">$zoo._("Unique Symbol")</option>
+	    <option value="gradSymb" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="gs"#selected="true"#end if#>$zoo._("Graduated Symbol")</option>
+	    <option value="contCol" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="cc"#selected="true"#end if#>$zoo._("Continuous Color")</option>
+	    <option value="uniqVal" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="uv"#selected="true"#end if#>$zoo._("Unique Value")</option>
+	  </select>
+	</form>
+      </td>
+      </tr>
+      #end if
+      
+    </table>
+    
+    <div id="divuniqSymb" class="box">
+      #from Cheetah.Template import Template
+      $(Template(file=$conf["main"]["templatesPath"]+"/Manager/Styler/UniqSymb.tmpl",searchList=$searchList))
+    </div>
+    
+    #if $inputs["layer"]["value"].count("grid_")==0
+    <div id="divgradSymb" class="box">
+      <table class="classif">
+	<tr>
+	  <td>$zoo._("Min / Max color:")</td>
+	  <td colspan="3">
+	    <input id="gs-min-colorpicker" type="text" name="us-min-colorpicker" value="$colors[0]" />
+	    <input id="gs-max-colorpicker" type="text" name="us-max-colorpicker" value="$colors[1]" />
+	  </td>
+	</tr>
+	<tr>
+	  <td>$zoo._("Classification:")</td>
+	  <td>
+	    
+	    #if $m.getLayerByName($inputs["layer"]["value"]).numclasses > 0#<input name="gsFieldH" id="gsFieldH" type="hidden" value="$m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmField")" />#end if#
+	    <select id="gsField" class="select-window">
+	      <option value="Texture">$zoo._("Select field")</option>
+	    </select>
+	  </td>
+	</tr>
+	
+	<!--
+	    <tr>
+	      <td>Mode:</td>
+	      <td>
+		<select class="select-window">
+		  <option value="eqInterval">Equal intervals</option>
+		  <option value="tmp[0]quatiles">Quantiles</option>
+		</select>
+	      </td>
+	    </tr>
+	    -->
+	
+	<tr>
+	  <td>$zoo._("Classes:")</td>
+	  <td>
+	    <input id="gsNbClasses" type="text" name="" value="#if $m.getLayerByName($inputs["layer"]["value"]).numclasses > 0#$m.getLayerByName($inputs["layer"]["value"]).numclasses#else#6#end if#" class="input-window-short"/>
+	    <a class="ui-state-default ui-button-text-only ui-corner-all classify" onclick="classifyMap('gs');" href="#">$zoo._("Classify")</a>
+	  </td>
+	</tr>
+	
+	<tr>
+	  <td class="title">$zoo._("Discretization:")</td>
+	  <td>
+	    <select id="dropdownd" name="dropdownd" class="select-window">
+	      <option value="-1">$zoo._("Choose")</option>
+	      #set tmp=["equal","jenks","quantile","pretty","kmeans","fisher"]
+	      #for a in tmp 
+	      <option value="$a" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmMethod") and $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmMethod")==$a#selected="true"#end if#>$zoo._(a)</option>
+	      #end for
+	    </select>
+	  </td>
+	</tr>
+      </table>
+      <div id="gs_classification">
+	
+	#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="gs"
+	#from Cheetah.Template import Template
+	$(Template(file=$conf["main"]["templatesPath"]+"/Manager/Styler/ClassLegend.tmpl",searchList=$searchList))
+	#end if
+	
+      </div>
+    </div>
+    
+    
+    <div id="divcontCol" class="box">
+      <table class="classif">
+	<tr>
+	  <td>$zoo._("Classification:")</td>
+	  <td>
+	    #if $m.getLayerByName($inputs["layer"]["value"]).numclasses > 0#<input name="ccFieldH" id="ccFieldH" type="hidden" value="$m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmField")" />#end if#
+	    <select id="ccField" class="select-window">
+	      <option value="Texture" selected="selected">$zoo._("Select field")</option>
+	    </select>
+	  </td>
+	</tr>
+	<tr>
+	  <td>$zoo._("Min value:")</td>
+	  <td>
+	    <input id="cc-min-colorpicker" type="text" name="min-colorpicker" value="#if $colors[3] is not None#$colors[0]#else#$colors[3]#end if#" />
+	  </td>
+	</tr>
+	<tr>
+	  <td>$zoo._("Max value:")</td>
+	  <td>
+	    <input id="cc-max-colorpicker" type="text" name="max-colorpicker" value="#if $colors[4] is not None#$colors[1]#else#$colors[4]#end if#" />
+	  </td>
+	</tr>
+	<tr>
+	  <td>$zoo._("Width:")</td>
+	  <td>
+	    <input id="ccWidth" type="text" name="" value="1" class="input-window-short"/>
+	  </td>
+	</tr>
+	<tr>
+	  <td>$zoo._("Legend:")</td>
+	  <td>
+	    <img id="ccLegend" style="width: 24px;height:24px;" src=""/>
+	  </td>
+	</tr>
+      </table>
+      
+      <ul class="style-tabs-nav1">
+	<li><a class="ui-state-default ui-button-text-only ui-corner-all" onclick="classifyMap('cc')" href="#first">$zoo._("Apply")</a></li>
+      </ul>
+      
+    </div>
+
+    
+    <div id="divuniqVal" class="box">
+      <table class="classif">
+	<tr>
+	  <td>$zoo._("Min / Max color:")</td>
+	  <td colspan="3">
+	    <input id="us-min-colorpicker" type="text" name="us-min-colorpicker" value="#if $colors[3] is not None#$colors[3]#else#$colors[0]#end if#" />
+	    <input id="us-max-colorpicker" type="text" name="us-max-colorpicker" value="#if $colors[4] is not None#$colors[4]#else#$colors[1]#end if#" />
+	  </td>
+	</tr>
+	<tr>
+	  <td>$zoo._("Classification:")  <input class="hasInfo" title="$zoo._("Use the field to define size of the symbol.")" id="uniqValSize" type="checkbox" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get('mmFAS') is not None and $m.getLayerByName($inputs["layer"]["value"]).metadata.get('mmFAS')=="true"#checked="true"#end if# onclick="if(\$(this).is(':checked')){\$('#uniqValFormula').val(\$('#usField').val());\$('#uniqValFormula').show();}else \$('#uniqValFormula').hide();" /></td>
+	  <td>
+	    #if $m.getLayerByName($inputs["layer"]["value"]).numclasses > 0#<input name="usFieldH" id="usFieldH" type="hidden" value="$m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmField")" />#end if#
+	    <select id="usField" class="select-window">
+	      <option value="Texture" selected="selected">$zoo._("Select field")</option>
+	    </select>
+	    <input id="uniqValFormula" class="hasInfo" title="$zoo._("Use the formula you want (ie. MY_FIELD*10).")" type="text" value="$m.getLayerByName($inputs["layer"]["value"]).metadata.get('mmFASF')" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get('mmFAS') is None#style="display:none"#end if#/>
+	  </td>
+	  <td>
+	  </td>
+	  <td>
+	    <a class="ui-state-default ui-button-text-only ui-corner-all classify" onclick="classifyMap('us');" href="#">$zoo._("Classify")</a>
+	  </td>
+	</tr>
+      </table>
+      
+      
+      <div id="us_classification">
+	
+	#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="uv"
+	#from Cheetah.Template import Template
+	$(Template(file=$conf["main"]["templatesPath"]+"/Manager/Styler/ClassLegend.tmpl",searchList=$searchList))
+	#end if
+
+      </div>
+    </div>
+
+    #else
+    
+#set l=$m.getLayerByName($inputs["layer"]["value"])
+  </div>
+  <div id="third">
+    <table>
+      <tr>
+	<td>$zoo._("Label Format:") </td>
+	<td colspan="2"><input id="mmLabelFormat" type="text" value="$l.metadata.get('mmLabelFormat')" class="hasInfo" title="$zoo._("Format of the label. &#8220;DD&#8221; for degrees, &#8220;DDMM&#8221; for degrees minutes, and &#8220;DDMMSS&#8221; for degrees, minutes, seconds. A C-style formatting string is also allowed, such as &#8220;%g°&#8221; to show decimal degrees with a degree symbol.")"/></td>
+      </tr>
+      #set infos=[[$zoo._("The minimum number of arcs to draw. Increase this parameter to get more lines."),$zoo._("The maximum number of arcs to draw.   Decrease this parameter to get fewer lines.")],[$zoo._("The minimum number of intervals to try to use. The distance between the grid lines, in the units of the grid&#8217;s coordinate system."),$zoo._("The maximum number of intervals to try to use.  The distance between the grid lines, in the units of the grid&#8217;s coordinate system.")],[$zoo._("The minimum number of segments to use when rendering an arc.  If the lines should be very curved, use this to smooth the lines by adding more segments."),$zoo._("The maximum number of segments to use when rendering an arc. If the graticule should be very straight, use this to minimize the number of points for faster rendering.")]]
+#set suffix=$zoo._(" Optional, set to '0' to deactivate.")
+      #set ii=0
+#for j in ('Arcs','Interval','Subdivide')
+      <tr>
+	<td>Min / Max $(j): </td>
+#set jj=0
+	#for i in ('min','max')
+	<td><input id="mm$(i)$(j)" type="text" class="hasInfo" value="#if $l.metadata.get("mm"+$i+$j) is not None#$l.metadata.get("mm"+$i+$j)#else#0#end if#" title="$infos[$ii][$jj] $suffix"/></td>
+#set jj=$jj+1
+#end for
+      </tr>
+#set ii=$ii+1
+#end for
+    </table>
+
+    <ul class="style-tabs-nav1">
+      <li><a class="ui-state-default ui-button-text-only ui-corner-all" onclick="saveLayerGrid()" href="#first">$zoo._("Apply")</a></li>
+    </ul>
+    #end if
+
+  </div>
+	
+  <div id="second">
+    #try
+    #set label=$m.getLayerByName($inputs["layer"]["value"]).getClass(0).getLabel(0)
+    #except
+    #set label=None
+    #end try
+    
+    <input type="checkbox" id="displayLabel" onclick="\$('#Styler_Labels').css('display',(this.checked?'block':'none'))" #if $label is not None and $label.size > 0#checked="true"#end if#/>
+    <label>$zoo._("Show labels")</label>
+    
+    #set l=$label
+    #*set l=$m.getLayerByName($inputs["layer"]["value"]).getClass(0).label*#
+    
+    <div id="Styler_Labels" #if $l is None or $l.size < 0#style="display:none"#end if#>
+	 <table>
+	   #if $inputs["layer"]["value"].count("grid_")==0
+	   <tr>
+	     <td>$zoo._("Labeling field:")</td>
+	     <td>
+	       <input id="labelFieldH" type="hidden" value="$m.getLayerByName($inputs["layer"]["value"]).labelitem" />
+	       <select id="labelField" class="select-window">
+		 <option value="sdfs" selected="selected">$zoo._("Select field")</option>
+	       </select>
+	     </td>
+	   </tr>
+#end if
+	   <tr>
+	     <td>$zoo._("Orientation:")</td>
+	     <td>
+	       #set labftmp=$m.getLayerByName($inputs["layer"]["value"]).metadata.get("label_angle_field")
+	       #if $labftmp is None
+	       #set labftmp=""
+	       #end if
+	       <input id="labelAngle" type="text" name="" value="#if $l is not None and $l.angle#$l.angle#else#0#end if#" class="input-window-short hasInfo" title="$zoo._("Angle, given in degrees, to draw the label. Using value '0' for a LINE layers will imply the computation of a curved label for appropriate linear features.")" #if $labftmp is not None and $labftmp.count("[")>0#style="display:none"#end if# />
+    <input id="labelAngleFieldH" type="hidden" value="$labftmp.replace("[","").replace("]","")" />
+    <select id="labelAngleField" class="select-window" #if $labftmp is None or $labftmp.count("[")==0#style="display:none"#end if#>
+      <option value="sdfs" selected="selected">$zoo._("Select field")</option>
+    </select>
+    <input type="checkbox" id="lauf" class="hasInfo" title="$zoo._("Specify the item name in the attribute table to use for angle values")" onclick="if(\$(this).is(':checked')){\$('#labelAngle').hide();\$('#labelAngleField').show();}else{\$('#labelAngleField').hide();\$('#labelAngle').show();}" #if $labftmp is not None and $labftmp.count("[")!=0# checked="true"#end if# />
+</td>
+</tr>
+<tr>
+	<td>
+	  $zoo._("Clean size")
+	</td>
+	<td>
+	  <input id="labelBufferF" type="text" name="" value="#if $l is not None and $l.buffer#$l.buffer#else#0#end if#" class="input-window-short hasInfo" title="$zoo._("Padding, in pixels, around labels. Useful for maintaining spacing around text to enhance readability.")"/>
+	</td>
+      </tr>
+    </table>
+
+    <table>
+      <tr>
+	<td>$zoo._("Font:")</td>
+	<td> 
+	  <table>
+	    <tr>
+	      <td>
+		<select id="font" class="select-window">
+#set font_famillies=['Arial','Georgia','Osaka','Tahoma','Trebuchet','Verdana']
+#for a in $font_famillies
+		  <option style="font-family:$a;font-size:1.1em;" value="$a" onclick="\$('#demo_string').css('font-family', this.value);" #if $l is not None and $l.font==$a#selected="true"#end if#>$a</option>
+#end for
+		</select>
+	      </td>
+	      <td>
+		<select id="fonts" class="select-window">
+#set font_sizes=range(6,18)
+#for a in font_sizes
+		  <option style="font-size:${a}px;" value="${a}" onclick="\$('#demo_string').css('font-size',this.value);" #if $l is not None and $l.size==$a# selected="true"#end if#>${a}px</option>
+#end for
+		</select>
+	      </td>
+	      <td>
+#if $l is not None
+#set col='#%02x%02x%02x' % (l.color.red,l.color.green,l.color.blue)
+#else
+#set col='#ffffff'
+#end if
+		<span class="fcolor2">Font-color <input id="font-colorpicker" type="text" name="font-colorpicker" value="$(col)" /></span>
+	      </td>
+	    </tr>
+	  </table>
+
+	</td>
+      </tr>
+    </table>
+
+
+
+    <table>
+      <tr>
+	<td>$zoo._("Buffered label:")</td>
+	<td><input type="checkbox" name="bufferLabel" id="bufferLabel" onchange="if(this.checked)\$('#bufferLabelOption').show();else \$('#bufferLabelOption').hide()" #if $l is not None and l.outlinewidth > 0# checked="true"#end if#/></td>
+      </tr>
+    </table>
+
+    <table id="bufferLabelOption" #if $l is None or l.outlinewidth == 0#style="display: none;"#end if# >
+      <tr>
+	<td>$zoo._("Size:") <input id="mmLabelBufferSize" value="#if $l is not None and $l.outlinewidth#$l.outlinewidth#else#0#end if#" /></td>
+#if $l is not None
+#set ocol='%02x%02x%02x' % (l.outlinecolor.red,l.outlinecolor.green,l.outlinecolor.blue)
+#else
+#set ocol='-1-1-1'
+#end if
+#if ocol!="-1-1-1"
+#set ocol="#"+$ocol
+#else
+#set ocol="#ffffff"
+#end if
+	<td><span class="fcolor2">$zoo._("Buffer color:")<input id="buffer-font-colorpicker" type="text" name="font-colorpicker" value="$(ocol)" /></span></td>
+      </tr>
+    </table>
+
+#if $inputs["layer"]["value"].count("grid_")==0
+    <table>
+      <tr>
+	<td>$zoo._("Position:")</td>
+	<td></td>
+      </tr>
+    </table>
+#set values=['ul','uc','ur','cl','cc','cr','ll','lc','lr']
+#from mapscript import *
+#set msValues=[MS_UL,MS_UC,MS_UR,MS_CL,MS_CC,MS_CR,MS_LL,MS_LC,MS_LR]
+
+#set positions_x=[$zoo._('Left'),$zoo._('Center'),$zoo._('Right')]
+#set positions_y=[$zoo._('Top'),'',$zoo._('Bottom')]
+
+    <table>
+#set id=0
+#for a in $positions_y
+      <tr>
+#for b in $positions_x
+	<td><input value="$values[$id]" name="position_label" type="radio"  #if $l is not None and $l.position==$msValues[$id]#checked="true"#end if#/><label>$a $b</label></td>
+#set id=$id+1
+#end for
+      </tr>
+#end for
+    </table>
+#end if
+
+  </div>
+
+  <ul class="style-tabs-nav1">
+    <li><a class="ui-state-default ui-button-text-only ui-corner-all" onclick="saveLayerLabel()" href="#first">$zoo._("Apply")</a></li>
+  </ul>
+
+</div>
+
+</div>
+
+#else
+<div>
+#if $inputs["layer"]["value"].count("tile_")==0
+
+#if $m.getLayerByName($inputs["layer"]["value"]).type==mapscript.MS_LAYER_RASTER
+#set resMeth=['NEAREST','AVERAGE','BILINEAR']
+$zoo._("Resampling method:")
+#try
+#set proc=$m.getLayerByName($inputs["layer"]["value"]).getProcessing(0)
+#except
+$m.getLayerByName($inputs["layer"]["value"]).addProcessing("RESAMPLE=NEAREST")
+#end try
+<select id="resMethod">
+#for i in range(0,3)
+  <option value="$resMeth[$i]" #if $m.getLayerByName($inputs["layer"]["value"]).getProcessing(0)=="RESAMPLE="+$resMeth[$i]#selected="true"#end if#>$resMeth[$i]</option>
+#end for
+</select>
+#end if
+		<table class="classif">
+			<tr>
+				<td class="title">$zoo._("Opacity:")<input type="text" id="opacity" name="opacity" value="#if $m.getLayerByName($inputs["layer"]["value"]).getClass(0) is not None#$m.getLayerByName($inputs["layer"]["value"]).getClass(0).getStyle(0).opacity%#else##if $m.getLayerByName($inputs["layer"]["value"]).opacity#$m.getLayerByName($inputs["layer"]["value"]).opacity#else#100#end if#%#end if#" class="opacity"/></td>
+				<td><div id="slider-opacity"></div></td>
+			</tr>
+			<tr>
+				<td class="title">$zoo._("Legend Type:")</td>
+				<td>
+					<form>
+ 
+ <select id="dropdown" name="dropdown" class="select-window">
+
+#import osgeo.gdal
+
+#if $inputs.keys().count("field") > 0 
+#set field=$inputs["field"]["value"]
+#else
+#set field="1"
+#end if
+
+#if $m.getLayerByName($inputs["layer"]["value"]).connectiontype!=mapscript.MS_WMS
+#set b=osgeo.gdal.Open($m.getLayerByName($inputs["layer"]["value"]).data)
+#else
+#set b=osgeo.gdal.Open($m.getLayerByName($inputs["layer"]["value"]).connection)
+#end if
+
+#if $b.GetRasterBand(int($field)).GetColorInterpretation() == 3
+  <option value="greyScale">$zoo._("Colors")</option>
+#else
+  <option value="greyScale">$zoo._("GreyScale")</option>
+#end if
+
+#if $m.getLayerByName($inputs["layer"]["value"]).connectiontype!=mapscript.MS_WMS
+  <option value="gradSymb" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="gs"#selected="true"#end if#>$zoo._("Graduated Symbol")</option>
+  <option value="uniqVal" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="uv"#selected="true"#end if#>$zoo._("Unique Value")</option>
+#end if
+ </select>
+</form>
+				</td>
+			</tr>
+		</table>
+<div id="divgreyScale" class="box">
+<div>
+#try
+#set code=$m.getLayerByName($inputs["layer"]["value"]).offsite.toHex()
+#set offsite=True
+#except
+#set code="#000000"
+#set offsite=False
+#end try
+  NoData: <input id="nodatab" type="checkbox" #if $offsite#checked="true"#end if# onchange="if(\$(this).is(':checked'))\$('#noData').show();else \$('#noData').hide();" />
+  <div id="noData" #if $offsite==False#style="display:none;"#end if#>
+    <input id="nodata-colorpicker" type="text" name="us-nodata-colorpicker" value="$code" />
+  </div>
+</div>
+<a class="ui-state-default ui-button-text-only ui-corner-all classify" onclick="System.rasterLayer=1;saveLayerStyle();" href="#">Apply</a>
+</div>
+
+<div id="divuniqVal" class="box">
+      <table class="classif">
+	<tr>
+	  <td>
+	  $zoo._("Tiled version:")
+	  </td>
+	  <td colspan="3">
+	  <input id="us-tiled" type="checkbox" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmTiled")#checked="true"#end if# onchange="if(\$(this).is(':checked'))\$('#us-tiled-value').show();else \$('#us-tiled-value').hide();"/>
+	  <input type="text" id="us-tiled-value" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmTiled")#value="$m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmTiled")"#else# style="display:none"#end if#/>
+	  </td>
+	</tr>
+	<tr>
+	  <td>$zoo._("Min / Max color:")</td>
+	  <td colspan="3">
+	    <input id="us-min-colorpicker" type="text" name="us-min-colorpicker" value="#if $colors[3] is not None#$colors[3]#else#$colors[0]#end if#" />
+	    <input id="us-max-colorpicker" type="text" name="us-max-colorpicker" value="#if $colors[4] is not None#$colors[4]#else#$colors[1]#end if#" />
+	  </td>
+	</tr>
+	<tr>
+	  <td>$zoo._("Classification:")</td>
+	  <td>
+#if $m.getLayerByName($inputs["layer"]["value"]).numclasses > 0#<input name="gsFieldH" id="gsFieldH" type="hidden" value="$m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmField")" />#end if#
+	    <select id="usField" class="select-window">
+#set j=1
+#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("ows_bandnames")
+#for i in $m.getLayerByName($inputs["layer"]["value"]).metadata.get("ows_bandnames").split(',')
+	      <option value="$j">$i</option>
+#set j=$j+1
+#end for
+#end if
+	    </select>
+	    <a class="ui-state-default ui-button-text-only ui-corner-all classify" onclick="classifyMap('us');" href="#">$zoo._("Classify")</a>
+	  </td>
+	</tr>
+      </table>
+      
+      
+      <div id="us_classification">
+	
+	#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="uv"
+	#from Cheetah.Template import Template
+	$(Template(file=$conf["main"]["templatesPath"]+"/Manager/Styler/ClassLegend.tmpl",searchList=$searchList))
+	#end if
+
+      </div>
+</div>
+
+<div id="divgradSymb" class="box">
+<table class="classif">
+	<tr>
+	  <td>
+	  $zoo._("Tiled version:")
+	  </td>
+	  <td colspan="3">
+	  <input id="rs-tiled" type="checkbox" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmTiled")#checked="true"#end if# onchange="if(\$(this).is(':checked'))\$('#rs-tiled-value').show();else \$('#rs-tiled-value').hide();"/>
+	  <input type="text" id="rs-tiled-value" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmTiled")#value="$m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmTiled")"#end if#/>
+	  </td>
+	</tr>
+<tr>
+#set tmp0=$m.getLayerByName($inputs["layer"]["value"]).metadata.get("Band1_interval")
+#set tmp0=$tmp0.split(" ")
+<td>$zoo._("Min (%s) / Max (%s):"%(tmp0[0].split(".")[0],tmp0[1].split(".")[0]))
+<input id="rsimin" type="hidden" value="$tmp0[0]" />
+<input id="rsimax" type="hidden" value="$tmp0[1]" /> 
+</td>
+<td>
+#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mm_interval")
+#set tmp=$m.getLayerByName($inputs["layer"]["value"]).metadata.get("mm_interval")
+#else
+#set tmp=$m.getLayerByName($inputs["layer"]["value"]).metadata.get("Band1_interval")
+#end if
+#set tmp1=$tmp.split(" ")
+<input id="rsmin" type="text" value="$tmp1[0]" /> / 
+<input id="rsmax" type="text" value="$tmp1[1]" />
+</td>
+</tr>
+<tr>
+<td>$zoo._("Min / Max color:")</td>
+<td colspan="3">
+<input id="fill-colorpicker" type="text" name="us-min-colorpicker" value="$colors[3]" />
+<input id="stroke-colorpicker" type="text" name="us-max-colorpicker" value="$colors[4]" />
+</td>
+</tr>
+<tr>
+<td>$zoo._("Classification:")</td>
+<td>
+#if $m.getLayerByName($inputs["layer"]["value"]).numclasses > 0#<input name="gsFieldH" id="gsFieldH" type="hidden" value="$m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmField")" />#end if#
+<select id="rsField" class="select-window">
+#set j=1
+#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("ows_bandnames")
+#for i in $m.getLayerByName($inputs["layer"]["value"]).metadata.get("ows_bandnames").split(',')
+			<option value="$j">$i</option>
+#set j=$j+1
+#end for
+#end if
+</select>
+</td>
+</tr>
+
+<tr>
+<td>$zoo._("Classes:")</td>
+<td>
+<input id="rsNbClasses" type="text" name="" value="#if $m.getLayerByName($inputs["layer"]["value"]).numclasses > 0#$m.getLayerByName($inputs["layer"]["value"]).numclasses#else#6#end if#" class="input-window-short"/>
+<a class="ui-state-default ui-button-text-only ui-corner-all classify" onclick="System.rasterLayer=true;classifyMap('rs');" href="#">$zoo._("Classify")</a>
+</td>
+</tr>
+</table>
+
+<div id="rs_classification">
+
+#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="gs"
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/Manager/Styler/ClassLegend.tmpl",searchList=$searchList))
+#end if
+
+</div>
+</div>
+</div>
+
+#else
+<table class="classif">
+#set resMeth=['NEAREST','AVERAGE','BILINEAR']
+$zoo._("Resampling method:")
+<select id="resMethod">
+#try
+#set proc=$m.getLayerByName($inputs["layer"]["value"]).getProcessing(0)
+#except
+$m.getLayerByName($inputs["layer"]["value"]).addProcessing("RESAMPLE=NEAREST")
+#end try
+#for i in range(0,3)
+  <option value="$resMeth[$i]" #if $m.getLayerByName($inputs["layer"]["value"]).getProcessing(0)=="RESAMPLE="+$resMeth[$i]#selected="true"#end if#>$resMeth[$i]</option>
+#end for
+</select>
+<a class="ui-state-default ui-button-text-only ui-corner-all classify" onclick="saveProcessingDirective();" href="#">$zoo._("Apply")</a>
+</div>
+
+#end if
+
+
+
+#end if

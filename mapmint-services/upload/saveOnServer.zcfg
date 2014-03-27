@@ -1,0 +1,30 @@
+[saveOnServer]
+ Title = Save individual file on server
+ Abstract = Save individual file on server
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [file]
+   Title = The file name
+   Abstract = The file name
+   minOccurs = 0
+   maxOccurs = 1
+   <ComplexData>
+     isFile = true
+    <Default>
+     MimeType = image/tiff     
+    </Default>
+   </ComplexData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting message
+   Abstract = The resulting message
+   <LiteralData>
+	dataType = string
+	<Default />
+   </LiteralData>
+ </DataOutputs>

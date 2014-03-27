@@ -1,0 +1,47 @@
+#import zoo
+<form>
+<div>
+<h1>$zoo._("Projection Systems")</h1>
+#import sqlite_module as sql
+#set v="SELECT code as id,name, fav from spatial_ref_sys order by name"
+#set t=sql.request($conf,v)
+#set tags=[]
+#set tags1=[]
+#set tags2=[]
+#for i in $t
+#set tags+=[$i[1]]
+#set tags1+=[$i[0]]
+#if $i[2]
+#set tags2+=[$i[2]]
+#else
+#set tags2+=[0]
+#end if
+#end for
+<div style="float:left">
+<div class="ui-widget">
+<label for="tags">$zoo._("Name:") </label>
+<select id="tags" class="easyui-combobox">
+#for i in range(0,len($tags))
+     <option value="$tags[$i]">$tags[$i]</option>
+#end for
+</select>
+</div>
+<div class="ui-widget">
+<label for="tags1">$zoo._("Code:") </label>
+<select id="tags1">
+#for i in range(0,len($tags1))
+     <option value="$tags1[$i]">$tags1[$i]</option>
+#end for
+</select>
+</div>
+</div>
+<script type="text/javascript">
+
+#import json
+\$( "#tags" ).combobox();
+\$( "#tags1" ).combobox();
+</script>
+<input type="checkbox" name="prjfav" id="prjfav" />
+<a href="#" onclick="SrsManager.updateFav();">$zoo._("Save")</a>
+</div>
+</form>

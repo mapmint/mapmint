@@ -1,0 +1,130 @@
+#encoding UTF-8
+
+#from Skeleton import Skeleton
+#extends Skeleton
+
+#attr $mmodule = "Documents"
+
+#attr $ocss = ['colorpicker.css']
+
+#attr $js = ['jquery.tipsy.js','jquery.hoverIntent.min.js','colorpicker.js','jquery.jqplot.min.js','plugins/jqplot.dateAxisRenderer.js','plugins/jqplot.highlighter.js','plugins/jqplot.cursor.js','plugins/jqplot.pieRenderer.min.js','plugins/jqplot.donutRenderer.min.js','progress-bar.js','Meta.js','jquery.cookie.js','wps.js','roundies.js','generic.js','ckeditor.js']
+
+#attr $js1 = ['main_js']
+
+#def page_title
+MapMint: Documents
+#end def
+
+#def body
+#import zoo
+#import mm_access
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set prefix=auth.getPrefix($conf)
+#set cur=con.connect()
+#set cur=con.conn.cursor()
+
+<div class="ui-layout-center"> 
+  <div id="Documents" class="inner-layout-container">   
+    
+    <div class="inner-center" id="documents_edition_ui">
+      
+      <h1 class="pane-title">$zoo._("Informations"): <span  class="project-title" id="documents_name_title">$zoo._("Name of the selected document")</span></h1>
+      <div class="toolbar"><p class="hour">$zoo._("Name of the selected document")</p></div>
+      <div class="lcontent">
+      <table class="gen">
+	<tbody>
+	  <tr>
+	    <td valign="middle" style="width:200px;">$zoo._("Name:")</td>
+	    <td><input id="documents_name" class="rounded frm" type="text" value="" /></td>
+	  </tr>
+
+          <tr>
+            <td valign="middle" style="width:200px;">$zoo._("Themes:")</td>
+            <td>
+              <select multiple="multiple" class="rounded mltp" id="documents_documents_themes">
+#set res=cur.execute("SELECT id,name as val from "+$prefix+"themes order by name")
+#set vals=cur.fetchall()
+#for i in range(0,len(vals))
+		<option value="$vals[i][0]">$vals[i][1]</option>
+#end for
+              </select>
+            </td>
+          </tr>
+
+	  <tr>
+	    <td valign="middle" style="width:200px;">$zoo._("Description:")</td>
+	    <td><textarea id="documents_description" class="rounded frm maincfg" type="text"></textarea></td>
+	  </tr>
+
+	  <tr>
+	    <td valign="middle" style="width:200px;">$zoo._("File:") <input type="radio" name="doct" value="file"  selected="true" onclick="\$('#documents_url').hide();\$('#file').show();" /> URL: <input type="radio" name="doct" value="url" onclick="\$('#documents_url').show();\$('#file').hide();" /></td>
+	    <td>
+	      <textarea id="documents_url" class="rounded frm url maincfg" style="display:none;"></textarea>
+	      <form id="fileUpload" action="$conf["main"]["serverAddress"]?metapath=upload&request=Execute&service=WPS&version=1.0.0&Identifier=saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="uploader">
+		<input type="file" name="file" id="file" class="rounded frm file" />
+		<a id="documents_file_link" href="" target="_blank"></a>
+	      </form>
+	      <input type="hidden" id="documents_filename" class="rounded frm file" />
+	      <iframe onload="if(counter>0){updateElement();counter=1;}else counter+=1;" name="uploader" id="uploader" style="display:none"></iframe>
+	    </td>
+	  </tr>
+
+          <tr>
+            <td valign="middle" style="width:200px;">$zoo._("Groups:")</td>
+            <td>
+              <select multiple="multiple" class="rounded mltp" id="documents_documents_groups">
+$(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/GroupMultipleList.html",searchList={"cur":$cur,"prefix":$prefix}))
+              </select>
+            </td>
+          </tr>
+
+	</tbody>
+      </table>
+      <a href="#" class="wbutton ui-corner-all al" onclick="\$('#documents_filename').val(\$('#file').val());\$('#fileUpload').submit();">$zoo._("Save")</a>
+      </div>
+    </div>
+    
+    
+    <div class="inner-west" id="documents-tree">
+      <h1 class="pane-title">$zoo._("Documents")</h1>
+      <div class="toolbar">
+	<a class="fg-button ui-state-default ui-corner-all add-document"  id="add-documents" href="#" title="$zoo._("Add Document")"></a>
+	<a class="fg-button ui-state-default ui-corner-all delete-document"  id="delete-documents" href="#" title="$zoo._("Delete document")"></a>
+	<label for="documents_search">$zoo._("Search:") </label>
+	<input id="documents_search" type="text" value="" />
+      </div>
+      <div id="ltree" class="lcontent"></div>
+    </div>
+    
+  </div>
+</div> 
+
+
+<div id="add-documents-dialog" data-options="title:'$zoo._("Add a document")'">
+  <table class="gen">
+    <tbody>
+      <tr>
+        <td valign="middle" style="width:100px;">Nom:</td>
+        <td><input id="eName" class="rounded wfrm" type="text" value="" /></td>
+      </tr>
+    </tbody>
+  </table>
+  <a href="#" class="wbutton ui-corner-all" onclick="insertElement();">$zoo._("Add")</a>
+  <a href="#" class="wbuttonc ui-corner-all" onclick="\$('#add-documents-dialog').window('close');">$zoo._("Cancel")</a>
+</div>
+
+<div id="delete-documents-dialog" data-options="title:'$zoo._("Delete a document")'">
+  <table class="gen">
+    <tbody>
+      <tr>
+        <td valign="middle" style="width:100px;">Nom:</td>
+        <td><input id="edName" class="rounded wfrm" type="text" value="" /></td>
+      </tr>
+    </tbody>
+  </table>
+  <a href="#" class="wbutton ui-corner-all" onclick="deleteElement();">$zoo._("Delete")</a>
+  <a href="#" class="wbuttonc ui-corner-all" onclick="\$('#delete-territory-dialog').window('close');">$zoo._("Cancel")</a>
+</div>
+
+#end def

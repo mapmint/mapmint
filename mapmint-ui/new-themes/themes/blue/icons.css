@@ -1,0 +1,71 @@
+/*
+ *	MapMint Icons CSS
+ */
+ 
+.maincfg1 {border:1px solid #8f8f8f;background-image:url(../img/monitor-blue.png) !important;}
+.maincfg2 {border:1px solid #8f8f8f;background-image:url(../img/security-blue.png) !important;}
+.maincfg3 {border:1px solid #8f8f8f;background-image:url(../img/user-blue.png) !important;}
+
+.projects {border:1px solid #8f8f8f;background-image:url(../img/process-blue.png) !important;}
+.documents {border:1px solid #8f8f8f;background-image:url(../img/docs-blue.png) !important;}
+
+.add-database {border:1px solid #8f8f8f;background-image:url(../img/add-database-default-blue.png) !important;}
+.add-directory {border:1px solid #8f8f8f;background-image:url(../img/add-directory-default-blue.png) !important;}
+.add-vector {border:1px solid #8f8f8f;background-image:url(../img/add-vector-blue.png) !important;}
+.add-raster {border:1px solid #8f8f8f;background-image:url(../img/add-raster-blue.png) !important;}
+.add-wms {border:1px solid #8f8f8f;background-image:url(../img/add-wms-blue.png) !important;}
+.add-wfs {border:1px solid #8f8f8f;background-image:url(../img/add-wfs-blue.png) !important;}
+.add-wcs {border:1px solid #8f8f8f;background-image:url(../img/add-wcs-blue.png) !important;}
+
+.add-layer {border:1px solid #8f8f8f;background-image:url(../img/add-layer-blue.png) !important;}
+.open-map {border:1px solid #8f8f8f;background-image:url(../img/open-map-blue.png) !important;}
+
+.pan {border:1px solid #8f8f8f;background-image:url(../img/pan-blue.png) !important;}
+.zoom-box {border:1px solid #8f8f8f;background-image:url(../img/zoom-in-blue.png) !important;}
+.zoom-in {border:1px solid #8f8f8f;background-image:url(../img/zoomin-blue.png) !important;}
+.zoom-in:hover {border:1px solid #8f8f8f;background: #73C354 url(../img/zoomin-hover-blue.png) !important; 
+}
+.zoom-to-max-extent {border:1px solid #8f8f8f;background-image:url(../img/zoomtomaxextent-blue.png) !important;}
+.zoom-to-max-extent:hover {border:1px solid #8f8f8f;background-image:url(../img/zoomtomaxextent-hover-blue.png) !important;}
+.zoom-out {border:1px solid #8f8f8f;background-image:url(../img/zoomout-blue.png) !important;}
+.zoom-out:hover {border:1px solid #8f8f8f;background: #73C354 url(../img/zoomout-hover-blue.png) !important;}
+.zoom-to-point {border:1px solid #8f8f8f;background-image:url(../img/zoom-to-point-blue.png) !important;}
+.identify {border:1px solid #8f8f8f;background-image:url(../img/identify-blue.png) !important;}
+.mesure-distance {border:1px solid #8f8f8f;background-image:url(../img/ruler-blue.png) !important;}
+.mesure-area {border:1px solid #8f8f8f;background-image:url(../img/ruler-crop-blue.png) !important;}
+
+.select {border:1px solid #8f8f8f;background-image:url(../img/select-blue.png) !important;}
+.edit-point {border:1px solid #8f8f8f;background-image:url(../img/edit-point-blue.png) !important;}
+.edit-line {border:1px solid #8f8f8f;background-image:url(../img/edit-line-blue.png) !important;}
+.edit-polygon {border:1px solid #8f8f8f;background-image:url(../img/edit-polygon-blue.png) !important;}
+.delete-feature {border:1px solid #8f8f8f;background-image:url(../img/delete-feature-blue.png) !important;}
+
+.buffer {border:1px solid #8f8f8f;background-image:url(../img/buffer-blue.png) !important;}
+.centroid {border:1px solid #8f8f8f;background-image:url(../img/centroid-blue.png) !important;}
+.boundary {border:1px solid #8f8f8f;background-image:url(../img/boundary-blue.png) !important;}
+.convexhull {border:1px solid #8f8f8f;background-image:url(../img/convexhull-blue.png) !important;}
+.simplify {border:1px solid #8f8f8f;background-image:url(../img/simplify-blue.png) !important;}
+.union {border:1px solid #8f8f8f;background-image:url(../img/union-blue.png) !important;}
+.intersection {border:1px solid #8f8f8f;background-image:url(../img/intersection-blue.png) !important;}
+.symdifference {border:1px solid #8f8f8f;background-image:url(../img/symdifference-blue.png) !important;}
+.difference {border:1px solid #8f8f8f;background-image:url(../img/difference-blue.png) !important;}
+
+.raster-histogram {border:1px solid #8f8f8f;background-image:url(../img/raster-histogram-blue.png) !important;}
+.clip-raster {border:1px solid #8f8f8f;background-image:url(../img/clip-layer-blue.png) !important;}
+.merge-rasters {border:1px solid #8f8f8f;background-image:url(../img/merge-layer-blue.png) !important;}
+.polygons-from-raster {border:1px solid #8f8f8f;background-image:url(../img/polygons-from-raster-blue.png) !important;}
+.raster-from-csv {border:1px solid #8f8f8f;background-image:url(../img/raster-from-csv-blue.png) !important;}
+
+.terrain-profile {border:1px solid #8f8f8f;background-image:url(../img/terrain-profile-blue.png) !important;}
+.contours-from-dem {border:1px solid #8f8f8f;background-image:url(../img/contours-from-dem-blue.png) !important;}
+.shaded-relief {border:1px solid #8f8f8f;background-image:url(../img/shaded-relief-blue.png) !important;}
+.color-relief {border:1px solid #8f8f8f;background-image:url(../img/color-relief-blue.png) !important;}
+.slope-map {border:1px solid #8f8f8f;background-image:url(../img/slope-map-blue.png) !important;}
+
+.main-configuration {border:1px solid #8f8f8f;background-image:url(../img/process-blue.png) !important;}
+.layout-settings {border:1px solid #8f8f8f;background-image:url(../img/layout-settings-blue.png) !important;}
+.map-settings {border:1px solid #8f8f8f;background-image:url(../img/map-settings-blue.png) !important;}
+.layers-settings {border:1px solid #8f8f8f;background-image:url(../img/layers-settings-blue.png) !important;}
+.controls-settings {border:1px solid #8f8f8f;background-image:url(../img/controls-settings-blue.png) !important;}
+
+

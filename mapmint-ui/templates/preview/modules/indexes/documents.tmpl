@@ -1,0 +1,41 @@
+#encoding UTF-8
+#import zoo,mm_access
+#import authenticate.service as auth
+#set con=$auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#try
+#set offset=$inputs["offset"]["value"]
+#except
+#set offset=str(0)
+#end try
+#set sql0="select count(*) from documents, documents_groups where d_id=documents.id and g_id in (SELECT id from velo.groups where name='"+$conf["senv"]["group"]+"' or name='public')"
+#set res1=cur.execute(sql0)
+#set vals2=cur.fetchone()
+     	<input type='hidden' id='document_counter' value="#if $vals2 is not None#$vals2[0]#end if#" />
+#try
+#set sql="select get_index_of(array_agg(documents.id),"+$inputs["id"]["value"]+"),count(*) from documents, documents_groups where d_id=documents.id and g_id in (SELECT id from velo.groups where name='"+$conf["senv"]["group"]+"' or name='public')"
+#set res=cur.execute(sql)
+#set vals0=cur.fetchone()
+#set offset=str((($vals0[0]-1)/3)*3)
+#set pos=(int($vals0[0])-1)%3
+     	<input type='hidden' id='document_pos' value="$pos" />
+     	<input type='hidden' id='document_cpage' value="$((vals0[0]-1)/3)" />
+#set sql="select * from documents, documents_groups where d_id=documents.id and g_id in (SELECT id from velo.groups where name='"+$conf["senv"]["group"]+"' or name='public') LIMIT 3 OFFSET "+$offset
+#except
+#set sql="select * from documents, documents_groups where d_id=documents.id and g_id in (SELECT id from velo.groups where name='"+$conf["senv"]["group"]+"' or name='public') LIMIT 3 OFFSET "+$offset
+#end try
+        <dl class="accordion">
+#set res=cur.execute(sql)
+#set vals0=cur.fetchall()
+#if $vals0 is not None
+#for i in range(0,len($vals0))
+	  <dt><a href="" class="expd">$vals0[i][1]</a> <a class="dbutt more" href="#if $vals0[i][5] is not None#$vals0[i][5]#else#$conf["main"]["publicationUrl"]/documents/$vals0[i][4]#end if#" target="_blank">Télécharger</a> </dt>
+	  <dd>
+	    <ul>
+	      <li>Description: <span class="li">$vals0[i][3]</span></li>
+	    </ul>
+	  </dd>
+#end for
+#end if
+	</dl>

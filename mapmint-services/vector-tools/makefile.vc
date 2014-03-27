@@ -1,0 +1,13 @@
+TROOT=$(ZOOK_DIR)\
+!IF DEFINED(MS_DIR) 
+MS_BASE=$(MS_DIR) 
+!INCLUDE $(MS_DIR)\nmake.opt 
+!ENDIF 
+!include $(ZOOK_DIR)\nmake.opt
+
+cgi-env/service.zo: service.c
+	$(CPP) -I$(ZOOK_DIR) -I$(XSLT_DIR)/ -I$(GDAL_DIR)/alg -I$(GDAL_DIR)/ogr/ogrsf_frmts -I$(ZOOK_DIR)/../../thirds/dirent-win32 $(CFLAGS) /c service.c
+	link /dll /out:cgi-env/service.zo $(ZOOK_DIR)/dirent.obj $(ZOOK_DIR)/service_internal.obj $(ZOOK_DIR)/service_internal_ms.obj $(ZOOK_DIR)/service_internal_js.obj $(ZOOK_DIR)/ulinet.obj ./service.obj $(LDFLAGS) $(XSLT_DIR)\win32\bin.msvc\libxslt.lib
+
+clean:
+	del cgi-env\service.zo

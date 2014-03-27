@@ -1,0 +1,17 @@
+.. _indicators:
+
+Module de création d'indicateurs
+================================
+
+Cette section regroupe la documentation relative au module de créations d'indicateurs de MapMint.
+
+.. note::
+	Le module de création d'indicateurs est un module **optionel** et nécessite certains prérequis pour fonctionner
+
+.. toctree::
+   :maxdepth: 2
+   
+   presentation
+   indicatorstree
+   indicatorspanel
+

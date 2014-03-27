@@ -1,0 +1,122 @@
+.. _dashboard-configuration:
+
+Panneau de configuration
+========================
+
+Le panneau de configuration permet de visualiser et d'éditer les paramètres d'installation de MapMint. Les formulaires sont renseignés automatiquement suite à l'installation et selon le contenu présent dans le fichier de configuration générale (main.cfg).
+
+.. note::
+	Certains des paramètres de configuration sont utilisés pour les métadonnées "opengeospatial web services" (OWS) définies par l'Open Geospatial Consortium.
+	
+.. warning::
+	Il n'est pas conseillé de modifier les paramètres de configuration sans en connaitre les conséquences
+	
+Le panneau de configuration est organisé en trois onglets, listés ci-dessous. Un clic sur l'icône entraine l'affichage de l'onglet correspondant.
+
+.. |mcon| image:: ../../_static/images/monitor.png
+   :height: 24
+   :width: 24
+   :alt: Main configuration icon
+
+.. |icon| image:: ../../_static/images/security.png
+   :height: 24
+   :width: 24
+   :alt: Indentification configuration icon
+   
+.. |pcon| image:: ../../_static/images/user.png
+   :height: 24
+   :width: 24
+   :alt: Provider configuration icon
+   
+============ ============================================
+**Icône**    **Action**       
+------------ --------------------------------------------
+|mcon|       Configuration générale 	           
+|icon|       Configuration de l'identification	
+|pcon|       Configuration du fournisseur		  	           
+============ ============================================	
+
+Configuration générale
+------------
+
+Le formulaire de confuguration générale regroupe les variables d'environnement et les paramètres d'installation de l'instance MapMint.
+
+==================== ============================================
+**Paramètre**        **Définition**       
+-------------------- --------------------------------------------
+Encoding       		 Définit l'encodage de l'installation par défaut (utf-8)  	           
+Mmadress      		 Définit le répertoire d'installation par défaut (/mm/)
+Datapath       		 Définit le chemin vers le répertoire /data dédié aux stockage des données
+Jscache       		 Définit si les fichiers javascripts sont compressés ou non (prod|dev)
+Tmppath			     Définit le chemin vers le répertoire de stockage des fichiers temporaires (/tmp/)
+Cachedir			 Définit le chemin vers le répertoire de stockage du cache (/cache/)
+3D					 Définit l'activation du mode 3D (false|true)
+Rooturl				 Définit le répertoire d'accès à l'interface publique par défaut (/public/)
+Publicationurl		 Définit le répertoire de publication où sont stockés les fichiers (/public_map/)
+Dblink				 Définit le chemin vers la base de données des utilisateurs de l'instance MapMint
+Mmpath				 Définit l'URL complète du répertoire d'installation par défaut (/mm/)
+Version				 Définit le numéro de version de MapMint
+Rpy2				 Définit l'activation de la librairie R (true|false)
+Dbuser			     Définit le nom de la base de données des utilisateurs
+Applicationadress	 Définit l'adresse racine de l'instance MapMint 
+Lang				 Définit les langues supportées par l'instance
+Sesspath			 Définit le chemin vers le répertoire de stockage des fichiers temporaires de session (/tmp/)
+Publicationpath      Définit le chemin vers le répertoire de publication de l'instance MapMint
+Csscache             Définit si les fichiers CSS sont compressés ou non (prod|dev)
+Msogcversion         Définit la version des services WMS et WFS de MapServer
+Serveradress         Définit le chemin complet vers l'executable de ZOO-Project (WPS kernel)
+Dbusername           
+Templatesadress
+Language			 Définit la langue de l'instance
+Mapserveradress		 Définit le chemin vers l'éxécutable de MapServer
+Tmpurl
+Templatespath		  	           
+==================== ============================================
+
+Configuration de l'identification
+----------------------------------
+
+Les formulaires de configuration de l'identification et du forunisseur des services permet de caractériser l'organisation qui publie les données et la personne responsable du serveur et/ou de l'application MapMint.
+
+============================= ============================================
+**Paramètre**                 **Définition**       
+----------------------------- --------------------------------------------
+Positionname       		      Définit la position du contact de référence           
+Individualname      	      Définit le nom individuel du contact de référence	
+Providername       		      Définit le nom du fournisseur des services
+Adressadministrativearea      Définit le secteur administratif du fournisseur des services
+Adresscountry				  Définit le pays du fournisseur des services
+Phonevoice					  Définit le numéro de téléphone du contact de référence
+Adresspostalcode			  Définit le code postal du fournisseur des services
+Role						  Définit le role du fournisseur des services
+Providersite				  Définit l'adresse du site Internet du fournisseur des services
+Phonefacsimile				  Définit le numéro de fax du contat de référence
+Addresselectronicmailaddress  Définit l'adresse de courier électronique du contat de référence
+Adresscity					  Définit la ville du fournisseur des services
+Adressdeliverypoint           Définit l'adresse du fournisseur des services
+============================= ============================================
+	
+.. note::
+	Le contact de référence correspond habituellement au nom de la personne responsable du serveur
+	
+Configuration du fournisseur des services
+-----------------------------------------
+
+============================= ============================================
+**Paramètre**                 **Définition**       
+----------------------------- --------------------------------------------
+Keywords         		      Définit les mots clés attribués aux services web, séparés par des virgules  	           
+Title               	      Définit le titre du serveur cartographique	
+Abstract       		          Définit le serveur cartographique par une courte description
+Accesscontraints              Définit si le serveur cartographique nécessite une identification
+Fees						  Définit les conditions d'utilisation et/ou le copyright du serveur
+============================= ============================================
+
+.. note::
+	Le fournisseur des services correspond habituellement au nom de l'organisme qui publie les données
+	
+.. warning::
+	Le titre et la description du serveur sont également utilisés dans la page d'accueil de l'interface publique
+	
+
+

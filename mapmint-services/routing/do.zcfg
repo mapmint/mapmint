@@ -1,0 +1,69 @@
+[do]
+ Title = Shortest Path
+ Abstract =  Compute and return shortest path using pgRouting library
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <MetaData>
+   title = Demo
+ </MetaData>
+ <DataInputs>
+  [startPoint]
+   Title = Starting Point
+   Abstract = The Point to use as starting of the path
+   minOccurs = 2
+   maxOccurs = 2
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+    </Default>
+    <Supported>
+     mimeType = application/json
+     encoding = UTF-8
+    </Supported>
+   </ComplexData>
+  [endPoint]
+   Title = End Point
+   Abstract = The Point to use as ending point of the path
+   minOccurs = 2
+   maxOccurs = 2
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+    </Default>
+    <Supported>
+     mimeType = application/json
+     encoding = UTF-8
+    </Supported>
+   </ComplexData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = Buffered Polygon
+   Abstract = GML stream describing the buffered polygon feature.
+   <MetaData>
+    title = Mon test  
+   </MetaData>   
+   <ComplexData>
+    <Default>
+     mimeType = application/json
+     asReference = true
+     msStyle = STYLE COLOR 0 255 0 OUTLINECOLOR 75 75 75  WIDTH 3.8 OUTLINEWIDTH 0.8  END
+     useMapServer = true
+     extension = json
+    </Default>
+    <Supported>
+     mimeType = image/png
+     asReference = true
+     msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 3 END
+     useMapServer = true
+     extension = json
+    </Supported>
+   </ComplexData>
+ </DataOutputs>  

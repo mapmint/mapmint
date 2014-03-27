@@ -1,0 +1,30 @@
+#if $m.web.metadata.get('layout_t')!="mobile"
+	\$(".close").live('click', function() {
+                mmLayout.close('west');
+		\$("#map").before('<span class="open" onclick="mmLayout.open(\'west\')" title="Open"></span>');
+    	});
+
+  		 
+	\$("span.open").live('click', function() {
+		\$("span.open").remove(); 
+		\$(".tipsy-inner").remove(); 
+    	});
+
+	\$('.fg-toolbar a').tipsy({fade: true, offset:5, opacity: 1, gravity: 'nw'});
+	\$('.toolbar-noborder a').tipsy({fade: true, offset:3, opacity: 1, gravity: 'nw'});
+	\$('.ui-layout-toggler-west-open').tipsy({fade: true, offset:3, opacity: 1, gravity: 'w'});
+	\$('span.close').tipsy({fade: true, offset:3, opacity: 1, gravity: 'w'});
+	\$('span.open').tipsy({live: true, fade: true, offset:3, opacity: 1, gravity: 'w'});
+#end if
+
+
+});  
+
+//end doc ready
+function updateSize(){
+    var center = map.getCenter();
+    map.updateSize();
+    map.setCenter(center);
+}
+
+

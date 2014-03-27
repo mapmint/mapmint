@@ -1,0 +1,19 @@
+#import zoo
+<h1 class="pane-title-small">$zoo._("Activated Symbols:")</h1>
+<div id="symbolOrig" class="point-symbol-container">
+</div>
+<h1 class="pane-title-small">$zoo._("Symbol to Add:")</h1>
+<select class="ssy" onchange="displaySymbolAdd(this.value);">
+     <option value="-1">$zoo._("Select a font")</option>
+     <option value="images">$zoo._("External images")</option>
+#import os
+#set t=os.listdir($conf["main"]["dataPath"]+"/fonts/")
+$t.sort()
+#for i in $t
+#if $i.count(".TTF")>0 or $i.count(".ttf")>0
+     <option value="$i">$i.replace(".TTF","").replace(".ttf","")</option>
+#end if
+#end for
+</select>
+<div id="symbolAdd"  class="point-symbol-container">
+</div>

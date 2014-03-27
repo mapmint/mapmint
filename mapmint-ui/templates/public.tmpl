@@ -1,0 +1,18 @@
+#import os
+#import customize
+#import mapscript
+#if $project!=""
+#set myProject=$project
+#set mapfile=$conf["main"]["dataPath"]+"/public_maps/"+myProject
+#from Cheetah.Template import Template
+#if os.path.islink($mapfile)
+#set mapfile=os.readlink($mapfile).replace('\\??\\','').replace('\\','/')
+#set lastMap=$mapfile.replace($conf["main"]["dataPath"]+"/public_maps/project_","").replace(".map","")
+#set tmp=$conf
+#set $tmp["senv"]["last_map"]=$lastMap
+#end if
+#set m=mapscript.mapObj($mapfile)
+#include $conf["main"]["templatesPath"]+"/preview/"+$m.web.metadata.get('layout_t')+".tmpl"
+#else
+$(Template(file=$conf["main"]["templatesPath"]+"/public-access.tmpl",searchList=$searchList))
+#end if

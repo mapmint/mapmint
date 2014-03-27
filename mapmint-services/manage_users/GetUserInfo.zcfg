@@ -1,0 +1,18 @@
+[GetUserInfo]
+ Title = Get user info from database.
+ Abstract = Get user info from database.
+ processVersion = 2
+ storeSupported = false
+ statusSupported = true
+ serviceProvider = service_users
+ serviceType = Python
+ <DataOutputs>
+  [Result]
+   Title = result of the request
+   Abstract = Result of the request as a json object.
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>
+

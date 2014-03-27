@@ -1,0 +1,95 @@
+#import zoo
+#import sqlite_module as sql
+#import authenticate.service as auth
+#set sprefix=$auth.getPrefix($conf)
+#if $inputs.has_key("prefix")
+#set prefix=$inputs["prefix"]["value"]
+#else
+#set prefix=""
+#end if
+#if $inputs.has_key("dataStore")
+#set suffix=" WHERE adm=1 "
+#else
+#set suffix=" WHERE "
+#end if
+<fieldset class="$(prefix)um_groups_f">
+#set cnt=sql.request($conf,"SELECT count(*) from "+$sprefix+"groups "+$suffix)[0][0]
+#set q0=sql.request($conf,"SELECT name from "+$sprefix+"groups "+$suffix)
+#if $inputs.has_key("clause")
+#if $inputs["clause"]["value"]=="id="
+#set q1=[[""]]
+#else
+#set req="SELECT "+$sprefix+"groups.name from "+$sprefix+"user_group,"+$sprefix+"groups "+$suffix+" id_group="+$sprefix+"groups.id and "+$inputs["clause"]["value"].replace("id","id_user")
+#set q1=sql.request($conf,$req)
+#if len($q1)==0
+#set q1=[[""]]
+#end if
+#end if
+#else
+#set q1=[["public"]]
+#set q2=[["1","1","1"]]
+#if $inputs.has_key("layer")
+#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mm_access_groups") is not None
+#set q1=[]
+#set q2=[]
+#for i in $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mm_access_groups").split(",")
+#set $q1+=[[i]]
+#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mm_access_"+i) is not None
+#set $q2+=[$m.getLayerByName($inputs["layer"]["value"]).metadata.get("mm_access_"+i).split(',')]
+#end if
+#end for
+#end if
+#else
+#if $inputs.has_key("dataStore")
+#set q1=[["admin"]]
+#else
+#if $m.web.metadata.get("mm_access_groups") is not None
+#set q1=[]
+#for i in $m.web.metadata.get("mm_access_groups").split(",")
+#set $q1+=[[i]]
+#end for
+#end if
+#end if
+#end if
+#end if
+<legend>$zoo._("Groups") #if len(q0)>1#<input type="submit" value="$zoo._("Add")" onclick="var tmp=(\$('.$(prefix)gselect').length);#if $inputs.has_key("layer")#\$('#$(prefix)um_gtr_0').clone().attr('id', '$(prefix)um_gtr_'+tmp).appendTo('#$(prefix)um_table');#else#\$('select#$(prefix)um_group_0').clone().attr('id', '$(prefix)um_group_'+tmp).appendTo('.$(prefix)um_groups_f');#end if# if(tmp+1>1) \$('#$(prefix)um_gdelete').show();return false;" /><input id="$(prefix)um_gdelete" type="submit" value="$zoo._("Delete")" onclick="var tmp=(\$('.$(prefix)gselect').length-1);if(tmp>0){\$('select#$(prefix)um_group_'+tmp).remove();#if $inputs.has_key("layer")#\$('#$(prefix)um_gtr_'+tmp).remove();#end if#}else {alert('$zoo._("You should keep at least one group linked to a user")');\$('#$(prefix)um_gdelete').toggle();}if(tmp-1==0) \$('#$(prefix)um_gdelete').toggle();return false;" #if len($q1)==1#style="display:none"#end if#/>#end if#</legend>
+#if $inputs.has_key("layer") or $inputs.has_key("dataStore")
+<table id="$(prefix)um_table">
+<tr>
+<th>$zoo._("Group")</th>
+<th colspan="3">$zoo._("Access")</th>
+</tr>
+<tr>
+<td></td>
+<td>r</td>
+<td>w</td>
+<td>x</td>
+</tr>
+#end if
+#for k in range(0,len($q1))
+#if $inputs.has_key("layer") or $inputs.has_key("dataStore")
+<tr id="$(prefix)um_gtr_$k">
+<td>
+#end if
+<select id="$(prefix)um_group_$k" class="$(prefix)gselect">
+<option value="-1">$zoo._("Choose")</option>
+#for i in range(0,len($q0))
+#for j in range(0,len($q0[$i]))
+<option value="$q0[$i][$j]" #if $q1[$k][0]==$q0[$i][$j]#selected="true"#end if#>$q0[$i][$j]</option>
+#end for
+#end for
+</select>
+#if $inputs.has_key("layer")  or $inputs.has_key("dataStore")
+</td>
+#set l=0
+#for m in ["r","w","x"]
+<td><input type="checkbox" id="${m}_$(prefix)um_group_$k" class="${m}_$(prefix)um_group" #if $q2[$k][$l]=="1"#checked="true"#end if# /></td>
+#set $l+=1
+#end for
+</tr>
+#end if
+#end for
+#if $inputs.has_key("layer") or $inputs.has_key("dataStore")
+</table>
+#end if
+</fieldset>

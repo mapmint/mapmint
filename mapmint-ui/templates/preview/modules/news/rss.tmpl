@@ -1,0 +1,34 @@
+#encoding "utf-8"
+#import zoo
+#from manage_users import *
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set prefix=auth.getPrefix($conf)
+#set c=con.connect()
+#set conn = con.conn
+#set cur=conn.cursor()
+#set clause=""
+#for i in $conf["senv"]["group"].split(",")
+#if clause!=""
+#set $clause+=" or "
+#end if
+#set $clause+=" name = '"+$i+"' "
+#end for
+#set res=cur.execute('SELECT title,p_date,content from '+prefix+'news where id in (select n_id from '+prefix+'news_groups where g_id in (select id from '+prefix+'groups where name=\'public\' or '+$clause+')) order by p_date desc LIMIT 4')
+#set vals=cur.fetchall()
+<rss version="2.0">
+  <channel>
+    <title>$conf["identification"]["title"]</title>
+    <link>$conf["main"]["applicationAddress"]/public/</link>
+    <description>$zoo._("Latest news from ") $conf["identification"]["title"]</description>
+    <language>$conf["main"]["language"][:2]</language>
+    <image>
+      <url>$conf["main"]["applicationAddress"]/img/mm-logo-default.png</url>
+    </image>
+    <item>
+      <title>$vals[0][0]</title>
+      <description>$vals[0][2]</description>
+      <pubDate>$vals[0][1]</pubDate>
+    </item>
+  </channel>
+</rss>

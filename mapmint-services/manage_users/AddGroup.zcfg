@@ -1,0 +1,41 @@
+[AddGroup]
+ Title = Add group on database.
+ Abstract = insert group on user database.
+ processVersion = 2
+ storeSupported = false
+ statusSupported = true
+ serviceProvider = service_users
+ serviceType = Python
+ <MetaData>
+   title = Demo
+ </MetaData>
+ <DataInputs>
+  [nom]
+   Title = Input string
+   Abstract = name.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [description]
+   Title = Input string
+   Abstract = group description.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = result of the request
+   Abstract = Result Group if success.
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>
+

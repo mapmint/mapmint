@@ -1,0 +1,17 @@
+#import zoo
+#import mm_access
+#if $mm_access.checkDataSourcePriv($conf,None,$inputs["dstName"]["value"],$inputs["dsoName"]["value"],"rwx")
+<form method="post">
+        <div>
+
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",searchList={"conf": $conf,"prefix":"set_","selected":""}))
+
+	</div>
+	<input type="hidden" id="layer_dst" value="$inputs["dstName"]["value"]" />
+	<input type="hidden" id="layer_dso" value="$inputs["dsoName"]["value"]" />
+	<div><input type="submit" value="Set" onclick="try{setProjection();}catch(e){}return false;" /></div>
+</form>
+#else
+#include $conf["main"]["templatesPath"]+"/default_auth_msg.tmpl"
+#end if
