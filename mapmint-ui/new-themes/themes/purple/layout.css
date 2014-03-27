@@ -1,0 +1,2 @@
+.close:hover {width:16px;height:17px;cursor:pointer;margin: 0 5px 0 0;background: url(../img/close-sidebar-hover-purple.png) no-repeat;}
+.close-inv:hover {width:16px;height:17px;float:left;cursor:pointer;background: url(../img/close-sidebar-right-hover-purple.png) no-repeat;margin: 0 0 0 1px;}

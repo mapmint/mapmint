@@ -1,0 +1,30 @@
+[loadContext]
+ Title = Save a routing result
+ Abstract = Keep a copy of the routing result
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [name]
+   Title = The urls to the WMS Servers
+   Abstract = The WMS Server urls
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    dataType=string
+    <Default>
+    </Default>
+   </LiterlData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The result 
+   Abstract = GeoJSON stream containint the splited line.
+   <LiteralData>
+    dataType=string
+    <Default>
+    </Default>
+   </LiteralData>
+ </DataOutputs>  

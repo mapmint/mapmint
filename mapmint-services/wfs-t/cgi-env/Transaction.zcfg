@@ -1,0 +1,59 @@
+[Transaction]
+ Title = Execute a WFS Transaction request using a MapServer WFS server
+ Abstract = Execute a WFS Transaction request using a MapServer WFS server
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = wfst_sp.zo
+ serviceType = C  
+ <DataInputs>
+  [Request]
+   Title = The WFS request to run
+   Abstract = XML WFS Transaction Request
+   minOccurs = 1
+   maxOccurs = 1
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://fooa/gml/3.1.0/polygon.xsd
+     asReference = true 
+    </Default>
+    <Supported>
+     mimeType = application/json
+     encoding = UTF-8
+    </Supported>
+   </ComplexData>
+  [MapFile]
+   Title = the mapfile full path
+   Abstract = Distance to be used to calculate buffer.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    dataType = string
+    <Default>
+     uom = meters
+     value = 1
+    </Default>
+    <Supported>
+     uom = feet
+    </Supported>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The TransactionResponse document
+   Abstract = The resulting  WFS TransactionResponse document 
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://www.opengis.net/wfs/1.0.0/WFS-transaction.xsd
+    </Default>
+    <Supported>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://www.opengis.net/wfs/1.0.0/WFS-transaction.xsd
+    </Supported>
+   </ComplexData>
+ </DataOutputs>

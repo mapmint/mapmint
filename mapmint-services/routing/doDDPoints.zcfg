@@ -1,0 +1,53 @@
+[doDDPoints]
+ Title = Driving Distance
+ Abstract =  Compute and return all points which are accessible from the given point and distance
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [startPoint]
+   Title = Starting Point
+   Abstract = The Point to use as starting of the path
+   minOccurs = 2
+   maxOccurs = 2
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+    </Default>
+    <Supported>
+     mimeType = application/json
+     encoding = UTF-8
+    </Supported>
+   </ComplexData>
+  [distance]
+   Title = Distance
+   Abstract = The distance used to compute driving distance 
+   minOccurs = 2
+   maxOccurs = 2
+   <LiteralData>	
+     dataType=float
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The result 
+   Abstract = GeoJSON stream containint all points reachable by distance providen.
+   <ComplexData>
+    <Default>
+     mimeType = application/json
+     extension = json
+    </Default>
+    <Supported>
+     mimeType = image/png
+     asReference = true
+     msStyle = STYLE SYMBOL "circle" SIZE 15 COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 3 END
+     useMapServer = true
+     extension = json
+    </Supported>
+   </ComplexData>
+ </DataOutputs>  

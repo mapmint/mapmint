@@ -1,0 +1,18 @@
+[logOut]
+ Title = List all key value from a configuration maps.
+ Abstract = List all the key value pairs from the main configuration file.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs />
+ <DataOutputs>
+  [Result]
+   Title = The logOut message
+   Abstract = The HTML content out of the template.
+   <LiteralData>
+    dataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

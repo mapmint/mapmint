@@ -1,0 +1,30 @@
+[applyStyleToRouteMap]
+ Title = Save a routing result using styles
+ Abstract = Keep a copy of the routing result using styles defined in the StyleRoute project
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [map]
+   Title = The mapfile to update
+   Abstract = The mapfile to update
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    dataType=string
+    <Default>
+    </Default>
+   </LiterlData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The result 
+   Abstract = GeoJSON stream containint the splited line.
+   <LiteralData>
+    dataType=string
+    <Default>
+    </Default>
+   </LiteralData>
+ </DataOutputs>  

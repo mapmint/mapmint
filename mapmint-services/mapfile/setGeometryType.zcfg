@@ -1,0 +1,28 @@
+[setDefaultExtent]
+ Title = Set the default extent in senv map.
+ Abstract = Set the default extent in senv map corresponding to the user.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [bbox]
+   Title = Input string
+   Abstract = The name of the map to extract values from.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <LiteralData>
+   dataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

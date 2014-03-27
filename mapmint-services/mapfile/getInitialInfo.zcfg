@@ -1,0 +1,35 @@
+[getInitialInfo]
+ Title = Get information about a map layer. 
+ Abstract = Get general informations about a map layer. 
+ Profile = urn:ogc:wps:1.0.0:centroid
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service.js
+ serviceType = JS
+ <DataInputs>
+  [map]
+   Title = Polygon to get the centroid
+   Abstract = The centroid which is not necessarily within the geometry.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+     dataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The Centroid
+   Abstract = XML File representing the vector informations
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+    </Default>
+    <Supported>
+     mimeType = text/xml
+     encoding = UTF-8
+    </Supported>
+   </ComplexData>
+ </DataOutputs>  

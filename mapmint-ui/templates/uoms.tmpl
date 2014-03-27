@@ -1,0 +1,10 @@
+#import zoo
+         <span>$zoo._("Unit Of Measure:")</span>
+	 <select id="${prefix}tuom">
+#set t=0
+#set tt=$conf["mm"]["uomsName"].split(',')
+#for i in $conf["mm"]["uomsId"].split(',')
+       	  <option value="$i" #if $uom==$i#selected="true"#end if#>$zoo._($tt[$t])</option>
+#set t=$t+1
+#end for
+	 </select>

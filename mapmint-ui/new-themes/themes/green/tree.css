@@ -1,0 +1,12 @@
+.tree-node-selected{
+	background:#99CC66;
+}
+
+.menu-active{
+	border:1px solid #ADEF73;
+	background:#fafafa;
+	border-radius:4px;
+	-moz-border-radius:4px;
+	-webkit-border-radius: 4px;
+	 behvior: url(js/ie-css3.htc);
+}

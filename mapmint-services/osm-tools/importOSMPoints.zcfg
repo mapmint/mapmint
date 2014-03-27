@@ -1,0 +1,48 @@
+[importOSMPoints]
+ Title = Create a shapefile from OSM dataset
+ Abstract = Create a Point shapefile for an OSM dataset
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service.js
+ serviceType = JS
+ <DataInputs>
+  [bbox]
+   Title = The bbox
+   Abstract = The bounding box to extract the OSM data
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+	dataType=string
+    <Default />
+   </LiteralData>
+  [dstn]
+   Title = The MapMint DataStore
+   Abstract = The MapMint DataStore to store outputed shapefile
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+	dataType=string
+    <Default />
+   </LiteralData>
+  [dson]
+   Title = The MapMint DataSource
+   Abstract = The MapMint DataSource filename to create
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+	dataType=string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The success or failure message
+   Abstract = The success or failure message.
+   <ComplexData>
+    <Default>
+	mimeType=text/html
+	encoding=utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

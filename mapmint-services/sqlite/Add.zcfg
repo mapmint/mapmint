@@ -1,0 +1,53 @@
+[Add]
+ Title = Add rows of sqlite database.
+ Abstract = insert row on sqlite database.
+ processVersion = 2
+ storeSupported = false
+ statusSupported = true
+ serviceProvider = sqlite_service
+ serviceType = Python
+ <MetaData>
+   title = Demo
+ </MetaData>
+ <DataInputs>
+  [table]
+   Title = Input string
+   Abstract = Table name.
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = My test
+   </MetaData>
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+   </LiteralData>
+  [row]
+   Title = Input string
+   Abstract = row to insert as a json object.
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData>
+    title = My test
+   </MetaData>
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = result of the request
+   Abstract = Result row if success.
+   <MetaData>
+    title = My test
+   </MetaData>
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+   </LiteralData>
+ </DataOutputs>
+

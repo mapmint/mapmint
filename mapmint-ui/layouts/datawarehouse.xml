@@ -1,0 +1,121 @@
+<div id="datawarehouse" class="inner-layout-container"> 
+  <div class="inner-center">     
+    <h1 class="pane-title">Data Sources</h1>
+     <div class="toolbar">
+      <a class="fg-button ui-state-default ui-corner-all add-vector"  href="#" title="Add Vector"></a>
+      <a class="fg-button ui-state-default ui-corner-all add-raster"  href="#" title="Add Raster"></a>
+      <a class="fg-button ui-state-default ui-corner-all add-wms"  href="#" title="Add WMS"></a>
+      <a class="fg-button ui-state-default ui-corner-all add-wfs"  href="#" title="Add WFS"></a>
+      <a class="fg-button ui-state-default ui-corner-all add-wcs"  href="#" title="Add WCS"></a>
+    </div>
+    
+    <div class="datasources-container" id="datasources-container-id">
+    </div>
+    
+    
+    
+  </div>   
+  <div class="inner-west">
+    <h1 class="pane-title">Data Stores</h1> 
+         <div class="toolbar">
+      <a class="fg-button ui-state-default ui-corner-all db add-database"  href="#" title="Add PG connection"></a>
+      <a class="fg-button ui-state-default ui-corner-all dir add-directory"  href="#" title="Add Directory"></a>
+    </div>
+    
+    <ul id="browser" class="tree">
+      <li iconCls="icon-db">
+	<span>Databases</span>
+	<ul>
+	  <li id="mysqlList" iconCls="icon-db"><span>MySQL connections</span>
+	  </li>
+	</ul>
+	<ul>
+	  <li id="postgisList" iconCls="icon-db"><span>PostGIS connections</span>
+	  </li>
+	</ul>
+      </li>
+      <li id="mainDirectoriesList">
+	<span>Directories</span>
+      </li>
+      </ul>
+
+  </div> 
+</div> 
+
+<div class="dialog-postgis-new" title="Add new PostGIS connexion" >
+<form action="" method="#" class="dialogs">
+
+<table style="width:100%;padding:10px;font-size:0.9em;">
+<tr>
+<td>Name:</td>
+<td><input id="Datawarehouse.pgisform.name" type="text" class="rounded"/></td>
+</tr>
+
+<tr>
+<td>Host:</td>
+<td><input id="Datawarehouse.pgisform.host" type="text" class="rounded" /></td>
+</tr>
+<tr>
+<td>Port:</td>
+<td><input id="Datawarehouse.pgisform.port" type="text" class="rounded" /></td>
+</tr>
+<tr>
+<td>Login:</td>
+<td><input id="Datawarehouse.pgisform.user" type="text" class="rounded" /></td>
+</tr>
+<tr>
+<td>Password:</td>
+<td><input id="Datawarehouse.pgisform.password" type="text" class="rounded" /></td>
+</tr>
+<tr>
+<td>Type: </td>
+<td>
+<dl id="#" class="addDB-toolbar">
+        <dt><a href="#" class="ui-corner-all"><span id="Datawarehouse.pgisform.dbtype">Type</span></a></dt>
+        <dd>
+            <ul>
+                <li><a href="javascript:{$mj('PostGreSQL').checked=true;return true;}"><input type="radio" name="Datawarehouse.pgisform.type" id="PostGreSQL" value="PostGIS" /><label for="PostGreSQL">PostGreSQL</label></a></li>
+                <li><a href="javascript:{$mj('MySQL').checked=true;return true;}"><input type="radio" name="Datawarehouse.pgisform.type" id="MySQL" value="MySQL" /><label for="MySQL">MySQL</label></a></li>
+            </ul>
+        </dd>
+    </dl>
+</td>
+</tr>
+<tr>
+<td>Database:</td>
+<td><input id="Datawarehouse.pgisform.dbname" type="text" class="rounded" /></td>
+</tr>
+</table>
+</form>
+</div>
+
+<div class="dialog-directory-new" title="Add new directory" >
+<form action="" method="#" class="dialogs">
+<p style="font-size:0.9em" float:left>Name: <input type="text" id="Datawarehouse.form.name"  class="name"/></p>
+<table>
+<tr><td>
+<input type="radio" name="Datawarehouse.form.type" value="use" onclick="$mj('Datawarehouse.form.path').value='/';layouts[1].loadDir('/');$mj('Datawarehouse.form.path').disabled=true;" checked="true"/>Browse
+</td><td>
+<input type="radio" name="Datawarehouse.form.type" value="new" onclick="$mj('Datawarehouse.form.path').value='/';layouts[1].loadDir('/');$mj('Datawarehouse.form.path').disabled=false;" />New
+</td></tr>
+</table>
+<p style="font-size:0.9em">Path: <input type="text" id="Datawarehouse.form.path" disabled="true" class="name" value="/"/></p>
+<div id="browseDirectoriesList_"></div>
+</form>
+</div>
+
+<div class="dialog-add-vector" title="Add vector" >
+<form action="" method="#" class="dialogs">
+<p style="font-size:0.9em">Name: <input type="text" class="name"/></p>
+<p style="font-size:0.9em">Browse: <input type="file"/></p>
+</form>
+</div>
+
+<div class="dialog-add-raster" title="Add raster" >
+<form action="" method="#" class="dialogs">
+<p style="font-size:0.9em">Name: <input type="text" class="name"/></p>
+<p style="font-size:0.9em">Browse: <input type="file"/></p>
+</form>
+</div>
+
+

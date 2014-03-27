@@ -1,0 +1,77 @@
+#import zoo
+#import mapscript
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/project_"+$conf["senv"]["last_map"]+".map")
+#import mm_access
+#if not($mm_access.checkMapPriv($conf,$m))
+#set page="/error.tmpl"
+#set nameSpace={"conf":$conf, "errorMsg": $zoo._("You're not authorized to access this content")}
+$Template(file=$conf["main"]["templatesPath"]+$page,searchList=$nameSpace)
+#else
+#if m.web.metadata.get("mmTitle") is not None and m.web.metadata.get("mmTitle")!=""
+#set title=m.web.metadata.get("mmTitle")
+#else
+#set title=$zoo._("Preview")
+#end if
+#set searchList=[{"m": $m}, {"tmpl": "fullscreen"},{"conf": $conf},{"inputs":$inputs}]
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/default_header.tmpl",searchList=$searchList))
+<body onload="init()">
+
+#if $m.web.metadata.get('mmNav')
+#set nav=$m.web.metadata.get('mmNav').split(',')
+#else
+#set nav=[]
+#end if
+
+<div id="map">
+
+</div>
+
+
+<div class="btm">
+<div class="lft">
+<a href="http://natureparif.fr" target="_blank"></a>
+</div>
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/copyright.tmpl",searchList=$searchList))
+<div id="coords"></div>
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/other_tools/overviewmap_button.tmpl",searchList={"m":$m,"nav":$nav,"conf":$conf}))
+</div>
+</div>
+
+
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/other_tools/SearchBox.tmpl",searchList={"m": $m}))
+
+<div id="header">
+<img src="$conf["main"]["applicationAddress"]/img/mapmint-logo.png" />
+<h1>$title</h1>
+	
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/toolbar.tmpl",searchList={"m": $m,"conf": $conf}))
+
+</div>
+        
+<div id="ls-container">
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/toolbars/layer.tmpl",searchList=$searchList))
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/layerswitcher.tmpl",searchList=$searchList))
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/addLayer/display.html",searchList={"m": $m,"conf": $conf}))
+</div>
+
+$Template(file=$conf['main']['templatesPath']+"/preview/modules/timeline/display.html",searchList={"m": $m,"conf": $conf})
+       
+$Template(file=$conf['main']['templatesPath']+"/preview/modules/other_tools/display.html",searchList={"m": $m,"conf": $conf})
+
+#*$Template(file=$conf['main']['templatesPath']+"/preview/modules/timeline/display.html",searchList={"m": $m,"conf": $conf,"suffix":"_c"})*#
+ 
+<div id="loading" style="dispay:none">
+	<div>
+		<div id="progress_txt"></div>
+	</div>
+</div>
+
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/default_footer.tmpl",searchList={"m":$m,"nav":$nav,"conf":$conf}))
+
+</body>
+</html>
+#end if

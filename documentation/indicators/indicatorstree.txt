@@ -1,0 +1,74 @@
+.. _indicators-indicatorstree:
+
+Arbre des indicateurs
+===================
+
+.. contents:: Table des matières
+    :depth: 4
+    :backlinks: top
+
+L'arbre des indicateurs liste les indicateurs crées par l'utilisateur par date de création, dans le panneau de gauche du :doc:`index`.
+
+.. |addind| image:: ../../_static/images/add-indicator.png
+   :height: 24
+   :width: 24
+   :alt: Add indicator icon
+
+.. |remind| image:: ../../_static/images/delete-indicator.png
+   :height: 24
+   :width: 24
+   :alt: Delete indicator icon
+   
+============ ============================================
+**Icône**    **Action**       
+------------ --------------------------------------------
+|addind|     Ajoute un indicateur 	           
+|remind|     Supprime un indicateur			  	           
+============ ============================================							
+   
+Ajouter un indicateur
+-------------------------------
+
+Pour ajouter un nouvel indicateur, veuillez cliquer sur l'icône correspondante dans la barre d'outil du paneau de gauche. Cela ouvre la fenêtre d'ajout d'indicateur illustrée ci-dessous.
+
+.. |addiw| image:: ../../_static/images/add-indicator-window.png
+	:scale: 80%
+	:alt: Add new indicator
+
+|addiw|
+
+Veuillez spécifier un nom dans la zone de texte prévue à cet effet puis cliquer sur le bouton "Ajouter". Cela entraine la fermeture de la fenêtre, l'ajout de l'indicateur à l'arbre et le rechargement du panneau de la :doc:`indicatorspanel`, à droite de l'écran.
+
+Supprimer un indicateur
+-----------------------
+
+Pour supprimer un indicateur existant, veuillez cliquer sur le nom d'un indicateur dans l'arbre, puis sur l'icône de suppression dans la barre d'outil du paneau de gauche. Cela ouvre la fenêtre de suppression d'indicateur illustrée ci-dessous.
+
+.. |deliw| image:: ../../_static/images/delete-indicator-window.png
+	:scale: 80%
+	:alt: Delete indicator indicator
+
+|deliw|
+
+Cliquez ensuite sur le bouton "Supprimer". Cela entraine la fermeture de la fenêtre et la suppression de l'indicateur de l'arbre.
+
+.. note::
+	La suppression d'un indicateur équivaut à supprimer le mapfile correspondant.
+
+.. warning::
+	La suppression d'un indicateur est permanente et irréversible.
+
+Rechercher un indicateur
+-----------------------
+
+Pour rechercher un indicateur existant, utilisez le moteur de recherche prévu à cet effet à droite de la barre d'outil du panneau de gauche, représenté ci-dessous.
+
+.. |seaiw| image:: ../../_static/images/search-indicator.png
+	:scale: 80%
+	:alt: Delete indicator indicator
+	
+|seaiw|	
+
+Le moteur de recherche est dotté d'une fonctionnalité d'autocomplétion. Entrez quelques lettres ou appuyer sur la flèche du bas de votre clavier. Cela entraine l'affichage d'une liste de résulat en dessous de la zone de saisie.
+
+Le clic sur l'un des résulats entraine le rechargement de la page et charge les informations de l'indicateur dans le panneau de droite. L'indicateur recheché est à présent l'indicateur actif.

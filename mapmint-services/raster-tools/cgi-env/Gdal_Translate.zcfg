@@ -1,0 +1,61 @@
+[Gdal_Translate]
+ Title = Convert raster data from one format to another. 
+ Abstract = Converts raster data between different formats.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceType = C
+ serviceProvider = translate_service.zo
+ <MetaData>
+   title = My Demo
+ </MetaData>
+ <DataInputs>
+  [Format]
+   Title = Format of the output data
+   Abstract = Select the output format by usig short name of the format (use gda-config --formats for list of available formats on your platform).
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+     value = GTiff
+    </Default>
+   </LiteralData>
+  [GCP]
+   Title = Ground Point Control
+   Abstract = Ground Point Control in the form : pixel,line,eating,northing(,elev).
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [InputDSN]
+   Title = The input data source name
+   Abstract = The input data source name to use as source for convertion.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [OutputDSN]
+   Title = The output data source name
+   Abstract = The output data source name to use as source for convertion.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>	
+   </LiteralData>
+ </DataOutputs>  

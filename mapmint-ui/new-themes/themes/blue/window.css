@@ -1,0 +1,30 @@
+.panel-tool-close{
+	background:url('../img/panel_tools-blue.gif') no-repeat -16px 0px;
+}
+.panel-tool-min{
+	background:url('../img/panel_tools-blue.gif') no-repeat 0px 0px;
+}
+.panel-tool-max{
+	background:url('../img/panel_tools-blue.gif') no-repeat 0px -16px;
+}
+.panel-tool-restore{
+	background:url('../img/panel_tools-blue.gif') no-repeat -16px -16px;
+}
+.panel-tool-collapse{
+	background:url('../img/panel_tool_collapse-blue.gif') no-repeat;
+}
+.panel-tool-expand{
+	background:url('../img/panel_tool_expand-blue.gif') no-repeat;
+}
+.panel-loading{
+	padding:11px 0px 10px 30px;
+	background:url('../img/panel_loading.gif') no-repeat 10px 10px;
+}
+
+a.l-btn:hover{
+	color:#FFFFFF;
+	text-shadow: #777777 0px 1px 0px;
+background: -moz-linear-gradient(top, #7fe5f9 , #3d93df);
+background: -webkit-gradient(linear, left top, left bottom, from(#7fe5f9), to(#3d93df));
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#7fe5f9', endColorstr='#3d93df');
+}

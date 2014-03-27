@@ -1,0 +1,44 @@
+.. _userguidegeneral:
+
+Généralités
+============
+
+Qu’est-ce que MapMint?
+---------------------
+
+MapMint est un logiciel de système d'information géographique (SIG) sur l'Internet  conçu pour faciliter le déploiement d'**infrastructures de données spatiales** (IDS). 
+
+MapMint s'adresse aux individus et aux organisations souhaitant maîtriser et optimiser la mise en place d'IDS et le déploiement d'applications de cartographie dynamique. L'application centralise et simplifie un certain nombre de fonctionnalités SIG et WebSIG. Les différents niveaux de droits utilisateur répartissent les tâches selon les publics (administrateurs système, géomaticiens, techniciens SIG, cartographes, webmasters...).  
+
+Que permet MapMint?
+--------------------
+
+MapMint permet d'effectuer plusieurs tâches relative à la mise en place d'une IDS, depuis une interface d'administration modulaire et conviviale. L'utilisateur MapMint peut, selon ses droits: 
+
+ * Importer et stocker des données SIG vecteur et raster
+ * Interroger des base de données et des serveur WMS/WFS externes 
+ * Publier des données géographiques sous la forme de services WMS, WFS et WMTS
+ * Traiter, éditer et styler des sources de données
+ * Composer et enregistrer des cartes, sous forme de projets (mapfiles)
+ * Paramétrer et générer des applications cartographiques
+ * Configurer et animer un portail cartographique
+ * Consulter et partager des cartes
+
+Comment fonctionne MapMint?
+---------------------------
+
+MapMint regroupe plusieurs `logiciels libres <http://mapmint.com/en/Components>`__ dans une plateforme de webmapping complète et cohérente, dont le fonctionnement repose sur l'utilisation des `standards ouverts <http://mapmint.com/en/Components>`__ de la géomatique et de l'internet.
+
+.. |archi| image:: ../../_static/images/mm-architecture-scheme.png
+   :height: 345
+   :width: 700
+   :alt: MapMint architecture preview image
+   
+|archi|
+
+Retrouvez des informations d'ordre général sur le site internet de `MapMint <http://mapmint.com/en/>`__
+
+
+
+
+

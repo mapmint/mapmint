@@ -1,0 +1,37 @@
+[removeLayer]
+ Title = Remove a layer from a project.
+ Abstract = Remove a layer from a project map.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [map]
+   Title = The map
+   Abstract = The map name.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [layer]
+   Title = The layer
+   Abstract = The layer name.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting message
+   Abstract = The welcome message created by service.
+   <LiteralData>
+     dataType=string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

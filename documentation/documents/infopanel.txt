@@ -1,0 +1,49 @@
+.. _documents-infopanel:
+
+Panneau d'information
+=====================
+
+.. contents:: Table des matières
+    :depth: 4
+    :backlinks: top
+    
+Le panneau d'information des documents permet de visualiser et d'éditer les propriétés du document séléctionné dans le panneau des document. 
+
+.. |infthw| image:: ../../_static/images/documents-infopanel-window.png
+	:scale: 80%
+	:alt: Document information window
+
+|infthw|
+
+Nom du document
+-------------------------------------
+
+Le nom du document renseigné doit être synthétique. La valeur du champs texte est utilisé dans l'interface publique.
+
+Thème du document
+-------------------------------------
+
+Un document peut être rattaché à un ou plusieurs thèmes en les sélectionnant dans la liste à choix multiple prévue à cet effet.
+
+Fichier ou URL
+--------------------
+
+Un document peut être un fichier ou une URL.
+
+Pour ajouter un fichier depuis votre station de travail, veuillez cliquer sur le bouton "Choisissez un fichier". Cela entraine l'ouverture d'une fenêtre de votre navigateur permettant de sélectionner un fichier .pdf, .doc, .xls, .jpg ou .png. Cliquez sur le bouton "Ajouter", ce qui entraine le chargement du document sur le serveur.
+
+Pour ajouter un document de type URL, veuillez spécifier une URL valide dans le champs prévu à cet effet.
+
+Description du document
+-------------------------------------
+
+La decription du document est une chaine de caractère décriavnt le document. Ce texte est utilisé dans l'onglet "Documents" de l'interface publique. Vous pouvez l'éditez avec un éditeur rich-text. Pour plus d'information sur les fonctionnalités de l'éditeur, veuillez vous référer à la `documentation de CKEditor <http://docs.cksource.com/Main_Page>`__ .
+
+Droits des groupes
+---------------------------------
+
+L'accès au document peut être restreint à certain groupes d'utilisateurs. Cliquez sur le/les groupes ciblés dans la liste à choix multiple prévue à cet effet.
+
+.. note::
+	Cliquez en maintenant la touche Shift enfoncée pour sélectionner plusieurs groupes.
+

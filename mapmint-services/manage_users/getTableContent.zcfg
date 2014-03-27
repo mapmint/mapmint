@@ -1,0 +1,31 @@
+[getTableContent]
+ Title = update user on users database.
+ Abstract = update user on users database.
+ processVersion = 2
+ storeSupported = false
+ statusSupported = true
+ serviceProvider = service_users
+ serviceType = Python
+ <DataInputs>
+  [table]
+   Title = Input string
+   Abstract = user to update as a json object.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = JSON Object
+   Abstract = JSON Object.
+   <ComplexData>
+    <Default>
+     mimeType=application/json
+     encoding=utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>
+

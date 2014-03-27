@@ -1,0 +1,9 @@
+.. _apps-mapspanel:
+
+Panneau des cartes
+===================
+
+.. contents:: Table des matières
+    :depth: 4
+    :backlinks: top
+

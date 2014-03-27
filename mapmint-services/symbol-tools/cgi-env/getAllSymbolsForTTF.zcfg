@@ -1,0 +1,30 @@
+[getAllSymbolsForTTF]
+ Title = List all charcodes in truetype font
+ Abstract = List all charcodes in a truetype font
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [name]
+   Title = Input string
+   Abstract = The name of the map to extract values from.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <ComplexData>
+    <Default>
+	mimeType=text/html
+	encoding=utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

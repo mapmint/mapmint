@@ -1,0 +1,28 @@
+[load]
+ Title = Load all WMS/WFS Data Stores.
+ Abstract = Load all WMS/WFS Data Stores.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [name]
+   Title = The Data Store Name
+   Abstract = The name of the Data Store to create.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting message
+   Abstract = The message providing informations about the deletion of the WMS or WFS Data Store.
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

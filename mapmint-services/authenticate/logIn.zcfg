@@ -1,0 +1,39 @@
+[logIn]
+ Title = List all key value from a configuration maps.
+ Abstract = List all the key value pairs from the main configuration file.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [login]
+   Title = Template name
+   Abstract = The name of the template to fill.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [password]
+   Title = Template name
+   Abstract = The name of the template to fill.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The HTML content out of the template.
+   <ComplexData>
+    <Default>
+     mimeType = text/html
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

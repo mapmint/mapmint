@@ -1,0 +1,56 @@
+[Gdal_Dem]
+ Title = Tools to analyze and visualize DEMs.
+ Abstract = http://www.gdal.org/gdaldem.html
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceType = C
+ serviceProvider = dem_service.zo
+ <DataInputs>
+  [InputDSN]
+   Title = The input data source name
+   Abstract = The input data source name to use.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [OutputDSN]
+   Title = The output data source name
+   Abstract = The output data source name.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [utility]
+   Title = The mode
+   Abstract = This service has 4 different modes :  hillshade,  slope,  aspect, color-relief
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [s]
+   Title = The scale
+   Abstract = Scale is the ratio of vertical units to horizontal, for Feet:Latlong use 370400, for Meters:LatLong use 111120
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>	
+   </LiteralData>
+ </DataOutputs>  

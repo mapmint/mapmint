@@ -1,0 +1,18 @@
+#import zoo,mapscript
+#import json,sys
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/project_"+$conf["senv"]["last_map"]+".map")
+#set t=$mapscript.projectionObj($m.getLayerByName($inputs["layer"]["value"]).getProjection())
+#set s=$mapscript.projectionObj("epsg:4326")
+#set g=json.loads($inputs["geometry"]["value"])
+#set res=[]
+#for i in $g["coordinates"]
+#set p=mapscript.pointObj(i[0],i[1])
+#set r=$p.project($t,$s)
+#try
+#set $res+=[[$p.x,$p.y,$i[2]]]
+#except
+#set $res+=[[$p.x,$p.y]]
+#end try
+#end for
+#set $g["coordinates"]=$res
+$json.dumps($g)

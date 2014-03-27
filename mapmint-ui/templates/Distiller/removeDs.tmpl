@@ -1,0 +1,33 @@
+#import mm_access
+#import zoo
+#if $mm_access.checkDataSourcePriv($conf,None,$inputs["dst"]["value"],$inputs["dso"]["value"],"w")
+<div id="delete-datasource-dialog" title="$zoo._("Drop Datasource")">
+<p>
+$zoo._("Please, confirm that you want to remove the following DataSource.")
+</p>
+<table>
+
+<tbody>
+ <tr>
+  <td>$zoo._("Name:")</td>
+  <td><input id="Distiller_deleteDS_name" class="rounded" type="text" value="$inputs["dso"]["value"]" disabled="disabled" />
+   <input id="Distiller_deleteDS_dst" class="rounded" type="hidden" value="$inputs["dst"]["value"]" />
+   <input id="Distiller_deleteDS_stype" class="rounded" type="hidden" />
+  </td>
+ </tr>
+
+</tbody>
+
+</table>
+
+	<div id="dlgr-buttons">
+		<a href="#" class="easyui-linkbutton" onclick="\$('#removeDs-dialog').window('close');">$zoo._("Cancel")</a>
+		<a href="#" class="easyui-linkbutton" onclick="Distiller.deleteDs();">$zoo._("Remove")</a>
+	</div>
+
+</div>
+#else
+<div id="delete-datasource-dialog" title="$zoo._("Privileges not granted")">
+#include $conf["main"]["templatesPath"]+"/default_auth_msg.tmpl"
+</div>
+#end if

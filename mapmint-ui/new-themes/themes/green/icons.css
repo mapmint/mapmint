@@ -1,0 +1,93 @@
+/*
+ *	MapMint Icons CSS
+ */
+ 
+.maincfg1 {border:1px solid #8f8f8f;background-image:url(../img/monitor.png) !important;}
+.maincfg2 {border:1px solid #8f8f8f;background-image:url(../img/security.png) !important;}
+.maincfg3 {border:1px solid #8f8f8f;background-image:url(../img/user.png) !important;}
+
+.add-database {border:1px solid #cfcece;background-image:url(../img/add-database-default.png) !important;}
+.add-directory {border:1px solid #8f8f8f;background-image:url(../img/add-directory-default.png) !important;}
+.add-vector {border:1px solid #8f8f8f;background-image:url(../img/add-vector.png) !important;}
+.add-raster {border:1px solid #8f8f8f;background-image:url(../img/add-raster.png) !important;}
+.add-wms {border:1px solid #8f8f8f;background-image:url(../img/add-wms.png) !important;}
+.add-wfs {border:1px solid #8f8f8f;background-image:url(../img/add-wfs.png) !important;}
+.add-wcs {border:1px solid #8f8f8f;background-image:url(../img/add-wcs.png) !important;}
+
+.add-territory {border:1px solid #8f8f8f;background-image:url(../img/add-territory.png) !important;}
+.view-territory {border:1px solid #8f8f8f;background-image:url(../img/view-territory.png) !important;}
+.delete-territory {border:1px solid #8f8f8f;background-image:url(../img/delete-territory.png) !important;}
+
+.add-index {border:1px solid #8f8f8f;background-image:url(../img/add-index.png) !important;}
+.delete-index {border:1px solid #8f8f8f;background-image:url(../img/delete-index.png) !important;}
+.data{border:1px solid #8f8f8f;background-image:url(../img/data.png) !important;background-position:1px 2px !important;}
+.metadata{border:1px solid #8f8f8f;background-image:url(../img/metadata.png) !important;background-position:1px 2px !important;}
+.symbology{border:1px solid #8f8f8f;background-image:url(../img/symbology.png) !important;background-repeat:no-repeat !important;background-position:1px 1px !important;}
+.table{border:1px solid #8f8f8f;background-image:url(../img/table.png) !important;background-repeat:no-repeat !important;background-position:1px 1px !important;}
+.chart{border:1px solid #8f8f8f;background-image:url(../img/chart.png) !important;background-repeat:no-repeat !important;background-position:1px 1px !important;}
+.aggregation{border:1px solid #8f8f8f;background-image:url(../img/aggregation.png) !important;background-position:1px 2px !important;}
+.repport{border:1px solid #8f8f8f;background-image:url(../img/repport.png) !important;background-position:1px 2px !important;}
+.desactivated{opacity: 0.2;filter:alpha(opacity=20);}
+
+.add-theme {border:1px solid #8f8f8f;background-image:url(../img/add-theme.png) !important;}
+.delete-theme {border:1px solid #8f8f8f;background-image:url(../img/delete-theme.png) !important;}
+
+.add-document {border:1px solid #8f8f8f;background-image:url(../img/add-document.png) !important;}
+.delete-document {border:1px solid #8f8f8f;background-image:url(../img/delete-document.png) !important;}
+
+.add-layer {border:1px solid #8f8f8f;background-image:url(../img/add-layer.png) !important;}
+.open-map {border:1px solid #8f8f8f;background-image:url(../img/open-map.png) !important;}
+
+.bl-button{margin:0 5px 0 0;-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;}
+
+.zoom-to-max-extent {border:1px solid #8f8f8f;background-image:url(../img/zoomtomaxextent.png) !important;background-position:1px 2px !important;}
+.pan {border:1px solid #8f8f8f;background-image:url(../img/pan.png) !important;}
+.zoom-box {border:1px solid #8f8f8f;background-image:url(../img/zoom-in.png) !important;}
+.osm-box {border:1px solid #8f8f8f;background-image:url(../img/import-osm.png) !important;}
+.crop-box {border:1px solid #8f8f8f;background-image:url(../img/crop-raster.png) !important;}
+
+.zoom-in {border:1px solid #8f8f8f;background-image:url(../img/zoomin.png) !important;}
+.zoom-in:hover {border:1px solid #8f8f8f;background-image: #73C354 url(../img/zoomin-hover.png) !important; }
+.zoom-out {border:1px solid #8f8f8f;background-image:url(../img/zoomout.png) !important;}
+.zoom-out:hover {border:1px solid #8f8f8f;background-image: #73C354 url(../img/zoomout-hover.png) !important;}
+.zoom-to-point {border:1px solid #8f8f8f;background-image:url(../img/zoom-to-point.png) !important;}
+.identify {border:1px solid #8f8f8f;background-image:url(../img/identify.png) !important;}
+.mesure-distance {border:1px solid #8f8f8f;background-image:url(../img/ruler.png) !important;}
+.mesure-area {border:1px solid #8f8f8f;background-image:url(../img/ruler-crop.png) !important;}
+
+.select {border:1px solid #8f8f8f;background-image:url(../img/select.png) !important;}
+.edit-point {border:1px solid #8f8f8f;background-image:url(../img/edit-point.png) !important;}
+.edit-line {border:1px solid #8f8f8f;background-image:url(../img/edit-line.png) !important;}
+.edit-polygon {border:1px solid #8f8f8f;background-image:url(../img/edit-polygon.png) !important;}
+.delete-feature {border:1px solid #8f8f8f;background-image:url(../img/delete-feature.png) !important;}
+
+.buffer {border:1px solid #8f8f8f;background-image:url(../img/buffer.png) !important;}
+.spatial-buffer {border:1px solid #8f8f8f;background-image:url(../img/buffer-mask.png) !important;}
+.centroid {border:1px solid #8f8f8f;background-image:url(../img/centroid.png) !important;}
+.boundary {border:1px solid #8f8f8f;background-image:url(../img/boundary.png) !important;}
+.convexhull {border:1px solid #8f8f8f;background-image:url(../img/convexhull.png) !important;}
+.simplify {border:1px solid #8f8f8f;background-image:url(../img/simplify.png) !important;}
+.union {border:1px solid #8f8f8f;background-image:url(../img/union.png) !important;}
+.intersection {border:1px solid #8f8f8f;background-image:url(../img/intersection.png) !important;}
+.symdifference {border:1px solid #8f8f8f;background-image:url(../img/symdifference.png) !important;}
+.difference {border:1px solid #8f8f8f;background-image:url(../img/difference.png) !important;}
+.spatial-query {border:1px solid #8f8f8f;background-image:url(../img/spatial-query.png) !important;}
+
+.raster-histogram {border:1px solid #8f8f8f;background-image:url(../img/raster-histogram.png) !important;}
+.clip-raster {border:1px solid #8f8f8f;background-image:url(../img/clip-layer.png) !important;}
+.merge-rasters {border:1px solid #8f8f8f;background-image:url(../img/merge-layer.png) !important;}
+.polygons-from-raster {border:1px solid #8f8f8f;background-image:url(../img/polygons-from-raster.png) !important;}
+.raster-from-csv {border:1px solid #8f8f8f;background-image:url(../img/raster-from-csv.png) !important;}
+
+.terrain-profile {border:1px solid #8f8f8f;background-image:url(../img/terrain-profile.png) !important;}
+.contours-from-dem {border:1px solid #8f8f8f;background-image:url(../img/contours-from-dem.png) !important;}
+.shaded-relief {border:1px solid #8f8f8f;background-image:url(../img/shaded-relief.png) !important;}
+.color-relief {border:1px solid #8f8f8f;background-image:url(../img/color-relief.png) !important;}
+.slope-map {border:1px solid #8f8f8f;background-image:url(../img/slope-map.png) !important;}
+
+.main-configuration {border:1px solid #8f8f8f;background-image:url(../img/process.png) !important;}
+.layout-settings {border:1px solid #8f8f8f;background-image:url(../img/layout-settings.png) !important;}
+.map-settings {border:1px solid #8f8f8f;background-image:url(../img/map-settings.png) !important;}
+.layers-settings {border:1px solid #8f8f8f;background-image:url(../img/layers-settings.png) !important;}
+.controls-settings {border:1px solid #8f8f8f;background-image:url(../img/controls-settings.png) !important;}
+

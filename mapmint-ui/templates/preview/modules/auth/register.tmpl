@@ -1,0 +1,35 @@
+#import zoo
+<h3 class="lgnnm">$zoo._("Register")</h3>
+<form id="form_inscription" action="" method="post">
+
+<table class="reg">
+    <tr>
+      <td width="40%"><label for="lastname">$zoo._("Last name:")</label>
+      <input type="text" name="lastname" id="lastname"/>
+      </td>
+      <td width="40%"><label for="firtname">$zoo._("First name:")</label>
+      <input type="text" name="firstname" id="firstname"/>
+      </td>
+    </tr>
+    <tr>
+      <td width="40%"><label for="rlogin">$zoo._("Login:")</label>
+      <input type="text" class="nc" name="rlogin" id="rlogin"/>
+     </td>
+     <td width="40%"><label for="rpassword">$zoo._("Password:")</label>
+     <input type="password" name="rpassword" id="rpassword"/>
+     </td>
+    </tr>
+    <tr>
+      <td width="40%"><label for="c_password">$zoo._("Confirm ")</label>
+      <input type="password" name="c_password" id="c_password"/>
+      </td>
+      <td width="40%"><label for="email">$zoo._("Email:")</label>
+      <input type="text" name="email" id="email"/></td>
+    </tr>
+</table>
+  <div style="margin:0 0 0 15px;">
+    <input type="submit" id="bt_submit" name="bt_submit" value="$zoo._("Register")" onclick="try{registerUser()}catch(e){}return false;" style="cursor: pointer;"/>
+    <input type="submit" id="bt_submit" name="bt_submit" value="$zoo._("Cancel")" onclick="try{#if not($inputs.has_key('pcancel'))#cancelUserPreferences#else#pcancel#end if#();}catch(e){}return false;" style="cursor: pointer;"/>
+  </div>
+  
+</form>

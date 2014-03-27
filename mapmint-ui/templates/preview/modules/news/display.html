@@ -1,0 +1,19 @@
+#import zoo
+#from manage_users import *
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set prefix=auth.getPrefix($conf)
+#set c=con.connect()
+#set conn = con.conn
+#set cur=conn.cursor()
+#set clause=""
+#for i in $conf["senv"]["group"].split(",")
+#if clause!=""
+#set $clause+=" or "
+#end if
+#set $clause+=" name = '"+$i+"' "
+#end for
+#set res=cur.execute('SELECT title,p_date,content from '+prefix+'news where id = '+inputs["id"]["value"]+') order by p_date desc LIMIT 4')
+#set vals=cur.fetchall()
+<h1>$vals[i][0] ($vals[i][1])</h1>
+$vals[i][2]

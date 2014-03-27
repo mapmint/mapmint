@@ -1,0 +1,34 @@
+[cleanUp]
+ Title = Convert vector data from one format to another.
+ Abstract = Converts vector data between different formats.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceType = Python
+ serviceProvider = service
+ <DataInputs>
+  [dso]
+   Title = The input datasource name
+   Abstract = The input datasource name to use as source for convertion.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+    <Supported>
+    </Supported>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>
+    <Supported>
+    </Supported>
+   </LiteralData>
+ </DataOutputs>

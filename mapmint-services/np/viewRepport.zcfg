@@ -1,0 +1,57 @@
+[viewRepport]
+ Title = Preview Index pdf file as image.
+ Abstract = Preview Index pdf file as image.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [idx]
+   Title = The index identifier
+   Abstract = The index identifier
+   minOccurs = 1
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [field]
+   Title = The field name
+   Abstract = The field name
+   minOccurs = 1
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [in_val]
+   Title = The index identifier
+   Abstract = The index identifier
+   minOccurs = 1
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [out_val]
+   Title = The index identifier
+   Abstract = The index identifier
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <ComplexData>
+    <Default>
+     mimeType = application/pdf
+     extension = pdf
+    </Default>
+   </ComplexData>
+ </DataOutputs>

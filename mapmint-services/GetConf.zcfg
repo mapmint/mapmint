@@ -1,0 +1,44 @@
+[GetConf]
+ Title = List all key value from a configuration maps.
+ Abstract = List all the key value pairs from the main configuration file.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <MetaData lang="en">
+   title = Demo
+ </MetaData>
+ <DataInputs>
+  [section]
+   Title = Input string
+   Abstract = The name of the map to extract values from.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+     UOM = meter
+    </Default>
+    <Supported>
+     UOM = meter
+    </Supported>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <MetaData lang="en">
+    title = My test
+   </MetaData>
+   <LiteralData>
+    DataType = string
+    <Default>
+     UOM = meter
+    </Default>
+    <Supported>
+     UOM = meter
+    </Supported>
+   </LiteralData>
+ </DataOutputs>

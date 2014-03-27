@@ -1,0 +1,30 @@
+[checkFile]
+ Title = Verify if uploaded files are well GIS data and remove others
+ Abstract = Verify if uploaded files are well GIS data and remove others.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [dest]
+   Title = The destination folder
+   Abstract = The destination folder.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = JSON object containing both rejected and accepted list of files
+   Abstract = JSON object containing both rejected and accepted list of files.
+   <ComplexData>
+    <Default>
+     mimeType = application/json
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

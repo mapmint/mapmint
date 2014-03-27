@@ -1,0 +1,24 @@
+.loader-container{
+   position: absolute;
+   width:100%;
+   height:100%;
+   background: url("../../img/loader-bck.png");
+   z-index: 1000;
+}
+
+#loader{
+position:absolute;
+height:50px; 
+width:50px;
+margin:-50px 0px 0px -50px;
+top: 50%; 
+left: 50%;
+background:#000 url("../../img/loader.gif") no-repeat center center;
+text-align: center;
+border-radius: 10px;
+-webkit-border-radius:10px;
+-moz-border-radius:10px;
+   opacity:0.7;
+   z-index:1000;   
+
+}

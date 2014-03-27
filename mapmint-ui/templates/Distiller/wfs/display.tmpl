@@ -1,0 +1,32 @@
+#import zoo
+#if $inputs.has_key("name")
+#set url=open($conf["main"]["dataPath"]+"/"+$inputs["type"]["value"].upper()+"/"+$inputs["name"]["value"]+".txt").read
+#set name=$inputs["name"]["value"]
+#set etype="Edit"
+#else
+#set url=""
+#set name=""
+#set etype="Add"
+#end if
+<div id="add-wfs-dialog" title="$zoo._($etype+" a "+$inputs["type"]["value"].upper()+" Server")">
+  <table>    
+    <tbody><tr>
+      <td>$zoo._("Name:")</td>
+      <td><input id="Distiller_wfsform_name" class="rounded" type="text" value="$name" /></td>
+    </tr>
+    
+    <tr>
+      <td>$zoo._("URL:")</td>
+      <td><input id="Distiller_wfsform_url" class="rounded" type="text" value="$url" /></td>
+    </tr>
+    
+    </tbody> 
+  </table>
+  
+  <div id="dlg-buttons">
+    <input id="Distiller_wfsform_wxsType" type="hidden" value="$inputs["type"]["value"]" />
+    <a href="#" class="easyui-linkbutton"   onclick="MapMintWFSManager.commit('test');">$zoo._("Test")</a>
+    <a href="#" class="easyui-linkbutton"  onclick="\$('#add-wfs-dialog').dialog('close')">$zoo._("Cancel")</a>
+    <a href="#" class="easyui-linkbutton"   onclick="MapMintWFSManager.commit('add');">$zoo._("Add")</a>
+  </div>
+</div>

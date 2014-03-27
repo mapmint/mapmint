@@ -1,0 +1,6 @@
+.tabs-right ul li:hover, .maps-container ul li:hover {cursor:pointer;
+background: #8340f3; /* for non-css3 browsers */
+filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#c743f8', endColorstr='#8340f3'); /* for IE */
+background: -webkit-gradient(linear, left top, left bottom, from(#c743f8), to(#8340f3)); /* for webkit browsers */
+background: -moz-linear-gradient(top,  #c743f8, #8340f3 ); /* for firefox 3.6+ */
+}

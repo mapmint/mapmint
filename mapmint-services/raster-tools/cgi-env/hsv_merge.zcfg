@@ -1,0 +1,50 @@
+[hsv_merge]
+ Title = Convert raster data from one format to another. 
+ Abstract = Converts raster data between different formats.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceType = Python
+ serviceProvider = service
+ <MetaData>
+   title = My Demo
+ </MetaData>
+ <DataInputs>
+  [scfn]
+   Title = The source color filename
+   Abstract = The input data source name to use as source for convertion.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [sgfn]
+   Title = The source greyscale filename
+   Abstract = The output data source name to use as source for convertion.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [dcfn]
+   Title = The destination color filename
+   Abstract = The output data source name to use as source for convertion.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>	
+   </LiteralData>
+ </DataOutputs>  

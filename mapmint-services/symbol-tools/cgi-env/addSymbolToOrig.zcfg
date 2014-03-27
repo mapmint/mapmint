@@ -1,0 +1,30 @@
+[addSymbolToOrig]
+ Title = Add one symbol to the list of available symbols to MapServer
+ Abstract = Add one symbol to the list of available symbols to MapServer.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [name]
+   Title = The symbol name
+   Abstract = The symbol name.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The success or failure message
+   Abstract = The success or failure message.
+   <ComplexData>
+    <Default>
+	mimeType=text/html
+	encoding=utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

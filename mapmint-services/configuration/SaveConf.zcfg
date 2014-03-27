@@ -1,0 +1,28 @@
+[SaveConf]
+ Title = Save a section.
+ Abstract = Save a section in the ZOO main configuration file.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [section]
+   Title = Input string
+   Abstract = The name of the section to save.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default/>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The success or failure message
+   Abstract = The success or failure message.
+   <LiteralData>
+    DataType = string
+    <Default/>
+   </LiteralData>
+ </DataOutputs>

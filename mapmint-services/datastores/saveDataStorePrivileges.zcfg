@@ -1,0 +1,69 @@
+[saveDataStorePrivileges]
+ Title = save datastore privileges.
+ Abstract = Save a datastor privileges .
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [dataStore]
+   Title = DataStore name
+   Abstract = The name of the datastore.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [group]
+   Title = Group name
+   Abstract = The group name which get access privileges for the dataStore.
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [ds_r]
+   Title = Group name
+   Abstract = The group name which get access privileges for the dataStore.
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [ds_w]
+   Title = Group name
+   Abstract = The group name which get access privileges for the dataStore.
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [ds_x]
+   Title = Group name
+   Abstract = The group name which get access privileges for the dataStore.
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <LiteralData>
+    DataType = string
+    <Default>
+     UOM = meter
+    </Default>
+    <Supported>
+     UOM = meter
+    </Supported>
+   </LiteralData>
+ </DataOutputs>

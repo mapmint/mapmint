@@ -1,0 +1,22 @@
+#import zoo
+<div id="connexion-form">
+<form action="#" method="post" class="" onsubmit="return false;" >
+#if $conf.has_key("senv") and $conf["senv"].has_key("loggedin") and $conf["senv"]["loggedin"]=="true"
+#import authenticate.service as auth
+#set con=$auth.getCon($conf)
+#set prefix=$auth.getPrefix($conf)
+#set cur=con.cur
+#if $conf.has_key("senv") and $conf["senv"].has_key("login")
+
+#set ret=cur.execute("SELECT mail,login from "+$prefix+"users where login='"+$conf["senv"]["login"]+"'")
+#set res=cur.fetchall()
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/auth/preferences.html",searchList={"res": $res,"conf":$conf,"inputs":$inputs}))
+
+#end if
+#else
+
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/auth/login.html",searchList={"conf":$conf}))
+
+#end if
+</form>
+</div>

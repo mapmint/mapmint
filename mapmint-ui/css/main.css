@@ -1,0 +1,28 @@
+.jquery-notify-bar {
+  width:100%;
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:32768;
+  background-color:#efefef;
+  font-size:18px;
+  color:#929292;
+  text-align:center;
+  padding:0;
+  line-height:1em;
+  margin:0;
+border-bottom:1px solid #cacaca;
+}
+.jquery-notify-bar.error {
+  color:#f00;
+  background-color:#fdd;
+}
+.jquery-notify-bar.success {
+  color:#060;
+  background-color:#BBFFB6;
+}
+.notify-bar-close {
+  position:absolute;
+  left:95%;
+  font-size:11px;
+}

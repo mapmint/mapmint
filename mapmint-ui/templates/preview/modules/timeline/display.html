@@ -1,0 +1,82 @@
+#import zoo
+#import mapscript
+#try
+#set suffix=$suffix
+#except
+#set suffix=""
+#end try
+<div id="timeliners$suffix">
+#try
+#set m0=$m.getLayer(0)
+#set isIndex=False
+#except
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/indexes_maps/project_Index"+$conf["senv"]["last_index"]+".map")
+#set isIndex=True
+#end try
+#set hasIndex=False
+#for i in range(0,$m.numlayers)
+#if $m.getLayer($i).metadata.get('mmClass')=="tl"
+#set l=$m.getLayer($i)
+#set steps=$l.metadata.get("mmSteps").split(',')
+#set cnt=0
+<div id="timeline$(l.name.replace(".","_"))" class="timeline" #if $m.web.metadata.get("mmActivatedLayers") and $m.web.metadata.get("mmActivatedLayers").count($l.name)>0#style="display:block"#else#style="display:none"#end if#>
+  <ul id="dates$l.name.replace(".","_")" class="dates">
+#for j in steps
+    <li class="std#if $cnt==0# selected#end if#"><a href="#$(i)step$cnt">$j</a></li>
+#set $cnt=$cnt+1
+#end for
+  </ul>
+  <ul id="issues$l.name.replace('.','_')" class="issues">
+#set $cnt=0
+#set $jsStr=""
+#for j in steps
+  <li id="step$(i)$cnt" class="std#if $cnt==0# selected#end if#">
+    <div class="innerTree">
+      <ul id="step$(i)00$cnt">
+#if isIndex==True
+#set m0=mapscript.mapObj($conf["main"]["dataPath"]+"/indexes_maps/timeline_PIndex"+$conf["senv"]["last_index"]+"_indexes_view_idx"+$conf["senv"]["last_index"]+"_step"+str($cnt)+".map")
+#else
+#set m0=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/timeline_"+$conf["senv"]["last_map"]+"_"+$l.name+"_step"+str($cnt)+".map")
+#end if
+#set layer=m0.getLayer($i)
+#set res=$layer.metadata.set("cstep",str($cnt))
+$Template(file=$conf['main']['templatesPath']+"layer_display.tmpl",searchList={"m": $m0,"layer": $layer,"conf": $conf})
+      </ul>
+#set $jsStr=$jsStr+'$("#step'+str($i)+'00'+str($cnt)+'").tree({checkbox: true,isAlreadyLoaded: false,dnd: false});'
+#set $jsStr=$jsStr+'$("#step'+str($i)+'00'+str($cnt)+' .tree-checkbox0").hide();'
+    </div>
+  </li>
+#set $cnt=$cnt+1
+#end for
+  </ul>
+  <a href="#" id="next">+</a>
+  <a href="#" id="prev">-</a>
+</div>
+<script>
+\$().timelinr({
+runAfter:function(){
+try{
+#if isIndex
+#if not(hasIndex)
+#set m00=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/project_indicateurs.map")
+#set cid=i+$m00.numlayers
+#set hasIndex=True
+#end if
+ layersList[$(cid)].url=msUrl+"?map=$conf["main"]["dataPath"]/indexes_maps/timeline_PIndex$(conf["senv"]["last_index"])_indexes_view_idx$(conf["senv"]["last_index"])_step"+arguments[0]+".map";
+layersList[$(cid)].redraw(true);
+#else
+layersList[$(i)].url=msUrl+"?map=$conf["main"]["dataPath"]/maps/timeline_$(conf["senv"]["last_map"])_$(layer.name)_step"+arguments[0]+".map";
+layersList[$(i)].redraw(true);
+#end if
+}catch(e){}
+},
+arrowKeys: 'true',
+containerDiv: "#timeline$(l.name.replace(".","_"))",
+datesDiv: "#dates$(l.name.replace(".","_"))",
+issuesDiv: "#issues$(l.name.replace(".","_"))"
+});
+$jsStr
+</script>
+#end if
+#end for
+</div>

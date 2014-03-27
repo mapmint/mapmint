@@ -1,0 +1,23 @@
+<div>
+<div>
+<label for="diro">Datastore:</label>
+#import datastores.service as ds
+#import mapfile.service as ms
+#set outputs={"Result":{"value":""}}
+#set tt=ds.list($conf,$inputs,$outputs)
+#set elements=eval($outputs["Result"]["value"])
+<select id="diro">
+#for ij in $elements
+#if $ij!="WFS" and $ij!="PostGIS"
+<option disabled="true" style="font-weight: bold;color: #111">$ij</option>
+#for jk in $elements[$ij]
+<option>$jk.name</option>
+#end for
+#end if
+#end for
+</select>
+</div>
+<label for="filename">Filename: </label>
+<input id="filename" value="" />
+<input type="submit" value="Save" onclick=try{cropImage()}catch(e){alert(e)};return false;" />
+</div>

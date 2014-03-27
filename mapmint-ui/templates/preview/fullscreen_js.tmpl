@@ -1,0 +1,12 @@
+
+function tinit(){
+  \$("#layerswitcher").css({height: (\$(window).height()/2)+"px"});
+  \$("#olayerswitcher").css({height: (\$(window).height()/2)+"px"});
+  \$("#layers_list").css({height: ((\$(window).height()/2)-(46))+"px"});
+  \$("#map").css({height: (\$(window).height())+"px"});
+\$(".hp-toogler, .ov-toogler").tipsy({fade: true, offset:10, opacity: 1, gravity: 'se'});
+\$(".ls-toogler").click(function () {
+        \$("#layerswitcher").toggle();
+      });
+  \$("#olayerswitcher").toggle();
+}

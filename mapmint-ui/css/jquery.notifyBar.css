@@ -1,0 +1,54 @@
+/*
+*  Notify Bar - jQuery plugin
+*
+*  Copyright (c) 2009-2010 Dmitri Smirnov
+*
+*  Licensed under the MIT license:
+*  http://www.opensource.org/licenses/mit-license.php
+*  
+*  Version: 1.2
+*
+*  Project home:
+*  http://www.dmitri.me/blog/notify-bar
+*/
+
+.jquery-notify-bar {
+  width:100%;
+  height:25px;
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:32768;
+  text-transform:uppercase;
+  font-size:1.4em;
+  color:#000;
+  text-align:center;
+  font-family:  Verdana, sans-serif;
+  padding:12px 0px;
+  border-bottom:1px solid #bbb;
+}
+.jquery-notify-bar.error {
+  color:#f00;
+  background-color:#fdd;
+}
+.jquery-notify-bar.success {
+  color:#FFFFFF;
+  	background: #8ad148; /* for non-css3 browsers */
+	filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#8ad148', endColorstr='#4bbf30'); /* for IE */
+	background: -webkit-gradient(linear, left top, left bottom, from(#8ad148), to(#4bbf30)); /* for webkit browsers */
+	background: -moz-linear-gradient(top,  #8ad148,  #4bbf30); /* for firefox 3.6+ */;
+}
+.notify-bar-close {
+  position:absolute;
+  left:95%;
+  font-size:11px;
+}
+
+
+.dialog-loading{
+  background:#E0E0E0;
+}
+
+.load{
+   margin:0;padding:0;
+}

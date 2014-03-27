@@ -1,0 +1,53 @@
+[CentroidPy]
+ Title = Get the centroid of a polygon. 
+ Abstract = Compute the geometry centroid.
+ Profile = urn:ogc:wps:1.0.0:centroid
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <MetaData lang="en">
+   title = Demo
+ </MetaData>
+ <DataInputs>
+  [InputPolygon]
+   Title = Polygon to get the centroid
+   Abstract = The centroid which is not necessarily within the geometry.
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData lang="en">
+    title = Mon test  
+   </MetaData>   
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+    </Default>
+    <Supported>
+     mimeType = text/xml
+     encoding = base64
+     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+    </Supported>
+   </ComplexData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The Centroid
+   Abstract = JSON String / GML Entity of the centroid
+   <MetaData lang="en">
+    title = Mon test  
+   </MetaData>   
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://schemas.opengis.net/gml/3.1.0/point.xsd
+    </Default>
+    <Supported>
+     mimeType = application/json
+     encoding = UTF-8
+    </Supported>
+   </ComplexData>
+ </DataOutputs>  

@@ -1,0 +1,37 @@
+[deleteStep]
+ Title = Remove a step name from a project map.
+ Abstract = Remove a step name from a project map.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [layer]
+   Title = Input string
+   Abstract = The name of the layer to update.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [name]
+   Title = Input string
+   Abstract = The name of the step to remove.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting message
+   Abstract = The message providing informations about step creation.
+   <LiteralData>
+   dataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

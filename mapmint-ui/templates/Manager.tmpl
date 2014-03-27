@@ -1,0 +1,194 @@
+#from Skeleton import Skeleton
+#extends Skeleton
+
+#attr $mmodule = "Manager"
+
+#attr $ocss = ['colorpicker.css']
+
+#attr $js = ['jquery.tipsy.js','jquery.hoverIntent.min.js','progress-bar.js','jquery.jgrowl.js','jquery.colorPicker.js','jquery.cookie.js','jquery.jqplot.min.js','plugins/jqplot.dateAxisRenderer.js','plugins/jqplot.highlighter.js','plugins/jqplot.cursor.js','jquery.xml2json.pack.js','Meta.js','wps.js','ckeditor.js','colorpicker.js',]
+
+#attr $js1 = ["main_js","manager_tree_js","wfst_js"] 
+
+#attr $js3 = ['OpenLayers.min.js','MMMap/mmlib/mmmap.js','MMMap/mmlib/MMPanZoom.js']
+
+#def page_title
+MapMint: Manager
+#end def
+
+#def body
+#import zoo
+<div class="ui-layout-west">
+	<h1 class="pane-title">$zoo._("Data Layers")</h1>
+	<div class="toolbar">
+		<a class="fg-button ui-state-default ui-corner-all open-map"  href="#" title="$zoo._("Open Map")"></a>
+ 				
+		<span class="ui-state-default ui-button-text-only ui-corner-all save-as-map"  href="#" title=""><input type="text" id="mapName" name="mapName" value="$conf["senv"]["last_map"]" /><input type="hidden" id="mapNameOrig" name="mapNameOrig" value="$conf["senv"]["last_map"]" /><input type="hidden" id="mapNameH" name="mapNameOrig" value="$conf["senv"]["last_map"]" /></span>
+
+		<a class="ui-state-default ui-button-text-only ui-corner-all save-as-map"  href="#" title="" onclick="System.afterSave=null;saveAsMap()">$zoo._("Save")</a>
+
+	</div>
+	
+	<div class="west-container lcontent">
+
+	
+		<ul id="tt2"></ul>
+	
+	<div id="mm" class="easyui-emenu emenu" style="width:120px;">
+		<div class="zoomTo" iconCls="icon-zoom">$zoo._("Zoom to")</div>
+		<div class="view-table" iconCls="icon-table">$zoo._("Table")</div>
+		<div class="edit-table" iconCls="icon-edit">$zoo._("Edit")</div>
+		<div class="style" onclick="" iconCls="icon-style">$zoo._("Style")</div>
+		<div class="view-lprop" iconCls="icon-properties">$zoo._("Properties")</div>
+		<div iconCls="icon-template" class="emenu">Templates
+		     <div  style="width: 100px;">
+		     <div class="template" iconCls="icon-template-header" id="header">$zoo._("Header")</div>
+		     <div class="template" iconCls="icon-template-content" id="tmpl">$zoo._("Content")</div>
+		     <div class="template" iconCls="icon-template-footer" id="footer">$zoo._("Footer")</div>
+		     </div>
+		</div>
+		<div class="scales emenu" iconCls="scales" >$zoo._("Scales")
+		     <div style="width: 100px;">
+		     <div iconCls="min-scale" class="min-scale-b">$zoo._("Min") &nbsp;</div>
+		     <div iconCls="max-scale"  class="max-scale-b">$zoo._("Max") &nbsp;</div>
+		     <div iconCls="min-scale" class="lmin-scale-b">$zoo._("Label Min") &nbsp;</div>
+		     <div iconCls="max-scale"  class="lmax-scale-b">$zoo._("Label Max") &nbsp;</div>
+		     </div>
+		</div>
+		<div class="menu-sep"></div>
+		<div class="moveLayer" onclick="System.isAlreadyLoaded=true;\$('#tt2').tree('enableDnd'); \$(this).addClass('active');\$(this).iconCls='icon-move-active';" iconCls="icon-move">$zoo._("Move")</div>
+		<div onclick="removeLayer()" iconCls="icon-remove">$zoo._("Remove")</div>
+	</div>	    
+
+	<div id="mmenu1" class="easyui-emenu" style="width:170px;">
+		<div class="addLayer"  href="#" title="$zoo._("Add Layer")" iconCls="icon-add-layer-m">$zoo._("Add Layer")</div>
+		<div class="addDirectory" onclick="startAddGrid()" iconCls="icon-add-grid">$zoo._("Add grid")</div>
+		<div class="addDirectory" onclick="startAddGroup()" iconCls="icon-add-dir">$zoo._("Add dir.")</div>
+		<div class="setLayersOrder" onclick="setLayersOrder()" iconCls="icon-move">$zoo._("Set layer order")</div>
+#if $conf["main"].has_key("3D") and $conf["main"]["3D"]=="true"
+		<div class="setFlyAddress" onclick="setFlyAddress()" iconCls="icon-fly">$zoo._("Set Master Fly")</div>
+#end if
+	</div>	    
+
+	<div id="mmenu2" class="easyui-emenu" style="width:170px;">
+		<div class="moveLayer" onclick="System.isAlreadyLoaded=true;\$('#tt2').tree('enableDnd'); \$(this).addClass('active');\$(this).iconCls='icon-move-active';" iconCls="icon-move">$zoo._("Move")</div>
+		<div onclick="editGroup()" iconCls="icon-edit">$zoo._("Edit")</div>
+		<div onclick="removeGroup()" iconCls="icon-remove">$zoo._("Remove")</div>
+	</div>	    
+
+    </div>
+
+</div>
+
+<div class="ui-layout-center">
+	<h1 class="pane-title">$zoo._("Map Viewer")</h1>
+		<div class="toolbar">
+		<a class="fg-button ui-corner-all zoom-to-max-extent ui-state-active"  href="#" title="$zoo._("Zoom to max extent")" onclick="map.zoomToMaxExtent();"></a>
+		<a class="fg-button ui-corner-all pan ui-state-active gbutton"  href="#" title="$zoo._("Pan")" onclick="activateControl(0);"></a>
+		<a class="fg-button ui-state-default ui-corner-all zoom-box gbutton"  href="#" title="$zoo._("Zoom Box")" onclick="activateControl(1);"></a>
+		<a class="fg-button ui-state-default ui-corner-all osm-box gbutton"  href="#" title="$zoo._("Import OSM from Extent")" onclick="activateControl(3);"></a>
+#*
+		<a class="fg-button ui-state-default ui-corner-all zoom-to-point"  href="#" title="$zoo._("Zoom To Point")"></a>
+		<a class="fg-button ui-state-default ui-corner-all identify"  href="#" title="$zoo._("Identify")"></a>
+		<a class="fg-button ui-state-default ui-corner-all mesure-distance"  href="#" title="$zoo._("Mesure Distance")"></a>
+		<a class="fg-button ui-state-default ui-corner-all mesure-area"  href="#" title="$zoo._("Mesure Area")"></a>
+*#
+
+	</div>
+
+	<div id="scales">
+	     <select id="scalesList" onchange="map.zoomTo(this.value)">
+#set a=$conf["mm"]["scales"].split(',')
+#set b=0
+#for i in a
+		<option value="$b">1:$i</option>
+#set b=$b + 1
+#end for
+	     </select>
+	</div>
+
+
+			<div class="bl-layer base_layer" id="base_layer_dummy" title="$zoo._("Colored Base Layer")" style="position: absolute;top: 15px;right: 350px;"></div>
+	<div id="base_layers">
+#set a=$conf["mm"]["bmLayerAlias"].split(',')
+#set b=$conf["mm"]["bmLayers"].split(',')
+#set a1=$b+[$conf["mm"]["boLayers"]]
+#set b1=$a+[$conf["mm"]["boLayerAlias"]]
+#for i in range(0,len(a1))
+			<div onclick="map.setBaseLayer(map.layers[$i],true);" class="bl-layer base_layer #if $b1[$i]!=$conf["mm"]["boLayerAlias"]#base_layer_selected#end if#" id="base_layer_$a1[$i]" title="#if $b1[$i]!=$conf["mm"]["boLayerAlias"]#$conf["mm"]["bmName"] #end if#$b1[$i]"></div>
+#end for
+		</div>
+
+	<div id="map" class="smallmap">
+        </div>
+	    
+</div>
+
+<div id="add-layer-dialog" title="$zoo._("Add Layer")">	
+
+</div>
+
+<div id="view-table-dialog" title="$zoo._("Features table")">
+</div>
+
+<div id="style-dialog" title="$zoo._("Style")">
+</div>
+
+<div id="class-dialog" title="$zoo._("Class")"></div>
+
+<div id="open-map-dialog" title="$zoo._("Open Map")">
+</div>
+
+<div id="add-dir-dialog" title="$zoo._("Layers Group")">
+</div>
+
+#*
+
+<div id="zoom-to-point-dialog" title="Zoom To Point">
+<p><img src="img/information.png" />&#160; This will zoom the Map to a given X/Y</p>
+		<table>
+		<tr>
+			<td>EPSG:</td>
+			<td>
+			<select class="select-window">
+				<option>EPSG:27572</option>
+				<option>EPSG:900913</option>
+				<option>EPSG:2867</option>
+				<option>EPSG:xxxx</option>
+			</select>
+			</td>
+		</tr>
+		<tr>
+		<td class="title">X:</td>
+		<td><input type="text" id="" class="rounded zoom ui-state-disabled"/></td>
+		<td class="title">Y:</td>
+		<td><input type="text" id="" class="rounded zoom ui-state-disabled"/></td>
+		</tr>
+		</table>
+	<div id="dlg-buttons">
+		<a href="#" class="easyui-linkbutton"  onclick="javascript:\$('#zoom-to-point-dialog').dialog('close')">Cancel</a>
+		<a href="#" class="easyui-linkbutton"  onclick="#">Zoom To</a>
+	</div>
+</div>
+
+
+<div id="editing-toolbar" title="Editing Tools">
+<div class="toolbar-noborder">
+		<a class="fg-button ui-state-default ui-corner-all select"  href="#" title="Select"></a>
+		<a class="fg-button ui-state-default ui-corner-all edit-point"  href="#" title="Add Point"></a>
+		<a class="fg-button ui-state-default ui-corner-all edit-line"  href="#" title="Add Line"></a>
+		<a class="fg-button ui-state-default ui-corner-all edit-polygon"  href="#" title="Add polygon"></a>
+		<a class="fg-button ui-state-default ui-corner-all delete-feature"  href="#" title="Delete Feature"></a>
+</div>
+</div>
+
+
+#include $conf["main"]["templatesPath"]+"/Manager/SpatialToolbar.tmpl"
+#include $conf["main"]["templatesPath"]+"/Manager/RasterToolbar.tmpl"
+#include $conf["main"]["templatesPath"]+"/Manager/TerrainToolbar.tmpl"
+#include $conf["main"]["templatesPath"]+"/Manager/TerrainToolbar.tmpl"
+
+*#
+
+<div id="one" class="jGrowl bottom-right"></div>
+
+#end def

@@ -1,0 +1,45 @@
+[doUnion]
+ Title = Shortest Path
+ Abstract =  Similar to do but compute and return shortest path using pgRouting library as a single feature
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <MetaData>
+   title = Demo
+ </MetaData>
+ <DataInputs>
+  [startPoint]
+   Title = Starting Point
+   Abstract = The Point to use as starting of the path
+   minOccurs = 2
+   maxOccurs = 2
+   <LiteralData>
+    dataType = string
+    <Default>
+    </Default>
+   </LiteralData>
+  [endPoint]
+   Title = End Point
+   Abstract = The Point to use as ending point of the path
+   minOccurs = 2
+   maxOccurs = 2
+   <LiteralData>
+    dataType = string
+    <Default>
+    </Default>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = Buffered Polygon
+   Abstract = GML stream describing the buffered polygon feature.
+   <ComplexData>
+    <Default>
+     mimeType = application/json
+     asReference = true
+     msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 3 END
+    </Default>
+   </ComplexData>
+ </DataOutputs>  

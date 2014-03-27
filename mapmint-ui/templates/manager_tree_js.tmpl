@@ -1,0 +1,2095 @@
+#import zoo
+var map;
+var modify;
+var finalLayers=[];
+var editable;
+var layersList=[];
+var localLayers=[];
+System.cnt=0;
+System.references={};
+System.layerFields={};
+System.layerTypes={};
+var wgs84;
+var mercator;
+var osmBboxControl;
+
+#import mapscript
+#set j=0
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$conf["senv"]["last_map"]+".map")
+var tItems=[
+#for i in range(0,m.numlayers)
+#if m.getLayer(i).metadata.get("mmClass")=="tl"
+#if $j>0
+    ,
+#end if
+    $i
+#set $j=$j+1
+#end if
+#end for
+];
+
+function init(){
+  
+    var extent = new OpenLayers.Bounds(-20037508, -20037508,20037508, 20037508.34)
+    
+    wgs84=new OpenLayers.Projection("ESPG:4326");
+    mercator=new OpenLayers.Projection("ESPG:900913");
+    
+    
+    System.initZoomLevel=0
+    
+    var options = {
+    	controls: [
+	    new OpenLayers.Control.Navigation(),
+	    new OpenLayers.Control.ZoomBox({alwaysZoom:true}),
+	    new OpenLayers.Control.MMPanZoom()
+	],
+  	projection: new OpenLayers.Projection("EPSG:900913"),
+  	displayProjection: new OpenLayers.Projection("EPSG:4326"),
+	units: "m",
+  	numZoomLevels: 18,
+  	minZoomLevel: 2,
+  	maxResolution: 156543.0339,
+  	maxExtent: new OpenLayers.Bounds(-20037508, -20037508,20037508, 20037508.34),
+	tileManager: null, 
+	fallThrough: true,
+	zoomMethod: null
+    };
+    
+    map = new OpenLayers.Map('map', options);
+    
+    osmBboxControl = new OpenLayers.Control();
+    OpenLayers.Util.extend(osmBboxControl, {
+	draw: function () {
+	    this.box = new OpenLayers.Handler.Box( osmBboxControl, {"done": this.notice});
+	    //this.box = new OpenLayers.Handler.RegularPolygon( osmBboxControl, {"done": this.notice},{sides: 40});
+	    this.box.activate();
+	    },
+	
+	notice: function (bounds) {
+	    
+	    var ll = map.getLonLatFromPixel(new OpenLayers.Pixel(bounds.left, bounds.bottom)).transform(map.projection,map.displayProjection);
+	    var ur = map.getLonLatFromPixel(new OpenLayers.Pixel(bounds.right, bounds.top)).transform(map.projection,map.displayProjection);
+	    
+	    var tmp=new OpenLayers.Bounds(ll.lon.toFixed(4),ll.lat.toFixed(4),ur.lon.toFixed(4),ur.lat.toFixed(4));
+	    if(!System.lastLayer){
+		System.lastLayer=new OpenLayers.Layer.Vector("BBoxDisplay", {styleMap:
+      	      								     new OpenLayers.Style({
+										 fillColor:"blue",
+	    									 fillOpacity:0.25,
+	    									 pointRadius: 10,
+	    									 strokeColor:"blue",
+	    									 strokeOpacity:1,
+	    									 strokeWidth:1.2
+	    								     })
+	      								    });
+	      	map.addLayer(System.lastLayer);
+	    }
+	    
+	    tmp=tmp.transform(map.displayProjection,map.projection);
+	    var tmpf=new OpenLayers.Feature.Vector(tmp.toGeometry(),{"name": "bbox"});
+	    System.lastLayer.removeFeatures(System.lastLayer.features);
+	    System.lastLayer.addFeatures([tmpf]);
+	    System.lastLayer.setVisibility(true);
+	    map.zoomToExtent(tmp);
+	    
+	    $.ajax({
+	      	url: "$conf["main"]["serverAddress"]?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Manager/ImportOSMWindow&RawDataOutput=Result",
+		complete: function(xml,status){
+		    if(!\$('#importOSM-dialog')[0])
+			\$("body").append('<div id="importOSM-dialog" title="'+"$zoo._("OSM Importer")"+'"></div>');
+		    \$('#importOSM-dialog').html("");
+		    \$('#importOSM-dialog').append(xml.responseText);
+		    \$('#importOSM-dialog').window({
+			width: 325,
+			height: 220,
+			maximizable:false,
+			resizable: false,
+			onClose: function(){
+			    System.lastLayer.removeFeatures(System.lastLayer.features);
+			}
+		    });
+		}
+	    })
+	}
+    });
+    
+    map.addControl(osmBboxControl);
+    activateControl(0);
+    //osmBboxControl.box.deactivate();
+    
+    //var osm = new OpenLayers.Layer.OSM( {minZoomLevel: 9, maxZoomLevel:18});
+    arrayOSM = ["http://mtile01.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
+		"http://mtile02.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
+		"http://mtile03.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
+		"http://mtile04.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png"];
+    var osm = new OpenLayers.Layer.OSM("MapQuest-OSM Tiles", arrayOSM);
+    
+    arrayOSM1 = ["http://mtile01.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
+                 "http://mtile02.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
+                 "http://mtile03.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
+                 "http://mtile04.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png"];
+    var osm1 = new OpenLayers.Layer.OSM("MapQuest-OSM Tiles", arrayOSM1);
+  
+    var osm2 = new OpenLayers.Layer.OSM("OSM Tiles",null);
+    var zoomOrigin=[156543.03392804099712520838,78271.51696402048401068896,39135.75848201022745342925,19567.87924100512100267224,9783.93962050256050133612,4891.96981025128025066806,2445.98490512564012533403,1222.99245256282006266702,611.49622628141003133351,305.74811314070478829308,152.87405657035250783338,76.43702828517623970583,38.21851414258812695834,19.10925707129405992646,9.55462853564703173959,4.77731426782351586979,2.38865713391175793490,1.19432856695587897633,0.59716428347793950593];
+    var cZoom=map.getZoomForExtent(map.maxExtent,true);
+    var zoomServer=[];
+    var minZoomServer=cZoom;
+    for(var i=cZoom-1;i<map.getNumZoomLevels();i++){
+    	    zoomServer.push(zoomOrigin[i]);
+    }
+
+#set urls=[]
+#if $conf["main"].has_key("mapserverAddresses")
+#set tmp=$conf["main"]["mapserverAddresses"].split(",")
+#for i in $tmp
+#set $urls+=[$i+"?map="+$conf["main"]["dataPath"]+"/maps/baselayer.map"]
+#end for
+#else
+#set $urls+=[$conf["main"]["mapserverAddress"]+"?map="+$conf["main"]["dataPath"]+"/maps/baselayer.map"]
+#end if
+#import json
+    var dummy = new OpenLayers.Layer.WMS("Dummy",$json.dumps($urls),{"layers": "dummy","format":"image/png"},{singleTile:true, gutter:0,ratio:1,isBaseLayer:true,wrapDateLine: true,
+					       serverResolutions: zoomOrigin,
+					       units:"m",
+					       //maxExtent: new OpenLayers.Bounds(-20037508.342789,-20037508.342789,20037508.342789,20037508.342789),
+					       minResolution: zoomServer[zoomServer.length-1],
+					       numZoomLevels: zoomOrigin.length,
+					       projection: new OpenLayers.Projection("EPSG:900913"),
+					       sphericalMercator: true,
+					       transitionEffect: null});
+    
+    \$("#base_layer_dummy").html('<div id="colorSelector2"><div style="background-color:#fff"></div></div><div id="colorpickerHolder2"></div>');
+
+    \$('#colorpickerHolder2').ColorPicker({
+	flat: true,
+	color: "#ffffff",
+        onSubmit: function(hsb, hex, rgb) {
+            \$('#colorSelector2 div').css('backgroundColor', '#' + hex);
+	    \$("#themes_color").val(hex);
+	    \$.ajax({
+		type: "GET",
+	  	url: "$conf["main"]["serverAddress"]?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=wms_sld_xml;color="+hex+"&ResponseDocument=Result@asReference=true",
+	  	dataType: "xml",
+	  	complete: function(xml,status) {
+		    var test=false;
+		    if(map.layers[3].params["SLD"])
+			test=true;
+		    map.layers[3].params["SLD"]=WPSParseReference(xml);
+		    map.setBaseLayer(map.layers[3])
+		    if(test)
+			map.layers[3].redraw(true);
+		}
+	    });		  
+        }
+    });
+
+    \$('#colorpickerHolder2>div').css('position', 'relative');
+    var widt = false;
+    \$('#colorSelector2').bind('click', function() {
+        \$('#colorpickerHolder2').stop().animate({height: widt ? 0 : 173}, 500);
+        widt = !widt;
+    });
+
+
+    map.addLayers([osm,osm1,osm2,dummy]);
+    
+    finalLayers[0] = new OpenLayers.Layer.Vector("DisplayFeatures", {styleMap:
+      new OpenLayers.Style({
+	  fillColor:"white",
+	  fillOpacity:0.25,
+	  strokeColor:"white",
+	  strokeOpacity:1,
+	  pointRadius: 10,
+	  strokeWidth:1.2
+      })
+								    });
+    finalLayers[1] = new OpenLayers.Layer.Vector("Display", {styleMap:
+      new OpenLayers.Style({
+	  fillColor:"yellow",
+	  fillOpacity:0.25,
+	  pointRadius: 10,
+	  strokeColor:"red",
+	  strokeOpacity:1,
+	  strokeWidth:1.2
+      })
+							    });
+    finalLayers[2] = new OpenLayers.Layer.Vector("Edition", {styleMap:
+      new OpenLayers.Style({
+	  fillColor:"blue",
+	  fillOpacity:0.25,
+	  pointRadius: 10,
+	  strokeColor:"blue",
+	  strokeOpacity:1,
+	  strokeWidth:1.2
+      })
+							    });
+    editable = new OpenLayers.Layer.Vector("Edition Panel");
+	
+
+    map.zoomToMaxExtent();
+    map.setCenter(map.getCenter(),2);
+    reinitZoomLevel();
+    map.events.register("zoomend", null, reinitZoomLevel);
+}
+
+function getScales(){
+    var res=new Array();
+    for(var i=0;i<19;i++){
+	var tmp=map.getResolutionForZoom(i)*39.3701*72;
+	res[i]=tmp;
+    }
+    return res;
+}
+
+function reinitZoomLevel(){
+    \$("#scalesList")[0].selectedIndex=map.getZoom();
+}
+
+function startMapList(){
+    if(arguments.length>0){
+	System.afterSave=[function(){document.location.reload(true);}]
+	 saveAsMap([\$("#mapName")[0].value,\$("#mapName")[0].value]);
+	\$( "#open-map-dialog" ).window("close");
+	return 1;
+    }
+    \$('#tt2').tree({
+	isAlreadyLoaded: false,
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=getLayersList&DataInputs=name="+\$mj("mapName").value+"&RawDataOutput=Result@mimeType=application/json",
+	method: "GET",
+	onlyLeafCheck: true,
+	checkbox: true,
+	cascadeCheck: true,
+	//  dnd: true,
+	onDragLeave:function(node,data){
+	    //alert(data+" "+node);
+	},
+	onStopDrag: function(node){
+      	    //	  alert("OK stop drag !"+node);
+	},
+	onClick:function(node){
+	    \$(this).tree('toggle', node.target);
+	},
+	onCheck:function(node,checked){
+	    if(\$(this).tree('isLeaf', node.target)){
+		for(var i=0;i<layersList.length;i++)
+		    if(layersList[i].local_id==node.id){
+			if(checked)
+			    layersList[i].setVisibility(true);
+			else
+			    layersList[i].setVisibility(false);
+		    }
+	    }
+	    \$(this).tree('toggle', node.target);
+	},
+	onContextMenu: function(e, node){
+	    if(\$(this).tree('isLeaf', node.target)){
+		e.preventDefault();
+		\$('#tt2').tree('select', node.target);
+		System.mmNodeId=node.id;
+		\$('#mm').emenu('show', {
+		    left: e.pageX,
+		    top: e.pageY
+		});
+	    }else{
+		if(node.id=='Layers'){
+	    	    e.preventDefault();
+	    	    \$('#mmenu1').emenu('show', {
+	      		left: e.pageX,
+	      		top: e.pageY
+	    	    });
+		}else{
+		    System.mmNodeId=node.text;
+	    	    e.preventDefault();
+	    	    \$('#mmenu2').emenu('show', {
+	      		left: e.pageX,
+	      		top: e.pageY
+	    	    });
+		}
+	    }
+	},
+	onLoadSuccess: function(node,data){
+            for(var i=layersList.length-1;i>=0;i--){
+	  	map.removeLayer(layersList[i]);
+	    }
+            for(var i=finalLayers.length-1;i>=0;i--){
+	  	try{
+		    map.removeLayer(finalLayers[i]);
+		}catch(e){}
+	    }
+	    layersList=[];
+	    
+	    if(data!=""){
+		
+		storeTypes(data[0]);
+		
+		if(System.isAlreadyLoaded){
+		    passed=new Array();
+		  j=0;
+		    var jsonTree='';
+		    jsonTree=('['+buildTree(this,jsonTree,\$(this).tree('getRoot'),0,passed)+']');
+		    var req='<wps:Execute service="WPS" version="1.0.0" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 ../wpsExecute_request.xsd"><ows:Identifier>updateMapOrder</ows:Identifier><wps:DataInputs><wps:Input><ows:Identifier>jsonStr</ows:Identifier><wps:Data><wps:LiteralData dataType="string">'+jsonTree+'</wps:LiteralData></wps:Data></wps:Input><wps:Input><ows:Identifier>map</ows:Identifier><wps:Data><wps:LiteralData dataType="string">'+\$('#mapName')[0].value+'</wps:LiteralData></wps:Data></wps:Input></wps:DataInputs><wps:ResponseForm><wps:RawDataOutput><wps:Output><ows:Identifier>Result</ows:Identifier></wps:Output></wps:RawDataOutput></wps:ResponseForm></wps:Execute>';
+		    \$.ajax({
+			type: "POST",
+			contentType: 'text/xml',
+	  		url: "$conf["main"]["serverAddress"]?metapath=mapfile",
+			data: req,
+	  		dataType: "xml",
+	  		complete: function(xml,status) {
+			    checkWPSResult(xml);
+			}
+		    });		  
+		    
+		    System.isAlreadyLoaded=false;
+	    	}else{
+		    this.isAlreadyLoaded=true;
+		}
+		
+		//alert(data[0]);
+		\$.ajax({
+		    type: "GET",
+	  	    url: "$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/project_"+\$mj("mapName").value+".map&service=WMS&version=1.0.0&request=GetCapabilities",
+	  	    dataType: "xml",
+	  	    complete: function(xml,status) {
+			var localCnt=0;
+			System.layersListOrder=new Array();
+			var tmp=\$(xml.responseXML).find("Layer").each(
+			    function(){
+				\$(this).find('Layer').each(
+				    function(){
+					\$(this).find('Name').each(
+					    function(){
+						var tmpLayer;
+						var tmpName=\$(this).text();
+						var isStep=false;
+						for(i=0;i<tItems.length;i++){
+						    if(tItems[i]==layersList.length){
+							isStep=true;
+							break;
+						    }
+						}
+
+						tmpLayer = new OpenLayers.Layer.WMS(
+						    \$(this).text(),
+						    "$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/"+(isStep?"timeline_"+\$("#mapName")[0].value+"_step0.map":(System.layerTypes[\$(this).text()]==4?"color_ramp_"+\$("#mapName")[0].value+"_"+\$(this).text()+".map":"project_"+\$("#mapName")[0].value+".map")),
+						    {layers: \$(this).text(),srs: "EPSG:900913",format: "image/png"},
+						    {isBaseLayer: false, singleTile: false, ratio: (\$(this).text().replace("grid_","")!=\$(this).text()?1:1.4),transitionEffect: null}
+			    			);
+						tmpLayer.local_id=\$(this).text();
+						System.layersListOrder[System.layersListOrder.length]=\$(this).text();
+						tmpLayer.setVisibility(false);
+			    			layersList[layersList.length]=tmpLayer;
+						//alert(tmpLayer.name);
+		 	    			map.addLayer(tmpLayer);
+					    }
+					    
+					);
+					\$(this).find('LatLonBoundingBox').each(
+					    function(){
+						layersList[localCnt].mmLc=[\$(this).attr("minx"),\$(this).attr("miny")];
+						layersList[localCnt].mmUc=[\$(this).attr("maxx"),\$(this).attr("maxy")];
+						    }
+					);
+					localCnt+=1;
+				    }
+				);
+			    });
+			
+			for(var t=0;t<finalLayers.length;t++){
+			    map.addLayer(finalLayers[t]);
+			    if(t+1==finalLayers.length){
+				map.addControl(new OpenLayers.Control.SelectFeature(finalLayers[t], {callbacks: {'click':feature_info}}));
+			    }
+			}
+			map.addLayer(editable);
+			endLoading();
+		    }
+		});
+		
+	    }
+	},
+	
+    });
+}
+
+function storeTypes(data){
+    for(jj=0;jj<data.children.length;jj++){
+	if(data.children[jj]&&data.children[jj]["mmType"]>=0){
+	    System.layerTypes[data.children[jj]["id"]]=data.children[jj]["mmType"];
+	    if(data.children[jj]["mmType"]==3&&data.children[jj]["nclasses"]>1)
+		System.layerTypes[data.children[jj]["id"]]+=1;
+	}
+	else{
+	    if(data.children[jj]&&data.children[jj].children)
+		storeTypes(data.children[jj]);
+	}
+    }
+}
+
+\$(function(){
+    startMapList();
+});
+
+\$(document).ready(function () {
+    
+    defaultInit();
+
+    
+    myLayout = \$('body').layout({
+	north__minSize:80,
+	north__closable:false,
+	north__resizable:false,
+	north__spacing_open:0,
+	north__spacing_closed:0,
+	north__showOverflowOnHover:	true,
+	west__minSize: .28,
+	west__resizable: false,
+	west__spacing_closed: 20,
+	east__minSize: .28,
+	east__resizable: false,
+	east__closable:false,
+	south__closable:false,
+	south__resizable:false,
+	south__minSize:40,
+	onopen: function() {updateSize();},
+	onclose: function() {updateSize();},
+	onresize: function() {updateSize();}
+    });
+    
+    \$('div.ui-layout-resizer-west div.ui-layout-toggler').before('<span class="close-inv" onclick="myLayout.open(\'west\')" title="$zoo._("Open")"></span>');
+    
+    
+    \$( "#nav li a" ).button();
+    \$( "a.save-config" ).button();
+    \$( ".nb-container p a" ).button();
+    
+    \$('.toolbar a').tipsy({fade: true, offset:3, opacity: 1, gravity: 'nw'});
+    \$('.base_layer').tipsy({fade: true, offset:3, opacity: 1, gravity: 'ne'});
+    \$('.toolbar2 a').tipsy({fade: true, offset:3, opacity: 1, gravity: 'nw'});
+    \$('.toolbar-noborder a').tipsy({fade: true, offset:3, opacity: 1, gravity: 'nw'});
+    \$('.nav-toolbar a').tipsy({fade: true, offset:3, opacity: 1, gravity: 'w'});
+    
+    function megaHoverOver(){
+      \$(this).find(".sub").stop().fadeTo('fast', 1).show();
+	
+	(function(\$) { 
+	    jQuery.fn.calcSubWidth = function() {
+		rowWidth = 0;
+		\$(this).find("ul").each(function() {					
+	      rowWidth += \$(this).width(); 
+		});	
+	};
+	})(jQuery); 
+	
+	if ( \$(this).find(".row").length > 0 ) {
+	    var biggestRow = 0;	
+	    \$(this).find(".row").each(function() {							   
+	    \$(this).calcSubWidth();
+	    if(rowWidth > biggestRow) {
+		biggestRow = rowWidth;
+	    }
+	  });
+	    \$(this).find(".sub").css({'width' :biggestRow});
+	    \$(this).find(".row:last").css({'margin':'0'});
+	    
+	} else { 
+	    
+	    \$(this).calcSubWidth();
+	    \$(this).find(".sub").css({'width' : rowWidth});	
+	}
+    }
+ 
+    function megaHoverOut(){ 
+	\$(this).find(".sub").stop().fadeTo('fast', 0, function() {
+	    \$(this).hide(); 
+	});
+    }
+    
+    var config = {    
+	sensitivity: 1,  
+	interval: 50,  
+	over: megaHoverOver, 
+	timeout: 50,    
+	out: megaHoverOut 
+    };
+    
+    \$("ul li .sub").css({'opacity':'0'});
+    \$("ul li").hoverIntent(config);
+    
+    \$('#progress_bar .ui-progress').animateProgress(100, function() {
+	\$('#progress_bar .ui-progress').fadeOut(1000);
+	
+    });
+    
+    \$("#logout").click(function () {
+	
+	\$( "#logout-message" ).window({
+	    modal: true,
+	    collapsible:false,
+	    minimizable:false,
+	    maximizable:false,
+	    draggable:false,
+	    resizable: false
+	});
+    });   
+    
+    \$(".addLayer").click(function () {
+	\$.ajax({
+	    type: "GET",
+	    url: "$conf["main"]["serverAddress"]?metapath=datastores&service=WPS&version=1.0.0&request=Execute&Identifier=options&DataInputs=&RawDataOutput=Result",
+	    dataType: "xml",
+	    complete: function(xml,status) {
+		\$( "#add-layer-dialog" ).html(xml.responseText);
+		\$( "#add-layer-dialog" ).window({
+		    minimizable:false,
+		    maximizable:false,
+		    resizable: false,
+		    height:400,
+		    width:500
+		});
+		
+	    }
+	});
+    }); 
+    
+    \$(".addWMSLayer").click(function () {
+	\$.ajax({
+	    type: "GET",
+	    url: "$conf["main"]["serverAddress"]?metapath=datastores&service=WPS&version=1.0.0&request=Execute&Identifier=options&DataInputs=wms=true&RawDataOutput=Result",
+	    dataType: "xml",
+	    complete: function(xml,status) {
+	      \$( "#add-layer-dialog" ).html(xml.responseText);
+		\$( "#add-layer-dialog" ).window({
+		    minimizable:false,
+		    maximizable:false,
+		    resizable: false,
+		    height:400,
+		    width:500
+		});
+		
+	    }
+	});
+    }); 
+    
+    
+    \$(".view-lprop").click(function (e) {
+      if(!\$( "#view-lprop-dialog" )[0])
+          \$( "body" ).append('<div id="view-lprop-dialog" title="$zoo._("Layer Properties")"></div>');
+      	\$( "#view-lprop-dialog" ).html("");
+        \$.ajax({
+	  type: "GET",
+	    url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=getMapLayerProperties&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+	    complete:function(xml,status){
+		\$( "#view-lprop-dialog" ).html(xml.responseText);
+		\$( "#view-lprop-dialog" ).window({
+		    height:360,
+		    width:240,
+		    left: e.pageX,
+		    maximizable:false,
+		    resizable: false
+		});
+		updateSelectWithFields(["lsearch_field","lfilter_field","lzfilter_field"]);
+		
+	    }
+	});
+      
+    	
+    });
+    
+    \$(".min-scale-b").click(function (e) {
+	setScale("Min");
+    });
+    \$(".max-scale-b").click(function (e) {
+	setScale("Max");
+    });
+    \$(".lmin-scale-b").click(function (e) {
+	setScale("Min","Label");
+    });
+    \$(".lmax-scale-b").click(function (e) {
+	setScale("Max","Label");
+    });
+    
+    \$(".edit-table").click(function (e) {
+    	System.layerEdition=true;
+	\$(".view-table").click();
+    	//System.layerEdition=false;
+    });
+    
+    \$(".view-table").click(function (e) {
+
+	
+	
+	\$( "#view-table-dialog" ).html("");      
+	\$.ajax({
+	    dwDataSource: System.mmNodeId,
+	    type: "GET",
+	    url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=getInitialInfo&DataInputs="+(System.layerEdition?"priv=rw;":"priv=r;")+"map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+	    dataType: 'xml',
+	    complete:function(xml,status){
+		if(!checkWPSResult(xml,false))
+		    return false;
+		var tmp=\$(xml.responseXML).find("ows\\:ExceptionText").text();
+		if(tmp!=""){
+		    alert(tmp);
+		    return;
+		}
+		
+		colModel=[];
+		fields=[];
+		try{
+		    var tmp=$.xml2json(xml.responseXML);
+		    var nbCol=0;
+		    if(tmp.fields){
+		    if(!tmp.fields.field.length)
+			tmp.fields.field=[tmp.fields.field];
+			for(j=0;j<tmp.fields.field.length;j++){
+			    colModel[nbCol]={display: tmp.fields.field[j].id, name : tmp.fields.field[j].id, width: (nbCol==0?80:120), sortable : true, align: 'center'};
+			    fields[nbCol]=tmp.fields.field[j].id;		
+			    nbCol++;
+			}
+			/*for(i=0;i<tmp.fields.length;i++){
+			  for(j=0;j<tmp.fields[i].field.length;j++){
+			  colModel[nbCol]={display: tmp.fields[i].field[j].id[0].Text, name : tmp.fields[i].field[j].id[0].Text, width: (nbCol==0?80:120), sortable : true, align: 'center'};
+			  fields[nbCol]=tmp.fields[i].field[j].id[0].Text;		
+			nbCol++;
+			}
+			}*/
+			\$('#view-table-dialog').append('<table id="flex'+(System.cnt)+'" style="display:none"></table>');
+			
+			var localTmp1=tmp;
+			\$("#mapNameH")[0].value="$conf["main"]["dataPath"]/maps/search_"+\$("#mapName")[0].value+"_"+System.mmNodeId+".map";
+			//alert(System.layerEdition);
+			\$("#flex"+(System.cnt)).flexigrid({
+			    adminAccess: '<tr><td class="ndcol1"></td><td class="ndcol4"  onclick="saveMapFor(\'GFI\');">'+"$zoo._("Save Get Feature Info")"+'</td></tr><tr><td class="ndcol1"></td><td class="ndcol4" onclick="saveMapFor(\'E\')">'+"$zoo._("Save Export")"+'</td></tr><tr><td class="ndcol1"></td><td class="ndcol4" onclick="toggleSave();\$(this).parent().toggle();\$(this).parent().next().toggle();\$(this).parent().next().next().toggle();">Set Label</td></tr><tr style="display:none"><td class="ndcol1"></td><td class="ndcol4" onclick="\$(this).parent().prev().toggle();\$(this).parent().toggle();\$(this).parent().next().toggle();saveLayerLabelAlias();">'+"$zoo._("Save Label")"+'</td></tr><tr style="display:none"><td class="ndcol1"></td><td class="ndcol4" onclick="\$(this).parent().prev().toggle();\$(this).parent().prev().prev().toggle();\$(this).parent().toggle();toggleSave();">Cancel Label Edition</td></tr>',
+			    autoload: true,
+			    url: '$conf["main"]["serverAddress"]',
+			    ogcProtocol: "WFS",
+			    ogcUrl: "$conf["main"]["mapserverAddress"]",
+			    dataType: 'xml',
+			    colModel: colModel,
+			    usepager: (tmp.featureCount>10?true:false),
+			    id: System.cnt,
+			    sortname: tmp.fields.field[0].id,
+			    sortorder: "asc",
+			    fields: fields,
+			    dwDataSource: \$("#mapNameH")[0].value,
+			    dwLayer: System.mmNodeId,
+			    noSelection: (System.layerEdition?false:true),
+			    nbElements: tmp.featureCount,
+			    title: tmp.name.replace(/__/g,"/"),
+			    useLimit: true,
+			    limit: 10,
+			    showTableToggleBtn: false,
+			    width: "100%",
+			    height: 290 
+			});
+		    }else{
+					      \$('#view-table-dialog').append('\
+<div class="rDiv" id="flex'+(System.cnt)+'" >\
+	<div class="trigger">\
+	<img src="../img/raster-icon.png" alt="Raster" /> '+this.dwDataSource.replace(/__/g,"/")+'\
+		<div class="ptogtitle ui-corner-all" id="flexi_title_'+(System.cnt)+'" title="$zoo._("Toogle table")">\
+			<span></span>\
+		</div>\
+	</div>\
+	<div class="toggle_container" id="flexi_toggler_'+(System.cnt)+'">\
+		<div class="block">\
+			<div id="chart'+(System.cnt)+'" class="plot" style="width:100%;height:300px;"></div>\
+		</div>\
+	</div>\
+</div>\
+');
+
+			\$.jqplot.config.enablePlugins = true;
+			mySeries=[];
+			myLabels=[];
+			var j=0;
+			for(var i=0;i<tmp.Band.length;i++){
+			    //alert("["+tmp.Band[i].histogram[0].Text+"]");
+			    mySeries[j] = eval("["+tmp.Band[i].histogram[0].Text+"]");
+			    myLabels[j] = "Band "+(i+1);
+			    j++;
+			}
+			plot2 = \$.jqplot('chart'+System.cnt, mySeries, {
+			    seriesDefaults:{
+				rendererOptions:{ varyBarColor : true },
+				lineWidth: 1.5,
+				markerRenderer: \$.jqplot.MarkerRenderer,
+				markerOptions: {
+				    show: false,
+				    style: 'square',
+				    lineWidth: 2,
+				    size: 4,
+				    color: '#666666',
+				    shadow: true,
+				    shadowAngle: 45,
+				    shadowOffset: 1,
+				    shadowDepth: 3,
+				    shadowAlpha: 0.07
+				}
+			    },
+			    
+			    barRenderer: {barWidth: '1px'},
+			    highlighter: { bringSeriesToFront: true, tooltipLocation: 'e', tooltipOffset: 0, formatString: '<div class="jqplot-highlighter">%s: <strong>%s</strong></div>' },
+			    axesDefaults:{
+				min: 0
+			    },
+			    cursor: {
+				show: true,
+				zoom: true     
+			    },
+			    grid: {background: '#FFFFFF', gridLineColor: '#b4b4b4', borderColor: '#b4b4b4', borderWidth:'1px', drawBorder:false},
+			    legend: {show: true, location: 'nw', xoffset: -115, labels: myLabels },
+			    seriesColors: [ "#3DA83B", "#86C55A", "#B3EF75"]
+			});
+			
+			\$("div.ptogtitle, .delete, .open-in-mamanger, .download, .preview, .reproject").tipsy({fade: true, offset:3, opacity: 1, gravity: 'ne'}); 
+			
+			
+			
+		    }
+		    System.cnt+=1;
+		    System.flexi_cnt=System.cnt;
+		    //\$('.flexigrid').addClass('hideBody');  
+		}catch(e){alert("MM Error : "+e);}
+
+		\$( "#view-table-dialog" ).window({
+		    height:410,
+		    width:590,
+		    left: e.pageX,
+		    maximizable:true,
+		    resizable: false,
+		    onClose: function(){
+	      		finalLayers[0].removeFeatures(finalLayers[0].features);
+	      		finalLayers[1].removeFeatures(finalLayers[1].features);
+	      		finalLayers[2].removeFeatures(finalLayers[2].features);
+	      		editable.removeFeatures(editable.features);
+			System.layerEdition=false;
+		    }
+		});
+	    }
+	});
+    });
+    
+    \$(".zoomTo").click(function () {
+	for(var i in layersList){
+	    if(layersList[i].local_id==System.mmNodeId){
+		var bounds = new OpenLayers.Bounds(
+		    layersList[i].mmLc[0], layersList[i].mmLc[1],
+		    layersList[i].mmUc[0], layersList[i].mmUc[1]
+		);
+	    var proj=new OpenLayers.Projection("EPSG:4326");
+		map.zoomToExtent(bounds.transform(proj, map.getProjectionObject()));
+	    }
+	}
+    });
+    
+    
+    \$(".template").click(function () {
+        System.tmplId=this.id;
+	\$.ajax({
+	    type: "GET",
+	    url: "$conf["main"]["serverAddress"]?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Manager/TemplateEditor;map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";name="+this.id+"&RawDataOutput=Result",
+	    dataType: "xml",
+	    complete: function(xml,status) {
+	  	if(!\$('#templateEditor-dialog')[0])
+		    \$('body').append('<div id="templateEditor-dialog" title="$zoo._("Template Editor")"></div>');
+		\$( "#templateEditor-dialog" ).html(xml.responseText);
+		    
+		updateSelectWithFields(["template_field"]);
+		startTemplateEditor();
+		
+		\$("#te_save").click(function(){
+		    var data=WPSGetHeader("saveTemplate")+WPSGetInputs([{name: "map",value: \$("#mapName")[0].value,dataType: "string"},{name: "layer",value: System.mmNodeId,dataType: "string"},{name: "name",value: System.tmplId,dataType: "string"},{name: "content","value":CKEDITOR.instances.tmplContent.getData(),"dataType": "string"},{name: "click", "value": (\$("#template_type")[0].value=="click"?"true":"false"),"dataType": "string"}])+WPSGetOutput({name: "Result"})+WPSGetFooter();
+		    \$.ajax({
+			type: "POST",
+	  		url: "$conf["main"]["serverAddress"]?metapath=mapfile",
+			data: data,
+			contentType: 'text/xml',
+	  		dataType: "xml",
+	  		complete: function(xml,status) {
+			    checkWPSResult(xml);
+			    \$( "#templateEditor-dialog" ).window('close');
+			}
+		    });
+		});
+		\$( "#templateEditor-dialog" ).window({
+	      	    collapsible:false,
+	      	    minimizable:false,
+	      	    maximizable:false,
+	      	    resizable: false
+	      	});
+	    }
+	});
+    })
+    
+    \$(".style").click(function () {
+	MMStyler.startWindow();
+    });
+
+    \$(".edit-toolbar").click(function () {
+	\$( "#editing-toolbar" ).window({
+	    minimizable:false,
+	    maximizable:false,
+	    resizable: false
+	});
+    });
+    
+    \$(".spatial-toolbar").click(function () {
+	\$( "#spatial-toolbar" ).window({
+	    minimizable:false,
+	    maximizable:false,
+	    resizable: false
+	});
+    }); 
+    
+    
+    
+    \$('#select-datasource, #select-group').attr('disabled', 'disabled');
+    
+    \$(".open-map").click(function () {
+	\$.ajax({
+	    type: "GET",
+	    url: "$conf["main"]["applicationAddress"]/Manager/OpenMap",
+	    dataType: "xml",
+	    complete: function(xml,status) {
+		\$( "#open-map-dialog" ).html(xml.responseText);
+		
+     		\$.ajax({
+		    type: "GET",
+		    url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=listMap&DataInputs=&RawDataOutput=Result",
+		    dataType: "xml",
+		    complete: function(xml,status) {
+			eval("tmp="+xml.responseText+";");
+			//alert(tmp);
+			for(var i in tmp){
+			    if(i==0){
+				\$("#selectMap").html("");
+				//alert(tmp[i]);
+			    }
+			    if(tmp[i]["id"])
+				\$("#selectMap").append('<option value="'+tmp[i]["id"]+'">'+tmp[i]["id"]+'</option>');
+			}
+			\$( "#open-map-dialog" ).window({
+			    resizable: false,
+			    minimizable:false,
+			    maximizable:false
+			});
+		    }
+		});
+	    }
+	});
+	
+    }); 
+    
+    \$(".dropdown-toolbars dt a").click(function() {
+	\$(".dropdown-toolbars dd ul").show('slow');
+    });
+    
+    
+    \$('.dropdown-toolbars dd ul').mouseleave(function() {
+	\$(".dropdown-toolbars dd ul").hide('slow');\$(document).ready(function () {
+	    
+	    
+	    
+	    myLayout = \$('body').layout({
+		north__minSize:60,
+		north__closable:false,
+		north__resizable:false,
+		north__spacing_open:0,
+		north__spacing_closed:0,
+		north__showOverflowOnHover:	true,
+		west__minSize: .28,
+		west__resizable: false,
+		west__spacing_closed: 20,
+		east__minSize: .28,
+		east__resizable: false,
+		east__closable:false,
+		south__closable:false,
+		south__resizable:false,
+		south__minSize:40,
+		onopen: function() {updateSize();},
+		onclose: function() {updateSize();},
+		onresize: function() {updateSize();}
+	    });
+	    
+	    \$('div.ui-layout-resizer-west div.ui-layout-toggler').before('<span class="close-inv" onclick="myLayout.open(\'west\')" title="$zoo._("Open")"></span>');
+	    
+	    
+	    \$.stylesheetInit();
+	    \$('.styleswitch').bind('click',
+				    function(e){
+					\$.stylesheetSwitch(this.getAttribute('rel'));
+					return false;
+				    }
+				   );
+	    
+	    \$( "#nav li a" ).button();
+	    \$( "a.save-config" ).button();
+	    \$( ".nb-container p a" ).button();
+	    
+	    \$('.toolbar a').tipsy({fade: true, offset:3, opacity: 1, gravity: 'nw'});
+	    \$('.toolbar2 a').tipsy({fade: true, offset:3, opacity: 1, gravity: 'nw'});
+	    \$('.toolbar-noborder a').tipsy({fade: true, offset:3, opacity: 1, gravity: 'nw'});
+	    \$('.nav-toolbar a').tipsy({fade: true, offset:3, opacity: 1, gravity: 'w'});
+	    
+	    function megaHoverOver(){
+		\$(this).find(".sub").stop().fadeTo('fast', 1).show();
+		
+		(function(\$) { 
+		    jQuery.fn.calcSubWidth = function() {
+			rowWidth = 0;
+			\$(this).find("ul").each(function() {					
+			    rowWidth += \$(this).width(); 
+			});	
+		    };
+		})(jQuery); 
+		
+		if ( \$(this).find(".row").length > 0 ) {
+		    var biggestRow = 0;	
+		    \$(this).find(".row").each(function() {							   
+			\$(this).calcSubWidth();
+			if(rowWidth > biggestRow) {
+			    biggestRow = rowWidth;
+			}
+		    });
+		    \$(this).find(".sub").css({'width' :biggestRow});
+		    \$(this).find(".row:last").css({'margin':'0'});
+		    
+		} else { 
+		    
+		    \$(this).calcSubWidth();
+		    \$(this).find(".sub").css({'width' : rowWidth});	
+		}
+	    }
+	    
+	    function megaHoverOut(){ 
+		\$(this).find(".sub").stop().fadeTo('fast', 0, function() {
+		    \$(this).hide(); 
+		});
+	    }
+	    
+	    var config = {    
+		sensitivity: 1,  
+		interval: 50,  
+		over: megaHoverOver, 
+		timeout: 50,    
+		out: megaHoverOut 
+	    };
+	    
+	    \$("ul li .sub").css({'opacity':'0'});
+	    \$("ul li").hoverIntent(config);
+ 
+	    \$('#progress_bar .ui-progress').animateProgress(100, function() {
+		\$('#progress_bar .ui-progress').fadeOut(1000);
+		
+	    });
+	    
+	    \$("#logout").click(function () {
+		
+		\$( "#logout-message" ).window({
+		    modal: true,
+		    collapsible:false,
+		    minimizable:false,
+		    maximizable:false,
+		    draggable:false,
+		    resizable: false
+		});
+	    });   
+	    
+	    \$(".addLayer").click(function () {
+		\$.ajax({
+		    type: "GET",
+		    url: "$conf["main"]["serverAddress"]?metapath=datastores&service=WPS&version=1.0.0&request=Execute&Identifier=options&DataInputs=&RawDataOutput=Result",
+		    dataType: "xml",
+		    complete: function(xml,status) {
+			\$( "#add-layer-dialog" ).html(xml.responseText);
+			\$( "#add-layer-dialog" ).window({
+			    minimizable:false,
+			    maximizable:false,
+			    resizable: false,
+			    height:400,
+			    width:500
+			});
+			
+		    }
+		});
+	    }); 
+	    
+	    
+	    \$(".view-table").click(function () {
+		
+		\$( "#view-table-dialog" ).window();
+		
+	    });
+	    
+	    
+	    \$(".zoomTo").click(function () {
+		for(var i in layersList)
+		    if(layersList[i].local_id==System.mmNodeId){
+			var bounds = new OpenLayers.Bounds(
+			    layersList[i].mmLc[0], layersList[i].mmLc[1],
+			    layersList[i].mmUc[0], layersList[i].mmUc[1]
+			);
+			var proj=new OpenLayers.Projection("EPSG:4326");
+			map.zoomToExtent(bounds.transform(proj, map.getProjectionObject()));
+		    }
+	    });
+	    
+	    \$(".template").click(function () {
+		\$.ajax({
+		    type: "GET",
+		    url: "$conf["main"]["serverAddress"]?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=template=Manager/TemplateEditor;map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+		    dataType: "xml",
+		    complete: function(xml,status) {
+	  		if(\$('#templateEditor-dialog')[0])
+			    \$("body").append('<div id="templateEditor-dialog" title="$zoo._("Template editor")"></div>');
+			\$( "#templateEditor-dialog" ).append(xml.responseText);
+			\$( "#templateEditor-dialog" ).window({
+	  	    	    modal: true,
+	      		    collapsible:false,
+	      		    minimizable:false,
+	      		    maximizable:false,
+	      		    draggable:false,
+	      		    resizable: false
+	      		});
+		    }
+		});
+	    })
+	    
+	    \$(".style").click(function () {
+		\$.ajax({
+		    type: "GET",
+		    url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+		    dataType: "xml",
+		    complete: function(xml,status) {
+			
+			\$.ajax({
+			    type: "GET",
+			    url: "$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/project_"+\$("#mapName")[0].value+".map&service=WFS&version=1.0.0&request=DescribeFeatureType&typename="+System.mmNodeId+"",
+			    complete: function(xml,status){
+				var i=0;
+				var tmp=\$(xml.responseXML).find("element").each(
+				    function(){
+				        var tmpIds=["gradSymbField","ccField","uniqValField","labelField","labelAngleField"];
+					if(\$(this).attr("type")!="gml:GeometryPropertyType" &&
+					   \$(this).attr("type")!="ms:"+System.mmNodeId+"Type"){
+					    if(i==0){
+					        for(k=0;k<tmpIds.length;k++)
+						    \$("#"+tmpIds[k]).html("");
+					    }
+					    for(k=0;k<tmpIds.length;k++)
+					         \$("#"+tmpIds[k]).append('<option value="'+\$(this).attr("name")+'">'+\$(this).attr("name")+" ("+\$(this).attr("type")+')</option>');
+					    i+=1;
+					}
+				    });
+
+			    }
+			});
+			
+			\$( "#style-dialog" ).html(xml.responseText);
+			\$( "#style-dialog" ).window({
+			    minimizable:false,
+			    maximizable:false,
+			    resizable: false,
+			    height:400,
+			    width:500
+			});
+			
+			try{
+			    \$( "#slider-opacity" ).slider({
+				value:100,
+				min: 0,
+				max: 100,
+				step: 1,
+				slide: function( event, ui ) {
+				    \$( "#amount" ).val(ui.value +  "%" );
+				}	
+			    });
+			}catch(e){alert(e);}
+			
+
+			
+			\$(function () {
+                            var tabContainers = \$('div.style-tabs > div');
+                            tabContainers.hide().filter(':first').show();
+                            
+                            \$('div.style-tabs ul.style-tabs-nav a').click(function () {
+                                tabContainers.hide();
+                                tabContainers.filter(this.hash).show();
+                                \$('div.style-tabs ul.style-tabs-nav a').removeClass('selected');
+                                \$(this).addClass('selected');
+                                return false;
+                            }).filter(':first').click();
+			});
+			
+			
+			\$('#divgradSymb, #divcontCol, #divuniqVal').hide();
+			\$('#dropdown').change(function() {
+			    alert(\$("#dropdown").val());
+			    if(\$("#dropdown").val()!="timeline"){
+			    	\$('.box').hide();
+			    	\$('#div' + \$(this).val()).show();
+			    }
+			});
+			\$('#dropdown0').change(function() {
+			    \$('.box').hide();
+			    \$('#div' + \$(this).val()).show();
+			});
+			
+			\$(function() {    
+			    
+			    \$('#fill-colorpicker').colorPicker();
+			    \$('#stroke-colorpicker').colorPicker();
+			    \$('#nodata-colorpicker').colorPicker();
+			    \$('#cc-min-colorpicker').colorPicker();
+			    \$('#cc-max-colorpicker').colorPicker();
+			    \$('#font-colorpicker').colorPicker();
+			    
+			}); 
+			
+			
+			
+			
+		    }
+		});
+		
+	    }); 
+	    
+
+
+	    \$(".edit-toolbar").click(function () {		
+		\$( "#editing-toolbar" ).window({
+		    minimizable:false,
+		    maximizable:false,
+		    resizable: false
+		});
+	    });
+	    
+	    \$(".spatial-toolbar").click(function () {
+		
+		\$( "#spatial-toolbar" ).window({
+		    
+		    minimizable:false,
+		    maximizable:false,
+		    resizable: false
+		});
+	    }); 
+	    
+	    
+	    
+	    \$('#select-datasource, #select-group').attr('disabled', 'disabled');
+ 
+	    \$(".open-map").click(function () {
+     		\$.ajax({
+		    type: "GET",
+		    url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=listMap&DataInputs=&RawDataOutput=Result",
+		    dataType: "xml",
+		    complete: function(xml,status) {
+			eval("tmp="+xml.responseText+";");
+			for(var i in tmp){
+			    if(i==0){
+				\$("#selectMap").html("");
+				//alert(tmp[i]);
+			    }
+			    if(tmp[i]["id"])
+				\$("#selectMap").append('<option value="'+tmp[i]["id"]+'">'+tmp[i]["id"]+'</option>');
+			}
+			\$( "#open-map-dialog" ).window({
+			    resizable: false,
+			    minimizable:false,
+			    maximizable:false
+			});
+		    }
+		});
+		
+		
+	    }); 
+	    
+	    \$(".dropdown-toolbars dt a").click(function() {
+		\$(".dropdown-toolbars dd ul").show('slow');
+	    });
+	    
+	    
+	    \$('.dropdown-toolbars dd ul').mouseleave(function() {
+		\$(".dropdown-toolbars dd ul").hide('slow');
+	    });
+	    
+	    
+	    init();
+	    
+	});
+	
+    });
+    
+    
+    init();
+    
+});
+
+function setOpacityOnly(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=saveOpacity&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmOpacity="+\$("#opacity").val().replace("%","")+(\$("#dropdown").val()=='timeline'?";mmStep="+(\$("#mmsteps")[0].selectedIndex-2):"")+"&RawDataOutput=Result",
+	dataType: "xml",
+	complete: function(xml,status) {
+	    for(var i in layersList)
+		if(layersList[i].local_id==System.mmNodeId)
+		    layersList[i].redraw(true);
+	}
+    });
+}
+
+function saveLayerStyle(){
+    var dvalue="";
+    try{
+	dvalue=\$("#dropdown").val();
+	if(dvalue=="timeline")
+	    dvalue=\$("#dropdown1").val();
+    }catch(e){
+	dvalue="uniqSymb";
+    }
+    localArg=arguments[0];
+    localArg1=(arguments.length>2?arguments[2]:null);
+    var lhatch=\$("#class-hatch_check")[0]?\$("#class-hatch_check")[0]:\$("#hatch_check")[0];
+    var lsymb=\$("#class-symbol_check")[0]?\$("#class-symbol_check")[0]:\$("#symbol_check")[0];
+    var prefix=(arguments.length>2?"class-":(arguments.length>1?"class-style-":(arguments.length>0?"class-":"")));
+    var prefix1=(arguments.length>2?"class_":(arguments.length>1?"class_style_":(arguments.length>0?"class_":"")));
+    var localArgs=arguments;
+    var url="$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=saveLayerStyle&DataInputs=";
+    var newcName="";
+    try{
+	url+="map="+\$("#mapName").val();
+	url+=";layer="+System.mmNodeId;
+	url+=";mmClassName="+\$("#"+prefix+"cName").val();
+	newCName=\$("#"+prefix+"cName").val();
+	if(\$("#"+prefix+"cExpressionC").length>0 && \$("#"+prefix+"cExpressionC")[0].checked){
+	    url+=";mmExpr="+\$("#"+prefix+"cExpression").val();
+	}
+	url+=";mmClassName="+\$("#"+prefix+"cName").val();
+	if(arguments.length>2){
+	    url+=";mmStep="+arguments[2];
+	}
+	url+=";mmType="+dvalue;
+	if(System.rasterLayer==1){
+	    url+=";mmOpacity="+\$("#opacity").val().replace("%","")+";resm="+\$("#resMethod").val()+(arguments.length==0?";force=true":"");
+	    url+=";mmFill="+\$("#"+prefix+"fill-colorpicker").val().replace("#","");
+	    url+=";mmStroke="+\$("#"+prefix+"stroke-colorpicker").val().replace("#","");
+	    url+=(\$("#"+prefix+"stroke-width")[0]?";mmStrokeWidth="+\$("#"+prefix+"stroke-width").val():"");
+	    if(\$("#"+prefix1+"layerWidth").val())
+		url+=";mmWidth="+\$("#"+prefix1+"layerWidth").val();
+	    if(\$("#nodatab").is(":checked"))
+		url+=";mmOffsite="+\$("#nodata-colorpicker").val().replace("#","");
+	}
+	else{
+	    url+=";mmSymb="+((lhatch && lhatch.checked==true) && arguments.length<=1?"polygon_hatch;mmHatchWidth="+\$("#"+(lhatch.id=="class-hatch_check"?"class-":"")+"hatch_width").val()+";mmAngle="+\$("#"+(lhatch.id=="class-hatch_check"?"class-":"")+"hatch_angle").val():((lsymb && lsymb.checked==false)?"":\$("#"+prefix1+"symbolSelected").val()));
+	    url+=";mmFill="+\$("#"+prefix+"fill-colorpicker").val().replace("#","");
+	    url+=";mmStroke="+\$("#"+prefix+"stroke-colorpicker").val().replace("#","");
+	    url+=(\$("#"+prefix+"stroke-width")[0]?";mmStrokeWidth="+\$("#"+prefix+"stroke-width").val():"");
+	    url+=";mmWidth="+\$("#"+prefix1+"layerWidth").val();
+	    url+=";mmSize="+((lhatch && lhatch.checked==false) && arguments.length<=1?"-1.0":\$("#"+(lhatch && lhatch.checked==true && arguments.length<=1?(lhatch.id=="class-hatch_check"?"class-":"")+"hatch_size":prefix1+"layerSize")).val());
+	    url+=";mmOpacity="+\$("#opacity").val().replace("%","");
+	    url+=";"+(arguments.length>0?"mmClass="+arguments[0]:"mmClass=0");
+	    url+=(arguments.length>1 && arguments[1]!=null?";mmStyle="+arguments[1]:"");
+	    url+=(arguments.length>2?";mmStep="+arguments[2]:"");
+	    url+=(arguments.length==0?";force=true":"");
+	    url+=(\$('#'+prefix+'stroke-colorpicker-chk')[0]?(\$('#'+prefix+'stroke-colorpicker-chk')[0].checked?"":";noStroke=true"):"");
+	    url+=(\$('#'+prefix+'fill-colorpicker-chk')[0]?(\$('#'+prefix+'fill-colorpicker-chk')[0].checked?"":";noFill=true"):"");
+	    url+=(\$('#'+prefix+'pattern_check')[0]&&\$('#'+prefix+'pattern_check')[0].checked?";pattern="+\$('#'+prefix+'pattern').val():"");
+	    url+=(\$("#"+prefix1+"layerGap")[0]?";mmGap="+\$("#"+prefix1+"layerGap").val():"");
+	    url+=(\$("#"+prefix1+"symbol_check")[0] && \$("#"+prefix1+"symbol_check")[0].checked==false?";noSymbolFill=true":"");
+	}
+	url+="&RawDataOutput=Result";
+    }catch(e){
+	alert(e);
+    }
+    
+    \$.ajax({
+	localArgs: localArgs,
+	type: "GET",
+	prefix1: prefix1,
+	prefix: prefix,
+	url: url,
+	dataType: "xml",
+	complete: function(xml,status){
+	    $.notifyBar({ cssClass: "success", html: xml.responseText });
+	    for(var i=0;i<layersList.length;i++)
+		if(layersList[i].local_id==System.mmNodeId){
+		    if(System.rasterLayer){
+			layersList[i].url="$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/project_$(conf["senv"]["last_map"]).map";
+		    }
+		    layersList[i].redraw(true);
+		}
+	    if(localArg>=0){
+		try{
+		    \$("#"+this.prefix1+"Legend").attr("src","$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_"+\$("#mapName")[0].value+"_"+System.mmNodeId+(localArgs.length>2?"_step"+localArgs[2]:"")+".map&service=WMS&version=1.0.0&request=Getmap&LAYERS="+System.mmNodeId+(localArg>0?"_"+(localArg+1):"")+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=24&HEIGHT=24&mmTime="+Math.random());
+		}catch(e){}
+		try{
+		    \$("#"+dvalue+"_Legend_"+localArg).attr("src","$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_"+\$("#mapName")[0].value+"_"+System.mmNodeId+(localArgs.length>2?"_step"+localArgs[2]:"")+".map&service=WMS&version=1.0.0&request=Getmap&LAYERS="+System.mmNodeId+(localArg>0?"_"+(localArg+1):"")+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-0.5,-0.5,7.0,7.0&SRS=EPSG:4326&WIDTH=14&HEIGHT=14&mmTime="+Math.random());
+		    \$("#"+dvalue+"_Legend_"+localArg).parent().parent().next().html('<div style="width: 307px;">'+newCName+'</div>');
+		}catch(e){
+		    \$("#Legend").attr("src","$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_"+\$("#mapName")[0].value+"_"+System.mmNodeId+".map&service=WMS&version=1.0.0&request=Getmap&LAYERS="+System.mmNodeId+(localArg>0?"_"+(localArg+1):"")+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=24&HEIGHT=24&mmTime="+Math.random());
+		    
+		}
+		try{
+		    \$("#"+dvalue+"_min_"+localArg).css({"background-color": \$("#"+this.prefix+"fill-colorpicker")[0].value,"border-color": \$("#"+this.prefix+"stroke-colorpicker")[0].value});
+		}catch(e){alert(e);}
+	    }else{
+		if(\$("#Legend")[0]){
+		    \$("#Legend")[0].src="$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_"+\$("#mapName")[0].value+"_"+System.mmNodeId+".map&service=WMS&version=1.0.0&request=Getmap&LAYERS="+System.mmNodeId+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=24&HEIGHT=24&mmTime="+Math.random();
+		}
+	    }
+	    //alert(localArg);
+	    if(System.isGrid){
+		saveLayerGrid();
+		System.isGrid=false;
+	    }
+	}
+    });	 
+    
+}
+
+function saveLayerLabel(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=saveLabel&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";label="+(\$("#displayLabel")[0].checked?(\$("#labelField")[0]?""+\$("#labelField")[0].value:"GRID")+";angle="+(\$("#lauf").is(":checked")?"["+\$("#labelAngleField").val()+"]":\$("#labelAngle").val())+";pos="+\$('input[type=radio][name=position_label]:checked').attr('value')+";mmFill="+\$("#font-colorpicker")[0].value.replace("#","")+";bs="+\$("#labelBufferF")[0].value+";fs="+\$('#fonts')[0].value+";f="+\$('#font')[0].value+(\$("#bufferLabel")[0].checked?";mmOut="+\$("#buffer-font-colorpicker")[0].value.replace("#","")+";lbs="+\$("#mmLabelBufferSize")[0].value:""):"")+"&RawDataOutput=Result",
+	complete: function(xml, status){
+	    for(var i in layersList)
+		if(layersList[i].local_id==System.mmNodeId)
+		    layersList[i].redraw(true);			  
+	}
+    });
+}
+
+function saveLayerGrid(){
+    var tmp=Array("mmLabelFormat","mmminArcs","mmmaxArcs","mmminInterval","mmmaxInterval","mmminSubdivide","mmmaxSubdivide");
+    var args="";
+    var arg=[];
+    arg[arg.length]={name: "map",value: \$("#mapName").val(),dataType: "string"};
+    arg[arg.length]={name: "layer",value: System.mmNodeId,dataType: "string"};
+    for(i=0;i<tmp.length;i++)
+	arg[arg.length]={name: tmp[i],value: \$("#"+tmp[i]).val(),dataType: "string"};
+    //	args+=";"+tmp[i]+"="+\$("#"+tmp[i]).val();
+    var data=WPSGetHeader("saveLayerGrid")+WPSGetInputs(arg)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    \$.ajax({
+	type: "POST",
+	url: "$conf["main"]["serverAddress"]?metaPath=mapfile",
+	data: data,
+	contentType: "text/xml",
+	complete: function(xml, status){
+	    if(checkWPSResult(xml))
+		for(var i in layersList)
+		    if(layersList[i].local_id==System.mmNodeId)
+			layersList[i].redraw(true);			  
+	}
+    });
+}
+
+function startAddGrid(){
+    if(!\$('#addGrid-dialog')[0])
+	\$("body").append('<div id="addGrid-dialog" title="$zoo._("Add Grid")"></div>');
+    \$('#addGrid-dialog').html("");
+    $.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metaPath=template&version=1.0.0&request=Execute&service=WPS&Identifier=display&DataInputs=tmpl=Manager/addGridWindow;map="+\$("#mapName")[0].value+"&RawDataOutput=Result",
+	complete: function(xml,status){
+	    \$('#addGrid-dialog').append(xml.responseText);
+	    \$('#addGrid-dialog').window({
+		width: 325,
+		height: 220,
+		maximizable:false,
+		resizable: false
+	    });
+	}
+    });
+}
+
+function addGrid(){
+	$.ajax({
+	    type: "GET",
+	    url: "$conf["main"]["serverAddress"]?metaPath=mapfile&version=1.0.0&request=Execute&service=WPS&Identifier=addGridToMap&DataInputs=layer="+\$("#gridName").val()+";map="+\$("#mapName")[0].value+"&RawDataOutput=Result",
+	    complete: function(xml,status){
+		checkWPSResult(xml);	 
+	 	\$('#addGrid-dialog').window("close");
+		startMapList();
+	    }
+	});
+}
+
+function classifyMap(){
+    var localArg=arguments[0];
+    try{
+	params=[];
+	params.push({name: "layer",value: System.mmNodeId,dataType: "string"});
+	params.push({name: "map",value: \$("#mapName").val(),dataType: "string"});
+	params.push({name: "field",value: \$("#"+arguments[0]+"Field").val(),dataType: "string"});
+	if(arguments[0]=="rs"){
+	    params.push({name: "field",value: \$("#"+arguments[0]+"Field").val(),dataType: "string"});
+	    params.push({name: "from",value: \$("#fill-colorpicker").val().replace("#",""),dataType: "string"});
+	    params.push({name: "to",value: \$("#stroke-colorpicker").val().replace("#",""),dataType: "string"});
+	    params.push({name: "min",value: \$("#rsmin").val(),dataType: "string"});
+	    params.push({name: "max",value: \$("#rsmax").val(),dataType: "string"});
+	    if(\$("#rs-tiled").is(":checked"))
+		params.push({name: "tiled",value: \$("#rs-tiled-value").val(),dataType: "string"});
+	    if(System.rasterLayer)
+		System.rasterClasify=true;
+	}else{
+	    params.push({name: "from",value: \$("#"+arguments[0]+"-min-colorpicker").val().replace("#",""),dataType: "string"});
+	    params.push({name: "to",value: \$("#"+arguments[0]+"-max-colorpicker").val().replace("#",""),dataType: "string"});
+	    if(\$("#us-tiled").is(":checked"))
+		params.push({name: "tiled",value: \$("#us-tiled-value").val(),dataType: "string"});
+	}
+	if(\$("#dropdown").val()!='timeline'){
+	    params.push({name: "mmType",value: \$("#dropdown").val(),dataType: "string"});
+	}else{
+	    params.push({name: "mmType",value: \$("#dropdown1").val(),dataType: "string"});
+	    params.push({name: "mmStep",value: (\$("#mmsteps")[0].selectedIndex-2),dataType: "string"});
+	}
+	if(\$("#dropdownd").val()!=-1 && \$("#dropdownd").is(":visible"))
+		params.push({name: "method",value: \$("#dropdownd").val().replace("%",""),dataType: "string"});
+	if(arguments[0]=="gs"||arguments[0]=="rs"){
+	    params.push({name: "nbClasses",value: \$("#"+arguments[0]+"NbClasses").val(),dataType: "string"});
+	    params.push({name: "type",value: "gs",dataType: "string"});
+	}
+	if(\$("#uniqValSize").is(":checked")){
+	    params.push({name: "mmFAS",value: "true",dataType: "string"});
+	    params.push({name: "mmFASF",value: \$("#uniqValFormula").val(),dataType: "string"});
+	}
+
+	params.push({name: "mmOpacity",value: \$("#opacity").val().replace("%",""),dataType: "string"});
+	var data=WPSGetHeader("classifyMap")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+	//alert(data);
+	//var URL="$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=classifyMap&DataInputs=layer="+System.mmNodeId+";map="+\$("#mapName").val()+";field="+\$("#"+arguments[0]+"Field").val()+";from="+\$("#"+(arguments[0]=="rs"?"fill":arguments[0]+"-min")+"-colorpicker").val().replace("#","")+";to="+\$("#"+(arguments[0]=="rs"?"stroke":arguments[0]+"-max")+"-colorpicker").val().replace("#","")+(arguments[0]=="gs"||arguments[0]=="rs"?";nbClasses="+\$("#"+arguments[0]+"NbClasses").val()+";type=gs":(arguments[0]=="gs"?"":""))+";mmType="+(\$("#dropdown").val()!='timeline'?\$("#dropdown").val():\$("#dropdown1").val()+";mmStep="+(\$("#mmsteps")[0].selectedIndex-2))+";mmOpacity="+\$("#opacity").val().replace("%","")+(\$("#resMethod")[0]?";resm="+\$("#resMethod").val().replace("%",""):"")+(\$("#dropdownd").val()!=-1?";method="+\$("#dropdownd").val().replace("%",""):"")+"&RawDataOutput=Result";
+    }catch(e){
+	alert(e);
+    }
+    \$.ajax({
+	type: "POST",
+	data: data,
+	url: "$conf["main"]["serverAddress"]?metaPath=mapfile",
+	dataType: "xml",
+	contentType: "text/xml",
+	complete: function(xml,status){
+	    if(localArg=="cc"){
+		\$("#ccLegend")[0].src="$conf["main"]["serverAddress"]?metaPath=classifier&request=Execute&service=WPS&version=1.0.0&Identifier=getClassifierImage&DataInputs=from="+\$("#cc-min-colorpicker").val().replace("#","")+";to="+\$("#cc-max-colorpicker").val().replace("#","")+";nbClass=24&RawDataOutput=Result";
+	    }
+	    \$("#"+localArg+"_classification").html(xml.responseText);
+	    for(var i in layersList)
+		if(layersList[i].local_id==System.mmNodeId){
+		    if(System.rasterClasify){
+			layersList[i].url="$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/color_ramp_$(conf["senv"]["last_map"])_"+System.mmNodeId+".map";
+		    }
+		    layersList[i].redraw(true);
+		}
+	    
+	    \$(".flexiClasses").flexigrid({title: 'Classes', noSelection: true,height: (\$("#dropdown")[0].value=='gradSymb'?140:(\$("#dropdown")[0].value=='timeline'?100:180)), rp: 4, usepager: false, resizable: false});
+	    
+	}
+    });	 
+}
+
+var toRunAfter=Array();
+
+function editClass(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmClass="+arguments[0]+(arguments.length>1?";mmStep="+arguments[1]:"")+"&RawDataOutput=Result",
+	complete: function(xml,status){
+	    \$( "#class-dialog" ).html(xml.responseText);
+	    \$( "#class-dialog" ).window({
+		minimizable:false,
+		maximizable:false,
+		resizable: false,
+		height:260,
+		width:370
+	    });
+	    \$('#class-fill-colorpicker').colorPicker();
+   	    \$('#class-stroke-colorpicker').colorPicker();
+	    for(i=0;i<toRunAfter.length;i++)
+		toRunAfter[i]();
+	}
+    });
+}
+
+function editSymbolStyle(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmClass="+arguments[0]+";mmStyle=2&RawDataOutput=Result",
+	complete: function(xml,status){
+	    if(!\$( "#class-style-dialog" )[0])
+		\$("body").append('<div id="class-style-dialog" title="$zoo._("Symbol Fill")"></div>');
+	    \$( "#class-style-dialog" ).html(xml.responseText);
+	    \$( "#class-style-dialog" ).window({
+		minimizable:false,
+		maximizable:false,
+		resizable: false,
+		height:260,
+		width:370
+	    });
+	    \$('#class-style-fill-colorpicker').colorPicker();
+   	    \$('#class-style-stroke-colorpicker').colorPicker();
+	    for(i=0;i<toRunAfter.length;i++)
+		toRunAfter[i]();
+	}
+    });
+}
+
+
+function addGroup(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmClass="+arguments[0]+"&RawDataOutput=Result",
+	complete: function(xml,status){
+	    \$( "#class-dialog" ).html(xml.responseText);
+	    \$( "#class-dialog" ).window({
+		minimizable:false,
+		maximizable:false,
+		resizable: false,
+		height:260,
+		width:370
+	    });
+	    \$('#class-fill-colorpicker').colorPicker();
+   	    \$('#class-stroke-colorpicker').colorPicker();
+	    
+	}
+    });
+}
+
+function setLayerProperties(){
+    var url="";
+    url+=";_f="+\$('#lfilter').is(":checked")+";_ff="+\$('#lfilter_field').val()+";zf="+\$('#lzfilter').is(":checked")+";zff="+\$('#lzfilter_field').val()+";s="+\$('#lsearch').is(":checked")+";sf="+\$('#lsearch_field').val();
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=setMapLayerProperties&DataInputs=map="+\$("#mapName").val()+";layer="+\$('#lnameOrig').val()+"#if $conf["main"]["3D"]=="true"#;lfly="+\$('#lfly').val()+"#end if#;ln="+\$('#lname').val()+";a="+(\$('#lalias').val())+";e="+(\$('#lexport')[0].checked?"true":"false")+";q="+(\$('#lquery')[0].checked?"true":"false")+";sq="+(\$('#lspatialquery')[0].checked?"true":"false")+";sqt="+\$('#lsptype').val()+";ab="+\$('#labstract').val()+";kl="+\$('#lkeywords').val()+";f="+\$('#lfees').val()+url+"&RawDataOutput=Result",
+	complete:function(xml,status){
+	    checkWPSResult(xml);
+	    \$( "#view-lprop-dialog" ).window('close');
+	    \$( "#view-lprop-dialog" ).remove();
+	}
+    });
+}
+
+function removeLayer(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=removeLayer&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+	complete:function(xml,status){
+	    startMapList();
+	}
+    });
+}
+
+function setScale(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=setLayer"+(arguments.length>1?arguments[1]:"")+"Scale&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";st="+arguments[0]+";sv="+map.getScale()+"&RawDataOutput=Result",
+	dataType: 'xml',
+	complete:function(xml,status){
+	    for(i=0;i<layersList.length;i++){
+		if(layersList[i].local_id==System.mmNodeId){
+		    layersList[i].redraw(true);
+		}
+	    }
+	}
+    });
+}
+
+
+function saveMapFor(){
+    var fields="";
+    var fields_width="";
+    var cnt=0;
+    \$(".hDiv").find("th").each(function(){
+	if(this.style.display!='none'){
+	    fields+=(cnt>0?",":"")+\$(this).text();
+	    fields_width+=(cnt>0?',':'')+\$(this).width();
+	    cnt++;
+	}
+    });
+    
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=saveMapFor&DataInputs=map="+\$("#mapName")[0].value+";layers="+System.mmNodeId+";fields="+fields+";fwidth="+fields_width+";type="+arguments[0]+"&RawDataOutput=Result",
+	dataType: 'xml',
+	complete:function(xml,status){
+	}
+    });
+}
+
+
+System.editLabel=false;
+function toggleSave(){
+    if(!System.editLabel){
+	System.ndcol2List=[];
+	var cnt=0;
+	\$(".ndcol2").each(function(){
+	    var tmp=\$(this).text();
+	    if(!\$('#field_'+tmp)[0]){
+		System.ndcol2List[System.ndcol2List.length]=tmp;
+		\$(this).html('<input id="field_'+tmp+'" name="'+tmp+'" value="'+tmp+'" />');
+	    }
+	    cnt++;
+	});
+	System.editLabel=true;
+    }else{
+	var cnt=0;
+	\$(".ndcol2").each(function(){
+	    \$(this).html(System.ndcol2List[cnt]);
+	    cnt++;
+	});
+	System.editLabel=false;
+    }
+}
+
+function saveLayerLabelAlias(){
+    var cnt=0;
+    var fields="";
+    var fieldAliases="";
+    \$(".hDiv").find("th").each(function(){
+	fields+=(cnt>0?",":"")+\$(this).text();
+	cnt++;
+    });
+    for(var i=0;i<System.ndcol2List.length;i++){
+	fieldAliases+=(i>0?',':'')+\$('#field_'+System.ndcol2List[i]).val();		
+	}
+	//alert(fields+fieldAliases);
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=saveMapFor&DataInputs=map=$conf["senv"]["last_map"];layers="+System.mmNodeId+";fields="+fields+";faliases="+fieldAliases+";type=Alias&RawDataOutput=Result",
+	dataType: 'xml',
+	complete:function(xml,status){
+	    toggleSave();
+	}
+    });
+}
+
+function feature_info(feature){
+    editable.removeFeatures(editable.features);
+    editable.addFeatures([feature.clone()]);
+    if(!modify){
+	modify=new OpenLayers.Control.ModifyFeature(editable);
+  	map.addControl(modify);
+    }
+    modify.activate();
+    modify.selectFeature(editable.features[0]);
+}
+
+function updateFeature() {
+    // reset modification mode
+    map.controls[map.controls.length-1].mode = OpenLayers.Control.ModifyFeature.RESHAPE;
+    var rotate = document.getElementById("rotate").checked;
+    if(rotate) {
+        map.controls[map.controls.length-1].mode |= OpenLayers.Control.ModifyFeature.ROTATE;
+    }
+    var resize = document.getElementById("resize").checked;
+    if(resize) {
+        map.controls[map.controls.length-1].mode |= OpenLayers.Control.ModifyFeature.RESIZE;
+        var keepAspectRatio = document.getElementById("keepAspectRatio").checked;
+        if (keepAspectRatio) {
+            map.controls[map.controls.length-1].mode &= ~OpenLayers.Control.ModifyFeature.RESHAPE;
+        }
+    }
+    var drag = document.getElementById("drag").checked;
+    if(drag) {
+        map.controls[map.controls.length-1].mode |= OpenLayers.Control.ModifyFeature.DRAG;
+    }
+    if (rotate || drag) {
+        map.controls[map.controls.length-1].mode &= ~OpenLayers.Control.ModifyFeature.RESHAPE;
+    }
+}
+
+function activateControl(){	 
+    System.localI=0;
+    System.index=arguments[0];
+    \$(".gbutton").each(function(){
+	if(System.localI==System.index){
+	    try{
+		\$(this).removeClass("ui-state-default").addClass("ui-state-active");
+	    }catch(e){alert(e);for(var i in e)alert(i+" "+e[i]);}
+	}else{
+	    try{
+		\$(this).removeClass("ui-state-active").addClass("ui-state-default");
+	    }catch(e){alert(e);for(var i in e)alert(i+" "+e[i]);}
+	}
+	System.localI++;
+    });
+
+    for(var i=0;i<map.controls.length;i++){
+	if(i!=arguments[0]){
+	    map.controls[i].deactivate();
+	    if(map.controls[i].box)
+		map.controls[i].box.deactivate();
+	}
+	else{
+	    map.controls[i].activate();
+	    if(map.controls[i].box)
+		map.controls[i].box.activate();
+	}
+    }
+}
+
+
+
+function buildTree(elem,jsonTree,node,j,pass){
+    for(var i=0;i<pass.length;i++){
+	//alert(pass[i]);
+	if(node.id==pass[i])
+	    return "";
+    }
+    pass[pass.length]=node.id;
+    if(\$(this).tree('isLeaf',node.target)){
+	//alert(node.mmType);
+	System.layerTypes[node.id]=node.mmType;
+	return '{"id": "'+node.id+'","text": "'+node.text+'"}';
+    }else{
+	var tmp1=\$(elem).tree('getChildren',node.target);
+	jsonTree+='{"id": "'+node.id+'","text": "'+node.text+'","children": [';
+	var l=0;
+	for(var k=0;k<tmp1.length;k++){
+	    var jsStr=buildTree(elem,"",tmp1[k],0,pass);
+	    if(jsStr!=""){
+		jsonTree+=(l>0?",":"")+jsStr;
+		l++;
+	    }
+	}
+	jsonTree+=']}';
+    }
+    return jsonTree;
+}
+
+function startAddGroup(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["applicationAddress"]/Manager/AddDir",
+	dataType: "xml",
+	complete: function(xml,status) {
+	    \$( "#add-dir-dialog" ).html(xml.responseText);
+	    
+	    \$( "#add-dir-dialog" ).window({
+		modal: true,
+		collapsible:false,
+		minimizable:false,
+		maximizable:false,
+		draggable:false,
+		resizable: false
+	    });
+	    \$('#addDirName').val("");
+	    \$('#origDirName').val("");
+	    if(System.onAddGroup){
+		System.onAddGroup();
+		System.onAddGroup=null;
+	    }
+	}
+    });
+}
+
+function editGroup(){
+    System.onAddGroup=function(){
+	\$('#addDirName').val(System.mmNodeId);
+    	\$('#origDirName').val(System.mmNodeId);
+    };
+    startAddGroup();
+}
+
+function removeGroup(){
+    System.onAddGroup=function(){
+        \$('#addDirName').val(System.mmNodeId);
+		\$('#origDirName').val("remove");
+    };
+    startAddGroup();
+}
+
+function setLayersOrder(){
+    if(!\$("#view-layers-order")[0]){
+	\$( "body" ).append('<div id="view-layers-order" title="$zoo._("Layers Order")"></div>');
+    }
+    \$("#view-layers-order").html("").append('<ul id="ttlo"></ul><div><input type="button" name="" id="" value="$zoo._("Save")" onclick="saveLayersOrder()" /></div>');
+    var data=[];
+    for(var i=0;i<System.layersListOrder.length;i++){
+	data[data.length]={id: System.layersListOrder[i], text: System.layersListOrder[i]};
+    }
+    \$('#ttlo').tree({
+	data: data,
+	dnd: true
+    });
+    \$( "#view-layers-order" ).window({
+        height: 250,
+	collapsible:false,
+	minimizable:false,
+	maximizable:false,
+	resizable: false
+    });
+}
+
+function saveLayersOrder(){
+    var tmp=\$('#ttlo').tree('getRoots');
+    var layers="[";
+    for(var i=0;i<tmp.length;i++)
+	layers+=(i>0?",":"")+'"'+tmp[i].id+'"';
+    layers+="]";
+    //alert(layers);
+    var req='<wps:Execute service="WPS" version="1.0.0" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 ../wpsExecute_request.xsd"><ows:Identifier>updateLayersOrder</ows:Identifier><wps:DataInputs><wps:Input><ows:Identifier>layers</ows:Identifier><wps:Data><wps:LiteralData dataType="string">'+layers+'</wps:LiteralData></wps:Data></wps:Input><wps:Input><ows:Identifier>map</ows:Identifier><wps:Data><wps:LiteralData dataType="string">'+\$('#mapName')[0].value+'</wps:LiteralData></wps:Data></wps:Input></wps:DataInputs><wps:ResponseForm><wps:RawDataOutput><wps:Output><ows:Identifier>Result</ows:Identifier></wps:Output></wps:RawDataOutput></wps:ResponseForm></wps:Execute>';
+    \$.ajax({
+	type: "POST",
+	contentType: 'text/xml',
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile",
+	data: req,
+	dataType: "xml",
+	complete: function(xml,status) {
+	    checkWPSResult(xml);
+	    startMapList();
+	    \$( "#view-layers-order" ).window('close');
+	}
+    });		  
+    
+}
+
+function setFlyAddress(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=getFlyAddress&DataInputs=&RawDataOutput=Result",
+	complete: function(xml,status) {
+	    if(checkWPSResult(xml,false)){
+		if(!\$("#view-layers-fly")[0]){
+		    \$( "body" ).append('<div id="view-layers-fly" title="$zoo._("Master Fly")"></div>');
+		}
+		\$("#view-layers-fly").html("").append('<label for=""fe_flyAddress>Fly Address: </label><input type="text" id="fe_flyAddress" value="'+xml.responseText+'"/><input type="button" name="" id="" value="$zoo._("Save")" onclick="saveFlyAddress()" /></div>');
+		\$( "#view-layers-fly" ).window({
+		    collapsible:false,
+		    minimizable:false,
+		    maximizable:false,
+		    resizable: false
+		});
+	    }
+	}
+    });
+}
+
+function saveFlyAddress(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=saveFlyAddress&DataInputs=flyAddress="+\$("#fe_flyAddress")+"&RawDataOutput=Result",
+	dataType: "xml",
+	complete: function(xml,status) {
+	    checkWPSResult(xml);
+	    \$( "#view-layers-fly" ).window('close');
+	}
+    });
+    
+}
+
+function getFlyAddress(){
+    \$.ajax({
+	type: "GET",
+	contentType: 'text/xml',
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile&request=Execute&service=WPS&Identifier=getFlyAddress&DataInputs=flyAddress&RawDataOutput=Result",
+	data: req,
+	dataType: "xml",
+	complete: function(xml,status) {
+	    checkWPSResult(xml);
+	    \$( "#view-layers-fly" ).window('close');
+	}
+    });
+    
+}
+
+#include $conf["main"]["templatesPath"]+"/Manager/timeline.js"
+
+function addDirToMap(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&metapath=mapfile&Identifier="+(\$("#origDirName")[0].value==""?"addGroupToMap":(\$("#origDirName")[0].value=="remove"?"removeGroupFromMap":"renameGroupInMap"))+"&DataInputs=map="+\$mj("mapName").value+";group="+\$("#addDirName")[0].value+(\$("#origDirName")[0].value!=""?";oldgroup="+\$("#origDirName")[0].value:"")+"&RawDataOutput=Result",
+	dataType: "xml",
+	complete: function(xml,status) {
+	    checkWPSResult(xml);
+	    startMapList();
+	    \$( "#add-dir-dialog" ).window('close');			
+	}
+    });
+    return false;
+}
+
+function saveProcessingDirective(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&metapath=mapfile&Identifier=setResample&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";resm="+\$("#resMethod")[0].value+"&RawDataOutput=Result",
+	dataType: "xml",
+	complete: function(xml,status) {
+	    checkWPSResult(xml);
+	    for(var i=0;i<layersList.length;i++)
+		if(layersList[i].local_id==System.mmNodeId)
+		    layersList[i].redraw(true);
+	    \$( "#add-dir-dialog" ).window('close');
+	}
+    });
+    return false;
+}
+
+function startSymbolManager(){
+    \$.ajax({
+	type: "GET",
+	url: "Manager/Styler/SymbolManager",
+	complete: function(xml,status) {
+	    
+     	    if(!\$( "#view-symb-dialog" )[0])
+        	\$( "body" ).append('<div id="view-symb-dialog" title="$zoo._("Symbol Manager")"></div>');
+      	    \$( "#view-symb-dialog" ).html("");
+	    \$( "#view-symb-dialog" ).append(xml.responseText);
+	    \$( "#view-symb-dialog" ).window({
+		collapsible:false,
+		minimizable:false,
+		maximizable:false,
+		draggable:true,
+		resizable: false
+	    });
+	    refreshSymbolOrig();
+	}
+    });
+}
+
+function refreshSymbolOrig(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=symbol-tools&service=WPS&version=1.0.0&request=Execute&Identifier=getSymbolChooser4TTF&DataInputs=&RawDataOutput=Result@mimeType=text/html",
+	complete: function(xml,status) {
+	    
+      	    \$( "#symbolOrig" ).html("");
+	    \$( "#symbolOrig" ).append(xml.responseText);
+	    
+	}
+    });
+}
+
+function symbolAddToOrig(){
+    var tmp=arguments[0].split('|');
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=symbol-tools&service=WPS&version=1.0.0&request=Execute&Identifier=addSymbolToOrig&DataInputs=ttf="+tmp[0]+";charcodes=["+tmp[1]+"]&RawDataOutput=Result@mimeType=text/html",
+	complete: function(xml,status) {
+	    refreshSymbolOrig();			  
+	}
+    });
+    
+}
+
+function displaySymbolAdd(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=symbol-tools&service=WPS&version=1.0.0&request=Execute&Identifier=getSymbolChooser4TTF&DataInputs=ttf="+arguments[0]+"&RawDataOutput=Result@mimeType=text/html",
+	complete: function(xml,status) {
+	    
+      	    \$( "#symbolAdd" ).html("");
+	    \$( "#symbolAdd" ).append(xml.responseText);
+	    
+	}
+    });
+}
+
+
+function updateSelectWithFields(){
+    var selIds=arguments[0];
+    
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/project_"+\$("#mapName")[0].value+".map&service=WFS&version=1.0.0&request=DescribeFeatureType&typename="+System.mmNodeId+"",
+	complete: function(xml,status){
+	    var i=0;
+	    var tmp=\$(xml.responseXML).find("element").each(
+		function(){
+		    if(\$(this).attr("type")!="gml:GeometryPropertyType" &&
+		       \$(this).attr("type")!="ms:"+System.mmNodeId+"Type"){
+			if(i==0){
+			    for(var t=0;t<selIds.length;t++)
+			      	\$("#"+selIds[t]).html("");
+			}
+			for(var t=0;t<selIds.length;t++)
+			    \$("#"+selIds[t]).append('<option value="'+\$(this).attr("name")+'" '+(\$("#"+selIds[t]+"H").val()==\$(this).attr("name")?'selected="true"':'')+'>'+\$(this).attr("name")+" ("+\$(this).attr("type")+')</option>');
+			i+=1;
+		    }
+		});
+	    
+	}
+    });
+    
+}
+
+function importOSM(){
+    var tmp=System.lastLayer.features[0].geometry.transform(map.projection,map.displayProjection).getBounds();
+    
+    var data=WPSGetHeader((arguments[0]=="point"?"importOSMPoints":"importOSMLines"))+WPSGetInputs([{name: "bbox",value: tmp,dataType: "string"},{name: "dson",value: \$('#osm_dson')[0].value,dataType: "string"},{name: "dstn",value: \$('#osm_dstn')[0].value,dataType: "string"}])+WPSGetOutput({name: "Result"})+WPSGetFooter();
+    
+    \$.ajax({
+	type: "POST",
+	url: "$conf["main"]["serverAddress"]?metapath=osm-tools",
+	data: data,
+	contentType: 'text/xml',
+	complete: function(xml,status) {
+	    checkWPSResult(xml);
+	    \$.ajax({
+		type: "GET",
+		url: "$conf["main"]["serverAddress"]?metapath=vector-tools&service=WPS&version=1.0.0&request=Execute&Identifier=mmVectorInfo2Map&DataInputs=dataSource=$conf["main"]["dataPath"]/dirs/"+\$('#osm_dstn')[0].value+"/",
+		complete: function(xml,status){
+		    checkWPSResult(xml);
+		    \$.ajax({
+			type: "GET",
+			url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=loadMapForDs&DataInputs=map=$conf["senv"]["last_map"];dstName="+\$('#osm_dstn')[0].value+";dsoName="+\$('#osm_dson')[0].value+";dsgName=Layers&RawDataOutput=Result",
+			complete: function(xml,status){
+			    checkWPSResult(xml);
+			    startMapList();
+			    \$( "#importOSM-dialog" ).window('close');
+			}
+		    });
+		}
+	    });
+	}
+    });
+    
+}
+
+function readTemplate(){
+    \$.ajax({
+	type: "GET",
+	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=readTemplate&DataInputs=layer="+arguments[1]+";map="+arguments[2]+";click="+(arguments[0]==""?false:true)+";ext="+\$("#te_ext")[0].value+"&RawDataOutput=Result",
+	complete: function(xml,status){
+	    \$("#tmplContent").val(xml.responseText);
+	    startTemplateEditor();
+	}
+    });
+    
+}
+
+function updateTextarea(){
+    var oEditor = CKEDITOR.instances.tmplContent;
+    if ( oEditor.mode == 'wysiwyg' )
+	oEditor.insertText( '[item name='+arguments[0].value+']' );
+    else
+	alert('$zoo._('You must be in WYSIWYG mode to use this function')');
+    /*var tmp=\$('#tmplContent').val();
+      \$('#tmplContent').val(tmp+'[item name="'+arguments[0].value+'"]');*/
+}
+
+function startTemplateEditor(){
+#set ll=$conf["main"]["language"].split('-')
+#* cf. http://docs.cksource.com/CKEditor_3.x/Developers_Guide/Toolbar for more
+    informations on ckEditor toolbars *#
+    if (CKEDITOR.instances.tmplContent) { CKEDITOR.instances.tmplContent.destroy(true); }
+    CKEDITOR.replace('tmplContent',{
+	skin : 'v2',
+	language: '$ll[0]',
+	toolbar:[
+	    { name: 'document', items : [ 'Source','NewPage','Preview' ] },
+	    { name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
+	    { name: 'editing', items : [ 'Find','Replace','-','SelectAll','-','Scayt' ] },
+	    '/',
+	    { name: 'insert', items : [ 'Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak','Iframe' ] },
+	    { name: 'styles', items : [ 'Styles','Format' ] },
+	    '/',
+	    { name: 'basicstyles', items : [ 'Bold','Italic','Strike','-','RemoveFormat' ] },
+	    { name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote' ] },
+	    { name: 'links', items : [ 'Link','Unlink','Anchor' ] },
+	    { name: 'colors', items : [ 'TextColor','BGColor' ] },
+	    { name: 'tools', items : [ 'Maximize'] }
+	]
+    });
+}

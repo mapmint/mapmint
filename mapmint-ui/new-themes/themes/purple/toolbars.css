@@ -1,0 +1,33 @@
+
+
+
+a.butt:hover{color:#FFFFFF;position:relative;top:5px;left:0px;text-shadow:#333333 0 1px 0;
+background: #8340f3; /* for non-css3 browsers */
+filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#c743f8', endColorstr='#8340f3'); /* for IE */
+background: -webkit-gradient(linear, left top, left bottom, from(#c743f8), to(#8340f3)); /* for webkit browsers */
+background: -moz-linear-gradient(top,  #c743f8, #8340f3 ); /* for firefox 3.6+ */}
+
+a.save-as-map:hover{color:#FFFFFF;position:relative;top:1px;left:20px;text-shadow:#333333 0 1px 0;
+background: #8340f3; /* for non-css3 browsers */
+filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#c743f8', endColorstr='#8340f3'); /* for IE */
+background: -webkit-gradient(linear, left top, left bottom, from(#c743f8), to(#8340f3)); /* for webkit browsers */
+background: -moz-linear-gradient(top,  #c743f8, #8340f3 ); /* for firefox 3.6+ */}
+
+a.view-site:hover{color:#FFFFFF;position:relative;top:1px;left:20px;text-shadow:#333333 0 1px 0;
+background: #8340f3; /* for non-css3 browsers */
+filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#c743f8', endColorstr='#8340f3'); /* for IE */
+background: -webkit-gradient(linear, left top, left bottom, from(#c743f8), to(#8340f3)); /* for webkit browsers */
+background: -moz-linear-gradient(top,  #c743f8, #8340f3 ); /* for firefox 3.6+ */
+}
+
+a.view-all-project:hover,  a.view-all-docs:hover{color:#FFFFFF;position:relative;top:0;right:10px;text-shadow:#333333 0 1px 0;background: #8340f3; /* for non-css3 browsers */
+filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#c743f8', endColorstr='#8340f3'); /* for IE */
+background: -webkit-gradient(linear, left top, left bottom, from(#c743f8), to(#8340f3)); /* for webkit browsers */
+background: -moz-linear-gradient(top,  #c743f8, #8340f3 ); /* for firefox 3.6+ */
+}
+a.preview:hover, a.export:hover{color:#FFFFFF;position:relative;top:0;left:5px;text-shadow:#333333 0 1px 0;
+background: #8340f3; /* for non-css3 browsers */
+filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#c743f8', endColorstr='#8340f3'); /* for IE */
+background: -webkit-gradient(linear, left top, left bottom, from(#c743f8), to(#8340f3)); /* for webkit browsers */
+background: -moz-linear-gradient(top,  #c743f8, #8340f3 ); /* for firefox 3.6+ */
+}

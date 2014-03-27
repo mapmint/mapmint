@@ -1,0 +1,39 @@
+[clogIn]
+ Title = Client Login.
+ Abstract = Give capability for client users to log into the system on the client side.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [login]
+   Title = User login
+   Abstract = The login of the user.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [password]
+   Title = Password
+   Abstract = The password of the user.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = Login message
+   Abstract = The message to let the client know if he was able to login or not.
+   <ComplexData>
+    <Default>
+     mimeType = text/html
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

@@ -1,0 +1,597 @@
+#encoding UTF-8
+#from Skeleton import Skeleton
+#extends Skeleton
+
+#attr $mmodule = "Publisher"
+
+#attr $ocss = []
+
+#attr $js = ['jquery.tipsy.js','jquery.hoverIntent.min.js','progress-bar.js','jquery.jgrowl.js','jquery.colorPicker.js','Meta.js','jqXMLUtils.js ','jquery.cookie.js','jquery.paginate.js','jquery.fileinput.js','plupload.js','plupload.html5.js','jquery.plupload.queue/jquery.plupload.queue.js','wps.js','generic.js','ckeditor.js','upload.js']
+
+#attr $js1 = ['main_js','Publisher_js']
+
+#def page_title
+MapMint: Publisher
+#end def
+
+#def body
+#import zoo
+<div class="ui-layout-west">
+  <h1 class="pane-title">$zoo._("Maps")<span class="close" onclick="myLayout.close('west')" title=""></span></h1>
+  <div class="toolbar">
+    <label for="project_search">$zoo._("Search:") </label>
+    <input id="project_search" type="text" value="" />
+  </div>
+	
+$(Template(file=$conf["main"]["templatesPath"]+"/ProjectsList.tmpl",searchList=$searchList))
+
+</div>
+
+#import mapscript
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$conf["senv"]["last_map"]+".map")
+
+<div class="ui-layout-center">
+  <h1 class="pane-title">$zoo._("Project:")<span class="project-title">#if $m.web.metadata.get("mmProjectName") is not None#$m.web.metadata.get("mmProjectName")#else#Unnamed_1#end if#</span></h1>
+  <div class="toolbar2">
+    <a class="fg-button ui-state-default ui-corner-all ui-icon main-configuration" id="main-configuration" href="#main-config" title="$zoo._("General")"></a>
+    <a class="fg-button ui-state-default ui-corner-all ui-icon layout-settings" id="layout-settings" href="#layout-sets" title="$zoo._("Layout")"></a>
+    <a class="fg-button ui-state-default ui-corner-all ui-icon layers-settings" id="layers-settings" href="#layers-sets" title="$zoo._("Layers")"></a>
+    <a class="fg-button ui-state-default ui-corner-all ui-icon map-settings" id="maps-settings" href="#map-sets" title="$zoo._("Map")"></a>
+    <a class="fg-button ui-state-default ui-corner-all ui-icon controls-settings" id="controls-settings" href="#controls-sets" title="$zoo._("Controls")"></a>
+    <a class="ui-state-default ui-button-text-only ui-corner-all save-as-map _nothidable"  href="#" title="" onclick="savePublishedMap();">$zoo._("Publish")</a>
+    <a class="ui-state-default ui-button-text-only ui-corner-all save-as-map _nothidable"  href="#" title="" onclick="savePublishedPreview();">$zoo._("Publish Map Preview")</a>
+    <a class="ui-state-default ui-button-text-only ui-corner-all save-as-map _nothidable"  href="./preview/#if $m.web.metadata.get("layout_t")#$m.web.metadata.get("layout_t")#else#fullscreen#end if#" target="_blank" title="" id="previewer">$zoo._("Preview")</a>
+    <a class="ui-state-default ui-button-text-only ui-corner-all save-as-map _nothidable"  href="#" title="" onclick="confirmRemovePublishedMap();">$zoo._("Remove")</a>
+  </div>
+	
+  <div class="center-container">
+	    
+    <div class="tabs-project">  
+	  
+      <div style="display:block;" id="main-config" class="lcontent">
+	<h3 class="title">$zoo._("General")</h3>
+	<table class="gen">
+	  <tbody>
+	    <tr>
+	      <td valign="middle" style="width:120px;">$zoo._("Project Name:")</td>
+	      <td><input id="mmProjectName" class="rounded" type="text" value="#if $m.web.metadata.get("mmProjectName") is not None#$m.web.metadata.get("mmProjectName")#else#$conf["senv"]["last_map"]#end if#" onkeyup="\$('._disabled').val('$conf["main"]["rootUrl"]'+this.value);\$('.project-title').html(this.value)" disabled="true"/></td>
+	    </tr>
+	    <tr>
+	      <td valign="middle" style="width:120px;">$zoo._("Project Title:")</td>
+	      <td><input id="mmTitle" class="rounded" type="text" value="#if $m.web.metadata.get("mmTitle") is not None#$m.web.metadata.get("mmTitle")#else#$zoo._("Untitled")#end if#"></td>
+	    </tr>
+	    <tr>
+	      <td valign="middle" style="width:120px;">$zoo._("Access privileges:")</td>
+	      <td>
+#set inputs1=$inputs
+#set $inputs1["prefix"]={"value":"publisher","dataType":"string"}
+$(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/GroupList.html",searchList={"conf": $conf,"prefix":"","m": $m,"inputs": $inputs1}))
+	      </td>
+	    </tr>
+            <tr>
+              <td valign="middle" style="width:120px;">$zoo._("Classify in theme:")</td>
+              <td>
+#set inputs1=$inputs
+#set $inputs1["prefix"]={"value":"publisherTH","dataType":"string"}
+$(Template(file=$conf["main"]["templatesPath"]+"/ThemesManagement/list.html",searchList={"conf": $conf,"prefix":"th","m": $m,"inputs": $inputs1}))
+              </td>
+            </tr>
+	  </tbody>
+	</table>
+	  
+	<table class="gen">
+	  <tbody>  
+	    <tr>
+	      <td valign="middle" style="width:120px;">Project URL:</td>
+	      <td><input disabled="true" id="#" class="rounded  _disabled" type="text" value="${conf["main"]["rootUrl"]}/#if $m.web.metadata.get("mmProjectName") is not None#$m.web.metadata.get("mmProjectName")#else#Unnamed_1#end if#"></td>
+	    </tr>
+	    <tr>
+	      <td valign="middle" style="width:120px;">$zoo._("Active Map:")</td>
+	      <td><input disabled="true" id="#" class="rounded" type="text" value="$conf["senv"]["last_map"]"></td>
+	    </tr>
+	    <tr>
+	      <td valign="middle" style="width:120px;">$zoo._("Creation Date:")</td>
+#import os,time
+	      <td><input disabled="true" id="#" class="rounded" type="text" value="savedTime"></td>
+	    </tr>
+
+
+	  </tbody>
+	</table>
+	
+	<table class="gen">
+	  <tbody>
+	    
+	    <tr>
+	      <td valign="middle" style="width:120px;">$zoo._("Language:")</td>
+	      <td><input id="#" class="rounded" type="text" value="en-US"></td>
+	    </tr>
+	  </tbody>
+	</table>
+	
+	<table class="gen">
+	  <tbody>
+	    <tr>
+	      <td valign="middle" style="width:120px;">$zoo._("Key Words:")</td>
+	      <td><input id="mmKeywords" class="rounded" type="text" value="$m.web.metadata.get("mmKeywords")"></td>
+	    </tr>
+	    <tr>
+	      <td valign="middle" style="width:120px;">$zoo._("Author:")</td>
+	      <td><input id="mmAuthor" class="rounded" type="text" value="$m.web.metadata.get("mmAuthor")"></td>
+	    </tr>
+	    <tr>
+	      <td valign="middle" style="width:120px;">$zoo._("Copyright:")</td>
+	      <td><input id="mmCopyright" class="rounded" type="text" value="$m.web.metadata.get("mmCopyright")"></td>
+	    </tr>
+	  </tbody>
+	</table>
+	
+	
+	<table class="gen">
+	  <tbody>
+	    <tr>
+	      <td valign="top" style="width:120px;">$zoo._("Description:")</td>
+	      <td><textarea id="mmDescription" name="keywords" rows="3" cols="17" class="maincfg">#try#$(open($m.web.metadata.get("ows_abstract").replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"])).read())#except#$m.web.metadata.get("ows_abstract")#end try#</textarea></td>
+	    </tr>
+	  </tbody>
+	</table>
+	
+      </div>
+      
+      <div style="display:none;" id="layout-sets"  class="lcontent">
+	<h3 class="title">$zoo._("Layout")</h3>
+	<p>$zoo._("Text settings:")</p>	
+	<table class="gen font">
+	  <tbody>
+	    <tr>
+	      <td>
+		
+		<select id="ffamily" class="select-window">
+		  <option value="-1" #if $m.web.metadata.get("ffamily")==""#selected="selected"#end if#>$zoo._("Font-family")</option>
+#set fonts=["Arial","Courier","Georgia","Helvetica","Lucida","Tahoma","Trebuchet"]
+#for i in fonts		    
+		  <option style="font-family:${i};font-size:1.1em;" value="${i}" #if $m.web.metadata.get("ffamily")==$i#selected="selected"#end if#>${i}</option>
+#end for
+		</select>
+	      </td>
+	      <td>
+		<select id="fsize" class="select-window">
+		  <option value="-1" #if $m.web.metadata.get("fsize")==""#selected="selected"#end if#>$zoo._("Font-size")</option>
+#for i in range(9,15)
+		  <option style="font-size:${i}px;" value="$i" #if $m.web.metadata.get("fsize")==str($i)#selected="selected"#end if#>${i}px</option>
+#end for
+		</select>
+	      </td>
+	      <td>
+		<span class="fcolor">$zoo._("Font-color") <input id="font-colorpicker" type="text" name="font-colorpicker" value="#if $m.web.metadata.get("font-colorpicker")==""#selected="selected"#\#333333#else#$m.web.metadata.get("font-colorpicker")#end if#" /></span>     </td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  
+	  <table class="gen logo">
+	    <tbody>
+#try
+#set tt=$conf["senv"]
+#set $tt["last_file"]=""
+#except
+#pass
+#end try
+	      <tr>
+		<td>
+		  <form action="#" class="upload">
+		  <label class="up" for="file">$zoo._("Select a logo image:")</label>
+		<div id="uploader">
+		  <input id="upload_dest" type="hidden" value="logoDir">
+		</div>
+		
+		
+		</form>
+		</td>
+	      </tr>
+	    </tbody>
+	  </table>
+	  <p>$zoo._("Select template:")</p>
+	  <table class="gen layouts">
+	    <tbody>
+	      
+	      <tr>
+#set laydefs=['fullscreen','largemap','leftcol','rightcol','nudemap','mobile','natureparif-indicateurs']
+#set jj=0
+#set tt=[$zoo._("Full Screen"),$zoo._("Large Map"),$zoo._("Left Column"),$zoo._("Right Column"),$zoo._("Nude"),$zoo._("Mobile")]
+#if $conf["mm"]["indexes"]=="true"
+#set $tt+=[$zoo._("Indicateurs")]
+#end if
+#for i in $tt
+		<td valign="top"><input value="$laydefs[$jj]" name="layout_t" id="layout_t"  type="radio" #if ($m.web.metadata.get("layout_t")!="" and $m.web.metadata.get("layout_t")==$laydefs[$jj])#checked="true"#end if# onclick="\$('#previewer')[0].href='./preview/$laydefs[$jj]';"/>$i</td>
+#set jj=$jj+1
+#end for
+	      </tr>
+	      <tr>
+#for i in range(0,5)
+		<td class="preview"><img src="$conf['main']['mmAddress']/img/layout$(i).png" /></td>
+#end for
+	      </tr>
+	    </tbody>
+	  </table>
+	
+	  <p>$zoo._("Select theme:")</p>
+	
+	  <table class="themz">
+	    <tbody>
+	      <tr>
+#set jj=1
+#for i in ['green','blue','purple','pink']
+		<td>
+		  <input type="radio" name="layout_color" id="mmLayoutColor" class="th" #if ($m.web.metadata.get("mmLayoutColor")!="" and $m.web.metadata.get("mmLayoutColor")==$i) or ($m.web.metadata.get("mmLayoutColor")=="" and $i=="green")#checked="true"#end if# value="$i"/><a class="$i ui-corner-all" href="#" title="$i"><span>$($zoo._(i).title())</span></a>
+		</td>
+#set jj=$jj+10
+#end for
+	      </tr>
+	    </tbody>
+	  </table>
+          
+
+
+	</div>
+    
+	<div style="display:none;" id="map-sets"  class="lcontent">
+	  <h3 class="title">$zoo._("Map")</h3>
+	
+	<table class="gen">
+	    <tbody>
+	      <tr>
+		<td style="width:120px;">$zoo._("Display") 
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",searchList={"conf": $conf,"prefix":"","selected": $m.web.metadata.get('tprj')}))
+		</td>
+	      </tr>
+	      <tr>
+		<td style="width:120px;">$zoo._("Renderer Method:")
+		  <select id="mmRenderer">
+		    <option value="SVG" #if $m.web.metadata.get('mmRenderer') is None or $m.web.metadata.get('mmRenderer')=='SVG'#selected#end if#>SVG</option>
+		    <option value="Canvas" #if $m.web.metadata.get('mmRenderer') is not None and $m.web.metadata.get('mmRenderer')=='Canvas'#selected#end if#>Canvas</option>
+		  </select>	    
+		</td>
+	      </tr>
+	      <tr>
+		<td style="width:120px;">
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/uoms.tmpl",searchList={"conf": $conf,"prefix":"","uom": $m.web.metadata.get("tuom")}))
+		</td>
+	      </tr>
+	    </tbody>
+	</table>
+	
+	<table class="gen">
+	    <thead>
+	      <tr>
+		<th valign="middle" style="width:120px;">$zoo._("Extent")</th>
+		<th>$zoo._("Restricted")</th>
+		<th>X min</th>
+		<th>Y min</th>
+		<th>X max</th>
+		<th>Y max</th>
+		<th style="width: 30px;"></th>
+	      </tr>
+	    </thead>
+	    <tbody>
+#set labels=[$zoo._("Default"),$zoo._("Maximum"),$zoo._("Minimum")]
+#set j=0
+#for i in ['default','max','min']
+	      <tr>
+		<td valign="middle" style="width:120px;">$labels[$j]</td>
+		<td>
+#if $i=="max"
+		  <input id="mmRestricted" class="rounded" type="checkbox" value="true" #if $m.web.metadata.get("mmRestricted")=="true"#checked="true"#end if# />
+#end if
+		</td>
+#for k in ['minx','miny','maxx','maxy']
+		<td><input id="${i}_${k}" class="rounded" type="text" value="#if $m.web.metadata.get($i+'_'+$k)#$m.web.metadata.get($i+'_'+$k)#end if#" /></td>
+#end for
+		<td style="width: 150px;">
+		  <!--<input class="map_extent" id="map_$(i)_extent" onclick="\$(this).next().toggle();" type="button" value="set" />-->
+		<div id="form_move_$(i)" >
+		  <select id="form_move_layer_$(i)" onchange="if(this.options[this.selectedIndex].value=='-1'){\$('#${i}_minx')[0].value='';\$('#${i}_miny')[0].value='';\$('#${i}_maxx')[0].value='';\$('#${i}_maxy')[0].value='';}else{var tmp=this.value.split(' ');\$('#${i}_minx')[0].value=tmp[0];\$('#${i}_miny')[0].value=tmp[1];\$('#${i}_maxx')[0].value=tmp[2];\$('#${i}_maxy')[0].value=tmp[3];}">
+		    <option value="-1">$zoo._("Select")</option>
+
+#for k in range(0,$m.numlayers)
+#set l=$m.getLayer($k)
+#if $l.name.count("grid_")==0
+#try
+#set iproj=mapscript.projectionObj($l.getProjection())
+#except
+#set iproj=mapscript.projectionObj("epsg:4326")
+#end try
+#set oproj=mapscript.projectionObj($m.getProjection())
+#set toto=$l.getExtent()
+#set va=$toto.project(iproj,oproj)
+		    <option value="$toto.minx $toto.miny $toto.maxx $toto.maxy">$m.getLayer($k).name</option>
+#end if
+#end for
+
+		  </select>
+		</div>
+		</td>
+	      </tr>
+#set j=$j+1
+#end for
+	    </tbody>
+	  </table>
+	
+	</div>
+   
+	<div style="display:none;" id="layers-sets"  class="lcontent">
+	  <h3 class="title">$zoo._("Base Layers")</h3>
+	  <table class="gen layers-gen">
+	    <tbody>
+	      <tr>
+		<td valign="middle" style="width:120px;">Default:</td>
+		<td><select id="base_layer_active" onchange="\$('#base_layer_active_sel').val(this.value);">
+		</select>
+		<input type="hidden" id="base_layer_active_sel" value="$m.web.metadata.get('mmActivatedBaseLayers')" />
+	      </td>
+	    </tr>
+	    <tr>
+	      <td valign="middle" style="width:120px;">$conf["mm"]["boLayerAlias"]:</td>
+	      <td><input type="checkbox" id="base_osm" value="true" #if $m.web.metadata.get("mmOSMBaseLayers")=="true"#checked="true"#end if# onchange="updateBaseLayersList();"/>
+	      </td>
+	    </tr>
+	    <tr>
+	      <td valign="top" style="width:120px;">$conf["mm"]["bmName"]:</td>
+	      <td><select multiple class="select-window" style="height: 50px;" onchange="updateBaseLayersList();">
+		<option value="-1" #if not($m.web.metadata.get('mmMBaseLayers'))#selected="true"#end if#>$zoo._("None")</option>
+#set a=$conf["mm"]["bmLayers"].split(",")
+#set b=$conf["mm"]["bmLayerAlias"].split(",")
+#if $m.web.metadata.get('mmMBaseLayers')
+#set setM=$m.web.metadata.get('mmMBaseLayers').split(',')
+#else
+#set setM=[]
+#end if
+#for i in range(0,len(a))
+		<option value="$a[$i]" #if $setM.count($a[$i])>0#selected="true"#end if#>$b[$i]</option>
+#end for
+	      </select>
+	    </td>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td valign="top" style="width:120px;">$zoo._("Proprietary:")</td>
+	    <td>
+#if $m.web.metadata.get("mmProprietaryBaseLayers")
+#set lname=$m.web.metadata.get("mmProprietaryBaseLayers")
+#else
+#set lname=$conf["mm"]["bpDefault"]
+#end if
+	      <select class="select-window" id="mmBBDefault" onchange="\$('#'+this.value).show();var tmp=['$conf["mm"]["bbName"]','$conf["mm"]["bgName"]','$conf["mm"]["biName"]'];for(i in tmp){if(this.value!=tmp[i])\$('#'+tmp[i]).hide();else \$('#'+tmp[i]).show();}if(this.value=='$conf["mm"]["bgName"]')\$(this).parent().parent().next().hide();else \$(this).parent().parent().next().show();">
+		<option value="-1" #if $lname=="None"#selected="true"#end if#>None</option>
+		<option value="$conf["mm"]["bgName"]" #if $lname==$conf["mm"]["bgName"]#selected="true"#end if#>$conf["mm"]["bgName"]</option>
+		<option value="$conf["mm"]["bbName"]" #if $lname==$conf["mm"]["bbName"]#selected="true"#end if#>$conf["mm"]["bbName"]</option>
+		<option value="$conf["mm"]["biName"]" #if $lname==$conf["mm"]["biName"]#selected="true"#end if#>$conf["mm"]["biName"]</option>
+	      </select>
+		
+	      <select multiple class="select-window bgSelect" id="$conf["mm"]["bgName"]"  #if $lname!=$conf["mm"]["bgName"]#style="display: none"#end if# onchange="updateBaseLayersList();">
+		<option value="-1" #if $m.web.metadata.get('mmProprietaryBaseLayers')!="Google" or $m.web.metadata.get('mmPBaseLayers')==""#selected="true"#end if#>None</option>
+#set a=$conf["mm"]["bgLayerAlias"].split(",")
+#set b=$conf["mm"]["bgLayers"].split(",")
+#if $m.web.metadata.get('mmProprietaryBaseLayers')=="Google" and $m.web.metadata.get('mmPBaseLayers')!=""
+#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+#else
+#set setM=[]
+#end if
+#for i in range(0,len(a))
+		<option value="$b[$i]" #if $setM.count($b[$i])>0#selected="true"#end if#>$a[$i]</option>
+#end for
+	      </select>
+	      <select multiple class="select-window bgSelect" id="$conf["mm"]["bbName"]" #if $lname!="Bing"#style="display: none"#end if#>
+		<option value="-1" #if $m.web.metadata.get('mmProprietaryBaseLayers')!="Bing" or $m.web.metadata.get('mmPBaseLayers')==""#selected="true"#end if#>None</option>
+#set a=$conf["mm"]["bbLayerAlias"].split(",")
+#set b=$conf["mm"]["bbLayers"].split(",")
+#if $m.web.metadata.get('mmProprietaryBaseLayers')=="Bing" and $m.web.metadata.get('mmPBaseLayers')
+#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+#else
+#set setM=[]
+#end if
+#for i in range(0,len(a))
+		<option value="$b[$i]" #if $setM.count($b[$i])>0#selected="true"#end if#>$a[$i]</option>
+#end for
+	      </select>
+		
+	      <select multiple class="select-window biSelect" id="$conf["mm"]["biName"]" #if $lname!=$conf["mm"]["biName"]#style="display: none"#end if#>
+		<option value="-1" #if $m.web.metadata.get('mmProprietaryBaseLayers')!=$conf["mm"]["biName"] or $m.web.metadata.get('mmPBaseLayers')==""#selected="true"#end if#>None</option>
+#set a=$conf["mm"]["biLayerAlias"].split(",")
+#set b=$conf["mm"]["biLayers"].split(",")
+#if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["biName"] and $m.web.metadata.get('mmPBaseLayers')
+#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+#else
+#set setM=[]
+#end if
+#for i in range(0,len(a))
+		<option value="$b[$i]" #if $setM.count($b[$i])>0#selected="true"#end if#>$a[$i]</option>
+#end for
+	      </select>
+	      
+	    </td>
+	  </tr>
+	  <tr #if $m.web.metadata.get("mmProprietaryBaseLayers")!=$conf["mm"]["bbName"] and $m.web.metadata.get("mmProprietaryBaseLayers")!=$conf["mm"]["biName"]#style="display:none"#end if#>
+	    <td>
+	      API Key:
+	    </td>
+	    <td>
+	      <input id="mmBAK" type="text" value="$m.web.metadata.get('mmBAK')">
+	    </td>
+	  </tr>
+	  <tr>
+	      <td valign="top" >
+	      $zoo._("Created layers:")
+	      </td>
+	      <td>
+		<select multiple id="mmBProject" class="select-window" onchange="updateBaseLayersList();">
+		  <option value="-1">$zoo._("None")</option>
+#try
+#set sel=$m.web.metadata.get('mmBProject').split(",")
+#except
+#set sel=[]
+#end try
+#import os
+#for i in os.listdir($conf["main"]["dataPath"]+"/public_maps/")
+#if $i.count(".map")==0
+#try 
+#set t=os.readlink($conf["main"]["dataPath"]+"/public_maps/"+$i)
+		  <option value="$i" #if sel.count($i)>0#selected="true"#end if#>$i</option>		
+#except
+#set t=None
+#end try
+#end if
+#end for
+		</select>
+	      </td>
+	  </tr>
+	  </tbody>
+      </table>
+      
+      <h3 class="title">$zoo._("Overlay Layers")</h3>
+    <div class="dsContainer">
+      <table id="datasources_list">
+	<thead>
+	<th width="350">$zoo._("Layer Name")</th>
+	<th width="50">$zoo._("Popup")</th>
+	<th width="50">$zoo._("Window")</th>
+	<th width="50">$zoo._("Vector")</th>
+	<th width="50">$zoo._("Raster")</th>
+	<th width="50">$zoo._("Activated")</th>
+	<th width="75">$zoo._("Min Zoom")</th>
+	<th width="75">$zoo._("Max Zoom")</th>
+	<th width="50">$zoo._("Access")</th>
+	</thead>
+	<tbody>
+#if $m.web.metadata.get('mmActivatedLayers')
+#set activatedLayers=$m.web.metadata.get('mmActivatedLayers').split(",")
+#else
+#set activatedLayers=[]
+#end if
+#if $m.web.metadata.get('mmPopupList')
+#set popupList=$m.web.metadata.get('mmPopupList').split(",")
+#else
+#set popupList=[]
+#end if
+#if $m.web.metadata.get('mmWindowList')
+#set windowList=$m.web.metadata.get('mmWindowList').split(",")
+#else
+#set windowList=[]
+#end if
+#if $m.web.metadata.get('rasterLayers')
+#set rasterLayers=$m.web.metadata.get('rasterLayers').split(",")
+#else
+#set rasterLayers=[]
+#end if
+#if $m.web.metadata.get('vectorLayers')
+#set vectorLayers=$m.web.metadata.get('vectorLayers').split(",")
+#else
+#set vectorLayers=[]
+#end if
+#for i in range(0,$m.numlayers)
+	  <tr>
+	    <td>$m.getLayer($i).name</td>
+	    <td><input type="checkbox" value="p$i" id="layer_has_popup_$m.getLayer($i).name" #if ($popupList.count($m.getLayer($i).name)>0)#checked="true"#end if# #if vectorLayers.count($m.getLayer($i).name)==0#disabled="true"#end if#/></td>
+	    <td><input type="checkbox" value="w$i" id="layer_has_click_$m.getLayer($i).name" #if ($windowList.count($m.getLayer($i).name)>0)#checked="true"#end if# #if vectorLayers.count($m.getLayer($i).name)==0#disabled="true"#end if#/></td>
+	    <td><input type="radio" id="layer_type_$m.getLayer($i).name" name="layer_type_$m.getLayer($i).name" #if vectorLayers.count($m.getLayer($i).name)>0#checked="true"#end if# value="vector" #if $m.getLayer($i).type==3#disabled="true"#end if# onchange="\$('#layer_has_popup_$(m.getLayer($i).name)')[0].disabled=false;\$('#layer_has_click_$m.getLayer($i).name')[0].disabled=false;"/></td>
+	    <td><input type="radio" id="layer_type1_$m.getLayer($i).name" name="layer_type_$m.getLayer($i).name" #if rasterLayers.count($m.getLayer($i).name)>0#checked="true"#end if#/ value="raster"  onchange="\$('#layer_has_popup_$(m.getLayer($i).name)')[0].disabled=true;\$('#layer_has_click_$m.getLayer($i).name')[0].disabled=true;"></td>
+	    <td><input type="checkbox" value="a$i" id="is_activated_layer_$m.getLayer($i).name" #if ($activatedLayers.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>
+	    <td><input type="text" style="width:75px;" id="min_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmMinScale")" /></td>
+	    <td><input type="text" style="width:75px;" id="max_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmMaxScale")" /></td>
+	    <td><a href="#access" onclick="MapMintUsersManager.editPrivilege('$m.getLayer($i).name')">priv.</a></td>
+	  </tr>
+#end for
+	</tbody>
+      </table>
+    </div>
+    </div>
+
+#if $m.web.metadata.get('mmNav')
+#set mmNav=$m.web.metadata.get('mmNav').split(',')
+#else
+#set mmNav=[]
+#end if
+#if $m.web.metadata.get('mmOT')
+#set mmOT=$m.web.metadata.get('mmOT').split(',')
+#else
+#set mmOT=[]
+#end if
+
+      <div style="display:none;" id="controls-sets" class="lcontent">
+      <h3 class="title">$zoo._("Controls")</h3>
+      <p>$zoo._("Navigation Toolbar") <a href="#" onclick="MapMintNavPriv.edit();"">$zoo._("Privileges")</a></p>
+      <table class="gen">
+	<tbody>
+	  <tr>
+	    <td>
+	      
+	      <select id="mmNav" multiple class="select-window control-select">
+		<option value="-1" #if len(mmNav)==0#selected="true"#end if#>None</option>
+#set tn=$conf["navbar"]["name"].split(',')
+#set tv=$conf["navbar"]["id"].split(',')
+#for i in range(0,len(tv))
+		<option value="$tv[$i]" #if $mmNav.count($tv[$i])#selected="true"#end if#>$zoo._($tn[$i])</option>
+#end for
+	      </select>
+	    </td>
+	  </tr>
+	</tbody>
+      </table>
+      
+      
+      <p>$zoo._("Other Tools")</p>
+      <table class="gen">
+	<tbody>
+	  <tr>
+	    <td><select id="mmOT" multiple class="select-window control-select">
+	      <option value="-1" #if len(mmOT)==0#selected="true"#end if#>$zoo._("None")</option>
+#set otids=$conf["othertools"]["ids"].split(',')
+#set otnames=$conf["othertools"]["names"].split(',')
+#for i in range(0,len(otids))
+     	      <option value="$otids[$i]" #if $mmOT.count($otids[$i])>0#selected="selected"#end if#>$zoo._($otnames[$i])</option>
+#end for
+	    </select>
+	  </td>
+	</tr>
+      </tbody>
+    </table>
+    
+    
+    <p>$zoo._("Toolbars")</p>
+    
+#if $m.web.metadata.get('mmVT')
+#set mmVT=$m.web.metadata.get('mmVT').split(',')
+#else
+#set mmVT=[]
+#end if
+
+#set toolbars=$conf["mm"]["toolbars"].split(',')
+#for i in range(0,len($toolbars))
+    <p>$zoo._($toolbars[$i])</p>
+    <table class="gen">
+      <tbody>
+	<tr>
+	  <td><select multiple class="select-window control-select" id="mmVT">
+#set items=$conf["mm"][$toolbars[$i].lower()+"Toolbar"].split(',')
+#set items_alias=$conf["mm"][$toolbars[$i].lower()+"ToolbarAlias"].split(',')
+	    <option value="-1">None</option>
+#for j in range(0,len($items))
+	    <option value="$items[$j]" #if $mmVT.count($items[$j])>0#selected="true"#end if#>$items_alias[$j]</option>
+#end for
+	  </select>
+	</td>
+      </tr>
+    </tbody>
+  </table>	
+#end for
+*#
+</div>
+
+  </div>
+
+</div>
+
+</div>
+
+#end def

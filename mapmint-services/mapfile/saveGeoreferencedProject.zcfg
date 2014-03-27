@@ -1,0 +1,46 @@
+[saveGeoreferencedProject]
+ Title = Save a MapMint Georeferencing Project
+ Abstract = Save a MapMint Georeferencing Project and GCP file if any GCP was provided.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [dst]
+   Title = Datastore
+   Abstract = The name of the datastore where to find the image.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [dso]
+   Title = Datasource
+   Abstract = The name of the datasource located in the specified datastore.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [gcpfile]
+   Title = GCP File
+   Abstract = The name of the file where was stored GCPs.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting message
+   Abstract = The resulting message created by service.
+   <LiteralData>
+   dataType=string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

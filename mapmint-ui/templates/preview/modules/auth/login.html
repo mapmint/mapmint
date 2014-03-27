@@ -1,0 +1,16 @@
+#import zoo
+<table>
+  <tr>
+    <td style="text-align:left;width:140px;"><label for="email">$zoo._("Login:")</label></td>
+    <td><input type="text" name="login" id="login_f" style="background-color: #FFFFFF;" /></td>
+  </tr>
+  <tr>
+    <td style="text-align:left;width:140px;"><label for="password">$zoo._("Password:")</label></td>
+    <td><input type="password" name="password" id="password_f" /></td>
+  </tr>
+</table>
+<input type="submit" id="auth_validate" class="butt ui-corner-all" value="$zoo._("Login")" onclick="try{authenticateUser();}catch(e){alert(e);}return false;" />
+<input type="submit" id="auth_regiser" class="butt ui-corner-all" value="$zoo._("Register")" onclick="try{registerUserWindow();}catch(e){}return false;" />
+#if $conf.has_key("smtp")
+<input type="submit" id="auth_recover" class="butt ui-corner-all" value="$zoo._("Lost password")" onclick="try{recoverUserWindow();}catch(e){}return false;" />
+#end if

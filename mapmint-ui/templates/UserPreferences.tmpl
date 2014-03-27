@@ -1,0 +1,81 @@
+#import zoo
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#set fields="id,login,firstname,lastname,passwd,mail,phone,last_con,last_map"
+#if $inputs.has_key("clause")
+#set haveGroup=True
+#if $inputs["clause"]["value"]=="id="
+#set q=[["","","","","","","","","",""]]
+#else
+#set q=cur.execute("SELECT "+$fields+" from "+$prefix+"users where "+$inputs["clause"]["value"])
+#set q=cur.fetchall()
+#end if
+#else
+#set haveGroup=False
+#set q=cur.execute("SELECT "+$fields+" from "+$prefix+"users where login='"+$conf["senv"]["login"]+"'")
+#set q=cur.fetchall()
+#end if
+#set titles=['id','login','first name','last name','password','email','phone','last_con','last_map']
+<form id="user_preferences">
+<div>
+#if not($inputs.has_key("type")) or ($inputs.has_key("type") and $inputs["type"]["value"]!="delete")
+#set j=1
+#for i in titles
+#set ii=$i.replace(' ','_')
+#if i!='last_map' and i!='last_con' and i!='id'
+#if i!='password'
+<div>
+<label for="up_$ii">$zoo._(i.title()): </label>
+<input id="up_$ii" value="$q[0][$j]"/>
+#if i=="login"
+#set login=$q[0][$j]
+#end if
+</div>
+#else
+<fieldset>
+<legend>$zoo._("Password:") <input type="checkbox" id="up_cp" onclick="if(this.checked)\$(this).parent().next().show();else \$(this).parent().next().hide();"/></legend>
+<div style="display:none">
+<div>
+<label for="up_$i">$zoo._($i): </label>
+<input id="up_$i" type="password" value=""/>
+</div>
+<div>
+<label for="up_confirm_$i">$zoo._("Confirm") $zoo._($i): </label>
+<input id="up_confirm_$i" type="password" value=""/>
+</div>
+</div>
+</fieldset>
+#end if
+#set j=$j+1
+#end if
+#end for
+
+#if haveGroup
+#include $conf["main"]["templatesPath"]+"/UsersManagement/GroupList.html"
+#end if
+
+#else
+#set i=titles[1]
+#set ii=$i.replace(' ','_')
+#set login=$q[0][1]
+<label for="up_$ii">$zoo._(i.title()): </label>
+<input id="up_$ii" value="$q[0][1]"/>
+#end if
+
+#if $inputs.has_key("clause")
+<input id="um_uclause" type="hidden" value="$login" />
+#end if
+#if $inputs.has_key("type")
+<input id="um_utype" type="hidden" value="$inputs["type"]["value"]" />
+#end if
+<div id="dlgr-buttons">
+#if $inputs.has_key('type')
+<a href="#" class="easyui-linkbutton" onclick="System.updateUserPreferences();">#if $inputs["type"]["value"]=="delete"#$zoo._("Delete")#else##if $inputs["type"]["value"]=="update"#$zoo._("Save")#else#$zoo._("Add")#end if##end if#</a>
+#else
+<a href="#" class="easyui-linkbutton" onclick="System.updateUserPreferences();">$zoo._("Save")</a>
+#end if
+</div>
+</div>
+</form>

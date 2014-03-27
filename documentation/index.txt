@@ -1,0 +1,36 @@
+.. _home:
+
+Table des matières
+=================
+
+Bienvenue dans le guide utilisateur de l'application `MapMint <http://mapmint.com>`__.
+
+.. note::
+    Le guide utilisateur est aussi disponible aux formats 
+    `PDF <./ZOOProject.pdf>`__ |image|  et `ePub <./ZOOProject.epub>`__ |image2|
+    
+.. |image| image:: _static/images/pdf.png
+   :height: 16
+   :width: 16
+   :alt: PDF icon
+   :target: /ZOOProject.pdf
+   
+.. |image2| image:: _static/images/epub.png
+   :height: 16
+   :width: 16
+   :alt: ePub icon
+   :target: /ZOOProject.pdf
+
+.. toctree::
+   :maxdepth: 2
+   
+   introduction/index
+   dashboard/index
+   territories/index   
+   data/index
+   indicators/index
+   maps/index
+   themes/index
+   documents/index
+   apps/index
+

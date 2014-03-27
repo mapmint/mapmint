@@ -1,0 +1,30 @@
+[getIndexDisplay]
+ Title = List all key value from a configuration maps.
+ Abstract = List all the key value pairs from the main configuration file.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [id]
+   Title = Fields used to joind the two dataSources
+   Abstract = Fields used to joind the two dataSources
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

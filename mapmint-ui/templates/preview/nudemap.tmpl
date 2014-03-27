@@ -1,0 +1,48 @@
+#import zoo
+#import mapscript
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$conf["senv"]["last_map"]+".map")
+#if m.web.metadata.get("mmTitle") is not None and m.web.metadata.get("mmTitle")!=""
+#set title=m.web.metadata.get("mmTitle")
+#else
+#set title="Preview"
+#end if
+
+
+#set tmp=$searchList[len($searchList)-1]
+#set tmp["m"]=$m
+#set tmp["tmpl"]="nudemap"
+
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/default_header.tmpl",searchList=$searchList))
+
+<body onload="init()">
+
+        
+
+<div class="ui-layout-center">
+<div id="loading" style="dispay:none">
+	<div>
+		<div id="progress_txt"></div>
+	</div>
+</div>
+
+<div id="map"></div>
+
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayers.tmpl",searchList={"m": $m,"conf": $conf})
+
+$Template(file=$conf['main']['templatesPath']+"/preview/modules/other_tools/display.html",searchList={"m": $m,"conf": $conf})
+
+<div class="btm">
+<div class="lft"></div>
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/copyright.tmpl",searchList=$searchList))
+<div id="coords"></div>
+</div>
+</div>
+<div class="dialog-gfi" title="$zoo._("Get Feature Info")">
+	<div id="output-gfi"></div>	                
+</div>
+
+</body>
+</html>
+

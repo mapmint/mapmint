@@ -1,0 +1,30 @@
+#from Skeleton import Skeleton
+#extends Skeleton
+#import zoo
+#attr $ocss = ['error.css']
+
+#attr $js = ['Meta.js']
+
+#attr $js1 = []
+
+#attr $isError=True
+
+#def page_title
+MapMint: $zoo._("Error occurs")
+#end def
+
+#def body
+<div id="container">
+
+<div id="error-box">
+<p>$zoo._("Requested page could not be loaded")</p>
+<p>
+$errorMsg
+</p>
+<input type="button" class="butt ui-corner-all" value="$zoo._("Go back to Dashboard")" onclick="document.location='$conf["mm"]["address"]/Dashboard';" />   
+</div>
+
+<script>
+\$(".loader-container").hide();
+</script>
+</div>#end def

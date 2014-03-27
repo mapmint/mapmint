@@ -1,0 +1,57 @@
+#encoding utf-8
+#import zoo
+#import authenticate.service as auth
+#set con=$auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#set tmpIdx=[["Identify Point","getFeature","infopoint"],["Identify","getFeature","info"],["Identify Circle","getFeatureCircle","infocircle"],["Select from feature table","sft","table"],["Remove all selected features","removeAll","removeAll"]]
+<h3 class="rpt">$zoo._("Repport")</h3>
+<span class="idx-name pad">$zoo._("The index name")</span>
+
+<div style="height:250px;margin:10px 0 0 0;">
+<div class="easyui-accordion" style="width:280px;margin:0 auto;">
+<div title="$zoo._("Select territories")" selected="true" style="padding:10px;">
+#for i in $tmpIdx
+<a href="#" class="idx-button fg-button ui-state-default ui-corner-all fg-button-icon-solo " title="$zoo._($i[0])" name="$i[1]" onclick="System.si='in';idx_activate('$i[2]')"><span class="ui-icon $i[2]"></span></a>
+#end for
+<div id="basket_in" class="heyho fwi"></div>
+</div>
+
+<div title="$zoo._("Comparing with")" style="padding:10px;">
+#for i in $tmpIdx
+<a href="#" class="idx-button fg-button ui-state-default ui-corner-all fg-button-icon-solo " title="$zoo._($i[0])" name="$i[1]" onclick="System.si='out';idx_activate('$i[2]')"><span class="ui-icon $i[2]"></span></a>
+#end for
+<div id="basket_out" class="heyho fwi"></div>
+</div>
+
+<div title="$zoo._("Indexes list")" style="padding:10px;">
+<div>
+      <select id="idx_themes">
+        <option value="-1">$zoo._("Select theme")</option>
+#import np.service as np
+#set t=np.listThemes($cur,$prefix)
+#set p=""
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/themes/list.html",searchList={"conf":$conf,"t": $t,"p":0}))
+        </select>
+</div>
+
+<div>
+<input type="text" id="idx_search" class="fwi" value="$zoo._("Input index name")" onclick="\$(this).val('')">
+</div>
+
+<div id="idxs_list" class="heyho">
+</div>
+
+</div>
+</div>
+
+</div>
+
+<div id="doc_progress_bar_c" style="display:none">
+<div id="doc_progress_bar" class="ui-progress-bar ui-container"><div class="ui-progress" style="width: 1%;"><span class="ui-label" style="display:none;"><b class="value">1%</b></span></div></div>
+<div class="loading"></div>
+</div>
+
+<a href="#" id="repport_submit" class="vsource" title="$zoo._("Download repport")" name="$i[1]" onclick="idxPrintDocument();">$zoo._("Repport access")</a>
+
+</div>

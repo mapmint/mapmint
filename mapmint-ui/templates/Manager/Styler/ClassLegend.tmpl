@@ -1,0 +1,53 @@
+#import mapscript
+#import zoo
+#try
+#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass") == "gs"
+#set $localName="gradSymb"
+#else
+#set $localName="uniqVal"
+#end if
+#except
+#set $localName="uniqVal"
+#end try
+
+#set mapPath=$conf["main"]["dataPath"]+"/maps"
+#if $inputs.has_key('prefix')
+#set $mapPath=$conf["main"]["dataPath"]+"/"+$inputs["prefix"]["value"]+"_maps"
+#end if
+#if $inputs.has_key('mmStep')
+#set mapfile=$mapPath+"/map4legend_"+$inputs["name"]["value"]+"_"+$inputs["layer"]["value"].replace(".","_")+"_step"+$inputs["mmStep"]["value"]+".map"
+#else
+#set mapfile=$mapPath+"/map4legend_"+$inputs["name"]["value"]+"_"+$inputs["layer"]["value"].replace(".","_")+".map"
+#end if
+#set suffix=""
+#if $inputs["layer"]["value"].count("indexes.agregate")>0
+#set suffix="A"
+#end if
+<table class="flexiClasses$suffix">
+<thead>
+ <tr>
+  <th width="14" align="center">N</th>
+#if $m.getLayerByName($inputs["layer"]["value"]).type != mapscript.MS_LAYER_RASTER
+  <th width="40" align="center">$zoo._("Legend")</th>
+#end if
+  <th width="307">$zoo._("Name")</th>
+  <th width="30" align="center">$zoo._("Colors")</th>
+ </tr>
+</thead>
+<tbody>
+#for a in range(0,$m.getLayerByName($inputs["layer"]["value"]).numclasses)
+ <tr  onclick="editClass('$a'#if $inputs.has_key('mmStep')#,'$inputs["mmStep"]["value"]'#else##if $inputs.has_key('isStep')#,'0'#end if##end if#);">
+  <td>$(a+1)</td>
+
+#if $m.getLayerByName($inputs["layer"]["value"]).type != mapscript.MS_LAYER_RASTER
+  <td>
+#import time 
+<img id="$(localName)_Legend_$(a)" src="$conf["main"]["mapserverAddress"]?map=$mapfile&SERVICE=WMS&&version=1.0.0&request=Getmap&LAYERS=$(inputs["layer"]["value"])_$(a + 1)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-0.2,-0.2,6.2,6.2&SRS=EPSG:4326&WIDTH=14&HEIGHT=14&mmtime=$(time.time())" />
+  </td>
+#end if
+  <td>$m.getLayerByName($inputs["layer"]["value"]).getClass($a).name</td>
+  <td><div style="width: 26px;border: 1px solid #000;padding:0;margin:0;margin-top: -3px;"><div  id="$(localName)_min_$(a)" style="#if $m.getLayerByName($inputs["layer"]["value"]).getClass($a).getStyle(0).color is None#display: none;#end if# background-color: \##if $m.getLayerByName($inputs["layer"]["value"]).getClass($a).getStyle(0).color#$('%02x%02x%02x'%($m.getLayerByName($inputs["layer"]["value"]).getClass($a).getStyle(0).color.red,$m.getLayerByName($inputs["layer"]["value"]).getClass($a).getStyle(0).color.green,$m.getLayerByName($inputs["layer"]["value"]).getClass($a).getStyle(0).color.blue))#else#ffffff#end if#; #if $m.getLayerByName($inputs["layer"]["value"]).getClass($a).getStyle(0).outlinecolor#border: 2px solid \#$('%02x%02x%02x'%($m.getLayerByName($inputs["layer"]["value"]).getClass($a).getStyle(0).outlinecolor.red,$m.getLayerByName($inputs["layer"]["value"]).getClass($a).getStyle(0).outlinecolor.green,$m.getLayerByName($inputs["layer"]["value"]).getClass($a).getStyle(0).outlinecolor.blue))#end if#"></div></div></td>
+ </tr>
+#end for
+</tbody>
+</table>

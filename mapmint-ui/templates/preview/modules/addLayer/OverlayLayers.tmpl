@@ -1,0 +1,20 @@
+#encoding UTF-8
+#import zoo
+#import mapscript
+#from Cheetah.Template import Template
+  <div id="overlay_layerswitcher" class="flipped">
+#from mapfile.service import getMapList
+#set linputs={"name": {"value": "idxOverlays"}}
+#set loutputs={"Result": {"value": ""}}
+#set a=getMapList($conf,$linputs,$loutputs)
+#set a=eval($loutputs["Result"]["value"])
+	     <ul id="overlays_list">
+#for i in range(0,len($a[0]["children"]))
+$Template(file=$conf['main']['templatesPath']+"layer_tree.tmpl",searchList={"m": $m,"elem": $a[0]["children"],"i": $i,"conf": $conf,"prefix":"_overlays"})
+
+#end for
+
+	      </ul>
+
+
+    </div>

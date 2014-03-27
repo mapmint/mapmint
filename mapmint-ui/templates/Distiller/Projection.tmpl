@@ -1,0 +1,12 @@
+#import zoo
+         <span>$zoo._("Projection System:")</span>
+	 <select id="${prefix}tprj">
+#import sqlite3
+#set conn = sqlite3.connect($conf['main']['dblink'])
+#set c = $conn.cursor()
+#set i=$c.execute(" SELECT code,name FROM spatial_ref_sys WHERE fav")
+#set a=$c.fetchall()
+#for i in $a
+       	  <option value="$i[0]" #if $selected is not None and $selected==$i[0]#selected#end if#>$i[1]</option>
+#end for
+	 </select>

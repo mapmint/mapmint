@@ -1,0 +1,7 @@
+<div>
+
+#for i in range(len($images))
+     <a href="#" onclick="#if $inputs.keys().count('ttf')>0#symbolAddToOrig('$images[$i].id.replace('Symbol_',"")')#end if#"><img src="$images[$i].value" /></a>
+#end for
+
+</div>

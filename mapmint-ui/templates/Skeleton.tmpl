@@ -1,0 +1,179 @@
+#encoding UTF-8
+#import zoo
+#attr $js1 = ["main_js"] 
+#attr $js3 = [] 
+#attr $mmodule = "Distiller"
+#import zoo
+<!DOCTYPE html> 
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="$zoo._("MapMint: Professional SDI manager")">
+<meta name="keywords" content="MapMint, SDI, Geospatial, Web GIS, GIS, WPS, WMS, WFS, WCS, ZOO-Project, ZOO, ZOO WPS, MapServer, GDAL, OSGeo, FOSS4G, OGC, OWS">
+<meta name="copyright" content="$conf["provider"]["providerName"]">
+<meta name="author" content="$conf["provider"]["providerName"]">
+<link rel="shortcut icon" href="$conf["main"]["mmAddress"]/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="MapMint RSS Feed" href="$(conf["main"]["applicationAddress"])public/rss" />
+<title>$page_title</title>
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css' />
+#for $f in $ocss:
+<link type="text/css" rel="stylesheet" href="#if $f[0:7]=='http://'#$f#else#$conf["main"]["mmAddress"]/css/$f#end if#" />
+#end for
+
+#attr $css = ["green"]
+
+#for $f in $css:
+<link type="text/css" rel="stylesheet" #if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"]["loggedin"])#media="screen" title="#if $conf["mm"].has_key("adminTheme")#$conf["mm"]["adminTheme"]#else#$f#end if#"#end if# href="#if $f[0:7]=='http://'#$f#else#$conf["main"]["mmAddress"]/css/#if $conf["mm"].has_key("adminTheme")#$conf["mm"]["adminTheme"]#else#$f#end if##end if#" id="#if $conf["mm"].has_key("adminTheme")#$conf["mm"]["adminTheme"]#else#$f#end if#" />
+#end for
+<link type="text/css" rel="stylesheet" href="$conf["main"]["mmAddress"]/new-themes/themes/default/loader.css" /> 
+<!--[if IE]>
+        <link rel="stylesheet" type="text/css" href="$conf["main"]["mmAddress"]/css/all-ie-only.css" />
+<![endif]-->
+
+#if $conf["main"].has_key("jsCache") and $conf["main"]["jsCache"]=="prod"
+#if len($js)>0 and $js[len($js)-1]=="ckeditor.js"
+#set finalJS=$js[len($js)-1]
+#else
+#set finalJS=""
+#end if
+#set $ljs=['flexigrid.js']+$js+['MLayout.js']
+<script type="text/javascript" src="$conf["main"]["mmAddress"]/js/#for $f in ["modernizr.custom","jquery-2.0.3.min","jquery-ui-1.10.3",'jquery.notifyBar','jquery.easyui.min','jquery.layout-latest']#${f}.js,#end for#"></script>
+
+#if len($ljs)>0
+<script type="text/javascript" src="$conf["main"]["mmAddress"]/js/#for $f in $ljs##if $finalJS!=$f#$f,#end if##end for#"></script>
+#if $finalJS!=""
+<script src="$conf["main"]["mmAddress"]/js/$finalJS"></script>
+#end if
+#end if
+
+
+#for $f in $js1:
+<script type="text/javascript" src="$conf['main']['serverAddress']?metaPath=template&request=Execute&service=WPS&version=1.0.0&Identifier=display&DataInputs=tmpl=$f;module=$mmodule&RawDataOutput=Result@mimeType=text/plain"></script>
+#end for
+
+
+#attr $js2=[]
+#for $f in $js2:
+<script type="text/javascript" src="$f"></script>
+#end for
+
+
+#if len($js3)>0
+#for $f in $js3
+<script type="text/javascript" src="$conf["main"]["publicationUrl"]/$f"></script>
+#end for
+#end if
+
+#else
+#for $f in ["jquery-2.0.3.min","jquery-ui-1.10.3",'jquery.notifyBar','jquery.easyui.min','jquery.layout-latest']
+<script type="text/javascript" src="$conf["main"]["mmAddress"]/js/${f}.js"></script>
+#end for
+
+#set $ljs=['flexigrid.js']+$js+['MLayout.js']
+#for $f in $ljs:
+<script type="text/javascript" src="$conf["main"]["mmAddress"]/js/$f"></script>
+#end for
+
+#for $f in $js1:
+<script type="text/javascript" src="$conf['main']['serverAddress']?metaPath=template&request=Execute&service=WPS&version=1.0.0&Identifier=display&DataInputs=tmpl=$f;module=$mmodule&RawDataOutput=Result@mimeType=text/plain"></script>
+#end for
+
+
+#attr $js2=[]
+#for $f in $js2:
+<script type="text/javascript" src="$f"></script>
+#end for
+
+#for $f in $js3
+<script type="text/javascript" src="$conf["main"]["publicationUrl"]/$f"></script>
+#end for
+
+#end if
+
+</head>
+<body>
+
+#try
+#set verr=$errorMsg
+#except
+#set verr=None
+#end try
+#if $mmodule!="public"
+<div class="loader-container"> 
+<div id="loader"> 
+</div> 
+</div> 
+
+#if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false") and not($verr)
+<div class="ui-layout-north">
+
+<h1 class="ttitle"><span class="logo"></span>Map<span class="mint">Mint</span></h1>
+
+<ul id="nav">
+
+#if $conf["mm"]["indexes"]=="true"
+#set menu=['Dashboard','Distiller','Territories','Indexes','Themes','Documents','Manager','Publisher']
+#else
+#if $conf["mm"]["documents"]=="true"
+#set menu=['Dashboard','Distiller','Manager','Themes','Documents','Publisher']
+#else
+#set menu=['Dashboard','Distiller','Manager','Themes','Publisher']
+#end if
+#end if
+
+#for a in $menu
+    <li class="current">
+#if $inputs['tmpl']['value']==$a
+      <a href="$a" id="${a}_button" class="ui-state-active">
+#else
+      <a href="$a" id="${a}_button">
+#end if
+    $zoo._($a)</a>
+    </li>
+#end for
+
+  </ul>
+
+</div>
+
+<div class="admin">
+    <h2 class="ad">$conf["senv"]["firstname"] $conf["senv"]["lastname"]</h2>
+<ul class="sets">
+                <li class="sett"><a href="#" id="users_admin" title="" onclick="System.UserPreferences()">$zoo._("Preferences")</a></li>
+#import mm_access
+#set groups=mm_access.getGroup($conf)
+#if $groups.count("admin")>0
+                <li class="user"><a href="#" id="user_management" title="" onclick="System.UserManagement()">$zoo._("Users management")</a></li>
+#end if
+                <li class="logt"><a href="#" id="logout" title="">$zoo._("Log out")</a></li>
+        </ul>
+        
+</div>
+
+#end if
+#end if
+
+$body
+
+#if $mmodule!="public" and ($conf.keys().count("senv")>0 and $conf["senv"]["loggedin"]!="false" and $conf["senv"].keys().count("firstname")>0) and not($verr)
+<div class="ui-layout-south"> 
+  <p class="credits">&copy; copyright <a href="$conf["provider"]["providerSite"]">$conf["provider"]["providerName"]</a></p>
+<!--<div class="progress_box_call"></div>-->	
+<div id="progress_bar" class="ui-progress-bar ui-container">
+<div class="ui-progress" style="width: 79%;">
+  <span class="ui-label" style="display:none;"><b class="value">79%</b></span>
+</div>
+</div>
+#else
+#if $conf["mm"].keys().count("nofooter")==0 or ($conf["mm"]["nofooter"]!="true" and $conf["mm"].keys().count("nofooter")>0)
+<ul class="credits">
+<li>&copy; copyright <a href="$conf["provider"]["providerSite"]">$conf["provider"]["providerName"]</a></li>|&#160;&#160;<li><a href="http://www.mapmint.com">$zoo._("Terms of use")</a></li>
+</ul>
+#end if
+#end if
+
+</div>
+</body>
+</html>

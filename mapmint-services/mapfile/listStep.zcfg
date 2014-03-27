@@ -1,0 +1,28 @@
+[listStep]
+ Title = List step names from a project map.
+ Abstract = List all step names available for a project map.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [layer]
+   Title = Input string
+   Abstract = The name of the layer to search for steps.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting message
+   Abstract = The message providing informations about step creation.
+   <LiteralData>
+   dataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

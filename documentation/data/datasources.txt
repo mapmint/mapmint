@@ -1,0 +1,311 @@
+.. _data-datasources:
+
+Sources de données
+===================
+
+.. contents:: Table des matières
+    :depth: 4
+    :backlinks: top
+
+Une source de données est constituée d'une ou plusieurs informations à référence spatiale, contenues par l'un des :doc:`datastores` disponibles. MapMint supporte plusieurs types de sources de données décrites dans cette section.
+
+.. |vptds| image:: ../../_static/images/data-vector-point-icon.png
+   :height: 16
+   :width: 16
+   :alt: Vector point datasource icon
+
+.. |vlids| image:: ../../_static/images/data-vector-line-icon.png
+   :height: 16
+   :width: 16
+   :alt: Vector line datasource icon
+   
+.. |vpods| image:: ../../_static/images/data-vector-polygon-icon.png
+   :height: 16
+   :width: 16
+   :alt: Vector polygon datasource icon
+   
+.. |rasds| image:: ../../_static/images/data-raster-icon.png
+   :height: 16
+   :width: 16
+   :alt: Raster datasource icon
+   
+========== ============================================
+**Icône**  **Type**       
+---------- --------------------------------------------
+|vptds|    Source de données vectorielles de type Point
+|vlids|    Source de données vectorielles de type Ligne 
+|vpods|    Source de données vectorielles de type Polygone 
+|rasds|    Source de données matricielles  	           	  	           
+========== ============================================
+   
+Données vectorielles
+--------------------
+
+Formats supportés
+.................
+
+MapMint supporte les formats de données vectorielles listés ci-dessous.
+
+======================== ============== ==============================
+**Format**               **Code**       **Fichiers nécessaires**    
+------------------------ -------------- ------------------------------  
+Comma Separated Value    CSV	        csv  
+ESRI Shapefile           SHP		    shp,dbf,shx,prj 
+GPX                      GPX 		    gpx   		 
+Mapinfo                  MIF			mif
+KML                      KML		    kml
+PostgreSQL/PostGIS       PostGIS	    connexion PostGIS	
+Web Feature Service      WFS		    connexion WFS
+======================== ============== ==============================
+
+.. note::
+	D'autre `formats <http://www.gdal.org/ogr/ogr_formats.html>`__ supportés par la libraire `OGR <http://www.gdal.org/ogr>`__ peuvent également être utilisés avec MapMint.
+
+Consulter la table
+..................
+
+Pour consulter la table d'une source de données, veuillez cliquer sur l'icône "flèche" à droite de la :ref:`datasource-table-label`. Cela entraîne le depliement de la table de données. Un exemple de cette dernière est donné ci-après.
+
+.. |viewt| image:: ../../_static/images/view-datasource-table.png
+	:scale: 80%
+	:alt: View datasource table
+
+|viewt|
+
+Une fois la table affichée, et si celle-ci contient un nombre d'entités suffisant, il est possible de naviguer dans les différentes pages de la table à l'aide des flèches de navigation affichée en bas de la table. 
+
+.. |taf| image:: ../../_static/images/table-arrow-first.png
+   :height: 16
+   :width: 16
+   :alt: First page table arrow
+
+.. |tap| image:: ../../_static/images/table-arrow-prev.png
+   :height: 16
+   :width: 16
+   :alt: Previous page table arrow
+   
+.. |tan| image:: ../../_static/images/table-arrow-next.png
+   :height: 16
+   :width: 16
+   :alt: Next page table arrow
+   
+.. |tal| image:: ../../_static/images/table-arrow-last.png
+   :height: 16
+   :width: 16
+   :alt: Last page table arrow
+   
+.. |rtb| image:: ../../_static/images/table-refresh.png
+   :height: 16
+   :width: 16
+   :alt: Last page table arrow
+   
+========== ============================================
+**Icône**  **Action**       
+---------- --------------------------------------------
+|taf|      Affiche la première page de la table
+|tap|      Affiche la page précédente 
+|tan|      Afiche la page suivante 
+|tal|      Affiche la dernière page de la table  
+|rtb|      Rafraichit la table  	           	  	           
+========== ============================================
+
+.. note:: 
+	La liste déroulante en bas à gauche de la table vous permet d'afficher 10, 15, 20, 25 ou 30 entités par page
+
+.. note:: 
+	Le clic sur un titre d'une colonne trie les valeurs par ordre croissant/décroissant ou par ordre alphabétique.
+
+Paramétrer l'affichage de la table
+...................................
+
+En cliquant sur l'icône en forme de flèche placé à droite du titre des colones, vous avez la possibilité d'afficher ou de désafficher les colonnes, à l'aide du menu déroulant prévu à cet effet.
+
+En maintenant le curseur de votre souris sur les bordures de colonnes, vous pouvez ajuster leur largeur par défaut.
+
+En maintenant le curseur de votre souris sur le titre d'une colonne, vous pouvez la déplacer par glisser-déposer et ainsi modifier l'ordre des champs.
+
+.. warning ::
+	La configuration de la table sera reprise à l'identique dans les applications clientes  
+
+Définir l'encodage des caractères de la table
+.............................................
+
+MapMint utilise l'encodage UTF-8 par défaut pour afficher les tables des sources de données. Il est toutefois fréquent que des données encodées dans un autre système soient chargées dans le module de gestion des données. Dans ce cas, il est possible d'assigner un système d'encodage différent dans le champs texte prévu à cet effet, à droite de la barre de navigation. 
+
+Veuillez y entrer le code de l'encodage désiré, puis cliqué sur l'icône "Rafraichir" de la barre d'outil. Cela entrâine le rechargement de la table et son affichage dans l'encodage souhaité.
+
+Des exemples d'encodage de caractère sont listés ci-dessous à titre informatif:
+
+======================== =============================================
+**Code**                 **Description**    
+------------------------ ---------------------------------------------  
+utf-8					 Ensemble des caractères internationaux d'unicode compatible avec la norme ASCII (anglais)
+iso-8859-1				 Alphabet latin numéro 1 contenant 191 caractères de l'alphabet latin
+iscii					 Alphasyllabaires utilisés en Inde, au Sri Lanka et au Bangladesh
+viscii					 Alphabet latin moderne du vietnamien
+shift-jis                Syllabaires et écriture sinographique traditionnelle des langues japonaises
+======================== =============================================
+
+.. note:: 
+	Obtenez plus d'informaton sur le codage des caractères sur `Wikipédia <http://fr.wikipedia.org/wiki/Codage_des_caract%C3%A8res>`__ 
+
+
+Données matricielles
+--------------------
+
+Formats supportés
+.................
+
+MapMint supporte les formats de données matricielles listés ci-dessous.
+
+======================== ============== ==============================
+**Format**               **Code**       **Fichiers nécessaires**    
+------------------------ -------------- ------------------------------  
+Arc/Info ASCII Grid      AAIGrid   	    asc
+GeoTiff                  GTiff	        tif
+JPEG                     JPEG         	jpg	     		 
+======================== ============== ==============================
+
+.. note::
+	D'autre `formats <http://www.gdal.org/formats_list.html>`__ supportés par la libraire `GDAL <http://www.gdal.org>`__ peuvent également être utilisés avec MapMint.
+
+Consulter l'histogramme
+.......................
+
+Pour consulter l'histogramme d'une source de données, veuillez cliquer sur l'icône "flèche" à droite de la :ref:`datasource-table-label`. Cela entraîne le depliement de l'histogramme, comme illustré ci-après.
+
+.. |viewh| image:: ../../_static/images/view-datasource-histogram.png
+	:scale: 80%
+	:alt: View datasource histogram
+
+|viewh|
+
+L'histogramme de la source de données vous permet de consulter la distribution de sa/ses bande(s) dans la matrice de pixel.
+
+.. note::
+	Il est possible de zoomer dans l'histogramme en maintenant votre curseur et en desssinant un rectangle
+
+
+.. _datasource-table-label:
+
+Barre d'outils des sources de données
+-----------------------------
+
+.. |cds| image:: ../../_static/images/convert-datasource-icon.png
+   :height: 16
+   :width: 16
+   :alt: Convert datasource icon
+
+.. |dds| image:: ../../_static/images/download-datasource-icon.png
+   :height: 16
+   :width: 16
+   :alt: Downlaod datasource icon
+   
+.. |oim| image:: ../../_static/images/open-in-manager-icon.png
+   :height: 16
+   :width: 16
+   :alt: Open datasource in manager icon
+   
+.. |spd| image:: ../../_static/images/set-datasources-access-icon.png
+   :height: 16
+   :width: 16
+   :alt: Set  datasource permissions icon
+
+.. |pds| image:: ../../_static/images/preview-datasource-icon.png
+   :height: 16
+   :width: 16
+   :alt: Preview datasource icon
+     
+.. |sds| image:: ../../_static/images/delete-datasource-icon.png
+   :height: 16
+   :width: 16
+   :alt: Delete datasource icon
+   
+========== ============================================
+**Icône**  **Action**       
+---------- --------------------------------------------
+|spd|      Définir les permissions d'accès d'une source de données
+|cds|      Convertir une source de données
+|dds|      Télécharger une source de données	
+|pds|      Prévisualiser une source de données
+|oim|      Ouvrir une source de données	dans le module de création de cartes
+|sds|      Supprimer une source de données		           	  	           
+========== ============================================
+
+Droits d'accès
+..................................
+
+Une source de données est accessible à tout les groupes d'utilisateurs par défaut. Pour modifier les permissions l'accès à une couche, veuillez cliquer sur l'icone correspondant dans la :ref:`datasource-table-label`. Celà entraîne l'ouverture de la fenêtre des droits d'accès, illustrée ci-dessous:
+
+.. |setp| image:: ../../_static/images/set-datasources-access-window.png
+	:scale: 80%
+	:alt: View datasource histogram
+
+|setp|
+
+========== ============================================
+**Valeur**  **Définition**       
+---------- --------------------------------------------
+r          Le groupe d'utilisateur à accès à la couche en lecture
+w          Le groupe d'utilisateur à accès à la couche en écriture
+x          Le groupe d'utilisateur à accès ...			           	  	           
+========== ============================================
+
+Ajoutez un ou plusieur groupes avec le bouton "Ajouter", cela entraine l'ajout de listes déroulantes dans la fenêtre. Ajustez les valeurs **r**, **w** et **x** puis cliquer sur le bouton "Valider". La fenêtre se ferme et l'enregistrement des modifications est stipulé en haut de votre écran dans un bandeau de couleur verte.
+
+Téléchargement
+..................................
+
+Pour télécharger une source de données sur votre ordinateur, il suffit de cliquer sur l'icône correspondant dans la :ref:`datasource-table-label`. Cela engendre le téléchargement direct de la donnée, archivée dans un fichier .zip 
+
+Prévisualisation 
+..................................
+
+Pour prévisualiser uen source de données, veuillez cliquer sur l'icône correspondante dans la :ref:`datasource-table-label`. Cela ouvre la fenêtre de prévisualisation.
+
+.. |prer| image:: ../../_static/images/preview-raster-window.png
+	:scale: 80%
+	:alt: Preview raster datasource
+
+.. |prev| image:: ../../_static/images/preview-vector-window.png
+	:scale: 80%
+	:alt: Preview vector datasource
+
+============================== ============================================
+**Source de données vecteur**  **Source de données raster**       
+------------------------------ --------------------------------------------
+|prev|           	  	       |prer|   
+============================== ============================================
+
+.. note::
+	Les sources de données vecteur sont prévisualisées avec un style par défaut (remplissage violet et bordure gris foncé)
+	
+.. warning::
+	Les sources de données de type WMS externes ne disposent pas de la fonctionnalité de prévisualisation
+
+Suppression 
+..................................
+
+Pour supprimer une source de données, veuillez cliquer sur l'icône correspondante dans la :ref:`datasource-table-label`. Cela ouvre la fenêtre de suppression illustrée ci-après.
+
+.. |delds| image:: ../../_static/images/delete-datasource-window.png
+	:scale: 80%
+	:alt: Delete datasource
+	
+|delds|
+
+Cliquez sur le bouton "Supprimer" pour supprimer la donnée. La fenêtre se ferme et la suppression de la source de données est stipulé en haut de votre écran dans un bandeau de couleur verte.
+
+.. warning::
+	L'utilisation de cette fonctionnalité supprime la source de données de l'espace de stockage et supprime le jeux de données physiquement sur le serveur. Cette action est permanente et irréversible. 
+	
+Ouverture 
+..................................
+
+Pour ouvrir une source de données dans le :doc:`../maps/index`, veuillez cliquer sur l'icône correspondante dans la :ref:`datasource-table-label`. Cela entraine l'ouverture de la source de données dans le :doc:`../maps/index`. La source de données est ajouté à la racine de l'arbre de couches, dans un projet *Untitled_0* et représentée avec le style par défaut. 
+
+.. note::
+	Une fois la source de données chargée, il est conseiller d'enregistrer le projet *Untitled_0* sous un non adéquat 
+
+
+
