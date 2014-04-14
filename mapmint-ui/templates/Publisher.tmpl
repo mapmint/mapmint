@@ -461,6 +461,8 @@ $(Template(file=$conf["main"]["templatesPath"]+"/uoms.tmpl",searchList={"conf": 
 	<th width="50">$zoo._("Activated")</th>
 	<th width="75">$zoo._("Min Zoom")</th>
 	<th width="75">$zoo._("Max Zoom")</th>
+	<th width="75">$zoo._("Label Min Zoom")</th>
+	<th width="75">$zoo._("Label Max Zoom")</th>
 	<th width="50">$zoo._("Access")</th>
 	</thead>
 	<tbody>
@@ -499,6 +501,8 @@ $(Template(file=$conf["main"]["templatesPath"]+"/uoms.tmpl",searchList={"conf": 
 	    <td><input type="checkbox" value="a$i" id="is_activated_layer_$m.getLayer($i).name" #if ($activatedLayers.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>
 	    <td><input type="text" style="width:75px;" id="min_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmMinScale")" /></td>
 	    <td><input type="text" style="width:75px;" id="max_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmMaxScale")" /></td>
+	    <td><input type="text" style="width:75px;" id="label_min_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmLabelMinScale")" /></td>
+	    <td><input type="text" style="width:75px;" id="label_max_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmLabelMaxScale")" /></td>
 	    <td><a href="#access" onclick="MapMintUsersManager.editPrivilege('$m.getLayer($i).name')">priv.</a></td>
 	  </tr>
 #end for

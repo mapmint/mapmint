@@ -102,17 +102,36 @@ function savePublishedMap(){
   var cmis=0;
   var maxScale="";
   var cmas=0;  
+  var lminScale="";
+  var lcmis=0;
+  var lmaxScale="";
+  var lcmas=0;  
   \$(".dsContainer").find("input[type=text]").each(function(){
-      if(this.id.replace("min_scale_","")==this.id){
-	maxScale+=((cmas>0)?",":"")+this.value;
-	cmas++;
+      if(this.id.replace("min_scale_","")==this.id &&
+	 this.id.replace("label_min_scale_","")==this.id && 
+	 this.id.replace("label_max_scale_","")==this.id){
+	  maxScale+=((cmas>0)?",":"")+this.value;
+	  cmas++;
       }else{
-	minScale+=((cmis>0)?",":"")+this.value;
-	cmis++;
+	  if(this.id.replace("label_min_scale_","")==this.id && 
+      	     this.id.replace("label_max_scale_","")==this.id){
+	    minScale+=((cmis>0)?",":"")+this.value;
+	    cmis++;
+          } else{
+	      if(this.id.replace("label_min_scale_","")==this.id){
+		  lmaxScale+=((lcmas>0)?",":"")+this.value;
+		  lcmas++;		  
+	      }else{
+		  lminScale+=((lcmis>0)?",":"")+this.value;
+		  lcmis++;		  
+	      }
+	  }
       }
     });
   postRequest[postRequest.length]={name:'minScales',value: minScale,dataType: "string"};
   postRequest[postRequest.length]={name:'maxScales',value: maxScale,dataType: "string"};
+  postRequest[postRequest.length]={name:'lminScales',value: lminScale,dataType: "string"};
+  postRequest[postRequest.length]={name:'lmaxScales',value: lmaxScale,dataType: "string"};
 
   var vectorLayers="";
   var rasterLayers="";

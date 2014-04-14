@@ -82,10 +82,10 @@ function startOverlay(){
 
 #if $i==0
 #if $setM.count($a[$i])>0
-    arrayOSM = ["http://mtile01.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
-		"http://mtile02.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
-		"http://mtile03.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
-		"http://mtile04.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png"];
+    arrayOSM = ["http://otile1.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
+		"http://otile2.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
+		"http://otile3.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
+		"http://otile4.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png"];
     osm=new OpenLayers.Layer.OSM("$conf["mm"]["bmName"] $ml[$i]", arrayOSM);
     registerLoadEvents(osm);
     map.addLayer(osm);
@@ -96,10 +96,10 @@ function startOverlay(){
     
 #if $i==1
 #if $setM.count($a[$i])>0
-    arrayOSM1 = ["http://mtile01.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
-                 "http://mtile02.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
-                 "http://mtile03.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
-                 "http://mtile04.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png"];
+    arrayOSM1 = ["http://otile1.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
+                 "http://otile2.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
+                 "http://otile3.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
+                 "http://otile4.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png"];
     var osm1 = new OpenLayers.Layer.OSM("$conf["mm"]["bmName"] $ml[$i]", arrayOSM1);
     registerLoadEvents(osm1);
     map.addLayer(osm1);

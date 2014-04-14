@@ -328,6 +328,8 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/measure/polygon
 #if f0.count('MousePosition')>0
         OpenLayers.Util.getElement("coords").innerHTML = '' + Math.round(lonlatGCS.lon*100)/100 + ', ' + Math.round(lonlatGCS.lat*100)/100;
 #end if
+#else 
+#set f0=[]
 #end if
     });
 
