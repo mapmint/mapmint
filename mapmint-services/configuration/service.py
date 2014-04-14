@@ -109,7 +109,7 @@ def SaveConf(conf,inputs,outputs):
 	except Exception,e:
 		#print >> sys.stderr,"Error occurs when trying to parse the section"
 		#print >> sys.stderr, inputs["section"]["value"]
-		conf["lenv"]["message"]=zoo._("Error occurs when trying to parse the ")+inputs["section"]["value"]+zoo._(" section: ")+b+"="+str(e)
+		conf["lenv"]["message"]=zoo._("Error occurs when trying to parse the ")+inputs["section"]["value"]+zoo._(" section: ")+str(e)
 		return 4
 	return 3
 

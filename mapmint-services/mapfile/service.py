@@ -2505,6 +2505,8 @@ def savePublishMap(conf,inputs,outputs):
 
     minScales=inputs["minScales"]["value"].split(',')
     maxScales=inputs["maxScales"]["value"].split(',')
+    lminScales=inputs["lminScales"]["value"].split(',')
+    lmaxScales=inputs["lmaxScales"]["value"].split(',')
     for l in range(0,m.numlayers):
 
         if len(minScales)>l and minScales[l]!="":
@@ -2525,11 +2527,34 @@ def savePublishMap(conf,inputs,outputs):
                 m.getLayer(l).metadata.remove('mmMaxScale')
             except:
                 pass
+        if len(lminScales)>l and lminScales[l]!="":
+            m.getLayer(l).labelminscaledenom=int(lminScales[l])
+            m.getLayer(l).metadata.set('mmLabelMinScale',minScales[l])
+        else:
+            try:
+                m.getLayer(l).labelminscaledenom=-1
+                m.getLayer(l).metadata.remove('mmLabelMinScale')
+            except:
+                pass
+        if len(lmaxScales)>l and lmaxScales[l]!="":
+            m.getLayer(l).labelmaxscaledenom=int(lmaxScales[l])
+            m.getLayer(l).metadata.set('mmLabelMaxScale',maxScales[l])
+        else:
+            try:
+                m.getLayer(l).labelmaxscaledenom=-1
+                m.getLayer(l).metadata.remove('mmLabelMaxScale')
+            except:
+                pass
+
         
         if m.getLayer(l).metadata.get('mmMinScale') is not None and m.getLayer(l).metadata.get('mmMinScale')!='None':
             m.getLayer(l).minscaledenom=int(m.getLayer(l).metadata.get('mmMinScale'))
         if m.getLayer(l).metadata.get('mmMaxScale') is not None and m.getLayer(l).metadata.get('mmMaxScale')!='None':
             m.getLayer(l).maxscaledenom=int(m.getLayer(l).metadata.get('mmMaxScale'))
+        if m.getLayer(l).metadata.get('mmLabelMinScale') is not None and m.getLayer(l).metadata.get('mmLabelMinScale')!='None':
+            m.getLayer(l).labelminscaledenom=int(m.getLayer(l).metadata.get('mmLabelMinScale'))
+        if m.getLayer(l).metadata.get('mmLabelMaxScale') is not None and m.getLayer(l).metadata.get('mmLabelMaxScale')!='None':
+            m.getLayer(l).labelmaxscaledenom=int(m.getLayer(l).metadata.get('mmLabelMaxScale'))
         if inputs["mmProprietaryBaseLayers"]["value"]==conf["mm"]["biName"]:
             m.getLayer(l).metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:900914")
     m.web.metadata.set("ows_title",inputs["mmTitle"]["value"]);

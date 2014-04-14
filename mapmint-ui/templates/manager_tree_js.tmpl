@@ -119,16 +119,16 @@ function init(){
     //osmBboxControl.box.deactivate();
     
     //var osm = new OpenLayers.Layer.OSM( {minZoomLevel: 9, maxZoomLevel:18});
-    arrayOSM = ["http://mtile01.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
-		"http://mtile02.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
-		"http://mtile03.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
-		"http://mtile04.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png"];
+    arrayOSM = ["http://otile1.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
+		"http://otile2.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
+		"http://otile3.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png",
+		"http://otile4.mqcdn.com/tiles/1.0.0/vy/map/\${z}/\${x}/\${y}.png"];
     var osm = new OpenLayers.Layer.OSM("MapQuest-OSM Tiles", arrayOSM);
     
-    arrayOSM1 = ["http://mtile01.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
-                 "http://mtile02.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
-                 "http://mtile03.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
-                 "http://mtile04.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png"];
+    arrayOSM1 = ["http://otile1.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
+                 "http://otile2.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
+                 "http://otile3.mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png",
+                 "http://otile4mqcdn.com/tiles/1.0.0/vy/sat/\${z}/\${x}/\${y}.png"];
     var osm1 = new OpenLayers.Layer.OSM("MapQuest-OSM Tiles", arrayOSM1);
   
     var osm2 = new OpenLayers.Layer.OSM("OSM Tiles",null);
