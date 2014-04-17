@@ -1,4 +1,25 @@
+
 $(document).ready(function(){
+
+$('.thumbnail').hover(
+        function(){
+            $(this).parent().find('.caption').slideDown(250); //.fadeIn(250)
+        },
+        function(){
+            $(this).parent().find('.caption').slideUp(250); //.fadeOut(205)
+        }
+    );
+
+
+$("#stage").on({
+    mouseenter: function () {
+$(this).find('.caption').slideDown(250); //.fadeIn(250)
+    },
+    mouseleave:function () {
+$(this).find('.caption').slideUp(250); //.fadeIn(250)
+    }
+},'li');
+
 
     $("#tagcloud a").tagcloud({ 
 	size: { 
@@ -40,50 +61,84 @@ $(document).ready(function(){
 	});
 	getIndexQuote(null,System.starcIds);
     }
-    $('.bar2').mosaic({animation:'slide'});
+    //$('.bar2').mosaic({animation:'slide'});
 
-    startMozaic($('.mosaic-block'));
+    //startMozaic($('.mosaic-block'));
 });
 
-function startMozaic(){
-    arguments[0].hover(function() {
-	System.hoverMap=$(this).parent().attr("id");
-	$(this).append("<div class='mosaic-subbackdrop'><a class='plus' href='#'> + d'info</a></div>");
-	$(this).parent().find(".mosaic-overlay").css({"bottom":"0px"});
-	$('.plus').click(function(e) {
-	    e.preventDefault();
-	    if($("#moreinfo-dialog")[0])
-		$("#moreinfo-dialog").remove();
-	    $.ajax({
-		type: "GET",
-		url: "./MapDetails;id="+System.hoverMap,
-		complete: function(xml,status) {
 
-		    $('<div id="moreinfo-dialog" title="Description détaillée">').appendTo('body');
-		    $('#moreinfo-dialog').append(xml.responseText);
-		    $('#moreinfo-dialog').show(); 
-		    
-		    $( "#moreinfo-dialog" ).window({
-			width:600,
-			height:400,
-			modal: true,
-			draggable:false,
-			collapsible: false,
-			maximizable:false,
-			minimizable:false,
-			resizable:false,
-			onBeforeClose: function(){
-			    $("body").removeClass('stop-scrolling');
-			}
-		    });
-		    $("body").addClass('stop-scrolling');
+function startMozaic(){
+        $('.minfo').click(function(e) {
+        System.hoverMap=$(this).attr("id");
+           e.preventDefault();
+            if($("#moreinfo-dialog")[0])
+                $("#moreinfo-dialog").remove();
+            $.ajax({
+                type: "GET",
+                url: "./MapDetails;id="+System.hoverMap,
+                complete: function(xml,status) {
+var map_details = '<div id="moreinfo-dialog" title="Map details"></div>';
+bootbox.dialog({
+  message: map_details,
+  title: "Map details",
+  buttons: {
+    view: {
+      label: "View map",
+      className: "map-btn",
+      callback: function() {
+      }
+    },
+    cancel: {
+      label: "cancel",
+      className: "map-btn",
+      callback: function() {
+      }
+    }
+  }
+});
+
+$('#moreinfo-dialog').html(xml.responseText);
+$('#moreinfo-dialog').show();
+
+//function startMozaic(){
+//    arguments[0].hover(function() {
+//	System.hoverMap=$(this).parent().attr("id");
+//	$(this).append("<div class='mosaic-subbackdrop'><a class='plus' href='#'> + d'info</a></div>");
+//	$(this).parent().find(".mosaic-overlay").css({"bottom":"0px"});
+//	$('.plus').click(function(e) {
+//	    e.preventDefault();
+//	    if($("#moreinfo-dialog")[0])
+//		$("#moreinfo-dialog").remove();
+//	    $.ajax({
+//		type: "GET",
+//		url: "./MapDetails;id="+System.hoverMap,
+//		complete: function(xml,status) {
+//
+//		    $('<div id="moreinfo-dialog" title="Description détaillée">').appendTo('body');
+//		    $('#moreinfo-dialog').append(xml.responseText);
+//		    $('#moreinfo-dialog').show(); 
+//		    
+//		    $( "#moreinfo-dialog" ).window({
+//			width:600,
+//			height:400,
+//			modal: true,
+//			draggable:false,
+//			collapsible: false,
+//			maximizable:false,
+//			minimizable:false,
+//			resizable:false,
+//			onBeforeClose: function(){
+//			    $("body").removeClass('stop-scrolling');
+//			}
+//		    });
+//		    $("body").addClass('stop-scrolling');
 		}
 	    });
 	});	  
-    },function() {
-	$(this).parent().find(".mosaic-overlay").css({"bottom":"-130px"});
-	$('.mosaic-subbackdrop').remove();
-    });
+//    },function() {
+//	$(this).parent().find(".mosaic-overlay").css({"bottom":"-130px"});
+//	$('.mosaic-subbackdrop').remove();
+//  });
 }
 
 $("#slideshow > div:gt(0)").hide();
@@ -117,19 +172,18 @@ $(function(){
     });
 });
 
+
 $(function () {
     var tabContainers = $('div.all > div');
     tabContainers.hide().filter(':first').show();
-    
-    $('.main-navigation a').click(function () {
-	tabContainers.hide();
-	tabContainers.filter(this.hash).show();
-	$('.main-navigation a').removeClass('current');
-	$(this).addClass('current');
-	return false;
+    $('.main-navigation li:not(:last-child) a').click(function () {
+        tabContainers.hide();
+        tabContainers.filter(this.hash).show();
+        $('.main-navigation a').removeClass('active');
+        $(this).addClass('active');
+        return false;
     }).filter(':first').click();
 });
-
 
 function previous(){
 	new_page = parseInt($('#current_page').val()) - 1;
