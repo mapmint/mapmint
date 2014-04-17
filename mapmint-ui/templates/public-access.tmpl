@@ -3,9 +3,9 @@
 #from Skeleton import Skeleton
 #extends Skeleton
 
-#attr $ocss = ['public.css']
+#attr $ocss = ['bootstrap.min.css','public.css']
 
-#attr $js=[ "OpenLayers.min.js","proj4js-compressed.js","Meta.js", "flip.js","jquery.quicksand.js", "mosaic.1.0.1.min.js", "jquery.raty.min.js","jquery.xml2json.pack.js", "wps.js","Graphs.js", "jquery.tagcloud.js", "np-public.js"]
+#attr $js=[ "OpenLayers.min.js","proj4js-compressed.js","Meta.js", "flip.js","jquery.quicksand.js", "mosaic.1.0.1.min.js", "jquery.raty.min.js","jquery.xml2json.pack.js", "wps.js","Graphs.js", "jquery.tagcloud.js", "np-public.js", "bootstrap.min.js", "bootbox.min.js"]
 
 #attr $js2=["./init_js","./index_js"]
 
@@ -22,79 +22,62 @@ $conf["identification"]["title"]
 #import mapfile.service as mms
 <!-- $(conf["senv"]["last_map"]="Default")-->
 
-<script>
-\$(document).ready(function(){
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="http://mapmint.com" target="_blank">Map<span>Mint</span>
+				<img src="$conf["main"]["mmAddress"]/img/mapmint-logo-small.png" class="pull-left"/>
+			</a>
+		</div>
+        	<div class="collapse navbar-collapse navbar-ex1-collapse">
+                	<ul class="nav navbar-nav navbar-right main-navigation">
+                		<li><a href="#home" class="">$zoo._("Home")</a></li>
+                		#if $conf["mm"]["indexes"]=="true"
+                		<li><a href="#indicateurs" class="">$zoo._("Indexes")</a></li>
+                		#end if
+                		<li><a href="#cartotheque" class="">$zoo._("Maps")</a></li>
+                		#if $conf["mm"]["documents"]=="true"
+                		<li><a href="#documents" class="">$zoo._("Documents")</a></li>
+                		#end if
+				<li class="dropdown">
+                		<a href="" class="dropdown-toggle" data-toggle="dropdown">$zoo._("About") <b class="caret"></b></a>
+                		<ul class="dropdown-menu">
+                  			<li><a href="#">$zoo._("Legal notice")</a></li>
+                  			<li class="divider"></li>
+                  			<li><a href="http://mapmint.com">mapmint.com</a></li>
+                		</ul>
+                		</li>
+                	</ul>
+		</div>
+	</div>
+</nav>
+<div class="container">
+	<div class="main">
+		<div id="master-header" class="clearix">
+		#if $conf["mm"]["slideshow"]=="true"
+		<div id="slideshow">
+		#set imgs=oslistdir($conf["main"]["mmPath"]+"/img/slideshow/")
+		#for i in $imgs
+		#if $i!=".svn"
+	<div>
+        <img src="$conf["main"]["mmAddress"]/img/slideshow/$i" title="" alt="" />
+	</div>
+	#end if
+	#end for
+	</div>
+	#end if
+	<h1 id="site-title"><span>$conf["identification"]["title"]</span></h1>
+	<div class="banner"></div>
+	</div>
+	</div>
+</div>
 
-    \$('.bar2').mosaic({animation:'slide'});
-
-
-  var tabContainers=\$('div.all > div');
-  tabContainers.hide().filter(':first').show();
-  \$(".them").click(function () {
-      tabContainers.hide();
-      tabContainers.filter(this.hash).show();
-      return false;
-    }).filter(':first').click();
-  \$(".home").click(function () {
-      tabContainers.hide();
-      tabContainers.filter(this.hash).show();
-      return false;
-    });
-
-  \$(".indx").click(function () {
-      tabContainers.hide();
-      tabContainers.filter(this.hash).show();
-      return false;
-    });
-
-  var tabContainers = \$('div.all > div');
-  tabContainers.hide().filter(':first').show();
-
-  \$('.main-navigation a').click(function () {
-    tabContainers.hide();
-    tabContainers.filter(this.hash).show();
-    \$('.main-navigation a').removeClass('current');
-    \$(this).addClass('current');
-    return false;
-  }).filter(':first').click();
- });
-
-</script>
-
-<div class="main">
-  <header id="master-header" class="clearfix">
-#if $conf["mm"]["slideshow"]=="true"
-    <div id="slideshow">
-#set imgs=os.listdir($conf["main"]["mmPath"]+"/img/slideshow/")
-#for i in $imgs
-#if $i!=".svn"
-      <div>
-	<img src="$conf["main"]["mmAddress"]/img/slideshow/$i" title="" alt="" />
-      </div>
-#end if
-#end for
-    </div>
-#end if
-    <hgroup>
-    <h1 class="title"><span class="logo"></span><a href="">Map<span>Mint</span></a></h1>
-    <h1 id="site-title"><span>$conf["identification"]["title"]</span></h1>
-    </hgroup>
-    <div class="banner">
-    </div>
-
-    <nav class="main-navigation" role="navigation">
-      <ul id="main-nav">
-	<li><a href="#home" class="current">$zoo._("Home")</a></li>
-#if $conf["mm"]["indexes"]=="true"
-        <li><a href="#indicateurs" class="indx">$zoo._("Indexes")</a></li>
-#end if
-        <li><a href="#cartotheque" class="them">$zoo._("Maps")</a></li>
-#if $conf["mm"]["documents"]=="true"
-        <li><a href="#documents" class="docs">$zoo._("Documents")</a></li>
-#end if
-      </ul>
-      </nav>
-  </header>
 
 #import authenticate.service as auth
 #set con=$auth.getCon($conf)
@@ -110,74 +93,66 @@ $con
 #set $favorites+=[$i[0]]
 #end for
 
-    <div class="all">
+<div class="all">
     <div id="home">
-      <div class="content">
+    <div id="map">
+        <div class="container">
+              <div id="info"></div>
+              <div id="goup">
+                <a href="#" id="zoomtomaxextent" title="$zoo._("Zoom to max extent")" onclick="map.zoomToExtent(System.bounds);"><span class="zoomtomaxextent"></span></a>
+              </div>
+        </div>
+    </div>
+
+<div class="container">
+<div class="row">
+<div class="col-xs-12 col-sm-8 col-lg-8">
         <div id="m_content">
-	  <div id="main_content">
-	    <div class="post">
-	      <h2 class="htxt">$zoo._("Welcome")</h2>
-	      <p>
+          <div id="main_content">
+            <div class="post phome">
 #if $conf["identification"]["abstract"].count($conf["main"]["tmpUrl"])>0
-#set f=open($conf["identification"]["abstract"].replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")    
-	      $f.read()
+#set f=open($conf["identification"]["abstract"].replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
+              $f.read()
 #else
-	      $conf["identification"]["abstract"].replace("[BR]","</p><p>")
+              $conf["identification"]["abstract"].replace("[BR]","</p><p>")
 #end if
-	      </p>
-	    </div>
-	    <div id="map">
-	      <div id="info"></div>
-	      <div id="goup">
-		<a href="#"  title="$zoo._("Zoom to max extent")" onclick="map.zoomToExtent(System.bounds);"><span class="zoomtomaxextent"></span></a>
-		</div>
-	    </div>
+            </div>
 #if False
 #set res=$cur.execute("SELECT name, content from "+$prefix+"ilinks where short='"+$inputs["idp"]["value"]+"'")
 #set $vals=$cur.fetchall()
-	    <div class="post">
-	      <h2 class="htxt">$vals[0][0] <a href="$conf["main"]["applicationAddress"]/public/">retour</a></h2>
-	      <p>$vals[0][1].replace("\\n","</p><p>")</p>
-	    </div>
+            <div class="post">
+              <h2 class="htxt">$vals[0][0] <a href="$conf["main"]["applicationAddress"]/public/">retour</a></h2>
+              <p>$vals[0][1].replace("\\n","</p><p>")</p>
+            </div>
 #end if
-	  </div>
-	  <div id="main_content_bg" style="display: none;">
-	  </div>	
-	</div>
-      </div>
-      <div class="sidebar">
-	<div id="formContainer">
-	  <form id="login" method="post" action="">
-	    <h3 class="lgn">$zoo._("Login")</h3>
-	    #from Cheetah.Template import Template
-	    #try
-	    #set cinputs=$inputs
-	    #except
-	    #set cinputs={}
-	    #end try
-	    #set cinputs["pcancel"]=None
-	    $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/auth/login.html",searchList={"conf":$conf,"inputs": $cinputs}))
-	  </form>
-	  <form id="recover">
-	    $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/auth/login.tmpl",searchList={"conf":$conf,"inputs": $cinputs}))
-	  </form>
-	</div>
-	<div id="news_block" class="rank flip">
-	  <div id="news_list" class="flip_content">
-#if $conf["mm"]["indexes"]=="true"
-           $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/indexes/list.html",searchList={"conf":$conf}))
-#else
-           $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/news/list.html",searchList={"conf":$conf}))
-           $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/links/display.html",searchList={"conf":$conf}))
-#end if
-	  </div>
-	</div>
+          </div>
+          <div id="main_content_bg" style="display: none;"></div>
+        </div>
+</div>
+
+    <div class="col-xs-12 col-sm-4 col-lg-4">
+        <div id="formContainer">
+          <form id="login" method="post" action="">
+            <h3 class="lgn">$zoo._("Login")</h3>
+            #from Cheetah.Template import Template
+            #try
+            #set cinputs=$inputs
+            #except
+            #set cinputs={}
+            #end try
+            #set cinputs["pcancel"]=None
+            $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/auth/login.html",searchList={"conf":$conf,"inputs": $cinputs}))
+          </form>
+          <form id="recover">
+            $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/auth/login.tmpl",searchList={"conf":$conf,"inputs": $cinputs}))
+          </form>
+        </div>
       </div>
 
-      <div class="bottom-head">
-	<h3 class="lsm">$zoo._("Last published maps") <span><a href="#cartotheque" class="them aliri more2">$zoo._("All maps")</a></span></h3>
-      </div>
-      <div class="bottom">
+<div class="col-xs-12 col-sm-12 col-lg-12">
+<h3 class="lgb">$zoo._("Recent maps")</h2>
+</div>
+
 #import os
 #import mapscript
 #import time
@@ -221,24 +196,30 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #set x=(($a.maxx-$a.minx)/2)+$a.minx
 #set y=(($a.maxy-$a.miny)/2)+$a.miny
 
-      <div class="ovw" id="$i[1]">
-        <div class="mosaic-block bar2">
-	  <a href="$conf["main"]["rootUrl"]#if $conf["main"]["rootUrl"][len($conf["main"]["rootUrl"])-1]!="/"#/#end if#$i[1]" class="mosaic-overlay">
-	    <div class="details">
-	      <h4>$mm.web.metadata.get('mmTitle')</h4>
-	      <p class="date">$zoo._("Published on: ")$(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($mpath)))) </p>
-	      <p class="meta">$(mms.getShortDescription($conf,$mm))</p>
-	   </div>
-	  </a>
-	  <div class="mosaic-backdrop">
+<div class="col-sm-6 col-md-3">
+	<div class="thumbnail">
+
+                <div class="caption">
+			 <h4>$mm.web.metadata.get('mmTitle')</h4>
+
+              <p class="date"> $(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($mpath)))) </p>
+               <p class="meta">$(mms.getShortDescription($conf,$mm))</p>
+	<ul class="dtls">
+              <li><a href="#" id="$i[1]" class="map-btn minfo">Information</a></li>
+             <li>       <a href="$conf["main"]["rootUrl"]#if $conf["main"]["rootUrl"][len($conf["main"]["rootUrl"])-1]!="/"#/#end if#$i[1]" class="map-btn">View</a></li>
+        </ul>
+       </div>
+
 #if mm.web.metadata.get("previewUrl")
-		      <img src="$mm.web.metadata.get('previewUrl')" />
+                      <img src="$mm.web.metadata.get('previewUrl')" class="img-responsive" />
 #else
-	    <img src="$conf["main"]["mapserverAddress"]?map=${project}&LAYERS=$(ll)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$a.minx,$a.miny,$a.maxx,$a.maxy&SRS=EPSG:4326&WIDTH=230&HEIGHT=170&r=1315253453.18" width="230" height="170" />
+            <img src="$conf["main"]["mapserverAddress"]?map=${project}&LAYERS=$(ll)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$a.minx,$a.miny,$a.maxx,$a.maxy&SRS=EPSG:4326&WIDTH=250&HEIGHT=160&r=1315253453.18" width="250" height="160" class="img-responsive"/>
 #end if
-	  </div>
+
 	</div>
-      </div>
+<h4 class="text-center">$mm.web.metadata.get('mmTitle')</h4>
+ </div>
+
 #except
  Error occured
 #end try
@@ -247,8 +228,26 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #set $cnt=$cnt+1
 #end for
 
-    </div>
-  </div>
+<!-- <div class="col-xs-12 col-sm-12 col-lg-12">
+<div id="news_block" class="rank flip">
+         <div id="news_list" class="flip_content">
+#if $conf["mm"]["indexes"]=="true"
+           $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/indexes/list.html",searchList={"conf":$conf}))
+#else
+<div id="" class="col-sm-6 col-md-6">
+  $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/news/list.html",searchList={"conf":$conf}))
+</div>
+<div id="" class="col-sm-6 col-md-6">
+           $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/links/display.html",searchList={"conf":$conf}))
+</div>
+#end if
+          </div>
+</div>
+</div> -->
+
+</div>
+</div>
+</div>
 
 #if $conf["mm"]["indexes"]=="true"
   <div id="indicateurs">
@@ -336,18 +335,19 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 </div>
 #end if
 
+<div id="cartotheque">
+<div class="content-full">
+<div class="container">
+<div class="row">
+<div class="col-xs-12 col-sm-12 col-lg-12">
 
-  <div id="cartotheque">
-    
-    <div class="content-full">
       <div class="post">
-	<h2 class="htxt">$zoo._("Published maps") <!--<a href="#home" class="home mbutt more" >$zoo._("Home")</a>--></h2>
-	<div id="filter"></div>
-	
+        <h3 class="amp">$zoo._("All maps") <!--<a href="#home" class="home mbutt more" >$zoo._("Home")</a>--> </h3>
+        <div id="filter"></div>
+
       </div>
-      
-      <section id="container">
-        <ul id="stage">
+
+        <ul id="stage" class="list-unstyled">
 #for i in mfiles1
 #set mpath=$i[0]
 #set project=$i[0]
@@ -382,83 +382,87 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #else
 #set fvals=$zoo._("Unknown")
 #end if
-	      
-              <li data-tags="$fvals#if $favorites.count($i[1])>0#,$zoo._("Favorites")#end if#">
-		<div class="ovw" id="$i[1]">
-		  <div class="mosaic-block bar2">
-		    <a href="$conf["main"]["rootUrl"]#if $conf["main"]["rootUrl"][len($conf["main"]["rootUrl"])-1]!="/"#/#end if#$i[1]" class="mosaic-overlay">
-		      <div class="details">
-			<h4>$mm.web.metadata.get('ows_title')</h4>
-#import locale
-#try
-#set oloc=locale.getlocale(locale.LC_ALL)
-#set t=locale.setlocale(locale.LC_ALL,'')
-#except
-#pass
-#end try
-			<p class="date"> Publiée le: $(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($mpath )))) </p>
-		        <p class="meta">$(mms.getShortDescription($conf,$mm))</p>
-		    </div>
-		    </a>
-		    <div class="mosaic-backdrop">
+
+ <li data-tags="$fvals#if $favorites.count($i[1])>0#,$zoo._("Favorites")#end if#" class="col-lg-3 col-sm-4 col-xs-6">
+
+                <div id="$i[1]" class="thumbnail">
+
+                <div class="caption">
+              <h4>$mm.web.metadata.get('mmTitle')</h4>
+<p class="date"> $(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($mpath)))) </p>
+               <p class="meta">$(mms.getShortDescription($conf,$mm))</p>
+                <a href="#" id="$i[1]" class="map-btn minfo">Information</a>
+                <a href="$conf["main"]["rootUrl"]#if $conf["main"]["rootUrl"][len($conf["main"]["rootUrl"])-1]!="/"#/#end if#$i[1]" class="map-btn">View</a>
+</div>
+
 #if mm.web.metadata.get("previewUrl")
-		      <img src="$mm.web.metadata.get('previewUrl')" />
+                      <img src="$mm.web.metadata.get('previewUrl')" />
 #else
-		      <img src="$conf["main"]["mapserverAddress"]?map=${project}&LAYERS=$(ll)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$a.minx,$a.miny,$a.maxx,$a.maxy&SRS=EPSG:4326&WIDTH=300&HEIGHT=170&r=1315253453.18" width="300" height="170" />
+                      <img src="$conf["main"]["mapserverAddress"]?map=${project}&LAYERS=$(ll)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$a.minx,$a.miny,$a.maxx,$a.maxy&SRS=EPSG:4326&WIDTH=250&HEIGHT=160&r=1315253453.18" width="250" height="160" />
 #end if
-		    </div>
-		  </div>
-		</div>
-	      </li>
+        </div>
+ </li>
+	      
 #except
 	Error occured
 #end try
 #end if
 #set $cnt=$cnt+1
 #end for
-	</ul>
-      </section>
-    </div>   
-  </div>
+</ul>
 
-  <div id="documents">
-    <div class="content">
+</div>
+</div>
+</div>
+</div>
+</div>
+
+ <div id="documents">
+
+
+<div class="container">
+<div class="row">
+
+<div class="col-xs-12 col-sm-8 col-lg-8">
       <div class="post shad">
-	<h2 class="htxt">$zoo._("Documents")</h2>
-	<p>$zoo._("Available documents")</p>
+        <h3 class="amp">$zoo._("Documents")</h3>
+        <p>$zoo._("Available documents")</p>
         <div id='page_navigation'></div>
-	
-	</div>
-      </div>
 
-      <div class="sidebar">
+        </div>
+
+</div>
+
+<div class="col-xs-12 col-sm-4 col-lg-4">
+<div class="sidebar">
       <div class="ilist">
-	<h3 class="doc">$zoo._("Search")</h3>
-	<label for="documents_search">$zoo._("Search:")</label>
-	<input type="text" id="documents_search" class="dwi" value="$zoo._("Enter few letters")">
+        <h3 class="dse">$zoo._("Search")</h3>
+        <label for="documents_search">$zoo._("Search:")</label>
+        <input type="text" id="documents_search" class="dwi" value="$zoo._("Enter few letters")">
       </div>
       </div>
+</div>
 
-
+<div class="col-xs-12 col-sm-12 col-lg-12">
       <div class="content-idx">
 
-	<input type='hidden' id='current_page' />
-	<input type='hidden' id='show_per_page' />	
+        <input type='hidden' id='current_page' />
+        <input type='hidden' id='show_per_page' />
         <div id="documents_container">
 #include($conf["main"]["templatesPath"]+"/preview/modules/indexes/documents.tmpl")
-	</div>
+        </div>
+</div>
+ </div>
+</div>
+</div>
+</div>
 
-      </div>
 
     </div>
 
-  </div>
-
-  <footer id="footer" role="contentinfo">
-  <div class="lftbx">
-    <a href="http://www.natureparif.fr" target="_blank" class="cr"></a>
-  </div>
-  <a href="http://www.mapmint.com" target="_blank" class="if"><img title="mapmint.com" src="$conf["main"]["serverAddress"]?service=WPS&amp;version=1.0.0&amp;request=Execute&amp;Identifier=QREncode&amp;DataInputs=size=2;bgcolor=3A3A3A;fgcolor=83C849;Text=http://mapmint.com&amp;RawDataOutput=QR"></a>
+ <footer id="footer" role="contentinfo">
+<div class="container">
+  <a href="http://www.mapmint.com" target="_blank" class="if"><img title="mapmint.com" src="$conf["main"]["serverAddress"]?service=WPS&amp;version=1.0.0&amp;request=Execute&amp;Identifier=QREncode&amp;DataInputs=size=3;bgcolor=3A3A3A;fgcolor=83C849;Text=http://mapmint.com&amp;RawDataOutput=QR"></a>
   <p> Copyright &copy; &#160;<a href="$conf["provider"]["providerSite"]" target="_blank">$conf["provider"]["providerName"]</a>
   <span class="sep">|</span>
 #set vals=$cur.execute("SELECT name,short,url from "+$prefix+"ilinks order by id")
@@ -471,8 +475,9 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
   <span class="sep">|</span>
 #end for
   </p>
+</div>
   </footer>
-  </div>
+</div>
 
 <script>   
 \$(".loader-container").hide();
