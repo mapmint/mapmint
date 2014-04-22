@@ -314,8 +314,8 @@ def UpdateUser(conf,inputs,outputs):
 					return 4
 				if i=="login":
 					userl=j
-			if inputs.has_key("login"):
-				userl=inputs["login"]["value"]
+			#if inputs.has_key("login"):
+			#	userl=inputs["login"]["value"]
 			if inputs.has_key("type") and inputs["type"]["value"]=="delete":
 				try:
 					c.cur.execute("DELETE FROM "+prefix+"user_group WHERE id_user=(select id from "+prefix+"users where login='"+userl+"')")
@@ -333,7 +333,8 @@ def UpdateUser(conf,inputs,outputs):
 				
 			if c.update_user_by_login(user,userl):
 				outputs["Result"]["value"] = inputs["set"]["value"]
-				if inputs.has_key("group"):
+				print >> sys.stderr,inputs["group"]["value"]
+				if inputs.has_key("group") and inputs["group"]["value"]!="NULL":
 					print >> sys.stderr,inputs["group"]
 					try:
 						c.cur.execute("DELETE FROM "+prefix+"user_group where id_user=(select id from "+prefix+"users where login='"+userl+"')")

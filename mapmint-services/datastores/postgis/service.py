@@ -15,16 +15,15 @@ def test(conf,inputs,outputs):
 	xcontent='<connection><dbname>'+inputs["dbname"]["value"]+'</dbname><user>'+inputs["user"]["value"]+'</user><password>'+inputs["password"]["value"]+'</password><host>'+inputs["host"]["value"]+'</host><port>'+inputs["port"]["value"]+'</port></connection>'
 	doc=libxml2.parseMemory(xcontent,len(xcontent))
 	styledoc = libxml2.parseFile(conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/conn.xsl")
-	#print >> sys.stderr,conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/conn.xsl"
 	style = libxslt.parseStylesheetDoc(styledoc)
 	result = style.applyStylesheet(doc, None)
-	#print >> sys.stderr,"("+result.content+")"
 	ds = osgeo.ogr.Open( result.content )
 	if ds is None:
 		conf["lenv"]["message"]=zoo._("Unable to connect to ")+inputs["name"]["value"]
 		return 4
 	else:
-		outputs["Result"]["value"]=zoo._("Connection to ")+inputs["name"]["value"]+zoo._(" successfull")
+		print >> sys.stderr,"OK 6'"
+		outputs["Result"]["value"]=zoo._("Connection to ")+str(inputs["name"]["value"]).encode('utf-8')+zoo._(" successfull")
 	ds = None
 	return 3
 
@@ -39,14 +38,20 @@ def load(conf,inputs,outputs):
 		xqf = libxml2.readFile(conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"+inputs["name"]["value"]+".xml", None, parse_options)
 		cnt=0
 		for j in dbParams:
+			print >> sys.stderr,j
 			#print >> sys.stderr, j
-			items = xqf.xpathEval("/connection/"+j)
-			for i in items:
+			try:
+				items = xqf.xpathEval("/connection/"+j)
+				for i in items:
 				#print >> sys.stderr, cnt
-				if cnt>0:
-					values+=', '
-				values+='"'+i.name+'": "'+str(i.children.get_content())+'"'
+					if cnt>0:
+						values+=', '
+					values+='"'+i.name+'": "'+str(i.children.get_content())+'"'
+					cnt+=1
+			except:
+				values+='"'+j+'": ""'
 				cnt+=1
+				pass
 	except Exception,e:
 		print >> sys.stderr,e
 		conf["lenv"]["message"]=zoo._("Unable to parse the file")

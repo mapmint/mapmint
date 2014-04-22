@@ -246,6 +246,51 @@ def openInManager(conf,inputs,outputs):
     mmsession.save(conf)
     return zoo.SERVICE_SUCCEEDED
 
+
+def refreshLayerInfo(conf,inputs,outputs):
+    import mm_access,mapscript
+    lmap=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
+    llayer=lmap.getLayerByName(inputs["layer"]["value"])
+    print >> sys.stderr,llayer.metadata.get("mmDSTN")
+    dstn=llayer.metadata.get("mmDSTN")
+    mapfile=conf["main"]["dataPath"]+"/dirs/"+dstn.replace(conf["main"]["dataPath"]+"/dirs/","")+"/ds_ows.map"
+    print >> sys.stderr,mapfile
+    m=None
+    try:
+        m = mapscript.mapObj(mapfile)
+    except:
+        for i in ["PostGIS","MySQL","WFS","WMS"]:
+            try:
+                mapfile=conf["main"]["dataPath"]+"/"+i+"/"+dstn.replace("WFS:","").replace("WMS:","")+"ds_ows.map"
+                print >> sys.stderr,mapfile
+                m = mapscript.mapObj(mapfile)
+            except:
+                pass
+        if m is None:
+            conf["lenv"]["message"]=zoo._("Unable to open the mapfile")
+            return 4
+
+    cnt=0
+
+    m.setProjection("EPSG:4326")
+    i=m.numlayers-1
+    while i >= 0:
+        l=m.getLayer(i)
+        if l.name!=llayer.data:
+            m.removeLayer(i)
+        i-=1
+
+    llayer.setProjection(m.getLayer(0).getProjection())
+    ext=m.getLayer(0).getExtent()
+    print >> sys.stderr,ext
+    llayer.setExtent(ext.minx,ext.miny,ext.maxx,ext.maxy)
+
+    lmap.save(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
+    outputs["Result"]["value"]=zoo._("Layer %s is now up-to-date in your %s project." % (inputs["layer"]["value"], inputs["map"]["value"]))
+    import mmsession
+    mmsession.save(conf)
+    return zoo.SERVICE_SUCCEEDED
+
 def listDataSource(conf,inputs,outputs):
     import mapscript
     mapfile=conf["main"]["dataPath"]+"/dirs/"+inputs["name"]["value"]+"/ds_ows.map"

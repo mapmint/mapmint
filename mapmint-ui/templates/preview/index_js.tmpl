@@ -647,7 +647,6 @@ System.postMap[System.postMap.length]={
 #end if
 #else
 #if $mm_access.checkLayerPriv($conf,$m,$l.name,"r")
-
     var tmpLayer = new OpenLayers.Layer.WMS(
 	"$lname",
 	"$conf["main"]["mapserverAddress"]?map="+#if $l.metadata.get('mmFilterField') and $inputs.has_key('filter')#pmapfiles["$(lname)"][0]#else##if $l.type==mapscript.MS_LAYER_RASTER and $l.numclasses>1#pmapfiles["$(lname)"][0]#else#pmapfile#end if##end if#+"",
@@ -663,6 +662,10 @@ System.postMap[System.postMap.length]={
     try{
 	\$('#layers_list').tree('check',\$(".tree_layer"+(layersList.length-1))[0].parentNode);
     }catch(e){}
+
+  
+
+
 #end if
 #if $m.getLayerByName(lname).metadata.get('mmZFilterField') and $inputs.has_key('filter')
     url="$conf["main"]["mapserverAddress"]?map="+pmapfiles["$(lname)"][0]+"&SERVICE=WFS&typename=$(lname)&VERSION=1.0.0&REQUEST=GetFeature";
@@ -746,6 +749,94 @@ var ok=1;
     queryLayersList[queryLayersList.length-1].real_name=tmpLayer.name;
     queryLayersList[queryLayersList.length-1].displayed_fields="#if $l.metadata.get("mmGFIFields") is not None#$l.metadata.get("mmGFIFields")#else#all#end if#";
     queryLayersList[queryLayersList.length-1].displayed_fields_width="#if $l.metadata.get("mmGFIFieldsWidth") is not None#$l.metadata.get("mmGFIFieldsWidth")#else#all#end if#";
+
+#if $m.web.metadata.get("mmPopupList").split(',').count($lname)>0
+  if(!System.wmsInfo){
+   System.wmsInfo = new OpenLayers.Control.WMSGetFeatureInfo({
+       url: System.mapUrl+"?map="+System.mapfile,
+       title: 'Identify features by clicking',
+       queryVisible: true,
+       layers: queryLayersList,
+       hover: true,
+       eventListeners: {
+           getfeatureinfo: function(event) {
+	       WMSHighlightFeatureInfo("$(lname)",event);
+#if $conf["senv"]["last_map"]!="Default"
+               if(System.popup)
+		   map.removePopup(System.popup);
+	       System.popup=new OpenLayers.Popup.FramedCloud(
+                   "chicken",
+                   map.getLonLatFromPixel(event.xy),
+                   null,
+                   event.text,
+                   null,
+                   true
+               );
+               map.addPopup(System.popup);
+#else
+	       \$('#info').html(event.text);
+#end if
+           }
+       }
+   });
+   map.addControl(System.wmsInfo);
+   System.wmsInfo.activate();
+  }
+#end if
+#if $m.web.metadata.get("mmWindowList").split(',').count($lname)>0
+  if(!System.wmsInfo1){
+   System.wmsInfo1 = new OpenLayers.Control.WMSGetFeatureInfo({
+       url: System.mapUrl+"?map="+System.mapfile,
+       title: 'Identify features by clicking',
+       queryVisible: true,
+       layers: queryLayersList,
+       hover: false,
+       eventListeners: {
+           getfeatureinfo: function(event) {
+	       WMSHighlightFeatureInfo("$(lname)",event);
+#if $conf["senv"]["last_map"]!="Default"
+	if(!(\$("#dialog-featureInfo").length>0)){
+	    \$('body').append('<div id="dialog-featureInfo" title=""></div>')
+	    System.window=true;
+	}
+	    \$("#dialog-featureInfo").html(event.text);
+	    
+#if $m.web.metadata.get('layout_t')=="mobile"
+	    \$.mobile.changePage("#popup", "none"); 
+#else
+	    \$("#dialog-featureInfo")[0].title=System.messages["Feature Details"];
+	    \$("#dialog-featureInfo").window({
+		maximizable:false,
+		resizable: false,
+		minimizable:false,
+		collapsible: false,
+		width:250,
+		top:100,
+		left: 358
+	    });
+#end if
+#else
+               if(System.popup)
+		   map.removePopup(System.popup);
+	       System.popup=new OpenLayers.Popup.FramedCloud(
+                   "chicken",
+                   map.getLonLatFromPixel(event.xy),
+                   null,
+                   event.text,
+                   null,
+                   true
+               );
+               map.addPopup(System.popup);
+
+#end if
+           }
+       }
+   });
+   map.addControl(System.wmsInfo1);
+   System.wmsInfo1.activate();
+  }
+#end if
+ 
 
 #if $l.metadata.get("mmGFIFields") is not None and $l.metadata.get("mmAliasFields") is not None
 #set fs=$l.metadata.get("mmGFIFields").split(",")
@@ -870,7 +961,6 @@ if(layersList[layersList.length-1] && (!layersList[layersList.length-1].value ||
 	    });
     }
 });
-
 
 #if $conf["senv"]["login"]!="anonymous"
 isFavoriteMap();
@@ -1587,4 +1677,36 @@ function mmSetLayerOrder(){
 	}
     });
     //alert(tmm);
+}
+
+function WMSHighlightFeatureInfo(lname,event){
+    var lonlat = map.getLonLatFromViewPortPx(event.xy);
+    bounds3=lonlat;
+    var ll=new OpenLayers.LonLat(bounds3.lon-100, bounds3.lat-100);
+    var ur=new OpenLayers.LonLat(bounds3.lon+100, bounds3.lat+100);
+    bounds2 = new OpenLayers.Bounds();
+    bounds2.extend(ll);
+    bounds2.extend(ur);
+    bounds2.transform(map.getProjectionObject(),wgs84);
+    tmp=bounds2.toBBOX().split(',');
+    
+    var sld="<StyledLayerDescriptor version=\"1.0.0\"><NamedLayer><Name>"+lname+"</Name><UserStyle><Title>Basic red</Title><FeatureTypeStyle><Rule><Name>default</Name><Filter><BBOX><PropertyName>msGeometry</PropertyName><Box><coordinates>"+tmp[0]+","+tmp[1]+" "+tmp[2]+","+tmp[3]+"</coordinates></Box></BBOX></Filter><PolygonSymbolizer><Fill><CssParameter name=\"fill\">#880000</CssParameter></Fill></PolygonSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>";
+    if(System.goverlay){
+	map.removeLayer(System.goverlay);
+    }
+    System.goverlay=new OpenLayers.Layer.WMS(
+	"Selected Feature",
+	System.mapUrl+"?map="+System.mapfile,
+	{
+	    format: "image/png",
+	    layers: lname,
+	    styles: "default",
+	    sld_body: sld
+	},
+	{useCanvas: System.useCanvas,isBaseLayer: false}
+    );
+    System.goverlay.setVisibility(true);
+    System.goverlay.setOpacity(0.3);
+    map.addLayer(System.goverlay);
+    map.setLayerIndex(System.goverlay,map.layers.length-1);
 }

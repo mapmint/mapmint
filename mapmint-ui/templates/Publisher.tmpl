@@ -494,10 +494,10 @@ $(Template(file=$conf["main"]["templatesPath"]+"/uoms.tmpl",searchList={"conf": 
 #for i in range(0,$m.numlayers)
 	  <tr>
 	    <td>$m.getLayer($i).name</td>
-	    <td><input type="checkbox" value="p$i" id="layer_has_popup_$m.getLayer($i).name" #if ($popupList.count($m.getLayer($i).name)>0)#checked="true"#end if# #if vectorLayers.count($m.getLayer($i).name)==0#disabled="true"#end if#/></td>
-	    <td><input type="checkbox" value="w$i" id="layer_has_click_$m.getLayer($i).name" #if ($windowList.count($m.getLayer($i).name)>0)#checked="true"#end if# #if vectorLayers.count($m.getLayer($i).name)==0#disabled="true"#end if#/></td>
-	    <td><input type="radio" id="layer_type_$m.getLayer($i).name" name="layer_type_$m.getLayer($i).name" #if vectorLayers.count($m.getLayer($i).name)>0#checked="true"#end if# value="vector" #if $m.getLayer($i).type==3#disabled="true"#end if# onchange="\$('#layer_has_popup_$(m.getLayer($i).name)')[0].disabled=false;\$('#layer_has_click_$m.getLayer($i).name')[0].disabled=false;"/></td>
-	    <td><input type="radio" id="layer_type1_$m.getLayer($i).name" name="layer_type_$m.getLayer($i).name" #if rasterLayers.count($m.getLayer($i).name)>0#checked="true"#end if#/ value="raster"  onchange="\$('#layer_has_popup_$(m.getLayer($i).name)')[0].disabled=true;\$('#layer_has_click_$m.getLayer($i).name')[0].disabled=true;"></td>
+	    <td><input type="checkbox" value="p$i" id="layer_has_popup_$m.getLayer($i).name" #if ($popupList.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>
+	    <td><input type="checkbox" value="w$i" id="layer_has_click_$m.getLayer($i).name" #if ($windowList.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>
+	    <td><input type="radio" id="layer_type_$m.getLayer($i).name" name="layer_type_$m.getLayer($i).name" #if vectorLayers.count($m.getLayer($i).name)>0#checked="true"#end if# value="vector" #if $m.getLayer($i).type==3#disabled="true"#end if# /></td>
+	    <td><input type="radio" id="layer_type1_$m.getLayer($i).name" name="layer_type_$m.getLayer($i).name" #if rasterLayers.count($m.getLayer($i).name)>0#checked="true"#end if#/ value="raster" /></td>
 	    <td><input type="checkbox" value="a$i" id="is_activated_layer_$m.getLayer($i).name" #if ($activatedLayers.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>
 	    <td><input type="text" style="width:75px;" id="min_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmMinScale")" /></td>
 	    <td><input type="text" style="width:75px;" id="max_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmMaxScale")" /></td>
