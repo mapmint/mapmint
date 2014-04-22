@@ -56,8 +56,6 @@ def displayHTML(conf,inputs,outputs):
     wmsStrs=outputs["Result"]["value"]
 
 
-    #print >> sys.stderr,dbStrs
-    #outputs["Result"]["value"]=str(dirStr)+str(dbStrs)
     inputs["dirs"]={"value":dirStr}
     inputs["dbs"]={"value":dbStrs}
     inputs["wfs"]={"value":wfsStrs}
@@ -100,38 +98,36 @@ def list(conf,inputs,outputs):
     suported_dbs=["PostGIS","MySQL"]
     dbStrs={}
     for i in suported_dbs:
+        print >> sys.stderr,i
         dbs.displayJson(conf,{"type":{"value":i}},outputs)
+        print >> sys.stderr,str(outputs["Result"]["value"])
         try:
-            dbStrs[i]=eval(outputs["Result"]["value"])
-            #print >> sys.stderrrr,conf
-            #print >> sys.stderr,dbStrs[i]["sub_elements"]
+            dbStrs[i]=json.loads(outputs["Result"]["value"])
             b=0
             for a in dbStrs[i]["sub_elements"]:
                 tmpI={}
                 if b==0:
                     elements[i]=[]
-                dbs.load(conf,{"type": {"value": i}, "name": {"value": a["name"]}},outputs)
-                #print >> sys.stderr,outputs
-                tmp=eval(outputs["Result"]["value"])
-                #print >> sys.stderr,"tmp"
-                #print >> sys.stderr,tmp
+                b+=1
+                outputs1={"Result":{}}
+                inputs1={"type": {"value": i}, "name": {"value": a["name"]}}
+                dbs.load(conf,inputs1,outputs1)
+                print >> sys.stderr,"LOAD <=> "+str(outputs1)
+                tmp=json.loads(outputs1["Result"]["value"])
+                print >> sys.stderr,"tmp <=> "+str(tmp)
                 li={}
                 for c in tmp:
                     li[c]={}
-                    li[c]["value"]=tmp[c]
+                    li[c]["value"]=tmp[c].decode('utf-8')
                 li["type"]={}
                 li["type"]["value"]=i
                 if dbs.test(conf,li,outputs)==3:
                     elements[i]+=[{"name": a["name"]}]
-                #print >> sys.stderr, a["name"]
-                b+=1
-                #print >> sys.stderr, dbStrs
-        except:
+        except Exception,e:
+            print >> sys.stderr, e
             pass
+        print >> sys.stderr,"/"+i
 
-    #print >> sys.stderr,dbStrs
-    #print >> sys.stderr,dirStr
-    #print >> sys.stderr,elements
     import json
     outputs["Result"]["value"]=json.dumps(elements)
     return 3

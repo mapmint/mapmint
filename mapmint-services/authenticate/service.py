@@ -294,6 +294,7 @@ def logIn(conf,inputs,outputs):
 	c = conn.cursor()
 	try:
 		req=" SELECT users.*,(select name from "+prefix+"groups where id=id_group) as gname FROM "+prefix+"users,"+prefix+"user_group,"+prefix+"groups WHERE "+prefix+"users.id=id_user AND "+prefix+"groups.id=id_group AND adm=1 AND login='"+inputs['login']['value']+"' AND passwd='"+h.hexdigest()+"' "
+		print >> sys.stderr,req
 		c.execute(req)
 	except Exception as e:
 		conf["lenv"]["message"]=zoo._("Error when processing SQL query: ")+str(e)
@@ -309,7 +310,7 @@ def logIn(conf,inputs,outputs):
 		
 		# Set all the Session environment variables using the users 
 		# table content.
-		print >> sys.stderr,con.desc
+		#print >> sys.stderr,con.desc
 		c.execute(con.desc)
 		desc=c.fetchall()
 		for i in desc:

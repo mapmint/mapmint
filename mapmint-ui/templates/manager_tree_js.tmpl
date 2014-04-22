@@ -784,6 +784,24 @@ function storeTypes(data){
 	    }
 	}
     });
+
+    \$(".refresh").click(function () {
+	for(var i in layersList){
+	    if(layersList[i].local_id==System.mmNodeId){
+		System.tmplId=this.id;
+		\$.ajax({
+		    type: "GET",
+		    url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=refreshLayerInfo&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+		    dataType: "xml",
+		    complete: function(xml,status) {
+			if(checkWPSResult(xml)){
+			    document.location.reload(true);
+			}
+		    }
+		});
+	    }
+	}
+    });
     
     
     \$(".template").click(function () {
