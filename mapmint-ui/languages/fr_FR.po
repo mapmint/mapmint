@@ -90,6 +90,9 @@ msgstr "cartes"
 msgid "projects"
 msgstr "projets"
 
+msgid "ZOO-Project version:"
+msgstr "Version de ZOO-Project :"
+
 msgid "MapServer version:"
 msgstr "Version de MapServer :"
 

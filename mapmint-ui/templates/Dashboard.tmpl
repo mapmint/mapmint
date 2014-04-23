@@ -141,6 +141,7 @@ MapMint: Dashboard
       <div class="toolbar"><p class="ip">$zoo._("Server IP is") $(s.getsockname()[0])</p></div>
 #set res=$s.close()
       <div>
+	<div>$zoo._("ZOO-Project version:") $zoo.VERSION</div>
 	<div>$zoo._("MapServer version:") $mapscript.MS_VERSION</div>
 	<div>$zoo._("GDAL version:") $osgeo.gdal.__version__</div>
       </div>
