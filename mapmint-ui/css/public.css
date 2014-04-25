@@ -986,6 +986,22 @@ a.map-btn:hover, input[type=submit]:hover{
 
 .ftitle{font-size:1.2em;font-weight:bold;color:#3d2d24 !important;}
 
+#page_navigation a{
+	padding:5px;
+	background:#707070;
+	border-radius:4px;
+	margin:5px 5px 0 0;
+	padding:5px 10px 5px 10px;
+	font-size:.9em;
+	color:#FFFFFF;
+	text-decoration:none
+}
+.active_page{
+	background:#83c849 !important;
+	color:#FFFFFF !important;
+}
+
+
 footer {
 background: #3a3a3a;
 padding: 0;
