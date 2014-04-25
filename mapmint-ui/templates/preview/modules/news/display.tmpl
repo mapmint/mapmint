@@ -15,5 +15,5 @@
 #end for
 #set res=cur.execute('SELECT title,p_date,content from '+prefix+'news where id = '+$inputs["id"]["value"]+' order by p_date desc LIMIT 4')
 #set vals=cur.fetchall()
-<h1>$vals[0][0] ($vals[0][1])</h1>
+<h3 class="lgb">$vals[0][0] ($vals[0][1])</h3>
 <p>$vals[0][2].replace("\\n","</p><p>")</p>

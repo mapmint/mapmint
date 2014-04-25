@@ -45,14 +45,14 @@ $conf["identification"]["title"]
                 		#if $conf["mm"]["documents"]=="true"
                 		<li><a href="#documents" class="">$zoo._("Documents")</a></li>
                 		#end if
-				<li class="dropdown">
+				<!-- <li class="dropdown">
                 		<a href="" class="dropdown-toggle" data-toggle="dropdown">$zoo._("About") <b class="caret"></b></a>
                 		<ul class="dropdown-menu">
                   			<li><a href="#">$zoo._("Legal notice")</a></li>
                   			<li class="divider"></li>
                   			<li><a href="http://mapmint.com">mapmint.com</a></li>
                 		</ul>
-                		</li>
+                		</li> -->
                 	</ul>
 		</div>
 	</div>
@@ -228,7 +228,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #set $cnt=$cnt+1
 #end for
 
-<!-- <div class="col-xs-12 col-sm-12 col-lg-12">
+<div class="col-xs-12 col-sm-12 col-lg-12">
 <div id="news_block" class="rank flip">
          <div id="news_list" class="flip_content">
 #if $conf["mm"]["indexes"]=="true"
@@ -243,7 +243,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #end if
           </div>
 </div>
-</div> -->
+</div>
 
 </div>
 </div>
