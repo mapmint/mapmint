@@ -44,10 +44,18 @@
      mimeType = text/xml
      encoding = UTF-8
      schema = http://schemas.opengis.net/gml/3.1.0/point.xsd
+     extension = xml
+     useMapserver = true
     </Default>
     <Supported>
      mimeType = application/json
      encoding = UTF-8
+    </Supported>
+    <Supported>
+     mimeType = image/png
+     useMapserver = true
+     extension = xml
+     useMapserver = true
     </Supported>
    </ComplexData>
  </DataOutputs>  

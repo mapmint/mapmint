@@ -269,18 +269,31 @@
 
   </div>
 	
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/Manager/Label.tmpl",searchList=$searchList))
+
+#*
   <div id="second">
     #try
-    #set label=$m.getLayerByName($inputs["layer"]["value"]).getClass(0).getLabel(0)
+    #set l1=$m.getLayerByName($inputs["layer"]["value"])
+    #set label=$l1.getClass(0).getLabel(0)
+    #set litem=$l1.labelitem 
+    #except
+    #set m1=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$conf["senv"]["last_map"]+".map")
+    #set l1=$m1.getLayerByName($inputs["layer"]["value"]+"_mmlabel")
+    #try
+    #set label=$l1.getClass(0).getLabel(0)
+    #set litem=$l1.labelitem 
     #except
     #set label=None
+    #set litem=None
+    #end try
     #end try
     
     <input type="checkbox" id="displayLabel" onclick="\$('#Styler_Labels').css('display',(this.checked?'block':'none'))" #if $label is not None and $label.size > 0#checked="true"#end if#/>
     <label>$zoo._("Show labels")</label>
     
     #set l=$label
-    #*set l=$m.getLayerByName($inputs["layer"]["value"]).getClass(0).label*#
     
     <div id="Styler_Labels" #if $l is None or $l.size < 0#style="display:none"#end if#>
 	 <table>
@@ -288,7 +301,7 @@
 	   <tr>
 	     <td>$zoo._("Labeling field:")</td>
 	     <td>
-	       <input id="labelFieldH" type="hidden" value="$m.getLayerByName($inputs["layer"]["value"]).labelitem" />
+	       <input id="labelFieldH" type="hidden" value="$litem" />
 	       <select id="labelField" class="select-window">
 		 <option value="sdfs" selected="selected">$zoo._("Select field")</option>
 	       </select>
@@ -298,10 +311,14 @@
 	   <tr>
 	     <td>$zoo._("Orientation:")</td>
 	     <td>
-	       #set labftmp=$m.getLayerByName($inputs["layer"]["value"]).metadata.get("label_angle_field")
+	       #if $l1
+	       #set labftmp=$l1.metadata.get("label_angle_field")
+	       #else
+	       #set $labftmp=None
+	       #end if
 	       #if $labftmp is None
 	       #set labftmp=""
-	       #end if
+	       #end if	       
 	       <input id="labelAngle" type="text" name="" value="#if $l is not None and $l.angle#$l.angle#else#0#end if#" class="input-window-short hasInfo" title="$zoo._("Angle, given in degrees, to draw the label. Using value '0' for a LINE layers will imply the computation of a curved label for appropriate linear features.")" #if $labftmp is not None and $labftmp.count("[")>0#style="display:none"#end if# />
     <input id="labelAngleFieldH" type="hidden" value="$labftmp.replace("[","").replace("]","")" />
     <select id="labelAngleField" class="select-window" #if $labftmp is None or $labftmp.count("[")==0#style="display:none"#end if#>
@@ -417,6 +434,7 @@
   </ul>
 
 </div>
+*#
 
 </div>
 

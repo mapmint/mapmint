@@ -26,8 +26,7 @@
    maxOccurs = 1
    <LiteralData>
     <Default>
-    mimeType = text/xml
-    encoding = utf-8
+    dataType = string
     </Default>
    </LiteralData>
  </DataInputs>

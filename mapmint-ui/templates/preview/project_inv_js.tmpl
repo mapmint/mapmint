@@ -7,8 +7,8 @@
 #set res=[]
 #for i in $g["coordinates"]
 #set p=mapscript.pointObj(i[0],i[1])
-#set r=$p.project($t,$s)
 #try
+#set r=$p.project($t,$s)
 #set $res+=[[$p.x,$p.y,$i[2]]]
 #except
 #set $res+=[[$p.x,$p.y]]

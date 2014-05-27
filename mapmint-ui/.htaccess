@@ -1,4 +1,4 @@
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ /svn-bin/zoo_loader.cgi?metapath=template&request=Execute&service=WPS&version=1.0.0&Identifier=display&DataInputs=tmpl=$1&RawDataOutput=Result [L,QSA]
+RewriteRule ^(.*)$ /cgi-bin/mm/zoo_loader.cgi?metapath=template&request=Execute&service=WPS&version=1.0.0&Identifier=display&DataInputs=tmpl=$1&RawDataOutput=Result [L,QSA]

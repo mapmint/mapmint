@@ -1,26 +1,43 @@
-#GDAL_SRC=./gdal_src/
+PREFIX=/usr/local
 
-#include $(GDAL_SRC)GDALmake.opt
 
-ZOO_PATH=/Users/djay/MapMint/zoo-project/
+XML2CFLAGS=-I/usr/include/libxml2
+XML2LDFLAGS=-L/usr/lib -lxml2
 
-CPPFLAGS        :=      $(GDAL_INCLUDE) -I$(GDAL_ROOT)/frmts $(CPPFLAGS) -DUSE_CAIRO -DUSE_KML -DUSE_MS -DDEBUGMS `mapserver-config --includes` -I/Users/djay/MapMint/zoo-project/zoo-project/zoo-kernel/ -I/Users/djay/MapMint/zoo-project/zoo-project/trunk/thirds/cgic206 -I/Users/djay/MapMint/src/mapserver-6.2.0 
-DEP_LIBS        =       $(EXE_DEP_LIBS) $(XTRAOBJ)
+GDAL_CFLAGS=-I/usr/include/gdal
+GDAL_LIBS=-L/usr/lib -lgdal
+
+XSLT_LDFLAGS=-L/usr/lib/i386-linux-gnu -lxslt -lxml2
+
+ZOO_FILE=/home/djay/src/zoo/zoo-project/zoo-kernel/ulinet.o /home/djay/src/zoo/zoo-project/zoo-kernel/service_internal_ms.o /home/djay/src/zoo/zoo-project/zoo-kernel/service_internal.o
+ZOO_DIR=/home/djay/src/zoo/zoo-project/zoo-kernel
+
+
+
+CPPFLAGS        :=  -DZOO_SERVICE  -DUSE_CAIRO -DUSE_KML -DUSE_MS -I${ZOO_DIR}
+
 BIN_LIST = cgi-env/service.zo
 
-default:        $(BIN_LIST)
+default : $(BIN_LIST)
 
-all: default
-
-lib-depend:
-	(cd $(GDAL_SRC)/gcore ; $(MAKE) )
-	(cd $(GDAL_SRC)/port ; $(MAKE) )
-
-CFLAGS=-DZOO_SERVICE -I/Users/djay/MapMint/zoo-project/zoo-project/zoo-kernel/
+cgi-env/service.zo: service.c
+	g++ ${GDAL_CFLAGS} $(CFLAGS) $(CPPFLAGS) -shared -fpic $< ${GDAL_LIBS} -o $@
 
 
-cgi-env/service.zo: service.c $(DEP_LIBS)
-	g++ `xml2-config --cflags` `/Library/Frameworks/GDAL.framework/unix/bin/gdal-config --cflags` $(CFLAGS) $(CPPFLAGS) -shared -fpic $< `xslt-config --libs` `xml2-config --libs` `/Library/Frameworks/GDAL.framework/unix/bin/gdal-config --libs` ${ZOO_PATH}/zoo-project/zoo-kernel/ulinet.o ${ZOO_PATH}/zoo-project/zoo-kernel/service_internal_ms.o ${ZOO_PATH}/zoo-project/zoo-kernel/service_internal.o ${ZOO_PATH}/zoo-project/zoo-kernel/service_internal_js.o -lc -lintl -lcrypto -lmapserver -lintl -lmozjs185 -lcurl -lfcgi -framework SystemConfiguration -framework CoreFoundation -o $@
+install: 
+	install -d ${PREFIX}/vector-converter/
+	cd ${PREFIX}/vector-converter/ && ln -s ../main.cfg
+	cd ${PREFIX}/vector-converter/ && ln -s ../ZOO-api.js
+	cd ${PREFIX}/vector-converter/ && ln -s ../ZOO-proj4js.js
+	install $(BIN_LIST)             ${PREFIX}/vector-converter/
+	install cgi-env/*.zcfg          ${PREFIX}/vector-converter/
+	install cgi-env/*.py            ${PREFIX}/vector-converter/
+	install cgi-env/*.js            ${PREFIX}/vector-converter/
 
-clean:
+
+
+
+
+clean : 
 	rm -f cgi-env/*zo
+

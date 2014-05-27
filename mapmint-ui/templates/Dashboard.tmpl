@@ -68,6 +68,7 @@ MapMint: Dashboard
 #end try
 #end for
 
+
 #set layersNumber=0
 #for i in range(len($dbs))
 #for j in range(len($dbs[i]))
@@ -141,9 +142,9 @@ MapMint: Dashboard
       <div class="toolbar"><p class="ip">$zoo._("Server IP is") $(s.getsockname()[0])</p></div>
 #set res=$s.close()
       <div>
-	<div>$zoo._("ZOO-Project version:") $zoo.VERSION</div>
-	<div>$zoo._("MapServer version:") $mapscript.MS_VERSION</div>
-	<div>$zoo._("GDAL version:") $osgeo.gdal.__version__</div>
+	<div>$(zoo._("%s version: %s")%("ZOO-Project",$zoo.VERSION))</div>
+	<div>$(zoo._("%s version: %s")%("MapServer",$mapscript.MS_VERSION))</div>
+	<div>$(zoo._("%s version: %s")%("GDAL",$osgeo.gdal.__version__))</div>
       </div>
 
       <div id="slocal_stats" class="rDiv">
@@ -171,8 +172,6 @@ MapMint: Dashboard
 
 
     </div>
-
   </div>
 </div> 
-
 #end def

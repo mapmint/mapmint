@@ -1526,7 +1526,11 @@ def classifyMap(conf,inputs,outputs):
 		for i in range(0,len(ll)):
 			for j in ll[i]:
 				vals+=[ll[i][j]]
-		classif=json.loads(cs._discretise(vals,inputs["nbClasses"]["value"],inputs["method"]["value"]))
+		try:
+			classif=json.loads(cs._discretise(vals,inputs["nbClasses"]["value"],inputs["method"]["value"]))
+		except Exception,e:
+			conf["lenv"]["message"]=str(e)
+			return zoo.SERVICE_FAILED
 		layer.metadata.set("mmMethod",inputs["method"]["value"])
 		rClass=True
 		print >> sys.stderr,"OKOK\n\n"
@@ -1539,14 +1543,17 @@ def classifyMap(conf,inputs,outputs):
     isRaster=-1
     try:
 	if not(rClass):
+		print >> sys.stderr,"OK"
 		vt.vectInfo(conf,lInputs,outputs)
+		print >> sys.stderr,"OK"
 		#print >> sys.stderr,outputs["Result"]["value"]
-		tmp=eval(outputs["Result"]["value"])
+	tmp=eval(outputs["Result"]["value"])
+
     except Exception,e:
         try:
 	    k=inputs.keys()
-	    #print >> sys.stderr,e
-	    #print >> sys.stderr,"/ERROR"
+	    print >> sys.stderr,e
+	    print >> sys.stderr,"/ERROR"
 	    
 	    if inputs["mmType"]["value"]!="uniqVal":
 		    if k.count("min")==0 :
@@ -1805,8 +1812,11 @@ def saveOpacity(conf,inputs,outputs):
 
 def saveLabel(conf,inputs,outputs):
     import mapscript
-
-    m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+    print >> sys.stderr,str(inputs)
+    if inputs.has_key("fullPath") and inputs["fullPath"]["value"]=="true":
+	    m=mapscript.mapObj(inputs["map"]["value"])
+    else:
+	    m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
     layer=m.getLayerByName(inputs["layer"]["value"])
 
     hasLabel=False
@@ -1900,7 +1910,39 @@ def saveLabel(conf,inputs,outputs):
 		pass
         j-=1
     
-    saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+    if inputs.has_key("fullPath") and inputs["fullPath"]["value"]=="true":
+	    saveProjectMap(m,inputs["map"]["value"])
+    else:
+	    saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+    outputs["Result"]["value"]=zoo._("Map saved")
+    return zoo.SERVICE_SUCCEEDED
+
+def isPolygon(conf,inputs,outputs):
+    import mapscript
+    m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+    l=m.getLayerByName(inputs["layer"]["value"])
+    outputs["Result"]["value"]=str(l.type==mapscript.MS_LAYER_POLYGON)
+    return zoo.SERVICE_SUCCEEDED
+
+def addLabelLayer(conf,inputs,outputs):
+    import mapscript
+    m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["omap"]["value"]+".map")
+    i=m.numlayers-1
+    while i >= 0:
+	    l0=m.getLayer(i)
+	    if l0.name==inputs["layer"]["value"]+"_mmlabel":
+		    m.removeLayer(i)
+	    i-=1
+    m1=mapscript.mapObj(inputs["map"]["value"])
+    l=m1.getLayerByName("Result")
+    l.name=inputs["layer"]["value"]+"_mmlabel"
+    l.getClass(0).removeStyle(0)
+    try:
+	    m.insertLayer(l,m.getLayerByName(inputs["layer"]["value"]).index+1)
+    except Exception,e:
+	    print >> sys.stderr,e
+	    m.insertLayer(l)
+    m.save(conf["main"]["dataPath"]+"/maps/project_"+inputs["omap"]["value"]+".map")
     outputs["Result"]["value"]=zoo._("Map saved")
     return zoo.SERVICE_SUCCEEDED
 
@@ -2432,19 +2474,20 @@ def saveLegendIconsForLayer(conf,m,lm,layer,i,step=None):
 		layer.metadata.set("mmIcon",lsavedImage.replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"]))
 	else:
 		files=[]
+		if step is None:
+			lm=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/map4legend_"+conf["senv"]["last_map"]+"_"+layer.name+".map")
+		else:
+			lm=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/map4legend_"+conf["senv"]["last_map"]+"_"+layer.name+"_step"+str(step)+".map")
+		lm.setSize(20,20)
+		lm.setExtent(-1.5,-1.5,7.5,7.5)
 		for k in range(0,layer.numclasses):
-			if step is None:
-				lm=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/map4legend_"+conf["senv"]["last_map"]+"_"+layer.name+".map")
-			else:
-				lm=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/map4legend_"+conf["senv"]["last_map"]+"_"+layer.name+"_step"+str(step)+".map")
-			lm.setSize(20,20)
-			lm.setExtent(-1.5,-1.5,7.5,7.5)
 			for j in range(0,lm.numlayers):
 				lm.getLayer(j).status=mapscript.MS_OFF
-			if lm.getLayer(k+1) is not None:
-				lm.getLayer(k+1).status=mapscript.MS_ON
+			print >> sys.stderr,"LAYER NAME "+layer.name+"_"+str(k+1)
+			if lm.getLayerByName(layer.name+"_"+str(k+1)) is not None:
+				lm.getLayerByName(layer.name+"_"+str(k+1)).status=mapscript.MS_ON
 			lsavedImage=conf["main"]["tmpPath"]+"/print_"+conf["senv"]["MMID"]+"_"+str(i)+"_"+str(time.clock()).split(".")[1]+"_"+str(k)+".png"
-					#print >> sys.stderr,"OK 2"
+			print >> sys.stderr,"OK 2"
 			try:
 				os.unlink(lsavedImage)
 			except:

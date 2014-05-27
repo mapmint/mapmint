@@ -3671,6 +3671,9 @@ ZOO.Format.WPS = ZOO.Class(ZOO.Format, {
     var outputs = node.*::ProcessOutputs.*::Output;
     if (outputs.length() > 0) {
       var data = outputs[0].*::Data.*::*[0];
+	if(!data){
+	    data = node.*::ProcessOutputs.*::Output[0].*::Reference;
+	}
       var builder = this.parseData[data.localName().toLowerCase()];
       if (builder)
         return builder.apply(this,[data]);
@@ -3733,7 +3736,7 @@ ZOO.Format.WPS = ZOO.Class(ZOO.Format, {
      * {Object} A WPS reference response.
      */
     'reference': function(node) {
-      var result = {type:'reference',value:node.*::href};
+      var result = {type:'reference',value:node.@href};
       return result;
     }
   },

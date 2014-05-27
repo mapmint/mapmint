@@ -360,6 +360,10 @@ function startMapList(){
 				    function(){
 					\$(this).find('Name').each(
 					    function(){
+					        var tmpName0="";
+						if(\$(this).text().indexOf("_mmlabel")!==-1){
+							tmpName0=\$(this).text().replace(/_mmlabel/g,"");
+						}
 						var tmpLayer;
 						var tmpName=\$(this).text();
 						var isStep=false;
@@ -369,18 +373,45 @@ function startMapList(){
 							break;
 						    }
 						}
-
+						stdSize=new OpenLayers.Size(256,256);
+						if(tmpName0!="")
+						    stdSize=new OpenLayers.Size(768,768);
 						tmpLayer = new OpenLayers.Layer.WMS(
 						    \$(this).text(),
 						    "$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/"+(isStep?"timeline_"+\$("#mapName")[0].value+"_step0.map":(System.layerTypes[\$(this).text()]==4?"color_ramp_"+\$("#mapName")[0].value+"_"+\$(this).text()+".map":"project_"+\$("#mapName")[0].value+".map")),
-						    {layers: \$(this).text(),srs: "EPSG:900913",format: "image/png"},
-						    {isBaseLayer: false, singleTile: false, ratio: (\$(this).text().replace("grid_","")!=\$(this).text()?1:1.4),transitionEffect: null}
+						    {layers: \$(this).text(),srs: "EPSG:900913", format: "image/png"},
+						    {isBaseLayer: false, singleTile: false, tileSize: stdSize, ratio: (\$(this).text().replace("grid_","")!=\$(this).text()?1:1.4),transitionEffect: null}
 			    			);
 						tmpLayer.local_id=\$(this).text();
 						System.layersListOrder[System.layersListOrder.length]=\$(this).text();
 						tmpLayer.setVisibility(false);
 			    			layersList[layersList.length]=tmpLayer;
 						//alert(tmpLayer.name);
+						if(tmpName0!=""){
+						    for(i=0;i<layersList.length;i++){
+							if(layersList[i].local_id==tmpName0){
+							    map.events.register('changelayer', null, function(evt){
+       								if(evt.property === "visibility" && evt.layer.visibility) {
+								    for(var j=0;j<layersList.length;j++){
+									if(layersList[j].local_id==tmpName0+"_mmlabel"){
+									    layersList[j].setVisibility(true);
+									    return;
+									}
+								    }
+       								}else{
+								    if(evt.property === "visibility" && !evt.layer.visibility) {
+									for(var j=0;j<layersList.length;j++){
+									    if(layersList[j].local_id==tmpName0+"_mmlabel"){
+										layersList[j].setVisibility(false);
+										return;
+									    }
+									}
+       								    }
+								}
+   							    });
+							}
+						    }
+						}
 		 	    			map.addLayer(tmpLayer);
 					    }
 					    
@@ -1371,11 +1402,15 @@ function saveLayerStyle(){
 function saveLayerLabel(){
     \$.ajax({
 	type: "GET",
-	url: "$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=saveLabel&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";label="+(\$("#displayLabel")[0].checked?(\$("#labelField")[0]?""+\$("#labelField")[0].value:"GRID")+";angle="+(\$("#lauf").is(":checked")?"["+\$("#labelAngleField").val()+"]":\$("#labelAngle").val())+";pos="+\$('input[type=radio][name=position_label]:checked').attr('value')+";mmFill="+\$("#font-colorpicker")[0].value.replace("#","")+";bs="+\$("#labelBufferF")[0].value+";fs="+\$('#fonts')[0].value+";f="+\$('#font')[0].value+(\$("#bufferLabel")[0].checked?";mmOut="+\$("#buffer-font-colorpicker")[0].value.replace("#","")+";lbs="+\$("#mmLabelBufferSize")[0].value:""):"")+"&RawDataOutput=Result",
+	url: "$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=saveLabelJS&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";label="+(\$("#displayLabel")[0].checked?(\$("#labelField")[0]?""+\$("#labelField")[0].value:"GRID")+";angle="+(\$("#lauf").is(":checked")?"["+\$("#labelAngleField").val()+"]":\$("#labelAngle").val())+";pos="+\$('input[type=radio][name=position_label]:checked').attr('value')+";mmFill="+\$("#font-colorpicker")[0].value.replace("#","")+";bs="+\$("#labelBufferF")[0].value+";fs="+\$('#fonts')[0].value+";f="+\$('#font')[0].value+(\$("#bufferLabel")[0].checked?";mmOut="+\$("#buffer-font-colorpicker")[0].value.replace("#","")+";lbs="+\$("#mmLabelBufferSize")[0].value:""):"")+"&RawDataOutput=Result",
 	complete: function(xml, status){
 	    for(var i in layersList)
-		if(layersList[i].local_id==System.mmNodeId)
-		    layersList[i].redraw(true);			  
+		if(layersList[i].local_id==System.mmNodeId){
+		    layersList[i].redraw(true);
+		}else{
+		    if(layersList[i].local_id==System.mmNodeId+"_mmlabel")
+			layersList[i].redraw(true);
+		}
 	}
     });
 }

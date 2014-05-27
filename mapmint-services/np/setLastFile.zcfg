@@ -6,7 +6,6 @@
  statusSupported = true
  serviceProvider = service
  serviceType = Python
- <DataInputs />
  <DataOutputs>
   [Result]
    Title = The welcome message

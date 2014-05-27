@@ -213,6 +213,26 @@ def BoundaryPy(conf,inputs,outputs):
     outputResult(conf,outputs["Result"],rgeometries)
     return zoo.SERVICE_SUCCEEDED
 
+def PointOnSurface(conf,inputs,outputs):
+    geometry=extractInputs(conf,inputs["InputPolygon"])
+    i=0
+    rgeometries=[]
+    while i < len(geometry):
+        tmp=geometry[i].Clone()
+        resg=geometry[i].GetGeometryRef()
+        if resg.GetGeometryType()!=3:
+            resg=resg.ConvexHull()
+        resg0=resg.PointOnSurface()
+        #print >> sys.stderr,"GEO "+str(resg.ExportToWkt())
+        if resg0 is None:
+            resg0=resg.Centroid()
+        tmp.SetGeometryDirectly(resg0)
+        rgeometries+=[tmp]
+        geometry[i].Destroy()
+        i+=1
+    outputResult(conf,outputs["Result"],rgeometries)
+    return zoo.SERVICE_SUCCEEDED
+
 def CentroidPy(conf,inputs,outputs):
     geometry=extractInputs(conf,inputs["InputPolygon"])
     i=0
@@ -222,13 +242,38 @@ def CentroidPy(conf,inputs,outputs):
         resg=geometry[i].GetGeometryRef()
         if resg.GetGeometryType()!=3:
             resg=resg.ConvexHull()
-        resg=resg.Centroid()
-        tmp.SetGeometryDirectly(resg)
+        resg0=resg.Centroid()
+        tmp.SetGeometryDirectly(resg0)
         rgeometries+=[tmp]
         geometry[i].Destroy()
         i+=1
     outputResult(conf,outputs["Result"],rgeometries)
-    return zoo.SUCCEEDED
+    return zoo.SERVICE_SUCCEEDED
+
+def CentroidPy1(conf,inputs,outputs):
+    geometry=extractInputs(conf,inputs["InputPolygon"])
+    i=0
+    rgeometries=[]
+    while i < len(geometry):
+        tmp=geometry[i].Clone()
+        resg=geometry[i].GetGeometryRef()
+        if resg.GetGeometryType()!=3:
+            resg=resg.ConvexHull()
+        print >> sys.stderr,str(resg)
+        resg=resg.Centroid()
+        if tmp.GetGeometryRef().Intesects(resg):
+            tmp.SetGeometryDirectly(resg)
+        else:
+            resg=geometry[i].GetGeometryRef()
+            print >> sys.stderr,str(resg.PointOnSurface())
+            resg=resg.PointOnSurface()
+            print >> sys.stderr,str(resg)
+            tmp.SetGeometryDirectly(resg)
+        rgeometries+=[tmp]
+        geometry[i].Destroy()
+        i+=1
+    outputResult(conf,outputs["Result"],rgeometries)
+    return zoo.SERVICE_SUCCEEDED
 
 def ConvexHullPy(conf,inputs,outputs):
     geometry=extractInputs(conf,inputs["InputPolygon"])

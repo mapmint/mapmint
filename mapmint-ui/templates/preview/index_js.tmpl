@@ -656,8 +656,35 @@ System.postMap[System.postMap.length]={
 	);
     tmpLayer.real_name="$(l.name)";
     tmpLayer.local_id="$lname";
-    tmpLayer.setVisibility(#if $m.web.metadata.get("mmActivatedLayers").split(',').count($lname)>0#true#else#false#end if#);
+    tmpLayer.setVisibility(#if $m.web.metadata.get("mmActivatedLayers").split(',').count($lname)>0 or $m.web.metadata.get("mmActivatedLayers").split(',').count($lname.replace("_mmlabel",""))>0#true#else#false#end if#);
     layersList[layersList.length]=tmpLayer;
+    if("$(l.name.count("_mmlabel")>0)"=="True"){
+
+	var tmpName0="$(l.name.replace("_mmlabel",""))";
+	if(layersList[layersList.length-2].local_id==tmpName0){
+	    map.events.register('changelayer', null, function(evt){
+		var tmpName0="$(l.name.replace("_mmlabel",""))";
+       		if(evt.property === "visibility" && evt.layer.visibility) {
+		    for(var j=0;j<layersList.length;j++){
+			if(layersList[j].local_id==tmpName0+"_mmlabel"){
+			    layersList[j].setVisibility(true);
+			    return;
+			}
+		    }
+       		}else{
+		    if(evt.property === "visibility" && !evt.layer.visibility) {
+			for(var j=0;j<layersList.length;j++){
+			    if(layersList[j].local_id==tmpName0+"_mmlabel"){
+				layersList[j].setVisibility(false);
+				return;
+			    }
+			}
+       		    }
+		}
+   	    });
+	}
+
+    }
 #if $m.web.metadata.get("mmActivatedLayers").split(',').count($lname)>0
     try{
 	\$('#layers_list').tree('check',\$(".tree_layer"+(layersList.length-1))[0].parentNode);
