@@ -1,0 +1,57 @@
+[PointOnSurface]
+ Title = Get the point on surface of a polygon. 
+ Abstract = Get the point on surface of a polygon. 
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [InputPolygon]
+   Title = Polygon to get the centroid
+   Abstract = The centroid which is not necessarily within the geometry.
+   minOccurs = 1
+   maxOccurs = 1
+   <MetaData lang="en">
+    title = Mon test  
+   </MetaData>   
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+    </Default>
+    <Supported>
+     mimeType = text/xml
+     encoding = base64
+     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+    </Supported>
+   </ComplexData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The Centroid
+   Abstract = JSON String / GML Entity of the centroid
+   <MetaData lang="en">
+    title = Mon test  
+   </MetaData>   
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://schemas.opengis.net/gml/3.1.0/point.xsd
+     extension = xml
+     useMapserver = true
+    </Default>
+    <Supported>
+     mimeType = application/json
+     encoding = UTF-8
+    </Supported>
+    <Supported>
+     mimeType = image/png
+     useMapserver = true
+     extension = xml
+     useMapserver = true
+    </Supported>
+   </ComplexData>
+ </DataOutputs>  
