@@ -130,10 +130,11 @@ def vectInfo(conf,inputs,outputs):
             if pszWHERE is not None:
                 poResultSet.SetAttributeFilter( pszWHERE )
 
-            print >> sys.stderr,outputs
+            #print >> sys.stderr,outputs
             res=[]
             ReportOnLayer( inputs, res, poResultSet, None, None, options )
-            outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False).encode("utf-8")
+            #print >> sys.stderr,res
+            outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
             poDS.ReleaseResultSet( poResultSet )
 
     for iRepeat in range(nRepeatCount):
@@ -160,7 +161,7 @@ def vectInfo(conf,inputs,outputs):
                         poLayer.ResetReading()
                     res=[]
                     ReportOnLayer( inputs, res, poLayer, pszWHERE, poSpatialFilter, options )
-                    outputs["Result"]["value"]=json.dumps(res)
+                    outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
 
         else:
 #/* -------------------------------------------------------------------- */ 
@@ -178,14 +179,14 @@ def vectInfo(conf,inputs,outputs):
 
                 res=[]
                 ReportOnLayer( inputs, res, poLayer, pszWHERE, poSpatialFilter, options )
-                outputs["Result"]["value"]=json.dumps(res)
+                outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
 
 #/* -------------------------------------------------------------------- */
 #/*      Close down.                                                     */
 #/* -------------------------------------------------------------------- */
     poDS.Destroy()
     #import json
-    print >> sys.stderr,outputs["Result"]["value"]
+    #print >> sys.stderr,outputs["Result"]["value"]
     outputs["Result"]["value"]=str(outputs["Result"]["value"])
     return 3
 

@@ -492,6 +492,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/uoms.tmpl",searchList={"conf": 
 #set vectorLayers=[]
 #end if
 #for i in range(0,$m.numlayers)
+#if $m.getLayer($i).name.count("_mmlabel")==0
 	  <tr>
 	    <td>$m.getLayer($i).name</td>
 	    <td><input type="checkbox" value="p$i" id="layer_has_popup_$m.getLayer($i).name" #if ($popupList.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>
@@ -505,6 +506,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/uoms.tmpl",searchList={"conf": 
 	    <td><input type="text" style="width:75px;" id="label_max_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmLabelMaxScale")" /></td>
 	    <td><a href="#access" onclick="MapMintUsersManager.editPrivilege('$m.getLayer($i).name')">priv.</a></td>
 	  </tr>
+#end if
 #end for
 	</tbody>
       </table>

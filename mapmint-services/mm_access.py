@@ -42,6 +42,7 @@ def checkMapPriv(conf,map):
         return False
 
 def checkLayerPriv(conf,map,layer,typ):
+    print >> sys.stderr,"LAYER "+str(layer)
     if len(typ)>1:
         ctypes=[]
         for i in range(0,len(typ)):

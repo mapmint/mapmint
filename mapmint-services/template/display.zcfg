@@ -26,9 +26,9 @@
      mimeType = text/html
      encoding = utf-8
     </Default>
-    <Default>
+    <Supported>
      mimeType = text/plain
      encoding = utf-8
-    </Default>
+    </Supported>
    </ComplexData>
  </DataOutputs>

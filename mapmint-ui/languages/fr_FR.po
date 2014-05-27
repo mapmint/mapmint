@@ -93,12 +93,8 @@ msgstr "projets"
 msgid "ZOO-Project version:"
 msgstr "Version de ZOO-Project :"
 
-msgid "MapServer version:"
-msgstr "Version de MapServer :"
-
-msgid "GDAL version:"
-msgstr "Version de GDAL :"
-
+msgid "%s version: %s"
+msgstr "Version de %s : %s"
 
 #: ..\wwwroot\mm\templates\Distiller.tmpl:54
 msgid "MySQL connections"

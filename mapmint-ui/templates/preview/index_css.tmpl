@@ -122,7 +122,11 @@ div#header{
 #set a={"minx": float($m1.web.metadata.get('max_minx')),"miny": float($m1.web.metadata.get('max_miny')),"maxx": float($m1.web.metadata.get('max_maxx')),"maxy":float($m1.web.metadata.get('max_maxy'))}
 #else
 #set a=$m1.getLayer(0).getExtent()
+#try
 /* BaseLayer $a.project(m.getLayer(0).getProjection()),mapscript.projectionObj(m.getProjection())) */
+#except
+/* BaseLayer */
+#end try
 #end if
 #set x=(($a.maxx-$a.minx)/2)+$a.minx
 #set y=(($a.maxy-$a.miny)/2)+$a.miny
