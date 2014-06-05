@@ -12,7 +12,7 @@ function refreshGraphFields(){
     $("#graphs_id").val("");
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=details&DataInputs=table="+tableName_G+";id="+System.nodeId+vars+";tab=graph&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table="+tableName_G+";id="+System.nodeId+vars+";tab=graph&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		try{

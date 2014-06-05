@@ -99,11 +99,11 @@ $(document).ready(function(){
 
 function setCurrentIndex(){
   params=[{name: "id", value: $("#index_id").val(), dataType: "string"}];
-  data=WPSGetHeader("setCurrentIndex")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+  data=WPSGetHeader("np.setCurrentIndex")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
   $.ajax({
     type: "POST",
     contentType: "text/xml",
-    url: System.zooUrl+"?metapath=np",
+    url: System.zooUrl,
     data: data,
     complete: function(xml,status) {
 	if(checkWPSResult(xml,false,false)){
@@ -155,11 +155,11 @@ function setCurrentIndex(){
 
 function refreshIndexDisplay(){
   params=[{name: "id", value: $("#index_id").val(), dataType: "string"}];
-  data=WPSGetHeader("getIndexDisplayJs")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+  data=WPSGetHeader("np.getIndexDisplayJs")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
   $.ajax({
     type: "POST",
     contentType: "text/xml",
-    url: System.zooUrl+"?metapath=np",
+    url: System.zooUrl,
     data: data,
     complete: function(xml,status) {
 	if(checkWPSResult(xml,false)){
@@ -172,7 +172,7 @@ function refreshIndexDisplay(){
 	      $("#flexi_index").flexigrid({
 		  autoload: true,
 		  ogcProtocol: "MM",
-		  url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=getIndexValues&RawDataOutput=Result&DataInputs=id="+$('#index_id').val(),
+		  url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.getIndexValues&RawDataOutput=Result&DataInputs=id="+$('#index_id').val(),
 		  id: "PG",
 		  singleSelect: true,
 		  colModel: colModel["values"],

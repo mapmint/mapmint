@@ -80,7 +80,7 @@ function mmGeocode(obj,feature){
     System.n=System.points[System.points.length-1];
     \$.ajax({
 	type: "GET",
-	url: "$conf["main"]["serverAddress"]?metapath=routing&service=WPS&version=1.0.0&request=Execute&Identifier=reverseGeocode&DataInputs=x="+lonlat.lon+";y="+lonlat.lat+"&RawDataOutput=Result",
+	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=routing.reverseGeocode&DataInputs=x="+lonlat.lon+";y="+lonlat.lat+"&RawDataOutput=Result",
 	dataType: "xml",
 	complete: function(xml,status) {
 	    try{
@@ -204,17 +204,17 @@ DrawPoints = OpenLayers.Class(OpenLayers.Control.DrawFeature, {
 
 function _getSitesAround(){
     var params1=[
-	{name: "InputEntity1","xlink:href": System.zooUrl+"?metapath=vector-tools&amp;service=WPS&amp;version=1.0.0&amp;request=Execute&amp;Identifier=BufferUnion&amp;DataInputs=InputPolygon=Reference@xlink:href="+encodeURIComponent(System.mapUrl+"&service=WFS&version=1.0.0&request=GetFeature&typename=Result")+";BufferDistance=0.02&amp;RawDataOutput=Result", mimeType: "application/json"},
+	{name: "InputEntity1","xlink:href": System.zooUrl+"?service=WPS&amp;version=1.0.0&amp;request=Execute&amp;Identifier=vector-tools.BufferUnion&amp;DataInputs=InputPolygon=Reference@xlink:href="+encodeURIComponent(System.mapUrl+"&service=WFS&version=1.0.0&request=GetFeature&typename=Result")+";BufferDistance=0.02&amp;RawDataOutput=Result", mimeType: "application/json"},
 	{name: "InputEntity2","xlink:href": msUrl+"?map="+pmapfile+"&amp;service=WFS&amp;version=1.0.0&amp;request=GetFeature&amp;typename=Sites",mimeType: "text/xml"},
 	{name: "line","xlink:href": System.mapUrl+"&amp;service=WFS&amp;version=1.0.0&amp;request=GetFeature&amp;typename=Result", mimeType: "text/xml"}
     ];
     //alert("ok");
-    var data1=WPSGetHeader("orderedIntersection")+WPSGetInputs(params1)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+    var data1=WPSGetHeader("vector-tools.orderedIntersection")+WPSGetInputs(params1)+WPSGetOutput({name: "Result"})+WPSGetFooter();
     //alert("ok "+data1);
     
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=vector-tools",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: data1,
 	complete: function(xml,status) {
@@ -285,10 +285,10 @@ function _getSitesAround(){
 		    {name: "epoint",value: endpoint.x+","+endpoint.y,dataType: "string"}
 		];
 
-		var data1=WPSGetHeader("orderPoiAlongLine")+WPSGetInputs(params1)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+		var data1=WPSGetHeader("vector-tools.orderPoiAlongLine")+WPSGetInputs(params1)+WPSGetOutput({name: "Result"})+WPSGetFooter();
 		$.ajax({
 		    type: "POST",
-		    url: System.zooUrl+"?metapath=vector-tools",
+		    url: System.zooUrl,
 		    contentType: 'text/xml',
 		    data: data1,
 		    complete: function(xml,status) {*/
@@ -321,22 +321,18 @@ function getSitesAround(){
 		  }
 		 );
 		
-    //alert("ok");
-    //\$( "#loadgcp-window" ).window('onclose',function(){alert("ok");});
-    //alert(System.mapUrl);
-    //alert(System.zooUrl+"?metapath=vector-tools&service=WPS&version=1.0.0&request=Execute&Identifier=Buffer&DataInputs=InputEntity1=Reference@xlink:href="+encodeURIComponent(System.mapUrl+"&service=WFS&version=1.0.0&request=GetFeature&typename=Result")+";BufferDistance=0.001&RawDataOutput=Result");
 
   
 #*    var params=[
 	{name: "InputPolygon","xlink:href": System.mapUrl+"&amp;service=WFS&amp;version=1.0.0&amp;request=GetFeature&amp;typename=Result",mimeType: "text/xml"},
 	{name: "Distance","value": 0.001,dataType: "string"}
     ];
-    var data=WPSGetHeader("Buffer")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+    var data=WPSGetHeader("vector-tools.Buffer")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
     //alert(data);
 
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=vector-tools",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: data,
 	complete: function(xml,status) {
@@ -345,10 +341,10 @@ function getSitesAround(){
 		    {name: "InputEntity1","value": xml.responseText, mimeType: "text/json"},
 		    {name: "InputEntity2","xlink:href": msUrl+"?map="+pmapfile+"&amp;service=WFS&amp;version=1.0.0&amp;request=GetFeature&amp;typename=Sites",mimeType: "text/xml"}
 		];
-		var data1=WPSGetHeader("Intersection")+WPSGetInputs(params1)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+		var data1=WPSGetHeader("vector-tools.Intersection")+WPSGetInputs(params1)+WPSGetOutput({name: "Result"})+WPSGetFooter();
 		$.ajax({
 		    type: "POST",
-		    url: System.zooUrl+"?metapath=vector-tools",
+		    url: System.zooUrl,
 		    contentType: 'text/xml',
 		    data: data1,
 		    complete: function(xml,status) {
@@ -436,7 +432,7 @@ function loadTrace(){
 	var params=[
 	    {name: "trace",value: arguments[0],dataType: "string"}
 	];
-	var data=WPSGetHeader("loadRoute")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+	var data=WPSGetHeader("routing.loadRoute")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
 	System.toLoad=arguments[0];
 	System.routingProfileComputed=false;
 #if $m.web.metadata.get('layout_t')=="mobile"
@@ -444,7 +440,7 @@ function loadTrace(){
 #end if
 	$.ajax({
 	    type: "POST",
-	    url: System.zooUrl+"?metapath=routing",
+	    url: System.zooUrl,
 	    contentType: 'text/xml',
 	    data: data,
 	    complete: function(xml,status) {
@@ -516,7 +512,7 @@ function loadTrace(){
 						    finalpoint = points_layer.features[1].geometry.clone();
 						    finalpoint.transform(mercator, geographic);
 						    
-						    System.inputs1=System.zooUrl+"?metapath=vector-tools&amp;service=WPS&amp;version=1.0.0&amp;request=Execute&amp;Identifier=UnionOneGeom&amp;DataInputs=InputEntity=Reference@xlink:href="+encodeURIComponent(System.mapUrl+"&service=WFS&version=1.0.0&request=GetFeature&typename=Result")+"&amp;RawDataOutput=Result"
+						    System.inputs1=System.zooUrl+"?service=WPS&amp;version=1.0.0&amp;request=Execute&amp;Identifier=vector-tools.UnionOneGeom&amp;DataInputs=InputEntity=Reference@xlink:href="+encodeURIComponent(System.mapUrl+"&service=WFS&version=1.0.0&request=GetFeature&typename=Result")+"&amp;RawDataOutput=Result"
 						    requestProfile();
 						}catch(e){alert(e);}
 						
@@ -542,11 +538,11 @@ function deleteTrace(){
     var params=[
 	{name: "trace",value: arguments[0],dataType: "string"}
     ];
-    var data=WPSGetHeader("removeRoute")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+    var data=WPSGetHeader("routing.removeRoute")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
 	tmp=arguments[0];
     $.ajax({
       type: "POST",
-	  url: System.zooUrl+"?metapath=routing",
+	  url: System.zooUrl,
 	  contentType: 'text/xml',
 	  data: data,
 	tmp: tmp,
@@ -575,11 +571,11 @@ function listSavedPaths(){
 	var params=[
 	    {name: "trace",value: arguments[0],dataType: "string"}
 	];
-	var data=WPSGetHeader("listRoute")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+	var data=WPSGetHeader("routing.listRoute")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
 	tmp=arguments[0];
 	$.ajax({
 	    type: "POST",
-	    url: System.zooUrl+"?metapath=routing",
+	    url: System.zooUrl,
 	    contentType: 'text/xml',
 	    data: data,
 	    tmp: tmp,
@@ -615,10 +611,10 @@ function routingSave(){
 	    params[params.length]={name: "user",value: "anonymous",dataType: "string"};
 	    System.shouldDisplay=false;
 	}
-	var data=WPSGetHeader("saveRouteForUser")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+	var data=WPSGetHeader("routing.saveRouteForUser")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
 	$.ajax({
 	    type: "POST",
-	    url: System.zooUrl+"?metapath=routing",
+	    url: System.zooUrl,
 	    contentType: 'text/xml',
 	    data: data,
 	    complete: function(xml,status) {
@@ -664,13 +660,13 @@ function saveNews(){
 	else
 	    params[params.length]={name: "type_incident",value: \$("#ntype1").val(),dataType: "string"};
 	
-	var data=WPSGetHeader("savePOIUser")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+	var data=WPSGetHeader("routing.savePOIUser")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
 #if $m.web.metadata.get('layout_t')=="mobile"
     $.mobile.showPageLoadingMsg();
 #end if
 	$.ajax({
 	    type: "POST",
-	    url: System.zooUrl+"?metapath=routing",
+	    url: System.zooUrl,
 	    contentType: 'text/xml',
 	    data: data,
 	    complete: function(xml,status) {
@@ -732,7 +728,7 @@ function runRouting(layer){
     requestedProfile=false;
     \$.ajax({
 	type: "GET",
-	url: zooUrl+"?metapath=routing&service=WPS&request=Execute&version=1.0.0&Identifier=do&DataInputs=startPoint="+startpoint.x+","+startpoint.y+suffix+";endPoint="+finalpoint.x+","+finalpoint.y+(\$("#pp2")[0].checked?";priorize=true":(\$("#pp0")[0].checked?";distance=true":""))+"&ResponseDocument=Result@asReference=true@mimeType=application/json@useMapserver=true@mimeType=application/json",
+	url: zooUrl+"?service=WPS&request=Execute&version=1.0.0&Identifier=do&DataInputs=routing.startPoint="+startpoint.x+","+startpoint.y+suffix+";endPoint="+finalpoint.x+","+finalpoint.y+(\$("#pp2")[0].checked?";priorize=true":(\$("#pp0")[0].checked?";distance=true":""))+"&ResponseDocument=Result@asReference=true@mimeType=application/json@useMapserver=true@mimeType=application/json",
 	dataType: 'xml',
 	complete:function(xml,status){
 	    if(status=="success"){
@@ -795,7 +791,7 @@ function runRouting(layer){
 		
 		\$.ajax({
 		    type: "GET",
-		    url: zooUrl+"?metapath=routing&service=WPS&request=Execute&version=1.0.0&Identifier=applyStyleToRouteMap&DataInputs=map="+tmp[1]+"&RawDataOutput=Result",
+		    url: zooUrl+"?service=WPS&request=Execute&version=1.0.0&Identifier=routing.applyStyleToRouteMap&DataInputs=map="+tmp[1]+"&RawDataOutput=Result",
 		    dataType: 'xml',
 		    complete:function(xml,status){
 			route_layer.redraw(true);
@@ -840,7 +836,7 @@ function runRouting(layer){
 			    });
 			//map.addLayers([route_layer]);
 #if $m.web.metadata.get('layout_t')!="mobile"
-			System.inputs1=System.zooUrl+"?metapath=vector-tools&amp;service=WPS&amp;version=1.0.0&amp;request=Execute&amp;Identifier=UnionOneGeom&amp;DataInputs=InputEntity=Reference@xlink:href="+encodeURIComponent(System.mapUrl+"&service=WFS&version=1.0.0&request=GetFeature&typename=Result")+"&amp;RawDataOutput=Result"
+			System.inputs1=System.zooUrl+"?service=WPS&amp;version=1.0.0&amp;request=Execute&amp;Identifier=vector-tools.UnionOneGeom&amp;DataInputs=InputEntity=Reference@xlink:href="+encodeURIComponent(System.mapUrl+"&service=WFS&version=1.0.0&request=GetFeature&typename=Result")+"&amp;RawDataOutput=Result"
 			//alert(System.selectPoi);
 			if(!System.selectPoi)
 			    requestProfile();
@@ -864,7 +860,7 @@ function runRouting(layer){
 	suffix+=","+interpoint[interpoint.length-1].x+","+interpoint[interpoint.length-1].y;
     }
     
-    url="/cgi-bin/zoo_loader.cgi?metapath=routing&service=WPS&request=Execute&version=1.0.0&Identifier=computeRouteProfile&DataInputs=startPoint="+startpoint.x+","+startpoint.y+suffix+";endPoint="+finalpoint.x+","+finalpoint.y+";mult=15&RawDataOutput=Result";
+    url="/cgi-bin/zoo_loader.cgi?service=WPS&request=Execute&version=1.0.0&Identifier=routing.computeRouteProfile&DataInputs=startPoint="+startpoint.x+","+startpoint.y+suffix+";endPoint="+finalpoint.x+","+finalpoint.y+";mult=15&RawDataOutput=Result";
 
 }
 
@@ -969,7 +965,7 @@ function drivingDistance(layer,mode) {
 	
 	\$.ajax({
 	    type: "GET",
-	    url: zooUrl+"?metapath=routing&service=WPS&request=Execute&version=1.0.0&Identifier=doDDPolygon&DataInputs=startPoint="+startpoint.x+","+startpoint.y+";distance="+((\$("#dd_distance").val()*1000)/111120)+"&ResponseDocument=Result@asReference=true@mimeType=image/png",
+	    url: zooUrl+"?service=WPS&request=Execute&version=1.0.0&Identifier=routing.doDDPolygon&DataInputs=startPoint="+startpoint.x+","+startpoint.y+";distance="+((\$("#dd_distance").val()*1000)/111120)+"&ResponseDocument=Result@asReference=true@mimeType=image/png",
 	    dataType: 'xml',
 	    complete:function(xml,status){
 		if(status=="success"){	
@@ -1066,10 +1062,10 @@ function drivingDistance(layer,mode) {
 									      {"name":"InputEntity1","xlink:href":mapUrl[0]+"&amp;service=WFS&amp;version=1.0.0&amp;request=GetFeature&amp;typename=Result","mimeType":"text/xml"},
 									      {"name":"InputEntity2","xlink:href":"$conf["main"]["mapserverAddress"]?service=WFS&amp;request=GetFeature&amp;version=1.0.0&amp;typename=Sites&amp;bbox="+tmp1+"&amp;map="+System.mapfile,"mimeType":"text/xml"}
 									  ];
-									  var data=WPSGetHeader("Intersection")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+									  var data=WPSGetHeader("vector-tools.Intersection")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
 									  $.ajax({
 									      type: "POST",
-									      url: System.zooUrl+"?metapath=vector-tools",
+									      url: System.zooUrl,
 									      contentType: 'text/xml',
 									      data: data,
 									      complete: function(xml,status) {
@@ -1211,7 +1207,7 @@ function routingDownload(){
     \$.ajax({
         type: "GET",
 	dataType: "html",
-	url: "/cgi-bin/zoo_loader.cgi?metapath=vector-converter&request=Execute&service=WPS&version=1.0.0&Identifier="+(arguments[0]?"convertTo":"convertToKML")+"&DataInputs=InputDSTN=${conf["main"]["dataPath"]}/ZOO_DATA_Result_"+tmp2[0]+".json"+(arguments[0]?";format="+arguments[0]:"")+"&RawDataOutput=Result",
+	url: "/cgi-bin/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=vector-converter."+(arguments[0]?"convertTo":"convertToKML")+"&DataInputs=InputDSTN=${conf["main"]["dataPath"]}/ZOO_DATA_Result_"+tmp2[0]+".json"+(arguments[0]?";format="+arguments[0]:"")+"&RawDataOutput=Result",
 	success: function(xml){
 #if $m.web.metadata.get('layout_t')=="mobile"
 	    $.mobile.hidePageLoadingMsg();
@@ -1661,10 +1657,10 @@ function requestProfile(){
 	{name: "mult","value": "10",dataTye: "string"},
 	{name: "RasterFile","value": "topofr.tif",dataType: "string"}
     ];
-    var data1=WPSGetHeader("GdalExtractProfile")+WPSGetInputs(params1)+WPSGetOutput({name: "Profile","form":"ResponseDocument","asReference": "true"})+WPSGetFooter();
+    var data1=WPSGetHeader("routing.GdalExtractProfile")+WPSGetInputs(params1)+WPSGetOutput({name: "Profile","form":"ResponseDocument","asReference": "true"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=routing",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: data1,
 	complete: function(xml,status) {
@@ -1679,7 +1675,7 @@ function loadProfileAndDisplay(){
     System.lineUrl=WPSParseReference(arguments[0]);
     \$.ajax({
 	type: "GET",
-	url: zooUrl+"?metapath=routing&service=WPS&request=Execute&version=1.0.0&Identifier=computeDistanceAlongLine&DataInputs=line=Reference@xlink:href="+System.lineUrl+"&RawDataOutput=Result@mimeType=application/json",
+	url: zooUrl+"?service=WPS&request=Execute&version=1.0.0&Identifier=routing.computeDistanceAlongLine&DataInputs=line=Reference@xlink:href="+System.lineUrl+"&RawDataOutput=Result@mimeType=application/json",
 	complete:function(request,status){
 	    //alert("ok");
 	    var coord;
@@ -1804,7 +1800,7 @@ function loadProfileAndDisplay(){
 				}
 				\$.ajax({
 				    type: "GET",
-				    url: zooUrl+"?metapath=routing&service=WPS&request=Execute&version=1.0.0&Identifier=splitLine&DataInputs=startPoint="+sspoints[parseInt(this.min)]+";endPoint="+sspoints[parseInt(this.max)]+";line=Reference@xlink:href="+encodeURIComponent(System.lineUrl)+"&ResponseDocument=Result@asReference=true@mimeType=text/xml",
+				    url: zooUrl+"?service=WPS&request=Execute&version=1.0.0&Identifier=routing.splitLine&DataInputs=startPoint="+sspoints[parseInt(this.min)]+";endPoint="+sspoints[parseInt(this.max)]+";line=Reference@xlink:href="+encodeURIComponent(System.lineUrl)+"&ResponseDocument=Result@asReference=true@mimeType=text/xml",
 				    dataType: 'xml',
 				    complete:function(xml,status){
 					System.tmpMUrl=WPSParseReference(xml);
@@ -2056,7 +2052,7 @@ function codeAddress(address) {
     
     \$.ajax({
 	type: "GET",
-	url: "$conf["main"]["serverAddress"]?metapath=routing&service=WPS&version=1.0.0&request=Execute&Identifier=geocodeAdresse&DataInputs=search="+System.address+"&RawDataOutput=Result",
+	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=routing.geocodeAdresse&DataInputs=search="+System.address+"&RawDataOutput=Result",
 	dataType: "xml",
 	complete: function(xml,status) {
 #if $m.web.metadata.get('layout_t')=="mobile"
@@ -2187,7 +2183,7 @@ function startSearch1(){
     
 	\$.ajax({
 	    type: "GET",
-	    url: "$conf["main"]["serverAddress"]?metapath=routing&service=WPS&version=1.0.0&request=Execute&Identifier=geocodeAdresse&DataInputs=search="+System.address+"&RawDataOutput=Result",
+	    url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=routing.geocodeAdresse&DataInputs=search="+System.address+"&RawDataOutput=Result",
 	    dataType: "xml",
 	    complete: function(xml,status) {
 		try{

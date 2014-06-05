@@ -269,7 +269,7 @@ function setIndexQuote(){
 	localID: this.length,
 	localElement: arguments[0],
 	localId: arguments[1],
-	url: zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=setIndexQuote&DataInputs=id="+arguments[1]+";quote="+arguments[2]+"&RawDataOutput=Result&timestamp="+d.getTime(),
+	url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.setIndexQuote&DataInputs=id="+arguments[1]+";quote="+arguments[2]+"&RawDataOutput=Result&timestamp="+d.getTime(),
 	complete: function(xml,status){
 	    getIndexQuote(this.localElement,this.localId);
 	}
@@ -285,7 +285,7 @@ function getIndexQuote(){
     $.ajax({
 	type: "GET",
 	localElem: arguments[0],
-	url: zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=getIndexQuote&DataInputs=id="+arguments[1]+"&RawDataOutput=Result&timestamp="+d.getTime(),
+	url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.getIndexQuote&DataInputs=id="+arguments[1]+"&RawDataOutput=Result&timestamp="+d.getTime(),
 	complete: function(xml,status){
 	    $("#"+this.localElem.attr('id')).raty({
 		number: 10,

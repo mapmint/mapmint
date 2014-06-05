@@ -96,7 +96,7 @@ function startGCPEditor(){
 function loadGeorefProject(){
 	\$.ajax({
 	  type: "GET",
-	  url: System.zooUrl+"?metapath=vector-tools&service=WPS&version=1.0.0&request=Execute&Identifier=mmExtractVectorInfo&DataInputs=dataSource=$conf["senv"]["mmGeoDST"];layer=$conf["senv"]["mmGeoDSO"]&RawDataOutput=Result",
+	  url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=vector-tools.mmExtractVectorInfo&DataInputs=dataSource=$conf["senv"]["mmGeoDST"];layer=$conf["senv"]["mmGeoDSO"]&RawDataOutput=Result",
 	  dataType: "xml",
 	  complete: function(xml,status) {
 		var tmp=\$(xml.responseXML).find("size").text().split(',');
@@ -191,7 +191,7 @@ function loadGeorefProject(){
  */
 
 function cropImage(){
-  var request=WPSGetHeader("cropImage");
+  var request=WPSGetHeader("georeferencer.cropImage");
   var postRequest=[];
   postRequest[postRequest.length]={"name": "dso","value": System.fileo,"dataType": "string"};
   postRequest[postRequest.length]={"name": "dsot","value": \$("#filename").val(),"dataType": "string"};
@@ -206,7 +206,7 @@ function cropImage(){
   //alert(request);
   $.ajax({
     type: "POST",
-    url: System.zooUrl+"?metapath=georeferencer",
+    url: System.zooUrl,
     data: request,
     contentType: "text/xml",
     complete: function(xml,status) {
@@ -248,7 +248,7 @@ function cropImage(){
 }
 
 function georeferenceImage(){
-  var request=WPSGetHeader("georeference");
+  var request=WPSGetHeader("georeferencer.georeference");
   var postRequest=[];
   postRequest[postRequest.length]={"name": "dso","value": \$("#fileo").val(),"dataType": "string"};
   for(i=0;i<points_layer.features.length;i++){
@@ -285,7 +285,7 @@ function georeferenceImage(){
   //alert(request);
   $.ajax({
     type: "POST",
-    url: System.zooUrl+"?metapath=georeferencer",
+    url: System.zooUrl,
     data: request,
     contentType: "text/xml",
     complete: function(xml,status) {
@@ -326,10 +326,10 @@ function georeferenceImage(){
 }
 
 function openInManager(dwDataSource,dwLayer){
-    var data=WPSGetHeader("openInManager")+WPSGetInputs([{"name": "dstn","value": dwDataSource.replace(/__/g,"/")+"/","dataType":"string"},{"name": "dson","value":dwLayer,"dataType":"string"}])+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    var data=WPSGetHeader("mapfile.openInManager")+WPSGetInputs([{"name": "dstn","value": dwDataSource.replace(/__/g,"/")+"/","dataType":"string"},{"name": "dson","value":dwLayer,"dataType":"string"}])+WPSGetOutput({name:"Result"})+WPSGetFooter();
     \$.ajax({
         type: "POST",
-	url: System.zooUrl+"?metapath=mapfile",
+	url: System.zooUrl,
 	data: data,
 	contentType: "text/xml",
 	complete: function(xml,status) {
@@ -457,7 +457,7 @@ function loadGCPWindow(){
 function loadGCPFile(){
   \$.ajax({
     type: "GET",
-    url: System.zooUrl+"?metapath=georeferencer&service=WPS&version=1.0.0&request=Execute&Identifier=loadGCP&DataInputs=dso="+\$("#mapName").val()+";file="+\$("#csvfile").val()+"&RawDataOutput=Result",
+    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=georeferencer.loadGCP&DataInputs=dso="+\$("#mapName").val()+";file="+\$("#csvfile").val()+"&RawDataOutput=Result",
     complete: function(xml,status) {
       if(checkWPSResult(xml,false)){
         points_layer.removeFeatures(points_layer.features);
@@ -513,7 +513,7 @@ function loadSaveGCPWindow(){
 function saveGeorefProject(){
 	\$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=georeferencer&service=WPS&version=1.0.0&request=Execute&Identifier=saveGeorefProject&DataInputs=map="+(arguments.length==1?arguments[0]:(\$("#hgeomap").val()+";dso="+\$("#mapName").val()+";force=true"))+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=georeferencer.saveGeorefProject&DataInputs=map="+(arguments.length==1?arguments[0]:(\$("#hgeomap").val()+";dso="+\$("#mapName").val()+";force=true"))+"&RawDataOutput=Result",
 	    dataType: "xml",	
 	    complete: function(xml,status) {
 		if(checkWPSResult(xml,false))
@@ -523,7 +523,7 @@ function saveGeorefProject(){
 }
 
 function saveGCP(){
-  var request=WPSGetHeader("saveGCPAsCSV");
+  var request=WPSGetHeader("georeferencer.saveGCPAsCSV");
   var postRequest=[];
   postRequest[postRequest.length]={"name": "dso","value": \$("#hgeodso").val(),"dataType": "string"};
   if(\$("#override").is(':checked'))
@@ -557,7 +557,7 @@ function saveGCP(){
   //alert(request);
   $.ajax({
     type: "POST",
-    url: System.zooUrl+"?metapath=georeferencer",
+    url: System.zooUrl,
     data: request,
     contentType: "text/xml",
     complete: function(xml,status) {
@@ -747,7 +747,7 @@ function init(){
 	      map.zoomToExtent(tmp);
 
 	      $.ajax({
-	      		      url: "$conf["main"]["serverAddress"]?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Georeferencer/SaveCropedImage&RawDataOutput=Result",
+	      		      url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Georeferencer/SaveCropedImage&RawDataOutput=Result",
 			      complete: function(xml,status){
 			      		if(!\$('#importOSM-dialog')[0])
 						\$("body").append('<div id="importOSM-dialog" title="Crop Raster"></div>');
@@ -1020,7 +1020,7 @@ function startMapList(){
     \$(".addLayer").click(function () {
 	\$.ajax({
 	  type: "GET",
-	  url: "$conf["main"]["serverAddress"]?metapath=datastores&service=WPS&version=1.0.0&request=Execute&Identifier=options&DataInputs=&RawDataOutput=Result",
+	  url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.options&DataInputs=&RawDataOutput=Result",
 	  dataType: "xml",
 	  complete: function(xml,status) {
 	      \$( "#add-layer-dialog" ).html(xml.responseText);
@@ -1043,7 +1043,7 @@ function startMapList(){
       	\$( "#view-lprop-dialog" ).html("");
         \$.ajax({
 	  type: "GET",
-	  url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=getMapLayerProperties&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+	  url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.getMapLayerProperties&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
 	  complete:function(xml,status){
 	    \$( "#view-lprop-dialog" ).html(xml.responseText);
 	    \$( "#view-lprop-dialog" ).window({
@@ -1087,7 +1087,7 @@ function startMapList(){
       \$.ajax({
 		dwDataSource: System.mmNodeId,
 		type: "GET",
-	    	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=getInitialInfo&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+	    	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.getInitialInfo&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
 		dataType: 'xml',
 		complete:function(xml,status){
 		  	var tmp=\$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -1248,7 +1248,7 @@ function startMapList(){
         System.tmplId=this.id;
 	\$.ajax({
 	  type: "GET",
-	  url: "$conf["main"]["serverAddress"]?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Manager/TemplateEditor;map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";name="+this.id+"&RawDataOutput=Result",
+	  url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Manager/TemplateEditor;map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";name="+this.id+"&RawDataOutput=Result",
 	  dataType: "xml",
 	  complete: function(xml,status) {
 	  	    if(!\$('#templateEditor-dialog')[0])
@@ -1258,10 +1258,10 @@ function startMapList(){
 		    updateSelectWithFields(["template_field"]);
 
 		    \$("#te_save").click(function(){
-			var data=WPSGetHeader("saveTemplate")+WPSGetInputs([{name: "map",value: \$("#mapName")[0].value,dataType: "string"},{name: "layer",value: System.mmNodeId,dataType: "string"},{name: "name",value: System.tmplId,dataType: "string"},{name: "content","value":\$('#tmplContent')[0].value,"dataType": "string"},{name: "click", "value": (\$("#template_type")[0].value=="click"?"true":"false"),"dataType": "string"}])+WPSGetOutput({name: "Result"})+WPSGetFooter();
+			var data=WPSGetHeader("mapfile.saveTemplate")+WPSGetInputs([{name: "map",value: \$("#mapName")[0].value,dataType: "string"},{name: "layer",value: System.mmNodeId,dataType: "string"},{name: "name",value: System.tmplId,dataType: "string"},{name: "content","value":\$('#tmplContent')[0].value,"dataType": "string"},{name: "click", "value": (\$("#template_type")[0].value=="click"?"true":"false"),"dataType": "string"}])+WPSGetOutput({name: "Result"})+WPSGetFooter();
 			\$.ajax({
 				type: "POST",
-	  			url: "$conf["main"]["serverAddress"]?metapath=mapfile",
+	  			url: "$conf["main"]["serverAddress"]",
 				data: data,
 				contentType: 'text/xml',
 	  			dataType: "xml",
@@ -1285,7 +1285,7 @@ function startMapList(){
     \$(".style").click(function () {
 	\$.ajax({
 	  type: "GET",
-	  url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+	  url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
 	  dataType: "xml",
 	  complete: function(xml,status) {
 	  
@@ -1316,7 +1316,7 @@ function startMapList(){
 
 
 	  try{
-	  \$("#ccLegend")[0].src="$conf["main"]["serverAddress"]?metaPath=classifier&request=Execute&service=WPS&version=1.0.0&Identifier=getClassifierImage&DataInputs=from="+\$("#cc-min-colorpicker")[0].value.replace("#","")+";to="+\$("#cc-max-colorpicker")[0].value.replace("#","")+";nbClass=24&RawDataOutput=Result"
+	  \$("#ccLegend")[0].src="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=classifier.getClassifierImage&DataInputs=from="+\$("#cc-min-colorpicker")[0].value.replace("#","")+";to="+\$("#cc-max-colorpicker")[0].value.replace("#","")+";nbClass=24&RawDataOutput=Result"
 	   }catch(e){}
 	   try{
        \$(function () {
@@ -1405,7 +1405,7 @@ function startMapList(){
     \$(".open-map").click(function () {
      	\$.ajax({
 	  type: "GET",
-	  url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=listMap&DataInputs=prefix=georeferencer_&RawDataOutput=Result",
+	  url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.listMap&DataInputs=prefix=georeferencer_&RawDataOutput=Result",
 	  dataType: "xml",
 	      complete: function(xml,status) {
 	      eval("tmp="+xml.responseText+";");
@@ -1547,7 +1547,7 @@ function startMapList(){
     \$(".addLayer").click(function () {
 	\$.ajax({
 	  type: "GET",
-	  url: "$conf["main"]["serverAddress"]?metapath=datastores&service=WPS&version=1.0.0&request=Execute&Identifier=options&DataInputs=&RawDataOutput=Result",
+	  url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.options&DataInputs=&RawDataOutput=Result",
 	  dataType: "xml",
 	  complete: function(xml,status) {
 	      \$( "#add-layer-dialog" ).html(xml.responseText);
@@ -1586,7 +1586,7 @@ function startMapList(){
     \$(".template").click(function () {
 	\$.ajax({
 	  type: "GET",
-	  url: "$conf["main"]["serverAddress"]?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=template=Manager/TemplateEditor;map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+	  url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=template=Manager/TemplateEditor;map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
 	  dataType: "xml",
 	  complete: function(xml,status) {
 	  	    if(\$('#templateEditor-dialog')[0])
@@ -1608,7 +1608,7 @@ function startMapList(){
     \$(".style").click(function () {
 	\$.ajax({
 	  type: "GET",
-	  url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+	  url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
 	  dataType: "xml",
 	  complete: function(xml,status) {
 
@@ -1731,7 +1731,7 @@ function startMapList(){
     \$(".open-map").click(function () {
      	\$.ajax({
 	  type: "GET",
-	  url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=listMap&DataInputs=&RawDataOutput=Result",
+	  url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.listMap&DataInputs=&RawDataOutput=Result",
 	  dataType: "xml",
 	      complete: function(xml,status) {
 	      eval("tmp="+xml.responseText+";");
@@ -1793,7 +1793,7 @@ function saveLayerStyle(){
 		type: "GET",
 		prefix1: prefix1,
 		prefix: prefix,
-		url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=saveLayerStyle&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmType="+dvalue+(System.rasterLayer==1?";mmOpacity="+\$("#opacity")[0].value.replace("%","")+";resm="+\$("#resMethod")[0].value+(arguments.length==0?";force=true":""):";mmSymb="+((lhatch && lhatch.checked==true) && arguments.length<=1?"polygon_hatch;mmHatchWidth="+\$("#"+(lhatch.id=="class-hatch_check"?"class-":"")+"hatch_width")[0].value+";mmAngle="+\$("#"+(lhatch.id=="class-hatch_check"?"class-":"")+"hatch_angle")[0].value:((lhatch && lhatch.checked==false)?"":\$("#"+prefix1+"symbolSelected")[0].value))+";mmFill="+\$("#"+prefix+"fill-colorpicker")[0].value.replace("#","")+";mmStroke="+\$("#"+prefix+"stroke-colorpicker")[0].value.replace("#","")+";"+(\$("#"+prefix+"stroke-width")[0]?";mmStrokeWidth="+\$("#"+prefix+"stroke-width")[0].value:"")+";mmWidth="+\$("#"+prefix1+"layerWidth")[0].value+";mmSize="+((lhatch && lhatch.checked==false) && arguments.length<=1?"-1.0":\$("#"+(lhatch && lhatch.checked==true && arguments.length<=1?(lhatch.id=="class-hatch_check"?"class-":"")+"hatch_size":prefix1+"layerSize"))[0].value)+";mmOpacity="+\$("#opacity")[0].value.replace("%","")+";"+(arguments.length>0?"mmClass="+arguments[0]:"mmClass=0")+(arguments.length>1?";mmStyle="+arguments[1]:"")+(arguments.length==0?";force=true":"")+(\$('#'+prefix+'stroke-colorpicker-chk')[0]?(\$('#'+prefix+'stroke-colorpicker-chk')[0].checked?"":";noStroke=true"):"")+(\$('#'+prefix+'fill-colorpicker-chk')[0]?(\$('#'+prefix+'fill-colorpicker-chk')[0].checked?"":";noFill=true"):"")+(\$('#'+prefix+'pattern_check')[0]&&\$('#'+prefix+'pattern_check')[0].checked?";pattern="+\$('#'+prefix+'pattern')[0].value:"")+(\$("#"+prefix1+"layerGap")[0]?";mmGap="+\$("#"+prefix1+"layerGap")[0].value:"")+(\$("#"+prefix1+"symbol_check")[0] && \$("#"+prefix1+"symbol_check")[0].checked==false?";noSymbolFill=true":""))+"&RawDataOutput=Result",
+		url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.saveLayerStyle&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmType="+dvalue+(System.rasterLayer==1?";mmOpacity="+\$("#opacity")[0].value.replace("%","")+";resm="+\$("#resMethod")[0].value+(arguments.length==0?";force=true":""):";mmSymb="+((lhatch && lhatch.checked==true) && arguments.length<=1?"polygon_hatch;mmHatchWidth="+\$("#"+(lhatch.id=="class-hatch_check"?"class-":"")+"hatch_width")[0].value+";mmAngle="+\$("#"+(lhatch.id=="class-hatch_check"?"class-":"")+"hatch_angle")[0].value:((lhatch && lhatch.checked==false)?"":\$("#"+prefix1+"symbolSelected")[0].value))+";mmFill="+\$("#"+prefix+"fill-colorpicker")[0].value.replace("#","")+";mmStroke="+\$("#"+prefix+"stroke-colorpicker")[0].value.replace("#","")+";"+(\$("#"+prefix+"stroke-width")[0]?";mmStrokeWidth="+\$("#"+prefix+"stroke-width")[0].value:"")+";mmWidth="+\$("#"+prefix1+"layerWidth")[0].value+";mmSize="+((lhatch && lhatch.checked==false) && arguments.length<=1?"-1.0":\$("#"+(lhatch && lhatch.checked==true && arguments.length<=1?(lhatch.id=="class-hatch_check"?"class-":"")+"hatch_size":prefix1+"layerSize"))[0].value)+";mmOpacity="+\$("#opacity")[0].value.replace("%","")+";"+(arguments.length>0?"mmClass="+arguments[0]:"mmClass=0")+(arguments.length>1?";mmStyle="+arguments[1]:"")+(arguments.length==0?";force=true":"")+(\$('#'+prefix+'stroke-colorpicker-chk')[0]?(\$('#'+prefix+'stroke-colorpicker-chk')[0].checked?"":";noStroke=true"):"")+(\$('#'+prefix+'fill-colorpicker-chk')[0]?(\$('#'+prefix+'fill-colorpicker-chk')[0].checked?"":";noFill=true"):"")+(\$('#'+prefix+'pattern_check')[0]&&\$('#'+prefix+'pattern_check')[0].checked?";pattern="+\$('#'+prefix+'pattern')[0].value:"")+(\$("#"+prefix1+"layerGap")[0]?";mmGap="+\$("#"+prefix1+"layerGap")[0].value:"")+(\$("#"+prefix1+"symbol_check")[0] && \$("#"+prefix1+"symbol_check")[0].checked==false?";noSymbolFill=true":""))+"&RawDataOutput=Result",
 	  	dataType: "xml",
 		complete: function(xml,status){
 			$.notifyBar({ cssClass: "success", html: xml.responseText });
@@ -1830,7 +1830,7 @@ function saveLayerLabel(){
 	 
 	 \$.ajax({
 		type: "GET",
-		url: "$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=saveLabel&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";label="+(\$("#displayLabel")[0].checked?(\$("#labelField")[0]?""+\$("#labelField")[0].value:"GRID")+";angle="+\$("#labelAngle")[0].value+";pos="+\$('input[type=radio][name=position_label]:checked').attr('value')+";mmFill="+\$("#font-colorpicker")[0].value.replace("#","")+";bs="+\$("#labelBufferF")[0].value+";fs="+\$('#fonts')[0].value+";f="+\$('#font')[0].value+(\$("#bufferLabel")[0].checked?";mmOut="+\$("#buffer-font-colorpicker")[0].value.replace("#","")+";lbs="+\$("#mmLabelBufferSize")[0].value:""):"")+"&RawDataOutput=Result",
+		url: "$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=mapfile.saveLabel&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";label="+(\$("#displayLabel")[0].checked?(\$("#labelField")[0]?""+\$("#labelField")[0].value:"GRID")+";angle="+\$("#labelAngle")[0].value+";pos="+\$('input[type=radio][name=position_label]:checked').attr('value')+";mmFill="+\$("#font-colorpicker")[0].value.replace("#","")+";bs="+\$("#labelBufferF")[0].value+";fs="+\$('#fonts')[0].value+";f="+\$('#font')[0].value+(\$("#bufferLabel")[0].checked?";mmOut="+\$("#buffer-font-colorpicker")[0].value.replace("#","")+";lbs="+\$("#mmLabelBufferSize")[0].value:""):"")+"&RawDataOutput=Result",
 		complete: function(xml, status){
 			  for(var i in layersList)
 			  	  if(layersList[i].local_id==System.mmNodeId)
@@ -1848,10 +1848,10 @@ function saveLayerGrid(){
 	 for(i=0;i<tmp.length;i++)
 		arg[arg.length]={name: tmp[i],value: \$("#"+tmp[i]).val(),dataType: "string"};
 	//	args+=";"+tmp[i]+"="+\$("#"+tmp[i]).val();
-	var data=WPSGetHeader("saveLayerGrid")+WPSGetInputs(arg)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+	var data=WPSGetHeader("mapfile.saveLayerGrid")+WPSGetInputs(arg)+WPSGetOutput({name:"Result"})+WPSGetFooter();
 	 \$.ajax({
 		type: "POST",
-		url: "$conf["main"]["serverAddress"]?metaPath=mapfile",
+		url: "$conf["main"]["serverAddress"]",
 		data: data,
 		contentType: "text/xml",
 		complete: function(xml, status){
@@ -1869,7 +1869,7 @@ function startAddGrid(){
 	\$('#addGrid-dialog').html("");
 	$.ajax({
 		type: "GET",
-		url: "$conf["main"]["serverAddress"]?metaPath=template&version=1.0.0&request=Execute&service=WPS&Identifier=display&DataInputs=tmpl=Manager/addGridWindow;map="+\$("#mapName")[0].value+"&RawDataOutput=Result",
+		url: "$conf["main"]["serverAddress"]?version=1.0.0&request=Execute&service=WPS&Identifier=template.display&DataInputs=tmpl=Manager/addGridWindow;map="+\$("#mapName")[0].value+"&RawDataOutput=Result",
 		complete: function(xml,status){
 	\$('#addGrid-dialog').append(xml.responseText);
 	\$('#addGrid-dialog').window({
@@ -1885,7 +1885,7 @@ function startAddGrid(){
 function addGrid(){
 	$.ajax({
 		type: "GET",
-		url: "$conf["main"]["serverAddress"]?metaPath=mapfile&version=1.0.0&request=Execute&service=WPS&Identifier=addGridToMap&DataInputs=layer="+\$("#gridName").val()+";map="+\$("#mapName")[0].value+"&RawDataOutput=Result",
+		url: "$conf["main"]["serverAddress"]?version=1.0.0&request=Execute&service=WPS&Identifier=mapfile.addGridToMap&DataInputs=layer="+\$("#gridName").val()+";map="+\$("#mapName")[0].value+"&RawDataOutput=Result",
 		complete: function(xml,status){
 			  checkWPSResult(xml);	 
 	 		  \$('#addGrid-dialog').window("close");
@@ -1898,11 +1898,11 @@ function classifyMap(){
 	 var localArg=arguments[0];
 	 \$.ajax({
 		type: "GET",
-		url: "$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=classifyMap&DataInputs=layer="+System.mmNodeId+";map="+\$("#mapName")[0].value+";field="+\$("#"+arguments[0]+"Field")[0].value+";from="+\$("#"+(arguments[0]=="rs"?"fill":arguments[0]+"-min")+"-colorpicker")[0].value.replace("#","")+";to="+\$("#"+(arguments[0]=="rs"?"stroke":arguments[0]+"-max")+"-colorpicker")[0].value.replace("#","")+(arguments[0]=="gs"||arguments[0]=="rs"?";nbClasses="+\$("#"+arguments[0]+"NbClasses")[0].value+";type=gs":(arguments[0]=="gs"?"":""))+";mmType="+\$("#dropdown")[0].value+";mmOpacity="+\$("#opacity")[0].value.replace("%","")+(\$("#resMethod")[0]?";resm="+\$("#resMethod")[0].value.replace("%",""):"")+"&RawDataOutput=Result",
+		url: "$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=mapfile.classifyMap&DataInputs=layer="+System.mmNodeId+";map="+\$("#mapName")[0].value+";field="+\$("#"+arguments[0]+"Field")[0].value+";from="+\$("#"+(arguments[0]=="rs"?"fill":arguments[0]+"-min")+"-colorpicker")[0].value.replace("#","")+";to="+\$("#"+(arguments[0]=="rs"?"stroke":arguments[0]+"-max")+"-colorpicker")[0].value.replace("#","")+(arguments[0]=="gs"||arguments[0]=="rs"?";nbClasses="+\$("#"+arguments[0]+"NbClasses")[0].value+";type=gs":(arguments[0]=="gs"?"":""))+";mmType="+\$("#dropdown")[0].value+";mmOpacity="+\$("#opacity")[0].value.replace("%","")+(\$("#resMethod")[0]?";resm="+\$("#resMethod")[0].value.replace("%",""):"")+"&RawDataOutput=Result",
 	  	dataType: "xml",
 		complete: function(xml,status){
 			  if(localArg=="cc"){
-				\$("#ccLegend")[0].src="$conf["main"]["serverAddress"]?metaPath=classifier&request=Execute&service=WPS&version=1.0.0&Identifier=getClassifierImage&DataInputs=from="+\$("#cc-min-colorpicker")[0].value.replace("#","")+";to="+\$("#cc-max-colorpicker")[0].value.replace("#","")+";nbClass=24&RawDataOutput=Result";
+				\$("#ccLegend")[0].src="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=classifier.getClassifierImage&DataInputs=from="+\$("#cc-min-colorpicker")[0].value.replace("#","")+";to="+\$("#cc-max-colorpicker")[0].value.replace("#","")+";nbClass=24&RawDataOutput=Result";
 				}
 			  \$("#"+localArg+"_classification").html(xml.responseText);
 			  for(var i in layersList)
@@ -1920,7 +1920,7 @@ var toRunAfter=Array();
 function editClass(){
 	 \$.ajax({
 		type: "GET",
-		url: "$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmClass="+arguments[0]+"&RawDataOutput=Result",
+		url: "$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=mapfile.createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmClass="+arguments[0]+"&RawDataOutput=Result",
 		complete: function(xml,status){
 	      \$( "#class-dialog" ).html(xml.responseText);
 	      \$( "#class-dialog" ).window({
@@ -1941,7 +1941,7 @@ function editClass(){
 function editSymbolStyle(){
 	 \$.ajax({
 		type: "GET",
-		url: "$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmClass="+arguments[0]+";mmStyle=2&RawDataOutput=Result",
+		url: "$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=mapfile.createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmClass="+arguments[0]+";mmStyle=2&RawDataOutput=Result",
 		complete: function(xml,status){
 		if(!\$( "#class-style-dialog" )[0])
 			\$("body").append('<div id="class-style-dialog" title="Symbol Fill"></div>');
@@ -1965,7 +1965,7 @@ function editSymbolStyle(){
 function addGroup(){
 	 \$.ajax({
 		type: "GET",
-		url: "$conf["main"]["serverAddress"]?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmClass="+arguments[0]+"&RawDataOutput=Result",
+		url: "$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=mapfile.createLegend&DataInputs=name="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";mmClass="+arguments[0]+"&RawDataOutput=Result",
 		complete: function(xml,status){
 	      \$( "#class-dialog" ).html(xml.responseText);
 	      \$( "#class-dialog" ).window({
@@ -1985,7 +1985,7 @@ function addGroup(){
 function setLayerProperties(){
         \$.ajax({
 	  type: "GET",
-	  url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=setMapLayerProperties&DataInputs=map="+\$("#mapName")[0].value+";layer="+\$('#lnameOrig')[0].value+";ln="+\$('#lname')[0].value+";a="+(\$('#lalias')[0].value)+";e="+(\$('#lexport')[0].checked?"true":"false")+";q="+(\$('#lquery')[0].checked?"true":"false")+";sq="+(\$('#lspatialquery')[0].checked?"true":"false")+";sqt="+\$('#lsptype')[0].value+";ab="+\$('#labstract')[0].value+";kl="+\$('#lkeywords')[0].value+";f="+\$('#lfees')[0].value+";s="+\$('#lsearch')[0].checked+";sf="+\$('#lsearch_field')[0].value+"&RawDataOutput=Result",
+	  url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.setMapLayerProperties&DataInputs=map="+\$("#mapName")[0].value+";layer="+\$('#lnameOrig')[0].value+";ln="+\$('#lname')[0].value+";a="+(\$('#lalias')[0].value)+";e="+(\$('#lexport')[0].checked?"true":"false")+";q="+(\$('#lquery')[0].checked?"true":"false")+";sq="+(\$('#lspatialquery')[0].checked?"true":"false")+";sqt="+\$('#lsptype')[0].value+";ab="+\$('#labstract')[0].value+";kl="+\$('#lkeywords')[0].value+";f="+\$('#lfees')[0].value+";s="+\$('#lsearch')[0].checked+";sf="+\$('#lsearch_field')[0].value+"&RawDataOutput=Result",
 	  complete:function(xml,status){
 		checkWPSResult(xml);
 		\$( "#view-lprop-dialog" ).window('close');
@@ -1997,7 +1997,7 @@ function setLayerProperties(){
 function removeLayer(){
         \$.ajax({
 	  type: "GET",
-	  url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=removeLayer&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
+	  url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.removeLayer&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+"&RawDataOutput=Result",
 	  complete:function(xml,status){
 		startMapList();
 	  }
@@ -2007,7 +2007,7 @@ function removeLayer(){
 function setScale(){
       \$.ajax({
 		type: "GET",
-	    	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=setLayer"+(arguments.length>1?arguments[1]:"")+"Scale&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";st="+arguments[0]+";sv="+map.getScale()+"&RawDataOutput=Result",
+	    	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.setLayer"+(arguments.length>1?arguments[1]:"")+"Scale&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";st="+arguments[0]+";sv="+map.getScale()+"&RawDataOutput=Result",
 		dataType: 'xml',
 		complete:function(xml,status){
 			for(i=0;i<layersList.length;i++){
@@ -2034,7 +2034,7 @@ function saveMapFor(){
 
       \$.ajax({
 		type: "GET",
-	    	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=saveMapFor&DataInputs=map="+\$("#mapName")[0].value+";layers="+System.mmNodeId+";fields="+fields+";fwidth="+fields_width+";type="+arguments[0]+"&RawDataOutput=Result",
+	    	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.saveMapFor&DataInputs=map="+\$("#mapName")[0].value+";layers="+System.mmNodeId+";fields="+fields+";fwidth="+fields_width+";type="+arguments[0]+"&RawDataOutput=Result",
 		dataType: 'xml',
 		complete:function(xml,status){
 		}
@@ -2080,7 +2080,7 @@ function saveLayerLabelAlias(){
 	//alert(fields+fieldAliases);
       \$.ajax({
 		type: "GET",
-	    	url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=saveMapFor&DataInputs=map=$conf["senv"]["last_map"];layers="+System.mmNodeId+";fields="+fields+";faliases="+fieldAliases+";type=Alias&RawDataOutput=Result",
+	    	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.saveMapFor&DataInputs=map=$conf["senv"]["last_map"];layers="+System.mmNodeId+";fields="+fields+";faliases="+fieldAliases+";type=Alias&RawDataOutput=Result",
 		dataType: 'xml',
 		complete:function(xml,status){
 			toggleSave();
@@ -2293,11 +2293,11 @@ function saveLayersOrder(){
 	 	 layers+=(i>0?",":"")+'"'+tmp[i].id+'"';
 	layers+="]";
 	//alert(layers);
-	var req='<wps:Execute service="WPS" version="1.0.0" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 ../wpsExecute_request.xsd"><ows:Identifier>updateLayersOrder</ows:Identifier><wps:DataInputs><wps:Input><ows:Identifier>layers</ows:Identifier><wps:Data><wps:LiteralData dataType="string">'+layers+'</wps:LiteralData></wps:Data></wps:Input><wps:Input><ows:Identifier>map</ows:Identifier><wps:Data><wps:LiteralData dataType="string">'+\$('#mapName')[0].value+'</wps:LiteralData></wps:Data></wps:Input></wps:DataInputs><wps:ResponseForm><wps:RawDataOutput><wps:Output><ows:Identifier>Result</ows:Identifier></wps:Output></wps:RawDataOutput></wps:ResponseForm></wps:Execute>';
+	var req='<wps:Execute service="WPS" version="1.0.0" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 ../wpsExecute_request.xsd"><ows:Identifier>mapfile.updateLayersOrder</ows:Identifier><wps:DataInputs><wps:Input><ows:Identifier>layers</ows:Identifier><wps:Data><wps:LiteralData dataType="string">'+layers+'</wps:LiteralData></wps:Data></wps:Input><wps:Input><ows:Identifier>map</ows:Identifier><wps:Data><wps:LiteralData dataType="string">'+\$('#mapName')[0].value+'</wps:LiteralData></wps:Data></wps:Input></wps:DataInputs><wps:ResponseForm><wps:RawDataOutput><wps:Output><ows:Identifier>Result</ows:Identifier></wps:Output></wps:RawDataOutput></wps:ResponseForm></wps:Execute>';
 			\$.ajax({
 				type: "POST",
 				contentType: 'text/xml',
-	  			url: "/cgi-bin/zoo_loader.cgi?metapath=mapfile",
+	  			url: "/cgi-bin/zoo_loader.cgi",
 				data: req,
 	  			dataType: "xml",
 	  			complete: function(xml,status) {
@@ -2312,7 +2312,7 @@ function saveLayersOrder(){
 function addDirToMap(){
 	 \$.ajax({
 		type: "GET",
-	  	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&metapath=mapfile&Identifier="+(\$("#origDirName")[0].value==""?"addGroupToMap":(\$("#origDirName")[0].value=="remove"?"removeGroupFromMap":"renameGroupInMap"))+"&DataInputs=map="+\$mj("mapName").value+";group="+\$("#addDirName")[0].value+(\$("#origDirName")[0].value!=""?";oldgroup="+\$("#origDirName")[0].value:"")+"&RawDataOutput=Result",
+	  	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile."+(\$("#origDirName")[0].value==""?"addGroupToMap":(\$("#origDirName")[0].value=="remove"?"removeGroupFromMap":"renameGroupInMap"))+"&DataInputs=map="+\$mj("mapName").value+";group="+\$("#addDirName")[0].value+(\$("#origDirName")[0].value!=""?";oldgroup="+\$("#origDirName")[0].value:"")+"&RawDataOutput=Result",
 	  	dataType: "xml",
 	  	complete: function(xml,status) {
 			checkWPSResult(xml);
@@ -2326,7 +2326,7 @@ function addDirToMap(){
 function saveProcessingDirective(){
 	 \$.ajax({
 		type: "GET",
-	  	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&metapath=mapfile&Identifier=setResample&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";resm="+\$("#resMethod")[0].value+"&RawDataOutput=Result",
+	  	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.setResample&DataInputs=map="+\$("#mapName")[0].value+";layer="+System.mmNodeId+";resm="+\$("#resMethod")[0].value+"&RawDataOutput=Result",
 	  	dataType: "xml",
 	  	complete: function(xml,status) {
 			checkWPSResult(xml);
@@ -2364,7 +2364,7 @@ function startSymbolManager(){
 function refreshSymbolOrig(){
 	 \$.ajax({
 		type: "GET",
-	  	url: "$conf["main"]["serverAddress"]?metapath=symbol-tools&service=WPS&version=1.0.0&request=Execute&Identifier=getSymbolChooser4TTF&DataInputs=&RawDataOutput=Result@mimeType=text/html",
+	  	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=symbol-tools.getSymbolChooser4TTF&DataInputs=&RawDataOutput=Result@mimeType=text/html",
 	  	complete: function(xml,status) {
 
       			  \$( "#symbolOrig" ).html("");
@@ -2378,7 +2378,7 @@ function symbolAddToOrig(){
 	 var tmp=arguments[0].split('|');
 	 \$.ajax({
 		type: "GET",
-	  	url: "$conf["main"]["serverAddress"]?metapath=symbol-tools&service=WPS&version=1.0.0&request=Execute&Identifier=addSymbolToOrig&DataInputs=ttf="+tmp[0]+";charcodes=["+tmp[1]+"]&RawDataOutput=Result@mimeType=text/html",
+	  	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=symbol-tools.addSymbolToOrig&DataInputs=ttf="+tmp[0]+";charcodes=["+tmp[1]+"]&RawDataOutput=Result@mimeType=text/html",
 	  	complete: function(xml,status) {
 			  refreshSymbolOrig();			  
 		}
@@ -2389,7 +2389,7 @@ function symbolAddToOrig(){
 function displaySymbolAdd(){
 	 \$.ajax({
 		type: "GET",
-	  	url: "$conf["main"]["serverAddress"]?metapath=symbol-tools&service=WPS&version=1.0.0&request=Execute&Identifier=getSymbolChooser4TTF&DataInputs=ttf="+arguments[0]+"&RawDataOutput=Result@mimeType=text/html",
+	  	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=symbol-tools.getSymbolChooser4TTF&DataInputs=ttf="+arguments[0]+"&RawDataOutput=Result@mimeType=text/html",
 	  	complete: function(xml,status) {
 
       			  \$( "#symbolAdd" ).html("");
@@ -2430,23 +2430,23 @@ function updateSelectWithFields(){
 function importOSM(){
 	 var tmp=System.lastLayer.features[0].geometry.transform(map.projection,map.displayProjection).getBounds();
 
-	 var data=WPSGetHeader((arguments[0]=="point"?"importOSMPoints":"importOSMLines"))+WPSGetInputs([{name: "bbox",value: tmp,dataType: "string"},{name: "dson",value: \$('#osm_dson')[0].value,dataType: "string"},{name: "dstn",value: \$('#osm_dstn')[0].value,dataType: "string"}])+WPSGetOutput({name: "Result"})+WPSGetFooter();
+	 var data=WPSGetHeader("osm-tools."+(arguments[0]=="point"?"importOSMPoints":"importOSMLines"))+WPSGetInputs([{name: "bbox",value: tmp,dataType: "string"},{name: "dson",value: \$('#osm_dson')[0].value,dataType: "string"},{name: "dstn",value: \$('#osm_dstn')[0].value,dataType: "string"}])+WPSGetOutput({name: "Result"})+WPSGetFooter();
 
 			\$.ajax({
 				type: "POST",
-	  			url: "$conf["main"]["serverAddress"]?metapath=osm-tools",
+	  			url: "$conf["main"]["serverAddress"]",
 				data: data,
 				contentType: 'text/xml',
 	  			complete: function(xml,status) {
 					  checkWPSResult(xml);
 					  \$.ajax({
 						type: "GET",
-						url: "$conf["main"]["serverAddress"]?metapath=vector-tools&service=WPS&version=1.0.0&request=Execute&Identifier=mmVectorInfo2Map&DataInputs=dataSource=$conf["main"]["dataPath"]/dirs/"+\$('#osm_dstn')[0].value+"/",
+						url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=vector-tools.mmVectorInfo2Map&DataInputs=dataSource=$conf["main"]["dataPath"]/dirs/"+\$('#osm_dstn')[0].value+"/",
 						complete: function(xml,status){
 							  checkWPSResult(xml);
 					  		  \$.ajax({
 								type: "GET",
-								url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=loadMapForDs&DataInputs=map=$conf["senv"]["last_map"];dstName="+\$('#osm_dstn')[0].value+";dsoName="+\$('#osm_dson')[0].value+";dsgName=Layers&RawDataOutput=Result",
+								url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.loadMapForDs&DataInputs=map=$conf["senv"]["last_map"];dstName="+\$('#osm_dstn')[0].value+";dsoName="+\$('#osm_dson')[0].value+";dsgName=Layers&RawDataOutput=Result",
 								complete: function(xml,status){
 							  		  checkWPSResult(xml);
 									  startMapList();
@@ -2463,7 +2463,7 @@ function importOSM(){
 function readTemplate(){
 	 \$.ajax({
 		type: "GET",
-		url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=readTemplate&DataInputs=layer="+arguments[1]+";map="+arguments[2]+";click="+(arguments[0]==""?false:true)+";ext="+\$("#te_ext")[0].value+"&RawDataOutput=Result",
+		url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.readTemplate&DataInputs=layer="+arguments[1]+";map="+arguments[2]+";click="+(arguments[0]==""?false:true)+";ext="+\$("#te_ext")[0].value+"&RawDataOutput=Result",
 		complete: function(xml,status){
 			  \$("#tmplContent")[0].value=xml.responseText;
 		}

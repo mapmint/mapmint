@@ -134,11 +134,11 @@ function publishIndexMap(){
     params=[
 	{name: "id", value: System.nodeId, dataType: "sring"}
     ];
-    data=WPSGetHeader((arguments.length>0?arguments[0]:"")+"publishFullIndex")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np."+(arguments.length>0?arguments[0]:"")+"publishFullIndex")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    checkWPSResult(xml);
@@ -151,11 +151,11 @@ function testQuery(){
 	{name: "dbname", value: $("#mmDbConnection").val(), dataType: "sring"},
 	{name: "query", value: $("#mmSQLQuery").val(), dataType: "sring"}
     ];
-    data=WPSGetHeader("testQuery")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.testQuery")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    checkWPSResult(xml);
@@ -168,11 +168,11 @@ function runQuery(){
 	    {name: "map", value: (arguments.length>0?System.dbuserName:$("#mmDbConnection").val()), dataType: "sring"},
 	    {name: "sql", value: (arguments.length>0?"SELECT * FROM "+$("#pg_table").val():$("#mmSQLQuery").val()), dataType: "sring"}
     ];
-    data=WPSGetHeader("createTempFile")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.createTempFile")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	  if(checkWPSResult(xml,false)){
@@ -183,7 +183,7 @@ function runQuery(){
 		  $.ajax({
 		    dwDataSource: dwDataSource,
 			type: "GET",
-			url: System.zooUrl+"?metapath=vector-tools&service=WPS&version=1.0.0&request=Execute&Identifier=mmVectorInfo2Map&DataInputs=dataSource="+dwDataSource.replace(/__/g,"/")+";force=1&RawDataOutput=Result",
+			url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=vector-tools.mmVectorInfo2Map&DataInputs=dataSource="+dwDataSource.replace(/__/g,"/")+";force=1&RawDataOutput=Result",
 			dataType: 'xml',
 			complete: function(xml,status) {
 			
@@ -221,7 +221,7 @@ function updateSelectWithFields(){
 	System.u0=false;
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=getMapRequest&DataInputs=t_id="+tid+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.getMapRequest&DataInputs=t_id="+tid+"&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		$.ajax({
@@ -295,12 +295,12 @@ function updateElement(){
 	{name: "keywords", value: $("#indicateurs_indicateurs_keywords").val(),dataType: "string"},
 	{name: "tuple", value: $.stringify(params), mimeType: "application/json"}
     ];
-    data=WPSGetHeader("updateElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.updateElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     //alert(data);
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -348,7 +348,7 @@ function refreshDetails(){
 
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=details&DataInputs=table="+tableName+";id="+System.nodeId+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table="+tableName+";id="+System.nodeId+"&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		$("#metadata").click();
@@ -460,7 +460,7 @@ function refreshAggregation(){
     $("#agreg").toggle(false);
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=details&DataInputs=table=territoires;id="+$("#indicateurs_indicateurs_territoires").val()+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table=territoires;id="+$("#indicateurs_indicateurs_territoires").val()+"&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		$('.aggregation').removeClass('desactivated');
@@ -491,7 +491,7 @@ function insertAgregate(){
 	vars+=";step="+($("#agregate_step")[0].selectedIndex-1);
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=createAgregate&DataInputs=table=public.territoires;field="+$('#s_fname').val()+";id="+System.nodeId+";tid="+$('#p_tname').val()+";formula="+$("#agregation_formula").val()+vars+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.createAgregate&DataInputs=table=public.territoires;field="+$('#s_fname').val()+";id="+System.nodeId+";tid="+$('#p_tname').val()+";formula="+$("#agregation_formula").val()+vars+"&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		//alert(xml.responseText);
@@ -506,7 +506,7 @@ function insertAgregate(){
 function refreshList(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=list&DataInputs=table=indicateurs&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.list&DataInputs=table=indicateurs&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		var data=$.parseJSON(xml.responseText);
@@ -543,11 +543,11 @@ function deleteElement(){
 	{name: "table", value: "territoires",dataType: "string"},
 	{name: "id", value: System.nodeId,dataType: "string"}
     ];
-    data=WPSGetHeader("deleteElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.deleteElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -593,11 +593,11 @@ function insertGraph(){
     if($("#graphs_steps").is(":visible") && $("#graphs_step").val()>0)
 	params.push({"name":"step","value":($("#graphs_step")[0].selectedIndex-1),dataType: "string"});
 
-    data=WPSGetHeader((test?"updateElem":"insertElem"))+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np."+(test?"updateElem":"insertElem"))+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -640,11 +640,11 @@ function insertTable(){
 	    cnt+=1;
 	});
     }
-    data=WPSGetHeader((test?"updateElem":"insertElem"))+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np."+(test?"updateElem":"insertElem"))+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -661,11 +661,11 @@ function insertElement(){
 	{name: "table", value: "indicateurs",dataType: "string"},
 	{name: "name", value: $("#eName").val(),dataType: "string"}
     ];
-    data=WPSGetHeader("insertElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.insertElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -691,11 +691,11 @@ function removeElement(){
 	{name: "akey", value: "i_id",dataType: "string"},
 	{name: "id", value: System.nodeId,dataType: "string"}
     ];
-    data=WPSGetHeader("deleteElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.deleteElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -725,7 +725,7 @@ function loadTableForFile(){
   $("#dsContainer").html('<table id="flex_csv" class="hideBody"></table>');
   $.ajax({
     type: "GET",
-    url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=getLastFile&DataInputs=&RawDataOutput=Result",
+    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.getLastFile&DataInputs=&RawDataOutput=Result",
     dataType: 'xml',
     complete: function(xml,status) {
 
@@ -735,7 +735,7 @@ function loadTableForFile(){
 	$.ajax({
 	  dwDataSource: dwDataSource,
 	  type: "GET",
-	  url: System.zooUrl+"?metapath=vector-tools&service=WPS&version=1.0.0&request=Execute&Identifier=mmVectorInfo2Map&DataInputs=dataSource="+dwDataSource.replace(/__/g,"/")+";force=1&RawDataOutput=Result",
+	  url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=vector-tools.mmVectorInfo2Map&DataInputs=dataSource="+dwDataSource.replace(/__/g,"/")+";force=1&RawDataOutput=Result",
 	  dataType: 'xml',
 	  complete: function(xml,status) {
 	      
@@ -772,7 +772,7 @@ function loadPageFromFile(){
       dwDataSource: arguments[0],
       dwLayer: System.dsField,
       type: "GET",
-      url: System.zooUrl+"?metapath=vector-tools&service=WPS&version=1.0.0&request=Execute&Identifier=mmExtractVectorInfo&DataInputs=dataSource="+arguments[0]+";layer="+System.dsField+"&RawDataOutput=Result",
+      url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=vector-tools.mmExtractVectorInfo&DataInputs=dataSource="+arguments[0]+";layer="+System.dsField+"&RawDataOutput=Result",
       dataType: 'xml',
       complete: function(xml,status) {
 	  colModel=[];
@@ -894,11 +894,11 @@ function createIndex(){
 
   params=parseParams();
 
-  data=WPSGetHeader("createIndex")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+  data=WPSGetHeader("np.createIndex")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
   $.ajax({
     type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	if(checkWPSResult(xml)){
@@ -920,7 +920,7 @@ function refreshIndex(){
   $.ajax({
     type: "GET",
 	//contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np&service=wps&version=1.0.0&request=Execute&Identifier=refreshIndex&DataInputs=id="+node.id+"&RawDataOutput=Result@mimeType=text/xml",
+	url: System.zooUrl+"?service=wps&version=1.0.0&request=Execute&Identifier=np.refreshIndex&DataInputs=id="+node.id+"&RawDataOutput=Result@mimeType=text/xml",
 	//data: data,
 	complete: function(xml,status) {
 	if(checkWPSResult(xml,false)){
@@ -1032,7 +1032,7 @@ function saveLayerStyle(){
     var localArgs=arguments;
 
 
-    var url=System.zooUrl+"?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=saveLayerStyle&DataInputs=";
+    var url=System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.saveLayerStyle&DataInputs=";
     var newcName="";
     try{
 	url+="prefix=indexes;map="+($("#agregation").is(":visible")?"A"+$("#p_tname").val()+"_":"")+"Index"+System.nodeId;
@@ -1111,11 +1111,11 @@ function editClass(){
 	  ];
   if(arguments.length>1)
     params.push({"name": "mmStep","value": arguments[1],"dataType":"string"});
-    data=WPSGetHeader("createLegend")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("mapfile.createLegend")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
       type: "POST",
 	  contentType: "text/xml",
-	  url: System.zooUrl+"?metapath=mapfile",
+	  url: System.zooUrl,
 	  data: data,
 	  complete: function(xml,status) {
 	  $( "#class-dialog" ).html(xml.responseText);
@@ -1149,11 +1149,11 @@ function classifyMap(){
 	var localArg0="A"+arguments[1]+"_";
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metaPath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=classifyMap&DataInputs=prefix=indexes;orig="+System.dbuserName+";layer=indexes.view_idx"+System.nodeId+";map="+(localArg0?localArg0:"")+"Index"+System.nodeId+";field="+$("#s_fname").val()+";from="+$("#s_color2").val().replace("#","")+";to="+$("#s_color3").val().replace("#","")+""+($("#s_ctype").val()=="gradSymb" || ($("#dropdown1").val()=="gradSymb" && $("#dropdown1").is(":visible"))?";type=gs":"")+($("#s_ctype").val()=="uniqVal"?"":";nbClasses="+$("#s_nbc").val())+";formula="+$("#s_formula").val()+($("#s_ctype").val()=="timeline"?";mmStep="+($("#mmsteps")[0].selectedIndex-2)+";mmType="+$("#dropdown1").val():";type="+$("#s_ctype").val())+($("#dropdownd").val()!=-1?";method="+$("#dropdownd").val().replace("%",""):"")+(localArg0?";agregate=true":"")+";mmOpacity=45&RawDataOutput=Result",
+	url: System.zooUrl+"?request=Execute&service=WPS&version=1.0.0&Identifier=mapfile.classifyMap&DataInputs=prefix=indexes;orig="+System.dbuserName+";layer=indexes.view_idx"+System.nodeId+";map="+(localArg0?localArg0:"")+"Index"+System.nodeId+";field="+$("#s_fname").val()+";from="+$("#s_color2").val().replace("#","")+";to="+$("#s_color3").val().replace("#","")+""+($("#s_ctype").val()=="gradSymb" || ($("#dropdown1").val()=="gradSymb" && $("#dropdown1").is(":visible"))?";type=gs":"")+($("#s_ctype").val()=="uniqVal"?"":";nbClasses="+$("#s_nbc").val())+";formula="+$("#s_formula").val()+($("#s_ctype").val()=="timeline"?";mmStep="+($("#mmsteps")[0].selectedIndex-2)+";mmType="+$("#dropdown1").val():";type="+$("#s_ctype").val())+($("#dropdownd").val()!=-1?";method="+$("#dropdownd").val().replace("%",""):"")+(localArg0?";agregate=true":"")+";mmOpacity=45&RawDataOutput=Result",
 	dataType: "xml",
 	complete: function(xml,status){
 	    if(localArg=="cc"){
-		$("#ccLegend")[0].src="http://127.0.0.1/np-bin/zoo_loader.cgi?metaPath=classifier&request=Execute&service=WPS&version=1.0.0&Identifier=getClassifierImage&DataInputs=from="+$("#cc-min-colorpicker").val().replace("#","")+";to="+$("#cc-max-colorpicker").val().replace("#","")+";nbClass=24&RawDataOutput=Result";
+		$("#ccLegend")[0].src="http://127.0.0.1/np-bin/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=classifier.getClassifierImage&DataInputs=from="+$("#cc-min-colorpicker").val().replace("#","")+";to="+$("#cc-max-colorpicker").val().replace("#","")+";nbClass=24&RawDataOutput=Result";
 	    }
 	    $("#indexStyle"+(localArg0?"A":"")).html(xml.responseText);
 	    $(".flexiClasses"+(localArg0?"A":"")).flexigrid({
@@ -1300,11 +1300,11 @@ function refreshLayerStyle(){
 	});
 	params.push({"name": "mmStep","value": lindex,"dataType":"string"});
     }
-  data=WPSGetHeader("createLegend")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+  data=WPSGetHeader("mapfile.createLegend")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
   $.ajax({
       type: "POST",
       contentType: "text/xml",
-      url: System.zooUrl+"?metapath=mapfile",
+      url: System.zooUrl,
       data: data,
       complete: function(xml,status) {
 	  if(checkWPSResult(xml,false)){
@@ -1341,11 +1341,11 @@ function refreshLayerStyle(){
   if(arguments.length>0)
       params.push({"name":"step","value":arguments[0],"dataType":"string"});
 
-  data=WPSGetHeader("getIndexStyle")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+  data=WPSGetHeader("np.getIndexStyle")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
   $.ajax({
     type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
@@ -1428,11 +1428,11 @@ function saveIndexDisplaySettings(){
 	  mimeType: "application/json"
 	  });
   }
-  data=WPSGetHeader("saveIndexDisplaySettings")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+  data=WPSGetHeader("np.saveIndexDisplaySettings")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
   $.ajax({
     type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	checkWPSResult(xml);
@@ -1532,12 +1532,12 @@ function loadIndexDisplaySettings(){
   params.push({"name": "rcol","value":fields,dataType:"string"});
   params.push({"name": "rwidth","value":fields_width,dataType:"string"});
 
-  data=WPSGetHeader("display")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+  data=WPSGetHeader("template.display")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
 
     $.ajax({
     type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=template",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	if(checkWPSResult(xml,false)){
@@ -1556,7 +1556,7 @@ function loadIndexDisplaySettings(){
 function preview(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=getMapRequest&DataInputs=t_id="+($("#agregation").is(":visible")?$("#p_tname").val():$("#indicateurs_indicateurs_territoires").val())+";preview=true&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.getMapRequest&DataInputs=t_id="+($("#agregation").is(":visible")?$("#p_tname").val():$("#indicateurs_indicateurs_territoires").val())+";preview=true&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		try{
@@ -1596,7 +1596,7 @@ function refreshAgregate(){
     tableName2="agregation";
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=details&DataInputs=table="+tableName+";id="+System.nodeId+";tab="+tableName2+"_"+$("#p_tname").val()+($("#agregate_steps").is(":visible") && $("#agregate_step")[0].selectedIndex>0?";step="+($("#agregate_step")[0].selectedIndex-1):"")+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table="+tableName+";id="+System.nodeId+";tab="+tableName2+"_"+$("#p_tname").val()+($("#agregate_steps").is(":visible") && $("#agregate_step")[0].selectedIndex>0?";step="+($("#agregate_step")[0].selectedIndex-1):"")+"&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		var data=$.parseJSON(xml.responseText);
@@ -1633,7 +1633,7 @@ function refreshRepport(){
     }
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=details&DataInputs=table="+tableName+";id="+System.nodeId+";tab="+tableName2+vars+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table="+tableName+";id="+System.nodeId+";tab="+tableName2+vars+"&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		var data=$.parseJSON(xml.responseText);
@@ -1664,7 +1664,7 @@ function editRepport(){
 	}
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Indexes/repportSettings;table="+tableName+";id="+System.nodeId+";tab="+tableName2+";template="+$("#repport_doc_url").html()+vars+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Indexes/repportSettings;table="+tableName+";id="+System.nodeId+";tab="+tableName2+";template="+$("#repport_doc_url").html()+vars+"&RawDataOutput=Result",
 	    complete: function(xml,status) {
 		if(checkWPSResult(xml,false)){
 		    $(".repport").removeClass('desactivated')
@@ -1734,11 +1734,11 @@ function saveRepport(){
     if($('#agregation').is(":visible") && $("#agregate_step")[0].selectedIndex-1>=0) {
 	params.push({name: "step", value: ($("#agregate_step")[0].selectedIndex-1), dataType: "sring"});
     }    
-    data=WPSGetHeader("saveRepportSettings")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.saveRepportSettings")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    checkWPSResult(xml);
@@ -1749,7 +1749,7 @@ function saveRepport(){
 function saveRepportFile(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=saveRepportFile&DataInputs=id="+System.nodeId+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.saveRepportFile&DataInputs=id="+System.nodeId+"&RawDataOutput=Result",
 	dataType: 'xml',
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml))
@@ -1840,7 +1840,7 @@ function loadAgregatedIndexRepportSettings(){
 function previewRepport(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=previewDoc&DataInputs=oDoc="+$("#repport_doc_url").text()+($("#repport_step").val()!="-1" && ($("#repport_step")[0].selectedIndex-1)>=0?";step="+($("#repport_step")[0].selectedIndex-1):"")+";id="+System.nodeId+(arguments.length==1?";tid="+$("#p_tname").val():"")+($("#agregate_step")[0] && $("#agregate_step")[0].selectedIndex-1>=0?";step="+($("#agregate_step")[0].selectedIndex-1):"")+";preview=true&ResponseDocument=Result@asReference=true",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.previewDoc&DataInputs=oDoc="+$("#repport_doc_url").text()+($("#repport_step").val()!="-1" && ($("#repport_step")[0].selectedIndex-1)>=0?";step="+($("#repport_step")[0].selectedIndex-1):"")+";id="+System.nodeId+(arguments.length==1?";tid="+$("#p_tname").val():"")+($("#agregate_step")[0] && $("#agregate_step")[0].selectedIndex-1>=0?";step="+($("#agregate_step")[0].selectedIndex-1):"")+";preview=true&ResponseDocument=Result@asReference=true",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false,true)){
 		try{
@@ -1855,7 +1855,7 @@ function previewRepport(){
 		    var reg=new RegExp(System.tmpUrl,"g");
 		    $.ajax({
 			type: "GET",
-			url: System.zooUrl+"?metapath=print&service=WPS&version=1.0.0&request=Execute&Identifier=preview&DataInputs=file="+lUrl.replace(reg,System.tmpPath)+";res=75&ResponseDocument=Result@asReference=true",
+			url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=print.preview&DataInputs=file="+lUrl.replace(reg,System.tmpPath)+";res=75&ResponseDocument=Result@asReference=true",
 			complete: function(xml,status) {
 			    if(checkWPSResult(xml,false)){
 				var lUrl="";

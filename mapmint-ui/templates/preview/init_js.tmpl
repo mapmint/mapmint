@@ -738,14 +738,12 @@ function singleGeom() {
     var started=true;
     var dep=finalLayers[tmpId+3];
     
-    var metapath="";
-    metapath="metapath=vector-tools&";
-    var url = '/cgi-bin/zoo_loader.cgi?'+metapath+'request=Execute&service=WPS&version=1.0.0&';
+    var url = '/cgi-bin/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&';
     if (aProcess == 'BufferPy' || aProcess == 'BufferMask' || aProcess == 'SpatialQuery') {
 	var dist = document.getElementById(arguments[0]+'_buffer-value')?document.getElementById(arguments[0]+'_buffer-value').value:'1';
 	if (isNaN(dist))
 	    return alert("Distance is not a Number!");
-	url+='Identifier='+aProcess+'&DataInputs='+((aProcess == 'SpatialQuery')?"layer="+\$("#"+arguments[0]+"_spatial-query-choice").val()+";":"")+'BufferDistance='+(dist/#if $m.web.metadata.get('tuom')=="metric"#111120#else##if $m.web.metadata.get('tuom')=="geographic"#1#else#(111120/0.3048)#end if##end if#)+'@datatype=interger;'+(aProcess=="BufferMask" || aProcess=="SpatialQuery"?'InputData':'InputPolygon')+'=Reference@xlink:href=';
+	url+='Identifier=vector-tools.'+aProcess+'&DataInputs='+((aProcess == 'SpatialQuery')?"layer="+\$("#"+arguments[0]+"_spatial-query-choice").val()+";":"")+'BufferDistance='+(dist/#if $m.web.metadata.get('tuom')=="metric"#111120#else##if $m.web.metadata.get('tuom')=="geographic"#1#else#(111120/0.3048)#end if##end if#)+'@datatype=interger;'+(aProcess=="BufferMask" || aProcess=="SpatialQuery"?'InputData':'InputPolygon')+'=Reference@xlink:href=';
     } else
 	if(aProcess == "SimpleBBOX" || aProcess == "SimpleChain" || 
 	   aProcess == "Mask" || aProcess == "BufferMask" || 
@@ -850,10 +848,10 @@ function saveContext(func){
 }
 
 function _saveContext(params,func){
-    data=WPSGetHeader("saveContext")+WPSGetInputs(params)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    data=WPSGetHeader("context.saveContext")+WPSGetInputs(params)+WPSGetOutput({name:"Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=context",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: data,
 	complete: function(xml,status) {
@@ -1015,11 +1013,11 @@ function loadIndex(){
 System.context="$context";
 function loadContext(){
     var params=[{name: "name",value:arguments[0],dataType: "string"}];
-    data=WPSGetHeader("loadContext")+WPSGetInputs(params)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    data=WPSGetHeader("context.loadContext")+WPSGetInputs(params)+WPSGetOutput({name:"Result"})+WPSGetFooter();
     System.hasTrace=false;
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=context",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: data,
 	complete: function(xml,status) {

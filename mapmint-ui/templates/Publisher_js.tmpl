@@ -143,10 +143,10 @@ function savePublishedMap(){
 
   //alert(WPSGetInputs(postRequest));
 
-  var data=WPSGetHeader("savePublishMap")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+  var data=WPSGetHeader("mapfile.savePublishMap")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
   \$.ajax({
 	type: "POST",
-	url: "$conf["main"]["serverAddress"]?metapath=mapfile",
+	url: "$conf["main"]["serverAddress"],
 	data: data,
 	contentType: "text/xml",
 	complete: function(xml,status) {
@@ -160,10 +160,10 @@ function savePublishedPreview(){
   var postRequest=[];
   postRequest[postRequest.length]={name:'map', value: "$conf["senv"]["last_map"]",dataType: 'string'};
 
-  var data=WPSGetHeader("savePublishPreview")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+  var data=WPSGetHeader("mapfile.savePublishPreview")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
   \$.ajax({
 	type: "POST",
-	url: "$conf["main"]["serverAddress"]?metapath=mapfile",
+	url: "$conf["main"]["serverAddress"]",
 	data: data,
 	contentType: "text/xml",
 	complete: function(xml,status) {
@@ -181,7 +181,7 @@ function setCurrentMap(){
 
 function confirmRemovePublishedMap(){
   $.ajax({
-    url: "$conf["main"]["serverAddress"]?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Publisher/confirmRemove&RawDataOutput=Result",
+    url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Publisher/confirmRemove&RawDataOutput=Result",
 	complete: function(xml,status){
 	if(!\$('#confirmRemoveProject').length>0)
 	  \$("body").append('<div id="confirmRemoveProject" title="OSM Importer"></div>');
@@ -200,7 +200,7 @@ function confirmRemovePublishedMap(){
 function removePublishedMap(){
   \$.ajax({
 	type: "GET",
-	url: "$conf["main"]["serverAddress"]?metapath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=removeMap&DataInputs=map=$conf["senv"]["last_map"]&RawDataOutput=Result",
+	url: "$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=mapfile.removeMap&DataInputs=map=$conf["senv"]["last_map"]&RawDataOutput=Result",
 	complete: function(xml,status) {
 	  if(checkWPSResult(xml)){
 	    \$('#confirmRemoveProject').window('close');

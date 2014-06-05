@@ -179,16 +179,16 @@ function handleProfile(event) {
 	}
     }
     params0[params0.length]={name: "geometry",value: geojson.write(event.geometry.transform(mercator,wgs84),false),mimeType: "application/json"};
-    data=WPSGetHeader("display")+WPSGetInputs(params0)+WPSGetOutput({name:"Result"})+WPSGetFooter();
-    params[params.length]={name: "Geometry","xlink:href": zooUrl+"?metapath=template", "method":"POST","headers":[{"key":"Content-Type","value":"text/xml"},{"key":"Cookie","value":"MMID=$conf["senv"]["MMID"]"}], "body": "<wps:Body>"+data+"</wps:Body>", mimeType: "application/json"};
-    data=WPSGetHeader("GdalExtractProfile")+WPSGetInputs(params)+WPSGetOutput({name:"Profile"})+WPSGetFooter();
+    data=WPSGetHeader("template.display")+WPSGetInputs(params0)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    params[params.length]={name: "Geometry","xlink:href": zooUrl, "method":"POST","headers":[{"key":"Content-Type","value":"text/xml"},{"key":"Cookie","value":"MMID=$conf["senv"]["MMID"]"}], "body": "<wps:Body>"+data+"</wps:Body>", mimeType: "application/json"};
+    data=WPSGetHeader("raster-tools.GdalExtractProfile")+WPSGetInputs(params)+WPSGetOutput({name:"Profile"})+WPSGetFooter();
     params0[0]["value"]="public/project_inv_js";
-    params0[params0.length-1]={name: "geometry","xlink:href": zooUrl+"?metapath=raster-tools", "method":"POST","headers":[{"key":"Content-Type","value":"text/xml"},{"key":"Cookie","value":"MMID=$conf["senv"]["MMID"]"}], "body": "<wps:Body>"+data+"</wps:Body>",mimeType: "application/json"};
-    data=WPSGetHeader("display")+WPSGetInputs(params0)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    params0[params0.length-1]={name: "geometry","xlink:href": zooUrl, "method":"POST","headers":[{"key":"Content-Type","value":"text/xml"},{"key":"Cookie","value":"MMID=$conf["senv"]["MMID"]"}], "body": "<wps:Body>"+data+"</wps:Body>",mimeType: "application/json"};
+    data=WPSGetHeader("template.display")+WPSGetInputs(params0)+WPSGetOutput({name:"Result"})+WPSGetFooter();
 
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=template",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: data,
 	complete: function(xml,status) {

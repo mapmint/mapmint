@@ -10,7 +10,7 @@ function Buffer(inputData,bDist){
   // Pass the value as json
   var myInputs = {InputPolygon: { type: 'complex', value: fGJ.write(inputData), mimeType: "application/json"}, BufferDistance: {type: 'float', "value": bDist } };  
   var myOutputs= {Result: { type: 'RawDatautput', "mimeType": "application/json" }};
-  var myProcess = new ZOO.Process(zoo_url,'BufferPy');
+  var myProcess = new ZOO.Process(zoo_url,'vector-tools.BufferPy');
   var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
 
   // Parse the result and extract JSON geometry
@@ -31,7 +31,7 @@ function BufferWOParse(inputData,bDist){
   // Pass the value as json
   var myInputs = {InputPolygon: { type: 'complex', value: fGJ.write(inputData), mimeType: "application/json"}, BufferDistance: {type: 'float', "value": bDist } };  
   var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess = new ZOO.Process(zoo_url,'BufferPy');
+  var myProcess = new ZOO.Process(zoo_url,'vector-tools.BufferPy');
   var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
 
   // Parse the result and extract JSON geometry
@@ -41,7 +41,7 @@ function BufferWOParse(inputData,bDist){
 
 function BufferMask(conf,inputs,outputs){
 
-  zoo_url=conf["main"]["serverAddress"]+"?metapath=vector-tools";
+  zoo_url=conf["main"]["serverAddress"];
   
   // Create all required ZOO.formats
   var fGJ=new ZOO.Format.GeoJSON();
@@ -68,7 +68,7 @@ alert("ok");
   
   // Request Difference service using Buffer result and features in the BBOX
   var result=new ZOO.Feature(finalG,{"fid": "1","name": "Result1000"});  
-  var myProcess2 = new ZOO.Process(zoo_url,'DifferencePy');
+  var myProcess2 = new ZOO.Process(zoo_url,'+"vector-tools.DifferencePy');
   var myInputs2 = {InputEntity1: { type: 'complex',  value: fGJ.write(bbox.toGeometry()), mimeType: "application/json" }, InputEntity2: { type: 'complex',  value: bufferResultAsJSON, mimeType: "application/json"} };
   var myOutputs2= {Result: { type: 'RawDataOutput', "mimeType": "application/json" } };
   var myExecuteResult4=myProcess2.Execute(myInputs2,myOutputs2);
@@ -78,7 +78,7 @@ alert("ok");
 }
 
 function SpatialQuery(conf,inputs,outputs){
-  zoo_url=conf["main"]["serverAddress"]+"?metapath=vector-tools";
+  zoo_url=conf["main"]["serverAddress"];
   
   // Create all required ZOO.formats
   var fGJ=new ZOO.Format.GeoJSON();
@@ -109,7 +109,7 @@ function SpatialQuery(conf,inputs,outputs){
   
   // Request Intersection service using Buffer result and WFS request using the
   // BBOX
-  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-tools",'IntersectionPy');
+  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.IntersectionPy');
   var myInputs2 = {InputEntity1: { type: 'complex',  value: bufferResultAsJSON, mimeType: "application/json"}, InputEntity2: { type: 'complex',  xlink: conf["main"]["mapserverAddress"]+"?map="+conf["main"]["dataPath"]+"/public_maps/project_"+conf["senv"]["last_map"]+".map&amp;SERVICE=WFS&amp;version=1.0.0&amp;request=GetFeature&amp;typename="+inputs["layer"]["value"]+"&amp;SRS=EPSG:4326&amp;BBOX="+lc[0]+","+lc[1]+","+uc[0]+","+uc[1], mimeType: "text/xml" } };
   var myOutputs2= {Result: { type: 'RawDataOutput', "mimeType": outputs["Result"]["mimeType"] } };
   var myExecuteResult4=myProcess2.Execute(myInputs2,myOutputs2);

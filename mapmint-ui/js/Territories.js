@@ -83,7 +83,7 @@ $(document).ready(function () {
 function preview(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=getMapRequest&DataInputs=t_id="+System.nodeId+";preview=true&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.getMapRequest&DataInputs=t_id="+System.nodeId+";preview=true&RawDataOutput=Result",
 	complete: function(xml,status) {
 
 	    if(checkWPSResult(xml,false)){
@@ -134,11 +134,11 @@ function updateElement(){
 	{name: "t_hierarchy_out", value: "p_t_id",dataType: "string"},
 	{name: "tuple", value: $.stringify(params), mimeType: "application/json"}
     ];
-    data=WPSGetHeader("updateElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.updateElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -157,7 +157,7 @@ function refreshDetails(){
 
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=details&DataInputs=table=territoires;id="+System.nodeId+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table=territoires;id="+System.nodeId+"&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		var data=$.parseJSON(xml.responseText);
@@ -203,11 +203,11 @@ function saveOrder(){
     for(i=0;i<nodes.length;i++){
 	params.push({name: "node", value: nodes[i].id, dataType: "string"});
     }
-    data=WPSGetHeader("orderElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.orderElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -246,7 +246,7 @@ function setOrder(){
 function refreshList(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=list&DataInputs=table=territoires&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.list&DataInputs=table=territoires&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		var data=$.parseJSON(xml.responseText);
@@ -314,11 +314,11 @@ function deleteElement(){
 	{name: "akey", value: "t_id",dataType: "string"},
 	{name: "id", value: System.nodeId,dataType: "string"}
     ];
-    data=WPSGetHeader("deleteElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.deleteElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -334,11 +334,11 @@ function insertElement(){
 	{name: "table", value: "territoires",dataType: "string"},
 	{name: "name", value: $("#eName").val(),dataType: "string"}
     ];
-    data=WPSGetHeader("insertElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.insertElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -352,7 +352,7 @@ function insertElement(){
 function loadForm(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=details&DataInputs=table=territoires;name='+arguments[0]+'&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table=territoires;name='+arguments[0]+'&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 	    }

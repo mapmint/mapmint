@@ -225,15 +225,14 @@ System.updateUserPreferences=function(){
     }catch(e){
 
     }
-    var data=WPSGetHeader((\$("#um_utype").val()=="insert"?"AddUser":"UpdateUser"))+WPSGetInputs(fparams)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    var data=WPSGetHeader("manage_users."+(\$("#um_utype").val()=="insert"?"AddUser":"UpdateUser"))+WPSGetInputs(fparams)+WPSGetOutput({name:"Result"})+WPSGetFooter();
     
     \$.ajax({
 	//type: "GET",
 	type: "POST",
 	data: data,
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=manage_users",
-	//url: System.zooUrl+"?metapath=manage_users&service=WPS&version=1.0.0&request=Execute&Identifier="+(\$("#um_utype").val()=="insert"?"AddUser":"UpdateUser")+"&DataInputs="+(\$("#um_utype").val()!="update"?params+";type="+\$("#um_utype").val()+";":params+";login="+\$("#um_uclause").val()+";")+(\$("#um_utype").val()=="insert"?"user":"set")+"={\"login\":\""+\$("#up_login").val()+"\",\"nom\":\""+\$("#up_first_name").val()+"\",\"prenom\":\""+\$("#up_last_name").val()+"\",\"mail\":\""+\$("#up_email").val()+"\",\"tel\":\""+\$("#up_phone").val()+"\""+((\$("#up_cp").is(":checked"))?',"passwd":"'+\$("#up_password").val()+'"':'')+"}"+"&RawDataOutput=Result",
+	url: System.zooUrl,
 	dataType: "text",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
@@ -247,7 +246,7 @@ System.updateUserPreferences=function(){
 System.UserPreferences=function(){
     \$.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=UserPreferences&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=UserPreferences&RawDataOutput=Result",
 	dataType: "text",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
@@ -322,10 +321,10 @@ MapMintUsersManager={
 		    postRequest[postRequest.length]={'name': 'user',value: \$("#um_group_"+i).val(),dataType: "string"};
 		}
 	}		    
-	var data=WPSGetHeader("requestGroup")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+	var data=WPSGetHeader("manage_users.requestGroup")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
 	$.ajax({
 	    type: "POST",
-	    url: System.zooUrl+"?metapath=manage_users",
+	    url: System.zooUrl,
 	    data: data,
 	    contentType: "text/xml",
 	    complete: function(xml,status) {
@@ -376,10 +375,10 @@ MapMintUsersManager={
 		postRequest[postRequest.length]={'name': "group_"+i,value: (\$(this).is(":checked")?1:0),dataType: "string"};
 	    });
 	
-	var data=WPSGetHeader("saveLayerPrivileges")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+	var data=WPSGetHeader("mapfile.saveLayerPrivileges")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
 	$.ajax({
 	    type: "POST",
-	    url: System.zooUrl+"?metapath=mapfile",
+	    url: System.zooUrl,
 	    data: data,
 	    contentType: "text/xml",
 	    complete: function(xml,status) {
@@ -412,7 +411,7 @@ System.UserManagement=function(){
 		\$('#um-dialog').html(xml.responseText);
 		\$("#um_utable").flexigrid({
 		    autoload: false,
-		    url: System.zooUrl+"?metapath=manage_users&request=Execute&service=WPS&version=1.0.0&Identifier=getTableContent&RawDataOutput=Result&DataInputs=table=users;cols=login,lastname,firstname,mail,phone",
+		    url: System.zooUrl+"?request=Execute&service=WPS&version=1.0.0&Identifier=manage_users.getTableContent&RawDataOutput=Result&DataInputs=table=users;cols=login,lastname,firstname,mail,phone",
 		    id: "UTable",
 		    searchitems: [{"display": "login","name":"login"},{"display": "lastname","name":"lastname"},{"display": "firstname","name":"firstname"},{"display": "mail","name":"mail"},{"display": "phone","name":"phone"}],
 		    singleSelect: true,
@@ -445,7 +444,7 @@ System.UserManagement=function(){
 		\$("#um_gtable").flexigrid({
 		    autoload: false,
 		    ogcProtocol: "MM",
-		    url: System.zooUrl+"?metapath=manage_users&request=Execute&service=WPS&version=1.0.0&Identifier=getTableContent&RawDataOutput=Result&DataInputs=table=groups;cols=name,description",
+		    url: System.zooUrl+"?request=Execute&service=WPS&version=1.0.0&Identifier=manage_users.getTableContent&RawDataOutput=Result&DataInputs=table=groups;cols=name,description",
 		    id: "GTable",
 		    singleSelect: true,
 		    searchitems: [{"display": "name","name":"name"},{"display": "description","name":"description"}],
@@ -488,7 +487,7 @@ function saveAsMap(){
 	mapNames=[\$("#mapName").val(),\$("#mapNameOrig").val()];
     \$.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=saveMap&DataInputs=map="+mapNames[0]+";mapOrig="+mapNames[1]+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.saveMap&DataInputs=map="+mapNames[0]+";mapOrig="+mapNames[1]+"&RawDataOutput=Result",
 	dataType: "xml",
 	complete: function(xml,status){
 	    checkWPSResult(xml);
@@ -572,7 +571,7 @@ function searchTable(){
 	source: function(request,response){
 	    \$.ajax({
 		type: "GET",
-		url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&identifier=searchByName&DataInputs=tbl="+System.tableName+";val="+request.term+(\$("#indicateurs_themes").val()!="-1"?";tid="+\$("#indicateurs_themes").val():"")+(\$("#indicateurs_territories").val()!="-1"?";t_id="+\$("#indicateurs_territories").val():"")+";public=true&RawDataOutput=Result",
+		url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&identifier=np.searchByName&DataInputs=tbl="+System.tableName+";val="+request.term+(\$("#indicateurs_themes").val()!="-1"?";tid="+\$("#indicateurs_themes").val():"")+(\$("#indicateurs_territories").val()!="-1"?";t_id="+\$("#indicateurs_territories").val():"")+";public=true&RawDataOutput=Result",
 		success: function(xml,status){
 		    var data=xml;
 		    response(data);

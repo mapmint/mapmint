@@ -10,7 +10,7 @@ $(document).ready(function() {
     $("#validate").click(function(){
 	$.ajax({
 	  type: "GET",
-	      url: System.zooUrl+"?metapath=authenticate&service=WPS&version=1.0.0&request=Execute&Identifier=logIn&DataInputs=login="+$('#email')[0].value+";password="+$('#password')[0].value+"&RawDataOutput=Result",
+	      url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=authenticate.logIn&DataInputs=login="+$('#email')[0].value+";password="+$('#password')[0].value+"&RawDataOutput=Result",
 	  dataType: "xml",
 	  complete: function(xml,status) {
 	      if(xml.responseXML){

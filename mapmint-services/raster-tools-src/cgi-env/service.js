@@ -1,7 +1,7 @@
 function createTindex(conf,inputs,outputs){
   
   var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=raster-tools",'tindex');
+  var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.tindex');
   inputs["iname"]["value"]="tile_"+inputs["iname"]["value"];
   inputs["dir"]["value"]=inputs["dir"]["value"].replace(conf["main"]["dataPath"]+"/ftp/","")
   var myExecuteResult=myProcess.Execute(inputs,myOutputs);
@@ -14,14 +14,14 @@ function createTindex(conf,inputs,outputs){
   inputs["a_srs"]["value"]="+init="+inputs["a_srs"]["value"];
   inputs["OutputDSN"]={"value": "TEMP_"+inputs["iname"]["value"]}
 
-  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Converter');
+  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
   var myOutputs1= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
   var myExecuteResult1=myProcess1.Execute(inputs,myOutputs1);
 
   
   alert(myExecuteResult1);
 
-  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=raster-tools",'copyTileIndex');
+  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.copyTileIndex');
   var myOutputs2= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
   var myExecuteResult2=myProcess2.Execute(inputs,myOutputs2);
 

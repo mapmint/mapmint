@@ -1,11 +1,11 @@
 function computeRouteProfile(conf,inputs,outputs){
   var myOutputs= {"Result": { "type": 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=routing",'doUnion');
+  var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'routing.doUnion');
   var myExecuteResult=myProcess.Execute(inputs,myOutputs);
   alert("*********** Parse error",myExecuteResult);
  
   var myOutputs1= {"Profile": { type: 'ResponseDocument', "mimeType": "application/json", "asReference": "true" }};
-  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=routing",'GdalExtractProfile');
+  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'routing.GdalExtractProfile');
   inputs["RasterFile"]={"value":"topofr.tif","dataType":"string"}
   var geom=false;
   var json=new ZOO.Format.GeoJSON();

@@ -1058,7 +1058,7 @@ function initOSlider(){
 	\$.ajax({
 	    dwDataSource: System.mmNodeId,
 	    type: "GET",
-	    url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=getInitialInfo&DataInputs=map=$conf["senv"]["last_map"];layer="+layersList[System.mmNodeId.replace(/layer_/,"")].real_name+"&RawDataOutput=Result",
+	    url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.getInitialInfo&DataInputs=map=$conf["senv"]["last_map"];layer="+layersList[System.mmNodeId.replace(/layer_/,"")].real_name+"&RawDataOutput=Result",
 	    dataType: 'xml',
 	    complete:function(xml,status){
 		var tmp=\$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -1210,7 +1210,7 @@ function initOSlider(){
 
 #if $conf["senv"]["last_map"]=="Default"
 function restartSelect(){
-    var url=zooUrl+"?metapath=authenticate&service=WPS&version=1.0.0&request=Execute&Identifier=setDefaultExtent&DataInputs=bbox="+System.bounds.transform(map.getProjection(),new OpenLayers.Projection('epsg:4326'))+"&RawDataOutput=Result";
+    var url=zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=authenticate.setDefaultExtent&DataInputs=bbox="+System.bounds.transform(map.getProjection(),new OpenLayers.Projection('epsg:4326'))+"&RawDataOutput=Result";
     \$.ajax({
 	url: url,
 	complete: function(xml,status){
@@ -1247,7 +1247,7 @@ var react=Array(
 	var tmp=obj.geom.bounds.clone();
 	System.tmp1=obj.geom.bounds.clone();
 
-	var url=zooUrl+"?metapath=authenticate&service=WPS&version=1.0.0&request=Execute&Identifier=setDefaultExtent&DataInputs=bbox="+tmp.transform(map.getProjection(),new OpenLayers.Projection('epsg:4326'))+"&RawDataOutput=Result";
+	var url=zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=authenticate.setDefaultExtent&DataInputs=bbox="+tmp.transform(map.getProjection(),new OpenLayers.Projection('epsg:4326'))+"&RawDataOutput=Result";
 	\$.ajax({
 	    url: url,
 	    complete: function(xml,status){
@@ -1469,7 +1469,7 @@ function previewPrint(){
 
     \$.ajax({
 	type: "GET",
-	url: zooUrl+"?metapath=print&service=WPS&version=1.0.0&request=Execute&Identifier=preview&DataInputs=res=32;file="+arguments[0]+"&ResponseDocument=Result@asReference=true",
+	url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=print.preview&DataInputs=res=32;file="+arguments[0]+"&ResponseDocument=Result@asReference=true",
 	complete: function(xml,status){
 	    \$(xml.responseXML).find("Reference").each(function(){
 		\$("#preview-link")[0].src=\$(this).attr("href");
@@ -1550,12 +1550,12 @@ function printDocument(){
     
     \$.ajax({
 	type: "GET",
-	url: zooUrl+"?metapath=raster-tools&service=WPS&version=1.0.0&request=Execute&Identifier=translate&DataInputs=InputDSN=base_layers/"+(map.baseLayer.name=="$conf["mm"]["bmName"] $ml[0]"?"mq-osm":(map.baseLayer.name=="$conf["mm"]["bmName"] $ml[1]"?"mq-aerial":(map.baseLayer.name.replace("$conf["mm"]["bgName"]","")==map.baseLayer.name?"default":"g"+map.baseLayer.name.replace("$conf["mm"]["bgName"] ",""))))+".xml;"+"OutputDSN=tmp_${conf["senv"]["MMID"]};Format=GTiff;OutSize="+(sizes[\$('#iFormat').val()][0])+","+(sizes[\$('#iFormat').val()][1])+";ProjWin="+tmpExt+"&RawDataOutput=Result&timestamp="+d.getTime(),
+	url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.translate&DataInputs=InputDSN=base_layers/"+(map.baseLayer.name=="$conf["mm"]["bmName"] $ml[0]"?"mq-osm":(map.baseLayer.name=="$conf["mm"]["bmName"] $ml[1]"?"mq-aerial":(map.baseLayer.name.replace("$conf["mm"]["bgName"]","")==map.baseLayer.name?"default":"g"+map.baseLayer.name.replace("$conf["mm"]["bgName"] ",""))))+".xml;"+"OutputDSN=tmp_${conf["senv"]["MMID"]};Format=GTiff;OutSize="+(sizes[\$('#iFormat').val()][0])+","+(sizes[\$('#iFormat').val()][1])+";ProjWin="+tmpExt+"&RawDataOutput=Result&timestamp="+d.getTime(),
 	complete: function(xml,status){
 	    
 	    \$.ajax({
 		type: "GET",
-		url: zooUrl+"?metapath=print&service=WPS&version=1.0.0&request=Execute&Identifier=printMap&DataInputs=layers="+ll+";ext="+tmpExt0+";iFormat="+\$('#iFormat').val()+";tDoc=MM-PrintedMap.pdf;map=$conf["senv"]["last_map"];bgMap="+xml.responseText+";zoom="+map.getZoom()+"&ResponseDocument=Result@asReference=true&timestamp="+d.getTime(),
+		url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=print.printMap&DataInputs=layers="+ll+";ext="+tmpExt0+";iFormat="+\$('#iFormat').val()+";tDoc=MM-PrintedMap.pdf;map=$conf["senv"]["last_map"];bgMap="+xml.responseText+";zoom="+map.getZoom()+"&ResponseDocument=Result@asReference=true&timestamp="+d.getTime(),
 		complete: function(xml,status){
 		    var url="";
 		    \$(xml.responseXML).find("Reference").each(function(){
@@ -1595,7 +1595,7 @@ function setFavoriteMap(){
     \$.ajax({
 	type: "GET",
 	localID: this.length,
-	url: zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=setFavoriteMap&DataInputs=&RawDataOutput=Result&timestamp="+d.getTime(),
+	url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.setFavoriteMap&DataInputs=&RawDataOutput=Result&timestamp="+d.getTime(),
 	complete: function(xml,status){
 	    isFavoriteMap();
 	}
@@ -1608,7 +1608,7 @@ function isFavoriteMap(){
     \$.ajax({
 	type: "GET",
 	localID: this.length,
-	url: zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=isFavoriteMap&DataInputs=&RawDataOutput=Result&timestamp="+d.getTime(),
+	url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.isFavoriteMap&DataInputs=&RawDataOutput=Result&timestamp="+d.getTime(),
 	complete: function(xml,status){
 	    if(eval(xml.responseText)){
 		\$(".star").addClass("star-enabled").removeClass("star");
@@ -1650,10 +1650,10 @@ function setLayerOrder(){
 	{"name": "layers","value":JSON.stringify(layers),mimeType:"application/json"},
 	{"name": "layers_id","value":JSON.stringify(layers_id),mimeType:"application/json"},
     ];
-    data=WPSGetHeader("display")+WPSGetInputs(params)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    data=WPSGetHeader("template.display")+WPSGetInputs(params)+WPSGetOutput({name:"Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=template",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: data,
 	complete: function(xml,status) {

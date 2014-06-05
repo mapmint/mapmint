@@ -4,7 +4,7 @@ function searchTable(){
 	source: function(request,response){
 	    $.ajax({
 		type: "GET",
-		url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&identifier=searchByName&DataInputs=tbl="+System.tableName+";val="+request.term+"&RawDataOutput=Result",
+		url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&identifier=np.searchByName&DataInputs=tbl="+System.tableName+";val="+request.term+"&RawDataOutput=Result",
 		success: function(xml,status){
 		    var data=xml;
 		    response(data);

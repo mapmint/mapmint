@@ -68,7 +68,7 @@ MapMint: Indexes
 		  <td valign="middle" style="width:200px;">Fichier: <input type="radio" name="doct" value="file"  selected="true" onclick="\$('#indicateurs_url').hide();\$('#file0').show();" /> URL: <input type="radio" name="doct" value="url" onclick="\$('#indicateurs_url').show();\$('#file0').hide();" /></td>
 		  <td>
 		    <input id="indicateurs_url" class="rounded frm maincfg url" style="display:none;" />
-		    <form id="fileUpload0" action="$conf["main"]["serverAddress"]?metapath=upload&request=Execute&service=WPS&version=1.0.0&Identifier=saveOnServer&dataInputs=file=upload;filename=file" method="post" enctype="multipart/form-data" target="uploader">
+		    <form id="fileUpload0" action="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=upload.saveOnServer&dataInputs=file=upload;filename=file" method="post" enctype="multipart/form-data" target="uploader">
 		    <input type="file" name="file" id="file0" class="rounded frm file" />
 		    <a id="indicateurs_file_link0" href="" target="_blank"></a>
 		    </form>
@@ -140,7 +140,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Indexes/displayThemes.html",sea
 	      </ul>
 	      
 	      <div id="opt1" class="desc">
-	      <form id="fileUpload" action="$conf["main"]["serverAddress"]?metapath=upload&request=Execute&service=WPS&version=1.0.0&Identifier=saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="uploader0">
+	      <form id="fileUpload" action="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=upload.saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="uploader0">
 		<input type="file" name="file" id="file" class="rounded frm file" />
 		<a id="indicateurs_file_link" href="" target="_blank"></a>
 		  <a href="#" class="wbutton ui-corner-all al" onclick="\$('#indicateurs_territoires_filename').val(\$('#file').val());\$('#fileUpload').submit();">$zoo._("Import")</a>

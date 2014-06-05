@@ -30,7 +30,7 @@ function georeference(conf,inputs,outputs){
     var inputs0={
 	"layer":{"value": conf["senv"]["mmGeoDSO"]}	
     }
-    var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=georeferencer",'copyLayerFile');
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'georeferencer.copyLayerFile');
     alert("GCPs",inputs["gcp"]["length"]);
     for(i=0;i<parseInt(inputs["gcp"]["length"]);i++)
 	alert("GCPs",inputs["gcp"]["value_"+i]);
@@ -46,7 +46,7 @@ function georeference(conf,inputs,outputs){
 	"gcp": inputs["gcp"],
 	"SRS": {"dataType":"string","value": "epsg:4326"}
     };
-    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=raster-tools",'Gdal_Translate');
+    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.Gdal_Translate');
     var myExecuteResult1=myProcess1.Execute(inputs1,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult1);
 
@@ -54,7 +54,7 @@ function georeference(conf,inputs,outputs){
      * Copy resulting file into dataPath
      */
     inputs0["lfile"]={"value": myExecuteResult1};
-    myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=georeferencer",'copyLayerFile');
+    myProcess = new ZOO.Process(conf["main"]["serverAddress"],'georeferencer.copyLayerFile');
     try{
 	var myExecuteResult0=myProcess.Execute(inputs0,myOutputs);
 	alert("Copy original file into dataPath",myExecuteResult0);
@@ -79,7 +79,7 @@ function georeference(conf,inputs,outputs){
     if(inputs["hres"] && inputs["vres"]){
 	inputs2["tr"]={"dataType":"string","value":inputs["hres"]+","+inputs["vres"]};
     }
-    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=raster-tools",'Gdal_Warp');
+    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.Gdal_Warp');
     var myExecuteResult2=myProcess2.Execute(inputs2,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult2);
 
@@ -88,7 +88,7 @@ function georeference(conf,inputs,outputs){
      */
     inputs0["lfile"]={"value": myExecuteResult2};
     inputs0["target"]={"value": conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]};
-    myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=georeferencer",'copyLayerFile');
+    myProcess = new ZOO.Process(conf["main"]["serverAddress"],'georeferencer.copyLayerFile');
     try{
 	myExecuteResult0=myProcess.Execute(inputs0,myOutputs);
     }catch(e){
@@ -101,14 +101,14 @@ function georeference(conf,inputs,outputs){
 	"dsType": {"dataType": "string","value": "mainDirectories"},
 	"dsName": {"dataType": "string","value": conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/"},
     };
-    var myProcess3 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=datastores/directories",'cleanup');
+    var myProcess3 = new ZOO.Process(conf["main"]["serverAddress"],'datastores.directories.cleanup');
     myExecuteResult0=myProcess3.Execute(inputs3,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult0);
 
     var inputs4={
 	"dataSource": {"dataType": "string","value": conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/"}
     };
-    var myProcess4 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-tools",'mmVectorInfo2Map');
+    var myProcess4 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.mmVectorInfo2Map');
     myExecuteResult0=myProcess4.Execute(inputs4,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult0);
 
@@ -121,7 +121,7 @@ function georeference(conf,inputs,outputs){
 	    conf["main"]["tmpPath"]+"/"+conf["senv"]["mmGeoDSO"]+"_georef.tif"
 	],"length": 4, "isArray":true}
     };
-    var myProcess5 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=georeferencer",'dropLayerFile');
+    var myProcess5 = new ZOO.Process(conf["main"]["serverAddress"],'georeferencer.dropLayerFile');
     myExecuteResult0=myProcess5.Execute(inputs5,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult0);
 
@@ -140,7 +140,7 @@ function cropImage(conf,inputs,outputs){
 	"layer":{"dataType":"string","value": inputs["dso"]["value"]},	
 	"dsto":{"dataType":"string","value": inputs["dsto"]["value"]}	
     }
-    var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=georeferencer",'copyLayerFile');
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'georeferencer.copyLayerFile');
     var myExecuteResult=myProcess.Execute(inputs0,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult);
 
@@ -152,7 +152,7 @@ function cropImage(conf,inputs,outputs){
 	"OutputDSN": {"dataType":"string","value":inputs["dsot"]["value"]+""},
 	"ProjWin": {"dataType": "sting","value": inputs["ProjWin"]["value"]}
     };
-    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=raster-tools",'Gdal_Translate');
+    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.Gdal_Translate');
     var myExecuteResult1=myProcess1.Execute(inputs1,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult1);
 
@@ -161,7 +161,7 @@ function cropImage(conf,inputs,outputs){
      */
     inputs0["lfile"]={"value": myExecuteResult1};
     inputs0["target"]={"value": conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]};
-    myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=georeferencer",'copyLayerFile');
+    myProcess = new ZOO.Process(conf["main"]["serverAddress"],'georeferencer.copyLayerFile');
     myExecuteResult0=myProcess.Execute(inputs0,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult0);
     
@@ -169,14 +169,14 @@ function cropImage(conf,inputs,outputs){
 	"dsType": {"dataType": "string","value": "mainDirectories"},
 	"dsName": {"dataType": "string","value": conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/"}
     };
-    var myProcess3 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=datastores/directories",'cleanup');
+    var myProcess3 = new ZOO.Process(conf["main"]["serverAddress"],'datastores.directories.cleanup');
     myExecuteResult0=myProcess3.Execute(inputs3,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult0);
 
     var inputs4={
 	"dataSource": {"dataType": "string","value": conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/"}
     };
-    var myProcess4 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-tools",'mmVectorInfo2Map');
+    var myProcess4 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.mmVectorInfo2Map');
     myExecuteResult0=myProcess4.Execute(inputs4,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult0);
 
@@ -189,7 +189,7 @@ function cropImage(conf,inputs,outputs){
 	    conf["main"]["tmpPath"]+"/"+inputs["dsot"]["value"]+".tif"
 	],"length": 4, "isArray":true}
     };
-    var myProcess5 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=georeferencer",'dropLayerFile');
+    var myProcess5 = new ZOO.Process(conf["main"]["serverAddress"],'georeferencer.dropLayerFile');
     myExecuteResult0=myProcess5.Execute(inputs5,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult0);
 

@@ -32,7 +32,7 @@ def addBgLayer(conf,m,size,zoomlevel,ext,typ="osm"):
     import json,mapscript,time,shutil
     delta=(100*(2**(18-zoomlevel)))
     ext0=json.dumps((float(ext[0])-delta,float(ext[3])+delta,float(ext[2])+delta,float(ext[1])-delta)).replace("[","").replace("]","").replace(" ","")
-    hreq=conf["main"]["serverAddress"]+"?metapath=raster-tools&service=WPS&version=1.0.0&request=Execute&Identifier=translate&DataInputs=InputDSN=base_layers/mq-"+typ+".xml;OutputDSN=tmp_"+conf["senv"]["MMID"]+str(time.clock()).split(".")[1]+";Format=GTiff;OutSize="+str(size[0]*1.5)+","+str(size[1]*1.5)+";ProjWin="+ext0+"&RawDataOutput=Result&language="+conf["main"]["language"]
+    hreq=conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.translate&DataInputs=InputDSN=base_layers/mq-"+typ+".xml;OutputDSN=tmp_"+conf["senv"]["MMID"]+str(time.clock()).split(".")[1]+";Format=GTiff;OutSize="+str(size[0]*1.5)+","+str(size[1]*1.5)+";ProjWin="+ext0+"&RawDataOutput=Result&language="+conf["main"]["language"]
     import urllib2
     u = urllib2.urlopen(hreq)
     fName=u.read()

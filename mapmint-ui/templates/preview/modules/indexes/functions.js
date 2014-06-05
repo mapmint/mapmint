@@ -49,10 +49,10 @@ function removeAllSelectedFeatures(){
 	    params=[];
 	    params.push({"name": "InputEntity1","xlink:href": System.allOverlays+"&amp;SERVICE=WFS&amp;VERSION=1.0.0&amp;REQUEST=GetFeature&amp;typeName=Result&amp;bbox="+bounds0.getBounds()+"&amp;times="+(Date()+"").split(' ')[4],"mimeType": "text/xml"});
 	    params.push({"name": "InputEntity2","xlink:href": ((System.si=="in")?System.inMap:System.outMap)+"&amp;SERVICE=WFS&amp;VERSION=1.0.0&amp;REQUEST=GetFeature&amp;typeName=Result&amp;times="+(Date()+"").split(' ')[4],"mimeType": "text/xml"});
-	    req=WPSGetHeader("Remove")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
+	    req=WPSGetHeader("vector-tools.Remove")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
 	    $.ajax({
 		type: "POST",
-		url: System.zooUrl+"?metapath=vector-tools",
+		url: System.zooUrl,
 		contentType: 'text/xml',
 		data: req,
 		complete: function(xml,status) {
@@ -86,7 +86,7 @@ function getIndexInfo(i,ll,ur){
 	ll: ll,
 	ur: ur,
 	type: "GET",
-	url: zooUrl+"?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=getInitialInfo&DataInputs=map="+lastMap+";layer="+queryLayersList[i].real_name+"&RawDataOutput=Result",
+	url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.getInitialInfo&DataInputs=map="+lastMap+";layer="+queryLayersList[i].real_name+"&RawDataOutput=Result",
 	dataType: 'xml',
 	complete:function(xml,status){
 	    var tmp=\$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -200,7 +200,7 @@ function getTerritoryTable(i){
     \$.ajax({
 	localI: i,
 	type: "GET",
-	url: zooUrl+"?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=getInitialInfo&DataInputs=map="+lastMap+";layer="+queryLayersList[i].real_name+"&RawDataOutput=Result",
+	url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.getInitialInfo&DataInputs=map="+lastMap+";layer="+queryLayersList[i].real_name+"&RawDataOutput=Result",
 	dataType: 'xml',
 	complete:function(xml,status){
 	    var tmp=\$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -331,10 +331,10 @@ function getTerritoryTable(i){
 				    
 				}
 				params.push({"name": "InputEntity1", "xlink:href": msUrl+"?map="+pmapfiles[queryLayersList[tmpIdp].real_name][0],"method":"POST","headers":[{"key":"Content-Type","value":"text/xml"}],"body": rbody,"mimeType": "text/xml"});
-				req=WPSGetHeader("getFeaturesCopy")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
+				req=WPSGetHeader("vector-tools.getFeaturesCopy")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
 				$.ajax({
 				    type: "POST",
-				    url: System.zooUrl+"?metapath=vector-tools",
+				    url: System.zooUrl,
 				    contentType: 'text/xml',
 				    data: req,
 				    complete: function(xml,status) {
@@ -359,7 +359,7 @@ function getTerritoryTable(i){
 					    System.outMap=WPSParseReference(xml);
 					    params.push({"name": "InputEntity1", "xlink:href": System.outMap+"&amp;SERVICE=WFS&amp;VERSION=1.0.0&amp;REQUEST=GetFeature&amp;typeName=Result"+"&amp;__tt="+Date(),"mimeType": "text/xml"});
 					}
-					req0=WPSGetHeader("nullGeo")+WPSGetInputs([{"name": "InputEntity1", "xlink:href": ((System.si=="in")?System.inMap:System.outMap)+"&amp;SERVICE=WFS&amp;VERSION=1.0.0&amp;REQUEST=GetFeature&amp;typeName=ms:Result"+"&amp;__tt="+Date(),"mimeType": "text/xml"}])+WPSGetOutput({"name": "Result","form":"RawDataOutput","mimeType": "application/json","asReference":"true"})+WPSGetFooter();
+					req0=WPSGetHeader("vector-tools.nullGeo")+WPSGetInputs([{"name": "InputEntity1", "xlink:href": ((System.si=="in")?System.inMap:System.outMap)+"&amp;SERVICE=WFS&amp;VERSION=1.0.0&amp;REQUEST=GetFeature&amp;typeName=ms:Result"+"&amp;__tt="+Date(),"mimeType": "text/xml"}])+WPSGetOutput({"name": "Result","form":"RawDataOutput","mimeType": "application/json","asReference":"true"})+WPSGetFooter();
 					indexes_reaction(req0,params);
 				    }
 				});
@@ -496,10 +496,10 @@ function idxRemoveFeature(id){
 	    params.push({"name": "InputEntity1","xlink:href": System.allOverlays+"&amp;SERVICE=WFS&amp;VERSION=1.0.0&amp;REQUEST=GetFeature&amp;typeName=Result&amp;times="+(Date()+"").split(' ')[4],"mimeType": "text/xml"});
 	    params.push({"name": "InputEntity2", "xlink:href": msUrl+"?map="+pmapfiles[queryLayersList[tmpIdp].real_name][0],"method":"POST","headers":[{"key":"Content-Type","value":"text/xml"}],"body": rbody,"mimeType": "text/xml"});
 	    
-	    req=WPSGetHeader("Remove")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
+	    req=WPSGetHeader("vector-tools.Remove")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
 	    $.ajax({
 		type: "POST",
-		url: System.zooUrl+"?metapath=vector-tools",
+		url: System.zooUrl,
 		contentType: 'text/xml',
 		data: req,
 		complete: function(xml,status) {
@@ -511,10 +511,10 @@ function idxRemoveFeature(id){
     params=[];
     params.push({"name": "InputEntity1","xlink:href": ((System.si=="in")?System.inMap:System.outMap)+"&amp;SERVICE=WFS&amp;VERSION=1.0.0&amp;REQUEST=GetFeature&amp;typeName=Result&amp;times="+(Date()+"").split(' ')[4],"mimeType": "text/xml"});
     params.push({"name": "InputEntity2", "xlink:href": msUrl+"?map="+pmapfiles[queryLayersList[tmpIdp].real_name][0],"method":"POST","headers":[{"key":"Content-Type","value":"text/xml"}],"body": rbody,"mimeType": "text/xml"});
-    req=WPSGetHeader("Remove")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
+    req=WPSGetHeader("vector-tools.Remove")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=vector-tools",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: req,
 	complete: function(xml,status) {
@@ -572,12 +572,12 @@ function idxPrintDocument(){
     });
     params.push({"name": "tid","value":\$('#it1').val(),dataType:"string"});
     
-    data=WPSGetHeader("viewRepport")+WPSGetInputs(params)+WPSGetOutput({name:"Result",form: "ResponseDocument","status": "true","storeExecuteResponse": "true", "asReference": "true"})+WPSGetFooter();
+    data=WPSGetHeader("np.viewRepport")+WPSGetInputs(params)+WPSGetOutput({name:"Result",form: "ResponseDocument","status": "true","storeExecuteResponse": "true", "asReference": "true"})+WPSGetFooter();
     \$("#doc_progress_bar_c").show();
     \$('#repport_submit').hide();
     \$.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: data,
 	complete: function(xml,status) {
@@ -594,7 +594,7 @@ function idxPrintDocument(){
 			    var reg0=new RegExp(System.tmpUrl,"g");
 			    \$.ajax({
 				type: "GET",
-				url: zooUrl+"?metapath=print&service=WPS&version=1.0.0&request=Execute&Identifier=preview&DataInputs=res=42;file="+ref0.replace(reg0,System.tmpPath)+"&ResponseDocument=Result@asReference=true",
+				url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=print.preview&DataInputs=res=42;file="+ref0.replace(reg0,System.tmpPath)+"&ResponseDocument=Result@asReference=true",
 				complete: function(xml,status){
 				    if(\$('#print-preview-dialog')[0]){
 					\$("#print-preview-dialog").window('close');
@@ -675,11 +675,11 @@ function mmAddOverlayLayers(){
     });
     \$(".tree_overlays_layer_class").next().hide();
 
-    var data=WPSGetHeader("getLayers")+WPSGetInputs(params)+WPSGetOutput({name:"Result"})+WPSGetFooter();   
+    var data=WPSGetHeader("mapfile.getLayers")+WPSGetInputs(params)+WPSGetOutput({name:"Result"})+WPSGetFooter();   
 
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=mapfile",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: data,
 	complete: function(xml,status) {
@@ -763,16 +763,16 @@ function mmAddWMSLayers(){
 function indexes_reaction(req0,params){
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=vector-tools",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: req0,
 	complete: function(xml,status) {
 	    idxReadFeatures(xml);
 	    
-	    req=WPSGetHeader("Append")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
+	    req=WPSGetHeader("vector-tools.Append")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
 	    $.ajax({
 		type: "POST",
-		url: System.zooUrl+"?metapath=vector-tools",
+		url: System.zooUrl,
 		contentType: 'text/xml',
 		data: req,
 		complete: function(xml,status) {
@@ -810,10 +810,10 @@ function indexes_reaction(req0,params){
 			params=[{"name": "InputEntity1", "xlink:href": System.allOverlays+"&amp;SERVICE=WFS&amp;VERSION=1.0.0&amp;REQUEST=GetFeature&amp;typeName=Result","mimeType": "text/xml"}];
 			params.push({"name": "InputEntity2", "xlink:href": tmp,"mimeType": "text/xml"});
 		    }
-		    req=WPSGetHeader("Append")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
+		    req=WPSGetHeader("vector-tools.Append")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
 		    $.ajax({
 			type: "POST",
-			url: System.zooUrl+"?metapath=vector-tools",
+			url: System.zooUrl,
 			contentType: 'text/xml',
 			data: req,
 			complete: function(xml,status) {

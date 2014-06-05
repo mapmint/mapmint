@@ -19,7 +19,7 @@ function exportData(){
     \$.ajax({
 	type: "GET",
         dataType: "html",
-	url: zooUrl+"?metapath=vector-converter&request=Execute&service=WPS&version=1.0.0&Identifier="+"exportTo"+"&DataInputs=map=$conf["senv"]["last_map"];layer="+System.mmNodeId.replace(/layer_/g,"")+";format="+\$("#select_export").val()+"&RawDataOutput=Result",
+	url: zooUrl+"?request=Execute&service=WPS&version=1.0.0&Identifier=vector-converter.exportTo"+"&DataInputs=map=$conf["senv"]["last_map"];layer="+System.mmNodeId.replace(/layer_/g,"")+";format="+\$("#select_export").val()+"&RawDataOutput=Result",
 	success: function(xml){
 #if $m.web.metadata.get('layout_t')=="mobile"
 	    $.mobile.hidePageLoadingMsg();
