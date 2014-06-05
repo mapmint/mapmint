@@ -2,7 +2,7 @@
 function startUploadWindow(){
   \$.ajax({
         type: "GET",
-	url: "$conf["main"]["serverAddress"]?metapath=upload&service=WPS&version=1.0.0&request=Execute&Identifier=getForm&DataInputs=form=Upload&RawDataOutput=Result",
+	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=upload.getForm&DataInputs=form=Upload&RawDataOutput=Result",
 	dataType: 'xml',
 	complete:function(xml,status){
 	  if(!\$("#upload-data-dialog")[0])
@@ -27,7 +27,7 @@ function startUploadForm(){
 #if $inputs["module"]["value"]=="Publisher"
 	multiple_queues: false,
 #end if
-	url : '$conf["main"]["serverAddress"]?metapath=upload&service=WPS&version=1.0.0&request=Execute&Identifier=saveOnServer&dataInputs=file=upload;dest='+\$("#upload_dest")[0].value,
+	url : '$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=upload.saveOnServer&dataInputs=file=upload;dest='+\$("#upload_dest")[0].value,
 	max_file_size : '10mb',
 	chunk_size : '10mb',
 	unique_names : true
@@ -38,7 +38,7 @@ function startUploadForm(){
 function startCheck(){
   \$.ajax({
         type: "GET",
-	url: "$conf["main"]["serverAddress"]?metapath=upload&service=WPS&version=1.0.0&request=Execute&Identifier=checkFile&DataInputs=dest="+\$("#upload_dest")[0].value+"&RawDataOutput=Result",
+	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=upload.checkFile&DataInputs=dest="+\$("#upload_dest")[0].value+"&RawDataOutput=Result",
 	dataType: 'xml',
 	complete:function(xml,status){
 	  \$("#uploader").html("");

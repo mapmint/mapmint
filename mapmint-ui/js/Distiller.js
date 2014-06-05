@@ -40,11 +40,11 @@ MapMintDSManager=Class.create({
 	    params[params.length]={"name":"overwrite","dataType":"string","value":"true"};
 	else
 	    params[params.length]={"name":"append","dataType":"string","value":"true"};
-	var request=WPSGetHeader("convert")+WPSGetInputs(params)+WPSGetOutput({"name":"Result"})+WPSGetFooter();
+	var request=WPSGetHeader("vector-converter.convert")+WPSGetInputs(params)+WPSGetOutput({"name":"Result"})+WPSGetFooter();
 
 	$.ajax({
 	    type: "POST",
-	    url: System.zooUrl+"?metapath=vector-converter",
+	    url: System.zooUrl,
 	    data: request,
 	    contentType: "text/xml",
 	    complete: function(xml,status) {
@@ -58,7 +58,7 @@ MapMintDSManager=Class.create({
     remove: function(){
       	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=delete&DataInputs=name="+$mj("Distiller.datasource.name").value+";type="+$mj("Distiller.datasource.stype").value,
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.delete&DataInputs=name="+$mj("Distiller.datasource.name").value+";type="+$mj("Distiller.datasource.stype").value,
 	    dataType: "text",
 	    complete: function(xml,status) {
 		var tmp=$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -91,7 +91,7 @@ MapMintDSManager=Class.create({
     },
     setGeometryType: function(){
 	$.ajax({
-	    url: System.zooUrl+"?metapath=mapfile&request=Execute&service=wps&version=1.0.0&Identifier=setGeometryType&DataInputs=dst="+$(dst).val()+";dso="+$(dso).val()+";geoType="+$(geoType).val()+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?request=Execute&service=wps&version=1.0.0&Identifier=mapfile.setGeometryType&DataInputs=dst="+$(dst).val()+";dso="+$(dso).val()+";geoType="+$(geoType).val()+"&RawDataOutput=Result",
 	    complete: function(xml,status){
 		if(checkWPSResult(xml))
 		    $('#sgt-dialog').window('close');
@@ -123,7 +123,7 @@ Ogr2OgrGUI=Class.create({
 
 function exportAsZip(){
     $.ajax({
-	url: System.zooUrl+"?metapath=vector-converter&request=Execute&service=WPS&version=1.0.0&Identifier=doZip&DataInputs=dst="+arguments[0]+";dso="+arguments[1]+";dstn="+arguments[1]+"_dl.zip&RawDataOutput=Result",
+	url: System.zooUrl+"?request=Execute&service=WPS&version=1.0.0&Identifier=vector-converter.doZip&DataInputs=dst="+arguments[0]+";dso="+arguments[1]+";dstn="+arguments[1]+"_dl.zip&RawDataOutput=Result",
 	complete: function(xml,status){
 	    if(checkWPSResult(xml,false)){
 		document.location=xml.responseText;
@@ -176,7 +176,7 @@ MapMintDBManager=Class.create({
 	    params+=(params!="{"?",":"")+'"'+this.id.replace(/pg_tuple_/g,"")+'":"'+$(this).val()+'"'
 	});
 	params+="}"
-	var request=WPSGetHeader("editTuple");
+	var request=WPSGetHeader("datastores.postgis.editTuple");
 	var dataInputs=[];
 	dataInputs[dataInputs.length]={"name": "dataStore","value": $('#browser_selected_dsName').val(),"dataType": "string"};
 	dataInputs[dataInputs.length]={"name": "table","value": $('#pg_table').val(),"dataType": "string"};
@@ -188,7 +188,7 @@ MapMintDBManager=Class.create({
 	request+=WPSGetInputs(dataInputs)+WPSGetOutput({"name":"Result"})+WPSGetFooter();
 	$.ajax({
 	    type: "POST",
-	    url: System.zooUrl+"?metapath=datastores/postgis",
+	    url: System.zooUrl,
 	    data: request,
 	    contentType: "text/xml",
 	    complete: function(xml,status) {
@@ -203,7 +203,7 @@ MapMintDBManager=Class.create({
     refreshTablesList: function(){
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=listTables&DataInputs=dataStore="+$('#browser_selected_dsName').val()+";schema="+$('#pg_schema').val()+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.listTables&DataInputs=dataStore="+$('#browser_selected_dsName').val()+";schema="+$('#pg_schema').val()+"&RawDataOutput=Result",
 	    complete: function(xml,status) {
 		if(checkWPSResult(xml,false)){
 		    var tmp=eval(xml.responseText);
@@ -272,7 +272,7 @@ MapMintDBManager=Class.create({
 	});
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=deleteTuple&DataInputs=dataStore="+$('#browser_selected_dsName').val()+";table="+$('#pg_table').val()+";clause="+System.pkey+"="+System.tupleID+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.deleteTuple&DataInputs=dataStore="+$('#browser_selected_dsName').val()+";table="+$('#pg_table').val()+";clause="+System.pkey+"="+System.tupleID+"&RawDataOutput=Result",
 	    complete: function(xml,status) {
 		if(checkWPSResult(xml,false)){
 		    MapMintDBManager.loadTable();		    
@@ -284,7 +284,7 @@ MapMintDBManager=Class.create({
     loadTable: function(){
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=getTableDescription&DataInputs=dataStore="+$('#browser_selected_dsName').val()+";table="+$('#pg_table').val()+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.getTableDescription&DataInputs=dataStore="+$('#browser_selected_dsName').val()+";table="+$('#pg_table').val()+"&RawDataOutput=Result",
 	    complete: function(xml,status) {
 		if(checkWPSResult(xml,false)){
 		    var colModel=[];
@@ -305,7 +305,7 @@ MapMintDBManager=Class.create({
 		    $("#pg_table_display").flexigrid({
 			autoload: true,
 			ogcProtocol: "MM",
-			url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=getTableContent&RawDataOutput=Result&DataInputs=dataStore="+$('#browser_selected_dsName').val()+";table="+$('#pg_table').val(),
+			url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.getTableContent&RawDataOutput=Result&DataInputs=dataStore="+$('#browser_selected_dsName').val()+";table="+$('#pg_table').val(),
 			id: "PG",
 			singleSelect: true,
 			buttons : [ {
@@ -350,7 +350,7 @@ MapMintDBManager=Class.create({
       if(!Distiller.windows["add-database-dialog"]){
 	  $.ajax({
 	      type: "GET",
-	      url: System.zooUrl+"?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Distiller_db_display&RawDataOutput=Result",
+	      url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Distiller_db_display&RawDataOutput=Result",
 	      dataType: "text",
 	      complete: function(xml,status) {
 		  try{
@@ -369,7 +369,7 @@ MapMintDBManager=Class.create({
 		      if(dsName!=null && dsType!=null){
 			  $.ajax({
 			      type: "GET",
-			      url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
+			      url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
 			      dataType: "text",
 			      complete: function(xml,status) {
 				  try{
@@ -398,7 +398,7 @@ MapMintDBManager=Class.create({
 	  if(dsName!=null && dsType!=null){
 	      $.ajax({
 		  type: "GET",
-		  url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
+		  url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
 		  dataType: "text",
 		  complete: function(xml,status) {
 		      try{
@@ -425,7 +425,7 @@ MapMintDBManager=Class.create({
 	else if (arguments[0]=='add'){
 	    $.ajax({
 		type: "GET",
-		url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=save&DataInputs=name="+$mj("Distiller.pgisform.name").value+";dbname="+$mj("Distiller.pgisform.dbname").value+";user="+$mj("Distiller.pgisform.user").value+";password="+$mj("Distiller.pgisform.password").value+";host="+$mj("Distiller.pgisform.host").value+";port="+$mj("Distiller.pgisform.port").value+";type="+$mj("Distiller.pgisform.stype").value,
+		url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.save&DataInputs=name="+$mj("Distiller.pgisform.name").value+";dbname="+$mj("Distiller.pgisform.dbname").value+";user="+$mj("Distiller.pgisform.user").value+";password="+$mj("Distiller.pgisform.password").value+";host="+$mj("Distiller.pgisform.host").value+";port="+$mj("Distiller.pgisform.port").value+";type="+$mj("Distiller.pgisform.stype").value,
 		dataType: "xml",
 		complete: function(xml,status) {
 		    $('#add-database-dialog').window('close');
@@ -439,7 +439,7 @@ MapMintDBManager=Class.create({
 	var localArg=arguments[0];
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=displayJson&DataInputs=type="+arguments[0]+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.displayJson&DataInputs=type="+arguments[0]+"&RawDataOutput=Result",
 	    dataType: "xml",	
 	    complete: function(xml,status) {
 		$('#progress_bar .ui-progress').css('width', '65%');
@@ -471,7 +471,7 @@ MapMintDBManager=Class.create({
     test: function(){
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=test&DataInputs=name="+$mj("Distiller.pgisform.name").value+";dbname="+$mj("Distiller.pgisform.dbname").value+";user="+$mj("Distiller.pgisform.user").value+";password="+$mj("Distiller.pgisform.password").value+";host="+$mj("Distiller.pgisform.host").value+";port="+$mj("Distiller.pgisform.port").value+";type="+$mj("Distiller.pgisform.stype").value+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.test&DataInputs=name="+$mj("Distiller.pgisform.name").value+";dbname="+$mj("Distiller.pgisform.dbname").value+";user="+$mj("Distiller.pgisform.user").value+";password="+$mj("Distiller.pgisform.password").value+";host="+$mj("Distiller.pgisform.host").value+";port="+$mj("Distiller.pgisform.port").value+";type="+$mj("Distiller.pgisform.stype").value+"&RawDataOutput=Result",
 	    dataType: "text",
 	    complete: function(xml,status) {
 		checkWPSResult(xml);
@@ -483,7 +483,7 @@ MapMintDBManager=Class.create({
 	dsType=$mj("Distiller.pgisrform.stype").value;
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/"+((dsType=='postgis' || dsType=='mysql')?"postgis":((dsType=='WMS' || dsType=='WFS')?"wfs":"directories"))+"&service=WPS&version=1.0.0&request=Execute&Identifier=delete&DataInputs=name="+$mj("Distiller.pgisrform.name").value+";type="+$mj("Distiller.pgisrform.stype").value,
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores."+((dsType=='postgis' || dsType=='mysql')?"postgis":((dsType=='WMS' || dsType=='WFS')?"wfs":"directories"))+".delete&DataInputs=name="+$mj("Distiller.pgisrform.name").value+";type="+$mj("Distiller.pgisrform.stype").value,
 	    dataType: "text",
 	    complete: function(xml,status) {
 		if(checkWPSResult(xml,false)){
@@ -511,7 +511,7 @@ MapMintDBManager=Class.create({
 	
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Distiller_db_remove&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Distiller_db_remove&RawDataOutput=Result",
 	    dataType: "text",
 	    complete: function(xml,status) {
 		$( 'body').append(xml.responseText);
@@ -528,7 +528,7 @@ MapMintDBManager=Class.create({
 				   Array("name"));
 		$.ajax({
 		    type: "GET",
-		    url: System.zooUrl+"?metapath=datastores/"+((dsType=="postgis" || dsType=="mysql")?"postgis":((dsType=="wfs" || dsType=="wms")?"wfs":"directories"))+"&service=WPS&version=1.0.0&request=Execute&Identifier=load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
+		    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores/"+((dsType=="postgis" || dsType=="mysql")?"postgis":((dsType=="wfs" || dsType=="wms")?"wfs":"directories"))+"load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
 		    dataType: "text",
 		    complete: function(xml,status){
 			var tmp=eval('('+xml.responseText+')');
@@ -558,7 +558,7 @@ Distiller=MLayout.extend({
 	if(!Distiller.windows["dialog-directory-new"]){
 	    $.ajax({
 		type: "GET",
-		url: System.zooUrl+"?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Datastore_dirs_display&RawDataOutput=Result",
+		url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Datastore_dirs_display&RawDataOutput=Result",
 		dataType: "text",
 		complete: function(xml,status) {
 		    try{
@@ -625,7 +625,7 @@ Distiller=MLayout.extend({
     loadIntoGeoreferencer: function(){
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=georeferencer&service=WPS&version=1.0.0&request=Execute&Identifier=saveGeoreferencedProject&DataInputs=dst="+arguments[0]+";dso="+arguments[1]+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=georeferencer.saveGeoreferencedProject&DataInputs=dst="+arguments[0]+";dso="+arguments[1]+"&RawDataOutput=Result",
 	    dataType: "xml",	
 	    complete: function(xml,status) {
 		if(checkWPSResult(xml,false))
@@ -638,7 +638,7 @@ Distiller=MLayout.extend({
 	var dsName=$('#browser_selected_dsName')[0].value.replace(/browseDirectoriesList/,"").replace(/__/g,"/");
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/directories&service=WPS&version=1.0.0&request=Execute&Identifier=cleanup&DataInputs=dsType="+dsType+";dsName="+dsName+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.directories.cleanup&DataInputs=dsType="+dsType+";dsName="+dsName+"&RawDataOutput=Result",
 	    dataType: "xml",	
 	    complete: function(xml,status) {
 		if(checkWPSResult(xml))
@@ -649,7 +649,7 @@ Distiller=MLayout.extend({
     directoriesListRefresh: function(){
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/directories&service=WPS&version=1.0.0&request=Execute&Identifier=displayJson&DataInputs=state=open&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.directories.displayJson&DataInputs=state=open&RawDataOutput=Result",
 	    dataType: "xml",	
 	    complete: function(xml,status) {
 		$('#progress_bar .ui-progress').css('width', '65%');
@@ -695,7 +695,7 @@ Distiller=MLayout.extend({
 	    
 	    $.ajax({
 		type: "GET",
-		url: System.zooUrl+"?metapath=datastores/directories&service=WPS&version=1.0.0&request=Execute&Identifier=saveDir&DataInputs=name="+$mj("Distiller.form.name").value+";path="+$mj("Distiller.form.path").value+";type="+tmp+"",
+		url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.directories.saveDir&DataInputs=name="+$mj("Distiller.form.name").value+";path="+$mj("Distiller.form.path").value+";type="+tmp+"",
 		dataType: "xml",
 		complete: function(xml,status) {
 		    var tmp=$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -731,7 +731,7 @@ Distiller=MLayout.extend({
 	$.ajax({
 	    dwDataSource: arguments[0],
 	    type: "GET",
-	    url: System.zooUrl+"?metapath="+(arguments.length>1?"vector-tools":"datastores")+"&service=WPS&version=1.0.0&request=Execute&Identifier="+(arguments.length>1?"mmExtractVectorInfo":"mmVectorInfo2MapJs")+"&DataInputs="+(arguments.length>1?"dataSource":"dataStore")+"="+arguments[0].replace(/__/g,"/")+(arguments.length>1?";type="+arguments[1]:"")+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier="+(arguments.length>1?"vector-tools":"datastores")+"."+(arguments.length>1?"mmExtractVectorInfo":"mmVectorInfo2MapJs")+"&DataInputs="+(arguments.length>1?"dataSource":"dataStore")+"="+arguments[0].replace(/__/g,"/")+(arguments.length>1?";type="+arguments[1]:"")+"&RawDataOutput=Result",
 	    mmargs: arguments,
 	    dataType: 'xml',
 	    complete: function(xml,status){
@@ -808,7 +808,7 @@ Distiller=MLayout.extend({
 				dwDataSource: this.dwDataSource,
 				dwLayer: localTmp[localI],
 				type: "GET",
-				url: System.zooUrl+"?metapath=vector-tools&service=WPS&version=1.0.0&request=Execute&Identifier=mmExtractVectorInfo&DataInputs=dataSource="+this.dwDataSource.replace(/__/g,"/")+";layer="+localTmp[localI]+"&RawDataOutput=Result",
+				url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=vector-tools.mmExtractVectorInfo&DataInputs=dataSource="+this.dwDataSource.replace(/__/g,"/")+";layer="+localTmp[localI]+"&RawDataOutput=Result",
 				dataType: 'xml',
 				complete: function(xml,status) {
 				    colModel=[];
@@ -1013,7 +1013,7 @@ Distiller=MLayout.extend({
     deleteDsConfirm: function(){
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Distiller/removeDs;dst="+arguments[0]+";dso="+arguments[1]+";dsotype="+arguments[1].value+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Distiller/removeDs;dst="+arguments[0]+";dso="+arguments[1]+";dsotype="+arguments[1].value+"&RawDataOutput=Result",
 	    dataType: "text",
 	    complete: function(xml,status) {
 		if(checkWPSResult(xml,false)){
@@ -1036,7 +1036,7 @@ Distiller=MLayout.extend({
     deleteDs: function(){
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores&service=WPS&version=1.0.0&request=Execute&Identifier=removeDS&DataInputs=dso="+$("#Distiller_deleteDS_name").val()+";dst="+$("#Distiller_deleteDS_dst").val()+";dsotype="+$("#Distiller_deleteDS_stype").val()+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.removeDS&DataInputs=dso="+$("#Distiller_deleteDS_name").val()+";dst="+$("#Distiller_deleteDS_dst").val()+";dsotype="+$("#Distiller_deleteDS_stype").val()+"&RawDataOutput=Result",
 	    dataType: "text",
 	    complete: function(xml,status) {
 		if(checkWPSResult(xml,false)){
@@ -1079,10 +1079,10 @@ Distiller=MLayout.extend({
 		postRequest[postRequest.length]={'name': "ds_"+i,value: ($(this).attr("checked")?1:0),dataType: "string"};
 	    });
 	
-	var data=WPSGetHeader("saveDataStorePrivileges")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+	var data=WPSGetHeader("datastores.saveDataStorePrivileges")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
 	$.ajax({
 	    type: "POST",
-	    url: System.zooUrl+"?metapath=datastores",
+	    url: System.zooUrl,
 	    data: data,
 	    contentType: "text/xml",
 	    complete: function(xml,status) {
@@ -1110,7 +1110,7 @@ Distiller.define({
 	
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/directories&service=WPS&version=1.0.0&request=Execute&Identifier="+(arguments[0]=="/"?"list":"displayJson")+"&DataInputs=dir="+Distiller.last_dir+(Distiller.last_dir=="/"?"":"/")+(arguments.length>1?";type="+arguments[1]:"")+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.directories."+(arguments[0]=="/"?"list":"displayJson")+"&DataInputs=dir="+Distiller.last_dir+(Distiller.last_dir=="/"?"":"/")+(arguments.length>1?";type="+arguments[1]:"")+"&RawDataOutput=Result",
 	    dataType: "xml",
 	    complete: function(xml,status) {
 		if(!Distiller.loaded_dirs[Distiller.last_dir]){
@@ -1337,7 +1337,7 @@ function addFeatureId(){
     
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=vector-converter&service=WPS&version=1.0.0&request=Execute&Identifier=addFeatureId&DataInputs=InputDSTN="+arguments[0]+";InputDSON="+arguments[1]+"",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=vector-converter.addFeatureId&DataInputs=InputDSTN="+arguments[0]+";InputDSON="+arguments[1]+"",
 	dataType: "text",
 	complete: function(xml,status) {
 	    var tmp=$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -1369,10 +1369,10 @@ function createTileindex(){
 	postRequest[postRequest.length]={'name': "idir",value: this.value,dataType: "string"};
     });
     
-    var data=WPSGetHeader("createTindex")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    var data=WPSGetHeader("raster-tools.createTindex")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
     $.ajax({
         type: "POST",
-	url: System.zooUrl+"?metapath=raster-tools",
+	url: System.zooUrl,
 	data: data,
 	contentType: "text/xml",
 	complete: function(xml,status) {
@@ -1398,10 +1398,10 @@ function mozaicImages(){
 	postRequest[postRequest.length]={'name': "OutputDSN",value: System.dataPath+"/dirs/"+this.value+"/"+$("#tname").val()+".tif",dataType: "string"};
     });
     
-    var data=WPSGetHeader("Gdal_Merge")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    var data=WPSGetHeader("raster-tools.Gdal_Merge")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
     $.ajax({
         type: "POST",
-	url: System.zooUrl+"?metapath=raster-tools",
+	url: System.zooUrl,
 	data: data,
 	contentType: "text/xml",
 	complete: function(xml,status) {
@@ -1412,10 +1412,10 @@ function mozaicImages(){
 }
 
 function openInManager(dwDataSource,dwLayer){
-    var data=WPSGetHeader("openInManager")+WPSGetInputs([{"name": "dstn","value": dwDataSource.replace(/__/g,"/"),"dataType":"string"},{"name": "dson","value":dwLayer,"dataType":"string"}])+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    var data=WPSGetHeader("mapfile.openInManager")+WPSGetInputs([{"name": "dstn","value": dwDataSource.replace(/__/g,"/"),"dataType":"string"},{"name": "dson","value":dwLayer,"dataType":"string"}])+WPSGetOutput({name:"Result"})+WPSGetFooter();
     $.ajax({
         type: "POST",
-	url: System.zooUrl+"?metapath=mapfile",
+	url: System.zooUrl,
 	data: data,
 	contentType: "text/xml",
 	complete: function(xml,status) {
@@ -1438,7 +1438,7 @@ MapMintWFSManager=Class.create({
 	} 
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Distiller/wfs/display;type="+System.wxsType+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Distiller/wfs/display;type="+System.wxsType+"&RawDataOutput=Result",
 	    dataType: "text",
 	    complete: function(xml,status) {
 		try{
@@ -1468,7 +1468,7 @@ MapMintWFSManager=Class.create({
 	else if (arguments[0]=='add' || arguments[0]=='test'){
 	    ($("#Distiller_wfsform_name").val()?$("#Distiller_wfsform_name").val():$("#OWS_form_name").val())
 	    var tdata=
-		WPSGetHeader((arguments[0]=='add'?"save":"test"))+
+		WPSGetHeader("datastores.wfs."+(arguments[0]=='add'?"save":"test"))+
 		WPSGetInputs([
 		    {
 			name: "name",
@@ -1490,7 +1490,7 @@ MapMintWFSManager=Class.create({
 		WPSGetFooter();
 	    $.ajax({
 		type: "POST",
-		url: System.zooUrl+"?metapath=datastores/wfs",
+		url: System.zooUrl,
 		data: tdata,
 		contentType: "text/xml",
 		mtype: arguments[0],
@@ -1509,7 +1509,7 @@ MapMintWFSManager=Class.create({
 	document.location.reload(true);
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/wfs&service=WPS&version=1.0.0&request=Execute&Identifier=displayJson&DataInputs=type="+arguments[0]+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.wfs.displayJson&DataInputs=type="+arguments[0]+"&RawDataOutput=Result",
 	    dataType: "xml",	
 	    complete: function(xml,status) {
 		$('#progress_bar .ui-progress').css('width', '65%');
@@ -1543,7 +1543,7 @@ MapMintWFSManager=Class.create({
 	dsType=$mj("Distiller.pgisrform.stype").value;
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/"+(($mj("Distiller.pgisrform.stype").value=='PostGIS' || $mj("Distiller.pgisrform.stype").value=='MySQL')?"postgis":"directories")+"&service=WPS&version=1.0.0&request=Execute&Identifier=delete&DataInputs=name="+$mj("Distiller.pgisrform.name").value+";type="+$mj("Distiller.pgisrform.stype").value,
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores."+(($mj("Distiller.pgisrform.stype").value=='PostGIS' || $mj("Distiller.pgisrform.stype").value=='MySQL')?"postgis":"directories")+".delete&DataInputs=name="+$mj("Distiller.pgisrform.name").value+";type="+$mj("Distiller.pgisrform.stype").value,
 	    dataType: "text",
 	    complete: function(xml,status) {
 	      var tmp=$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -1571,7 +1571,7 @@ MapMintWFSManager=Class.create({
 	if(!Distiller.windows["delete-database-dialog"]){
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Distiller_db_remove&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Distiller_db_remove&RawDataOutput=Result",
 	    dataType: "text",
 	    complete: function(xml,status) {
 	      $( 'body').append(xml.responseText);
@@ -1589,7 +1589,7 @@ MapMintWFSManager=Class.create({
 				       Array("name"));
 		    $.ajax({
 			type: "GET",
-			url: System.zooUrl+"?metapath=datastores/"+((dsType=="postgis" || dsType=="mysql")?"postgis":"directories")+"&service=WPS&version=1.0.0&request=Execute&Identifier=load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
+			url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores."+((dsType=="postgis" || dsType=="mysql")?"postgis":"directories")+".load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
 			dataType: "text",
 			complete: function(xml,status){
 			    var tmp=eval('('+xml.responseText+')');
@@ -1615,7 +1615,7 @@ MapMintWFSManager=Class.create({
 			       Array("name"));
 	    $.ajax({
 		type: "GET",
-		url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
+		url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
 		dataType: "text",
 		complete: function(xml,status){
 		    var tmp=eval('('+xml.responseText+')');
@@ -1676,14 +1676,14 @@ function runGdalDem(){
 	params.push({name: $(this)[0].id.replace(reg,""),value: $(this).val(),dataType: "string"});
     });
 
-    var data=WPSGetHeader(($("#raster_method").val()=="contour")?"Gdal_Contour":"Gdal_Dem")+WPSGetInputs(params)+WPSGetOutput({"name":"Result"})+WPSGetFooter();
+    var data=WPSGetHeader("raster-tools."+($("#raster_method").val()=="contour")?"Gdal_Contour":"Gdal_Dem")+WPSGetInputs(params)+WPSGetOutput({"name":"Result"})+WPSGetFooter();
 
     $("#raster-dialog").find("input[type=submit]").hide();
     $.ajax({
 	type: "POST",
 	data: data,
 	contentType: "text/xml",
-	url: System.zooUrl+"?metaPath=raster-tools",
+	url: System.zooUrl,
 	dataType: "xml",
 	complete: function(xml,status){
 	    if(checkWPSResult(xml,false)){
@@ -1700,7 +1700,7 @@ OWService=Class.create({
 	var dsName=arguments[1].split(":")[1];
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Distiller/wfs/display;type="+dsType+";name="+dsName+";etype=Edit&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Distiller/wfs/display;type="+dsType+";name="+dsName+";etype=Edit&RawDataOutput=Result",
 	    dataType: "text",
 	    complete: function(xml,status) {
 		try{
@@ -1741,7 +1741,7 @@ function startMergeWindow(){
 
   $.ajax({
         type: "GET",
-	url: System.zooUrl+"?metapath=upload&service=WPS&version=1.0.0&request=Execute&Identifier=getForm&DataInputs=form=Distiller/TileWindow;type=merge&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=upload.getForm&DataInputs=form=Distiller/TileWindow;type=merge&RawDataOutput=Result",
 	dataType: 'xml',
 	complete:function(xml,status){
 	  $("#merge-data-dialog").html(xml.responseText);  
@@ -1780,10 +1780,10 @@ function setProjection(){
     postRequest[postRequest.length]={'name': "dson",value: $("#layer_dso")[0].value,dataType: "string"};
     postRequest[postRequest.length]={'name': "srs",value: $("#set_tprj")[0].value,dataType: "string"};
     postRequest[postRequest.length]={'name': "isRaster",value: (System.isRaster?System.isRaster:false),dataType: "string"};
-    var data=WPSGetHeader("setSRS")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+    var data=WPSGetHeader("vector-converter.setSRS")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=vector-converter",
+	url: System.zooUrl,
 	data: data,
 	contentType: "text/xml",
 	complete: function(xml,status) {
@@ -1812,7 +1812,7 @@ function startSetProjectionWindow(){
 
   $.ajax({
         type: "GET",
-	url: System.zooUrl+"?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Distiller/SetProjection;dstName="+dstName+";dsoName="+arguments[1]+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Distiller/SetProjection;dstName="+dstName+";dsoName="+arguments[1]+"&RawDataOutput=Result",
 	dataType: 'xml',
 	complete:function(xml,status){
 	  $("#projection-data-dialog").html(xml.responseText);  
@@ -1847,7 +1847,7 @@ function startTileWindow(){
     
     $.ajax({
         type: "GET",
-	url: System.zooUrl+"?metapath=upload&service=WPS&version=1.0.0&request=Execute&Identifier=getForm&DataInputs=form=Distiller/TileWindow&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=upload.getForm&DataInputs=form=Distiller/TileWindow&RawDataOutput=Result",
 	dataType: 'xml',
 	complete:function(xml,status){
 	    $("#tileindex-data-dialog").html(xml.responseText);  
@@ -1895,7 +1895,7 @@ function dirRefresh(){
 	myTree.tree('update',{target: node1.target,text: mmTIN[node1.id]['text']+" (updating...)"});
 	$.ajax({
 	    type: "GET",
-	    url: System.zooUrl+"?metapath=datastores/directories&service=WPS&version=1.0.0&request=Execute&Identifier=displayJson&DataInputs=dir="+dir+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.directories.displayJson&DataInputs=dir="+dir+"&RawDataOutput=Result",
 	    complete: function(xml,status) {
 	  	var myData="None";
 		try{

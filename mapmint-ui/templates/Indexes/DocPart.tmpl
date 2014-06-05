@@ -5,7 +5,7 @@
     <tr>
       <td valign="middle" style="width:200px;">$zoo._("Document model:")</td>
       <td>
-	<form id="fileUpload1" action="$conf["main"]["serverAddress"]?metapath=upload&request=Execute&service=WPS&version=1.0.0&Identifier=saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="uploader1">
+	<form id="fileUpload1" action="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=upload.saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="uploader1">
 	<input id="repport_doc" name="file" class="rounded frm maincfg" type="file" />
 	<a id="repport_doc_url" href="#"></a>
 	</form>

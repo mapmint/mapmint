@@ -1,7 +1,7 @@
 function createTempFile(conf,inputs,outputs){
 
   var myOutputs00= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess00 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=np",'dropTempFile');
+  var myProcess00 = new ZOO.Process(conf["main"]["serverAddress"],'np.dropTempFile');
 
   var inputs00={
     "fullPath": {"value": "true","type":"string"}
@@ -10,7 +10,7 @@ function createTempFile(conf,inputs,outputs){
   alert(myExecuteResult00);
 
   var myOutputs0= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=mapfile",'getMapLayersInfo');
+  var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.getMapLayersInfo');
 
     map=inputs["map"]["value"];
     alert("MAP",inputs["map"]["value"]);
@@ -29,7 +29,7 @@ function createTempFile(conf,inputs,outputs){
   var tmp=eval(myExecuteResult0.replace(/None/g,"null"));
 
   var myOutputs1= {OutputedDataSourceName: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Ogr2Ogr');
+  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
   
   var inputs1={
     "OutputDSN": {"value": "temporary_index.csv","type":"string"},
@@ -42,7 +42,7 @@ function createTempFile(conf,inputs,outputs){
   alert(myExecuteResult1);
 
   var myOutputs2= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-tools",'mmVectorInfo2Map');
+  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.mmVectorInfo2Map');
 
   var inputs2={
     "force": {"value": "true","type":"string"},
@@ -52,7 +52,7 @@ function createTempFile(conf,inputs,outputs){
   alert(myExecuteResult2);
 
   var myOutputs2= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=np",'setLastFile');
+  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'np.setLastFile');
 
   var inputs2={
     "last_file": {"value": "temporary_index.csv","type":"string"}
@@ -69,7 +69,7 @@ function createTempFile(conf,inputs,outputs){
 function createIndex(conf,inputs,outputs){
 
   var myOutputs00= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess00 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=np",'dropTable');
+  var myProcess00 = new ZOO.Process(conf["main"]["serverAddress"],'np.dropTable');
 
   var inputs00={
     "id": {"value": inputs["id"]["value"],"type":"string"}
@@ -78,7 +78,7 @@ function createIndex(conf,inputs,outputs){
   alert(myExecuteResult00);
 
   var myOutputs0= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=mapfile",'getMapLayersInfo');
+  var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.getMapLayersInfo');
 
   var inputs0={
     "fullPath": {"value": "true","type":"string"},
@@ -90,7 +90,7 @@ function createIndex(conf,inputs,outputs){
   var tmp=eval(myExecuteResult0.replace(/None/g,"null"));
 
   var myOutputs1= {OutputedDataSourceName: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Ogr2Ogr');
+  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
   
   if(conf["senv"]["last_file"]=="None")
     conf["senv"]["last_file"]=conf["main"]["tmpPath"]+"/temporary_index.csv";
@@ -106,7 +106,7 @@ function createIndex(conf,inputs,outputs){
   var myExecuteResult1=myProcess1.Execute(inputs1,myOutputs1,"Cookie: MMID="+conf["senv"]["MMID"]);
   alert(myExecuteResult1);
 
-  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=np",'joinIndexTable');
+  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'np.joinIndexTable');
   var myOutputs2= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
   var inputs2=inputs;
   for(i in inputs2)
@@ -120,7 +120,7 @@ function createIndex(conf,inputs,outputs){
 
 function refreshIndex(conf,inputs,outputs){
     if(inputs["force"]){
-	var myProcess00 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=datastores/directories",'cleanup');
+	var myProcess00 = new ZOO.Process(conf["main"]["serverAddress"],'datastores.directories.cleanup');
 	var myOutputs00= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
 	var inputs00={
 	    "dsName": {"value": conf["main"]["dbuserName"],"type":"string"},
@@ -129,7 +129,7 @@ function refreshIndex(conf,inputs,outputs){
 	var myExecuteResult00=myProcess00.Execute(inputs00,myOutputs00,"Cookie: MMID="+conf["senv"]["MMID"]);
 	alert("refresh!!",myExecuteResult00);
     }else{
-	var myProcess00 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=np",'addLayerForIndex');
+	var myProcess00 = new ZOO.Process(conf["main"]["serverAddress"],'np.addLayerForIndex');
 	var myOutputs00= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
 	var inputs00={
 	    "id": {"value": inputs["id"]["value"],"type":"string"}
@@ -138,7 +138,7 @@ function refreshIndex(conf,inputs,outputs){
 	alert("refresh light !!",myExecuteResult00);	
     }
 
-  var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=datastores",'mmVectorInfo2MapJs');
+  var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"],'datastores.mmVectorInfo2MapJs');
   var inputs0={
     "dataStore": {"value": conf["main"]["dbuserName"],"type":"string"}
   }
@@ -148,7 +148,7 @@ function refreshIndex(conf,inputs,outputs){
   var myExecuteResult0=myProcess0.Execute(inputs0,myOutputs0,"Cookie: MMID="+conf["senv"]["MMID"]);
   alert(myExecuteResult0);
 
-  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-tools",'mmExtractVectorInfo');
+  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.mmExtractVectorInfo');
   var inputs2={
     "dataSource": {"value": conf["main"]["dbuserName"],"type":"string"},
     "layer": {"value": "indexes.view_idx"+inputs["id"]["value"],"type":"string"}
@@ -164,7 +164,7 @@ function refreshIndex(conf,inputs,outputs){
 function publishFullIndex(conf,inputs,outputs){
 
     var myOutputs= {"Result": { "type": 'RawDataOutput', "mimeType": "application/json" }};
-    var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=mapfile",'getMapLayersInfo');
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.getMapLayersInfo');
     /**
      * Check what are the input DataStore and DataSource
      */
@@ -181,7 +181,7 @@ function publishFullIndex(conf,inputs,outputs){
 
     try{
     myOutputs= {"Result": { "type": 'RawDataOutput', "mimeType": "application/json" } };
-    myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=np",'getIndexDisplayJs');
+    myProcess = new ZOO.Process(conf["main"]["serverAddress"],'np.getIndexDisplayJs');
     /**
      * Check what are the input DataStore and DataSource
      */
@@ -206,14 +206,14 @@ function publishFullIndex(conf,inputs,outputs){
     var exts=["kml","csv"]
     var formats=["KML","CSV"]
     for(j=0;j<formats.length;j++){
-	var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Ogr2Ogr');
+	var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
 	inputs["InputDSN"]={"value":tmp[0]};
 	inputs["F"]={"value": formats[j]};
 	inputs["sql"]={"value": "SELECT "+fields+", wkb_geometry from indexes.view_idx"+inputs["id"]["value"]};
 	inputs["OutputDSN"]={"value": "TEMP_"+conf["senv"]["MMID"]+"-"+inputs["id"]["value"]+"."+exts[j]};
 	inputs["nln"]={"value": "TEMP_"+conf["senv"]["MMID"]+"-"+inputs["id"]["value"]+""};	
 	
-	var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'cleanUp');
+	var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.cleanUp');
 	inputs1={
 	    "dso": {"value":inputs["OutputDSN"]["value"].replace(/.shp/g,""),"dataType":"string"},
 	    "dstn": {"value":inputs["OutputDSN"]["value"].replace(/.shp/g,".zip"),"dataType":"string"}
@@ -227,7 +227,7 @@ function publishFullIndex(conf,inputs,outputs){
     }
 
     myOutputs= {"Result": { "type": 'RawDataOutput', "mimeType": "application/json" } };
-    var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=np",'publishIndex');
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'np.publishIndex');
     myExecuteResult=myProcess.Execute(inputs,myOutputs,"Cookie: MMID="+conf["senv"]["MMID"]); 
 
    
@@ -237,12 +237,12 @@ function publishFullIndex(conf,inputs,outputs){
 
 function convertTo(conf,inputs,outputs){
     var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-    var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=np",'getIndexRequest');
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'np.getIndexRequest');
     var myExecuteResult=myProcess.Execute(inputs,myOutputs);
     var myExecuteResult0=myExecuteResult;
 
     var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=mapfile",'getMapLayersInfo');
+    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.getMapLayersInfo');
     inputs["map"]={"value": conf["main"]["dbuserName"]+"ds_ows.map"};
     inputs["layer"]={"value": "-1"};
     inputs["fullPath"]={"value": "true"};
@@ -250,7 +250,7 @@ function convertTo(conf,inputs,outputs){
     var tmp=eval(myExecuteResult1.replace('None','null'));
     
     var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-    var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Converter');
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
     inputs["InputDSN"]={"value": tmp[0]};
     inputs["F"]={"value": "KML"};
     inputs["sql"]={"value": myExecuteResult};

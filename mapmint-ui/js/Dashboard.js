@@ -117,7 +117,7 @@ SrsManager=Class.create({
 	var val="";
 	$("#"+System.currentField).next().find("input.combo-value").each(function(){val=$(this).val();})
 	$.ajax({
-	    url: System.zooUrl+"?metapath=datastores&service=WPS&version=1.0.0&request=Execute&Identifier=saveFavSrs&DataInputs=srs_field="+(System.currentField=="tags"?"name":"id")+";srs_id="+val+";fav="+$("#prjfav").is(":checked")+"&RawDataOutput=Result",
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.saveFavSrs&DataInputs=srs_field="+(System.currentField=="tags"?"name":"id")+";srs_id="+val+";fav="+$("#prjfav").is(":checked")+"&RawDataOutput=Result",
 	    complete: function(xml,status){
 		if(checkWPSResult(xml))
 		    System.srsHasChanged=true;
@@ -135,7 +135,7 @@ function loadTab(){
     $.ajax({
       cache: false,
       type: "GET",
-      url: System.zooUrl+"?metapath=configuration&service=WPS&version=1.0.0&request=Execute&Identifier=GetConf&DataInputs=section="+arguments[0]+"&RawDataOutput=Result",
+      url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=configuration.GetConf&DataInputs=section="+arguments[0]+"&RawDataOutput=Result",
       dataType: "xml",
       complete: function(xml,status) {
           $('#progress_bar .ui-progress').css('width', '65%');
@@ -191,10 +191,10 @@ function saveConf(){
     }
   }
   try{
-   var data=WPSGetHeader("SaveConf")+WPSGetInputs(tmp)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+   var data=WPSGetHeader("configuration.SaveConf")+WPSGetInputs(tmp)+WPSGetOutput({name: "Result"})+WPSGetFooter();
     $.ajax({
       type: "POST",
-	  url: System.zooUrl+"?metapath=configuration",
+	  url: System.zooUrl,
 	  contentType: 'text/xml',
 	  data: data,
 	  complete: function(xml,status) {

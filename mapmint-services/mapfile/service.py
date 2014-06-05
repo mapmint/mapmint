@@ -1392,7 +1392,7 @@ def createColorRamp(conf,m,layer,useTile=0):
     color_file.close()
     import urllib2
     tmp0=layer.data.split("/")
-    response = urllib2.urlopen(conf["main"]["serverAddress"]+"?metapath=raster-tools&service=WPS&version=1.0.0&request=Execute&Identifier=Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result")
+    response = urllib2.urlopen(conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result")
     value = response.read()
     print >> sys.stderr,useTile
     if useTile>0:
@@ -1413,7 +1413,7 @@ def createColorRamp(conf,m,layer,useTile=0):
 	    for j in range(0,useTile):
 		    for i in range(0,useTile):
 			    srcwin=str(i*twidth)+","+str(j*theight)+","+str(twidth)+","+str(theight)
-			    response = urllib2.urlopen(conf["main"]["serverAddress"]+"?metapath=raster-tools&service=WPS&version=1.0.0&request=Execute&Identifier=Gdal_Translate&DataInputs=InputDSN="+value.replace(conf["main"]["dataPath"],"")+";OutputDSN="+conf["senv"]["last_map"]+"_"+layer.name+"/"+tmp0+"_tile"+str(j)+"_"+str(i)+";SrcWin="+srcwin+"&RawDataOutput=Result")
+			    response = urllib2.urlopen(conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Translate&DataInputs=InputDSN="+value.replace(conf["main"]["dataPath"],"")+";OutputDSN="+conf["senv"]["last_map"]+"_"+layer.name+"/"+tmp0+"_tile"+str(j)+"_"+str(i)+";SrcWin="+srcwin+"&RawDataOutput=Result")
 			    print >> sys.stderr,response.read()
 	    import shutil
 	    try:
@@ -1429,7 +1429,7 @@ def createColorRamp(conf,m,layer,useTile=0):
 			    os.remove(i)
 		    except:
 			    pass
-	    response = urllib2.urlopen(conf["main"]["serverAddress"]+"?metapath=raster-tools&service=WPS&version=1.0.0&request=Execute&Identifier=tindex&DataInputs=idir=..;iname=tile_"+conf["senv"]["last_map"]+"_"+layer.name+";dir=../"+conf["senv"]["last_map"]+"_"+layer.name+";ext=tif&RawDataOutput=Result")
+	    response = urllib2.urlopen(conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.tindex&DataInputs=idir=..;iname=tile_"+conf["senv"]["last_map"]+"_"+layer.name+";dir=../"+conf["senv"]["last_map"]+"_"+layer.name+";ext=tif&RawDataOutput=Result")
 	    value=conf["main"]["dataPath"]+"/tile_"+conf["senv"]["last_map"]+"_"+layer.name+".shp"
 	    print >> sys.stderr,response.read()
 	    
@@ -2935,8 +2935,8 @@ def generatePreview(conf,m):
 	ext=[p0.x,p0.y,p1.x,p1.y]
 	
 	print >> sys.stderr,ext
-	print >> sys.stderr,(conf["main"]["serverAddress"]+'?metapath=raster-tools&service=WPS&version=1.0.0&request=Execute&Identifier=translate&DataInputs=InputDSN=base_layers/mq-osm.xml;OutputDSN=tmp_MM1369836649;Format=GTiff;OutSize=1024,768;ProjWin="+ext[0]+","+ext[3]+","+ext[2]+","+ext[1]+"&RawDataOutput=Result')
-	response = urllib2.urlopen(conf["main"]["serverAddress"]+"?metapath=raster-tools&service=WPS&version=1.0.0&request=Execute&Identifier=translate&DataInputs=InputDSN=base_layers/mq-osm.xml;OutputDSN=tmp_MM1369836649;Format=GTiff;OutSize=1024,768;ProjWin="+str(ext[0])+","+str(ext[3])+","+str(ext[2])+","+str(ext[1])+"&RawDataOutput=Result")
+	print >> sys.stderr,(conf["main"]["serverAddress"]+'?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.translate&DataInputs=InputDSN=base_layers/mq-osm.xml;OutputDSN=tmp_MM1369836649;Format=GTiff;OutSize=1024,768;ProjWin="+ext[0]+","+ext[3]+","+ext[2]+","+ext[1]+"&RawDataOutput=Result')
+	response = urllib2.urlopen(conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.translate&DataInputs=InputDSN=base_layers/mq-osm.xml;OutputDSN=tmp_MM1369836649;Format=GTiff;OutSize=1024,768;ProjWin="+str(ext[0])+","+str(ext[3])+","+str(ext[2])+","+str(ext[1])+"&RawDataOutput=Result")
 	html=response.read()
 
 	print >> sys.stderr,html

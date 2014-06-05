@@ -101,7 +101,7 @@ function isLeaf(){
 
 MapMintDsRefresh=function(){
   $.getJSON(
-	    System.zooUrl+"?metapath=mapfile&request=Execute&service=WPS&version=1.0.0&Identifier=redrawDsList&DataInputs=name="+arguments[0]+"&RawDataOutput=Result",
+	    System.zooUrl+"?request=Execute&service=WPS&version=1.0.0&Identifier=mapfile.redrawDsList&DataInputs=name="+arguments[0]+"&RawDataOutput=Result",
   {id: arguments[0], ajax: 'true'}, 
 	    function(j){
 	      var options = '';
@@ -128,7 +128,7 @@ function addLayer(){
     });
   $.ajax({
     type: "GET",
-	url: System.zooUrl+"?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=loadMapForDs&DataInputs=map="+$('#mapName')[0].value+";dstName="+$("#select-datastore")[0].value+";"+dsoNames+";dsgName="+$("#select-group")[0].value+"",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.loadMapForDs&DataInputs=map="+$('#mapName')[0].value+";dstName="+$("#select-datastore")[0].value+";"+dsoNames+";dsgName="+$("#select-group")[0].value+"",
     dataType: "xml",
     complete: function(xml,status) {
 	var tmp=$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -145,7 +145,7 @@ function addLayer(){
 function refreshMapLayers(){
   $.ajax({
     type: "GET",
-    url: System.zooUrl+"?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=getLayersList&DataInputs=name="+$("#mapName")[0].value+"&RawDataOutput=Result",
+    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.getLayersList&DataInputs=name="+$("#mapName")[0].value+"&RawDataOutput=Result",
     dataType: "json",
     complete: function(xml,status) {
 	var tmp=$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -161,7 +161,7 @@ function refreshTablesList(){
     var localTarget=arguments[1];
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=listTablesAndViews&DataInputs=dataStore="+$('#complex_ds').val()+";schema="+$('#'+arguments[0]).val()+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.listTablesAndViews&DataInputs=dataStore="+$('#complex_ds').val()+";schema="+$('#'+arguments[0]).val()+"&RawDataOutput=Result",
 	tid: arguments[0],
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
@@ -180,7 +180,7 @@ function refreshFieldsList(){
 	localTarget.push(arguments[i]);
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=getTableDescription&DataInputs=dataStore="+$('#complex_ds').val()+";table="+$('#'+arguments[0]).val()+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.getTableDescription&DataInputs=dataStore="+$('#complex_ds').val()+";table="+$('#'+arguments[0]).val()+"&RawDataOutput=Result",
 	tid: arguments[0],
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
@@ -255,11 +255,11 @@ function saveComplexParam(){
     }
     var tmp={"tbl_legend": $("#legend_table").val(),"ofield":$("#orig_column").val(),"tfield":$("#target_column").val(),"color":$("#target_color").val(),"min":$("#target_min").val(),"max":$("#target_max").val()};
     dataInputs.push({name: "legend",value: JSON.stringify(tmp),mimeType: "application/json"});
-    var data=WPSGetHeader("saveComplexSearch")+WPSGetInputs(dataInputs)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+    var data=WPSGetHeader("mapfile.saveComplexSearch")+WPSGetInputs(dataInputs)+WPSGetOutput({name: "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: 'text/xml',
-	url: System.zooUrl+"?metapath=mapfile",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    checkWPSResult(xml);

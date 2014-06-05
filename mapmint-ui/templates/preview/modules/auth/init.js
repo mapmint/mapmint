@@ -93,10 +93,10 @@ function recoverPassword(){
     var params=[
 	{name: "login",value: \$("#relogin").val(),dataType: "string"}
     ];
-    var data=WPSGetHeader("getLostPassword")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+    var data=WPSGetHeader("authenticate.getLostPassword")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
     $.ajax({
       type: "POST",
-	  url: System.zooUrl+"?metapath=authenticate",
+	  url: System.zooUrl,
 	  contentType: 'text/xml',
 	  data: data,
 	  complete: function(xml,status) {
@@ -160,11 +160,11 @@ function registerUser(){
 	{name: "fields",value: "mail",dataType: "string"},
 	{name: "values",value: \$("#email").val(),dataType: "string"}
     ];    
-    var data=WPSGetHeader("registerUser")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+    var data=WPSGetHeader("authenticate.registerUser")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
     //alert(data);
     \$.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=authenticate",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: data,
 	complete: function(xml,status) {
@@ -197,10 +197,10 @@ function saveUserPreferences(){
 	params[params.length]={name: "fields",value: "passwd",dataType: "string"};
 	params[params.length]={name: "values",value: \$("#upass").val(),dataType: "string"};
     }
-    var data=WPSGetHeader("saveUserPreferences")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+    var data=WPSGetHeader("authenticate.saveUserPreferences")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
-	url: System.zooUrl+"?metapath=authenticate",
+	url: System.zooUrl,
 	contentType: 'text/xml',
 	data: data,
 	complete: function(xml,status) {
@@ -220,10 +220,10 @@ function authenticateUser(){
 	{name: "password",value: \$("#password_f").val(),dataType: "string"}
     ];
 	
-    var data=WPSGetHeader("clogIn")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+    var data=WPSGetHeader("authenticate.clogIn")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
     $.ajax({
       type: "POST",
-	  url: System.zooUrl+"?metapath=authenticate",
+	  url: System.zooUrl,
 	  contentType: 'text/xml',
 	  data: data,
 	  complete: function(xml,status) {
@@ -243,10 +243,10 @@ function logoutUser(){
     var params=[
 	{name: "login",value: \$("#login").val(),dataType: "string"}
     ];
-    var data=WPSGetHeader("clogOut")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+    var data=WPSGetHeader("authenticate.clogOut")+WPSGetInputs(params)+WPSGetOutput({name: "Result"})+WPSGetFooter();
     $.ajax({
       type: "POST",
-	  url: System.zooUrl+"?metapath=authenticate",
+	  url: System.zooUrl,
 	  contentType: 'text/xml',
 	  data: data,
 	  complete: function(xml,status) {

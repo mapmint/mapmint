@@ -726,11 +726,10 @@
 				];							 
 				if(p.ogcProtocol=="MMWFS")
 				  var params = [
-		  { name : 'metapath', value : "vector-tools" },
 		  { name : 'version', value : "1.0.0" },
 		  { name : 'service', value : "WPS" },
 		  { name : 'request', value : "Execute" },
-		  { name : 'Identifier', value : "mmExtractVectorInfo" },
+		  { name : 'Identifier', value : "vector-tools.mmExtractVectorInfo" },
 		  { name : 'DataInputs', value : "getFeatures=true;dataSource="+p.dwDataSource+";layer="+p.dwLayer+";page="+p.newp+";limit="+p.limit+";sortname="+p.sortname+";sortorder="+p.sortorder+";encoding="+$("#swenc_"+p.id)[0].value },
 		  { name : 'RawDataOutput', value: 'Result'}
 						];

@@ -54,12 +54,12 @@ function saveWFST(){
 
   query=editMode=='Insert'?getInsertRequest():editMode=='Delete'?getDeleteRequest():getUpdateRequest();
 
-  pre_query='<wps:Execute service="WPS" version="1.0.0" xmlns:wfs="http://www.opengis.net/wfs" xmlns:ogc="http://www.opengis.net/ogc" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 ../wpsExecute_request.xsd"><ows:Identifier>Transaction</ows:Identifier><wps:DataInputs><wps:Input><ows:Identifier>Request</ows:Identifier><ows:Title>Playground area</ows:Title><wps:Data><wps:ComplexData mimeType="text/xml">';
+  pre_query='<wps:Execute service="WPS" version="1.0.0" xmlns:wfs="http://www.opengis.net/wfs" xmlns:ogc="http://www.opengis.net/ogc" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 ../wpsExecute_request.xsd"><ows:Identifier>wfs-t.Transaction</ows:Identifier><wps:DataInputs><wps:Input><ows:Identifier>Request</ows:Identifier><ows:Title>Playground area</ows:Title><wps:Data><wps:ComplexData mimeType="text/xml">';
 
   post_query='</wps:ComplexData></wps:Data></wps:Input><wps:Input><ows:Identifier>MapFile</ows:Identifier><ows:Title>Distance which people will walk to get to a playground.</ows:Title><wps:Data><wps:LiteralData>'+$("#mapName")[0].value+'</wps:LiteralData></wps:Data></wps:Input></wps:DataInputs><wps:ResponseForm><wps:RawDataOutput><wps:Output><ows:Identifier>Result</ows:Identifier></wps:Output></wps:RawDataOutput></wps:ResponseForm></wps:Execute>';
 
   var request = new OpenLayers.Request.XMLHttpRequest();
-  request.open('POST',System.zooUrl+'?metapath=wfs-t',true);
+  request.open('POST',System.zooUrl,true);
   request.setRequestHeader('Content-Type','text/xml');
   /*request.onreadystatechange = function() {
     if(request.readyState == OpenLayers.Request.XMLHttpRequest.DONE) {

@@ -10,7 +10,7 @@ MMStyler={
 	    System.startWindowStep();
 	\$.ajax({
 	    type: "GET",
-	    url: "$conf["main"]["serverAddress"]?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=createLegend&DataInputs=name="+(\$("#mapName").val()?\$("#mapName").val():"Index"+System.nodeId)+";layer="+System.mmNodeId+(System.styleIsStep?";mmStep="+(\$("#mmsteps")[0].selectedIndex-2):"")+(\$("#mmPrefix").val()?";prefix="+\$("#mmPrefix").val():"")+"&RawDataOutput=Result",
+	    url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.createLegend&DataInputs=name="+(\$("#mapName").val()?\$("#mapName").val():"Index"+System.nodeId)+";layer="+System.mmNodeId+(System.styleIsStep?";mmStep="+(\$("#mmsteps")[0].selectedIndex-2):"")+(\$("#mmPrefix").val()?";prefix="+\$("#mmPrefix").val():"")+"&RawDataOutput=Result",
 	    dataType: "xml",
 	    complete: function(xml,status) {
 		if(\$("#mapName").val()){
@@ -43,7 +43,7 @@ MMStyler={
 		if(\$('#dropdown').val()=="uniqSymb")
 		    \$("#opacityOnly").hide();
 		try{
-		    \$("#ccLegend")[0].src="$conf["main"]["serverAddress"]?metaPath=classifier&request=Execute&service=WPS&version=1.0.0&Identifier=getClassifierImage&DataInputs=from="+\$("#cc-min-colorpicker")[0].value.replace("#","")+";to="+\$("#cc-max-colorpicker")[0].value.replace("#","")+";nbClass=24&RawDataOutput=Result"
+		    \$("#ccLegend")[0].src="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=classifier.getClassifierImage&DataInputs=from="+\$("#cc-min-colorpicker")[0].value.replace("#","")+";to="+\$("#cc-max-colorpicker")[0].value.replace("#","")+";nbClass=24&RawDataOutput=Result"
 		}catch(e){}
 		try{
 		    \$(function () {
@@ -144,7 +144,7 @@ MMStyler={
 	saveStep: function (){
 	    \$.ajax({
 		type: "GET",
-		url: System.zooUrl+"?metapath=mapfile&version=1.0.0&service=WPS&request=Execute&service=WPS&Identifier="+(arguments.length==0?"saveStep":"removeStep")+"&dataInputs=layer="+System.mmNodeId+";name="+\$("#mmStepName").val()+(\$("#mmPrefix").val()?";prefix="+\$("#mmPrefix").val():"")+"&RawDataOutput=Result",
+		url: System.zooUrl+"?version=1.0.0&service=WPS&request=Execute&service=WPS&Identifier=mapfile."+(arguments.length==0?"saveStep":"removeStep")+"&dataInputs=layer="+System.mmNodeId+";name="+\$("#mmStepName").val()+(\$("#mmPrefix").val()?";prefix="+\$("#mmPrefix").val():"")+"&RawDataOutput=Result",
 		complete: function(xml,status) {
 		    if(checkWPSResult(xml)){
 			\$( "#view-addstep-dialog" ).window('close');
@@ -157,7 +157,7 @@ MMStyler={
 	deleteStep: function (){
 	    \$.ajax({
 		type: "GET",
-		url: System.zooUrl+"?metapath=mapfile&version=1.0.0&service=WPS&request=Execute&service=WPS&Identifier=deleteStep&dataInputs=layer="+System.mmNodeId+";name="+\$("#mmsteps").val()+"&RawDataOutput=Result",
+		url: System.zooUrl+"?version=1.0.0&service=WPS&request=Execute&service=WPS&Identifier=mapfile.deleteStep&dataInputs=layer="+System.mmNodeId+";name="+\$("#mmsteps").val()+"&RawDataOutput=Result",
 		complete: function(xml,status) {
 		    if(checkWPSResult(xml)){
 			\$( "#view-addstep-dialog" ).window('close');
@@ -170,7 +170,7 @@ MMStyler={
 	refreshStepList: function(){
 	    \$.ajax({
 		type: "GET",
-		url: System.zooUrl+"?metapath=mapfile&version=1.0.0&service=WPS&request=Execute&service=WPS&Identifier=listStep&dataInputs=layer="+System.mmNodeId+"&RawDataOutput=Result",
+		url: System.zooUrl+"?version=1.0.0&service=WPS&request=Execute&service=WPS&Identifier=mapfile.listStep&dataInputs=layer="+System.mmNodeId+"&RawDataOutput=Result",
 		complete: function(xml,status) {
 		    if(checkWPSResult(xml,false)){
 			json=new OpenLayers.Format.JSON();

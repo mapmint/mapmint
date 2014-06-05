@@ -17,7 +17,7 @@ function refreshTableFields(){
 	vars+=";step="+($("#table_step")[0].selectedIndex-1);
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=details&DataInputs=table="+tableName+";id="+System.nodeId+";tab=table"+vars+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table="+tableName+";id="+System.nodeId+";tab=table"+vars+"&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		try{

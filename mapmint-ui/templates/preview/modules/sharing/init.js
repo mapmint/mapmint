@@ -44,10 +44,10 @@ function _permalink(url){
 		{name: "url",value:System.curl,dataType: "string"},
 		{name: "tmpl",value:"public/modules/sharing/default",dataType: "string"}
 	    ];
-	    data=WPSGetHeader("display")+WPSGetInputs(params1)+WPSGetOutput({"name":"Result"})+WPSGetFooter();
+	    data=WPSGetHeader("template.display")+WPSGetInputs(params1)+WPSGetOutput({"name":"Result"})+WPSGetFooter();
 	    $.ajax({
 		type: "POST",
-		url: System.zooUrl+"?metapath=template",
+		url: System.zooUrl,
 		contentType: 'text/xml',
 		data: data,
 		complete: function(xml,status) {

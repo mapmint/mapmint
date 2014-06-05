@@ -4,7 +4,7 @@ function searchTable(){
 	source: function(request,response){
 	    $.ajax({
 		type: "GET",
-		url: System.zooUrl+"?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&identifier=searchByName&DataInputs=tbl="+System.tableName+";val="+request.term+"&RawDataOutput=Result",
+		url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&identifier=mapfile.searchByName&DataInputs=tbl="+System.tableName+";val="+request.term+"&RawDataOutput=Result",
 		success: function(xml,status){
 		    var data=xml;
 		    response(data);
@@ -181,7 +181,7 @@ $(function () {
 MapMintNavPriv={
     edit: function(){
 	$.ajax({
-	    url: "./UsersManagement/NavWindow",//"$conf["main"]["serverAddress"]?metapath=template&service=WPS&version=1.0.0&request=Execute&Identifier=display&DataInputs=tmpl=Publisher/confirmRemove&RawDataOutput=Result",
+	    url: "./UsersManagement/NavWindow",//"$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=template.display&DataInputs=tmpl=Publisher/confirmRemove&RawDataOutput=Result",
 	    complete: function(xml,status){
 		if(!$('#navPriv').length>0)
 		    $("body").append('<div id="navPriv" title="'+System.messages["Navigation Toolbar"]+' '+System.messages["Privileges"]+'"></div>');
@@ -219,10 +219,10 @@ MapMintNavPriv={
 	}
 	postRequest=[];
 	postRequest[postRequest.length]={name:'priv',value: System.navStr,dataType: "string"};
-	var data=WPSGetHeader("saveNavPrivileges")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
+	var data=WPSGetHeader("mapfile.saveNavPrivileges")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
 	$.ajax({
             type: "POST",
-	    url: System.zooUrl+"?metapath=mapfile",
+	    url: System.zooUrl,
 	    data: data,
 	    contentType: "text/xml",
 	    complete: function(xml,status) {

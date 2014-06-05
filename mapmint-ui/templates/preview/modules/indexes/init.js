@@ -14,10 +14,10 @@ function readIndexForGeo(featureGeoJSON,lbounds){
 		    params.push({"name": "InputEntity3","xlink:href": System.allOverlays+"&amp;SERVICE=WFS&amp;VERSION=1.0.0&amp;REQUEST=GetFeature&amp;typeName=Result&amp;bbox="+lbounds.getBounds()+"&amp;__tt="+Date(),"mimeType": "text/xml"});
 		
 	    }
-	    req=WPSGetHeader("Intersection0")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
+	    req=WPSGetHeader("vector-tools.Intersection0")+WPSGetInputs(params)+WPSGetOutput({"name": "Result","form":"ResponseDocument","mimeType": "image/png","asReference":"true"})+WPSGetFooter();
 	    $.ajax({
 		type: "POST",
-		url: System.zooUrl+"?metapath=vector-tools",
+		url: System.zooUrl,
 		contentType: 'text/xml',
 		data: req,
 		complete: function(xml,status) {

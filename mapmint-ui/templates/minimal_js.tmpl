@@ -31,7 +31,7 @@ function defaultInit(){
       \$("#logout").click(function(){
 	  \$.ajax({
 	    type: "GET",
-	    url: "$conf["main"]["serverAddress"]?metapath=authenticate&service=WPS&version=1.0.0&request=Execute&Identifier=logOut&DataInputs=&RawDataOutput=Result",
+	    url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=authenticate.logOut&DataInputs=&RawDataOutput=Result",
 	  dataType: "xml",
 	  complete: function(xml,status) {
 	      var tmp=\$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -58,10 +58,10 @@ function defaultInit(){
 		{"name":"section","value":"mm","dataType":"string"},
 		{"name":"adminTheme","value":this.getAttribute('rel'),"dataType":"string"}
 	    ];
-	    var data=WPSGetHeader("SaveConf")+WPSGetInputs(tmp)+WPSGetOutput({name: "Result"})+WPSGetFooter();
+	    var data=WPSGetHeader("configuration.SaveConf")+WPSGetInputs(tmp)+WPSGetOutput({name: "Result"})+WPSGetFooter();
 	    \$.ajax({
 		type: "POST",
-		url: System.zooUrl+"?metapath=configuration",
+		url: System.zooUrl,
 		contentType: 'text/xml',
 		data: data,
 		complete: function(xml,status) {
@@ -143,7 +143,7 @@ function setIndexQuote(){
 	localID: this.length,
 	localElement: arguments[0],
 	localId: arguments[1],
-	url: zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=setIndexQuote&DataInputs=id="+arguments[1]+";quote="+arguments[2]+"&RawDataOutput=Result&timestamp="+d.getTime(),
+	url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.setIndexQuote&DataInputs=id="+arguments[1]+";quote="+arguments[2]+"&RawDataOutput=Result&timestamp="+d.getTime(),
 	complete: function(xml,status){
 	    getIndexQuote(this.localElement,this.localId);
 	}
@@ -185,7 +185,7 @@ function getIndexQuote(){
 	type: "GET",
 	isArray: isArray(arguments[1]),
 	localElem: arguments[0],
-	url: zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=getIndexQuote&DataInputs="+tmp+"&RawDataOutput=Result&timestamp="+d.getTime(),
+	url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.getIndexQuote&DataInputs="+tmp+"&RawDataOutput=Result&timestamp="+d.getTime(),
 	complete: function(xml,status){
 		data=\$.parseJSON(xml.responseText);
 	    if(this.isArray && isArray(data)){

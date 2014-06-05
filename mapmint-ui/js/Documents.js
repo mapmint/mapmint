@@ -107,12 +107,12 @@ function updateElement(){
 	{name: "documents_themes_out", value: "t_id",dataType: "string"},
 	{name: "tuple", value: $.stringify(params), mimeType: "application/json"}
     ];
-    data=WPSGetHeader("updateElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.updateElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
 
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -126,7 +126,7 @@ function updateElement(){
 function refreshDetails(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=details&DataInputs=table=documents;id="+System.nodeId+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table=documents;id="+System.nodeId+"&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		var data=$.parseJSON(xml.responseText);
@@ -172,7 +172,7 @@ function refreshDetails(){
 function refreshList(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?metapath=np&service=WPS&version=1.0.0&request=Execute&Identifier=list&DataInputs=table=documents&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.list&DataInputs=table=documents&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		var data=$.parseJSON(xml.responseText);
@@ -209,11 +209,11 @@ function deleteElement(){
 	{name: "akey", value: "d_id",dataType: "string"},
 	{name: "id", value: System.nodeId,dataType: "string"}
     ];
-    data=WPSGetHeader("deleteElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.deleteElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){
@@ -229,11 +229,11 @@ function insertElement(){
 	{name: "table", value: "documents",dataType: "string"},
 	{name: "name", value: $("#eName").val(),dataType: "string"}
     ];
-    data=WPSGetHeader("insertElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
+    data=WPSGetHeader("np.insertElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	contentType: "text/xml",
-	url: System.zooUrl+"?metapath=np",
+	url: System.zooUrl,
 	data: data,
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml)){

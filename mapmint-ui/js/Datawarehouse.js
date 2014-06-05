@@ -6,7 +6,7 @@ Datawarehouse=MLayout.extend({
   postgisListRefresh: function(){
 	$.ajax({
 		type: "GET",
-		url: "/cgi-bin/zoo_loader.cgi?metapath=datastores/postgis&service=WPS&version=1.0.0&request=Execute&Identifier=list&DataInputs=type="+arguments[0]+"&RawDataOutput=Result",
+		url: "/cgi-bin/zoo_loader.cgi?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.postgis.list&DataInputs=type="+arguments[0]+"&RawDataOutput=Result",
 		dataType: "xml",	
 		complete: function(xml,status) {
 			$('#progress_bar .ui-progress').css('width', '65%');

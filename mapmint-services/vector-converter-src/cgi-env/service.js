@@ -1,7 +1,7 @@
 function addFeatureId(conf,inputs,outputs){
   alert(inputs);
   var myOutputs= {Result: { type: 'ResponseDocument', "mimeType": "application/json" }};
-  var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Converter');
+  var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
   alert(conf["main"]["dataPath"]);
   inputs["InputDSTN"]["value"]=inputs["InputDSTN"]["value"].replace(/conf["main"]["dataPath"]/,"");
   inputs["sql"]={"value": "SELECT fid AS MMID, * from "+inputs["InputDSON"]["value"]};
@@ -11,7 +11,7 @@ function addFeatureId(conf,inputs,outputs){
   alert(myExecuteResult);
 
   var myOutputs1= {Result: { type: 'ResponseDocument', "mimeType": "application/json" }};
-  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'saveLayer');
+  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.saveLayer');
   alert(conf["main"]["dataPath"]);
   inputs["InputDSTN"]["value"]=inputs["InputDSTN"]["value"];
   inputs["InputDSN"]={"value": ""};
@@ -27,7 +27,7 @@ function addFeatureId(conf,inputs,outputs){
 function ConverterJs(conf,inputs,outputs){
   alert(inputs);
   var myOutputs= {Result: { type: 'ResponseDocument', "mimeType": "application/json" }};
-  var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Converter');
+  var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
   alert(conf["main"]["dataPath"]);
   inputs["InputDSTN"]["value"]=inputs["InputDSTN"]["value"].replace(/conf["main"]["dataPath"]/,"");
   inputs["sql"]={"value": "SELECT fid AS MMID, * from "+inputs["InputDSON"]["value"]};
@@ -37,7 +37,7 @@ function ConverterJs(conf,inputs,outputs){
   alert(myExecuteResult);
 
   var myOutputs1= {Result: { type: 'ResponseDocument', "mimeType": "application/json" }};
-  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'saveLayer');
+  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.saveLayer');
   alert(conf["main"]["dataPath"]);
   inputs["InputDSTN"]["value"]=inputs["InputDSTN"]["value"];
   inputs["InputDSN"]={"value": ""};
@@ -52,7 +52,7 @@ function ConverterJs(conf,inputs,outputs){
 
 function convert(conf,inputs,outputs){
   var myOutputs= {"Result": { "type": 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=mapfile",'getMapLayersInfo');
+  var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.getMapLayersInfo');
   /**
    * Check what are the input DataStore and DataSource
    */
@@ -84,7 +84,7 @@ function convert(conf,inputs,outputs){
 	  input1["PGCLIENTENCODING"]={"value": "Latin1","type":"string"};
       else
 	  input1["OGR_FORCE_ASCII"]={"value": "NO","type":"string"};
-      var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=configuration",'SaveConf');
+      var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"],'configuration.SaveConf');
       var res=myProcess0.Execute(input1,myOutputs);
       alert(res);
   }
@@ -138,7 +138,7 @@ function convert(conf,inputs,outputs){
     for(i in inputs3){
 	alert(i+" => "+inputs3[i]["value"]);
     }
-  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Converter');
+  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
   var myFinalOutputs= {"Result": { "type": 'ResponseDocument', "dataType": "string" }};
   var myFinalResult=myProcess2.Execute(inputs3,myOutputs);
   alert(myFinalResult);
@@ -151,12 +151,12 @@ function convert(conf,inputs,outputs){
 	  if(i!="PGCLIENTENCODING"){
 	      input1[i]={"value": conf["env"][i],"type":"string"};
 	  }
-      var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=configuration",'SaveConf');
+      var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'configuration.SaveConf');
       var res=myProcess.Execute(input1,myOutputs);
       var formats=["GeoJSON","KML","GeoRSS","GML","GPX"];
       for(var k=0;k<formats.length;k++)
       if(inputs["dso_f"]["value"]==formats[k]){
-	  var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vecotr-converter",'Recode');
+	  var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"],'vecotr-converter.Recode');
 	  var input2={
 	      "file": {"value": tmp2[0]+"/"+inputs["dso_out"]["value"],"type": "string"},
 	      "sEncoding": {"value": tmp1[2],"type":"string"},
@@ -180,7 +180,7 @@ function convert(conf,inputs,outputs){
 
 function convertToKML(conf,inputs,outputs){
   var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Converter');
+  var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
   inputs["InputDSTN"]["value"]=inputs["InputDSTN"]["value"].replace(/conf["main"]["dataPath"]/,"");
   inputs["F"]={"value": "KML"};
   inputs["OutputDSN"]={"value": "TEMP_"+conf["senv"]["MMID"]+"-1.kml"};
@@ -194,7 +194,7 @@ function convertTo(conf,inputs,outputs){
   var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
 
 
-  var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Converter');
+  var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
   inputs["InputDSTN"]["value"]=inputs["InputDSTN"]["value"].replace(/conf["main"]["dataPath"]/,"");
   inputs["F"]={"value": inputs["format"]["value"]};
   inputs["OutputDSN"]={"value": "TEMP_"+conf["senv"]["MMID"]+"-1."};
@@ -206,7 +206,7 @@ function convertTo(conf,inputs,outputs){
       inputs["OutputDSN"]["value"]+="shp"
 
 
-    var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'cleanUp');
+    var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.cleanUp');
 	inputs1={
 	    "dso": {"value":inputs["OutputDSN"]["value"].replace(/.shp/g,""),"dataType":"string"},
 	    "dstn": {"value":inputs["OutputDSN"]["value"].replace(/.shp/g,".zip"),"dataType":"string"}
@@ -216,10 +216,10 @@ function convertTo(conf,inputs,outputs){
   var myExecuteResult=myProcess.Execute(inputs,myOutputs);
 
     if(inputs["format"]["value"]=="ESRI Shapefile"){
-	var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'doZip');
+	var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.doZip');
 	alert(myExecuteResult.replace(/.shp/g,"").replace(/conf["main"]["tmpUrl"]/g,""),conf["main"]["tmpUrl"]);
 	myExecuteResult=myProcess1.Execute(inputs1,myOutputs);
-	var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'cleanUp');
+	var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.cleanUp');
 	myExecuteResult2=myProcess2.Execute(inputs1,myOutputs);
     }
 
@@ -233,7 +233,7 @@ function setSRS(conf,inputs,outputs){
     var myProcess;
     if(inputs["isRaster"]["value"]=="true"){
 	var myOutputs1= {"Result": { "type": 'RawDataOutput', "mimeType": "application/json" }};
-	var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=mapfile",'getMapLayersInfo');
+	var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.getMapLayersInfo');
 	var inputs1={
 	    "map": {"value": inputs["dstn"]["value"]+"ds_ows.map","type":"string"},
 	    "fullPath": {"value": "true","type":"string"},
@@ -241,7 +241,7 @@ function setSRS(conf,inputs,outputs){
 	};
 	var myExecuteResult1=myProcess1.Execute(inputs1,myOutputs1);
 	var tmp=eval(myExecuteResult1);
-	myProcess= new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=raster-tools",'Gdal_Translate');
+	myProcess= new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.Gdal_Translate');
 	inputs["InputDSTN"]={"value": inputs["dstn"]["value"],"dataType": "string"};
 	inputs["InputDSON"]={"value": inputs["dson"]["value"],"dataType": "string"};
 	inputs["InputDSN"]={"value": tmp[2].replace(conf["main"]["dataPath"],""),"dataType": "string"};
@@ -250,7 +250,7 @@ function setSRS(conf,inputs,outputs){
 	inputs["SRS"]["value"]="+init="+inputs["srs"]["value"];
 	inputs["OutputDSN"]={"value": "TEMP_"+inputs["dson"]["value"]};
     }else{
-	myProcess= new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Converter');
+	myProcess= new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
 	inputs["InputDSTN"]=inputs["dstn"];
 	inputs["InputDSON"]={"value": inputs["dson"]["value"]}
 	inputs["a_srs"]=inputs["srs"];
@@ -262,7 +262,7 @@ function setSRS(conf,inputs,outputs){
     alert(myExecuteResult);
 
     inputs["idir"]={"value":inputs["dstn"]["value"].replace(conf["main"]["dataPath"]+"/dirs/","")};
-    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=raster-tools",'copyTileIndex');
+    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.copyTileIndex');
     var myOutputs2= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
     var myExecuteResult2=myProcess2.Execute(inputs,myOutputs2);
     
@@ -275,14 +275,14 @@ function exportTo(conf,inputs,outputs){
 
     var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
 
-    var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=template",'display');
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'template.display');
     inputs["tmpl"]={"value": "public/detail"};
     inputs["map"]={"value": inputs["map"]["value"]};
     inputs["layer"]={"value": inputs["layer"]["value"]};
     var myExecuteResult=myProcess.Execute(inputs,myOutputs);
     var tmp=eval(myExecuteResult);
     
-    var myProcess = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'Converter');
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
     inputs["InputDSTN"]={"value": tmp[0]};
     inputs["sql"]={"value": tmp[1]};
     inputs["F"]={"value": inputs["format"]["value"]};
@@ -295,7 +295,7 @@ function exportTo(conf,inputs,outputs){
 	inputs["OutputDSN"]["value"]+="shp"
     
     
-    var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'cleanUp');
+    var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.cleanUp');
     inputs1={
 	"dso": {"value":inputs["OutputDSN"]["value"].replace(/.shp/g,""),"dataType":"string"},
 	"dstn": {"value":inputs["OutputDSN"]["value"].replace(/.shp/g,".zip"),"dataType":"string"}
@@ -306,10 +306,10 @@ function exportTo(conf,inputs,outputs){
     var myExecuteResult=myProcess.Execute(inputs,myOutputs);
 
     if(inputs["format"]["value"]=="ESRI Shapefile"){
-	var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'doZip');
+	var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.doZip');
 	alert(myExecuteResult.replace(/.shp/g,"").replace(/conf["main"]["tmpUrl"]/g,""),conf["main"]["tmpUrl"]);
 	myExecuteResult=myProcess1.Execute(inputs1,myOutputs);
-	//var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"]+"?metapath=vector-converter",'cleanUp');
+	//var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.cleanUp');
 	//myExecuteResult2=myProcess2.Execute(inputs1,myOutputs);
     }
     

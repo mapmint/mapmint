@@ -61,7 +61,7 @@ MapMint: Documents
 	    <td valign="middle" style="width:200px;">$zoo._("File:") <input type="radio" name="doct" value="file"  selected="true" onclick="\$('#documents_url').hide();\$('#file').show();" /> URL: <input type="radio" name="doct" value="url" onclick="\$('#documents_url').show();\$('#file').hide();" /></td>
 	    <td>
 	      <textarea id="documents_url" class="rounded frm url maincfg" style="display:none;"></textarea>
-	      <form id="fileUpload" action="$conf["main"]["serverAddress"]?metapath=upload&request=Execute&service=WPS&version=1.0.0&Identifier=saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="uploader">
+	      <form id="fileUpload" action="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=upload.saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="uploader">
 		<input type="file" name="file" id="file" class="rounded frm file" />
 		<a id="documents_file_link" href="" target="_blank"></a>
 	      </form>

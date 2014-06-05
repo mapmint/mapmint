@@ -23,7 +23,7 @@
 		\$.ajax({
 		  localI: i,
 		      type: "GET",
-		      url: zooUrl+"?metapath=mapfile&service=WPS&version=1.0.0&request=Execute&Identifier=getInitialInfo&DataInputs=map="+lastMap+";layer="+queryLayersList[i].real_name+"&RawDataOutput=Result",
+		      url: zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.getInitialInfo&DataInputs=map="+lastMap+";layer="+queryLayersList[i].real_name+"&RawDataOutput=Result",
 		      dataType: 'xml',
 		      complete:function(xml,status){
 		      var tmp=\$(xml.responseXML).find("ows\\:ExceptionText").text();
@@ -70,7 +70,7 @@
 			  autoload: true,
 			      url: msUrl,
 			      ogcProtocol: "WFS",
-			      ogcUrl: zooUrl+"?metapath=vector-tools",
+			      ogcUrl: zooUrl,
 			      autozoom: false,
 			      dataType: 'xml',
 			      contentType: 'text/xml',
