@@ -179,14 +179,18 @@ def saveGeorefProject(conf,inputs,outputs):
     conf["senv"]["mmGeoImg"]=ofile.split('/')[len(ofile.split('/'))-1]
 
     mmsession.save(conf)
+    try:
+	    os.mkdir(conf["main"]["dataPath"]+"/georeferencer_maps/"+inputs["dso"]["value"])
+    except:
+	    pass
 
     if not(os.path.isfile(conf["main"]["dataPath"]+"/georeferencer_maps/project_"+inputs["dso"]["value"]+".map")) or (inputs.has_key("force") and inputs["force"]["value"]=="true"):
 	try:
-	    os.mkdir(conf["main"]["dataPath"]+"/georeferencer_maps/"+inputs["dso"]["value"])
 	    import glob
 	    for name in glob.glob(conf["main"]["dataPath"]+"/georeferencer_maps/"+inputs["map"]["value"]+"/*.csv"):
                 shutil.copy2(name,conf["main"]["dataPath"]+"/georeferencer_maps/"+inputs["dso"]["value"])
-	except:
+	except Exception,e:
+	    print >> sys.stderr,e
 	    pass
         m.save(conf["main"]["dataPath"]+"/georeferencer_maps/project_"+inputs["dso"]["value"]+".map")
     outputs["Result"]["value"]=zoo._("Georeference Project saved")
