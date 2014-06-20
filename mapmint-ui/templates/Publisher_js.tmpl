@@ -146,7 +146,7 @@ function savePublishedMap(){
   var data=WPSGetHeader("mapfile.savePublishMap")+WPSGetInputs(postRequest)+WPSGetOutput({name:"Result"})+WPSGetFooter();
   \$.ajax({
 	type: "POST",
-	url: "$conf["main"]["serverAddress"],
+	url: "$conf["main"]["serverAddress"]",
 	data: data,
 	contentType: "text/xml",
 	complete: function(xml,status) {
