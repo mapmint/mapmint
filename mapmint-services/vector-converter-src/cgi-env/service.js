@@ -140,7 +140,7 @@ function convert(conf,inputs,outputs){
     }
   var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
   var myFinalOutputs= {"Result": { "type": 'ResponseDocument', "dataType": "string" }};
-  var myFinalResult=myProcess2.Execute(inputs3,myOutputs);
+  var myFinalResult=myProcess2.Execute(inputs3,myFinalOutputs);
   alert(myFinalResult);
   /**
    * Remove the PGCLIENTENCODING from the [env] section when needed.

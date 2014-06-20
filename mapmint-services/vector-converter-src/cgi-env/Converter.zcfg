@@ -16,12 +16,10 @@
    minOccurs = 0
    maxOccurs = 1
    <LiteralData>
-    DataType = string
+    dataType = string
     <Default>
      value = ESRI ShapeFile
     </Default>
-    <Supported>
-    </Supported>
    </LiteralData>
   [InputDSN]
    Title = The input data source name
@@ -29,11 +27,8 @@
    minOccurs = 0
    maxOccurs = 1
    <LiteralData>
-    DataType = string
-    <Default>
-    </Default>	
-    <Supported>
-    </Supported>
+    dataType = string
+    <Default />
    </LiteralData>
   [OutputDSN]
    Title = The output data source name
@@ -41,11 +36,8 @@
    minOccurs = 1
    maxOccurs = 1
    <LiteralData>
-    DataType = string
-    <Default>
-    </Default>	
-    <Supported>
-    </Supported>
+    dataType = string
+    <Default />
    </LiteralData>
  </DataInputs>
  <DataOutputs>
@@ -54,9 +46,6 @@
    Abstract = The file name resulting of the convertion
    <LiteralData>
     DataType = string
-    <Default>
-    </Default>	
-    <Supported>
-    </Supported>
+    <Default />
    </LiteralData>
  </DataOutputs>  

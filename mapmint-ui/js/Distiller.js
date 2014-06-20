@@ -1676,7 +1676,7 @@ function runGdalDem(){
 	params.push({name: $(this)[0].id.replace(reg,""),value: $(this).val(),dataType: "string"});
     });
 
-    var data=WPSGetHeader("raster-tools."+($("#raster_method").val()=="contour")?"Gdal_Contour":"Gdal_Dem")+WPSGetInputs(params)+WPSGetOutput({"name":"Result"})+WPSGetFooter();
+    var data=WPSGetHeader("raster-tools."+($("#raster_method").val()=="contour"?"Gdal_Contour":"Gdal_Dem"))+WPSGetInputs(params)+WPSGetOutput({"name":"Result"})+WPSGetFooter();
 
     $("#raster-dialog").find("input[type=submit]").hide();
     $.ajax({

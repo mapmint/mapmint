@@ -44,7 +44,7 @@
    Abstract = The file name resulting of the convertion
    <ComplexData>
     <Default>
-      mimeType = text/xml
+      mimeType = application/json
       encoding = utf-8
     </Default>	
    </ComplexData>

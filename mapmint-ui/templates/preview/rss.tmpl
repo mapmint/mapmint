@@ -1,9 +1,16 @@
 #encoding UTF-8
 #import zoo
+#import mapfile.service as mms
 <rss version="2.0">
   <channel>
     <title>$zoo._("Latest maps")</title>
-    <description>$conf["identification"]["abstract"].replace('[BR]','\\n')</description>
+    <description>#if $conf["identification"]["abstract"].count($conf["main"]["tmpUrl"])>0#
+#set f=open($conf["identification"]["abstract"].replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
+<![CDATA[$f.read()]]>
+#else
+              $conf["identification"]["abstract"].replace("[BR]","</p><p>")
+#end if
+</description>
     <url>$(conf["main"]["applicationAddress"])public/</url>
     <image>
       <url>$conf["main"]["applicationAddress"]/img/mm-logo-default.png</url>
