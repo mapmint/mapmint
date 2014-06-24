@@ -357,7 +357,11 @@ class LOClient:
         @param image_name Image filename
         """
         cnt=0
-        image_url=self.loadImage(image_name,image_file)
+        try:
+            image_url=self.loadImage(image_name,image_file)
+        except:
+            print >> sys.stderr,image_name
+            return -1
         self.imin=0
         self.jmin=0
         self.kmin=0
@@ -381,33 +385,6 @@ class LOClient:
             self.insertImage(image_url)
             self.nbc+=1
             return 1
-        '''
-            #self.vcursor=self.doc.CurrentController.ViewCursor
-            self.vcursor.gotoStart(False)
-            self.vcursor.gotoEnd(True)#Right(self.text.String.index(image_name)-1,True)
-            print(self.vcursor.String,file=sys.stderr)
-            try:
-                if self.vcursor.String.count(image_name)>0:
-                    cpos=self.vcursor.String.index(image_name)
-                    self.vcursor.gotoStart(False)
-                    self.vcursor.goRight(cpos-(4+nblayer),False)
-                else:
-                    self.vcursor.gotoStart(False)
-                    self.vcursor.goRight(self.text.String.index(image_name)-1,False)
-            except:
-                    self.vcursor.gotoStart(False)
-                    self.vcursor.goRight(self.text.String.index(image_name)-1,False)
-                
-            self.vcursor.goRight(len(image_name),True)
-            print(self.vcursor.String,file=sys.stderr)
-            self.vcursor.setString("")
-            sys.stderr.flush()
-            #self.cursor=self.text.createTextCursorByRange(self.vcursor)
-            self.insertImage(image_url)
-            cnt+=1
-            if uniq:
-                return 1
-        '''
         while self.goToWord(image_name):
             self.insertImage(image_url)
             self.searchAndReplace(image_name,"",True)

@@ -2027,7 +2027,9 @@ int main( int nArgc, char ** papszArgv )
 #endif
     
 #ifdef ZOO_SERVICE
-    outputs->content=createMap("value",(char*)pszwebDestData);
+    setMapInMaps(outputs,"Result","value",(char*)pszwebDestData);
+    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
+    dumpMaps(outputs);
     fprintf(stderr,"%s: %d",__FILE__,__LINE__);
     return SERVICE_SUCCEEDED;
 #else
