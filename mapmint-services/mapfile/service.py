@@ -1548,7 +1548,6 @@ def classifyMap(conf,inputs,outputs):
 		print >> sys.stderr,"OK"
 		#print >> sys.stderr,outputs["Result"]["value"]
 	tmp=eval(outputs["Result"]["value"])
-
     except Exception,e:
         try:
 	    k=inputs.keys()

@@ -146,6 +146,8 @@ def printMap(conf,inputs,outputs):
     for i in layers:
         if i!="":
             layer=m.getLayer(int(i))
+            if layer is None:
+                break
             layer.status=mapscript.MS_ON
             print >> sys.stderr,layer.metadata.get("mmIcon")
             try:
@@ -164,8 +166,11 @@ def printMap(conf,inputs,outputs):
                 except Exception,e:
                     print >> sys.stderr,e
                     if layer.metadata.get("mmIcon"):
-                        layerNames+=["[_"+layer.name+"_] "+lname]
-                        script0+='pm.insertImageAt("[_'+layer.name+'_]","'+ico+'",True)\n'
+                        try:
+                            layerNames+=["[_"+layer.name+"_] "+lname]
+                            script0+='pm.insertImageAt("[_'+layer.name+'_]","'+ico+'",True)\n'
+                        except:
+                            continue
                     else:
                         layerNames+=[" "+layer.name]
             else:

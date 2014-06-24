@@ -257,9 +257,9 @@ def AddUser(conf,inputs,outputs):
 				if inputs.has_key("group"):
 					if inputs["group"].has_key("length"):
 						for i in range(0,len(inputs["group"]["value"])):
-							linkGroupToUser(c,prefix,inputs["group"]["value"],inputs["login"]["value"])
+							linkGroupToUser(conf,c,prefix,inputs["group"]["value"],inputs["login"]["value"])
 					else:
-						linkGroupToUser(c,prefix,inputs["group"]["value"],user["login"])
+						linkGroupToUser(conf,c,prefix,inputs["group"]["value"],user["login"])
 				return 3
 			else:
 				conf["lenv"]["message"] = zoo._("SQL Error")
@@ -308,17 +308,38 @@ def UpdateUser(conf,inputs,outputs):
 
 		if inputs['id']["value"] == "NULL":
 			userl=conf["senv"]["login"]
-			for (i,j) in user.items():
-				if not manage_users.check_user_params(i,j):
-					conf["lenv"]["message"] = 'Parametre %s incorrect'%(i)
-					return 4
-				if i=="login":
-					userl=j
-			#if inputs.has_key("login"):
-			#	userl=inputs["login"]["value"]
+			if not(inputs.has_key("type")) or inputs["type"]["value"]!="delete":
+				for (i,j) in user.items():
+					if not manage_users.check_user_params(i,j):
+						conf["lenv"]["message"] = 'Parametre %s incorrect'%(i)
+						return 4
+					if i=="login":
+						userl=j
+			if inputs.has_key("login"):
+				userl=inputs["login"]["value"]
 			if inputs.has_key("type") and inputs["type"]["value"]=="delete":
 				try:
 					c.cur.execute("DELETE FROM "+prefix+"user_group WHERE id_user=(select id from "+prefix+"users where login='"+userl+"')")
+				except Exception,e:
+					print >> sys.stderr,e
+					pass
+				try:
+					c.cur.execute("DELETE FROM indicateurs_favoris WHERE u_id=(select id from "+prefix+"users where login='"+userl+"')")
+				except Exception,e:
+					print >> sys.stderr,e
+					pass
+				try:
+					c.cur.execute("DELETE FROM "+prefix+"favoris WHERE u_id=(select id from "+prefix+"users where login='"+userl+"')")
+				except Exception,e:
+					print >> sys.stderr,e
+					pass
+				try:
+					c.cur.execute("DELETE FROM "+prefix+"news_groups WHERE n_id=(select id from "+prefix+"news where id_user=(select id from "+prefix+"users where login='"+userl+"'))")
+				except Exception,e:
+					print >> sys.stderr,e
+					pass
+				try:
+					c.cur.execute("DELETE FROM "+prefix+"news WHERE id_user=(select id from "+prefix+"users where login='"+userl+"')")
 				except Exception,e:
 					print >> sys.stderr,e
 					pass
@@ -343,9 +364,9 @@ def UpdateUser(conf,inputs,outputs):
 						pass
 					if inputs["group"].has_key("length"):
 						for i in range(0,len(inputs["group"]["value"])):
-							linkGroupToUser(c,prefix,inputs["group"]["value"][i],inputs["login"]["value"])
+							linkGroupToUser(conf,c,prefix,inputs["group"]["value"][i],inputs["login"]["value"])
 					else:
-						linkGroupToUser(c,prefix,inputs["group"]["value"],inputs["login"]["value"])
+						linkGroupToUser(conf,c,prefix,inputs["group"]["value"],inputs["login"]["value"])
 				return 3
 			else:
 				conf["lenv"]["message"] = zoo._("Update failed")
@@ -370,7 +391,7 @@ def UpdateUser(conf,inputs,outputs):
 		conf["lenv"]["message"]=zoo._("User not authenticated")
 		return 4
 
-def linkGroupToUser(c,prefix,gname,login):
+def linkGroupToUser(conf,c,prefix,gname,login):
 	try:
 		req="INSERT INTO "+prefix+"user_group (id_user,id_group) VALUES ((SELECT id from "+prefix+"users where login='"+login+"' limit 1),(SELECT id from "+prefix+"groups where name='"+gname+"'))"
 		print >> sys.stderr,req
