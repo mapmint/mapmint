@@ -86,6 +86,7 @@ bootbox.dialog({
       label: "View map",
       className: "map-btn",
       callback: function() {
+	  document.location="./"+System.hoverMap;
       }
     },
     cancel: {
@@ -176,7 +177,7 @@ $(function(){
 $(function () {
     var tabContainers = $('div.all > div');
     tabContainers.hide().filter(':first').show();
-    $('.main-navigation li:not(:last-child) a').click(function () {
+    $('.main-navigation li a').click(function () {
         tabContainers.hide();
         tabContainers.filter(this.hash).show();
         $('.main-navigation a').removeClass('active');
