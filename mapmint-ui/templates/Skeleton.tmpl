@@ -17,7 +17,6 @@
 <link rel="shortcut icon" href="$conf["main"]["mmAddress"]/favicon.ico" />
 <link rel="alternate" type="application/rss+xml" title="MapMint RSS Feed" href="$(conf["main"]["applicationAddress"])public/rss" />
 <title>$page_title</title>
-<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css' />
 #for $f in $ocss:
 <link type="text/css" rel="stylesheet" href="#if $f[0:7]=='http://'#$f#else#$conf["main"]["mmAddress"]/css/$f#end if#" />
 #end for
