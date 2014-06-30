@@ -5,7 +5,7 @@
 #set cur=con.conn.cursor()
 #set prefix=$auth.getPrefix($conf)
 #set fres=[]
-#set sql="select documents.id,documents.name from documents, documents_groups where d_id=documents.id and g_id in (SELECT id from velo.groups where name='"+$conf["senv"]["group"]+"' or name='public') and documents.name like '%"+$inputs["val"]["value"]+"%'"
+#set sql="select documents.id,documents.name from documents, documents_groups where d_id=documents.id and g_id in (SELECT id from "+$prefix+"groups where name='"+$conf["senv"]["group"]+"' or name='public') and documents.name like '%"+$inputs["val"]["value"]+"%'"
 #set res=cur.execute(sql)	   
 #set vals0=cur.fetchall()
 #if $vals0 is not None
@@ -14,4 +14,4 @@
 #end for
 #end if
 #import json
-$json.dumps($fres,ensure_ascii=False).encode('utf-8')
+$json.dumps($fres,ensure_ascii=False)
