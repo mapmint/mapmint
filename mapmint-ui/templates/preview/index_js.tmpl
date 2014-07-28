@@ -377,7 +377,6 @@ function startOverlay(){
 		    }
 		}			
 	    });
-#if $l.metadata.get('mmQuery')=="true"
 	    if(!System.hover){
 		System.hover = new OpenLayers.Layer.Vector("DisplaySelectedFeatures", {
                    styleMap: new OpenLayers.Style({
@@ -428,7 +427,7 @@ function startOverlay(){
 #if $m.web.metadata.get("mmPopupList").split(',').count($lname)>0
 		    overFeature: function(feature) { 
 			if(System.popupList[feature.localName].hasOver){
-			    var vs=feature.geometry.getVertices();
+		            var vs=feature.geometry.getVertices();
 			    tryRun(vs,0,feature.localName,feature,0);
 			}
 		    }, 
@@ -458,7 +457,6 @@ function startOverlay(){
 #end if
 	}
     };
-#end if    
 #else
 #if $mm_access.checkLayerPriv($conf,$m,$l.name,"r")
 System.postMap[System.postMap.length]={
@@ -1226,9 +1224,10 @@ var react=Array(
 #if $conf["senv"]["last_map"]!="Default"
         if(System.popup)
 	   map.removePopup(System.popup);
+	   try{
     	System.popup=new OpenLayers.Popup.FramedCloud(
 	    "demoPopup", 
-	    (obj.geom.getVertices().length==1?new OpenLayers.LonLat(tt.geometry.x,tt.geometry.y):(System.geoIsLine?System.lonlatQ:(tt.geometry && tt.geometry.getBounds()?tt.geometry.getBounds().getCenterLonLat():System.lonlat)))/*tt.geometry.getBounds().getCenterLonLat()*/,
+	    (obj.geom.getVertices().length==1?new OpenLayers.LonLat(obj.geom.x,obj.geom.y):(System.geoIsLine?System.lonlatQ:(tt.geometry && tt.geometry.getBounds()?tt.geometry.getBounds().getCenterLonLat():System.lonlat))),
 	    null,
 	    xml.responseText,
 	    null,
@@ -1236,6 +1235,7 @@ var react=Array(
         );
         map.addPopup(System.popup);
 	System.layerFeatures[layer+"_"+vs[vs.length-1]]=tt;
+	}catch(e){alert(e);}
 #else
 	\$('#info').html(xml.responseText);
 #end if
@@ -1323,10 +1323,13 @@ function printlTemplate(vs,tt,layer,feature){
     if(!System.lTemplates0[layer])
 	System.lTemplates0[layer]=System.lTemplates[layer];
     var res1=System.lTemplates[layer];
+    var tmp="";
     for(j in feature.data){
 	if(j!="msGeometry"){
-	    var reg=new RegExp("[="+j+"]","g");
-	    res1=res1.replace(reg,feature.data[j]);
+	    var reg=new RegExp("\\[=&quot;"+j+"&quot;\\]","g");	
+            res1=res1.replace(reg,feature.data[j]);
+            var reg=new RegExp("\\[="+j+"\\]","g");
+            res1=res1.replace(reg,feature.data[j]);
 	}
     }
     var xml={responseText: res1};
@@ -1346,7 +1349,7 @@ function tryRun(vs,tt,layerName,feature,index){
 	    System.geoIsLine=true;
 	}
 	System.onPrintlTemplate=react[index];
-	if(!System.lTemplates0[layer])
+	if(!System.lTemplates0[layerName])
 	    fetchlTemplate(vs,tt,layerName,feature);
 	else
 	    printlTemplate(vs,tt,layerName,feature);
