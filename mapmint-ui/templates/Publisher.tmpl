@@ -533,7 +533,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/uoms.tmpl",searchList={"conf": 
 	    <td>
 	      
 	      <select id="mmNav" multiple class="select-window control-select">
-		<option value="-1" #if len(mmNav)==0#selected="true"#end if#>None</option>
+		<option value="-1" #if len(mmNav)==0 or $mmNav.count("-1")#selected="true"#end if#>None</option>
 #set tn=$conf["navbar"]["name"].split(',')
 #set tv=$conf["navbar"]["id"].split(',')
 #for i in range(0,len(tv))
@@ -551,7 +551,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/uoms.tmpl",searchList={"conf": 
 	<tbody>
 	  <tr>
 	    <td><select id="mmOT" multiple class="select-window control-select">
-	      <option value="-1" #if len(mmOT)==0#selected="true"#end if#>$zoo._("None")</option>
+	      <option value="-1" #if len(mmOT)==0 or $mmOT.count("-1")#selected="true"#end if#>$zoo._("None")</option>
 #set otids=$conf["othertools"]["ids"].split(',')
 #set otnames=$conf["othertools"]["names"].split(',')
 #for i in range(0,len(otids))
@@ -581,7 +581,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/uoms.tmpl",searchList={"conf": 
 	  <td><select multiple class="select-window control-select" id="mmVT">
 #set items=$conf["mm"][$toolbars[$i].lower()+"Toolbar"].split(',')
 #set items_alias=$conf["mm"][$toolbars[$i].lower()+"ToolbarAlias"].split(',')
-	    <option value="-1">None</option>
+	    <option value="-1" #if len(mmVT)==0 or $mmVT.count("-1")#selected="true"#end if#>None</option>
 #for j in range(0,len($items))
 	    <option value="$items[$j]" #if $mmVT.count($items[$j])>0#selected="true"#end if#>$items_alias[$j]</option>
 #end for

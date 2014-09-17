@@ -35,6 +35,13 @@ try:
 except:
 	from manage_users import manage_users
 
+def setDefaultExtent(conf,inputs,outputs):
+	conf["senv"]["default_extent"]=inputs["bbox"]["value"]
+	import mmsession
+	mmsession.save(conf)
+	outputs["Result"]["value"]=zoo._("Default extent set.")
+	return zoo.SERVICE_SUCCEEDED
+
 def parseDb(db):
 	dbstr=""
 	for i in db:

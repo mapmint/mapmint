@@ -71,45 +71,60 @@ function saveLabelJS(conf,inputs,outputs){
 	var myExecuteResult0=myProcess0.Execute(inputs,myOutputs0,"Cookie: MMID="+conf["senv"]["MMID"]);
 	alert(myExecuteResult0);
 	if(myExecuteResult0=="True"){
-	    url=conf["main"]["mapserverAddress"]+"?map="+conf["main"]["dataPath"]+"/maps/search_"+conf["senv"]["last_map"]+"_"+inputs["layer"]["value"]+".map&request=GetFeature&service=WFS&version=1.0.0&typename="+inputs["layer"]["value"];
-	    var inputs1= {"InputPolygon": { "type": "reference", "value": url, "mimeType": "text/xml"}};
-	    var myOutputs1= {"Result": { type: 'ResponseDocument', "mimeType": "text/xml", "asReference": true }};
-	    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.PointOnSurface');
-	    var myExecuteResult1=myProcess1.Execute(inputs1,myOutputs1,"Cookie: MMID="+conf["senv"]["MMID"]);
-	    var w=new ZOO.Format.WPS();
-	    try{
-		tmp=w.read(myExecuteResult1);
-		for(i in tmp)
-		    alert(i,tmp[i]);
-		alert("Reference: ",tmp.value);
-		var mapfile=tmp.value.split('&');
-		mapfile=mapfile[0].split("=");
-		var inputs2=inputs;
-		var omap=inputs["map"]["value"];
-		inputs2["map"]["value"]=mapfile[1];
-		var lname=inputs["layer"]["value"];
-		inputs2["layer"]["value"]="Result";
-		inputs2["fullPath"]={"type": "boolean","value": "true"};
-		alert(mapfile[1]);
+	    var hasFill=false;
+	    for(i in inputs)
+		if(i=="mmFill"){
+		    hasFill=true;
+		    break;
+		}
+	    if(hasFill){
+		url=conf["main"]["mapserverAddress"]+"?map="+conf["main"]["dataPath"]+"/maps/search_"+conf["senv"]["last_map"]+"_"+inputs["layer"]["value"]+".map&request=GetFeature&service=WFS&version=1.0.0&typename="+inputs["layer"]["value"];
+		var inputs1= {"InputPolygon": { "type": "reference", "value": url, "mimeType": "text/xml"}};
+		var myOutputs1= {"Result": { type: 'ResponseDocument', "mimeType": "text/xml", "asReference": true }};
+		var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.PointOnSurface');
+		var myExecuteResult1=myProcess1.Execute(inputs1,myOutputs1,"Cookie: MMID="+conf["senv"]["MMID"]);
+		var w=new ZOO.Format.WPS();
+		try{
+		    tmp=w.read(myExecuteResult1);
+		    for(i in tmp)
+			alert(i,tmp[i]);
+		    alert("Reference: ",tmp.value);
+		    var mapfile=tmp.value.split('&');
+		    mapfile=mapfile[0].split("=");
+		    var inputs2=inputs;
+		    var omap=inputs["map"]["value"];
+		    inputs2["map"]["value"]=mapfile[1];
+		    var lname=inputs["layer"]["value"];
+		    inputs2["layer"]["value"]="Result";
+		    inputs2["fullPath"]={"type": "boolean","value": "true"};
+		    alert(mapfile[1]);
+		    var myOutputs2= {"Result": { type: 'RawDataOutput'}};
+		    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.saveLabel');
+		    var myExecuteResult2=myProcess2.Execute(inputs2,myOutputs2,"Cookie: MMID="+conf["senv"]["MMID"]);
+		    alert(myExecuteResult2);
+		    inputs2["omap"]={"type": "string","value": omap};
+		    inputs2["layer"]["value"]=lname;
+		    var myOutputs2= {"Result": { type: 'RawDataOutput'}};
+		    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.addLabelLayer');
+		    var myExecuteResult2=myProcess2.Execute(inputs2,myOutputs2,"Cookie: MMID="+conf["senv"]["MMID"]);
+		    alert(myExecuteResult2);
+		    
+		    return {result: ZOO.SERVICE_SUCCEEDED, outputs: [{name:"Result","dataType": "string",value: myExecuteResult2}]}
+		}catch(e){
+		    alert(e);
+		    return {result: ZOO.SERVICE_FAILED, conf: conf};
+		}
+            }else{
 		var myOutputs2= {"Result": { type: 'RawDataOutput'}};
-		var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.saveLabel');
-		var myExecuteResult2=myProcess2.Execute(inputs2,myOutputs2,"Cookie: MMID="+conf["senv"]["MMID"]);
+		var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.removeLabelLayer');
+		var myExecuteResult2=myProcess2.Execute(inputs,myOutputs2,"Cookie: MMID="+conf["senv"]["MMID"]);
 		alert(myExecuteResult2);
-		inputs2["omap"]={"type": "string","value": omap};
-		inputs2["layer"]["value"]=lname;
-		var myOutputs2= {"Result": { type: 'RawDataOutput'}};
-		var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.addLabelLayer');
-		var myExecuteResult2=myProcess2.Execute(inputs2,myOutputs2,"Cookie: MMID="+conf["senv"]["MMID"]);
-		alert(myExecuteResult2);
-		
 		return {result: ZOO.SERVICE_SUCCEEDED, outputs: [{name:"Result","dataType": "string",value: myExecuteResult2}]}
-	    }catch(e){
-		alert(e);
-	    }
+            }
 	}else{
 	    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.saveLabel');
 	    var myOutputs1= {"Result": { type: 'RawDataOutput', "dataType": "string" }};
-	    var myExecuteResult1=myProcess1.Execute(inputs1,myOutputs1,"Cookie: MMID="+conf["senv"]["MMID"]);
+	    var myExecuteResult1=myProcess1.Execute(inputs,myOutputs1,"Cookie: MMID="+conf["senv"]["MMID"]);
 	    return {result: ZOO.SERVICE_SUCCEEDED, outputs: [{name:"Result","dataType": "string",value: myExecuteResult1}]}
 	    
 	}

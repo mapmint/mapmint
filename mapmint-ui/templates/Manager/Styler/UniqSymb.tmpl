@@ -48,12 +48,13 @@ toRunAfter=Array();
 </td>
 </tr>
 
-<tr>
-<td valign="top">$zoo._("Expression settings")<input id="$(prefix1)cExpressionC" type="checkbox" onclick="if(!this.checked)\$(this).parent().next().hide();else \$(this).parent().next().show();" /> </td>
-<td style="display:none">
-<textarea id="$(prefix1)cExpression">$m.getLayerByName($inputs["layer"]["value"]).getClass($mmClass).getExpressionString()</textarea>
-</td>
-</tr>
+#set sp=$searchList
+#set $sp[len($sp)-1]["prefix1"]=$prefix1
+#set $sp[len($sp)-1]["mmClass"]=$mmClass
+#set $sp[len($sp)-1]["type"]="std"
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/Manager/Styler/ExprSettings.tmpl",searchList=$searchList))
+
 
 #if $inputs.has_key('prefix') and $inputs["prefix"]["value"]=="indexes"
 <tr>

@@ -664,7 +664,7 @@ System.postMap[System.postMap.length]={
 		var tmpName0="$(l.name.replace("_mmlabel",""))";
        		if(evt.property === "visibility" && evt.layer.visibility) {
 		    for(var j=0;j<layersList.length;j++){
-			if(layersList[j].local_id==tmpName0+"_mmlabel"){
+			if(layersList[j].local_id==evt.layer.name+"_mmlabel"){
 			    layersList[j].setVisibility(true);
 			    return;
 			}
@@ -672,7 +672,7 @@ System.postMap[System.postMap.length]={
        		}else{
 		    if(evt.property === "visibility" && !evt.layer.visibility) {
 			for(var j=0;j<layersList.length;j++){
-			    if(layersList[j].local_id==tmpName0+"_mmlabel"){
+			    if(layersList[j].local_id==evt.layer.name+"_mmlabel"){
 				layersList[j].setVisibility(false);
 				return;
 			    }

@@ -7,9 +7,6 @@
  statusSupported = true
  serviceProvider = service
  serviceType = Python
- <MetaData>
-   title = Demo
- </MetaData>
  <DataInputs>
   [InputPolygon]
    Title = Polygon to be buffered
