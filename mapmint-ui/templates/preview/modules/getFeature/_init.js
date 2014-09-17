@@ -1,3 +1,4 @@
+#encoding UTF-8
 	gfiControl = new OpenLayers.Control();
 	OpenLayers.Util.extend(gfiControl, {
 	  draw: function () {
@@ -70,7 +71,7 @@
 			      autozoom: false,
 			      dataType: 'xml',
 			      colModel: colModel,
-			      usepager: false,
+			    usepager: true,
 			      ltoolbar: true,
 			      id: localI,
 			      fields: fields,
@@ -82,7 +83,7 @@
 #set vt=$m.web.metadata.get("mmVT").split(',')
 #set nb=len($vt)+1
 #set cnt=1
-			      mmVectorOps: (vtLayers[queryLayersList[this.localI].real_name]?[
+			      mmVectorOps: (vtLayers[queryLayersList[localI].real_name]?[
 #if $vt.count("buffer")>0
 			      		   {"process": "BufferPy","class":"buffer","lib":"Buffer","hasText":true,"unit": "#if $m.web.metadata.get('tuom')=="metric"#m#else##if $m.web.metadata.get('tuom')=="geographic"#°#else#foot#end if##end if#"}#if $cnt <$nb#,#end if#
 #set cnt=$cnt+1

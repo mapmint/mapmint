@@ -93,6 +93,12 @@
     #if $inputs["layer"]["value"].count("grid_")==0
     <div id="divgradSymb" class="box">
       <table class="classif">
+#set sp=$searchList
+#set $sp[len($sp)-1]["prefix1"]="gs"
+#set $sp[len($sp)-1]["mmClass"]=$mmClass
+#set $sp[len($sp)-1]["type"]="spe"
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/Manager/Styler/ExprSettings.tmpl",searchList=$searchList))
 	<tr>
 	  <td>$zoo._("Min / Max color:")</td>
 	  <td colspan="3">
@@ -157,6 +163,12 @@
     
     <div id="divcontCol" class="box">
       <table class="classif">
+#set sp=$searchList
+#set $sp[len($sp)-1]["prefix1"]="c"
+#set $sp[len($sp)-1]["mmClass"]=$mmClass
+#set $sp[len($sp)-1]["type"]="spe"
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/Manager/Styler/ExprSettings.tmpl",searchList=$searchList))
 	<tr>
 	  <td>$zoo._("Classification:")</td>
 	  <td>
@@ -167,21 +179,10 @@
 	  </td>
 	</tr>
 	<tr>
-	  <td>$zoo._("Min value:")</td>
+	  <td>$zoo._("Min / Max color:")</td>
 	  <td>
 	    <input id="cc-min-colorpicker" type="text" name="min-colorpicker" value="#if $colors[3] is not None#$colors[0]#else#$colors[3]#end if#" />
-	  </td>
-	</tr>
-	<tr>
-	  <td>$zoo._("Max value:")</td>
-	  <td>
 	    <input id="cc-max-colorpicker" type="text" name="max-colorpicker" value="#if $colors[4] is not None#$colors[1]#else#$colors[4]#end if#" />
-	  </td>
-	</tr>
-	<tr>
-	  <td>$zoo._("Width:")</td>
-	  <td>
-	    <input id="ccWidth" type="text" name="" value="1" class="input-window-short"/>
 	  </td>
 	</tr>
 	<tr>
@@ -208,6 +209,12 @@
 	    <input id="us-max-colorpicker" type="text" name="us-max-colorpicker" value="#if $colors[4] is not None#$colors[4]#else#$colors[1]#end if#" />
 	  </td>
 	</tr>
+#set sp=$searchList
+#set $sp[len($sp)-1]["prefix1"]="us"
+#set $sp[len($sp)-1]["mmClass"]=$mmClass
+#set $sp[len($sp)-1]["type"]="spe"
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/Manager/Styler/ExprSettings.tmpl",searchList=$searchList))
 	<tr>
 	  <td>$zoo._("Classification:")  <input class="hasInfo" title="$zoo._("Use the field to define size of the symbol.")" id="uniqValSize" type="checkbox" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get('mmFAS') is not None and $m.getLayerByName($inputs["layer"]["value"]).metadata.get('mmFAS')=="true"#checked="true"#end if# onclick="if(\$(this).is(':checked')){\$('#uniqValFormula').val(\$('#usField').val());\$('#uniqValFormula').show();}else \$('#uniqValFormula').hide();" /></td>
 	  <td>
@@ -272,169 +279,6 @@
 #from Cheetah.Template import Template
 $(Template(file=$conf["main"]["templatesPath"]+"/Manager/Label.tmpl",searchList=$searchList))
 
-#*
-  <div id="second">
-    #try
-    #set l1=$m.getLayerByName($inputs["layer"]["value"])
-    #set label=$l1.getClass(0).getLabel(0)
-    #set litem=$l1.labelitem 
-    #except
-    #set m1=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$conf["senv"]["last_map"]+".map")
-    #set l1=$m1.getLayerByName($inputs["layer"]["value"]+"_mmlabel")
-    #try
-    #set label=$l1.getClass(0).getLabel(0)
-    #set litem=$l1.labelitem 
-    #except
-    #set label=None
-    #set litem=None
-    #end try
-    #end try
-    
-    <input type="checkbox" id="displayLabel" onclick="\$('#Styler_Labels').css('display',(this.checked?'block':'none'))" #if $label is not None and $label.size > 0#checked="true"#end if#/>
-    <label>$zoo._("Show labels")</label>
-    
-    #set l=$label
-    
-    <div id="Styler_Labels" #if $l is None or $l.size < 0#style="display:none"#end if#>
-	 <table>
-	   #if $inputs["layer"]["value"].count("grid_")==0
-	   <tr>
-	     <td>$zoo._("Labeling field:")</td>
-	     <td>
-	       <input id="labelFieldH" type="hidden" value="$litem" />
-	       <select id="labelField" class="select-window">
-		 <option value="sdfs" selected="selected">$zoo._("Select field")</option>
-	       </select>
-	     </td>
-	   </tr>
-#end if
-	   <tr>
-	     <td>$zoo._("Orientation:")</td>
-	     <td>
-	       #if $l1
-	       #set labftmp=$l1.metadata.get("label_angle_field")
-	       #else
-	       #set $labftmp=None
-	       #end if
-	       #if $labftmp is None
-	       #set labftmp=""
-	       #end if	       
-	       <input id="labelAngle" type="text" name="" value="#if $l is not None and $l.angle#$l.angle#else#0#end if#" class="input-window-short hasInfo" title="$zoo._("Angle, given in degrees, to draw the label. Using value '0' for a LINE layers will imply the computation of a curved label for appropriate linear features.")" #if $labftmp is not None and $labftmp.count("[")>0#style="display:none"#end if# />
-    <input id="labelAngleFieldH" type="hidden" value="$labftmp.replace("[","").replace("]","")" />
-    <select id="labelAngleField" class="select-window" #if $labftmp is None or $labftmp.count("[")==0#style="display:none"#end if#>
-      <option value="sdfs" selected="selected">$zoo._("Select field")</option>
-    </select>
-    <input type="checkbox" id="lauf" class="hasInfo" title="$zoo._("Specify the item name in the attribute table to use for angle values")" onclick="if(\$(this).is(':checked')){\$('#labelAngle').hide();\$('#labelAngleField').show();}else{\$('#labelAngleField').hide();\$('#labelAngle').show();}" #if $labftmp is not None and $labftmp.count("[")!=0# checked="true"#end if# />
-</td>
-</tr>
-<tr>
-	<td>
-	  $zoo._("Clean size")
-	</td>
-	<td>
-	  <input id="labelBufferF" type="text" name="" value="#if $l is not None and $l.buffer#$l.buffer#else#0#end if#" class="input-window-short hasInfo" title="$zoo._("Padding, in pixels, around labels. Useful for maintaining spacing around text to enhance readability.")"/>
-	</td>
-      </tr>
-    </table>
-
-    <table>
-      <tr>
-	<td>$zoo._("Font:")</td>
-	<td> 
-	  <table>
-	    <tr>
-	      <td>
-		<select id="font" class="select-window">
-#set font_famillies=['Arial','Georgia','Osaka','Tahoma','Trebuchet','Verdana']
-#for a in $font_famillies
-		  <option style="font-family:$a;font-size:1.1em;" value="$a" onclick="\$('#demo_string').css('font-family', this.value);" #if $l is not None and $l.font==$a#selected="true"#end if#>$a</option>
-#end for
-		</select>
-	      </td>
-	      <td>
-		<select id="fonts" class="select-window">
-#set font_sizes=range(6,18)
-#for a in font_sizes
-		  <option style="font-size:${a}px;" value="${a}" onclick="\$('#demo_string').css('font-size',this.value);" #if $l is not None and $l.size==$a# selected="true"#end if#>${a}px</option>
-#end for
-		</select>
-	      </td>
-	      <td>
-#if $l is not None
-#set col='#%02x%02x%02x' % (l.color.red,l.color.green,l.color.blue)
-#else
-#set col='#ffffff'
-#end if
-		<span class="fcolor2">Font-color <input id="font-colorpicker" type="text" name="font-colorpicker" value="$(col)" /></span>
-	      </td>
-	    </tr>
-	  </table>
-
-	</td>
-      </tr>
-    </table>
-
-
-
-    <table>
-      <tr>
-	<td>$zoo._("Buffered label:")</td>
-	<td><input type="checkbox" name="bufferLabel" id="bufferLabel" onchange="if(this.checked)\$('#bufferLabelOption').show();else \$('#bufferLabelOption').hide()" #if $l is not None and l.outlinewidth > 0# checked="true"#end if#/></td>
-      </tr>
-    </table>
-
-    <table id="bufferLabelOption" #if $l is None or l.outlinewidth == 0#style="display: none;"#end if# >
-      <tr>
-	<td>$zoo._("Size:") <input id="mmLabelBufferSize" value="#if $l is not None and $l.outlinewidth#$l.outlinewidth#else#0#end if#" /></td>
-#if $l is not None
-#set ocol='%02x%02x%02x' % (l.outlinecolor.red,l.outlinecolor.green,l.outlinecolor.blue)
-#else
-#set ocol='-1-1-1'
-#end if
-#if ocol!="-1-1-1"
-#set ocol="#"+$ocol
-#else
-#set ocol="#ffffff"
-#end if
-	<td><span class="fcolor2">$zoo._("Buffer color:")<input id="buffer-font-colorpicker" type="text" name="font-colorpicker" value="$(ocol)" /></span></td>
-      </tr>
-    </table>
-
-#if $inputs["layer"]["value"].count("grid_")==0
-    <table>
-      <tr>
-	<td>$zoo._("Position:")</td>
-	<td></td>
-      </tr>
-    </table>
-#set values=['ul','uc','ur','cl','cc','cr','ll','lc','lr']
-#from mapscript import *
-#set msValues=[MS_UL,MS_UC,MS_UR,MS_CL,MS_CC,MS_CR,MS_LL,MS_LC,MS_LR]
-
-#set positions_x=[$zoo._('Left'),$zoo._('Center'),$zoo._('Right')]
-#set positions_y=[$zoo._('Top'),'',$zoo._('Bottom')]
-
-    <table>
-#set id=0
-#for a in $positions_y
-      <tr>
-#for b in $positions_x
-	<td><input value="$values[$id]" name="position_label" type="radio"  #if $l is not None and $l.position==$msValues[$id]#checked="true"#end if#/><label>$a $b</label></td>
-#set id=$id+1
-#end for
-      </tr>
-#end for
-    </table>
-#end if
-
-  </div>
-
-  <ul class="style-tabs-nav1">
-    <li><a class="ui-state-default ui-button-text-only ui-corner-all" onclick="saveLayerLabel()" href="#first">$zoo._("Apply")</a></li>
-  </ul>
-
-</div>
-*#
 
 </div>
 

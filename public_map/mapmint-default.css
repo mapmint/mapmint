@@ -1038,12 +1038,12 @@ top:4px;
 left:7px;
 width:98%;}
 
-.pDiv2{display:none;}
+.pDiv2{display:block;}
 
 .flexigrid div.mDiv div.zoomToSetExtent {
 	position: absolute;
 	top: 4px;
-	right: 4px;
+	right: 24px;
 	padding: 0px;
 	height: 16px;
 	width: 16px;

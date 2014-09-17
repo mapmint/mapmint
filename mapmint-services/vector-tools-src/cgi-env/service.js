@@ -92,12 +92,13 @@ function SpatialQuery(conf,inputs,outputs){
   var bufferResultAsJSON=BufferWOParse(inputData,inputs["BufferDistance"]["value"]);
 
   // Create the Buffer result BBOX 
-  var myProcess3 = new ZOO.Process(conf["main"]["serverAddress"],'EnvelopePy');
+  var myProcess3 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.EnvelopePy');
   var myInputs3 = {InputPolygon: { type: 'complex',  value: bufferResultAsJSON, mimeType: "application/json"}};
   var myOutputs3= {Result: { type: 'RawDataOutput', "mimeType": "application/json" } };
   var myExecuteResult3=myProcess3.Execute(myInputs3,myOutputs3);
 
   var data=myExecuteResult3;
+    alert(data);
   data = data.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, "");
   data = new XML(data);
 

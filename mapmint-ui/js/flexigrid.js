@@ -571,7 +571,7 @@
 
 	      }else{
 
-		fRead=new OpenLayers.Format.GML({
+		fRead=new OpenLayers.Format.GML.Base({
 		    featurePrefix: (p.pparams?'ogr':'ms'),
 		    geometryName: (p.pparams?'ogr':'ms')+'Geometry',
 		      'internalProjection': map.getProjectionObject(),
@@ -605,12 +605,17 @@
 		    if(p.autozoom){
 		      map.zoomToExtent(finalLayers[tmpId+1].getDataExtent());
 		    }else{
-		      finalLayers[tmpId+2].setVisibility(true);					
+		      finalLayers[tmpId+2].setVisibility(true);
 		      if($(this).is(".trSelected")){
-			finalLayers[tmpId+2].getFeatureByFid(System.references["layer_"+p.id][this.local_id].fid).destroy();
+			  if(System.references["layer_"+p.id][this.local_id].fid!=null)
+			      finalLayers[tmpId+2].getFeatureByFid(System.references["layer_"+p.id][this.local_id].fid).destroy();
+			  else
+			      for(i in System.references["layer_"+p.id][this.local_id]["attributes"])
+				  if(i.indexOf("id")!=-1)
+				      alert(i+" "+System.references["layer_"+p.id][this.local_id]["attributes"][i]);
 		      }else{
-			finalLayers[tmpId+2].addFeatures([System.references["layer_"+p.id][this.local_id].clone()]);
-			finalLayers[tmpId+2].features[finalLayers[tmpId+2].features.length-1].fid=System.references["layer_"+p.id][this.local_id].fid;
+			  finalLayers[tmpId+2].addFeatures([System.references["layer_"+p.id][this.local_id].clone()]);
+			  finalLayers[tmpId+2].features[finalLayers[tmpId+2].features.length-1].fid=System.references["layer_"+p.id][this.local_id].fid;
 		      }
 
 		    }
@@ -1505,7 +1510,8 @@
 	$(g.bDiv).after(g.pDiv);
 	
 	var html1 = "";
-	if(p.mmVectorOps){
+	  
+	if(p.mmVectorOps!=null){
 	  html1+='<div class="pGroup"> <div class="toolbar-noborder">';
 	  for(i=0;i<p.mmVectorOps.length;i++){
 	    try{
@@ -1528,7 +1534,7 @@
 	}
 
 	html1+='<div class="btnseparator"></div> <div class="pGroup"><span class="pPageStat"></span></div>';
-	$('div',g.pDiv).html(html1);				
+	$('div',g.pDiv).html(html1);
       }
 
 

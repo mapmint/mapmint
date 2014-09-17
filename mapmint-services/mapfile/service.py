@@ -622,7 +622,7 @@ def getGroupList(conf,mapfile):
         groups=m.web.metadata.get("mm_group_"+str(i))
         print >> sys.stderr,"mm_group_"+str(i)+" = "+groups
         if groups is None:
-            break
+            continue
         if i==0:
             #print >> sys.stderr,groups
             resGroups[groups]=[]
@@ -1201,6 +1201,8 @@ def saveLayerStyle(conf,inputs,outputs):
 	    layer.getClass(nClass).name=inputs["mmClassName"]["value"]
     if inputs.has_key("mmExpr"):
 	    layer.getClass(nClass).setExpression(inputs["mmExpr"]["value"])
+	    print >> sys.stderr,layer.getClass(nClass).getExpressionString()
+
 
     print >> sys.stderr,"Edit the "+str(nClass)+" classe "+str(not(noColor))
     if not(noColor):
@@ -1226,7 +1228,8 @@ def saveLayerStyle(conf,inputs,outputs):
             if j!=0:
                 layer.removeClass(j)
             else:
-		layer.getClass(j).setExpression(None)
+                if inputs.keys().count("mmExpr")==0:
+			layer.getClass(j).setExpression(None)
 		if inputs.keys().count('noFill'):
                         layer.getClass(j).getStyle(mmStyle).color.setRGB(-1,-1,-1)
 		else:
@@ -1511,8 +1514,10 @@ def classifyMap(conf,inputs,outputs):
 		con.conn.commit()
 	con.conn.commit()
 
-
-    lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layerName+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
+    cond=""
+    if inputs.keys().count("mmMExpr")>0:
+	    cond=" WHERE "+inputs["mmMExpr"]["value"].replace("\"[","").replace("]\"","")
+    lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layerName+" "+cond+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
 
     rClass=False
     if layer.metadata.get("mmMethod"):
@@ -1695,32 +1700,38 @@ def classifyMap(conf,inputs,outputs):
 				
 				pass
 
+		precond=""
+		if inputs.keys().count("mmMExpr") > 0:
+			precond=" AND "+inputs["mmMExpr"]["value"]+" "
+			layer.metadata.set("mmMExpr",inputs["mmMExpr"]["value"])
+		else:
+			layer.metadata.remove("mmMExpr")
 		if inputs.keys().count("nbClasses")>0:
 			if rClass:
 				if i==0:
-					tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) )')
+					tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) '+precond+' )')
 				else:
-					tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] > '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) )')
+					tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] > '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) '+precond+' )')
 			elif i==0:
-				tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(minVal+(colspan*i))+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(minVal+(colspan*(i+1)))+' ) )')
+				tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(minVal+(colspan*i))+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(minVal+(colspan*(i+1)))+' ) '+precond+' )')
 			else:
-				tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] > '+str(minVal+(colspan*i))+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(minVal+(colspan*(i+1)))+' ) )')
+				tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] > '+str(minVal+(colspan*i))+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(minVal+(colspan*(i+1)))+' ) '+precond+' )')
                 
 		else:
 			for j in tmp[i]:
 				try:
 					if j=="pixel":
-						tmpClass.setExpression('( ['+j+'] = '+str(tmp[i][j])+' )')
+						tmpClass.setExpression('( ['+j+'] = '+str(tmp[i][j])+' '+precond+' )')
 					else:
 						try:
-							tmpClass.setExpression('( ['+j+'] = '+str(int(tmp[i][j]))+' )')
+							tmpClass.setExpression('( ['+j+'] = '+str(int(tmp[i][j]))+' '+precond+' )')
 						except:
-							tmpClass.setExpression('( "['+j+']" = '+json.dumps(tmp[i][j])+' )')
+							tmpClass.setExpression('( "['+j+']" = '+json.dumps(tmp[i][j])+' '+precond+' )')
 				except Exception,e:
 					print >> sys.stderr,e
 					iEnc=layer.encoding
 					oEnc=m.web.metadata.get("ows_encoding")
-					tmpClass.setExpression('( "['+j+']" = "'+tmp[i][j].decode(oEnc).encode(iEnc)+'" )')
+					tmpClass.setExpression('( "['+j+']" = "'+tmp[i][j].decode(oEnc).encode(iEnc)+'" '+precond+' )')
 				print >> sys.stderr,tmpClass.getExpressionString()
 				if inputs.has_key("mmFAS") and inputs["mmFAS"]["value"]=="true":
 					try:
@@ -1921,6 +1932,19 @@ def isPolygon(conf,inputs,outputs):
     m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
     l=m.getLayerByName(inputs["layer"]["value"])
     outputs["Result"]["value"]=str(l.type==mapscript.MS_LAYER_POLYGON)
+    return zoo.SERVICE_SUCCEEDED
+
+def removeLabelLayer(conf,inputs,outputs):
+    import mapscript
+    m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
+    i=m.numlayers-1
+    while i >= 0:
+        l0=m.getLayer(i)
+        if l0.name==inputs["layer"]["value"]+"_mmlabel":
+            m.removeLayer(i)
+        i-=1
+    m.save(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
+    outputs["Result"]["value"]=zoo._("Map saved")
     return zoo.SERVICE_SUCCEEDED
 
 def addLabelLayer(conf,inputs,outputs):
@@ -2616,7 +2640,7 @@ def savePublishMap(conf,inputs,outputs):
                 pass
         if len(lminScales)>l and lminScales[l]!="":
             m.getLayer(l).labelminscaledenom=int(lminScales[l])
-            m.getLayer(l).metadata.set('mmLabelMinScale',minScales[l])
+            m.getLayer(l).metadata.set('mmLabelMinScale',lminScales[l])
         else:
             try:
                 m.getLayer(l).labelminscaledenom=-1
@@ -2625,7 +2649,7 @@ def savePublishMap(conf,inputs,outputs):
                 pass
         if len(lmaxScales)>l and lmaxScales[l]!="":
             m.getLayer(l).labelmaxscaledenom=int(lmaxScales[l])
-            m.getLayer(l).metadata.set('mmLabelMaxScale',maxScales[l])
+            m.getLayer(l).metadata.set('mmLabelMaxScale',lmaxScales[l])
         else:
             try:
                 m.getLayer(l).labelmaxscaledenom=-1

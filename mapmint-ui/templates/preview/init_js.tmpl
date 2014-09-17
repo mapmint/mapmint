@@ -738,7 +738,7 @@ function singleGeom() {
     var started=true;
     var dep=finalLayers[tmpId+3];
     
-    var url = '/cgi-bin/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&';
+    var url = zooUrl+'?request=Execute&service=WPS&version=1.0.0&';
     if (aProcess == 'BufferPy' || aProcess == 'BufferMask' || aProcess == 'SpatialQuery') {
 	var dist = document.getElementById(arguments[0]+'_buffer-value')?document.getElementById(arguments[0]+'_buffer-value').value:'1';
 	if (isNaN(dist))

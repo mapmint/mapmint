@@ -136,15 +136,27 @@ MapMint: Dashboard
       </div>
 
       <h1 class="pane-title-sub">$zoo._("Server statistics")</h1>
+#try
 #import socket
 #set s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 #set res=$s.connect(("gmail.com",80))
       <div class="toolbar"><p class="ip">$zoo._("Server IP is") $(s.getsockname()[0])</p></div>
 #set res=$s.close()
+#except
+      <div class="toolbar"><p class="ip">$zoo._("Server IP is") $zoo._("Unknown")</p></div>
+#end try
       <div>
 	<div>$(zoo._("%s version: %s")%("ZOO-Project",$zoo.VERSION))</div>
+#try
 	<div>$(zoo._("%s version: %s")%("MapServer",$mapscript.MS_VERSION))</div>
+#except
+	<div>$(zoo._("%s version: %s")%("MapServer",$zoo._("unknown")))</div>
+#end try
+#try
 	<div>$(zoo._("%s version: %s")%("GDAL",$osgeo.gdal.__version__))</div>
+#except
+	<div>$(zoo._("%s version: %s")%("GDAL",$zoo._("unknown")))</div>
+#end try
       </div>
 
       <div id="slocal_stats" class="rDiv">

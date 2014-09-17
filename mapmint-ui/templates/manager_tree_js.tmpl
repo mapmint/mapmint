@@ -256,7 +256,7 @@ function startMapList(){
     }
     \$('#tt2').tree({
 	isAlreadyLoaded: false,
-	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.getLayersList&DataInputs=name="+\$mj("mapName").value+"&RawDataOutput=Result@mimeType=application/json",
+	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.getLayersList&DataInputs=name="+\$("#mapName").val()+"&RawDataOutput=Result@mimeType=application/json",
 	method: "GET",
 	onlyLeafCheck: true,
 	checkbox: true,
@@ -376,6 +376,7 @@ function startMapList(){
 						stdSize=new OpenLayers.Size(256,256);
 						if(tmpName0!="")
 						    stdSize=new OpenLayers.Size(768,768);
+						    //alert(System.layerTypes[\$(this).text()]);
 						tmpLayer = new OpenLayers.Layer.WMS(
 						    \$(this).text(),
 						    "$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/"+(isStep?"timeline_"+\$("#mapName")[0].value+"_step0.map":(System.layerTypes[\$(this).text()]==4?"color_ramp_"+\$("#mapName")[0].value+"_"+\$(this).text()+".map":"project_"+\$("#mapName")[0].value+".map")),
@@ -393,7 +394,7 @@ function startMapList(){
 							    map.events.register('changelayer', null, function(evt){
        								if(evt.property === "visibility" && evt.layer.visibility) {
 								    for(var j=0;j<layersList.length;j++){
-									if(layersList[j].local_id==tmpName0+"_mmlabel"){
+									if(layersList[j].local_id==evt.layer.name+"_mmlabel"){
 									    layersList[j].setVisibility(true);
 									    return;
 									}
@@ -401,7 +402,7 @@ function startMapList(){
        								}else{
 								    if(evt.property === "visibility" && !evt.layer.visibility) {
 									for(var j=0;j<layersList.length;j++){
-									    if(layersList[j].local_id==tmpName0+"_mmlabel"){
+									    if(layersList[j].local_id==evt.layer.name+"_mmlabel"){
 										layersList[j].setVisibility(false);
 										return;
 									    }
@@ -445,7 +446,7 @@ function startMapList(){
 }
 
 function storeTypes(data){
-    for(jj=0;jj<data.children.length;jj++){
+    for(var jj=0;jj<data.children.length;jj++){
 	if(data.children[jj]&&data.children[jj]["mmType"]>=0){
 	    System.layerTypes[data.children[jj]["id"]]=data.children[jj]["mmType"];
 	    if(data.children[jj]["mmType"]==3&&data.children[jj]["nclasses"]>1)
@@ -1176,7 +1177,7 @@ function storeTypes(data){
 			
 			\$('#divgradSymb, #divcontCol, #divuniqVal').hide();
 			\$('#dropdown').change(function() {
-			    alert(\$("#dropdown").val());
+			    //alert(\$("#dropdown").val());
 			    if(\$("#dropdown").val()!="timeline"){
 			    	\$('.box').hide();
 			    	\$('#div' + \$(this).val()).show();
@@ -1476,6 +1477,9 @@ function classifyMap(){
 	params=[];
 	params.push({name: "layer",value: System.mmNodeId,dataType: "string"});
 	params.push({name: "map",value: \$("#mapName").val(),dataType: "string"});
+	if(\$("#"+arguments[0]+"cExpression").val())
+	params.push({name: "mmMExpr",value: \$("#"+arguments[0]+"cExpression").val(),dataType: "string"});
+
 	params.push({name: "field",value: \$("#"+arguments[0]+"Field").val(),dataType: "string"});
 	if(arguments[0]=="rs"){
 	    params.push({name: "field",value: \$("#"+arguments[0]+"Field").val(),dataType: "string"});

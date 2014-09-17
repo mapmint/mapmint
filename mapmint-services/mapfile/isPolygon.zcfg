@@ -1,0 +1,28 @@
+[isPolygon]
+ Title = Check if a featuredataset is of type polygon.
+ Abstract = Check if a featuredataset is of type polygon.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [map]
+   Title = The map to search for the layer
+   Abstract = The map to search for the layer.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The boolean result
+   Abstract = The boolean result.
+   <LiteralData>
+   dataType = boolean
+    <Default />
+   </LiteralData>
+ </DataOutputs>

@@ -3,6 +3,8 @@
   <div id="second">
     #try
     #set l1=$m.getLayerByName($inputs["layer"]["value"])
+    <input type="hidden" value="$l1.type" id="gtype" />
+    #try
     #set label=$l1.getClass(0).getLabel(0)
     #set litem=$l1.labelitem 
     #except
@@ -14,6 +16,10 @@
     #set label=None
     #set litem=None
     #end try
+    #end try
+    #except
+    #set label=None
+    #set litem=None    
     #end try
     
     <input type="checkbox" id="displayLabel" onclick="\$('#Styler_Labels').css('display',(this.checked?'block':'none'))" #if $label is not None and $label.size > 0#checked="true"#end if#/>

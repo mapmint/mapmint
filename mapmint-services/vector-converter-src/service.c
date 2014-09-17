@@ -627,9 +627,9 @@ int main( int nArgc, char ** papszArgv )
     int          bQuiet = FALSE;
     int          bFormatExplicitelySet = FALSE;
     const char  *pszFormat = "ESRI Shapefile";
-    const char  *pszDataSource = NULL;
-    const char  *pszDestDataSource = NULL;
-    const char  *pszwebDestData = NULL;
+    char  *pszDataSource = NULL;
+    char  *pszDestDataSource = NULL;
+    char  *pszwebDestData = NULL;
     char        **papszLayers = NULL;
     char        **papszDSCO = NULL, **papszLCO = NULL;
     int         bTransform = FALSE;
@@ -777,13 +777,13 @@ int main( int nArgc, char ** papszArgv )
     tmpMap=NULL;
     tmpMap=getMapFromMaps(inputs,"sql","value");
     if(tmpMap!=NULL && strncasecmp(tmpMap->value,"NULL",4)!=0){
-      pszSQLStatement = tmpMap->value;
+      pszSQLStatement = zStrdup(tmpMap->value);
     }
 
     tmpMap=NULL;
     tmpMap=getMapFromMaps(inputs,"nln","value");
     if(tmpMap!=NULL && strncasecmp(tmpMap->value,"NULL",4)!=0){
-	  pszNewLayerName = tmpMap->value;
+      pszNewLayerName = zStrdup(tmpMap->value);
     }
 
     tmpMap=NULL;
@@ -960,7 +960,6 @@ int main( int nArgc, char ** papszArgv )
     tmpMap=getMapFromMaps(inputs,"OutputDSTN","value");
     if(tmpMap!=NULL && strncasecmp(tmpMap->value,"NULL",4)!=0){
       char *tmp0=strdup(tmpMap->value);
-      fprintf(stderr,"%s:%d => %s",__FILE__,__LINE__,tmp0);
       pszDestDataSource=strdup(tmp0);
       pszwebDestData=strdup(tmp0);
     }else{
@@ -1415,9 +1414,7 @@ int main( int nArgc, char ** papszArgv )
 /* -------------------------------------------------------------------- */
     OGRDataSource       *poDS;
     
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
     poDS = OGRSFDriverRegistrar::Open( pszDataSource, FALSE );
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
 
 /* -------------------------------------------------------------------- */
 /*      Report failure                                                  */
@@ -1460,7 +1457,6 @@ int main( int nArgc, char ** papszArgv )
     OGRSFDriver          *poDriver = NULL;
     int                  bCloseODS = TRUE;
 
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
     if( bUpdate )
     {
         /* Special case for FileGDB that doesn't like updating if the same */
@@ -1543,7 +1539,6 @@ int main( int nArgc, char ** papszArgv )
 #endif
         }
     }
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
 
 /* -------------------------------------------------------------------- */
 /*      Find the output driver.                                         */
@@ -1645,7 +1640,6 @@ int main( int nArgc, char ** papszArgv )
 #endif
         }
     }
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
 
 /* -------------------------------------------------------------------- */
 /*      Parse the output SRS definition if possible.                    */
@@ -1666,7 +1660,6 @@ int main( int nArgc, char ** papszArgv )
 #endif
         }
     }
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
 
 /* -------------------------------------------------------------------- */
 /*      Parse the source SRS definition if possible.                    */
@@ -1688,14 +1681,12 @@ int main( int nArgc, char ** papszArgv )
 #endif
         }
     }
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
 
 /* -------------------------------------------------------------------- */
 /*      Special case for -sql clause.  No source layers required.       */
 /* -------------------------------------------------------------------- */
     if( pszSQLStatement != NULL )
     {
-      fprintf(stderr,"%s: %d",__FILE__,__LINE__);
         OGRLayer *poResultSet;
 
         if( pszWHERE != NULL )
@@ -1778,7 +1769,6 @@ int main( int nArgc, char ** papszArgv )
 
     else
     {
-      fprintf(stderr,"%s: %d",__FILE__,__LINE__);
 
         int nLayerCount = 0;
         OGRLayer** papoLayers = NULL;
@@ -1788,7 +1778,6 @@ int main( int nArgc, char ** papszArgv )
 /* -------------------------------------------------------------------- */
         if ( CSLCount(papszLayers) == 0)
         {
-	  fprintf(stderr,"%s: %d",__FILE__,__LINE__);
             nLayerCount = poDS->GetLayerCount();
             papoLayers = (OGRLayer**)CPLMalloc(sizeof(OGRLayer*) * nLayerCount);
 
@@ -1987,13 +1976,11 @@ int main( int nArgc, char ** papszArgv )
         CPLFree(panLayerCountFeatures);
         CPLFree(papoLayers);
     }
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
 /* -------------------------------------------------------------------- */
 /*      Process DS style table                                          */
 /* -------------------------------------------------------------------- */
 
     poODS->SetStyleTable( poDS->GetStyleTable () );
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
     
 /* -------------------------------------------------------------------- */
 /*      Close down.                                                     */
@@ -2006,7 +1993,6 @@ int main( int nArgc, char ** papszArgv )
     OGRGeometryFactory::destroyGeometry(poSpatialFilter);
     OGRGeometryFactory::destroyGeometry(poClipSrc);
     OGRGeometryFactory::destroyGeometry(poClipDst);
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
 
     CSLDestroy(papszSelFields);
 #ifndef ZOO_SERVICE
@@ -2017,10 +2003,11 @@ int main( int nArgc, char ** papszArgv )
     CSLDestroy( papszLCO );
     CSLDestroy( papszFieldTypesToString );
     CPLFree( pszNewLayerName );
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
+    
+    free(pszDataSource);
+    free(pszDestDataSource);
 
     OGRCleanupAll();
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
 
 #ifdef DBMALLOC
     malloc_dump(1);
@@ -2028,9 +2015,7 @@ int main( int nArgc, char ** papszArgv )
     
 #ifdef ZOO_SERVICE
     setMapInMaps(outputs,"Result","value",(char*)pszwebDestData);
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
-    dumpMaps(outputs);
-    fprintf(stderr,"%s: %d",__FILE__,__LINE__);
+    free(pszwebDestData);
     return SERVICE_SUCCEEDED;
 #else
     return 0;
