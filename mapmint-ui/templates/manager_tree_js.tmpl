@@ -1477,7 +1477,7 @@ function classifyMap(){
 	params=[];
 	params.push({name: "layer",value: System.mmNodeId,dataType: "string"});
 	params.push({name: "map",value: \$("#mapName").val(),dataType: "string"});
-	if(\$("#"+arguments[0]+"cExpression").val())
+	if(\$("#"+arguments[0]+"cExpressionC").is(":checked"))
 	params.push({name: "mmMExpr",value: \$("#"+arguments[0]+"cExpression").val(),dataType: "string"});
 
 	params.push({name: "field",value: \$("#"+arguments[0]+"Field").val(),dataType: "string"});

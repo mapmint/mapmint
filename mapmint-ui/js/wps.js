@@ -37,7 +37,8 @@ function WPSGetComplexInput(obj){
 }
 
 function WPSGetOutput(obj){
-    return '<wps:ResponseForm><wps:'+(obj.form?obj.form:'RawDataOutput')+(obj.storeExecuteResponse?' storeExecuteResponse="'+obj.storeExecuteResponse+'"':"")+(obj.status?' status="'+obj.status+'"':"")+'><wps:Output '+((obj.mimeType)?'mimeType="'+obj.mimeType+'"':"")+' '+((obj.asReference)?'asReference="'+obj.asReference+'"':"")+'><ows:Identifier>'+obj.name+'</ows:Identifier></wps:Output></wps:'+(obj.form?obj.form:'RawDataOutput')+'></wps:ResponseForm>';
+    obj.form=(obj.form?obj.form:"RawDataOutput");
+    return '<wps:ResponseForm><wps:'+(obj.form?obj.form:'RawDataOutput')+(obj.storeExecuteResponse?' storeExecuteResponse="'+obj.storeExecuteResponse+'"':"")+(obj.status?' status="'+obj.status+'"':"")+((obj.form=="RawDataOutput"&&obj.mimeType)?'mimeType="'+obj.mimeType+'"':"")+'>'+(obj.form!="RawDataOutput"?'<wps:Output '+((obj.form!="RawDataOutput"&&obj.mimeType)?'mimeType="'+obj.mimeType+'"':"")+' '+((obj.asReference)?'asReference="'+obj.asReference+'"':"")+'>':'')+'<ows:Identifier>'+obj.name+'</ows:Identifier>'+(obj.form!="RawDataOutput"?'</wps:Output>':'')+'</wps:'+(obj.form?obj.form:'RawDataOutput')+'></wps:ResponseForm>';
 }
 
 function WPSParseReference(xml){

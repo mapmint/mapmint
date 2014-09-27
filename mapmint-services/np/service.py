@@ -193,7 +193,7 @@ def searchByName(conf,inputs,outputs):
             lclause+=" or "
         lclause+=" name = "+str(adapt(tmp[j]))
     suffix1=" (SELECT id FROM "+tprefix+"groups WHERE "+lclause+") "
-    suffix20="(SELECT DISTINCT i_id FROM ((select DISTINCT i_id from "+inputs["tbl"]["value"]+"_themes where t_id in (select DISTINCT t_id from themes_groups where g_id in "+suffix1+")) INTERSECT (select DISTINCT i_id from indicateurs_territoires where t_id in ( select DISTINCT t_id from territoires,territoires_groups where territoires.id=territoires_groups.t_id "+suffix10+" and g_id in "+suffix1+"))) as foo)"
+    suffix20="(SELECT DISTINCT i_id FROM ((select DISTINCT i_id from "+inputs["tbl"]["value"]+"_themes where t_id in (select DISTINCT t_id from "+tprefix+"themes_groups where g_id in "+suffix1+")) INTERSECT (select DISTINCT i_id from indicateurs_territoires where t_id in ( select DISTINCT t_id from territoires,territoires_groups where territoires.id=territoires_groups.t_id "+suffix10+" and g_id in "+suffix1+"))) as foo)"
     suffix2=" and indicateurs.id in "+suffix20+" and "
     suffix0=", "+inputs["tbl"]["value"]+"_groups "+suffix0+" "+inputs["tbl"]["value"]+"_groups.i_id="+inputs["tbl"]["value"]+".id "+suffix2+inputs["tbl"]["value"]+"_groups.g_id in "+suffix1+" and "
     req=" SELECT DISTINCT ON ("+prefix+"id) "+prefix+"id,"+prefix+"name from "+inputs["tbl"]["value"]+suffix0+" name like '%"+inputs["val"]["value"]+"%' "
@@ -1085,7 +1085,7 @@ def listThemes(cur,prefix,group='public',clause=None,clause1=None):
             if lclause!="":
                 lclause+=" OR "
             lclause+="name='"+groups[i]+"'"
-        req0+=" and id in (SELECT t_id from themes_groups where g_id in (SELECT id from "+prefix+"groups where "+lclause+" or name='public'))"
+        req0+=" and id in (SELECT t_id from "+prefix+"themes_groups where g_id in (SELECT id from "+prefix+"groups where "+lclause+" or name='public'))"
     if clause1 is not None:
         req0+=" AND "+clause1
     req0+=" order by ord"
@@ -1431,8 +1431,12 @@ def updateElement(conf,inputs,outputs):
             cnt+=1
         else:
             for j in range(0,len(obj[i])):
+		if inputs["table"]["value"]=="themes":
+			ntname=prefix+i
+		else:
+			ntname=i
                 if not(avoidReq1):
-                    req1="DELETE FROM "+i+" WHERE "+inputs[i+"_in"]["value"]+"="+str(obj["id"])
+                    req1="DELETE FROM "+ntname+" WHERE "+inputs[i+"_in"]["value"]+"="+str(obj["id"])
                     cur.execute(req1)
                     print >> sys.stderr,req1
                     req1=None
@@ -1440,7 +1444,7 @@ def updateElement(conf,inputs,outputs):
                 if obj[i][j]!="-1":
                     if req2 is None:
 			req2=[]
-                    req2+=["INSERT INTO "+i+" ("+inputs[i+"_in"]["value"]+","+inputs[i+"_out"]["value"]+") VALUES ("+str(obj["id"])+","+obj[i][j]+")"] 
+                    req2+=["INSERT INTO "+ntname+" ("+inputs[i+"_in"]["value"]+","+inputs[i+"_out"]["value"]+") VALUES ("+str(obj["id"])+","+obj[i][j]+")"] 
                 #if req2 is not None:
                 #    print >> sys.stderr,req2
                 #    cur.execute(req2)
@@ -1554,14 +1558,18 @@ def detailsThemes(cur,val,prefix):
         res["pid"]=vals[0][4]
     
     req1="select id from indicateurs where id in (select i_id from indicateurs_themes where t_id="+str(val)+")"
-    cur.execute(req1)
-    vals=cur.fetchall()
-    res["indicateurs_themes"]=[]
-    if len(vals)>0:
-        for i in range(0,len(vals)):
-            res["indicateurs_themes"]+=[vals[i][0]]
-
-    req2="select * from "+prefix+"groups where id in (select g_id from themes_groups where t_id="+str(val)+")"
+    try:
+    	cur.execute(req1)
+    	vals=cur.fetchall()
+    	res["indicateurs_themes"]=[]
+    	if len(vals)>0:
+        	for i in range(0,len(vals)):
+            		res["indicateurs_themes"]+=[vals[i][0]]
+    except:
+	print >> sys.stderr,dir(cur)
+	cur.connection.commit()
+    	pass
+    req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"themes_groups where t_id="+str(val)+")"
     cur.execute(req2)
     vals=cur.fetchall()
     res["themes_groups"]=[]
