@@ -1517,6 +1517,7 @@ def classifyMap(conf,inputs,outputs):
     cond=""
     if inputs.keys().count("mmMExpr")>0:
 	    cond=" WHERE "+inputs["mmMExpr"]["value"].replace("\"[","").replace("]\"","")
+	    cond=cond.replace("[","").replace("]","")
     lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layerName+" "+cond+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
 
     rClass=False
@@ -1705,7 +1706,10 @@ def classifyMap(conf,inputs,outputs):
 			precond=" AND "+inputs["mmMExpr"]["value"]+" "
 			layer.metadata.set("mmMExpr",inputs["mmMExpr"]["value"])
 		else:
-			layer.metadata.remove("mmMExpr")
+			try:
+				layer.metadata.remove("mmMExpr")
+			except:
+				pass
 		if inputs.keys().count("nbClasses")>0:
 			if rClass:
 				if i==0:

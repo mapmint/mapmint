@@ -471,6 +471,9 @@ def Intersection(conf,inputs,outputs):
     print >> sys.stderr,"/outputResult"
     return 3
 
+def IntersectionPy(conf,inputs,outputs):
+    return Intersection(conf,inputs,outputs)
+
 def Intersection0(conf,inputs,outputs):
 
     print >> sys.stderr, "Starting service ..."
