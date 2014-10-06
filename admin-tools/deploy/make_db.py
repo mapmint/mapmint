@@ -89,7 +89,8 @@ ftp://%s
 login: %s
 password : %s'''%(url,passwd,url,url.split('.')[0],passwd)
 bcc = ['david@saggiorato.net']
-toaddrs = [email] + bcc
+#toaddrs = [email] + bcc
+toaddrs = [email]
 header = "Subject: Mapmint Free trial\r\nFrom: trial@mapmint.com\r\nTo: %s\r\n\r\n"%(email)
 server = smtplib.SMTP('localhost')
 server.sendmail('david@mapmint.com', toaddrs, header+msg)
