@@ -51,6 +51,8 @@ def checkLayerPriv(conf,map,layer,typ):
         ctypes=[typ]
     groups=getGroup(conf)
     if checkMapPriv(conf,map):
+	if map.getLayerByName(layer) is None:
+		return False
         tmp=map.getLayerByName(layer).metadata.get("mm_access_groups")
         if tmp is not None:
             tmp=tmp.split(',')
