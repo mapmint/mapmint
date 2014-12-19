@@ -101,7 +101,6 @@ def vectInfo(conf,inputs,outputs):
         conf["lenv"]["message"]="FAILURE:\n"\
             "Unable to open datasource `%s' with the following drivers." % pszDataSource 
         for iDriver in range(ogr.GetDriverCount()):
-            print >>sys.stderr,"  -> %s" % ogr.GetDriver(iDriver).GetName()
             conf["lenv"]["message"]+="  -> %s" % ogr.GetDriver(iDriver).GetName()
         return 4
 
@@ -125,61 +124,58 @@ def vectInfo(conf,inputs,outputs):
 
         poResultSet = poDS.ExecuteSQL( pszSQLStatement, poSpatialFilter, 
                                         pszDialect )
-
         if poResultSet is not None:
             if pszWHERE is not None:
                 poResultSet.SetAttributeFilter( pszWHERE )
 
-            #print >> sys.stderr,outputs
             res=[]
             ReportOnLayer( inputs, res, poResultSet, None, None, options )
-            #print >> sys.stderr,res
             outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
             poDS.ReleaseResultSet( poResultSet )
-
-    for iRepeat in range(nRepeatCount):
-        if papszLayers is None:
+    else:
+        for iRepeat in range(nRepeatCount):
+            if papszLayers is None:
 #/* -------------------------------------------------------------------- */ 
 #/*      Process each data source layer.                                 */ 
 #/* -------------------------------------------------------------------- */ 
-            for iLayer in range(poDS.GetLayerCount()):
-                poLayer = poDS.GetLayer(iLayer)
+                for iLayer in range(poDS.GetLayerCount()):
+                    poLayer = poDS.GetLayer(iLayer)
 
-                if poLayer is None:
-                    print( "FAILURE: Couldn't fetch advertised layer %d!" % iLayer )
-                    return 1
+                    if poLayer is None:
+                        print( "FAILURE: Couldn't fetch advertised layer %d!" % iLayer )
+                        return 1
 
-                if not bAllLayers:
-                    line = "%d: %s" % (iLayer+1, poLayer.GetLayerDefn().GetName())
+                    if not bAllLayers:
+                        line = "%d: %s" % (iLayer+1, poLayer.GetLayerDefn().GetName())
 
-                    if poLayer.GetLayerDefn().GetGeomType() != ogr.wkbUnknown:
-                        line = line + " (%s)" % ogr.GeometryTypeToName( poLayer.GetLayerDefn().GetGeomType() )
+                        if poLayer.GetLayerDefn().GetGeomType() != ogr.wkbUnknown:
+                            line = line + " (%s)" % ogr.GeometryTypeToName( poLayer.GetLayerDefn().GetGeomType() )
 
-                    print(line)
-                else:
-                    if iRepeat != 0:
-                        poLayer.ResetReading()
-                    res=[]
-                    ReportOnLayer( inputs, res, poLayer, pszWHERE, poSpatialFilter, options )
-                    outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
+                        print(line)
+                    else:
+                        if iRepeat != 0:
+                            poLayer.ResetReading()
+                        res=[]
+                        ReportOnLayer( inputs, res, poLayer, pszWHERE, poSpatialFilter, options )
+                        outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
 
-        else:
+            else:
 #/* -------------------------------------------------------------------- */ 
 #/*      Process specified data source layers.                           */ 
 #/* -------------------------------------------------------------------- */ 
-            for papszIter in papszLayers:
-                poLayer = poDS.GetLayerByName(papszIter)
+                for papszIter in papszLayers:
+                    poLayer = poDS.GetLayerByName(papszIter)
 
-                if poLayer is None:
-                    print( "FAILURE: Couldn't fetch requested layer %s!" % papszIter )
-                    return 1
+                    if poLayer is None:
+                        print( "FAILURE: Couldn't fetch requested layer %s!" % papszIter )
+                        return 1
 
-                if iRepeat != 0:
-                    poLayer.ResetReading()
+                    if iRepeat != 0:
+                        poLayer.ResetReading()
 
-                res=[]
-                ReportOnLayer( inputs, res, poLayer, pszWHERE, poSpatialFilter, options )
-                outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
+                    res=[]
+                    ReportOnLayer( inputs, res, poLayer, pszWHERE, poSpatialFilter, options )
+                    outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
 
 #/* -------------------------------------------------------------------- */
 #/*      Close down.                                                     */
@@ -187,7 +183,7 @@ def vectInfo(conf,inputs,outputs):
     poDS.Destroy()
     #import json
     #print >> sys.stderr,outputs["Result"]["value"]
-    outputs["Result"]["value"]=str(outputs["Result"]["value"])
+    #outputs["Result"]["value"]=str(outputs["Result"]["value"])
     return 3
 
 #/************************************************************************/

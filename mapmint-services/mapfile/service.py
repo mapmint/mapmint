@@ -1515,7 +1515,7 @@ def classifyMap(conf,inputs,outputs):
 	con.conn.commit()
 
     cond=""
-    if inputs.keys().count("mmMExpr")>0:
+    if inputs.keys().count("mmMExpr")>0 and inputs["mmMExpr"]["value"]!="":
 	    cond=" WHERE "+inputs["mmMExpr"]["value"].replace("\"[","").replace("]\"","")
 	    cond=cond.replace("[","").replace("]","")
     lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layerName+" "+cond+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
@@ -1550,6 +1550,7 @@ def classifyMap(conf,inputs,outputs):
     try:
 	if not(rClass):
 		print >> sys.stderr,"OK"
+                print >> sys.stderr,lInputs
 		vt.vectInfo(conf,lInputs,outputs)
 		print >> sys.stderr,"OK"
 		#print >> sys.stderr,outputs["Result"]["value"]
@@ -1557,7 +1558,7 @@ def classifyMap(conf,inputs,outputs):
     except Exception,e:
         try:
 	    k=inputs.keys()
-	    print >> sys.stderr,e
+	    print >> sys.stderr,e.message
 	    print >> sys.stderr,"/ERROR"
 	    
 	    if inputs["mmType"]["value"]!="uniqVal":
@@ -1835,7 +1836,7 @@ def saveLabel(conf,inputs,outputs):
 
     hasLabel=False
     try:
-        hasLabel=(inputs["label"]["value"]=="")
+        hasLabel=(inputs.has_key("label") and inputs["label"].has_key("value") and inputs["label"]["value"]!="")
     except:
         hasLabel=False
     if inputs.keys().count("label") == 0 or hasLabel:
@@ -1854,9 +1855,11 @@ def saveLabel(conf,inputs,outputs):
         outputs["Result"]["value"]=zoo._("Map saved")
         return 3
 
-    if inputs.has_key("label") and inputs["label"]["value"]!="GRID":
+    if inputs.has_key("label") and inputs["label"].has_key("value") and inputs["label"]["value"]!="GRID" and inputs["label"]["value"]!="":
         layer.labelitem=inputs["label"]["value"]
         
+    
+    
 
     j=layer.numclasses-1
     while j>=0:
@@ -1864,63 +1867,66 @@ def saveLabel(conf,inputs,outputs):
 		layer.getClass(j).removeLabel(0)
 	except:
 		pass
-	l=mapscript.labelObj()
+        if not(inputs.has_key("label")) or not(inputs["label"].has_key("value")):
+            pass
+        if inputs.has_key("mmFill"):
+	    l=mapscript.labelObj()
 
-        l.type=mapscript.MS_TRUETYPE
-        l.antialias = mapscript.MS_TRUE
-        l.partials = False
-        l.encoding=layer.encoding
+            l.type=mapscript.MS_TRUETYPE
+            l.antialias = mapscript.MS_TRUE
+            l.partials = False
+            l.encoding=layer.encoding
         
-        # Set color, font and size
-        setRGB(l.color,[int(n, 16) for n in (inputs["mmFill"]["value"][:2],inputs["mmFill"]["value"][2:4],inputs["mmFill"]["value"][4:6])])
-        l.font=inputs["f"]["value"]
-        l.size=float(inputs["fs"]["value"])
+            # Set color, font and size
+            setRGB(l.color,[int(n, 16) for n in (inputs["mmFill"]["value"][:2],inputs["mmFill"]["value"][2:4],inputs["mmFill"]["value"][4:6])])
+            l.font=inputs["f"]["value"]
+            l.size=float(inputs["fs"]["value"])
         
-        # Never force display when no space available
-        l.force=False
+            # Never force display when no space available
+            l.force=False
         
-        # Set the default outline color and the buffer size
-        if inputs.keys().count("lbs")>0:
-            setRGB(l.outlinecolor,[int(n, 16) for n in (inputs["mmOut"]["value"][:2],inputs["mmOut"]["value"][2:4],inputs["mmOut"]["value"][4:6])])
-            l.outlinewidth=int(inputs["lbs"]["value"])
-        else:
-            l.outlinewidth=0
-        # Set angle
-	try:
-		angle=float(inputs["angle"]["value"])
-	except Exception,e:
-		print >> sys.stderr,e
-		angle=inputs["angle"]["value"]
-        if angle==0:
-            if inputs["label"]["value"]!="GRID":
-                l.anglemode = mapscript.MS_FOLLOW
-        else:
-	    l.anglemode = mapscript.MS_NONE
-	    try:
-		l.angle = angle
-		try:
-			layer.metadata.remove("label_angle_field")
-		except Excepion,e:
-			pass
-		print >> sys.stderr,dir(layer.metadata)
+            # Set the default outline color and the buffer size
+            if inputs.keys().count("lbs")>0:
+                setRGB(l.outlinecolor,[int(n, 16) for n in (inputs["mmOut"]["value"][:2],inputs["mmOut"]["value"][2:4],inputs["mmOut"]["value"][4:6])])
+                l.outlinewidth=int(inputs["lbs"]["value"])
+            else:
+                l.outlinewidth=0
+            # Set angle
+    	    try:
+	        angle=float(inputs["angle"]["value"])
 	    except Exception,e:
-		l.updateFromString("LABEL ANGLE "+angle+" END")
-		layer.metadata.set("label_angle_field",angle)
-        # Set buffer
-        l.buffer=int(inputs["bs"]["value"])
-        # Set position
-        if inputs["label"]["value"]!="GRID":
-            l.position=eval("mapscript.MS_"+inputs["pos"]["value"].upper())
-        else:
-            l.position=mapscript.MS_AUTO
+	        print >> sys.stderr,e
+	        angle=inputs["angle"]["value"]
+            if angle==0:
+                if inputs["label"]["value"]!="GRID":
+                    l.anglemode = mapscript.MS_FOLLOW
+            else:
+	        l.anglemode = mapscript.MS_NONE
+	        try:
+		    l.angle = angle
+		    try:
+			layer.metadata.remove("label_angle_field")
+		    except Excepion,e:
+			pass
+		    print >> sys.stderr,dir(layer.metadata)
+	        except Exception,e:
+		    l.updateFromString("LABEL ANGLE "+angle+" END")
+		    layer.metadata.set("label_angle_field",angle)
+            # Set buffer
+            l.buffer=int(inputs["bs"]["value"])
+            # Set position
+            if inputs["label"]["value"]!="GRID":
+                l.position=eval("mapscript.MS_"+inputs["pos"]["value"].upper())
+            else:
+                l.position=mapscript.MS_AUTO
 	
-	try:
+	    try:
 		layer.getClass(j).removeLabel(0)
-	except:
+	    except:
 		pass
-	try:
+	    try:
 		layer.getClass(j).addLabel(l)
-	except:
+	    except:
 		pass
         j-=1
     
