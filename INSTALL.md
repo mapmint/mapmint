@@ -1,6 +1,4 @@
-# ![logo](mapmint-ui/img/mapmint-logo-small.png "MapMint") MapMint
-
-Quick install guide for MapMint.
+# ![logo](mapmint-ui/img/mapmint-logo-small.png "MapMint") Installation guide
 
 <h3>Install all the dependencies (Ubuntu 14.04 LTS)</h3>
 
