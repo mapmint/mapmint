@@ -27,6 +27,6 @@ MapMint is using numerous OSGeo softwares and bring them all together in a compl
  ![logo](http://geolabs.fr/mmws2014/_static/images/zoo-logo-green.png) | All the processing in the MapMint solution iso based on the ZOO-Project so on the OGC WPS standard, even to produce dynamic web pages.
  ![logo](http://geolabs.fr/mmws2014/_static/images/ms-logo-green.png) | 	MapMint use the MapServer cartographic engine to publish your date through OGC Web Services (WMS,WFS and WCS) in an efficient way.
  ![logo](http://geolabs.fr/mmws2014/_static/images/gdal-logo-green.png "GDAL logo") |	The abstraction library used to access and interract with datasources transparently is the GDAL/OGR library.
- ![logo](hhttp://geolabs.fr/mmws2014/_static/images/ol-logo-green.png "OpenLayers logo") | 	MapMint User Interfaces (UI) are using OpenLayers. 
+ ![logo](http://geolabs.fr/mmws2014/_static/images/ol-logo-green.png "OpenLayers logo") | 	MapMint User Interfaces (UI) are using OpenLayers. 
  
 For information on how to setup MapMint, please refer to https://github.com/mapmint/mapmint/edit/master/INSTALL.md.
