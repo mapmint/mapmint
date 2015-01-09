@@ -179,6 +179,8 @@ sudo /etc/init.d/apache2 restart
 
 Download and use databases required by MapMint
 ```
+sudo mkdir /var/data
+cd /var/data
 sudo wget http://geolabs.fr/dl/mm.db
 
 sudo wget http://geolabs.fr/dl/mmdb.sql
@@ -192,7 +194,6 @@ psql mmdb -f mmdb.sql
 Create required directories
 
 ```
-sudo mkdir /var/data
 sudo cp $SRC/mapmint/template/data/* /var/data
 sudo mkdir /var/data/{templates,dirs}
 sudo mkdir -p /var/www/html/tmp/descriptions
@@ -201,7 +202,11 @@ wget http://geolabs.fr/dl/fonts.tar.bz2
 sudo mkdir /var/data/fonts
 sudo tar -xvf fonts.tar.bz2 -C /var/data/fonts
 
-cp /home/djay/src/mapmint/mapmint-ui/js/.htaccess /home/djay/src/mapmint/public_map/
+cp $SRC/mapmint/mapmint-ui/js/.htaccess $SRC/mapmint/public_map/
+sudo chown -R www-data:www-data /var/data
+sudo chown www-data:www-data /usr/lib/cgi-bin/main.cfg
+sudo chown www-data:www-data /usr/lib/cgi-bin/mapcache.xml
+
 ```
 
 Now you should edit the ```main.cfg``` file located in ```$SRC/mapmint/mapmint-services``` to fit with your setup. Then you should be ready to access your new MapMint installation through the following url: http://[HOST]:[PORT]/ui/Dashboard .
