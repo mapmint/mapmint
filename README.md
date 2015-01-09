@@ -1,6 +1,6 @@
 # ![logo](mapmint-ui/img/mapmint-logo-small.png "MapMint") MapMint
 
-MapMint is a Geographic Information System (GIS) software running on a web server made to facilitate the adminstration of a <b>Spatial Data Infrastructure</b> (SDI), publishing cartographic portals and dynamic applications.
+MapMint is a Geographic Information System (GIS) software running on a web server made to facilitate the administration of a <b>Spatial Data Infrastructure</b> (SDI), publishing cartographic portals and webmapping applications.
 
 The MapMint platform is a GIS Software accessible thourgh a simple web browser but also a modular and extensible WEB-GIS application generator. It provides numerous GIS capability and let the user do the following:
 
