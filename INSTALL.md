@@ -2,7 +2,7 @@
 
 Quick install guide for MapMint.
 
-<h3>Install all the dependencies (Ubuntu 14.04 TLS)</h3>
+<h3>Install all the dependencies (Ubuntu 14.04 LTS)</h3>
 
 ```sudo apt-get install flex bison libfcgi-dev libxml2 libxml2-dev curl
 openssl autoconf apache2 python-software-properties subversion git
