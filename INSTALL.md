@@ -197,6 +197,7 @@ Create required directories
 sudo cp $SRC/mapmint/template/data/* /var/data
 sudo mkdir /var/data/{templates,dirs}
 sudo mkdir -p /var/www/html/tmp/descriptions
+sudo mkdir -p /var/www/html/pm/styles
 
 wget http://geolabs.fr/dl/fonts.tar.bz2
 sudo mkdir /var/data/fonts
@@ -206,6 +207,7 @@ cp $SRC/mapmint/mapmint-ui/js/.htaccess $SRC/mapmint/public_map/
 sudo chown -R www-data:www-data /var/data
 sudo chown www-data:www-data /usr/lib/cgi-bin/main.cfg
 sudo chown www-data:www-data /usr/lib/cgi-bin/mapcache.xml
+sudo chown -R www-data:www-data /var/www/html/pm/styles
 
 ```
 
