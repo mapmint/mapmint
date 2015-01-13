@@ -164,7 +164,10 @@ $conf["identification"]["title"]
 #try
 #set mpath=os.readlink($conf["main"]["dataPath"]+"/public_maps/"+$i)
 #set project=mpath
+#set tmpM=mapscript.mapObj($mpath.replace("\\??\\",""))
+#if $mm_access.checkMapPriv($conf,$tmpM)
 #set $mfiles1+=[[mpath.replace("\\??\\",""),$i]]
+#end if
 #except
 #set project=None
 #end try
