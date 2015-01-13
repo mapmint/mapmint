@@ -5,9 +5,9 @@
 #set cur=con.conn.cursor()
 #set prefix=$auth.getPrefix($conf)
 #set fres=[]
-#set sql="select documents.id,documents.name from documents, documents_groups where d_id=documents.id and g_id in (SELECT id from "+$prefix+"groups where name='"+$conf["senv"]["group"]+"' or name='public') and documents.name like '%"+$inputs["val"]["value"]+"%'"
-#set res=cur.execute(sql)	   
-#set vals0=cur.fetchall()
+#set sql="select documents.id,documents.name from "+$prefix+"documents, "+$prefix+"documents_groups where d_id=documents.id and g_id in (SELECT id from "+$prefix+"groups where name=[_name_]  or name='public') and documents.name like [_val_]"
+#set res=con.pexecute_req([sql,{"name":{"value":$conf["senv"]["group"],"format":"s"},"val":{"value":"%"+$inputs["val"]["value"]+"%","format":"s"}}])
+#set vals0=$con.cur.fetchall()
 #if $vals0 is not None
 #for i in range(0,len($vals0))
 #set $fres+=[{"id": vals0[i][0],"value": vals0[i][1],"label": vals0[i][1]}]

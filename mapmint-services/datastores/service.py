@@ -24,6 +24,11 @@
 import zoo
 import sys
 import os.path
+try:  
+        from manage_users.manage_users import *
+except:
+        from manage_users import manage_users
+import authenticate as auth
 
 def removeDS(conf,inputs,outputs):
     #have to check before
@@ -289,19 +294,21 @@ def getDataStorePrivileges(conf,inputs,outputs):
     return zoo.SERVICE_SUCCEEDED
 
 def saveFavSrs(conf,inputs,outputs):
-    import sqlite_module as sql
+    con=manage_users(conf["main"]["dblink"])
+    con.connect(conf)
     var=0
     if inputs["fav"]["value"]=="true":
         var=1
     clause=""
     if inputs["srs_field"]["value"]=="id":
-        clause+="code='"
+        clause+="code="
     else:
-        clause+="name='"
-    clause+=inputs["srs_id"]["value"]+"'"
-    v="UPDATE spatial_ref_sys set fav="+str(var)+" WHERE "+clause
+        clause+="name="
+    clause+="[_val_]"
+    v="UPDATE spatial_ref_sys set fav=[_fav_] WHERE "+clause
     try:
-        t=sql.request(conf,v)
+        con.pexecute_req([v,{"fav":{"value":str(var),"format":"s"},"val":{"value":inputs["srs_id"]["value"],"format":"s"}}])
+        con.conn.commit()
         outputs["Result"]["value"]="SRS successfully updated"
     except Exception,e:
         outputs["Result"]["value"]="SRS update failed: "+str(e)

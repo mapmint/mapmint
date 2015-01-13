@@ -30,7 +30,7 @@ MapMint: Themes
     <div class="inner-center" id="themes_edition_ui">
       
       <h1 class="pane-title">$zoo._("Informations"): <span  class="project-title" id="themes_name_title">$zoo._("Name of the selected theme")</span></h1>
-      <div class="toolbar"><p class="hour">$zoo._("Name of the selected theme")</p></div>
+      <div class="toolbar"><p class="hour"></p></div>
       
       <table class="gen">
 	<tbody>
@@ -44,7 +44,7 @@ MapMint: Themes
             <td>
               <select class="rounded mltp" id="themes_pid">
 		<option value="-1">$zoo._("Select a theme")</option>
-#set res=cur.execute("SELECT id,name as val from themes order by name")
+#set res=cur.execute("SELECT id,name as val from "+$prefix+"themes order by name")
 #set vals=cur.fetchall()
 #for i in range(0,len(vals))
 		<option value="$vals[i][0]">$vals[i][1]</option>
@@ -57,7 +57,6 @@ MapMint: Themes
             <td valign="middle" style="width:200px;">$zoo._("Index:")</td>
             <td>
               <select multiple="multiple" class="rounded mltp" id="themes_indicateurs_themes">
-#set res=cur.execute("SELECT id,name as val from indicateurs order by name")
 #set vals=cur.fetchall()
 #for i in range(0,len(vals))
 		<option value="$vals[i][0]">$vals[i][1]</option>

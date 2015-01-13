@@ -66,9 +66,8 @@ def saveContext(conf,inputs,outputs):
             layers+=i
     else:
             layers+=inputs["layers"]["value"]
-    req="INSERT INTO "+prefix+"contexts (name,layers,ext) VALUES ('"+name+"','"+layers+"','"+inputs["extent"]["value"]+"')"
-    print >> sys.stderr,req
-    cur.execute(req)
+    req="INSERT INTO "+prefix+"contexts (name,layers,ext) VALUES ([_name_],[_layers_],[_extent_])"
+    con.pexecute_req([req,{"name":{"value":name,"format":"s"},"layers":{"value":layers,"format":"s"},"extent":{"value":inputs["extent"]["value"],"format":"s"}}])
     con.conn.commit()
     outputs["Result"]["value"]=conf["main"]["applicationAddress"]+"public/"+conf["senv"]["last_map"]+";c="+name
     return zoo.SERVICE_SUCCEEDED
@@ -80,9 +79,9 @@ def loadContext(conf,inputs,outputs):
     conn = con.conn
     cur = con.conn.cursor()
     name=inputs["name"]["value"]
-    req="SELECT ext,layers from "+prefix+"contexts where name = '"+name+"'"
-    cur.execute(req)
+    req="SELECT ext,layers from "+prefix+"contexts where name = [_name_]"
+    con.pexecute_req([req,{"name":{"value":name,"format":"s"}}])
     con.conn.commit()
-    res=cur.fetchall()
+    res=con.cur.fetchall()
     outputs["Result"]["value"]=json.dumps({"ext": res[0][0],"layers": res[0][1].split(',')})
     return zoo.SERVICE_SUCCEEDED

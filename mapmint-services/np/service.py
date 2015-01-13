@@ -50,16 +50,17 @@ def setIndexQuote(conf,inputs,outputs):
     con=auth.getCon(conf)
     cur=con.conn.cursor()
     tprefix=auth.getPrefix(conf)
-    req="SELECT count(*) from indicateurs_favoris WHERE i_id="+inputs["id"]["value"]+" and u_id=(SELECT id from "+tprefix+"users WHERE login='"+conf["senv"]["login"]+"')" 
-    res=cur.execute(req)
-    vals=cur.fetchone()
+    req="SELECT count(*) from indicateurs_favoris WHERE i_id=[_id_] and u_id=(SELECT id from "+tprefix+"users WHERE login=[_login_])" 
+    res=con.pexecute_req([req,{"id":{"value":inputs["id"]["value"],"format":"s"},"login":{"value":conf["senv"]["login"],"format":"s"}}])
+    vals=con.cur.fetchone()
     if vals is not None and vals[0]>0:
-        req="UPDATE indicateurs_favoris set note="+inputs["quote"]["value"]+" WHERE i_id="+inputs["id"]["value"]+" and u_id=(SELECT id from "+tprefix+"users WHERE login='"+conf["senv"]["login"]+"')"
+        req="UPDATE indicateurs_favoris set note=[_quote_] WHERE i_id=[_id_] and u_id=(SELECT id from "+tprefix+"users WHERE login=[_login_])"
+    	con.pexecute_req([req,{"quote":{"value":inputs["quote"]["value"],"format":"s"},"id":{"value":inputs["id"]["value"],"format":"s"},"login":{"value":conf["senv"]["login"],"format":"s"}}])
         outputs["Result"]["value"]=zoo._("Index quote updated.")
     else:
-        req="INSERT INTO indicateurs_favoris (i_id,u_id,note) VALUES ("+inputs["id"]["value"]+",(SELECT id from "+tprefix+"users WHERE login='"+conf["senv"]["login"]+"'),"+inputs["quote"]["value"]+")"
+        req="INSERT INTO indicateurs_favoris (i_id,u_id,note) VALUES ([_id_],(SELECT id from "+tprefix+"users WHERE login=[_login_]),[_quote_])"
+    	con.pexecute_req([req,{"id":{"value":inputs["id"]["value"],"format":"s"},"login":{"value":conf["senv"]["login"],"format":"s"},"quote":{"value":inputs["quote"]["value"],"format":"s"}}])
         outputs["Result"]["value"]=zoo._("Index quote saved.")
-    cur.execute(req)
     con.conn.commit()
     
     return zoo.SERVICE_SUCCEEDED
@@ -80,28 +81,27 @@ def getIndexQuote(conf,inputs,outputs):
     cur=con.conn.cursor()
     tprefix=auth.getPrefix(conf)
     clause="("
+    params={}
     if inputs["id"].has_key("length"):
         for i in range(int(inputs["id"]["length"])):
             if clause != "(":
                 clause+=" or "
-            clause+=" i_id="+inputs["id"]["value"][i]
+            clause+=" i_id=[_id_"+str(i)+"_]"
+            params["id_"+str(i)]={"value":inputs["id"]["value"][i],"format":"s"}
         clause+=")"
     else:
-        clause=" i_id="+inputs["id"]["value"]
+        clause=" i_id=[_id_]"
+        params["id"]={"value":inputs["id"]["value"],"format":"s"}
     if conf["senv"]["login"]=="anonymous":
         req="SELECT i_id,avg(note),true from indicateurs_favoris WHERE "+clause+" GROUP BY i_id" 
     else:
         req="SELECT i_id,note,false from indicateurs_favoris WHERE "+clause+" and u_id=(SELECT id from "+tprefix+"users WHERE login='"+conf["senv"]["login"]+"')" 
-    res=cur.execute(req)
-    vals=cur.fetchall()
+    res=con.pexecute_req([req,params])
+    vals=con.cur.fetchall()
     if inputs["id"].has_key("length"):
         res=[]
-        print >> sys.stderr,"LENGTH: "+str(inputs["id"]["length"])
-        print >> sys.stderr,vals
         for j in range(len(vals)):
             for i in range(int(inputs["id"]["length"])):
-                print >> sys.stderr,i
-                print >> sys.stderr,inputs["id"]["value"][i]
                 try:
                     if inputs["id"]["value"].count(str(vals[j][0]))>0:
                         res+=[{"id": str(vals[j][0]),"val": str(vals[j][1]),"ro":str(vals[j][2]).lower()}]
@@ -268,16 +268,21 @@ def getLastPublishedIndex(conf):
     rpath=conf["main"]["dataPath"]+"/indexes_maps/"
     tmp=glob.glob(rpath+"project_PIndex*.map")
     tmp.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x)))
-    return tmp[0].replace(conf["main"]["dataPath"]+"/indexes_maps/project_PIndex","").replace(".map","")
+    if len(tmp)>0:
+    	return tmp[0].replace(conf["main"]["dataPath"]+"/indexes_maps/project_PIndex","").replace(".map","")
+    return "-1"
+
 
 def getIndexDisplay(conf,inputs,outputs):
     id=inputs["id"]["value"]
     req="select label,width from dtable where it_id=(select id from indicateurs_territoires where i_id="+id+") order by pos"
+    req="select label,width from dtable where it_id=(select id from indicateurs_territoires where i_id=[_id_]) order by pos"
+    params={"id":{"value":id,"format":"s"}}
     import authenticate.service as auth
     con=auth.getCon(conf)
     cur=con.conn.cursor()
-    cur.execute(req)
-    vals=cur.fetchall()
+    con.pexecute_req([req,params])
+    vals=con.cur.fetchall()
     res='<table class="flexiClasses"><thead><tr>'
     for i in range(0,len(vals)):
         res+='<th width="'+str(vals[0][1])+'" align="center">'+str(vals[0][0])+'</th>'
@@ -1024,7 +1029,8 @@ def getMapRequest(conf,inputs,outputs):
     con=auth.getCon(conf)
     con.connect()
     cur=con.conn.cursor()
-    req0="SELECT datasource from territoires where id="+inputs["t_id"]["value"]
+    prefix=auth.getPrefix(conf)
+    req0="SELECT datasource from "+prefix+"territoires where id="+inputs["t_id"]["value"]
     cur.execute(req0)
     vals=cur.fetchall()
     dsn=""
@@ -1114,8 +1120,8 @@ def flatTerritoires(l,res):
             flatTerritoires(l[i]["children"],res)
         
 def listTerritoires(cur,prefix,group='public',clause=None,clause1=None):
-    req0="select * from territoires where id "
-    req1="select o_t_id from t_hierarchy "
+    req0="select * from "+prefix+"territoires where id "
+    req1="select o_t_id from "+prefix+"t_hierarchy "
     if clause is not None:
         req0+=""
         req1+=" where "+clause
@@ -1129,7 +1135,7 @@ def listTerritoires(cur,prefix,group='public',clause=None,clause1=None):
             if lclause!="":
                 lclause+=" OR "
             lclause+="name='"+groups[i]+"'"        
-        req0+=" and id in (SELECT t_id from territoires_groups where g_id=(SELECT id from "+prefix+"groups where "+lclause+" or name='public'))"
+        req0+=" and id in (SELECT t_id from "+prefix+"territoires_groups where g_id=(SELECT id from "+prefix+"groups where "+lclause+" or name='public'))"
     req2=req0
     if clause1 is not None:
 	req0+=" AND "+clause1
@@ -1162,6 +1168,9 @@ def list(conf,inputs,outputs):
     cur=con.conn.cursor()
     prefix=auth.getPrefix(conf)
     res=None
+    if not(auth.is_ftable(inputs["table"]["value"])):
+	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+	return zoo.SERVICE_FAILED
     if inputs["table"]["value"]=="territoires":
         res=listTerritoires(cur,prefix,conf["senv"]["group"])
     else:
@@ -1169,9 +1178,9 @@ def list(conf,inputs,outputs):
             res=listThemes(cur,prefix,conf["senv"]["group"])
         else:
             if inputs["table"]["value"]=="idicateurs":
-                res=listDefault(inputs["table"]["value"],cur," order by ord")
+                res=listDefault(prefix+inputs["table"]["value"],cur," order by ord")
             else:
-                res=listDefault(inputs["table"]["value"],cur)
+                res=listDefault(prefix+inputs["table"]["value"],cur)
     if res is not None:
         for i in res:
             i["selected"]=True
@@ -1200,12 +1209,12 @@ def insertElement(conf,inputs,outputs):
     con=auth.getCon(conf)
     con.connect()
     cur=con.conn.cursor()
+    if not(auth.is_ftable(inputs["table"]["value"])):
+	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+	return zoo.SERVICE_FAILED
     try:
-        if inputs["table"]["value"]=="themes":
-            prefix=auth.getPrefix(conf)
-            cur.execute("INSERT INTO "+prefix+inputs["table"]["value"]+" (name) VALUES ("+str(adapt(inputs["name"]["value"]))+")")
-        else:
-            cur.execute("INSERT INTO "+inputs["table"]["value"]+" (name) VALUES ("+str(adapt(inputs["name"]["value"]))+")")
+        prefix=auth.getPrefix(conf)
+        cur.execute("INSERT INTO "+prefix+inputs["table"]["value"]+" (name) VALUES ("+str(adapt(inputs["name"]["value"]))+")")
         outputs["Result"]["value"]=zoo._("Done")
     except Exception,e:
         conf["lenv"]["message"]=zoo._("An error occured when processing your request: ")+str(e)
@@ -1281,11 +1290,17 @@ def insertElem(conf,inputs,outputs):
     con=auth.getCon(conf)
     con.connect()
     cur=con.conn.cursor()
+    if not(auth.is_ftable(inputs["table"]["value"])):
+	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+	return zoo.SERVICE_FAILED
     try:
         fields=""
         values=""
         for i in inputs.keys():
             if i!="table" and i!="tid" and inputs[i]["value"]!="":
+    		if not(auth.is_ftable(inputs["table"]["value"])):
+			conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+			return zoo.SERVICE_FAILED
                 if fields!="":
                     fields+=","
                 fields+=i
@@ -1316,6 +1331,9 @@ def updateElem(conf,inputs,outputs):
     con=auth.getCon(conf)
     con.connect()
     cur=con.conn.cursor()
+    if not(auth.is_ftable(inputs["table"]["value"])):
+	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+	return zoo.SERVICE_FAILED
     try:
         fields=""
         values=""
@@ -1400,17 +1418,16 @@ def updateElement(conf,inputs,outputs):
             con.conn.commit()
             print >> sys.stderr,"li_d"
         
-    if inputs["table"]["value"]=="themes":
-        prefix=auth.getPrefix(conf)
-        req0="UPDATE "+prefix+inputs["table"]["value"]+" set "
-    else:
-        req0="UPDATE "+inputs["table"]["value"]+" set "
-    clause="id="+str(obj["id"])
+    prefix=auth.getPrefix(conf)
+    req0="UPDATE "+prefix+inputs["table"]["value"]+" set "
+    clause="id=[_id_]"
+    #clause="id="+str(obj["id"])
     keys=obj.keys()
     cnt=0
     req1=None
     req2=None
     avoidReq1=False
+    params={}
     for i in keys:
         if i is None or obj[i] == "":
             continue
@@ -1421,20 +1438,22 @@ def updateElement(conf,inputs,outputs):
                 req0+=", "
             try:
                 if obj[i]!="-1" and obj[i]!="":
-                    tmp = adapt(obj[i].encode('utf-8'))
-                    req0+= i +" = "+str(tmp).decode("utf-8")
+                    #tmp = adapt(obj[i].encode('utf-8'))
+                    req0+= i +" = [_"+i+"_]"
+                    params[i]={"value":obj[i],"format":"s"}
+                    #req0+= i +" = "+str(tmp).decode("utf-8")
                 else:
                     req0+=" "+i+"=NULL"
             except Exception,e :
                 print >> sys.stderr,e
-                req0+=" "+i+"="+obj[i]
+                req0+=" "+i+"=[_"+i+"_]"
+                params[i]={"value":obj[i],"format":"s"}
+                #req0+=" "+i+"="+obj[i]
+                #req0+=" "+i+"="+obj[i]
             cnt+=1
         else:
             for j in range(0,len(obj[i])):
-		if inputs["table"]["value"]=="themes":
-			ntname=prefix+i
-		else:
-			ntname=i
+		ntname=prefix+i
                 if not(avoidReq1):
                     req1="DELETE FROM "+ntname+" WHERE "+inputs[i+"_in"]["value"]+"="+str(obj["id"])
                     cur.execute(req1)
@@ -1451,11 +1470,13 @@ def updateElement(conf,inputs,outputs):
                 #    req2=None
             avoidReq1=False
     req0+=" WHERE "+clause
+    params["id"]={"value":obj["id"],"format":"s"}
 
     print >> sys.stderr,req0.encode("utf-8")
 
     try:
-        cur.execute(req0)
+        con.pexecute_req([req0,params])
+        #cur.execute(req0)
         if req1 is not None:
             cur.execute(req1)
         if req2 is not None:
@@ -1482,23 +1503,30 @@ def deleteElement(conf,inputs,outputs):
     con=auth.getCon(conf)
     con.connect()
     cur=con.conn.cursor()
+    if not(auth.is_ftable(inputs["table"]["value"])):
+	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+	return zoo.SERVICE_FAILED
     if inputs.has_key("atable") and inputs["atable"]["value"]!="NULL":
         if inputs["atable"]["value"].__class__.__name__ in ('list', 'tuple'):
             for i in range(0,len(inputs["atable"]["value"])):
-                req="DELETE FROM "+inputs["atable"]["value"][i]+" WHERE "+inputs["akey"]["value"][i]+"="+inputs["id"]["value"]
-                print >> sys.stderr,req
-                cur.execute(req)
+            	if not(auth.is_ftable(inputs["atable"]["value"][i])):
+			conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+			return zoo.SERVICE_FAILED
+			#req="DELETE FROM "+inputs["atable"]["value"][i]+" WHERE "+inputs["akey"]["value"][i]+"=[_id_]"
+                req="DELETE FROM "+inputs["atable"]["value"][i]+" WHERE "+inputs["akey"]["value"][i]+"=[_id_]"
+		con.pexecute_req([req,{"id":{"value":inputs["id"]["value"],"format":"s"}}])
         else:
-            req="DELETE FROM "+inputs["atable"]["value"]+" WHERE "+inputs["akey"]["value"]+"="+inputs["id"]["value"]
-            print >> sys.stderr,req
-            cur.execute(req)
-        
+            if not(auth.is_ftable(inputs["atable"]["value"])):
+            	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+		return zoo.SERVICE_FAILED
+            req="DELETE FROM "+inputs["atable"]["value"]+" WHERE "+inputs["akey"]["value"]+"=[_id_]"
+            con.pexecute_req([req,{"id":{"value":inputs["id"]["value"],"format":"s"}}])
     try:
         if inputs["table"]["value"]=="themes":
             prefix=auth.getPrefix(conf)
-            cur.execute("DELETE FROM "+prefix+inputs["table"]["value"]+" where id="+inputs["id"]["value"]+"")
+            con.pexecute_req(["DELETE FROM "+prefix+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
         else:
-            cur.execute("DELETE FROM "+inputs["table"]["value"]+" where id="+inputs["id"]["value"]+"")
+            con.pexecute_req(["DELETE FROM "+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
             if inputs["table"]["value"]=="indicateurs":
                 import glob,os,shutil
                 rpath=conf["main"]["dataPath"]+"/indexes_maps/"
@@ -1515,11 +1543,10 @@ def deleteElement(conf,inputs,outputs):
     con.conn.close()
     return zoo.SERVICE_SUCCEEDED
 
-def detailsDocuments(cur,val,prefix):
-    req0="select id,name,description,filename,url from documents where id="+str(val)
-    print >> sys.stderr,req0
-    cur.execute(req0)
-    vals=cur.fetchall()
+def detailsDocuments(con,val,prefix):
+    req0="select id,name,description,filename,url from "+prefix+"documents where id=[_id_]"
+    con.pexecute_req([req0,{"id":{"value":str(val),"format":"s"}}])
+    vals=con.cur.fetchall()
     res={}
     if len(vals)>0:
         res["id"]=vals[0][0]
@@ -1528,27 +1555,30 @@ def detailsDocuments(cur,val,prefix):
         res["file"]=vals[0][3]
         res["url"]=vals[0][4]
     
-    req1="select * from "+prefix+"themes where id in (select t_id from documents_themes where d_id="+str(val)+")"
-    print >> sys.stderr,req1
-    cur.execute(req1)
-    vals=cur.fetchall()
+    req1="select * from "+prefix+"themes where id in (select t_id from "+prefix+"documents_themes where d_id=[_id_])"
+    con.pexecute_req([req0,{"id":{"value":str(val),"format":"s"}}])
+    vals=con.cur.fetchall()
     res["documents_themes"]=[]
     if len(vals)>0:
         for i in range(0,len(vals)):
             res["documents_themes"]+=[vals[i][0]]
-            req2="select * from "+prefix+"groups where id in (select g_id from documents_groups where d_id="+str(val)+")"
-            cur.execute(req2)
-            vals0=cur.fetchall()
-            res["documents_groups"]=[]
-            if len(vals0)>0:
-                for j in range(0,len(vals0)):
-                    res["documents_groups"]+=[vals0[j][0]]
+            req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"documents_groups where d_id=[_id_])"
+            con.pexecute_req([req2,{"id":{"value":str(val),"format":"s"}}])
+            try:
+            	vals0=con.cur.fetchall()
+            	res["documents_groups"]=[]
+            	if len(vals0)>0:
+                	for j in range(0,len(vals0)):
+                    		res["documents_groups"]+=[vals0[j][0]]
+            except:
+		res["documents_groups"]+=[]
+
     return res
 
-def detailsThemes(cur,val,prefix):
-    req0="select id,name,description,color,pid from "+prefix+"themes where id="+str(val)
-    cur.execute(req0)
-    vals=cur.fetchall()
+def detailsThemes(con,val,prefix):
+    req0="select id,name,description,color,pid from "+prefix+"themes where id=[_id_]"
+    con.pexecute_req([req0,{"id":{"value":str(val),"format":"s"}}])
+    vals=con.cur.fetchall()
     res={}
     if len(vals)>0:
         res["id"]=vals[0][0]
@@ -1557,21 +1587,21 @@ def detailsThemes(cur,val,prefix):
         res["color"]=vals[0][3]
         res["pid"]=vals[0][4]
     
-    req1="select id from indicateurs where id in (select i_id from indicateurs_themes where t_id="+str(val)+")"
+    req1="select id from indicateurs where id in (select i_id from indicateurs_themes where t_id=[_t_id_]"
     try:
-    	cur.execute(req1)
+    	con.pexecute_req([req1,{"t_id":{"value":str(val),"format":"s"}}])
     	vals=cur.fetchall()
     	res["indicateurs_themes"]=[]
     	if len(vals)>0:
         	for i in range(0,len(vals)):
             		res["indicateurs_themes"]+=[vals[i][0]]
     except:
-	print >> sys.stderr,dir(cur)
-	cur.connection.commit()
+	print >> sys.stderr,dir(con.cur)
+	con.cur.connection.commit()
     	pass
-    req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"themes_groups where t_id="+str(val)+")"
-    cur.execute(req2)
-    vals=cur.fetchall()
+    req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"themes_groups where t_id=[_t_id_])"
+    con.pexecute_req([req2,{"t_id": {"value":str(val),"format":"s"}}])
+    vals=con.cur.fetchall()
     res["themes_groups"]=[]
     if len(vals)>0:
         for i in range(0,len(vals)):
@@ -1579,7 +1609,7 @@ def detailsThemes(cur,val,prefix):
     return res
 
 def detailsTerritoires(cur,val,prefix):
-    req0="select * from territoires where id="+str(val)
+    req0="select * from "+prefix+"territoires where id="+str(val)
     cur.execute(req0)
     vals=cur.fetchall()
     res={}
@@ -1588,7 +1618,7 @@ def detailsTerritoires(cur,val,prefix):
         res["name"]=vals[0][1]
         res["dataSource"]=vals[0][2]
     
-    req1="select * from territoires where id in (select p_t_id from t_hierarchy where o_t_id="+str(val)+")"
+    req1="select * from "+prefix+"territoires where id in (select p_t_id from "+prefix+"t_hierarchy where o_t_id="+str(val)+")"
     cur.execute(req1)
     vals=cur.fetchall()
     res["t_hierarchy"]=[]
@@ -1596,7 +1626,7 @@ def detailsTerritoires(cur,val,prefix):
         for i in range(0,len(vals)):
             res["t_hierarchy"]+=[vals[i][0]]
 
-    req2="select * from "+prefix+"groups where id in (select g_id from territoires_groups where t_id="+str(val)+")"
+    req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"territoires_groups where t_id="+str(val)+")"
     cur.execute(req2)
     vals=cur.fetchall()
     res["territoires_groups"]=[]
@@ -1608,8 +1638,7 @@ def detailsTerritoires(cur,val,prefix):
 def detailsIndicateurs(inputs,cur,val,tab,prefix):
     res={}
     if tab=="metadata":
-        req0="SELECT id, name, description, sources, filename, url from indicateurs where id="+val
-        print >> sys.stderr,req0
+        req0="SELECT id, name, description, sources, filename, url from "+prefix+"indicateurs where id="+val
         cur.execute(req0)
         vals=cur.fetchall()
         if len(vals)>0:
@@ -1621,12 +1650,12 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
             res["url"]=vals[0][5]
 
         suffix=" and (not(agregation) or agregation is null)"
-        req1="select count(*) from indicateurs_territoires where i_id="+val+suffix
+        req1="select count(*) from "+prefix+"indicateurs_territoires where i_id="+val+suffix
         print >> sys.stderr,req1
         cur.execute(req1)
         vals=cur.fetchall()
         if len(vals)>0 and vals[0][0]>0:
-            req2="SELECT t_id, o_key_link, filename, tbl_link, tbl_key_link, query, ds from indicateurs_territoires where i_id="+val+suffix
+            req2="SELECT t_id, o_key_link, filename, tbl_link, tbl_key_link, query, ds from "+prefix+"indicateurs_territoires where i_id="+val+suffix
             print >> sys.stderr,req2
             cur.execute(req2)
             vals=cur.fetchall()
@@ -1639,12 +1668,12 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
                 res["query"]=vals[0][5]
                 res["ds"]=vals[0][6]
 
-        req0="select count(*) from indicateurs_keywords where i_id="+val
+        req0="select count(*) from "+prefix+"indicateurs_keywords where i_id="+val
         print >> sys.stderr,req0
         cur.execute(req0)
         vals=cur.fetchall()
         if len(vals)>0 and vals[0][0]>0:
-            req2="SELECT nom from keywords where id in (SELECT k_id from indicateurs_keywords where i_id="+val+")"
+            req2="SELECT nom from keywords where id in (SELECT k_id from "+prefix+"indicateurs_keywords where i_id="+val+")"
             print >> sys.stderr,req2
             cur.execute(req2)
             vals=cur.fetchall()
@@ -1655,7 +1684,7 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
                     else:
                         res["indicateurs_keywords"]=str(vals[k][0].encode("utf-8")).decode('utf-8')
 
-        req2="select * from "+prefix+"groups where id in (select g_id from indicateurs_groups where i_id="+str(val)+")"
+        req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"indicateurs_groups where i_id="+str(val)+")"
         cur.execute(req2)
         vals=cur.fetchall()
         res["indicateurs_groups"]=[]
@@ -1665,7 +1694,7 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
 
         print >> sys.stderr,inputs
         if inputs.has_key("public"):
-            req22='select t_id from indicateurs_territoires,territoires where indicateurs_territoires.t_id=territoires.id and indicateurs_territoires.i_id='+str(res["id"])+' and agregation;'
+            req22='select t_id from '+prefix+'indicateurs_territoires,'+prefix+'territoires where indicateurs_territoires.t_id=territoires.id and indicateurs_territoires.i_id='+str(res["id"])+' and agregation;'
             print >> sys.stderr,req22
             cur.execute(req22)
             vals=cur.fetchall()
@@ -1683,9 +1712,9 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
 
 
             
-            req2="select name from "+prefix+"themes where id in (select t_id from indicateurs_themes where i_id="+str(val)+")"
+            req2="select name from "+prefix+"themes where id in (select t_id from "+prefix+"indicateurs_themes where i_id="+str(val)+")"
         else:
-            req2="select id from "+prefix+"themes where id in (select t_id from indicateurs_themes where i_id="+str(val)+")"
+            req2="select id from "+prefix+"themes where id in (select t_id from "+prefix+"indicateurs_themes where i_id="+str(val)+")"
         cur.execute(req2)
         vals=cur.fetchall()
         res["indicateurs_themes"]=[]
@@ -1759,11 +1788,14 @@ def details(conf,inputs,outputs):
     con.connect()
     cur=con.conn.cursor()
     res=None
+    if not(auth.is_ftable(inputs["table"]["value"])):
+	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+	return zoo.SERVICE_FAILED
     if inputs["table"]["value"]=="territoires":
         res=detailsTerritoires(cur,inputs["id"]["value"],prefix)
     else:
         if inputs["table"]["value"]=="themes":
-            res=detailsThemes(cur,inputs["id"]["value"],prefix)
+            res=detailsThemes(con,inputs["id"]["value"],prefix)
         if inputs["table"]["value"]=="indicateurs":
             if inputs.has_key("tab"):
                 res=detailsIndicateurs(inputs,cur,inputs["id"]["value"],inputs["tab"]["value"],prefix)
@@ -1788,7 +1820,7 @@ def details(conf,inputs,outputs):
 
             conf["senv"]["last_index"]=inputs["id"]["value"]
         if inputs["table"]["value"]=="documents":
-            res=detailsDocuments(cur,inputs["id"]["value"],prefix)
+            res=detailsDocuments(con,inputs["id"]["value"],prefix)
     if res.has_key("file_link"):
         conf["senv"]["last_file"]=res["file_link"]
     if res is not None:

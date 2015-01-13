@@ -81,7 +81,6 @@ $conf["identification"]["title"]
 
 #import authenticate.service as auth
 #set con=$auth.getCon($conf)
-$con
 #set cur=con.conn.cursor()
 #set prefix=$auth.getPrefix($conf)
 
@@ -256,7 +255,8 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #import np.service as np
 #set indexes=np.getPublishedIndex($conf)
 #set idx=np.getLastPublishedIndex($conf)
-#set res=$cur.execute("SELECT id, name, description from indicateurs where id="+idx)
+#set res=$cur.execute("SELECT id, name, description from "+$prefix+"indicateurs where id="+idx)
+#try
 #set val=$cur.fetchall()
       <div class="post">
 	<h2 id="idx_title" class="htxt2">$val[0][1]</h2>
@@ -267,18 +267,17 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
               </li>
 
 	      <li>Thème: <span id="idx_theme">$zoo._("Theme name")</span></li>
-#try
 #set immap=$conf["main"]["dataPath"]+"/indexes_maps/project_PIndex"+str($val[0][0])+".map"
 #set dte=time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($immap)))
-#except
+#*except
 #set dte=""
 #end try
+#try*#
 	      <li>Publié le: <span id="idx_pdate">$dte</span></li>
 	     <li>Description: <span id="idx_desc" class="desc">$val[0][2]</span></li>
 	 </ul>
 	</div>
 	<div class="iovw">
-#try
 #set mm=mapscript.mapObj($indexes[0])
 #set ll=mm.web.metadata.get('mmActivatedLayers')
 #set a=$mm.getLayer(0).getExtent()
@@ -288,11 +287,12 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 	   <a target="_blank" href="./indicateurs" id="indicateur_file_link" class="more3">Voir la fiche</a>
           <a href="./indicateurs" class="more3">Voir la carte</a> 
          <img id="idx_ov" src="$conf["main"]["mapserverAddress"]?map=${indexes[0]}&LAYERS=$($mm.getLayer(0).name)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$a.minx,$a.miny,$a.maxx,$a.maxy&SRS=EPSG:4326&WIDTH=140&HEIGHT=110&r=1315253453.18" width="140" height="110" style="float:right;margin:20px 0 0 0;" />
-#except
-	$zoo._("Error accured")
-#end try
 	</div>
       </div>
+#except
+	$zoo._("Error accured")</h2>
+</div>
+#end try
 </div>
 
 
@@ -308,7 +308,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 
 	<div id="graphDisplay" class="al"></div>
 
-#set res=$cur.execute("SELECT type,name,vx,vy,lx,ly,tooltip from graphs where it_id=(select id from indicateurs_territoires where i_id="+$idx+" and not(agregation))")
+#set res=$cur.execute("SELECT type,name,vx,vy,lx,ly,tooltip from "+$prefix+"graphs where it_id=(select id from "+$prefix+"indicateurs_territoires where i_id="+$idx+" and not(agregation))")
 #set val=$cur.fetchone()
 	<input type="hidden" id="graphs_tooltip" value="#if $val is not None#$val[6]#end if#"/>
 	<input type="hidden" id="graphs_f_type" value="#if $val is not None#$val[0]#end if#"/>
@@ -322,7 +322,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 
 
         <div id="tagcloud">
-#set req="select keywords.id,nom,count(*) from keywords,indicateurs_keywords where indicateurs_keywords.k_id=keywords.id group by keywords.id,keywords.nom;"
+#set req="select keywords.id,nom,count(*) from "+$prefix+"keywords,"+$prefix+"indicateurs_keywords where indicateurs_keywords.k_id=keywords.id group by keywords.id,keywords.nom;"
 #set res=$cur.execute(req)
 #set vals=$cur.fetchall()
 #for i in range(0,len(vals))

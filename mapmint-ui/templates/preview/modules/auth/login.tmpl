@@ -8,8 +8,11 @@
 #set cur=con.cur
 #if $conf.has_key("senv") and $conf["senv"].has_key("login")
 
-#set ret=cur.execute("SELECT mail,login from "+$prefix+"users where login='"+$conf["senv"]["login"]+"'")
+#set ret=con.pexecute_req(["SELECT mail,login from "+$prefix+"users where login=[_login_]",{"login":{"value":$conf["senv"]["login"],"format":"s"}}])
+#*set ret=cur.execute("SELECT mail,login from "+$prefix+"users where login='"+$conf["senv"]["login"]+"'")
 #set res=cur.fetchall()
+*#
+#set res=con.cur.fetchall()
 $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/auth/preferences.html",searchList={"res": $res,"conf":$conf,"inputs":$inputs}))
 
 #end if

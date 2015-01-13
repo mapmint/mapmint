@@ -1839,7 +1839,7 @@ def saveLabel(conf,inputs,outputs):
         hasLabel=(inputs.has_key("label") and inputs["label"].has_key("value") and inputs["label"]["value"]!="")
     except:
         hasLabel=False
-    if inputs.keys().count("label") == 0 or hasLabel:
+    if inputs.keys().count("label") == 0: 
         layer.labelitem=None
         j=layer.numclasses-1
         while j>=0:
@@ -1849,7 +1849,7 @@ def saveLabel(conf,inputs,outputs):
 		    try:
 			    layer.getClass(j).removeLabel(0)
 		    except:
-			    pass
+			    continue
             j-=1
         saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
         outputs["Result"]["value"]=zoo._("Map saved")
@@ -1863,11 +1863,14 @@ def saveLabel(conf,inputs,outputs):
 
     j=layer.numclasses-1
     while j>=0:
+	print >> sys.stderr,j
 	try:
 		layer.getClass(j).removeLabel(0)
-	except:
-		pass
+	except Exception,e:
+		print >> sys.stderr,e
+		
         if not(inputs.has_key("label")) or not(inputs["label"].has_key("value")):
+            j-=1
             pass
         if inputs.has_key("mmFill"):
 	    l=mapscript.labelObj()
@@ -1922,12 +1925,13 @@ def saveLabel(conf,inputs,outputs):
 	
 	    try:
 		layer.getClass(j).removeLabel(0)
-	    except:
-		pass
+	    except Exception,e:
+		print >> sys.stderr,e
 	    try:
 		layer.getClass(j).addLabel(l)
-	    except:
-		pass
+		print >> sys.stderr,"Label added"
+	    except Exception,e:
+		print >> sys.stderr,e
         j-=1
     
     if inputs.has_key("fullPath") and inputs["fullPath"]["value"]=="true":

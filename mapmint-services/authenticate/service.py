@@ -50,6 +50,17 @@ def parseDb(db):
 	print >> sys.stderr,dbstr
 	return dbstr
 
+def is_ftable(value):
+	import re
+	if value is None:
+		return False
+        tab= r'^([.\s\w]+)\Z'
+        ro=re.compile(tab,re.UNICODE)
+        if ro.match(value):
+                return True
+        else:   
+                return False
+
 def getCon(conf):
 	if conf["main"].has_key(conf["main"]["dbuser"]) and conf["main"]["dbuser"]=="dblink":
 		print >> sys.stderr,"DB IS SQLITE"
@@ -98,14 +109,14 @@ def getLostPassword(conf,inputs,outputs):
 	con.connect()
 	conn = con.conn
 	cur=conn.cursor()
-	cur.execute('SELECT login,mail from '+prefix+'users where login=\''+inputs["login"]["value"]+'\' or mail=\''+inputs["login"]["value"]+'\'')
-	a=cur.fetchall()
+	conn.pexecute_req(["SELECT login,mail from "+prefix+"users where login=[_login_] or email=[_login1_]",{"login":{"value":inputs["login"]["value"],"format":"s"},"login":{"value":inputs["login"]["value"],"format":"s"}}])
+	a=conn.cur.fetchall()
 	if len(a)>0:
 		try:
 			passwd = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(8))
 			h = hashlib.new('ripemd160')
 			h.update(passwd)
-			cur.execute('update '+prefix+'users set passwd=\''+h.hexdigest()+'\' where login=\''+a[0][0]+'\'')
+			conn.cur.pexecute_req(['update '+prefix+'users set passwd=[_password_] where login=[_login_]',{"password": {"value":h.hexdigest(),"format":"s"},"login":{"value":a[0][0],"format":"s"}}])
 			conn.commit()
 			sendMail(conf,"recovery",a[0][1],a[0][0],passwd)
 		except Exception,e:
@@ -141,9 +152,8 @@ def saveUserPreferences(conf,inputs,outputs):
 	print >> sys.stderr,sqlStr
 	cur=conn.cursor()
 	try:
-		sql="UPDATE "+prefix+"users set "+sqlStr+" where login='"+conf["senv"]["login"]+"'"
-		print >> sys.stderr,sql
-		cur.execute(sql)
+		sql="UPDATE "+prefix+"users set "+sqlStr+" where login=[_login_]"
+		con.pexecute_req([sql,{"login":{"value":conf["senv"]["login"],"format":"s"}}])
 		conn.commit()
 	except Exception,e:
 		conf["lenv"]["message"]=zoo._("Unable to update user preferences: ")+str(e)
@@ -161,6 +171,7 @@ def registerUser(conf,inputs,outputs):
 	valuesStr=""
 	login=""
 	mail=""
+	params={}
 	for i in inputs["fields"]["value"]:
 		if inputs["values"]["value"][j]!="NULL" and inputs["fields"]["value"][j]!="s_group_id":
 			if fieldsStr!="":
@@ -169,7 +180,9 @@ def registerUser(conf,inputs,outputs):
 			if i=="passwd":
 				h = hashlib.new('ripemd160')
 				h.update(inputs["values"]["value"][j])
-				valuesStr+="'"+h.hexdigest()+"'"
+				#valuesStr+="'"+h.hexdigest()+"'"
+				valuesStr+="[_passwd_]"
+				params[i]={"value":h.hexdigest(),"format":"s"}
 				fieldsStr+=i
 			else:
 				if i=="login":
@@ -177,16 +190,18 @@ def registerUser(conf,inputs,outputs):
 				else:
 					if i=="mail":
 						mail=inputs["values"]["value"][j]
-				valuesStr+="'"+inputs["values"]["value"][j]+"'"
+				#valuesStr+="'"+inputs["values"]["value"][j]+"'"
+				params[i]={"value":inputs["values"]["value"][j],"format":"s"}
+				valuesStr+="[_"+i+"_]"
 				fieldsStr+=i
 		j+=1
 	cur=conn.cursor()
 	try:
 		sql="INSERT INTO "+prefix+"users ("+fieldsStr+") VALUES("+valuesStr+")"
 		print >> sys.stderr,sql
-		cur.execute(sql)
-		sql="INSERT INTO "+prefix+"user_group (id_group,id_user) VALUES("+inputs["values"]["value"][inputs["fields"]["value"].index("s_group_id")]+",(select last_value from velo.velo_users_idseq))"
-		cur.execute(sql)
+		con.pexecute_req([sql,params])
+		sql="INSERT INTO "+prefix+"user_group (id_group,id_user) VALUES([_id_group_],(select last_value from "+prefix+(prefix.replace(".","_"))+"users_idseq))"
+		con.pexecute_req([sql,{"id_group":{"value":inputs["values"]["value"][inputs["fields"]["value"].index("s_group_id")],"format":"s"}}])
 		if conf.has_key("smtp"):
 			sendMail(conf,"register",mail,login,"XXX")
 		conn.commit()
@@ -202,17 +217,18 @@ def clogIn(conf,inputs,outputs):
 		return zoo.SERVICE_FAILED
 	con=getCon(conf)
 	prefix=getPrefix(conf)
-	con.connect()
+	#con.connect()
 	conn = con.conn
 	h = hashlib.new('ripemd160')
 	h.update(inputs['password']['value'])
 	c = conn.cursor()
 	try:
-		c.execute(" SELECT login FROM "+prefix+"users WHERE login='"+inputs['login']['value']+"' AND passwd='"+h.hexdigest()+"' ")
+		con.pexecute_req([" SELECT login FROM "+prefix+"users WHERE login=[_login_] AND passwd=[_password_]",{"login":{"value":inputs['login']['value'],"format":"s"},"password": {"value":h.hexdigest(),"format":"s"}}])
+		
 	except Exception as e:
 		conf["lenv"]["message"]=zoo._("Error when processing SQL query: ")+str(e)
 		return zoo.SERVICE_FAILED
-	a=c.fetchall()
+	a=con.cur.fetchall()
 
 	if len(a)>0:
 		# Set all the Session environment variables using the users 
@@ -224,12 +240,12 @@ def clogIn(conf,inputs,outputs):
 			conf["senv"]["isTrial"]="true"
 		else:
 			conf["senv"]["isTrial"]="false"
-		conf["senv"]["group"]=getGroup(conf,c,inputs['login']['value'])
+		conf["senv"]["group"]=getGroup(conf,con,inputs['login']['value'])
 		conf["senv"]["isAdmin"]="false"
 
 		outputs["Result"]["value"]=zoo._("User ")+conf["senv"]["login"]+zoo._(" authenticated")
-		sql=" UPDATE "+prefix+"users set last_con="+con.now+" WHERE login='"+inputs['login']['value']+"' "
-		c.execute(sql)
+		sql=" UPDATE "+prefix+"users set last_con="+con.now+" WHERE login=[_login_]"
+		con.pexecute_req([sql,{"login":{"value":inputs['login']['value'],"format":"s"}}])
 		conn.commit()
 		return zoo.SERVICE_SUCCEEDED
 	else:
@@ -253,7 +269,6 @@ def clogOut(conf,inputs,outputs):
 	return zoo.SERVICE_FAILED
 
 def logOut(conf,inputs,outputs):
-	print >> sys.stderr,conf["senv"]
 	if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
 		outputs["Result"]["value"]=zoo._("User disconnected")
 		conf["senv"]["loggedin"]="false"
@@ -265,12 +280,13 @@ def logOut(conf,inputs,outputs):
 	conf["lenv"]["message"]=zoo._("User not authenticated")
 	return zoo.SERVICE_FAILED
 
-def getGroup(conf,c,login):
+def getGroup(conf,con,login):
 	try:
 		prefix=getPrefix(conf)
+		
 		req="select groups.name from "+prefix+"users,"+prefix+"user_group,"+prefix+"groups WHERE "+prefix+"users.id=id_user AND "+prefix+"groups.id=id_group AND login='"+login+"'"
-		c.execute(req)
-		a=c.fetchall()
+		con.pexecute_req([req,{"login":{"value":login,"format":"s"}}])
+		a=con.cur.fetchall()
 		res=""
 		for i in range(0,len(a)):
 			for j in range(0,len(a[i])):
@@ -289,7 +305,7 @@ def logIn(conf,inputs,outputs):
 	con=getCon(conf)
 	con.conf=conf
 	prefix=getPrefix(conf)
-	con.connect(conf)
+	#con.connect(conf)
 	try:
 		conn = con.conn
 	except:
@@ -300,13 +316,13 @@ def logIn(conf,inputs,outputs):
 	h.hexdigest()
 	c = conn.cursor()
 	try:
-		req=" SELECT users.*,(select name from "+prefix+"groups where id=id_group) as gname FROM "+prefix+"users,"+prefix+"user_group,"+prefix+"groups WHERE "+prefix+"users.id=id_user AND "+prefix+"groups.id=id_group AND adm=1 AND login='"+inputs['login']['value']+"' AND passwd='"+h.hexdigest()+"' "
-		print >> sys.stderr,req
-		c.execute(req)
+		req=" SELECT users.*,(select name from "+prefix+"groups where id=id_group) as gname FROM "+prefix+"users,"+prefix+"user_group,"+prefix+"groups WHERE "+prefix+"users.id=id_user AND "+prefix+"groups.id=id_group AND adm=1 AND login=[_login_] AND passwd=[_password_]"
+		con.pexecute_req([req,{"login":{"value":inputs["login"]["value"],"format":"s"},"password":{"value":h.hexdigest(),"format":"s"}}])
+		
 	except Exception as e:
 		conf["lenv"]["message"]=zoo._("Error when processing SQL query: ")+str(e)
 		return zoo.SERVICE_FAILED
-	a=c.fetchall()
+	a=con.cur.fetchall()
 
 	if len(a)>0:
 		conf["lenv"]["cookie"]="MMID=MM"+str(time.time()).split(".")[0]+"; path=/"
@@ -332,7 +348,7 @@ def logIn(conf,inputs,outputs):
 				else:
 					conf["senv"][i[1]]=str(a[0][i[0]])
 
-		conf["senv"]["group"]=getGroup(conf,c,inputs['login']['value'])
+		conf["senv"]["group"]=getGroup(conf,con,inputs['login']['value'])
 		conf["senv"]["loggedin"]="true"
 		conf["senv"]["isAdmin"]="true"
 		print >> sys.stderr,conf["senv"]
@@ -344,8 +360,8 @@ def logIn(conf,inputs,outputs):
 
 
 		outputs["Result"]["value"]=zoo._("User ")+conf["senv"]["login"]+zoo._(" authenticated")
-		sql=" UPDATE "+prefix+"users set last_con="+con.now+" WHERE login='"+inputs['login']['value']+"' "
-		c.execute(sql)
+		sql=" UPDATE "+prefix+"users set last_con="+con.now+" WHERE login=[_login_]"
+		con.pexecute_req([req,{"login":{"value":inputs["login"]["value"],"format":"s"}}])
 		conn.commit()
 		return zoo.SERVICE_SUCCEEDED
 	else:

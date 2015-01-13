@@ -335,269 +335,276 @@ __declspec(dllexport)
     dumpMaps(inputs);
     fprintf(stderr,"Load Mapfile %s %d\n",mapPath,__LINE__);
     map* layerName=getMapFromMaps(inputs,"layer","value");
+    fprintf(stderr,"Load Mapfile %s %d\n",mapPath,__LINE__);
+    layerObj* myLayer=NULL;
     if(layerName!=NULL){
-      fprintf(stderr,"Load Layer %s %d\n",layerName->value,myMap->numlayers);
-      layerObj* myLayer=myMap->layers[msGetLayerIndex(myMap,layerName->value)];
-      fprintf(stderr,"Load Layer %s %d\n",layerName->value,myLayer->type);
-      //fprintf(stderr,"LAYER TYPE %d\n",myLayer->type);
+      fprintf(stderr,"Load Mapfile %s %d\n",mapPath,__LINE__);
+      if(myMap!=NULL){
+	fprintf(stderr,"Load Layer %s %d\n",layerName->value,myMap->numlayers);
+	layerObj* myLayer=myMap->layers[msGetLayerIndex(myMap,layerName->value)];
+	fprintf(stderr,"Load Layer %s %d\n",layerName->value,myLayer->type);
+	//fprintf(stderr,"LAYER TYPE %d\n",myLayer->type);
         
-      if(myLayer->type!=3 || myLayer->tileindex!=NULL){
-	fprintf(stderr,"LAYER CONNECTION %s\n",myLayer->connection);
-	if(isPg<0 && isWxs<0){
-	  free(mapPath);
-	  mapPath=(char*)malloc((strlen(iniPszDataSource)+13)*sizeof(char));
-	  sprintf(mapPath,"%s/ds_ows.map",iniPszDataSource);
-	  setMapInMaps(conf,"main","mapfile",mapPath);
-	  free(pszDataSource);
-	  if(myLayer->connection!=NULL)
-	    pszDataSource=strdup(myLayer->connection);
-	  else
-	    if(myLayer->tileindex!=NULL)
-	      pszDataSource=strdup(myLayer->tileindex);
-	}
+	if(myLayer->type!=3 || myLayer->tileindex!=NULL){
+	  fprintf(stderr,"LAYER CONNECTION %s\n",myLayer->connection);
+	  if(isPg<0 && isWxs<0){
+	    free(mapPath);
+	    mapPath=(char*)malloc((strlen(iniPszDataSource)+13)*sizeof(char));
+	    sprintf(mapPath,"%s/ds_ows.map",iniPszDataSource);
+	    setMapInMaps(conf,"main","mapfile",mapPath);
+	    free(pszDataSource);
+	    if(myLayer->connection!=NULL)
+	      pszDataSource=strdup(myLayer->connection);
+	    else
+	      if(myLayer->tileindex!=NULL)
+		pszDataSource=strdup(myLayer->tileindex);
+	  }
 
 	if(myLayer->connection!=NULL && strstr(myLayer->connection,".json")!=NULL)
 	  isJson=1;
-
-	const char *pszWHERE = NULL;
-	char        **papszLayers = NULL;
-	OGRGeometry *poSpatialFilter = NULL;
-	int         nRepeatCount = 1, bAllLayers = FALSE;
-	char  *pszSQLStatement = NULL;
-	const char  *pszDialect = NULL;
-	
-	/* -------------------------------------------------------------------- */
-	/*      Register format(s).                                             */
-	/* -------------------------------------------------------------------- */
-	OGRRegisterAll();
-	//msLookupHashTable(&(layer->metadata),defaultkey)
-	
-	xmlDocPtr resDoc = xmlNewDoc(BAD_CAST "1.0");
-	xmlNodePtr n;
-	
-	bSummaryOnly = TRUE;
-	bVerbose = FALSE;
-	map *tmp1=getMapFromMaps(inputs,"layer","value");
-	map *tmp2=getMapFromMaps(inputs,"getFeatures","value");
-	if(isJson<0 || tmp2!=NULL){
-	  if(tmp1!=NULL){
-	    if(tmp2!=NULL && isJson>0)
-	      papszLayers = CSLAddString( papszLayers, "OGRGeoJSON" );
-	    else
-	      papszLayers = CSLAddString( papszLayers, tmp1->value );
-	  }
-	  else{
-	    char *tmp4=strrchr(tmp->value,'/');
-	    if(tmp4!=NULL && strlen(tmp4) > 1){
-	      char *tmp2=strrchr(tmp->value,'/')+1;
-	      tmp2[strlen(tmp2)-strlen(strstr(tmp2,"."))]=0;
-	      char *tmp3=strdup(tmp2);
-	      papszLayers = CSLAddString( papszLayers, tmp3 );
-	      fprintf(stderr,tmp3);
-	      free(tmp3);
-	    }
-	  }
 	}
-
-	tmp1=getMapFromMaps(inputs,"getFeatures","value");
-	if(tmp1!=NULL){
-	  dataSource = FALSE;
-	  tmp1=getMapFromMaps(inputs,"page","value");
-	  if(tmp1!=NULL)
-	    mmPage=atoi(tmp1->value);
-	  tmp1=getMapFromMaps(inputs,"limit","value");
-	  if(tmp1!=NULL)
-	    mmLimit=atoi(tmp1->value);      
-
-	  char*   mmField=NULL;
-	  char*   mmOrder=NULL;
-	  tmp1=getMapFromMaps(inputs,"sortname","value");
-	  if(tmp1!=NULL)
-	    mmField=strdup(tmp1->value);
-	  tmp1=getMapFromMaps(inputs,"sortorder","value");
-	  if(tmp1!=NULL)
-	    mmOrder=strdup(tmp1->value);
-	  if(mmField!=NULL && mmOrder!=NULL){
-	    pszSQLStatement=(char*) malloc((strlen(mmField)+strlen(mmOrder)+128)*sizeof(char)+1);
-	    if(isPg<0)
-	      sprintf(pszSQLStatement,"SELECT * FROM \"%s\" ORDER BY %s %s",papszLayers[0],mmField,mmOrder);
-	    else{
-	      // Make it case sensitive !!
-	      sprintf(pszSQLStatement,"SELECT * FROM %s ORDER BY %s %s",papszLayers[0],mmField,mmOrder);
-	    }
-	    
-	    //sprintf(pszSQLStatement,"SELECT * FROM \"%s\" ORDER BY %s %s",papszLayers[0],mmField,mmOrder);
-	    fprintf(stderr,"SQL (%s)\n",pszSQLStatement);
-	    free(mmField);
-	    free(mmOrder);
-	  }
+	else{
+	  fprintf(stderr,"Should treat raster from here !!\n");
+	  gdalinfo(conf,outputs,myLayer->data);
 	}
-      
-	if(dataSource){
-	  n = xmlNewNode(NULL, BAD_CAST "datasource");
-	}
-	else
-	  n = xmlNewNode(NULL, BAD_CAST "FeatureCollection");
-	
-	/* -------------------------------------------------------------------- */
-	/*      Open data source.                                               */
-	/* -------------------------------------------------------------------- */
-	OGRDataSource       *poDS = NULL;
-	OGRSFDriver         *poDriver = NULL;
+      }
+    }
+    fprintf(stderr,"Load Mapfile %s %d\n",mapPath,__LINE__);
 
-	poDS = OGRSFDriverRegistrar::Open( pszDataSource, !bReadOnly, &poDriver );
-	if( poDS == NULL && !bReadOnly )
-	  {
-	    poDS = OGRSFDriverRegistrar::Open( pszDataSource, FALSE, &poDriver );
-	  }
-
-	/* -------------------------------------------------------------------- */
-	/*      Report failure                                                  */
-	/* -------------------------------------------------------------------- */
-	if( poDS == NULL )
-	  {
-	    OGRSFDriverRegistrar    *poR = OGRSFDriverRegistrar::GetRegistrar();
-	    char tmp2[2048];
-	    sprintf(tmp2,
-		    _ss("FAILURE:\n"
-			"Unable to open datasource `%s' with the following drivers:\n"),
-		    pszDataSource );
-
-	    for( int iDriver = 0; iDriver < poR->GetDriverCount(); iDriver++ )
-	      {
-		char *tmp3=strdup(tmp2);
-		sprintf(tmp2,"%s  - %s\n", tmp3, poR->GetDriver(iDriver)->GetName() );
-		free(tmp3);
-	      }
-	    setMapInMaps(conf,"lenv","message",tmp2);
-	    return SERVICE_FAILED;
-	  }
-
-	xmlNodePtr n1;
-	if(dataSource){
-	  n1=xmlNewNode(NULL,BAD_CAST "dataType");
-	  OGRSFDriver* tmp=poDS->GetDriver();
-	  xmlAddChild(n1,xmlNewText(BAD_CAST tmp->GetName()));
-	  xmlAddChild(n,n1);
-
-	  //if(strcasecmp(tmp->GetName(),"ESRI Shapefile")==0){
-	  //OGRLayer *_poResultSet = poDS->ExecuteSQL( tmpSQL, poSpatialFilter, pszDialect );
-	  //}
-	}
-
+    const char *pszWHERE = NULL;
+    char        **papszLayers = NULL;
+    OGRGeometry *poSpatialFilter = NULL;
+    int         nRepeatCount = 1, bAllLayers = FALSE;
+    char  *pszSQLStatement = NULL;
+    const char  *pszDialect = NULL;
     
-	/* -------------------------------------------------------------------- */
-	/*      Special case for -sql clause.  No source layers required.       */
-	/* -------------------------------------------------------------------- */
-	map* tmpSql=getMapFromMaps(inputs,"sql","value");
-	if(tmpSql!=NULL)
-	  pszSQLStatement=strdup(tmpSql->value);
+    /* -------------------------------------------------------------------- */
+    /*      Register format(s).                                             */
+    /* -------------------------------------------------------------------- */
+    OGRRegisterAll();
+    //msLookupHashTable(&(layer->metadata),defaultkey)
+    
+    xmlDocPtr resDoc = xmlNewDoc(BAD_CAST "1.0");
+    xmlNodePtr n;
+    
+    bSummaryOnly = TRUE;
+    bVerbose = FALSE;
+    map *tmp1=getMapFromMaps(inputs,"layer","value");
+    map *tmp2=getMapFromMaps(inputs,"getFeatures","value");
+    if(isJson<0 || tmp2!=NULL){
+      if(tmp1!=NULL){
+	if(tmp2!=NULL && isJson>0)
+	  papszLayers = CSLAddString( papszLayers, "OGRGeoJSON" );
+	else
+	  papszLayers = CSLAddString( papszLayers, tmp1->value );
+      }
+      else{
+	char *tmp4=strrchr(tmp->value,'/');
+	if(tmp4!=NULL && strlen(tmp4) > 1){
+	  char *tmp2=strrchr(tmp->value,'/')+1;
+	  tmp2[strlen(tmp2)-strlen(strstr(tmp2,"."))]=0;
+	  char *tmp3=strdup(tmp2);
+	  papszLayers = CSLAddString( papszLayers, tmp3 );
+	  fprintf(stderr,tmp3);
+	  free(tmp3);
+	}
+      }
+    }
+    
+    tmp1=getMapFromMaps(inputs,"getFeatures","value");
+    if(tmp1!=NULL){
+      dataSource = FALSE;
+      tmp1=getMapFromMaps(inputs,"page","value");
+      if(tmp1!=NULL)
+	mmPage=atoi(tmp1->value);
+      tmp1=getMapFromMaps(inputs,"limit","value");
+      if(tmp1!=NULL)
+	mmLimit=atoi(tmp1->value);      
       
-	if( pszSQLStatement != NULL )
+      char*   mmField=NULL;
+      char*   mmOrder=NULL;
+      tmp1=getMapFromMaps(inputs,"sortname","value");
+      if(tmp1!=NULL)
+	mmField=strdup(tmp1->value);
+      tmp1=getMapFromMaps(inputs,"sortorder","value");
+      if(tmp1!=NULL)
+	mmOrder=strdup(tmp1->value);
+      if(mmField!=NULL && mmOrder!=NULL){
+	pszSQLStatement=(char*) malloc((strlen(mmField)+strlen(mmOrder)+128)*sizeof(char)+1);
+	if(isPg<0)
+	  sprintf(pszSQLStatement,"SELECT * FROM \"%s\" ORDER BY %s %s",papszLayers[0],mmField,mmOrder);
+	else{
+	  // Make it case sensitive !!
+	  sprintf(pszSQLStatement,"SELECT * FROM %s ORDER BY %s %s",papszLayers[0],mmField,mmOrder);
+	}
+	
+	//sprintf(pszSQLStatement,"SELECT * FROM \"%s\" ORDER BY %s %s",papszLayers[0],mmField,mmOrder);
+	fprintf(stderr,"SQL (%s)\n",pszSQLStatement);
+	free(mmField);
+	free(mmOrder);
+      }
+    }
+    
+    if(dataSource){
+      n = xmlNewNode(NULL, BAD_CAST "datasource");
+    }
+    else
+      n = xmlNewNode(NULL, BAD_CAST "FeatureCollection");
+    
+    /* -------------------------------------------------------------------- */
+    /*      Open data source.                                               */
+    /* -------------------------------------------------------------------- */
+    OGRDataSource       *poDS = NULL;
+    OGRSFDriver         *poDriver = NULL;
+    
+    poDS = OGRSFDriverRegistrar::Open( pszDataSource, !bReadOnly, &poDriver );
+    if( poDS == NULL && !bReadOnly )
+      {
+	poDS = OGRSFDriverRegistrar::Open( pszDataSource, FALSE, &poDriver );
+      }
+    
+    /* -------------------------------------------------------------------- */
+    /*      Report failure                                                  */
+    /* -------------------------------------------------------------------- */
+    if( poDS == NULL )
+      {
+	OGRSFDriverRegistrar    *poR = OGRSFDriverRegistrar::GetRegistrar();
+	char tmp2[2048];
+	sprintf(tmp2,
+		_ss("FAILURE:\n"
+		    "Unable to open datasource `%s' with the following drivers:\n"),
+		pszDataSource );
+	
+	for( int iDriver = 0; iDriver < poR->GetDriverCount(); iDriver++ )
 	  {
-	    OGRLayer *poResultSet = NULL;
-
-	    nRepeatCount = 0;  // skip layer reporting.
-
-	    poResultSet = poDS->ExecuteSQL( pszSQLStatement, poSpatialFilter, 
-					    pszDialect );
-
-	    if( poResultSet != NULL )
-	      {
-		if( pszWHERE != NULL )
-		  poResultSet->SetAttributeFilter( pszWHERE );
-		ReportOnLayer( myMap, inputs, pszDataSource, poResultSet, NULL, NULL, n, conf );
-		poDS->ReleaseResultSet( poResultSet );
-	      }
-	    free(pszSQLStatement);
+	    char *tmp3=strdup(tmp2);
+	    sprintf(tmp2,"%s  - %s\n", tmp3, poR->GetDriver(iDriver)->GetName() );
+	    free(tmp3);
 	  }
-
-
-	for( int iRepeat = 0; iRepeat < nRepeatCount; iRepeat++ )
+	setMapInMaps(conf,"lenv","message",tmp2);
+	return SERVICE_FAILED;
+      }
+    
+    xmlNodePtr n1;
+    if(dataSource){
+      n1=xmlNewNode(NULL,BAD_CAST "dataType");
+      OGRSFDriver* tmp=poDS->GetDriver();
+      xmlAddChild(n1,xmlNewText(BAD_CAST tmp->GetName()));
+      xmlAddChild(n,n1);
+      
+      //if(strcasecmp(tmp->GetName(),"ESRI Shapefile")==0){
+      //OGRLayer *_poResultSet = poDS->ExecuteSQL( tmpSQL, poSpatialFilter, pszDialect );
+      //}
+    }
+    
+    
+    /* -------------------------------------------------------------------- */
+    /*      Special case for -sql clause.  No source layers required.       */
+    /* -------------------------------------------------------------------- */
+    map* tmpSql=getMapFromMaps(inputs,"sql","value");
+    if(tmpSql!=NULL)
+      pszSQLStatement=strdup(tmpSql->value);
+    
+    if( pszSQLStatement != NULL )
+      {
+	OGRLayer *poResultSet = NULL;
+	
+	nRepeatCount = 0;  // skip layer reporting.
+	
+	poResultSet = poDS->ExecuteSQL( pszSQLStatement, poSpatialFilter, 
+					pszDialect );
+	
+	if( poResultSet != NULL )
 	  {
-	    if ( CSLCount(papszLayers) == 0 )
+	    if( pszWHERE != NULL )
+	      poResultSet->SetAttributeFilter( pszWHERE );
+	    ReportOnLayer( myMap, inputs, pszDataSource, poResultSet, NULL, NULL, n, conf );
+	    poDS->ReleaseResultSet( poResultSet );
+	  }
+	free(pszSQLStatement);
+      }
+    
+    
+    for( int iRepeat = 0; iRepeat < nRepeatCount; iRepeat++ )
+      {
+	if ( CSLCount(papszLayers) == 0 )
+	  {
+	    /* -------------------------------------------------------------------- */ 
+	    /*      Process each data source layer.                                 */ 
+	    /* -------------------------------------------------------------------- */ 
+	    for( int iLayer = 0; iLayer < poDS->GetLayerCount(); iLayer++ )
 	      {
-		/* -------------------------------------------------------------------- */ 
-		/*      Process each data source layer.                                 */ 
-		/* -------------------------------------------------------------------- */ 
-		for( int iLayer = 0; iLayer < poDS->GetLayerCount(); iLayer++ )
+		OGRLayer        *poLayer = poDS->GetLayer(iLayer);
+		
+		if( poLayer == NULL )
 		  {
-		    OGRLayer        *poLayer = poDS->GetLayer(iLayer);
-
-		    if( poLayer == NULL )
-		      {
-			char tmp[128];
-			sprintf( tmp,
-				 _ss("FAILURE: Couldn't fetch advertised layer %d!\n"),
-				 iLayer );
-			setMapInMaps(conf,"lenv","message",_ss(tmp));
-			return SERVICE_FAILED;
-		      }
-
-		    if (!bAllLayers)
-		      {
-			ReportOnLayer( myMap, inputs, pszDataSource, poLayer, pszWHERE, poSpatialFilter, n, conf );
-		      }
-		    else
-		      {
-			if( iRepeat != 0 )
-			  poLayer->ResetReading();
-
-			ReportOnLayer( myMap, inputs, pszDataSource, poLayer, pszWHERE, poSpatialFilter, n, conf );
-		      }
+		    char tmp[128];
+		    sprintf( tmp,
+			     _ss("FAILURE: Couldn't fetch advertised layer %d!\n"),
+			     iLayer );
+		    setMapInMaps(conf,"lenv","message",_ss(tmp));
+		    return SERVICE_FAILED;
 		  }
-	      }
-	    else
-	      {
-		/* -------------------------------------------------------------------- */ 
-		/*      Process specified data source layers.                           */ 
-		/* -------------------------------------------------------------------- */ 
-		char** papszIter = papszLayers;
-		for( ; *papszIter != NULL; papszIter++ )
+		
+		if (!bAllLayers)
 		  {
-		    OGRLayer        *poLayer = poDS->GetLayerByName(*papszIter);
-
-		    if( poLayer == NULL )
-		      {
-			char tmp[128];
-			sprintf( tmp,
-				 _ss("FAILURE: Couldn't fetch requested layer %s!\n"),
-				 *papszIter );
-			setMapInMaps(conf,"lenv","message",tmp);
-			return SERVICE_FAILED;
-		      }
-
+		    ReportOnLayer( myMap, inputs, pszDataSource, poLayer, pszWHERE, poSpatialFilter, n, conf );
+		  }
+		else
+		  {
 		    if( iRepeat != 0 )
 		      poLayer->ResetReading();
-
-		    ReportOnLayer(myMap, inputs, pszDataSource,  poLayer, pszWHERE, poSpatialFilter, n, conf );
+		    
+		    ReportOnLayer( myMap, inputs, pszDataSource, poLayer, pszWHERE, poSpatialFilter, n, conf );
 		  }
 	      }
 	  }
-
-	/* -------------------------------------------------------------------- */
-	/*      Close down.                                                     */
-	/* -------------------------------------------------------------------- */
-	CSLDestroy( papszLayers );
-	CSLDestroy( papszOptions );
-	OGRDataSource::DestroyDataSource( poDS );
-	if (poSpatialFilter)
-	  OGRGeometryFactory::destroyGeometry( poSpatialFilter );
-
-	OGRCleanupAll();
-
-	xmlChar *xmlb;
-	int bsize;
-	xmlDocSetRootElement(resDoc, n);
-	xmlDocDumpFormatMemory(resDoc, &xmlb, &bsize, 1);
-	setMapInMaps(outputs,"Result","value",(char*)xmlb);
-
-      }else{
-	fprintf(stderr,"Should treat raster from here !!\n");
-	gdalinfo(conf,outputs,myLayer->data);
+	else
+	  {
+	    /* -------------------------------------------------------------------- */ 
+	    /*      Process specified data source layers.                           */ 
+	    /* -------------------------------------------------------------------- */ 
+	    char** papszIter = papszLayers;
+	    for( ; *papszIter != NULL; papszIter++ )
+	      {
+		OGRLayer        *poLayer = poDS->GetLayerByName(*papszIter);
+		
+		if( poLayer == NULL )
+		  {
+		    char tmp[128];
+		    sprintf( tmp,
+			     _ss("FAILURE: Couldn't fetch requested layer %s!\n"),
+			     *papszIter );
+		    setMapInMaps(conf,"lenv","message",tmp);
+		    return SERVICE_FAILED;
+		  }
+		
+		if( iRepeat != 0 )
+		  poLayer->ResetReading();
+		
+		ReportOnLayer(myMap, inputs, pszDataSource,  poLayer, pszWHERE, poSpatialFilter, n, conf );
+	      }
+	  }
       }
-
-    }
+    
+    /* -------------------------------------------------------------------- */
+    /*      Close down.                                                     */
+    /* -------------------------------------------------------------------- */
+    CSLDestroy( papszLayers );
+    CSLDestroy( papszOptions );
+    OGRDataSource::DestroyDataSource( poDS );
+    if (poSpatialFilter)
+      OGRGeometryFactory::destroyGeometry( poSpatialFilter );
+    
+    OGRCleanupAll();
+    
+    xmlChar *xmlb;
+    int bsize;
+    xmlDocSetRootElement(resDoc, n);
+    xmlDocDumpFormatMemory(resDoc, &xmlb, &bsize, 1);
+    setMapInMaps(outputs,"Result","value",(char*)xmlb);
+    
+  
 
     msSaveMap(myMap,mapPath);
     msFreeMap(myMap);

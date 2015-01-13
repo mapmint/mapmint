@@ -32,7 +32,14 @@ def check_user_params(param,valeur):
 		else:
 			return False
 
-
+def is_ftable(value):
+	tab= r'^([\s\w]+)\Z'
+	ro=re.compile(tab_reg[param],re.UNICODE)
+	if ro.match(value):
+		return True
+	else:
+		return False
+		
 
 
 def check_group_params(param,valeur):
@@ -62,6 +69,7 @@ class manage_users:
 			self.conf=conf
 		try:
 			self.db.index(".db")
+			self.paramstyle=sqlite3.paramstyle
                 	self.conn = sqlite3.connect(self.db)
                         self.cur = self.conn.cursor()
 			self.conn.execute("PRAGMA foreign_keys = ON")
@@ -72,6 +80,7 @@ class manage_users:
                 except Exception,e:
 			try:
 				self.conn = psycopg2.connect(self.db)
+				self.paramstyle=psycopg2.paramstyle
 				self.cur = self.conn.cursor()
 				self.dbtype="PG"
 				self.now="now()"
@@ -100,6 +109,32 @@ class manage_users:
 			self.conn.commit()
                 except Exception,e:
                 	print >> sys.stderr,e
+			self.conn.commit()
+			return False
+		return True
+
+	'''
+	Example "SELECT * FROM table WHERE name=[arg1]" {"arg1": {value: "myval",format: "s"}} 
+	'''
+	def pexecute_req(self,req):
+		params=None
+		for i in req[1]:
+			if self.paramstyle=="qmark":
+				if params is None:
+					params=()
+				req[0]=req[0].replace("[_"+i+"_]","?")
+				params+=(req[1][i]["value"],)
+			else:
+				if self.paramstyle=="pyformat":			
+					if params is None:
+						params={}
+					req[0]=req[0].replace("[_"+i+"_]","%("+i+")"+req[1][i]["format"])
+					params[i]=req[1][i]["value"]
+		try:
+			self.cur.execute(req[0],params)
+			self.conn.commit()
+		except Exception,e:
+			print >> sys.stderr,e
 			self.conn.commit()
 			return False
 		return True
