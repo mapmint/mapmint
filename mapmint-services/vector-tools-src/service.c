@@ -184,6 +184,7 @@ __declspec(dllexport)
     int isPg=-1;
     int isWxs=-1;
     int isJson=-1;
+    int isRaster=-1;
 
     map *tmpP=getMapFromMaps(conf,"main","dataPath");
     map *tmp=getMapFromMaps(inputs,"dataSource","value");
@@ -366,11 +367,13 @@ __declspec(dllexport)
 	else{
 	  fprintf(stderr,"Should treat raster from here !!\n");
 	  gdalinfo(conf,outputs,myLayer->data);
+	  isRaster=1;
 	}
       }
     }
     fprintf(stderr,"Load Mapfile %s %d\n",mapPath,__LINE__);
 
+    if(isRaster<0){
     const char *pszWHERE = NULL;
     char        **papszLayers = NULL;
     OGRGeometry *poSpatialFilter = NULL;
@@ -603,6 +606,7 @@ __declspec(dllexport)
     xmlDocSetRootElement(resDoc, n);
     xmlDocDumpFormatMemory(resDoc, &xmlb, &bsize, 1);
     setMapInMaps(outputs,"Result","value",(char*)xmlb);
+	}
     
   
 

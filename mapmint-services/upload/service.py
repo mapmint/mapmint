@@ -36,7 +36,10 @@ def getForm(conf,inputs,outputs):
             dirs+=[elements["Directories"][i]["name"]]
         j+=1
     import template.service as tmpl    
-    tmpl.display(conf,{"tmpl":{"value":inputs["form"]["value"]},"dirs": dirs},outputs)
+    inputs1=inputs
+    inputs1["tmpl"]={"value":inputs["form"]["value"]}
+    inputs1["dirs"]=dirs
+    tmpl.display(conf,inputs1,outputs)
     return 3
 
 def saveOnServer(conf,inputs,outputs):

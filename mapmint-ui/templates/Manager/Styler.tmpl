@@ -303,7 +303,11 @@ $m.getLayerByName($inputs["layer"]["value"]).addProcessing("RESAMPLE=NEAREST")
 		<table class="classif">
 			<tr>
 				<td class="title">$zoo._("Opacity:")<input type="text" id="opacity" name="opacity" value="#if $m.getLayerByName($inputs["layer"]["value"]).getClass(0) is not None#$m.getLayerByName($inputs["layer"]["value"]).getClass(0).getStyle(0).opacity%#else##if $m.getLayerByName($inputs["layer"]["value"]).opacity#$m.getLayerByName($inputs["layer"]["value"]).opacity#else#100#end if#%#end if#" class="opacity"/></td>
-				<td><div id="slider-opacity"></div></td>
+				<td><div id="slider-opacity"></div>
+      <div id="opacityOnly">
+	<a class="ui-state-default ui-button-text-only ui-corner-all classify opacity" href="#" onclick="setOpacityOnly()">Set opacity for each class</a>
+      </div>
+</td>
 			</tr>
 			<tr>
 				<td class="title">$zoo._("Legend Type:")</td>

@@ -1794,7 +1794,7 @@ def saveOpacity(conf,inputs,outputs):
     
     
     isStep=False
-    if inputs .has_key("mmStep"):
+    if inputs.has_key("mmStep"):
 	    m=mapscript.mapObj(mapfile)
 	    l=m.getLayerByName(inputs["layer"]["value"])
 	    l.metadata.set("mmClass","tl")
@@ -1805,8 +1805,22 @@ def saveOpacity(conf,inputs,outputs):
     m1=m.clone()
     i=0
     layer=m.getLayerByName(inputs["layer"]["value"])
+    if layer.metadata.get("mmClass")=="gs" and layer.type==mapscript.MS_LAYER_RASTER:
+    	mapfile1=mapPath+"/color_ramp_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"]+".map"
+	m1=mapscript.mapObj(mapfile1)
+	layer1=m1.getLayerByName(inputs["layer"]["value"])
+	layer1.opacity=int(inputs["mmOpacity"]["value"])
+	layer1.updateFromString("LAYER OPACITY "+str(inputs["mmOpacity"]["value"])+" END")
+	while i < layer1.numclasses:
+		try:
+			layer1.getClass(i).getStyle(0).opacity=int(inputs["mmOpacity"]["value"])
+		except:
+			continue
+        	i+=1
+	saveProjectMap(m1,mapfile1)	
     if layer.encoding is None:
         layer.encoding="utf-8"
+    i=0
     while i < layer.numclasses:
 	try:
 		layer.getClass(i).getStyle(0).opacity=int(inputs["mmOpacity"]["value"])
