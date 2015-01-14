@@ -528,7 +528,7 @@ MapMintDBManager=Class.create({
 				   Array("name"));
 		$.ajax({
 		    type: "GET",
-		    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores/"+((dsType=="postgis" || dsType=="mysql")?"postgis":((dsType=="wfs" || dsType=="wms")?"wfs":"directories"))+"load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
+		    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores."+((dsType=="postgis" || dsType=="mysql")?"postgis":((dsType=="wfs" || dsType=="wms")?"wfs":"directories"))+".load&DataInputs=type="+dsType+";name="+dsName+"&RawDataOutput=Result",
 		    dataType: "text",
 		    complete: function(xml,status){
 			var tmp=eval('('+xml.responseText+')');
