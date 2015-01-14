@@ -2715,10 +2715,11 @@ def savePublishMap(conf,inputs,outputs):
 def savePublishPreview(conf,inputs,outputs):
 	import mapscript
 	mapfile=conf["main"]["dataPath"]+"/public_maps/project_"+inputs["map"]["value"]+".map"
-	destMapfile=mapfile.replace("maps","public_maps")
+	destMapfile=mapfile.replace("public_maps","maps")
 	m = mapscript.mapObj(mapfile)
 	generatePreview(conf,m)
 	saveProjectMap(m,mapfile)
+	saveProjectMap(m,destMapfile)
 	outputs["Result"]["value"]=zoo._("Project preview generated")
 	return zoo.SERVICE_SUCCEEDED
 
