@@ -17,7 +17,7 @@ ZOO_DIR=@ZOO_DIR@
 
 
 
-CPPFLAGS        :=  -DZOO_SERVICE   -DUSE_CAIRO -DUSE_KML -DUSE_MS -I${ZOO_DIR}
+CPPFLAGS        :=  -DZOO_SERVICE   -DUSE_CAIRO -DUSE_KML -DUSE_MS -I${ZOO_DIR} -I${ZOO_DIR}/../../thirds/cgic206
 
 BIN_LIST = cgi-env/service.zo
 
