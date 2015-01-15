@@ -1,0 +1,28 @@
+[isFavSrs]
+ Title = Check for favorite SRS
+ Abstract = Verifiy if a SRS is a favorite.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [field]
+   Title = Input string
+   Abstract = The name of the map to extract values from.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The favorite value
+   Abstract = The favorite value
+   <LiteralData>
+    dataType = boolean
+    <Default />
+   </LiteralData>
+ </DataOutputs>

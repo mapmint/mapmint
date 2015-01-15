@@ -293,6 +293,29 @@ def getDataStorePrivileges(conf,inputs,outputs):
         outputs["Result"]["value"]=json.dumps([[conf["senv"]["group"],"1","1","1"]])
     return zoo.SERVICE_SUCCEEDED
 
+def isFavSrs(conf,inputs,outputs):
+    con=manage_users(conf["main"]["dblink"])
+    con.connect(conf)
+    clause="fav and "
+    if inputs["srs_field"]["value"]=="id":
+        clause+="code="
+    else:
+        clause+="name="
+    clause+="[_val_]"
+    v="SELECT count(*) from spatial_ref_sys WHERE "+clause
+    try:
+        con.pexecute_req([v,{"val":{"value":inputs["srs_id"]["value"],"format":"s"}}])
+	val=con.cur.fetchone()
+	print >> sys.stderr,val
+	if val[0]>0:
+        	outputs["Result"]["value"]="true"
+	else:
+		outputs["Result"]["value"]="false"
+    except Exception,e:
+	conf["lenv"]["message"]=zoo._("Error occured: ")+str(e)
+	return zoo.SERVICE_FAILED
+    return zoo.SERVICE_SUCCEEDED
+
 def saveFavSrs(conf,inputs,outputs):
     con=manage_users(conf["main"]["dblink"])
     con.connect(conf)

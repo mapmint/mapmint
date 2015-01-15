@@ -89,6 +89,7 @@ SrsManager=Class.create({
 		    $("#"+System.currentField).find("option").each(
 			function(){
 			    if($(this).val()==System.currentSelection){
+			    	SrsManager.isFav();
 				$("#tags"+(System.currentField=="tags"?"1":"")).next().find(".combo-text").each(function(){
 				    $(this).val(
 					$("#tags"+(System.currentField=="tags"?"1":""))[0].options[System.sid].value
@@ -110,6 +111,17 @@ SrsManager=Class.create({
 			    document.location.reload(false);
 		    }
 		});
+	    }
+	});
+    },
+    isFav: function(){
+	var val="";
+	$("#"+System.currentField).next().find("input.combo-value").each(function(){val=$(this).val();})
+	$.ajax({
+	    url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=datastores.isFavSrs&DataInputs=srs_field="+(System.currentField=="tags"?"name":"id")+";srs_id="+val+";fav="+$("#prjfav").is(":checked")+"&RawDataOutput=Result",
+	    complete: function(xml,status){
+		if(checkWPSResult(xml,false))
+		    $("#prjfav").prop( "checked", eval(xml.responseText));
 	    }
 	});
     },
