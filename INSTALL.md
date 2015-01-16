@@ -114,11 +114,12 @@ done
 cd $SRC
 wget http://fukuchi.org/works/qrencode/qrencode-3.4.1.tar.gz
 tar xvf qrencode-3.4.1.tar.gz
+cd qrencode-3.4.1
 ./configure
 make 
 sudo make install
 sudo ldconfig -v
-cd ~$SRC/zoo/zoo-project/zoo-services/qrencode/
+cd $SRC/zoo/zoo-project/zoo-services/qrencode/
 make
 sudo cp cgi-env/* /usr/lib/cgi-bin/mm/
 ```
@@ -136,10 +137,10 @@ install.packages("classInt")
 <h3>Final tweeks</h3>
 
 ```
-sudo ln -s /home/djay/src/mapmint/mapmint-ui/ /var/www/html/ui
-sudo ln -s /home/djay/src/mapmint/public_map/ /var/www/html/pm
+sudo ln -s $SRC/mapmint/mapmint-ui/ /var/www/html/ui
+sudo ln -s $SRC/mapmint/public_map/ /var/www/html/pm
 
-sudo ln -s /home/djay/src/mapmint/mapmint-services/ /usr/lib/cgi-bin/mm
+sudo ln -s $SRC/mapmint/mapmint-services/ /usr/lib/cgi-bin/mm
 
 sudo a2enmod fcgid
 sudo a2enmod cgid
