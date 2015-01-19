@@ -54,7 +54,7 @@ make
 sudo make install
 
 wget http://geolabs.fr/dl/mapcache.xml
-sudo cp mapcache.xml /usr/libc/cgi-bin/
+sudo cp mapcache.xml /usr/lib/cgi-bin/
 ```
 
 Create or edit the ```/etc/ld.so.conf.d/zoo.conf``` and add ```/usr/local/lib```
@@ -206,7 +206,7 @@ sudo tar -xvf fonts.tar.bz2 -C /var/data/fonts
 
 cp $SRC/mapmint/mapmint-ui/js/.htaccess $SRC/mapmint/public_map/
 sudo chown -R www-data:www-data /var/data
-sudo chown www-data:www-data /usr/lib/cgi-bin/main.cfg
+sudo chown www-data:www-data /usr/lib/cgi-bin/mm/main.cfg
 sudo chown www-data:www-data /usr/lib/cgi-bin/mapcache.xml
 sudo chown -R www-data:www-data /var/www/html/pm/styles
 
