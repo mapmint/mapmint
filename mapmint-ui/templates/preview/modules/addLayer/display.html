@@ -3,12 +3,16 @@
 #if $m.web.metadata.get('mmOT')
 #set f0=$m.web.metadata.get('mmOT').split(',')
 
-#if $f0.count('AddLayer')>0 and $f0.count('AddWMSLayer')>0
+#if $f0.count('AddLayer')>0 or $f0.count('AddWMSLayer')>0
 <div id="olayerswitcher" class="al-container ipannel" style="height: 337px;">
 <h3 class="lgn">$zoo._("Add layers")</h3>
 <ul id="tabs">
+#if $f0.count('AddLayer')>0
 	<li class="active"><a href="#tab1">$zoo._("Add layer")</a></li>
+#end if
+#if $f0.count('AddWMSLayer')>0
 	<li><a class="icon_accept" href="#tab2">$zoo._("Add WMS")</a></li>
+#end if
 </ul>
 #else
 #if $f0.count('AddLayer')>0
@@ -32,7 +36,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/addLayer/Overla
 
 #if $f0.count('AddWMSLayer')>0
 <div id="tab2" class="tab_content">
-$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/addLayer/WMSLayers.tmpl",searchList={"m":$m0,"conf":$conf}))
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/addLayer/WMSLayers.tmpl",searchList={"m":$m,"conf":$conf}))
 <a class="vsource" onclick="mmAddWMSLayers();" href="#">$zoo._("Add")</a>
 </div>
 </div>

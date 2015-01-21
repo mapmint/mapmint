@@ -9,12 +9,21 @@
 #set ids=$conf["othertools"]["ids"].split(',')
 #set names=$conf["othertools"]["names"].split(',')
 #set idsl=$conf["othertools"]["idsl"].split(',')
+#set idt=$conf["othertools"]["idt"].split(',')
+#set idb=$conf["othertools"]["idb"].split(',')
+#set idc=$conf["othertools"]["idc"].split(',')
 #set test=False
 #for i in $idsl
 #set k=$ids.index($i)
 #if f0.count($ids[$k])>0 and not($test)
 #set test=True
-  <a class="ls-button ui-state-default ui-corner-all fg-button-icon-solo al-toogler" href="#olayerswitcher" title="$zoo._($names[$k])"></a>
+  <a class="ls-button ui-state-default ui-corner-all fg-button-icon-solo al-toogler" href="#$idt[$k]" title="$zoo._($names[$k])"></a>
+#end if
+#end for
+#for i in $idb
+#set k=$ids.index($i)
+#if f0.count($ids[$k])>0 
+  <a class="ls-button ui-state-default ui-corner-all fg-button-icon-solo $(idc[$k])-toogler" href="#$idt[$k]" title="$zoo._($names[$k])"></a>
 #end if
 #end for
   </div>

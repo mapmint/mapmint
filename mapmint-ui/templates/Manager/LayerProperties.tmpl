@@ -111,6 +111,17 @@ $zoo._("Complexe Search:")
 <a id="lcsearch_field" href="#" style="display:none" onclick="runComplexParam();">$zoo._("Settings")</a>
 </td>
 </tr>
+#import mapscript
+#if $m.getLayerByName($inputs["layer"]["value"]).type==mapscript.MS_LAYER_LINE
+<tr>
+<td>
+$zoo._("Routing:")
+</td>
+<td>
+<input type="checkbox" name="lrouting" id="lrouting" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmRouting")=="true"# checked="true"#end if#/>
+</td>
+</tr>
+#end if
 #end if
 <tr>
 <td>

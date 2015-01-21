@@ -1395,6 +1395,7 @@ def createColorRamp(conf,m,layer,useTile=0):
     color_file.close()
     import urllib2
     tmp0=layer.data.split("/")
+    print >>sys.stderr,conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result"
     response = urllib2.urlopen(conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result")
     value = response.read()
     print >> sys.stderr,useTile
@@ -2080,6 +2081,8 @@ def setMapLayerProperties(conf,inputs,outputs):
     l.metadata.set("ows_title",urllib.unquote(inputs["a"]["value"]))
     l.metadata.set("mmQuery",inputs["q"]["value"])
     l.metadata.set("mmExport",inputs["e"]["value"])
+    if inputs.has_key("routing"):
+    	l.metadata.set("mmRouting",inputs["routing"]["value"])
     tmp=["s","_f","zf"]
     tmpn=["Search","Filter","ZFilter"]
     for i in range(0,3):

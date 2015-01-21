@@ -18,7 +18,7 @@ BIN_LIST = cgi-env/service.zo
 default : $(BIN_LIST)
 
 cgi-env/service.zo: service.c
-	g++ ${XML2_CPPFLAGS} ${GDAL_CFLAGS} ${MS_CFLAGS} ${CPPFLAGS} -shared -fpic $< ${XSLT_LDFLAGS} ${XML2LDFLAGS}  ${ZOO_FILE}  ${MS_LIB} -lc  -lcrypto  -lcurl -lfcgi -o $@
+	g++ ${XML2_CPPFLAGS} ${GDAL_CFLAGS} ${MS_CFLAGS} ${CPPFLAGS} -shared -fpic $< ${XSLT_LDFLAGS} ${XML2LDFLAGS}  ${ZOO_FILE}  ${MS_LDFLAGS} -lc  -lcrypto  -lcurl -lfcgi -o $@
 
 install:
 	install -d ${PREFIX}/vector-tools/

@@ -1,6 +1,21 @@
 #encoding UTF-8
+            if(!System.hover){
+                System.hover = new OpenLayers.Layer.Vector("DisplaySelectedFeatures", {
+                   styleMap: new OpenLayers.Style({
+                       fillColor:"white",
+                       fillOpacity:0,
+                       strokeOpacity:0,
+                       fillColor:"white",
+                       strokeColor:"pink",
+                       pointRadius: 10,
+                       strokeWidth:3
+                   }),renderers: System.renderer
+               });
+                map.addLayer(System.hover);
+            }
+
   points_layer = new OpenLayers.Layer.Vector("points");
-  points_layer.styleMap=new OpenLayers.StyleMap({pointRadius: 14,graphicYOffset: -24,graphicXOffset: -6,'externalGraphic': '$conf['main']['publicationUrl']/img/design/drapeau_noir.png'});
+  points_layer.styleMap=new OpenLayers.StyleMap({pointRadius: 14,graphicYOffset: -24,graphicXOffset: -6,'externalGraphic': '$conf['main']['publicationUrl']/img/endMarker.png'});
   points_layer.styleMap.addUniqueValueRules("default", "type", lookup);
 
 #if $m.web.metadata.get('layout_t')!="mobile"
@@ -28,13 +43,12 @@
   });
 
   points_layer1 = new OpenLayers.Layer.Vector("points1");
-  points_layer1.styleMap=new OpenLayers.StyleMap({pointRadius: 24,'externalGraphic': '$conf['main']['publicationUrl']/img/design/velo_orange.png'});
+  points_layer1.styleMap=new OpenLayers.StyleMap({pointRadius: 24,'externalGraphic': '$conf['main']['publicationUrl']/img/ccMarker.png'});
   
 
   map.addLayers([points_layer,route_layer1,points_layer1]);
 
   draw_points = new DrawPoints(points_layer);
-  //drag_points = new OpenLayers.Control.DragFeature(points_layer, {
   OpenLayers.Control.DragFeature.prototype.overFeature = function(feature) {
         var activated = false;
         if(!this.handlers.drag.dragging) {
@@ -59,6 +73,12 @@
   drag_points = new OpenLayers.Control.DragFeature(System.hover, {
       autoActivate: false,
       onStart: function(feature,pixel){
+          /*for(i in map.controls){
+              if(map.controls[i].active){
+                  System.revActivated=map.controls[i];
+                  map.controls[i].deactivate();
+              }
+          }*/
 	  if(!feature.data["idPoint"]){
 	      drag_points.handlers.drag.deactivate();
 	      return false;
@@ -84,6 +104,14 @@
 	  }
 	  else
 	      return false;
+      },
+      onComplete: function(feature,pixel){
+          for(i in map.controls){
+              if(map.controls[i].active){
+                  mapControls[i].deactivate();
+              }
+          }
+          System.revActivated.activate();
       }
   });
   drag_points.onComplete = function() {

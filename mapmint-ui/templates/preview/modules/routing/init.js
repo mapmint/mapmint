@@ -20,9 +20,9 @@ var previousIdStepDisplayed = -1;
 var nbSteps = 0;
 
   var lookup = {
-      "start": {pointRadius: 14,graphicYOffset: -24,graphicXOffset: -6,'externalGraphic': '$conf['main']['publicationUrl']/img/design/drapeau_bleu.png'},
-      "end": {pointRadius: 14,graphicYOffset: -24,graphicXOffset: -6,'externalGraphic': '$conf['main']['publicationUrl']/img/design/drapeau_rouge.png'},
-      "inter": {pointRadius: 14,graphicYOffset: -24,graphicXOffset: -6,'externalGraphic': '$conf['main']['publicationUrl']/img/design/drapeau_orange.png'},
+      "start": {pointRadius: 14,graphicYOffset: -24,graphicXOffset: -6,'externalGraphic': '$conf['main']['publicationUrl']/img/startMarker0.png'},
+      "end": {pointRadius: 14,graphicYOffset: -24,graphicXOffset: -6,'externalGraphic': '$conf['main']['publicationUrl']/img/endMarker.png'},
+      "inter": {pointRadius: 14,graphicYOffset: -24,graphicXOffset: -6,'externalGraphic': '$conf['main']['publicationUrl']/img/interMarker0.png'},
       "incident": {pointRadius: 14,graphicYOffset: -24,graphicXOffset: -6,'externalGraphic': '$conf['main']['publicationUrl']/img/design/danger_bleu.png'}
   }
 
@@ -65,10 +65,10 @@ function mmGeocode(obj,feature){
     }
     else{
 	tmp=obj.layer.features[obj.layer.features.length-1].geometry;
-	if(System.idPoint.indexOf("adresseEtape")<0)
+	if(System.idPoint.indexOf("step")<0)
 	    obj.layer.features[obj.layer.features.length-1].attributes["idPoint"]=System.idPoint;
 	else{
-	    var tmpv=eval(System.idPoint.replace(/adresseEtape/g,""));
+	    var tmpv=eval(System.idPoint.replace(/stepPoint/g,""));
 	    obj.layer.features[2+tmpv].attributes["idPoint"]=System.idPoint;
 	    tmp=obj.layer.features[2+tmpv].geometry;
 	}
@@ -87,9 +87,9 @@ function mmGeocode(obj,feature){
 		var results=\$.parseJSON(xml.responseText);
 		\$('#search_geocoding_results').empty();
 		\$("#"+System.n).val("");
-		\$("#"+System.n).val(results[0].label);
+		\$("#"+System.n).val(results[0][0]);
 	    }catch(e){
-		loadGCPWindow("windows/popupmessage?msg="+"$zoo._('No address found')","$zoo._('Information')",400,50);
+		//loadGCPWindow("windows/popupmessage?msg="+"$zoo._('No address found')","$zoo._('Information')",400,50);
 	    }	    
 	}
     });
@@ -115,7 +115,7 @@ DrawPoints = OpenLayers.Class(OpenLayers.Control.DrawFeature, {
 	
    setCurrentFlag: function(idPoint){
        //alert(idPoint)
-       if((idPoint=="adresseLieu") || (idPoint.indexOf("adresseDepart") != -1)){
+       if((idPoint=="startPoint") || (idPoint.indexOf("startPoint") != -1)){
 	   if(this.layer.features.length>1){
 	       var saveds=[];
 	       for(var i=0;i<this.layer.features.length;i++){
@@ -131,7 +131,7 @@ DrawPoints = OpenLayers.Class(OpenLayers.Control.DrawFeature, {
 	   }
 	   this.layer.features[0].attributes["type"]="start";
        }
-       else if(idPoint.indexOf("adresseArrivee") != -1  || (idPoint.indexOf("adresseArrivee") != -1)){
+       else if(idPoint.indexOf("endPoint") != -1){
 	   if(this.layer.features.length>2){
 	       var saveds=[];
 	       for(var i=1;i<this.layer.features.length;i){
@@ -146,10 +146,10 @@ DrawPoints = OpenLayers.Class(OpenLayers.Control.DrawFeature, {
 	   }
 	   this.layer.features[1].attributes["type"]="end";
        }
-       else if(idPoint.indexOf("adresseEtape") != -1  || (idPoint.indexOf("adresseEtape") != -1)){
+       else if(idPoint.indexOf("stepPoint") != -1 ){
 	   if(this.layer.features.length>3){
 	       var saveds=[];
-	       var tmps=eval(idPoint.replace(/adresseEtape/g,""));
+	       var tmps=eval(idPoint.replace(/stepPoint/g,""));
 	       var saveds=[];
 	       for(var i=2+tmps;i<this.layer.features.length;i){
 		   saveds.push(this.layer.features[i].clone());
@@ -157,10 +157,10 @@ DrawPoints = OpenLayers.Class(OpenLayers.Control.DrawFeature, {
 	       }
 	       this.layer.addFeatures([saveds[saveds.length-1]]);
 	       this.layer.features[this.layer.features.length-1].attributes["type"]="inter";
-	       this.layer.features[this.layer.features.length-1].attributes["idPoint"]="adresseEtape0";
+	       this.layer.features[this.layer.features.length-1].attributes["idPoint"]="stepPoint0";
 	       for(var i=0;i<saveds.length-1;i++){
 		   this.layer.addFeatures([saveds[i]]);
-		   this.layer.features[this.layer.features.length-1].attributes["idPoint"]="adresseEtape"+(i+1);
+		   this.layer.features[this.layer.features.length-1].attributes["idPoint"]="stepPoint"+(i+1);
 		   this.layer.features[this.layer.features.length-1].attributes["type"]="inter";
 	       }
 	       
@@ -168,9 +168,6 @@ DrawPoints = OpenLayers.Class(OpenLayers.Control.DrawFeature, {
 	       this.layer.features[1].attributes["type"]="end";
 	   }
 	   this.layer.features[this.layer.features.length-1].attributes["type"]="inter";
-       }
-       else if(idPoint.indexOf("adresseIncident") != -1){
-	   this.layer.features[this.layer.features.length-1].attributes["type"]="incident";
        }
        else alert("flag error: " + idPoint);
    },
@@ -186,7 +183,7 @@ DrawPoints = OpenLayers.Class(OpenLayers.Control.DrawFeature, {
 	    this.setCurrentFlag(System.idPoint);
 	    this.mmGeoCode(System.idPoint);
 	    // Zoom sur lieu
-	    if(System.idPoint=="adresseLieu")
+	    if(System.idPoint=="entityPoint")
 		map.zoomToExtent(points_layer.getDataExtent());
 	    
 #end if
@@ -548,10 +545,6 @@ function deleteTrace(){
 	tmp: tmp,
 	  complete: function(xml,status) {
 	      listSavedPaths();
-#if $m.web.metadata.get('layout_t')!="mobile"
-	      removeGCPWindow();
-	      loadGCPWindow("windows/popupmessage?msg="+"$zoo._('Route deleted')","$zoo._('Information')",300,50);
-#end if
 		  
         }
       });
@@ -619,13 +612,7 @@ function routingSave(){
 	    data: data,
 	    complete: function(xml,status) {
 		if(System.shouldDisplay){
-#if $m.web.metadata.get('layout_t')!="mobile"
-		    removeGCPWindow();
-#end if
 		    listSavedPaths();
-#if $m.web.metadata.get('layout_t')!="mobile"
-		    loadGCPWindow("windows/popupmessage?msg="+"$zoo._('The route has been saved into your routes history.')","$zoo._('Information')",400,50);
-#end if
 		}else{
 		    System.shouldDisplay=true;
 		    if(System.toCall)
@@ -672,7 +659,7 @@ function saveNews(){
 	    complete: function(xml,status) {
 		RoutingReinit();
 		//loadGCPWindow(false,'Actualités',300,200,{txt: xml.responseText});
-		loadGCPWindow("windows/popupmessage?msg="+"$zoo._('The reported incident has been recorded. Thank you for your participation.')","$zoo._('Information')",400,50);
+		//loadGCPWindow("windows/popupmessage?msg="+"$zoo._('The reported incident has been recorded. Thank you for your participation.')","$zoo._('Information')",400,50);
 #if $m.web.metadata.get('layout_t')=="mobile"
 	\$.mobile.hidePageLoadingMsg();
 #end if
@@ -728,19 +715,16 @@ function runRouting(layer){
     requestedProfile=false;
     \$.ajax({
 	type: "GET",
-	url: zooUrl+"?service=WPS&request=Execute&version=1.0.0&Identifier=do&DataInputs=routing.startPoint="+startpoint.x+","+startpoint.y+suffix+";endPoint="+finalpoint.x+","+finalpoint.y+(\$("#pp2")[0].checked?";priorize=true":(\$("#pp0")[0].checked?";distance=true":""))+"&ResponseDocument=Result@asReference=true@mimeType=application/json@useMapserver=true@mimeType=application/json",
+	url: zooUrl+"?service=WPS&request=Execute&version=1.0.0&Identifier=routing.do&DataInputs=startPoint="+startpoint.x+","+startpoint.y+suffix+";endPoint="+finalpoint.x+","+finalpoint.y+"&ResponseDocument=Result@asReference=true@mimeType=application/json@useMapserver=true@mimeType=application/json",
 	dataType: 'xml',
 	complete:function(xml,status){
 	    if(status=="success"){
 		if(!checkWPSResult(xml,false)){
-		    loadGCPWindow("windows/popupmessage?msg="+"$zoo._('Please set flags on a road or near by')","$zoo._('Information')",400,50);	
+		    //loadGCPWindow("windows/popupmessage?msg="+"$zoo._('Please set flags on a road or near by')","$zoo._('Information')",400,50);	
 		    //\$("#bt_recherche").removeAttr("disabled");
 		    if(btRecherche!=""){
 			document.getElementById(btRecherche).onclick = searchFunction;
 		    }
-#if $m.web.metadata.get('layout_t')!="mobile"
-		    removeGCPWindow();
-#end if
 		    \$("#link_export").hide();
 		    \$("#link_print").hide();
 		    return;
@@ -798,9 +782,6 @@ function runRouting(layer){
 			if(btRecherche!=""){
 			    document.getElementById(btRecherche).onclick = searchFunction;
 			}
-#if $m.web.metadata.get('layout_t')!="mobile"
-			removeGCPWindow();
-#end if
 		    }
 		});
 		
@@ -867,8 +848,8 @@ function runRouting(layer){
 function pgrouting(layer) {
     btRecherche="";
 #if $m.web.metadata.get('layout_t')!="mobile"
-    hideProfil('true');
-    initFdrMode();
+    //hideProfil('true');
+    //initFdrMode();
 #end if
     if (layer.features.length >= 2) {
 	if(arguments.length>1){
@@ -878,9 +859,9 @@ function pgrouting(layer) {
 	}
 	//\$("#bt_recherche").removeAttr("onclick");
 #if $m.web.metadata.get('layout_t')!="mobile"
-	loadGCPWindow('windows/chargement','$zoo._("Calculation in progress ...")',385,40,null,function(){},function(){
+	//loadGCPWindow('windows/chargement','$zoo._("Calculation in progress ...")',385,40,null,function(){},function(){
 	    runRouting(layer);
-	});	
+	//});	
 #else
 	runRouting(layer);
 #end if
@@ -934,7 +915,7 @@ function drivingDistance(layer,mode) {
 	    searchFunction = document.getElementById(btRecherche).onclick;
 	    document.getElementById(btRecherche).onclick = '';
 	}
-	loadGCPWindow('windows/chargement','$zoo._("Calculation in progress ...")',385,40);
+	//loadGCPWindow('windows/chargement','$zoo._("Calculation in progress ...")',385,40);
 #end if
 	// transform the two geometries from EPSG:900913 to EPSG:4326
 	startpoint = layer.features[0].geometry.clone();
@@ -1012,9 +993,6 @@ function drivingDistance(layer,mode) {
 		    if(btRecherche!=""){
 			document.getElementById(btRecherche).onclick = searchFunction;
 		    }
-#if $m.web.metadata.get('layout_t')!="mobile"
-		    removeGCPWindow();
-#end if
 		    System.selectPoi=true;
 		    
 		    for(var i=0;i<layersList.length;i++){
@@ -1242,6 +1220,7 @@ function routingDetailsNext(){
     }
 }
 
+#*
 System.pictos={
 #import authenticate.service as auth
 #import psycopg2
@@ -1267,26 +1246,16 @@ System.pictosRev={
 #set j=$j+1
 #end for
 };
+*#
 
 function routingDisplayCurrentStep(){
     if(arguments[0]>=0){
-	//alert("System.routingCnt => Etape" + arguments[0]);
-	// alert('previous='+previousIdStepDisplayed + ' ,current='+currentIdStepDisplayed + ', now=' + arguments[0]);
-	// if(currentIdStepDisplayed == arguments[0]){
-	// previousIdStepDisplayed = currentIdStepDisplayed;
-	// \$("#step_"+previousIdStepDisplayed).removeClass('step_selected');
-	// currentIdStepDisplayed = 0;
-	// previousIdStepDisplayed = -1;
-	// routingZoomOnStepsFDR(-1);
-	// }
-	// else{
 	routingZoomOnStepsFDR(arguments[0]);
 	previousIdStepDisplayed = currentIdStepDisplayed;
 	\$("#step_"+previousIdStepDisplayed).removeClass('step_selected');
 	currentIdStepDisplayed = arguments[0];
 	\$("#step_"+currentIdStepDisplayed).addClass('step_selected');
 	\$("#step_"+currentIdStepDisplayed).focus();
-	//}
     }
 }
 
@@ -1358,7 +1327,7 @@ function RoutingDisplayStep(){
 		    
 		    var dtype="revetement"
 		    var curPicto="$conf["main"]["publicationUrl"]/img/design/amenagements/"+(features[i].data["tid"]!="1"?"route_danger.png":System.pictos[features[i].data[dtype]]);
-		    \$('<span>Étape '+eval(System.routingCnt+"+"+i)+" : "+"avancez pendant "+(tmp1[0])+' mètres sur '+(features[i].attributes["name"]?features[i].attributes["name"]:"voie inconnue")+'.<img src="'+curPicto+'" title="'+features[i].data[dtype]+'" alt="'+features[i].data["nature"]+'" />'+"</span>")
+		    \$('<span>$zoo._("Step") '+eval(System.routingCnt+"+"+i)+": "+" $zoo.("advance for") "+(tmp1[0])+' $zoo._("meters") $zoo._("on") '+(features[i].attributes["name"]?features[i].attributes["name"]:"$zoo._("Unknown road")")+'.<img src="'+curPicto+'" title="'+features[i].data[dtype]+'" alt="'+features[i].data["nature"]+'" />'+"</span>")
 			.appendTo(\$("#_route_"+i));
 		    \$("#_route_"+i).parent().listview();
 		}
@@ -1368,7 +1337,6 @@ function RoutingDisplayStep(){
 		System.stepsFDR[j]=features[j];
 		j++;
 	    }
-	    $.mobile.hidePageLoadingMsg();
 	}});
 #else
     \$("#fdr_cadre").empty();
@@ -1395,12 +1363,31 @@ function RoutingDisplayStep(){
 		\$("#_route_"+i).empty();
 	    }
 	    //alert("nb Features = " + features.length);
+
+
+
+            $.ajax({
+                url: "./modules/routing/roadmap",
+                complete: function(xml,status){
+                    if(!\$('#roadmap-dialog')[0])
+			\$("body").append('<div id="roadmap-dialog" title="'+"$zoo._("Roadmap")"+'"></div>');
+		    \$('#roadmap-dialog').html("");
+		    \$('#roadmap-dialog').append(xml.responseText);
+		    \$('#roadmap-dialog').window({
+                        width: 325,
+                        height: 220,
+                        maximizable:false,
+                        resizable: false
+                    });
+
+            
 	    for(i in features){
+try{
 	        if(features[i].data){
 		    var tmp=(features[i].data["length"]*111120)+"";
 		    var tmp1=tmp.split(".");
 		    var classStep;
-		    
+
 		    // Elimination des étapes sur 0 mètres
 		    if(tmp1[0]!=0){
 			if(i % 2 == 0)
@@ -1409,32 +1396,21 @@ function RoutingDisplayStep(){
 			    classStep = "step_even";
 			
 			if(j==0)
-			    \$('<tr onclick=\'routingDisplayCurrentStep('+i+');\'><td id="step_'+i+'" class="'+classStep+'"><span class="fdr_etape">Départ : '+(features[i].attributes["name"]?features[i].attributes["name"]:"voie inconnue")+".</span></td><td><img id='img_picto"+i+"' class='fdr_img_picto' src='$conf['main']['publicationUrl']/img/design/drapeau_bleu.png' title='Départ' alt='Départ'/></td></tr>").appendTo(\$("#fdr_cadre"));
+			    \$('<tr onclick=\'routingDisplayCurrentStep('+i+');\'><td id="step_'+i+'" class="'+classStep+'"><span class="fdr_etape">$zoo._("Starting point:") '+(features[i].attributes["name"]?features[i].attributes["name"]:"$zoo._("Unknown road")")+".</span></td><td><img id='img_picto"+i+"' class='fdr_img_picto' src='$conf['main']['publicationUrl']/img/startMarker.png' title='starting point' alt='starting point'/></td></tr>").appendTo(\$("#fdr_cadre"));
 			else if (j==features.length-1) 
-			    \$('<tr onclick=\'routingDisplayCurrentStep('+i+');\'><td id="step_'+i+'" class="'+classStep+'"><span class="fdr_etape">Arrivée : '+(features[i].attributes["name"]?features[i].attributes["name"]:"voie inconnue")+".</span></td><td><img id='img_picto"+i+"' class='fdr_img_picto' src='$conf['main']['publicationUrl']/img/design/drapeau_rouge.png' title='Arrivée' alt='Arrivée'/></td></tr>").appendTo(\$("#fdr_cadre"));
+			    \$('<tr onclick=\'routingDisplayCurrentStep('+i+');\'><td id="step_'+i+'" class="'+classStep+'"><span class="fdr_etape">$zoo._("Destination:") '+(features[i].attributes["name"]?features[i].attributes["name"]:"$zoo._("Unknown road")")+".</span></td><td><img id='img_picto"+i+"' class='fdr_img_picto' src='$conf['main']['publicationUrl']/img/endMarker.png' title='destination' alt='destination'/></td></tr>").appendTo(\$("#fdr_cadre"));
 			else
 			{
 			    var idEtape = i-1;
-			    var curPicto="";
-			    var titlePicto="";
-			    if(currentFdrMode=='amenagement'){
-				curPicto = "$conf["main"]["publicationUrl"]/img/design/amenagements/"+(features[i].data["tid"]!="1"?"route_danger.png":System.pictos[features[i].data["nature"]]);
-				titlePicto = features[i].data["tid"]!="1"?"DANGER: HORS PLAN VÉLO":features[i].data["nature"];
-			    }
-			    else if(currentFdrMode=='revetement'){
-				curPicto = "$conf["main"]["publicationUrl"]/img/design/revetements/"+(features[i].data["tid"]!="1"?"route_danger.png":System.pictosRev[features[i].data["revetement"]]);
-				//titlePicto = features[i].data["revetement"];
-				titlePicto = features[i].data["tid"]!="1"?features[i].data["nature"]:features[i].data["revetement"];
-			    }
+			    var curPicto="/img/"+features[i].attributes["highway"]+".png";
+			    var titlePicto=features[i].attributes["highway"];
 			    
-			    // \$('<tr onclick=\'routingDisplayCurrentStep('+i+');\'><td id="step_'+i+'" class="'+classStep+'"><span class="fdr_etape">Étape '+eval(System.routingCnt+"+"+idEtape)+" : "+"avancez pendant "+(tmp1[0])+' mètres sur '+(features[i].attributes["name"]?features[i].attributes["name"]:"voie inconnue")+".</span></td><td><img id='img_picto"+i+"' class='fdr_img_picto'  alt0=\""+features[i].data["revetement"]+"\" alt=\""+features[i].data["nature"]+"\" src='"+curPicto+"'/></td></tr>")
-			    // .appendTo(\$("#fdr_cadre"));
-			    
-			    \$('<tr onclick=\'routingDisplayCurrentStep('+i+');\'><td id="step_'+i+'" class="'+classStep+'"><span class="fdr_etape">Étape '+eval(System.routingCnt+"+"+idEtape)+" : "+"avancez pendant "+(tmp1[0])+' mètres sur '+(features[i].attributes["name"]?features[i].attributes["name"]:"voie inconnue")+".</span></td><td><img id='img_picto"+i+"' class='fdr_img_picto' alt='"+titlePicto+"' title='"+titlePicto+"' src='"+curPicto+"'/></td></tr>")
+			    \$('<tr onclick=\'routingDisplayCurrentStep('+i+');\'><td id="step_'+i+'" class="'+classStep+'"><span class="fdr_etape">$zoo._("Step") '+eval(System.routingCnt+"+"+idEtape)+" : "+" $zoo._("advance for") "+(tmp1[0])+' $zoo._("meters") $zoo._("on") '+(features[i].attributes["name"]?features[i].attributes["name"]:"$zoo._("Unknown road")")+".</span></td><td><img id='img_picto"+i+"' class='fdr_img_picto' alt='"+titlePicto+"' title='"+titlePicto+"' src='"+curPicto+"'/></td></tr>")
 				.appendTo(\$("#fdr_cadre"));
 			}
 		    }
 		}
+}catch(e){alert(e);}
 		
 		//alert(features[i].geometry);
 		features[j].geometry=features[j].geometry.transform(geographic,map.getProjectionObject());
@@ -1444,6 +1420,7 @@ function RoutingDisplayStep(){
 		j++;
 		
 	    }
+}});
 	    
 	    //\$(".fdr_img_picto").tipsy({title: 'alt'});
 	    //alert("nb Features end = " + features.length);
@@ -1495,23 +1472,18 @@ function routingFormDeletePOI(){
 }
 #else
 function routingFormAddPOI(){
-    //if(System.routingPoiCnt>1){
     if(points_layer.features.length > 1){
 	System.routingPoiCnt+=1;
 	var currentIndex = System.nbEtapes+2;
-	//alert('create Etape' + System.nbEtapes);
-	//alert("Add >> Features count="+points_layer.features.length + ", System count="+System.routingPoiCnt);
 	\$("#etapes_2").append('<form id="routingAddedPoi'+System.routingPoiCnt+'" action="#" onsubmit="return false;">'+
 			       '<div>'+
 			       //'<img src="$conf['main']['publicationUrl']/img/design/etape.png" alt="Etape" class="img_recherche" style="margin-bottom:0px;"/>'+
 			       '<label class="lb_section_recherche txt_orange_black">$zoo._('STEP')</label>'+
-			       '<img id="adresse_add_'+System.routingPoiCnt+'" src="$conf['main']['publicationUrl']/img/design/drapeau_orange.png" title="$zoo._('Set a step place')" class="button-no-border icon_recherche" height="18px" width="16px"'+
-			       ' onclick="System.idPoint=\'adresseEtape'+System.nbEtapes+'\';globalResetAction(points_layer,'+currentIndex+');_routingForm();return false;" />'+
-			       '<img src="$conf['main']['publicationUrl']/img/design/poi_blue_no_border.png" title="$zoo._('Search a point of interest')" class="button-no-border icon_recherche" height="18px" width="16px" '+ 
-			       'onclick="loadGCPWindow(\'windows/selectpoi\',\'$zoo._('POI selection')\',500,290,\'adresseEtape'+ System.nbEtapes+'\');System.idPoint=\'adresseEtape'+System.nbEtapes+'\';globalResetAction(points_layer,'+currentIndex+');return false;"/>'+
+			       '<img id="adresse_add_'+System.routingPoiCnt+'" src="$conf['main']['publicationUrl']/img/interMarker0.png" title="$zoo._('Set a step place')" class="button-no-border icon_recherche" height="18px" width="16px"'+
+			       ' onclick="System.idPoint=\'stepPoint'+System.nbEtapes+'\';globalResetAction(points_layer,'+currentIndex+');_routingForm();return false;" />'+
 			       '</div>'+
 			       '<div>'+
-			       '<input id="adresseEtape'+System.nbEtapes+'" name="adresseEtape'+System.nbEtapes+'" type="text" class="champ_recherche" value="" onfocus="System.idPoint=\'adresseEtape'+ System.nbEtapes+'\';globalResetAction(points_layer,'+currentIndex+');return false;"  onblur="if(this.value != \'\') {System.nbEtapeFlags +=1;}" onmouseover="this.title=this.value;" />'+
+			       '<input id="stepPoint'+System.nbEtapes+'" name="adresseEtape'+System.nbEtapes+'" type="text" class="champ_recherche" value="" onfocus="System.idPoint=\'stepPoint'+ System.nbEtapes+'\';globalResetAction(points_layer,'+currentIndex+');return false;"  onblur="if(this.value != \'\') {System.nbEtapeFlags +=1;}" onmouseover="this.title=this.value;" />'+
 			       '</div>'+
 			       '</form>');
 	
@@ -1519,8 +1491,6 @@ function routingFormAddPOI(){
 	    \$("#routingDeletePoi").removeClass("hidden");
 	});
 	
-	// if(System.routingPoiCnt+1>4)
-	// \$("#etapes_2").css({"overflow":"auto","height":(\$(document).height()-700)+"px"});
 	startSearch1('adresseEtape'+ System.nbEtapes);
 	eval('\$( "#adresse_add_'+System.routingPoiCnt+'").draggable({'+
 	     'start: function() {'+
@@ -1533,9 +1503,7 @@ function routingFormAddPOI(){
 	     '},'+
 	     'scroll: false, revert: true, helper: "clone" });');
 
-	//System.routingPoiCnt=points_layer.features.length;
 	System.nbEtapes += 1;	
-	//alertAction('routingFormAddPOI end');
     }
 }
 
@@ -1543,11 +1511,10 @@ function routingFormDeletePOI(){
     if(System.nbEtapes>0)
 	System.nbEtapes -= 1;
     var currentIndex = System.nbEtapes+2;
-    //if(System.nbEtapes>0){
-    //alert('delete Etape' + System.nbEtapes);
-    //if(points_layer.features.length > 1){
-    //alert("Delete > Features count="+points_layer.features.length + ", System count="+System.routingPoiCnt);
-    //\$('#routingAddedPoi'+points_layer.features.length).fadeOut( 400, function(){
+    for(i in points_layer.features){
+	if(points_layer.features[i].attributes["idPoint"]=="stepPoint"+System.nbEtapes)
+		points_layer.removeFeatures([points_layer.features[i]]);
+    }
     \$('#routingAddedPoi'+System.routingPoiCnt).fadeOut( 400, function(){
 	\$(this).remove();
 	if(points_layer.features.length > 2 && System.nbEtapeFlags > System.nbEtapes){
@@ -1643,6 +1610,9 @@ function routingZoomOnStepsFDR(index){
 
 var requestedProfile=false;
 function requestProfile(){
+#import routing.service as routing
+#set cl=routing.getRasterLayer($conf)
+#if cl is not None
 #if $m.web.metadata.get('layout_t')=="mobile"
     $.mobile.showPageLoadingMsg();
 #end if
@@ -1655,9 +1625,9 @@ function requestProfile(){
     var params1=[
 	{name: "Geometry","xlink:href": System.inputs1, mimeType: "application/json"},
 	{name: "mult","value": "10",dataTye: "string"},
-	{name: "RasterFile","value": "topofr.tif",dataType: "string"}
+	{name: "RasterFile","value": "$cl.data.replace($conf["main"]["dataPath"],"")",dataType: "string"}
     ];
-    var data1=WPSGetHeader("routing.GdalExtractProfile")+WPSGetInputs(params1)+WPSGetOutput({name: "Profile","form":"ResponseDocument","asReference": "true"})+WPSGetFooter();
+    var data1=WPSGetHeader("raster-tools.GdalExtractProfile")+WPSGetInputs(params1)+WPSGetOutput({name: "Profile","form":"ResponseDocument","asReference": "true"})+WPSGetFooter();
     $.ajax({
 	type: "POST",
 	url: System.zooUrl,
@@ -1667,6 +1637,7 @@ function requestProfile(){
 	    loadProfileAndDisplay(xml);
 	}
     });
+#end if
     
 }
 
@@ -1690,10 +1661,6 @@ function loadProfileAndDisplay(){
 		    distances.push(distances0[i]);
 		}
 		coord=tmp["features"][0]["geometry"]["coordinates"];
-#if $m.web.metadata.get('layout_t')!="mobile"
-		if(!System.selectPoi)
-		    hideProfil('false');
-#end if
 		map.updateSize();
 		//alert("ok");
 	    }catch(e){
@@ -1732,13 +1699,13 @@ function loadProfileAndDisplay(){
 	    //alert("ok");
 
 #if $m.web.metadata.get('layout_t')!="mobile"
-	    \$('#routingProfileContainer').css({'height':'148px', 'width': (\$(document).width()-415)+'px','z-index': 1000});
+	    //\$('#routingProfileContainer').css({'height':'148px', 'width': (\$(document).width()-415)+'px','z-index': 1000});
 	    \$('#divInnerNorth').css({'height':'50px', 'width': (\$(document).width()-415)+'px','z-index': 1000});
 	    //\$('#map').css({'height': (\$(document).height()-450)+"px"});
 	    //alert("ok");
 	    
 	    // Masquage de la zone de recherche
-	    mmLayout.close('west');
+	    //mmLayout.close('west');
 
 	    map.updateSize();
 	    //alert("ok");
@@ -1761,6 +1728,22 @@ function loadProfileAndDisplay(){
 	    for(var t=0;t<values.length;t++)
 		if(values[t]>mmax)
 		    mmax=values[t];
+
+
+            $.ajax({
+                url: "./modules/routing/profile",
+                complete: function(xml,status){
+                    if(!\$('#profile-dialog')[0])
+			\$("body").append('<div id="profile-dialog" title="'+"$zoo._("Profile")"+'"></div>');
+		    \$('#profile-dialog').html("");
+		    \$('#profile-dialog').append(xml.responseText);
+		    \$('#profile-dialog').window({
+                        width: 625,
+                        height: 420,
+                        maximizable:false,
+                        resizable: false
+                    });
+
 	    Highcharts.setOptions({
 		lang: {
 		    resetZoomTitle: "$zoo._("Reset to initial zoom level")",
@@ -1784,7 +1767,7 @@ function loadProfileAndDisplay(){
 				    return parseDistance(Math.round(distances[tmp]*111120));
 			}
 		    },
-		    title: { text: 'Points' },
+		    title: { text: "$zoo._("Distance")" },
 		    events: {
 			afterSetExtremes: function(){
 			    if(\$("#profileZoomOnMap").is(':checked')){
@@ -1902,7 +1885,7 @@ function loadProfileAndDisplay(){
 		    }
 		},
 		series: [{
-		    name: '$zoo._('Elevation')',
+		    name: "$zoo._('Elevation')",
 		    type: 'area',
 		    data: values
 		}]
@@ -1917,10 +1900,7 @@ function loadProfileAndDisplay(){
 	    });
 	    map.zoomToExtent(System.curExtent);
 	    System.routingProfileComputed=true;
-#if $m.web.metadata.get('layout_t')=="mobile"
-	    \$.mobile.changePage('#routingProfilePage');
-	    \$.mobile.hidePageLoadingMsg();
-#end if
+}});
 	    
 	}
     });
@@ -2126,6 +2106,16 @@ function routingForm(a){
 
 function _routingForm(){
   //toggleControl({name: 'draw_points'});
+          for(i in map.controls){
+              if(map.controls[i] && map.controls[i].active){
+                  System.revActivated=map.controls[i];
+                  map.controls[i].deactivate();
+              }
+          }
+
+  for(i in points_layer.features)
+	if(points_layer.features[i].attributes["idPoint"]==System.idPoint)
+		points_layer.removeFeatures([points_layer.features[i]]);
   mapControls['draw_points'].activate();
   mapControls["drag_points"].activate();
   //try{tselect[tselect.length-1].deactivate();}catch(e){}
@@ -2136,7 +2126,6 @@ function displayRoadmap(a){
     \$('.ui-layout-east').removeClass('hidden');
     \$(".ui-layout-east").css({"z-index": "1"});
     \$('.ui-layout-center').css({"width": (\$(document).width()-(260+295))+"px"});
-    \$('#map').css({"width": (\$(document).width()-(260+295))+"px"});
     map.updateSize();
     \$('#routingProfileContainer').css({"width": (\$(document).width()-(260+295))+"px"});
   }
@@ -2144,7 +2133,6 @@ function displayRoadmap(a){
     \$('.ui-layout-east').addClass('hidden');
     \$(".ui-layout-east").css({"z-index": "0"});
     \$('.ui-layout-center').css({"width": (\$(document).width()-(280+0))+"px"});
-    \$('#map').css({"width": (\$(document).width()-(280+0))+"px"});
     map.updateSize();
     \$('#routingProfileContainer').css({"width": (\$(document).width()-(280+0))+"px"});
   }

@@ -137,7 +137,7 @@ div#header{
 
 #end if
 
-#if $conf["senv"]["last_map"]=="indicateurs" or $f0.count("AddLayer")>0 or $f0.count("AddWMSLayer")>0
+#if $conf["senv"]["last_map"]=="indicateurs" or $f0.count("AddLayer")>0
 #set searchList=[{"tmpl": "natureparif-indicateurs"},{"conf": $conf},{"inputs":$inputs}]
 $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/indexes/overlays_css.tmpl",searchList=$searchList))
 #end if

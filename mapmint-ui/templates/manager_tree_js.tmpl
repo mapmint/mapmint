@@ -1618,7 +1618,7 @@ function setLayerProperties(){
     url+=";_f="+\$('#lfilter').is(":checked")+";_ff="+\$('#lfilter_field').val()+";zf="+\$('#lzfilter').is(":checked")+";zff="+\$('#lzfilter_field').val()+";s="+\$('#lsearch').is(":checked")+";sf="+\$('#lsearch_field').val();
     \$.ajax({
 	type: "GET",
-	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.setMapLayerProperties&DataInputs=map="+\$("#mapName").val()+";layer="+\$('#lnameOrig').val()+"#if $conf["main"]["3D"]=="true"#;lfly="+\$('#lfly').val()+"#end if#;ln="+\$('#lname').val()+";a="+(\$('#lalias').val())+";e="+(\$('#lexport')[0].checked?"true":"false")+";q="+(\$('#lquery')[0].checked?"true":"false")+";sq="+(\$('#lspatialquery')[0].checked?"true":"false")+";sqt="+\$('#lsptype').val()+";ab="+\$('#labstract').val()+";kl="+\$('#lkeywords').val()+";f="+\$('#lfees').val()+url+"&RawDataOutput=Result",
+	url: "$conf["main"]["serverAddress"]?service=WPS&version=1.0.0&request=Execute&Identifier=mapfile.setMapLayerProperties&DataInputs=map="+\$("#mapName").val()+";layer="+\$('#lnameOrig').val()+"#if $conf["main"]["3D"]=="true"#;lfly="+\$('#lfly').val()+"#end if#;ln="+\$('#lname').val()+";a="+(\$('#lalias').val())+";e="+(\$('#lexport')[0].checked?"true":"false")+";q="+(\$('#lquery')[0].checked?"true":"false")+";sq="+(\$('#lspatialquery')[0].checked?"true":"false")+";sqt="+\$('#lsptype').val()+";ab="+\$('#labstract').val()+";kl="+\$('#lkeywords').val()+";f="+\$('#lfees').val()+url+(\$("#lrouting")[0]?";routing="+\$("#lrouting").is(":checked"):"")+"&RawDataOutput=Result",
 	complete:function(xml,status){
 	    checkWPSResult(xml);
 	    \$( "#view-lprop-dialog" ).window('close');

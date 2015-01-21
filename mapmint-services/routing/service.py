@@ -37,66 +37,58 @@ psycopg2.extensions.register_type(psycopg2.extensions.UNICODEARRAY)
 #con.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE)
 
 table="network_20130318"
+
 the_geom="wkb_geometry"
 
+def getRasterLayer(conf):
+    import mapscript
+    m=mapscript.mapObj(conf["main"]["dataPath"]+"/public_maps/project_"+conf["senv"]["last_map"]+".map")
+    for i in range(0,m.numlayers):
+	if m.getLayer(i).type==mapscript.MS_LAYER_RASTER and m.getLayer(i).metadata.get("mmQuery")=="true":
+		return m.getLayer(i)
+    return None
+
+def getRoutingLayer(conf):
+    import mapscript
+    m=mapscript.mapObj(conf["main"]["dataPath"]+"/public_maps/project_"+conf["senv"]["last_map"]+".map")
+    for i in range(0,m.numlayers):
+	if m.getLayer(i).metadata.get("mmRouting")=="true":
+		return m.getLayer(i)
+    return None
 def parseDb(dbp):
     print >> sys.stderr,auth.parseDb(dbp)
     return auth.parseDb(dbp)
 
+supportedgc=['Bing', 'GeoNames', 'GeocoderDotUS', 'Google', 'GoogleV3', 'MapQuest', 'MediaWiki', 'OpenMapQuest', 'SemanticMediaWiki', 'Yahoo']
 def reverseGeocode(conf,inputs,outputs):
     import shortInteger
-    conn=psycopg2.connect(parseDb(conf["velodb"]))
-    cur=conn.cursor()
-    print >> sys.stderr,"OK"
-    try:
-        sql="with index_query as (  select    *, st_distance(wkb_geometry, ST_Transform('SRID=4326;POINT("+inputs["x"]["value"]+" "+inputs["y"]["value"]+")',900914)) as distance  from adresse   order by wkb_geometry <-> ST_Transform('SRID=4326;POINT("+inputs["x"]["value"]+" "+inputs["y"]["value"]+")',900914) limit 100) select id, numero||' '||nom_voie||', '||code_insee||' '||(select nom from commune where code_insee=index_query.code_insee),ST_AsGeoJSON(st_transform(wkb_geometry,4326)) from index_query order by distance limit 1;"
-
-        #sql="select id,numero||' '||nom_voie||', '||code_insee||' '||(select nom from commune where code_insee=foo1.code_insee),ST_AsGeoJSON(st_transform(wkb_geometry,4326)) from (SELECT * from (select * from adresse where wkb_geometry && ST_Buffer(ST_Transform(setSRID(GeometryFromText('POINT("+inputs["x"]["value"]+" "+inputs["y"]["value"]+")'),4326),900914),75)) As foo ORDER BY foo.wkb_geometry <-> ST_Transform(setSRID(GeometryFromText('POINT("+inputs["x"]["value"]+" "+inputs["y"]["value"]+")'),4326),900914) desc limit 5) as foo1"
-        cur.execute(sql)
-        res=cur.fetchall()
-        outputs["Result"]["value"]=""
-        fres=[]
-        for i in res:
-            fres+=[{"id": i[0],"label": i[1],"geometry": i[2]}]
-        if len(fres)==0:
-            sql="select id,numero ,ST_AsGeoJSON(st_transform(ST_Centroid(wkb_geometry),4326)) from (SELECT * from (select * from route where numero not like 'NC' AND wkb_geometry && ST_Buffer(ST_Transform(setSRID(GeometryFromText('POINT("+inputs["x"]["value"]+" "+inputs["y"]["value"]+")'),4326),900914),150)) As foo ORDER BY foo.wkb_geometry <-> ST_Transform(setSRID(GeometryFromText('POINT("+inputs["x"]["value"]+" "+inputs["y"]["value"]+")'),4326),900914) desc limit 5) as foo1"
-            cur.execute(sql)
-            res=cur.fetchall()
-            outputs["Result"]["value"]=""
-            fres=[]
-            for i in res:
-                fres+=[{"id": i[0],"label": i[1],"geometry": i[2]}]
-
-
-        outputs["Result"]["value"]=json.dumps(fres);
-        return zoo.SERVICE_SUCCEEDED
-    except Exception,e:
-        conf["lenv"]["message"]="Error running sql query: "+str(e)
-        return zoo.SERVICE_FAILED
-
+    import geopy.geocoders as gc
+    if not(conf["main"].has_key("geocoder")) or not(supportedgc.count(conf["main"]["geocoder"])):
+	conf["lenv"]["message"]=zoo._("Unable to find reliable GeoCoder")
+	return zoo.SERVICE_FAILED
+    geolocator = eval("gc."+conf["main"]["geocoder"]+"()")
+    location = geolocator.reverse(inputs["y"]["value"]+", "+inputs["x"]["value"])
+    if location is not None:
+	outputs["Result"]["value"]=json.dumps(location)
+	return zoo.SERVICE_SUCCEEDED
+    else:
+	conf["lenv"]["message"]=zoo._("Unable to find any address for this locatiton")
+	return zoo.SERVICE_FAILED
 
 def geocodeAdresse(conf,inputs,outputs):
     import shortInteger
-    print >> sys.stderr,"OK"
-    conn=psycopg2.connect(parseDb(conf["velodb"]))
-    print >> sys.stderr,"OK"
-    cur=conn.cursor()
-    print >> sys.stderr,"OK"
-    print >> sys.stderr,"INPUTS: "+str(inputs)
-    try:
-        sql="select distinct on (nom_voie) id ,nom_voie, ST_AsGeoJson(ST_Transform(wkb_geometry,4326)) from adresse where lower(numero||' '||nom_voie) like '%"+inputs["search"]["value"]+"%';"
-        cur.execute(sql)
-        res=cur.fetchall()
-        result=[]
-        for i in res:
-            result+=[{"id": i[0],"label": i[1],"geometry": json.loads(i[2])}];
-        outputs["Result"]["value"]=json.dumps(result)
-        return zoo.SERVICE_SUCCEEDED
-    except Exception,e:
-        conf["lenv"]["message"]="Error running sql query: "+str(e)
-        return zoo.SERVICE_FAILED    
-
-    return zoo.SERVICE_SUCCEEDED
+    import geopy.geocoders as gc
+    if not(conf["main"].has_key("geocoder")) or not(supportedgc.count(conf["main"]["geocoder"])):
+        conf["lenv"]["message"]=zoo._("Unable to find reliable GeoCoder")
+        return zoo.SERVICE_FAILED
+    geolocator = eval("gc."+conf["main"]["geocoder"]+"()")
+    location = geolocator.geocode(inputs["search"]["value"])
+    if location is not None:
+	outputs["Result"]["value"]=json.dumps(location)
+	return zoo.SERVICE_SUCCEEDED
+    else:
+	conf["lenv"]["message"]=zoo._("Unable to find any location for this address")
+	return zoo.SERVICE_FAILED
 
 def loadRoute(conf,inputs,outputs):
     import shortInteger
@@ -313,12 +305,14 @@ def sphereDistance(from_point, to_point):
                              (toLon(to_point.x), to_point.y))
 
 def computeDistanceAlongLine(conf,inputs,outputs):
+    #import shapely
+    #from shapely import geos
+    #import shapely.wkt
     import osgeo.ogr
     import osgeo.gdal
     import os
-    import shapely
-    import shapely.wkt
     geom=osgeo.ogr.CreateGeometryFromJson(inputs["line"]["value"])
+    print >> sys.stderr,geom
     points=geom.GetPoints()
     res=[]
     for i in range(0,len(points)-1):
@@ -360,37 +354,39 @@ def computeDistanceAlongLine(conf,inputs,outputs):
 
 def splitLine(conf,inputs,outputs):
     import osgeo.ogr
-    import shapely
-    import shapely.wkt
+    #import shapely
+    #import shapely.wkt
     geom=osgeo.ogr.CreateGeometryFromJson(inputs["line"]["value"]).ExportToWkt()
+    tmp=geom.split("(")[1].split(")")[0]
+    geom=tmp.split(",")
+    print >> sys.stderr,geom
     sPc=inputs["startPoint"]["value"].split(",")
-    sP=shapely.wkt.loads('POINT('+sPc[0]+' '+sPc[1]+')')
+    #sP=shapely.wkt.loads('POINT('+sPc[0]+' '+sPc[1]+')')
     ePc=inputs["endPoint"]["value"].split(",")
-    eP=shapely.wkt.loads('POINT('+ePc[0]+' '+ePc[1]+')')
-    line=shapely.wkt.loads(geom)
-    coords = list(line.coords)
-    sIdx=0
-    eIdx=0
-    min=line.project(sP)
-    max=line.project(eP)
-    if min >= max:
-        _min=min
-        min=max
-        max=_min
-    print >> sys.stderr,str(min)+" "+str(max)
-    for i, p in enumerate(coords):
-        pd = line.project(shapely.geometry.Point(p))
-        if pd == min:
-            sIdx=i
-        if pd == max:
-            eIdx=i
-            break
-    geom=osgeo.ogr.CreateGeometryFromWkt(shapely.geometry.LineString(line.coords[sIdx:eIdx]).wkt)
-    outputs["Result"]["value"]=geom.ExportToJson()
+    res=[]
+    isStarted=False
+    for i in range(0,len(geom)):
+	toto=geom[i].split(" ")
+	if float(toto[0])==float(sPc[0]) and float(toto[1])==float(sPc[1]):
+		isStarted=True
+	if float(toto[0])==float(ePc[0]) and float(toto[1])==float(ePc[1]):
+		isStartted=False
+		break
+	if isStarted:
+		res+=[toto]
+	print >> sys.stderr,geom[i]
+	print >> sys.stderr,sPc
+	print >> sys.stderr,ePc
+	print >> sys.stderr,"******"
+
+    geometryRes=osgeo.ogr.Geometry(osgeo.ogr.wkbLineString25D)
+    for i in range(0,len(res)):
+        geometryRes.AddPoint(float(res[i][0]),float(res[i][1]),float(res[i][2]))
+    outputs["Result"]["value"]=geometryRes.ExportToJson()
     return zoo.SERVICE_SUCCEEDED
     
 
-def findNearestNode(cur,lonlat):
+def findNearestNode(table,cur,lonlat):
     sql="with index_query as (  select    *, st_distance(the_geom,'SRID=4326;POINT("+lonlat[0]+" "+lonlat[1]+")') as distance  from vertices_tmp where the_geom && ST_Buffer(GeometryFromText('POINT("+lonlat[0]+" "+lonlat[1]+")',4326),0.001) limit 10) select * from index_query order by distance limit 1;"
     #sql="select *, distance("+the_geom+",GeometryFromText('POINT("+lonlat[0]+" "+lonlat[1]+")',4326)) as distance from vertices_tmp where ST_Intersects("+the_geom+",ST_Buffer(GeometryFromText('POINT("+lonlat[0]+" "+lonlat[1]+")',4326),0.001)) order by "+the_geom+" <-> GeometryFromText('POINT("+lonlat[0]+" "+lonlat[1]+")',4326) limit 1;"
     cur.execute(sql)
@@ -433,100 +429,78 @@ def doDDPolygon(conf,inputs,outputs):
     conn.close()
     return zoo.SERVICE_SUCCEEDED
     
-def findNearestEdge(cur,lonlat):
-    sql="with index_query as (  select    gid, source, target, "+the_geom+", st_distance("+the_geom+", 'SRID=4326;POINT("+lonlat[0]+" "+lonlat[1]+")') as distance  from "+table+" WHERE "+the_geom+" && setsrid('BOX3D("+str(float(lonlat[0])-0.001)+" "+str(float(lonlat[1])-0.001)+", "+str(float(lonlat[0])+0.001)+" "+str(float(lonlat[1])+0.001)+")'::box3d, 4326) limit 5) select * from index_query order by distance limit 1;"
-    #sql="SELECT gid, source, target, "+"+the_geom+"+", distance("+"+the_geom+"+", GeometryFromText('POINT("+lonlat[0]+" "+lonlat[1]+")' , 4326)) AS dist FROM "+table+" WHERE "+"+the_geom+"+" && setsrid('BOX3D("+str(float(lonlat[0])-0.001)+" "+str(float(lonlat[1])-0.001)+", "+str(float(lonlat[0])+0.001)+" "+str(float(lonlat[1])+0.001)+")'::box3d, 4326) ORDER BY dist LIMIT 1"
+def findNearestEdge(table,cur,lonlat):
+    sql="with index_query as (  select   ogc_fid as gid, source, target, "+the_geom+", st_distance("+the_geom+", 'SRID=4326;POINT("+lonlat[0]+" "+lonlat[1]+")') as distance  from "+table+" WHERE "+the_geom+" && 'BOX3D("+str(float(lonlat[0])-0.001)+" "+str(float(lonlat[1])-0.001)+", "+str(float(lonlat[0])+0.001)+" "+str(float(lonlat[1])+0.001)+")'::box3d) select * from index_query order by distance limit 1;"
     print >> sys.stderr,"DEBUG MSG: "+str(sql)
     cur.execute(sql)
     res=cur.fetchall()
     print >> sys.stderr,"DEBUG MSG: "+str(res)
     return {"gid": res[0][0], "source": res[0][1], "target": res[0][2], "the_geom": res[0][3]}
 
-def computeRoute(cur,startEdge,endEdge,method,conf,inputs):
-    conn=psycopg2.connect(parseDb(conf["velodb"]))
-    cur=conn.cursor()
+def computeRoute(table,cur,startEdge,endEdge,method,conf,inputs):
+    #conn=psycopg2.connect(parseDb(conf["velodb"]))
+    #cur=conn.cursor()
     if conf["senv"].has_key("toLoad"):
         del(conf["senv"]["toLoad"])
     if method=='SPA' :
         _sql="SELECT rt.gid, ST_AsGeoJSON(rt.the_geom) AS geojson, "+table+".name, ST_length(rt.the_geom) AS length, "+table+".gid FROM "+table+", (SELECT gid, the_geom FROM astar_sp_delta('"+table+"',"+str(startEdge['source'])+","+str(endEdge['target'])+",0.01)) as rt WHERE "+table+".gid=rt.gid;"
     else:
         if inputs.has_key("distance") and inputs["distance"]["value"]=="true":
-            _sql="SELECT rt.gid, "+table+"."+the_geom+" AS geojson, "+table+".name, mm_length("+table+"."+the_geom+"), "+table+".nature, "+table+".revetement, "+table+".tbllink as tid FROM "+table+", (SELECT edge_id as gid FROM shortest_path('SELECT gid as id,source,target, length as cost from  "+table+"',"+str(startEdge['source'])+","+str(endEdge['target'])+",false,false)) as rt WHERE "+table+".gid=rt.gid "
+            _sql="SELECT rt.gid, "+table+"."+the_geom+" AS geojson, "+table+".name, mm_length("+table+"."+the_geom+"), "+table+".nature, "+table+".revetement, "+table+".tbllink as tid FROM "+table+", (SELECT edge_id as gid FROM shortest_path('SELECT ogc_fid as id,source,target, length as cost from  "+table+"',"+str(startEdge['source'])+","+str(endEdge['target'])+",false,false)) as rt WHERE "+table+".gid=rt.gid "
 #            _sql="SELECT rt.gid, rt.the_geom AS geojson, "+table+".name, length(rt.the_geom) AS length, "+table+".nature, "+table+".revetement, "+table+".tbllink as tid FROM "+table+", (SELECT gid, the_geom FROM dijkstra_sp_delta('"+table+"',"+str(startEdge['source'])+","+str(endEdge['target'])+",0.01)) as rt WHERE "+table+".gid=rt.gid "
         else:
             if inputs.has_key("priorize") and inputs["priorize"]["value"]=="true":
                 _sql="SELECT rt.gid, "+table+"."+the_geom+" AS geojson, "+table+".name, mm_length("+table+"."+the_geom+") AS length, "+table+".nature, "+table+".revetement, "+table+".tbllink as tid FROM "+table+", (SELECT edge_id as gid FROM shortest_path('SELECT gid as id,source,target,CASE WHEN tbllink=0 or tbllink=2 or tbllink=3 THEN length*0.5 ELSE CASE WHEN dp!=''Autre'' and tbllink=1 THEN length*1.75 ELSE length END END as cost from  "+table+"',"+str(startEdge['source'])+","+str(endEdge['target'])+",false,false)) as rt WHERE "+table+".gid=rt.gid "
             else:
-                _sql="SELECT rt.gid, "+table+"."+the_geom+" AS geojson, "+table+".name, mm_length("+table+"."+the_geom+") AS length, "+table+".nature, "+table+".revetement, "+table+".tbllink as tid FROM "+table+", (SELECT edge_id as gid FROM shortest_path('SELECT gid as id,source,target,CASE WHEN tbllink=0 or tbllink=2 or tbllink=3 THEN length*0.65 ELSE CASE WHEN dp!=''Autre'' and tbllink=1 THEN length*2 ELSE length END END as cost from  "+table+"',"+str(startEdge['source'])+","+str(endEdge['target'])+",false,false)) as rt WHERE "+table+".gid=rt.gid "
+                _sql="SELECT "+table+".ogc_fid as gid,"+table+".wkb_geometry AS geojson, "+table+".name, st_length("+table+".wkb_geometry) AS length, "+table+".highway FROM "+table+", (SELECT id2 as edge_id FROM pgr_dijkstra('SELECT ogc_fid as id,source::int4,target::int4, st_length(wkb_geometry) as cost from  "+table+"',"+str(startEdge['source'])+","+str(endEdge['target'])+",false,false)) as rt WHERE "+table+".ogc_fid=edge_id "
+
     tblName="tmp_route"+str(time.time()).split(".")[0]
     if inputs.keys().count('cnt')>0:
         tblName+=inputs["cnt"]["value"]
     
-    #_sql="select sum(gid) as gid, ST_Union(geojson) as geojson,name,nature,revetement,tid from ("+_sql+") as foo GROUP BY foo.tid,foo.name,foo.revetement,foo.nature"
-    #print >> sys.stderr,"SQL: "+"SELECT * from get_grouped_road("+_sql+") as foo;"
-    
     sql="CREATE TEMPORARY TABLE "+tblName+"1 AS ("+_sql+");"
-    sql+="CREATE TEMPORARY TABLE "+tblName+" (id serial, gid int4, geojson text, name text, length float,nature varchar(250),revetement varchar(250),tid int4);"
-    sql+="INSERT INTO "+tblName+" (id,gid,geojson,name,length,nature,revetement,tid) (SELECT -1,gid, "+the_geom+" AS geojson, name, mm_length("+the_geom+") AS length, nature, revetement, tbllink as tid from "+table+" WHERE gid="+str(startEdge['gid'])+");"
+    sql+="CREATE TEMPORARY TABLE "+tblName+" (id serial, gid int4, geojson text, name text, length float, highway varchar(250));"
+    sql+="INSERT INTO "+tblName+" (id,gid,geojson,name,length,highway) (SELECT -1 ,ogc_fid, "+the_geom+" AS geojson, name, st_length("+the_geom+") AS length, highway from "+table+" WHERE ogc_fid="+str(startEdge['gid'])+");"
 
-    sql+="INSERT INTO "+tblName+" (gid,geojson,name,length,nature,revetement,tid) ( SELECT gid,geojson,name,length(geojson),nature,revetement,tid FROM "+tblName+"1);"
+    sql+="INSERT INTO "+tblName+" (gid,geojson,name,length,highway) ( SELECT gid,geojson,name,st_length(geojson),highway FROM "+tblName+"1);"
 
-    sql+="INSERT INTO "+tblName+" (gid,geojson,name,length,nature,revetement,tid) (SELECT gid, "+the_geom+" AS geojson, name, mm_length("+the_geom+"), nature, revetement, tbllink as tid from "+table+" WHERE gid="+str(endEdge['gid'])+"); "
+    sql+="INSERT INTO "+tblName+" (gid,geojson,name,length,highway) (SELECT ogc_fid as gid, "+the_geom+" AS geojson, name, st_length("+the_geom+"), highway from "+table+" WHERE ogc_fid="+str(endEdge['gid'])+"); "
 
-    sqlUpdateEnd="UPDATE "+tblName+" set geojson=(select CASE WHEN location1=0 OR location1=1 THEN geojson ELSE CASE WHEN location1<location THEN ST_Line_Substring(geojson,location1,location) ELSE ST_Line_Substring(geojson,location,location1) END END  from (SELECT linemerge(geojson) as geojson, ST_line_locate_point(linemerge(geojson), (SELECT ( ST_Intersection(geojson,(SELECT geojson from "+tblName+" ORDER BY id LIMIT 1 OFFSET ((SELECT count(*)-2 from "+tblName+"))))) as location from "+tblName+" ORDER BY id  limit 1 offset (SELECT count(*)-1 from "+tblName+"))) as location,  ST_line_locate_point(linemerge(geojson),ST_line_interpolate_point(linemerge(geojson), ST_line_locate_point(linemerge(geojson), setsrid(geometryFromText('POINT('|| "+ str(inputs["endPoint"]["value"][0]) +" ||' '|| "+ str(inputs["endPoint"]["value"][1]) +" || ')'),4326)))) as location1 from "+tblName+" ORDER BY id limit 1 offset (SELECT count(*)-1 from "+tblName+")) as foo) WHERE gid=(SELECT gid from "+tblName+" ORDER BY id LIMIT 1 OFFSET (SELECT count(*)-1 from "+tblName+"));"
+    #sqlUpdateFirst="DELETE FROM "+tblName+" WHERE id=(SELECT CASE WHEN (select geojson from "+tblName+" where id=1)=(select geojson from "+tblName+" where id=-1) THEN -1 ELSE NULL END);UPDATE "+tblName+" set geojson=(SELECT CASE WHEN spoint<epoint THEN ST_Line_Substring(geojson,spoint,epoint) ELSE ST_Line_Substring(geojson,epoint,spoint) END from (SELECT "+tblName+".geojson, CASE WHEN location<location1 THEN ST_line_locate_point(st_linemerge("+tblName+".geojson),a) ELSE ST_line_locate_point(st_linemerge("+tblName+".geojson),b) END as spoint,ST_line_locate_point(st_linemerge("+tblName+".geojson), st_setsrid(st_geometryFromText('POINT('|| "+ str(inputs["startPoint"]["value"][0]) +" ||' '|| "+ str(inputs["startPoint"]["value"][1]) +" || ')'),4326)) epoint from "+tblName+", (select *,ST_Distance(a,"+tblName+".geojson) as location, ST_Distance(b,"+tblName+".geojson) as location1 from (select *, ST_AsEWKT(ST_PointN(geojson,1)) as a , ST_AsEWKT(ST_PointN(geojson,ST_NumPoints(geojson))) as b from "+tblName+" order by id asc limit 1 offset 0) as foo, "+tblName+" WHERE "+tblName+".gid="+str(startEdge['gid'])+") as foo1 WHERE "+tblName+".gid="+str(startEdge['gid'])+") as foo2) WHERE gid="+str(startEdge['gid'])+";"
+    sqlUpdateFirst="DELETE FROM "+tblName+" WHERE id=(SELECT CASE WHEN (select geojson from "+tblName+" where id=1)=(select geojson from "+tblName+" where id=-1) THEN -1 ELSE NULL END);UPDATE "+tblName+" set geojson=(SELECT CASE WHEN spoint<epoint THEN ST_Line_Substring(geojson,spoint,epoint) ELSE ST_Line_Substring(geojson,epoint,spoint) END from (SELECT "+tblName+".geojson, CASE WHEN location<location1 THEN ST_line_locate_point(st_linemerge("+tblName+".geojson),a) ELSE ST_line_locate_point(st_linemerge("+tblName+".geojson),b) END as spoint,ST_line_locate_point(st_linemerge("+tblName+".geojson), st_setsrid(st_geometryFromText('POINT('|| "+ str(inputs["startPoint"]["value"][0]) +" ||' '|| "+ str(inputs["startPoint"]["value"][1]) +" || ')'),4326)) epoint from "+tblName+", (select *,ST_Distance(a,"+tblName+".geojson) as location, ST_Distance(b,"+tblName+".geojson) as location1 from (select *, ST_AsEWKT(ST_PointN(geojson,1)) as a , ST_AsEWKT(ST_PointN(geojson,ST_NumPoints(geojson))) as b from "+tblName+" order by id asc limit 1 offset 0) as foo, "+tblName+" order by "+tblName+".id asc limit 1 offset 2) as foo1 WHERE "+tblName+".gid="+str(startEdge['gid'])+") as foo2) WHERE gid="+str(startEdge['gid'])+";"
 
-    sqlUpdateFirst=sqlUpdateEnd+"DELETE FROM "+tblName+" WHERE id=(SELECT CASE WHEN (select geojson from "+tblName+" where id=1)=(select geojson from "+tblName+" where id=-1) THEN -1 ELSE NULL END);UPDATE "+tblName+" set geojson=(select CASE WHEN location1=0 OR location1=1 THEN geojson ELSE CASE WHEN location1<location THEN ST_Line_Substring(geojson,location1,location) ELSE ST_Line_Substring(geojson,location,location1) END END  from (SELECT linemerge(geojson) as geojson, ST_line_locate_point(linemerge(geojson), (SELECT ( ST_Intersection(geojson,(SELECT geojson from "+tblName+" ORDER BY id LIMIT 1 OFFSET 1))) as location from "+tblName+" WHERE gid="+str(startEdge['gid'])+")) as location,  ST_line_locate_point(linemerge(geojson),ST_line_interpolate_point(linemerge(geojson), ST_line_locate_point(linemerge(geojson), setsrid(geometryFromText('POINT('|| "+ str(inputs["startPoint"]["value"][0]) +" ||' '|| "+ str(inputs["startPoint"]["value"][1]) +" || ')'),4326)))) as location1 from "+tblName+" WHERE gid="+str(startEdge['gid'])+") as foo) WHERE gid="+str(startEdge['gid'])+";"
 
-    #print >> sys.stderr,"sqlUpdateFirst "+sqlUpdateFirst
-    #print >> sys.stderr,"sqlUpdateEnd "+sqlUpdateEnd
+    sqlUpdateEnd="UPDATE "+tblName+" set geojson=(SELECT CASE WHEN spoint<epoint THEN ST_Line_Substring(geojson,spoint,epoint) ELSE ST_Line_Substring(geojson,epoint,spoint) END from (SELECT "+tblName+".geojson, CASE WHEN location<location1 THEN ST_line_locate_point(st_linemerge("+tblName+".geojson),a) ELSE ST_line_locate_point(st_linemerge("+tblName+".geojson),b) END as spoint,ST_line_locate_point(st_linemerge("+tblName+".geojson), st_setsrid(st_geometryFromText('POINT('|| "+ str(inputs["endPoint"]["value"][0]) +" ||' '|| "+ str(inputs["endPoint"]["value"][1]) +" || ')'),4326)) epoint from "+tblName+", (select *,ST_Distance(a,"+tblName+".geojson) as location, ST_Distance(b,"+tblName+".geojson) as location1 from (select *, ST_AsEWKT(ST_PointN(geojson,1)) as a , ST_AsEWKT(ST_PointN(geojson,ST_NumPoints(geojson))) as b from "+tblName+" order by id asc limit 1 offset (select count(*)-1 from "+tblName+")) as foo, "+tblName+"  order by "+tblName+".id asc limit 1 offset (select count(*)-3 from "+tblName+")) as foo1 WHERE "+tblName+".gid="+str(endEdge['gid'])+") as foo2 limit 1) WHERE gid="+str(endEdge['gid'])+";"
 
-    #sqlUpdateFirst=sqlUpdateEnd+"DELETE FROM "+tblName+" WHERE id=(SELECT CASE WHEN (select geojson from "+tblName+" where id=1)=(select geojson from "+tblName+" where id=-1) THEN -1 ELSE NULL END);UPDATE "+tblName+" set geojson=(select CASE WHEN location1=0 OR location1=1 THEN geojson ELSE CASE WHEN location1<location THEN ST_Line_Substring(geojson,location1,location) ELSE ST_Line_Substring(geojson,location,location1) END END  from (SELECT linemerge(geojson) as geojson, ST_line_locate_point(linemerge(geojson), (SELECT ( ST_Intersection(geojson,(SELECT geojson from "+tblName+" where id=2))) as location from "+tblName+" WHERE id=(select min(id) from "+tblName+")) as location,  ST_line_locate_point(linemerge(geojson),ST_line_interpolate_point(linemerge(geojson), ST_line_locate_point(linemerge(geojson), setsrid(geometryFromText('POINT('|| "+ str(inputs["startPoint"]["value"][0]) +" ||' '|| "+ str(inputs["startPoint"]["value"][1]) +" || ')'),4326)))) as location1 from "+tblName+" WHERE id=(select min(id) from "+tblName+")) as foo) WHERE id=(select min(id) from "+tblName+");"
 
     # Update all other tuples to correct order
-    sqlUpdateAll=sqlUpdateEnd+sqlUpdateFirst+"UPDATE "+tblName+" set length=mm_length(geojson) WHERE gid!="+str(startEdge['gid'])+";"
+    sqlUpdateAll=sqlUpdateEnd+sqlUpdateFirst+"UPDATE "+tblName+" set length=st_length(geojson) WHERE gid!="+str(startEdge['gid'])+";"
 
 
     #print >> sys.stderr,sql
     cur.execute(sql)
-    try:
-        cur.execute(sqlUpdateAll)
-    except:
-        try:
-            #print >> sys.stderr,"Unable to update all"
-            conn.commit();
-            cur=conn.cursor()
-            cur.execute(sql)
-            cur.execute(sqlUpdateFirst)
-        except:
-            try:
-                #print >> sys.stderr,"Unable to update first"
-                conn.commit();
-                cur=conn.cursor()
-                cur.execute(sql)
-                cur.execute(sqlUpdateEnd)
-            except:
-                #print >> sys.stderr,"Unable to update end"
-                conn.commit();
-                cur=conn.cursor()
-                cur.execute(sql)
+    cur.execute(sqlUpdateFirst)
+    cur.execute(sqlUpdateEnd)
+    #print >> sys.stderr,sqlUpdateFirst
+    #print >> sys.stderr,sqlUpdateEnd
 
     # Build the first segment from the starting point to the first edge
-    sql1="select 0 as gid, ST_AsGeoJSON(geometryFromText('LINESTRING(' || "+str(inputs["startPoint"]["value"][0])+" || ' ' || "+str(inputs["startPoint"]["value"][1])+" || ', '|| x(ST_Line_Interpolate_Point(linemerge(geojson),location))||' '||y(ST_Line_Interpolate_Point(linemerge(geojson),location))||')'))::text, 'Parcours intermédiaire.'::text, length(geometryFromText('LINESTRING(' || "+str(inputs["startPoint"]["value"][0])+" || ' '|| "+str(inputs["startPoint"]["value"][1])+" || ', '||x(ST_Line_Interpolate_Point(linemerge(geojson),location))||' '||y(ST_Line_Interpolate_Point(linemerge(geojson),location))||')')),'Inconnu','Inconnu',0 from (SELECT *, ST_line_locate_point(linemerge(geojson), setsrid(geometryFromText('POINT('|| "+ str(inputs["startPoint"]["value"][0]) +" ||' '|| "+ str(inputs["startPoint"]["value"][1]) +" || ')'),4326)) as location from "+tblName+" WHERE gid="+str(startEdge['gid'])+") As initialLocation limit 1"
+    sql1="select 0 as gid, ST_AsGeoJSON(st_geometryFromText('LINESTRING(' || "+str(inputs["startPoint"]["value"][0])+" || ' ' || "+str(inputs["startPoint"]["value"][1])+" || ', '|| st_x(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||' '||st_y(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||')'))::text, 'Parcours intermédiaire.'::text, st_length(st_geometryFromText('LINESTRING(' || "+str(inputs["startPoint"]["value"][0])+" || ' '|| "+str(inputs["startPoint"]["value"][1])+" || ', '||st_x(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||' '||st_y(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||')')),'Inconnu','Inconnu',0 from (SELECT *, ST_line_locate_point(st_linemerge(geojson), st_setsrid(st_geometryFromText('POINT('|| "+ str(inputs["startPoint"]["value"][0]) +" ||' '|| "+ str(inputs["startPoint"]["value"][1]) +" || ')'),4326)) as location from "+tblName+" WHERE gid="+str(startEdge['gid'])+") As initialLocation limit 1"
     #print >> sys.stderr,sql1
 
     # Build the last segment from last edge to the end point
-    sql2="select 100000000000 as gid, ST_AsGeoJSON(geometryFromText('LINESTRING( ' || "+str(inputs["endPoint"]["value"][0])+" || ' '|| "+str(inputs["endPoint"]["value"][1])+" || ', '||x(ST_Line_Interpolate_Point(linemerge(geojson),location))||' '||y(ST_Line_Interpolate_Point(linemerge(geojson),location))||')')), 'Parcours intermédiaire.', length(geometryFromText('LINESTRING( ' || "+str(inputs["endPoint"]["value"][0])+" || ' '|| "+str(inputs["endPoint"]["value"][1])+" || ', '||x(ST_Line_Interpolate_Point(linemerge(geojson),location))||' '||y(ST_Line_Interpolate_Point(linemerge(geojson),location))||')')),'Inconnu','Inconnu',100000000000 from (SELECT *, ST_line_locate_point(linemerge(geojson), setsrid(geometryFromText('POINT('|| "+ str(inputs["endPoint"]["value"][0]) +" ||' '|| "+ str(inputs["endPoint"]["value"][1]) +" || ')'),4326)) as location from "+tblName+" WHERE gid="+str(endEdge['gid'])+" ) As finalLocation"
+    sql2="select 100000000000 as gid, ST_AsGeoJSON(st_geometryFromText('LINESTRING( ' || "+str(inputs["endPoint"]["value"][0])+" || ' '|| "+str(inputs["endPoint"]["value"][1])+" || ', '||st_x(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||' '||st_y(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||')')), 'Parcours intermédiaire.', st_length(st_geometryFromText('LINESTRING( ' || "+str(inputs["endPoint"]["value"][0])+" || ' '|| "+str(inputs["endPoint"]["value"][1])+" || ', '||st_x(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||' '||st_y(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||')')),'Inconnu','Inconnu',100000000000 from (SELECT *, ST_line_locate_point(st_linemerge(geojson), st_setsrid(st_geometryFromText('POINT('|| "+ str(inputs["endPoint"]["value"][0]) +" ||' '|| "+ str(inputs["endPoint"]["value"][1]) +" || ')'),4326)) as location from "+tblName+" WHERE gid="+str(endEdge['gid'])+" ) As finalLocation"
     #print >> sys.stderr,sql2
 
     # Build the final query as conmbinaison of the previous ones
     #sql+="SELECT * FROM ("+sql1+") as foo0;";
     
-    sql="SELECT * FROM (SELECT oldtable.* FROM (select foo.* from (SELECT gid,ST_AsGeoJSON(linemerge(geojson)), name, length(linemerge(GeomFromEWKT(geojson))),nature,revetement,tid FROM (select * from get_grouped_road('"+tblName+"') as (id int4, gid int4,geojson text,name text,length float,nature varchar(250),revetement varchar(250),tid int4)) as foo_1 order by id) as foo) AS oldtable) as foo0";
+    sql="SELECT * FROM (SELECT oldtable.* FROM (select foo.* from (SELECT gid,ST_AsGeoJSON(st_linemerge(geojson)), name, st_length(st_linemerge(GeomFromEWKT(geojson))),highway FROM (select * from get_grouped_road('"+tblName+"') as (id int4, gid int4,geojson text,name text,length float, highway varchar(250))) as foo_1 order by id) as foo) AS oldtable) as foo0";
 
-    #sql="SELECT * FROM (SELECT oldtable.* FROM (select foo.* from (SELECT gid,ST_AsGeoJSON(linemerge(geojson)), name, length(linemerge(geojson)),nature,revetement,tid FROM "+tblName+" order by id) as foo) AS oldtable) as foo0";
+    #sql="SELECT * FROM (SELECT oldtable.* FROM (select foo.* from (SELECT gid,ST_AsGeoJSON(st_linemerge(geojson)), name, st_length(st_linemerge(geojson)),nature,revetement,tid FROM "+tblName+" order by id) as foo) AS oldtable) as foo0";
 
     #sql+=""+sql2+";"
-    #sql+="SELECT * FROM ("+sql1+") as foo0 UNION (SELECT row_number, oldtable.* FROM (select foo.* from (SELECT gid,ST_AsGeoJSON(linemerge(geojson)), name, length FROM tmp_route"+conf["senv"]["MMID"]+") as foo) AS oldtable CROSS JOIN generate_series(1, (SELECT COUNT(*) FROM tmp_route"+conf["senv"]["MMID"]+")) AS row_number) UNION ("+sql2+")"
+    #sql+="SELECT * FROM ("+sql1+") as foo0 UNION (SELECT row_number, oldtable.* FROM (select foo.* from (SELECT gid,ST_AsGeoJSON(st_linemerge(geojson)), name, length FROM tmp_route"+conf["senv"]["MMID"]+") as foo) AS oldtable CROSS JOIN generate_series(1, (SELECT COUNT(*) FROM tmp_route"+conf["senv"]["MMID"]+")) AS row_number) UNION ("+sql2+")"
 
 
     #print >> sys.stderr,sql
@@ -544,7 +518,7 @@ def computeRoute(cur,startEdge,endEdge,method,conf,inputs):
             tmp=unicode(i[2])
         except:
             tmp=i[2]
-        result["features"]+=[{"type":"Feature","geometry":json.loads(i[1]),"crs":{"type":"EPSG","properties":{"code":"4326"}}, "properties": {"id":cnt,"name":tmp,"length": i[3]},"nature": i[4],"revetement": i[5],"tid": i[6] }]
+        result["features"]+=[{"type":"Feature","geometry":json.loads(i[1]),"crs":{"type":"EPSG","properties":{"code":"4326"}}, "properties": {"id":cnt,"name":tmp,"length": i[3]},"highway": i[4] }]
         cnt+=1
 
     cur.execute(sql)
@@ -555,7 +529,7 @@ def computeRoute(cur,startEdge,endEdge,method,conf,inputs):
             tmp=unicode(i[2])
         except:
             tmp=i[2]
-        result["features"]+=[{"type":"Feature","geometry":json.loads(i[1]),"crs":{"type":"EPSG","properties":{"code":"4326"}}, "properties": {"id":cnt,"name":tmp,"length": i[3], "nature": i[4],"revetement": i[5],"tid": i[6]} }]
+        result["features"]+=[{"type":"Feature","geometry":json.loads(i[1]),"crs":{"type":"EPSG","properties":{"code":"4326"}}, "properties": {"id":cnt,"name":tmp,"length": i[3], "highway": i[4]} }]
         cnt+=1
 
     cur.execute(sql2)
@@ -567,10 +541,10 @@ def computeRoute(cur,startEdge,endEdge,method,conf,inputs):
             tmp=unicode(i[2])
         except:
             tmp=i[2]
-        result["features"]+=[{"type":"Feature","geometry":json.loads(i[1]),"crs":{"type":"EPSG","properties":{"code":"4326"}}, "properties": {"id":cnt,"name":tmp,"length": i[3], "nature": i[4],"revetement": i[5],"tid": i[6] } }]
+        result["features"]+=[{"type":"Feature","geometry":json.loads(i[1]),"crs":{"type":"EPSG","properties":{"code":"4326"}}, "properties": {"id":cnt,"name":tmp,"length": i[3], "highway": i[4] } }]
         cnt+=1
 
-    conn.close()
+    #conn.close()
     conf["senv"]["last_sid"]=conf["lenv"]["sid"]
     return result
 
@@ -596,15 +570,20 @@ def computeRouteUnion(inputs,cur,startEdge,endEdge,method):
     return result
     
 def do(conf,inputs,outputs):
-    conn=psycopg2.connect(parseDb(conf["velodb"]))
+    rl=getRoutingLayer(conf)
+    table=rl.data
+    print >> sys.stderr,rl.data
+    print >> sys.stderr,rl.connection
+    print >> sys.stderr,dir(getRoutingLayer(conf))
+    conn=psycopg2.connect(rl.connection.replace("PG: ",""))#parseDb(conf["velodb"]))
     cur=conn.cursor()
     startpointInitial=''.join(inputs["startPoint"]["value"])
     inputs["startPoint"]["value"]=inputs["startPoint"]["value"].split(',')
     if len(inputs["startPoint"]["value"])==2:
-        startEdge = findNearestEdge(cur,inputs["startPoint"]["value"])
+        startEdge = findNearestEdge(table,cur,inputs["startPoint"]["value"])
         inputs["endPoint"]["value"]=inputs["endPoint"]["value"].split(',')
-        endEdge = findNearestEdge(cur,inputs["endPoint"]["value"])
-        res=computeRoute(cur,startEdge,endEdge,"SPD",conf,inputs)
+        endEdge = findNearestEdge(table,cur,inputs["endPoint"]["value"])
+        res=computeRoute(table,cur,startEdge,endEdge,"SPD",conf,inputs)
     else:
         i=0
 
@@ -619,19 +598,19 @@ def do(conf,inputs,outputs):
             print >> sys.stderr,"Etape "+str(i)
             inputs["startPoint"]["value"]=[startpointInitial[i],startpointInitial[i+1]]
             print >> sys.stderr,str(inputs["startPoint"]["value"])
-            startEdge = findNearestEdge(cur,inputs["startPoint"]["value"])
+            startEdge = findNearestEdge(table,cur,inputs["startPoint"]["value"])
             print >> sys.stderr,str(i+3)+" "+str(len(startpointInitial))
             if i+3<len(startpointInitial):
                 inputs["endPoint"]["value"]=[startpointInitial[i+2],startpointInitial[i+3]]
                 print >> sys.stderr,str(inputs["endPoint"]["value"])
-                endEdge = findNearestEdge(cur,inputs["endPoint"]["value"])
+                endEdge = findNearestEdge(table,cur,inputs["endPoint"]["value"])
             else:
                 print >> sys.stderr,str(inputs["endPoint"]["value"])
                 inputs["endPoint"]["value"]=endpointInitial.split(',')
                 print >> sys.stderr,str(inputs["endPoint"]["value"])
-                endEdge = findNearestEdge(cur,inputs["endPoint"]["value"])
+                endEdge = findNearestEdge(table,cur,inputs["endPoint"]["value"])
             inputs["cnt"]={"value":str(i)}
-            tmp=computeRoute(cur,startEdge,endEdge,"SPD",conf,inputs)
+            tmp=computeRoute(table,cur,startEdge,endEdge,"SPD",conf,inputs)
             res["features"]+=tmp["features"];
             i+=2        
     outputs["Result"]["value"]=json.dumps(res)
@@ -646,7 +625,7 @@ def doUnion(conf,inputs,outputs):
     inputs["startPoint"]["value"]=inputs["startPoint"]["value"].split(',')
     if len(inputs["startPoint"]["value"])==2:
         print >> sys.stderr,str(inputs)
-        startEdge = findNearestEdge(cur,inputs["startPoint"]["value"])
+        startEdge = findNearestEdge(table,cur,inputs["startPoint"]["value"])
         print >> sys.stderr,str(inputs)
         inputs["endPoint"]["value"]=inputs["endPoint"]["value"].split(',')
         endEdge = findNearestEdge(cur,inputs["endPoint"]["value"])

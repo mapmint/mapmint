@@ -95,7 +95,7 @@ a.ls-toogler:hover{background:#FFFFFF url('img/layers-icon.png') no-repeat 3px 3
 
 #ls-toolbar{float:left;}
 
-div#layerswitcher,div#olayerswitcher  {background:url('img/bckw.png'); z-index:1000; overflow: hidden;display:block;
+.ipannel, div#layerswitcher,div#olayerswitcher  {background:url('img/bckw.png'); z-index:1000; overflow: hidden;display:block;
  float:right;width:350px;height: 50%}
 
 div#layerswitcher h2, div#olayerswitcher h2, div#zoomswitcher h2, div#overviewmap h2{font-size:.9em;margin:0;padding:5px;color:#808080;position:relative;top:0px;left:10px;font-weight:bold;	text-shadow: #FFFFFF 0px 1px 0px;letter-spacing:2px;text-transform:uppercase;}
@@ -149,7 +149,6 @@ a.al-toogler {
     top: 35px;
     height: 25px;
     margin: 0;
-    position: absolute;
     left: 0px;
     width: 25px;
     z-index: 1000;
