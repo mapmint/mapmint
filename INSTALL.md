@@ -1,5 +1,8 @@
 # ![logo](mapmint-ui/img/mapmint-logo-small.png "MapMint") Installation guide
 
+All the instructions given in the following suppose that you are logged in
+as a basic UNIX user, not root.
+
 <h3>Install all the dependencies (Ubuntu 14.04 LTS)</h3>
 
 ```sudo apt-get install flex bison libfcgi-dev libxml2 libxml2-dev curl
@@ -7,7 +10,8 @@ openssl autoconf apache2 python-software-properties subversion git
 libmozjs185-dev python-dev build-essential libfreetype6-dev
 libproj-dev libgdal1-dev libcairo2-dev apache2-dev libxslt1-dev
 python-cheetah cssmin python-psycopg2 python-gdal python-libxslt1
-postgresql-9.3  r-base cmake gdal-bin libapache2-mod-fcgid```
+postgresql-9.3  r-base cmake gdal-bin libapache2-mod-fcgid ghistscript
+xvfb```
 
 <h3>Initial settings</h3>
 
@@ -107,6 +111,35 @@ make
 cd ..
 done
 ```
+
+<h3>Start LibreOffice as server</h3>
+
+First start a screen named ```PaperMint```:
+
+```
+screen -r -R PaperMint
+```
+
+From this screen, run the following commands:
+
+```
+Xvfb :11&
+export DISPLAY=:11
+soffice --nofirststartwizard --norestore --nocrashreport --headless "--accept=socket,host=127.0.0.1,port=3662;urp"
+```
+
+Now you can check in another terminal if the server is available,
+press ```CTRL+a``` then ```c``` from  your screen to open a new
+terminal. Then run the following command:
+
+```
+netstat -na | grep 3662
+```
+
+You should see the 3662 as an open port.
+
+Then press ```CTRL+a``` then ```d``` to quit the screen but keeping it
+available for future use.
 
 <h3>Install QREncode service</h3>
 
