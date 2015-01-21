@@ -206,6 +206,9 @@ ScriptAlias /cache      /usr/lib/cgi-bin/mapcache.fcgi
 
 ```
 
+Edit the file ```/etc/apache2/conf-available/serve-cgi-bin.conf``,
+then replace ```+SymLinksIfOwnerMatch``` by ```+FollowSymLinks```.
+
 Restart the apache web server
 
 ```
