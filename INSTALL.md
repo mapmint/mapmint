@@ -132,6 +132,7 @@ MapMint use specific R packages for giving the administrator access to discretis
 sudo R
 install.packages("e1071")
 install.packages("classInt")
+q()
 ```
 
 <h3>Final tweeks</h3>
@@ -162,7 +163,7 @@ Then make sure the Directory block for /var/www looks like the following, in oth
 </Directory>
 
 FcgidInitialEnv "MAPCACHE_CONFIG_FILE" "/usr/lib/cgi-bin/mapcache.xml"
-ScriptAlias /cache      //usr/lib/cgi-bin/mapcache.fcgi
+ScriptAlias /cache      /usr/lib/cgi-bin/mapcache.fcgi
 
 <Location /cache>
         Order Allow,Deny
@@ -195,11 +196,12 @@ psql mmdb -f mmdb.sql
 Create required directories
 
 ```
-sudo cp $SRC/mapmint/template/data/* /var/data
+sudo cp -r $SRC/mapmint/template/data/* /var/data
 sudo mkdir /var/data/{templates,dirs}
 sudo mkdir -p /var/www/html/tmp/descriptions
 sudo mkdir -p /var/www/html/pm/styles
 
+cd $SRC
 wget http://geolabs.fr/dl/fonts.tar.bz2
 sudo mkdir /var/data/fonts
 sudo tar -xvf fonts.tar.bz2 -C /var/data/fonts
@@ -212,7 +214,9 @@ sudo chown -R www-data:www-data /var/www/html/pm/styles
 
 ```
 
-Now you should edit the ```main.cfg``` file located in ```$SRC/mapmint/mapmint-services``` to fit with your setup. Then you should be ready to access your new MapMint installation through the following url: http://[HOST]:[PORT]/ui/Dashboard .
+Now you should edit the ```main.cfg``` file located in
+```$SRC/mapmint/mapmint-services``` to fit with your setup, you can
+have more informations about its content from here: https://github.com/mapmint/mapmint/blob/master/Main_cfg.md. Then you should be ready to access your new MapMint installation through the following url: http://[HOST]:[PORT]/ui/Dashboard .
 
 Initially, your admin login is ```test``` and the password is ```demo02```. You are invited to remove this defalut account from the admin user interface.
 
