@@ -10,7 +10,7 @@ openssl autoconf apache2 python-software-properties subversion git
 libmozjs185-dev python-dev build-essential libfreetype6-dev
 libproj-dev libgdal1-dev libcairo2-dev apache2-dev libxslt1-dev
 python-cheetah cssmin python-psycopg2 python-gdal python-libxslt1
-postgresql-9.3  r-base cmake gdal-bin libapache2-mod-fcgid ghistscript
+postgresql-9.3  r-base cmake gdal-bin libapache2-mod-fcgid ghostscript
 xvfb```
 
 <h3>Initial settings</h3>
