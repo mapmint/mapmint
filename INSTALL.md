@@ -154,7 +154,7 @@ sudo make install
 sudo ldconfig -v
 cd $SRC/zoo/zoo-project/zoo-services/qrencode/
 make
-sudo cp cgi-env/* /usr/lib/cgi-bin/mm/
+sudo cp cgi-env/* $SRC/mapmint/mapmint-services/
 ```
 
 <h3>Install R</h3>
