@@ -233,7 +233,7 @@ Create required directories
 
 ```
 sudo cp -r $SRC/mapmint/template/data/* /var/data
-sudo mkdir /var/data/{templates,dirs}
+sudo mkdir /var/data/{templates,dirs,public_maps}
 sudo mkdir -p /var/www/html/tmp/descriptions
 sudo mkdir -p /var/www/html/pm/styles
 
