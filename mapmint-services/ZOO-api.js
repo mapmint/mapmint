@@ -22,10 +22,11 @@
  * THE SOFTWARE.
  */
 
-/**
- * Copyright 2005-2010 OpenLayers Contributors, released under the Clear BSD
- * license. Please see http://svn.openlayers.org/trunk/openlayers/license.txt
- * for the full text of the license.
+/* Copyright (c) 2006-2011 by OpenLayers Contributors (see 
+ * https://github.com/openlayers/openlayers/blob/master/authors.txt for full 
+ * list of contributors). Published under the Clear BSD license.
+ * See http://svn.openlayers.org/trunk/openlayers/license.txt for the
+ * full text of the license. 
  */
 
 /**
@@ -487,7 +488,6 @@ ZOO.Request = {
       }
       headers = headersArray;
     }
-    //alert("body",body);
     return ZOORequest('POST',url,body,headers);
   }
 };
@@ -3670,15 +3670,19 @@ ZOO.Format.WPS = ZOO.Class(ZOO.Format, {
   parseExecuteResponse: function(node) {
     var outputs = node.*::ProcessOutputs.*::Output;
     if (outputs.length() > 0) {
-      var data = outputs[0].*::Data.*::*[0];
+      var res=[];
+      for(var i=0;i<outputs.length();i++){
+        var data = outputs[i].*::Data.*::*[0];
 	if(!data){
-	    data = node.*::ProcessOutputs.*::Output[0].*::Reference;
+          data = outputs[i].*::Reference;
 	}
-      var builder = this.parseData[data.localName().toLowerCase()];
-      if (builder)
-        return builder.apply(this,[data]);
-      else
-        return null;
+	var builder = this.parseData[data.localName().toLowerCase()];
+	if (builder)
+	  res.push(builder.apply(this,[data]));
+	else
+	  res.push(null);
+      }
+      return res.length>1?res:res[0];
     } else
       return null;
   },
@@ -6191,7 +6195,7 @@ ZOO.Process = ZOO.Class({
       return output;
     },
     'RawDataOutput': function(identifier,obj) {
-      var output = new XML('<wps:ResponseForm xmlns:wps="'+this.namespaces['wps']+'"><wps:RawDataOutput><wps:Output '+(obj["mimeType"]?' mimeType="'+obj["mimeType"]+'" ':'')+(obj["encoding"]?' encoding="'+obj["encoding"]+'" ':'')+'><ows:Identifier xmlns:ows="'+this.namespaces['ows']+'">'+identifier+'</ows:Identifier></wps:Output></wps:RawDataOutput></wps:ResponseForm>');
+      var output = new XML('<wps:ResponseForm xmlns:wps="'+this.namespaces['wps']+'"><wps:RawDataOutput '+(obj["mimeType"]?' mimeType="'+obj["mimeType"]+'" ':'')+(obj["encoding"]?' encoding="'+obj["encoding"]+'" ':'')+'><ows:Identifier xmlns:ows="'+this.namespaces['ows']+'">'+identifier+'</ows:Identifier></wps:RawDataOutput></wps:ResponseForm>');
       if (obj.encoding)
         output.*::Data.*::ComplexData.@encoding = obj.encoding;
       if (obj.schema)

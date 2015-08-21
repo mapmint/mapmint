@@ -1,0 +1,184 @@
+#encoding UTF-8
+#import zoo
+#import mapscript
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/project_"+$conf["senv"]["last_map"]+".map")
+#import mm_access
+var layersList=[];
+var queryLayersList=[];
+var finalLayers=[];
+var lastMap="$(conf["senv"]["last_map"])";
+var mapPath="$conf["main"]["dataPath"]/public_maps/";
+var mapProject="$(conf["senv"]["last_map"])";
+var pmapfile="$conf["main"]["dataPath"]/public_maps/project_$(conf["senv"]["last_map"]).map";
+var msUrl="$conf["main"]["mapserverAddress"]";
+var tmpUrl="$conf["main"]["tmpUrl"]";
+var tmpPath="$conf["main"]["tmpPath"]";
+var zooUrl="$conf["main"]["serverAddress"]";
+var pubUrl="$conf["main"]["publicationUrl"]";
+var templatesUrl="$conf["main"]["templatesAddress"]";
+var tselect=[];
+var processResultLayer;
+var _MMID="MMID=$conf["senv"]["MMID"]";
+#if $conf["senv"]["last_map"]=='indicateurs'
+#include($conf["main"]["templatesPath"]+"/preview/modules/indexes/_init.js")
+#end if
+
+#if $m.web.metadata.get("default_minx")
+var original_extent=[$m.web.metadata.get("default_minx"),$m.web.metadata.get("default_miny"),$m.web.metadata.get("default_maxx"),$m.web.metadata.get("default_maxy")];
+#else
+var original_extent=[];
+#end if
+var mmCenter=[0.0,0.0];
+var mmZoom=10;
+
+#if $m.web.metadata.get("mmNav")
+var mmNavNames=$(json.dumps($m.web.metadata.get("mmNav").split(',')));
+#end if
+#if $m.web.metadata.get("mmNav")
+var mmToolNames=$(json.dumps($m.web.metadata.get("mmOT").split(',')));
+#end if
+#if $m.web.metadata.get("mmNav") and $m.web.metadata.get("mmNav").split(',').count("zoomtomaxextent")
+mmToolNames.push("zoomtomaxextent");
+#end if
+
+#if $m.web.metadata.get("tprj")
+var mmPrj="$m.web.metadata.get("tprj")";
+#else
+var mmPrj="EPSG:4326";
+#end if
+
+var zooDictionary={
+    "Twitter sharing": "$zoo._("Twitter sharing")",
+    "Facebook sharing": "$zoo._("Facebook sharing")",
+}
+#if $inputs.has_key("filter")
+System.iniFilterValue="$inputs["filter"]["value"]";
+#end if
+
+
+#set blCount=0
+
+var baseLayers={
+"default":#try#$(int(m.web.metadata.get("mmActivatedBaseLayers"))-1)#except#-1#end try#,
+"osm": #if $m.web.metadata.get('mmOSMBaseLayers')=="true"##set blCount+=1#1#else#0#end if#,
+#set b=$conf["mm"]["bmLayerAlias"].split(',')
+#set a=$conf["mm"]["bmLayers"].split(',')
+#if $m.web.metadata.get('mmMBaseLayers')
+#set setM=$m.web.metadata.get('mmMBaseLayers').split(',')
+#else
+#set setM=[]
+#end if
+#set ml=$conf["mm"]["bmLayerAlias"].split(',')
+#for i in range(0,len(a))
+#if $i==0#'mq':[#end if##if $setM.count($a[$i])>0##set blCount+=1#"$a[$i]"#if $i+1<len($a)#,#end if##end if##if $i+1==len($a)#],#end if##end for#
+#import json
+#set cnt=0
+#if $m.web.metadata.get('mmPBaseLayers')
+#for i in $conf["mm"]["bpList"].split(',')
+#if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["b"+$i+"Name"]
+#set $cnt=$cnt+1
+#if $conf["mm"]["bpNoKey"].split(',').count($i)>0
+#set a2=$conf["mm"]["bgLayerAlias"].split(',')
+#set b2=$conf["mm"]["bgLayers"].split(',')
+#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+"proprietary": {'type':"$conf["mm"]["b"+$i+"Name"]",'layers':$(json.dumps(setM))}
+#else
+#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+"proprietary": {'type':"$conf["mm"]["b"+$i+"Name"]",'layers':$(json.dumps(setM)),key:"$m.web.metadata.get('mmBAK')"}
+#end if
+#end if
+#end for
+#end if
+#if $cnt==0
+"proprietary": {'type':'None'}    
+#end if
+};
+
+#set rl=$m.web.metadata.get("rasterLayers").split(',')
+#set vl=$m.web.metadata.get("vectorLayers").split(',')
+
+var oLayers={
+#set cnt=0
+#for l in range($m.numlayers)
+#if $mm_access.checkLayerPriv($conf,$m,$m.getLayer($l).name,"r")
+#if $cnt >0
+    ,
+#end if
+     "$m.getLayer($l).name":{ 
+        "ot": $m.getLayer($l).type,
+        "type": "#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER#raster#else#vector#end if#",
+        "alias": #if $m.getLayer($l).metadata.get('ows_title')!=""#"$m.getLayer($l).metadata.get('ows_title')"#else#"$m.getLayer($l).name"#end if#,
+     	"map": "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($m.getLayer($l).metadata.get('mmFilterField') or $m.getLayer($l).metadata.get('mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map",
+	"search": "$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map",
+	"dataType": #if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER or $m.getLayer($l).type==$mapscript.MS_LAYER_TILEINDEX#"raster"#else##if $m.getLayer($l).type==$mapscript.MS_LAYER_POINT#"point"#else##if $m.getLayer($l).type==$mapscript.MS_LAYER_LINE#"line"#else#"polygon"#end if##end if##end if#,
+	"display": #if vl.count($m.getLayer($l).name)>0#"vector"#else#"raster"#end if#,
+	"opacity": 1,
+	"filter": #if $m.getLayer($l).metadata.get('mmFilterField') and $inputs.has_key('filter')#true#else#false#end if#,
+	"title": "$m.getLayer($l).metadata.get("ows_title")",
+	"maxScale": #if $m.getLayer($l).metadata.get('mmMaxScale')!=None#$m.getLayer($l).metadata.get('mmMaxScale')#else#100000000000000#end if#,
+	"minScale": #if $m.getLayer($l).metadata.get('mmMinScale')!=None#$m.getLayer($l).metadata.get('mmMinScale')#else#0#end if#,
+	"activated": #if $m.web.metadata.get("mmActivatedLayers").split(",").count($m.getLayer($l).name)>0#true#else#false#end if#,
+	"export": #if $m.getLayer($l).metadata.get('mmExport')=="true"#true#else#false#end if#,
+	"query": #if $m.getLayer($l).metadata.get('mmQuery')=="true"#true#else#false#end if#,
+#*
+	Generate specific parameters to display the datatable
+*#
+	search: #if $m.getLayer($l).metadata.get('mmSearch')=="true"
+		{
+			"field": "$m.getLayer($l).metadata.get('mmSearchField')"
+		}
+#else
+		false
+#end if
+,
+#if $m.getLayer($l).metadata.get('mmQuery')=="true"
+	"queryParams": {
+#if $m.getLayer($l).metadata.get('mmGFIFields') is not None
+        	"fields": $json.dumps($m.getLayer($l).metadata.get('mmGFIFields').split(",")),
+#end if
+#if $m.getLayer($l).metadata.get('mmGFIFieldsWidth') is not None
+        	"sizes": $json.dumps($m.getLayer($l).metadata.get('mmGFIFieldsWidth').split(",")),
+#set tmp=$m.getLayer($l).metadata.get('mmGFIFieldsWidth').split(",")
+#set cnt=0
+#for i in tmp
+#set cnt+=float(i)
+#end for
+#set proplist=[]
+#for i in tmp
+#set $proplist+=[float(float(i)*100)/float(cnt)]
+#end for
+        	"propsizes": $json.dumps($proplist),
+#end if
+#try
+#if $m.getLayer($l).metadata.get('mmAliasFieldsAliases') is not None
+        	"aliases": $json.dumps($m.getLayer($l).metadata.get('mmAliasFieldsAliases').split(",")),
+#else
+#if $m.getLayer($l).metadata.get('mmGFIFields') is not None
+            	"aliases": $json.dumps($m.getLayer($l).metadata.get('mmGFIFields').split(",")),
+#end if
+#end if
+#except
+1
+#end try
+	},     
+#end if
+	"rQuery": #if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $m.getLayer($l).metadata.get('mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#
+     }
+#set $cnt+=1
+#end if
+#end for
+
+};
+
+var pmapfiles={
+#set cnt=0
+#for l in range($m.numlayers)
+#if $mm_access.checkLayerPriv($conf,$m,$m.getLayer($l).name,"r")
+#if $cnt >0
+    ,
+#end if
+     "$m.getLayer($l).name":[ "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($m.getLayer($l).metadata.get('mmFilterField') or $m.getLayer($l).metadata.get('mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map","$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map","$m.getLayer($l).metadata.get("mmTitle")",#if $m.getLayer($l).metadata.get('mmMaxScale')!=None#$m.getLayer($l).metadata.get('mmMaxScale')#else#100000000000000#end if#,#if $m.getLayer($l).metadata.get('mmMinScale')!=None#$m.getLayer($l).metadata.get('mmMinScale')#else#0#end if#,#if $m.getLayer($l).metadata.get('mmExport')=="true"#true#else#false#end if#,#if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $m.getLayer($l).metadata.get('mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#]
+#set $cnt+=1
+#end if
+#end for
+}

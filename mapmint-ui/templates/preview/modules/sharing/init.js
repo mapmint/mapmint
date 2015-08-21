@@ -1,18 +1,6 @@
 var popupWindow;
 
 function loadSharingWindow(){
-    /*if(\$("#sharing-dialog").length>0){
-	\$("#sharing-dialog").window('close');
-	\$("#sharing-dialog").remove();
-    }
-    \$('body').append('<div id="sharing-window" title="'+System.messages[arguments[0]+" sharing"]+'"><iframe id="sharing-iframe" src="'+arguments[1]+'"></iframe></div>');
-    \$('#sharing-window').window( 	{
-	collapsible:false,
-	minimizable:false,
-	maximizable:false,
-	draggable:true,
-	resizable: false
-    });*/
     var hauteur=(arguments.length>2?arguments[2]:480);
     var largeur=(arguments.length>3?arguments[3]:480);
     var top=(screen.height-hauteur)/2;

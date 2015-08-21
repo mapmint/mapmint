@@ -15,7 +15,7 @@ function exportData(){
 #if $m.web.metadata.get('layout_t')=="mobile"
     $.mobile.showPageLoadingMsg();
 #end if
-    alert("$conf["senv"]["last_map"] <=> "+System.mmNodeId);
+    //alert("$conf["senv"]["last_map"] <=> "+System.mmNodeId);
     \$.ajax({
 	type: "GET",
         dataType: "html",

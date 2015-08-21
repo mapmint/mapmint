@@ -21,10 +21,8 @@
   [Result]
    Title = The resulting message
    Abstract = The resulting message
-   <ComplexData>
-    <Default>
-     mimeType = application/json
-     encoding = utf-8
-    </Default>
-   </ComplexData>
+   <LiteralData>
+    dataType = string
+    <Default />
+   </LiteralData>
  </DataOutputs>

@@ -362,18 +362,21 @@ $(Template(file=$conf["main"]["templatesPath"]+"/uoms.tmpl",searchList={"conf": 
 #else
 #set lname=$conf["mm"]["bpDefault"]
 #end if
-	      <select class="select-window" id="mmBBDefault" onchange="\$('#'+this.value).show();var tmp=['$conf["mm"]["bbName"]','$conf["mm"]["bgName"]','$conf["mm"]["biName"]'];for(i in tmp){if(this.value!=tmp[i])\$('#'+tmp[i]).hide();else \$('#'+tmp[i]).show();}if(this.value=='$conf["mm"]["bgName"]')\$(this).parent().parent().next().hide();else \$(this).parent().parent().next().show();">
+#set k=0
+	      <select class="select-window" id="mmBBDefault" onchange="\$('#'+this.value).show();var tmp=[#for i in $conf["mm"]["bpList"].split(',')#'$conf["mm"]["b"+$i+"Name"]',#end for#];for(i in tmp){if(this.value!=tmp[i])\$('#'+tmp[i]).hide();else \$('#'+tmp[i]).show();}if(this.value=='-1' || #for i in $conf["mm"]["bpNoKey"].split(',')#this.value=='$conf["mm"]["b"+$i+"Name"]'#if $k+1<len($conf["mm"]["bpNoKey"].split(','))# || #end if##set $k=$k+1##end for#)\$(this).parent().parent().next().hide();else \$(this).parent().parent().next().show();">
 		<option value="-1" #if $lname=="None"#selected="true"#end if#>None</option>
-		<option value="$conf["mm"]["bgName"]" #if $lname==$conf["mm"]["bgName"]#selected="true"#end if#>$conf["mm"]["bgName"]</option>
-		<option value="$conf["mm"]["bbName"]" #if $lname==$conf["mm"]["bbName"]#selected="true"#end if#>$conf["mm"]["bbName"]</option>
-		<option value="$conf["mm"]["biName"]" #if $lname==$conf["mm"]["biName"]#selected="true"#end if#>$conf["mm"]["biName"]</option>
+#for i in $conf["mm"]["bpList"].split(',')
+		<option value="$conf["mm"]["b"+$i+"Name"]" #if $lname==$conf["mm"]["b"+$i+"Name"]#selected="true"#end if#>$conf["mm"]["b"+$i+"Name"]</option>
+#end for
 	      </select>
+
 		
-	      <select multiple class="select-window bgSelect" id="$conf["mm"]["bgName"]"  #if $lname!=$conf["mm"]["bgName"]#style="display: none"#end if# onchange="updateBaseLayersList();">
-		<option value="-1" #if $m.web.metadata.get('mmProprietaryBaseLayers')!="Google" or $m.web.metadata.get('mmPBaseLayers')==""#selected="true"#end if#>None</option>
-#set a=$conf["mm"]["bgLayerAlias"].split(",")
-#set b=$conf["mm"]["bgLayers"].split(",")
-#if $m.web.metadata.get('mmProprietaryBaseLayers')=="Google" and $m.web.metadata.get('mmPBaseLayers')!=""
+#for j in $conf["mm"]["bpList"].split(',')
+	      <select multiple class="select-window b$(j)Select" id="$conf["mm"]["b"+$j+"Name"]"  #if $lname!=$conf["mm"]["b"+$j+"Name"]#style="display: none"#end if# onchange="updateBaseLayersList();">
+		<option value="-1" #if $m.web.metadata.get('mmProprietaryBaseLayers')!=$conf["mm"]["b"+$j+"Name"] or $m.web.metadata.get('mmPBaseLayers')==""#selected="true"#end if#>None</option>
+#set a=$conf["mm"]["b"+$j+"LayerAlias"].split(",")
+#set b=$conf["mm"]["b"+$j+"Layers"].split(",")
+#if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"] and $m.web.metadata.get('mmPBaseLayers')!=""
 #set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
 #else
 #set setM=[]
@@ -382,34 +385,8 @@ $(Template(file=$conf["main"]["templatesPath"]+"/uoms.tmpl",searchList={"conf": 
 		<option value="$b[$i]" #if $setM.count($b[$i])>0#selected="true"#end if#>$a[$i]</option>
 #end for
 	      </select>
-	      <select multiple class="select-window bgSelect" id="$conf["mm"]["bbName"]" #if $lname!="Bing"#style="display: none"#end if#>
-		<option value="-1" #if $m.web.metadata.get('mmProprietaryBaseLayers')!="Bing" or $m.web.metadata.get('mmPBaseLayers')==""#selected="true"#end if#>None</option>
-#set a=$conf["mm"]["bbLayerAlias"].split(",")
-#set b=$conf["mm"]["bbLayers"].split(",")
-#if $m.web.metadata.get('mmProprietaryBaseLayers')=="Bing" and $m.web.metadata.get('mmPBaseLayers')
-#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
-#else
-#set setM=[]
-#end if
-#for i in range(0,len(a))
-		<option value="$b[$i]" #if $setM.count($b[$i])>0#selected="true"#end if#>$a[$i]</option>
 #end for
-	      </select>
-		
-	      <select multiple class="select-window biSelect" id="$conf["mm"]["biName"]" #if $lname!=$conf["mm"]["biName"]#style="display: none"#end if#>
-		<option value="-1" #if $m.web.metadata.get('mmProprietaryBaseLayers')!=$conf["mm"]["biName"] or $m.web.metadata.get('mmPBaseLayers')==""#selected="true"#end if#>None</option>
-#set a=$conf["mm"]["biLayerAlias"].split(",")
-#set b=$conf["mm"]["biLayers"].split(",")
-#if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["biName"] and $m.web.metadata.get('mmPBaseLayers')
-#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
-#else
-#set setM=[]
-#end if
-#for i in range(0,len(a))
-		<option value="$b[$i]" #if $setM.count($b[$i])>0#selected="true"#end if#>$a[$i]</option>
-#end for
-	      </select>
-	      
+
 	    </td>
 	  </tr>
 	  <tr #if $m.web.metadata.get("mmProprietaryBaseLayers")!=$conf["mm"]["bbName"] and $m.web.metadata.get("mmProprietaryBaseLayers")!=$conf["mm"]["biName"]#style="display:none"#end if#>

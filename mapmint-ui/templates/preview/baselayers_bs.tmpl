@@ -1,0 +1,118 @@
+#import mapscript
+
+#set lcount=0
+
+#set nbBL=0
+#if $m.web.metadata.get('mmOSMBaseLayers')=="true"
+#set nbBL=$nbBL+1
+#end if
+#for i in ('mmMBaseLayers','mmPBaseLayers','mmBProject')
+#try
+#if $m.web.metadata.get($i)!=""
+#for k in $m.web.metadata.get($i).split(",")
+#set nbBL=$nbBL+1
+#end for
+#end if
+#except
+#pass
+#end try
+#end for
+<li class="list-group-item blc">
+#if nbBL>1
+    <ul class="baselayers">
+#if $getVar('bpLayer','Untitled') != "Untitled"
+#if $bpLayer == "google"
+#set lname="g"
+#else
+#if $bpLayer == "bing"
+#set lname="b"
+#else
+#if $bpLayer == "ign"
+#set lname="i"
+#end if
+#end if
+#end if
+#end if
+#if $getVar('lname','Untitled') != "Untitled"
+#set a=$conf["mm"]["b"+$lname+"Layers"].split(",")
+#set b=$conf["mm"]["b"+$lname+"LayerAlias"].split(",")
+#if $m.web.metadata.get('mmMBaseLayers')
+#set setM=$m.web.metadata.get('mmMBaseLayers').split(',')
+#else
+#set setM=[]
+#end if
+
+#for i in range(0,len(a))
+#if $setM.count($b[$i])
+	  <img title="$b[$i]" class="base_layer" src="$conf["main"]["publicationUrl"]/img/$a[$i]_preview.png" alt="" />
+#$lcount+=1
+#end if
+#end for
+#end if
+
+#set a=$conf["mm"]["bmLayerAlias"].split(',')
+#set b=$conf["mm"]["bmLayers"].split(',')
+#set a1=[$conf["mm"]["boLayers"]]+$b
+#set b1=[$conf["mm"]["boLayerAlias"]]+$a
+#if $m.web.metadata.get('mmMBaseLayers')
+#set setM=$m.web.metadata.get('mmMBaseLayers').split(',')
+#else
+#set setM=[]
+#end if
+#for i in range(0,len(a1))
+#if $i>=1 and i<=2
+#if $setM.count($a1[$i])
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs.tmpl",searchList={"t": $conf["mm"]["bmName"]+" "+$b1[$i],"l": $a1[$i],"lcount": $lcount})
+
+#set lcount=$lcount+1
+#end if
+#else
+#if $m.web.metadata.get('mmOSMBaseLayers')=="true"
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs.tmpl",searchList={"t": $b1[$i],"l": $a1[$i],"lcount": $lcount})
+
+#set lcount=$lcount+1
+#end if
+#end if
+#end for
+
+#if $m.web.metadata.get('mmPBaseLayers')
+#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+#set cnt=0
+#for j in $conf["mm"]["bpList"].split(',')
+#if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"]
+#set a2=$conf["mm"]["b"+$j+"Layers"].split(',')
+#set b2=$conf["mm"]["b"+$j+"LayerAlias"].split(',')
+#set cnt=1
+#end if
+#end for
+#if $cnt==0
+#set a2=[]
+#end if
+
+#for i in range(0,len($a2))
+#if $setM.count($a2[$i])>0
+#for j in $conf["mm"]["bpList"].split(',')
+#if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"]
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs.tmpl",searchList={"t": $conf["mm"]["b"+$j+"Name"]+" "+$b2[$i],"l": $a2[$i],"lcount": $lcount})
+#set lcount=$lcount+1
+#end if
+#end for
+#end if
+#end for
+
+#end if
+
+#if $m.web.metadata.get('mmBProject')
+#set lss=$m.web.metadata.get('mmBProject').split(",")
+#for ls in $lss
+#set m1=mapscript.mapObj(os.readlink($conf["main"]["dataPath"]+"/public_maps/"+$ls))
+#set ts=m1.web.metadata.get('mmTitle')
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs.tmpl",searchList={"t": $ts,"l": $ls,"lcount": $lcount}) 
+#set lcount=$lcount+1
+#end for
+#end if
+
+
+	</ul>
+#end if
+</li>

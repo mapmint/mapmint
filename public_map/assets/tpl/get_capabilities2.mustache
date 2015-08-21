@@ -1,0 +1,113 @@
+{{#Capabilities}}
+
+{{#ServiceIdentification}}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4 class="panel-title">ServiceIdentification</h4>
+  </div>
+  <div class="panel-body">
+    <ul>
+      <li>Title: {{Title}}</li>
+      <li>Abstract: {{Abstract}}</li>
+      {{#Keywords.length}}
+      <li>Keywords:
+        <ul>
+        {{#Keywords}}
+          <li>{{.}}</li>
+        {{/Keywords}}
+        </ul>
+      </li>
+      {{/Keywords.length}}
+      <li>ServiceType: {{ServiceType}}</li>
+      <li>ServiceTypeVersion: {{ServiceTypeVersion}}</li>
+      <li>Fees: {{Fees}}</li>
+      <li>AccessConstraints: {{AccessConstraints}}
+    </ul>
+  </div>
+</div>
+{{/ServiceIdentification}}
+
+{{#ServiceProvider}}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4 class="panel-title">ServiceProvider</h4>
+  </div>
+  <div class="panel-body">
+    <ul>
+      <li>ProviderName: {{ProviderName}}</li>
+      <li>ProviderSite: {{ProviderSite._xlink:href}}</li>
+      {{#ServiceContact}}
+      <li>ServiceContact
+        <ul>
+          <li>IndividualName: {{IndividualName}}</li>
+          <li>PositionName: {{PositionName}}</li>
+          {{#ContactInfo}}
+          <li>ContactInfo
+            <ul>
+              {{#Phone}}
+              <li>Phone
+                <ul>
+                  <li>Voice: {{Voice}}</li>
+                  <li>Facsimile: {{Facsimile}}</li>
+                </ul>
+              </li>
+              {{/Phone}}
+              {{#Address}}
+              <li>Address
+                <ul>
+                  <li>DeliveryPoint: {{DeliveryPoint}}</li>
+                  <li>City: {{City}}</li>
+                  <li>AdministrativeArea: {{AdministrativeArea}}</li>
+                  <li>PostalCode: {{PostalCode}}</li>
+                  <li>Country: {{Country}}</li>
+                  <li>ElectronicMailAddress: {{ElectronicMailAddress}}</li>
+                </ul>
+              </li>
+              {{/Address}}
+            </ul>
+          </li>
+          {{/ContactInfo}}
+        </ul>
+      </li>
+      {{/ServiceContact}}
+    <ul>
+  </div>
+</div>
+
+{{/ServiceProvider}}
+
+<div class="panel-group" id="accordion">
+
+{{resetIndex}}
+{{#Contents.ProcessSummary}}
+
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{setUpIndex}}">
+          <span class="glyphicon glyphicon-cog"></span> {{Identifier}}
+        </a>
+      </h4>
+    </div>
+    <div id="collapse{{getIndex}}" class="panel-collapse collapse">
+      <div class="panel-body">
+        <ul>
+          <li>Title: {{Title}}</li>
+          <li>Version: {{_processVersion}}</li>
+          <li>Job Control Option: {{_jobControlOptions}}</li>
+          <li>Abstract: {{Abstract}}</li>
+        </ul>
+
+        <a class="btn btn-default btn-sm showdetails" data-toggle="collapse" data-target="#viewdetails{{getIndex}}" data-identifier="{{Identifier}}"><span class="glyphicon glyphicon-eye-open"></span></a>
+
+        <div id="viewdetails{{getIndex}}" class="collapse">
+          <p>Describe process.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+{{/Contents.ProcessSummary}}
+</div>
+
+{{/Capabilities}}

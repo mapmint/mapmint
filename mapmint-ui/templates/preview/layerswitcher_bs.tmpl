@@ -1,0 +1,67 @@
+#encoding UTF-8
+#import zoo
+#import mapscript
+#from Cheetah.Template import Template
+<div>
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation"><a href="#mm_bs_display" aria-controls="home" role="tab" data-toggle="tab"><i class="i i-stack"></i> $zoo._("Base Layers")</a></li>
+    <li role="presentation"  class="active"><a href="#mm_layers_display" aria-controls="profile" role="tab" data-toggle="tab"><i class="i i-stack"></i> $zoo._("Legend")</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="mm_layers_display">
+      <div class="well tree-container">
+	<ul class="list-group tree">
+	  <li class="list-group-item">
+	   <ul class="list-group tree">
+#*
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayers_bs.tmpl",searchList={"m": $m,"conf": $conf})
+*#
+
+
+
+#from mapfile.service import getMapList
+#set linputs={"name": {"value": $conf["senv"]["last_map"]},"prefix": {"value": "public_"}}
+#set loutputs={"Result": {"value": ""}}
+#set a=getMapList($conf,$linputs,$loutputs)
+#set a=eval($loutputs["Result"]["value"])
+
+#for i in range(0,len($a[0]["children"]))
+
+$Template(file=$conf['main']['templatesPath']+"layer_tree_bs.tmpl",searchList={"m": $m,"elem": $a[0]["children"],"i": $i,"conf": $conf})
+
+#end for
+#if $conf["senv"]["last_map"]=="indicateurs"
+     <li id="Indicateurs">
+     </li>
+#end if
+
+
+#*
+	      <ul id="layers_bg" style="display:none">
+#for i in range(0,len($a[0]["children"]))
+
+$Template(file=$conf['main']['templatesPath']+"preview/modules/layer_fees/list.tmpl",searchList={"m": $m,"elem": $a[0]["children"],"i": $i,"conf": $conf})
+
+#end for
+#if $conf["senv"]["last_map"]=="indicateurs"
+     <li id="IndicateursFees">
+     </li>
+#end if
+*#
+	      </ul>
+	      </li>
+	      </ul>
+
+    </div>
+
+</div>
+    <div role="tabpanel" class="tab-pane" id="mm_bs_display">
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayers_bs_new.tmpl",searchList={"m": $m,"conf": $conf})
+
+    </div>
+  </div>
+</div>

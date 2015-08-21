@@ -1120,3 +1120,11 @@ font-size: 0.75em;
         text-decoration:line-through;
 	color:#707070;
 }
+
+.well-table{
+    margin-bottom:0;
+    padding: 10px 18px;
+    background: #fff;
+
+    border-top: none;
+}

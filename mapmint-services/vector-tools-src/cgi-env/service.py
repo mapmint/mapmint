@@ -29,18 +29,28 @@ import os
 import sys
 import zoo
 
+layerName=None
+
 def test(conf,inputs,outputs):
     conf["lenv"]["message"]="Error message"
     return zoo.SERVICE_FAILED
 
-def readFileFromBuffer(data,ext):
+def readFileFromBuffer(data,ext,sql=None):
     try:
         geometry=[]
         #print >> sys.stderr,'/vsimem//temp1'+ext
         #print >> sys.stderr,data
         osgeo.gdal.FileFromMemBuffer('/vsimem//temp1'+ext,data)
         ds = osgeo.ogr.Open('/vsimem//temp1'+ext)
-        lyr = ds.GetLayer(0)
+        if sql is not None:
+            if sql.count("from")==0:
+                layerName=ds.GetLayerByIndex(0).GetName()
+                sql+=" from "+layerName
+            lyr=ds.ExecuteSQL( sql, None, None )
+            print >> sys.stderr,lyr
+        else:
+            lyr = ds.GetLayer(0)
+            print >> sys.stderr,lyr
         feat = lyr.GetNextFeature()
         while feat is not None:
             geometry+=[feat.Clone()]
@@ -67,7 +77,7 @@ def buildFeatureFromGeomtry(conf,geom,driverName,ext):
     ds.Destroy()
     return [feat]
 
-def createGeometryFromWFS(conf,my_wfs_response):
+def createGeometryFromWFS(conf,my_wfs_response,sql=None):
     try:
         geom=osgeo.ogr.CreateGeometryFromGML(my_wfs_response.replace('<?xml version="1.0" encoding="utf-8"?>\n','').replace('<?xml version="1.0" encoding="utf-8"?>',''))
     except:
@@ -78,24 +88,24 @@ def createGeometryFromWFS(conf,my_wfs_response):
                 conf["lenv"]["cnt"]=0
             else:
                 conf["lenv"]["cnt"]+=1
-            return readFileFromBuffer(my_wfs_response,str(conf["lenv"]["cnt"]))
+            return readFileFromBuffer(my_wfs_response,str(conf["lenv"]["cnt"]),sql)
         else:
             return buildFeatureFromGeomtry(conf,geom,"GML","xml")
     except:
         print >> sys.stderr,"Unable to load file input data !!!\n\n\n"
 
-def createLayerFromJson(conf,obj):
+def createLayerFromJson(conf,obj,sql=None):
     geom=osgeo.ogr.CreateGeometryFromJson(obj)
     if geom is None:
-        return readFileFromBuffer(obj,".json")
+        return readFileFromBuffer(obj,".json",sql)
     else:
         return buildFeatureFromGeomtry(conf,geom,"GeoJSON","json")
 
-def extractInputs(conf,obj):
+def extractInputs(conf,obj,sql=None):
     if obj["mimeType"]=="application/json":
-        return createLayerFromJson(conf,obj["value"])
+        return createLayerFromJson(conf,obj["value"],sql)
     else:
-        return createGeometryFromWFS(conf,obj["value"])
+        return createGeometryFromWFS(conf,obj["value"],sql)
     
 def outputResult(conf,obj,geom):
     driverName = "GML"
@@ -113,17 +123,26 @@ def outputResult(conf,obj,geom):
     lyr = ds.CreateLayer( "Result", None, osgeo.ogr.wkbUnknown )
     i=0
     while i < len(geom):
+        hasFid0=False
+        fid0I=-1
         if i==0 and driverName!="GeoJSON":
             poDstFDefn=geom[i].GetDefnRef()
             if poDstFDefn is not None:
                 nDstFieldCount = poDstFDefn.GetFieldCount()
+                j=0
                 for iField in range(nDstFieldCount):
                     poSrcFieldDefn = poDstFDefn.GetFieldDefn(iField)
+                    if poSrcFieldDefn.GetNameRef()=="fid0":
+                        hasFid0=True
+                        fid0I=j
                     oFieldDefn = osgeo.ogr.FieldDefn(poSrcFieldDefn.GetNameRef(),poSrcFieldDefn.GetType())
                     oFieldDefn.SetWidth( poSrcFieldDefn.GetWidth() )
                     oFieldDefn.SetPrecision( poSrcFieldDefn.GetPrecision() )
                     lyr.CreateField( oFieldDefn )
-        lyr.CreateFeature(geom[i])
+                    j+=1
+        #if hasFid0:
+        #    geom[i].setFid(geom[i].get)
+        lyr.CreateFeature(geom[i].Clone())
         geom[i].Destroy()
         i+=1
     ds.Destroy()
@@ -170,6 +189,49 @@ def orderedIntersection(conf,inputs,outputs):
     inputs2=inputs
     inputs2["points"]=outputs["Result"]
     return orderPoiAlongLine(conf,inputs,outputs)
+
+def demo(conf,inputs,outputs):
+    outputs["Result"]["value"]=inputs["InputData"]["value"]
+    outputs["Result"]["mimeType"]=inputs["InputData"]["mimeType"]
+    return zoo.SERVICE_SUCCEEDED
+
+def access(conf,inputs,outputs):
+    print >> sys.stderr,str(inputs);
+    osgeo.gdal.FileFromMemBuffer('/vsimem//temp1',inputs["InputData"]["value"])
+    ds = osgeo.ogr.Open('/vsimem//temp1')
+    displayCnt=0
+    geometry=[]
+    if inputs["sql"].keys().count("value")>0:
+        lyr=ds.ExecuteSQL( inputs["sql"]["value"], None, None )
+        cnt=lyr.GetFeatureCount()
+        print >> sys.stderr,dir(lyr)
+        if cnt>0:
+            if cnt==1:
+                feat=lyr.GetNextFeature()
+                if feat is not None:
+                    geometry+=[feat.Clone()]
+            else:
+                for i in range(int(inputs["offset"]["value"]),int(inputs["offset"]["value"])+int(inputs["limit"]["value"])):
+                    if i < cnt:
+                        feat=lyr.GetFeature(i)
+                        if feat is not None:
+                            geometry+=[feat.Clone()]
+    else:
+        lyr = ds.GetLayer(0)
+        cnt=lyr.GetFeatureCount()
+        if cnt>0:
+            for i in range(int(inputs["offset"]["value"]),int(inputs["offset"]["value"])+int(inputs["limit"]["value"])):
+                if i < cnt:
+                    feat=lyr.GetFeature(i)
+                    if feat is not None:
+                        geometry+=[feat.Clone()]
+    #cnt=lyr.GetFeatureCount()
+    outputs["Count"]["value"]=str(cnt)
+    ds.Destroy()
+    osgeo.gdal.Unlink('/vsimem//temp1')
+    outputResult(conf,outputs["Result"],geometry)
+    return zoo.SERVICE_SUCCEEDED
+
 
 def BufferPy(conf,inputs,outputs):
     return Buffer(conf,inputs,outputs)
@@ -479,7 +541,7 @@ def Intersection0(conf,inputs,outputs):
     print >> sys.stderr, "Starting service ..."
     geometry1=extractInputs(conf,inputs["InputEntity1"])
     #print >> sys.stderr, "Starting 1 ... "+inputs["InputEntity1"]["mimeType"]
-    geometry2=extractInputs(conf,inputs["InputEntity2"])
+    geometry2=extractInputs(conf,inputs["InputEntity2"],"select gml_id as fid0,* ")
     #print >> sys.stderr, "Starting 2 ... "+inputs["InputEntity2"]["mimeType"]
 
     if inputs.has_key("InputEntity3") and inputs["InputEntity3"]["value"]:

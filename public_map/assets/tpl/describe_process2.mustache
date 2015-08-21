@@ -1,0 +1,140 @@
+{{#ProcessOfferings}}
+{{#ProcessOfferings.ProcessOffering}}
+{{#Process}}
+
+<ul>
+  <li>Version: {{_wps:processVersion}}</li>
+  <li>Store supported: {{_storeSupported}}</li>
+  <li>Status supported: {{_statusSupported}}</li>
+  
+  <li>Identifier: {{Identifier}}</li>
+  <li>Title: {{Title}}</li>
+  <li>Abstract: {{Abstract}}</li>
+
+  {{#Profile}}
+  <li>Profile: {{Profile}}</li>
+  {{/Profile}}
+  
+  <li>DataInputs
+    <ul>
+      {{#Input}}
+      <li>Input
+        <ul>
+          <li>minOccurs: {{_minOccurs}}</li>
+          <li>maxOccurs: {{_maxOccurs}}</li>
+          <li>Identifier: {{Identifier}}</li>
+          <li>Title: {{Title}}</li>
+          <li>Abstract: {{Abstract}}</li>
+          {{#LiteralData}}
+          <li>LiteralData
+            <ul>
+              <li>DataType: {{LiteralDataDomain.DataType}}</li>
+              {{#AnyValue}}
+              <li>AnyValue</li>
+              {{/AnyValue}}
+            </ul>
+          </li>
+          {{/LiteralData}}
+          
+          {{#ComplexData}}
+          <li>ComplexData
+            <ul>
+              {{#Format}}
+              <li>Default
+                <ul>
+                  <li>Format {{#_default}}(default){{/_default}}
+                    <ul>
+                      {{#_encoding}}
+                      <li>Encoding: {{_encoding}}</li>
+                      {{/_encoding}}
+                      {{#_mimeType}}
+                      <li>MimeType: {{_mimeType}}</li>
+                      {{/_mimeType}}
+                      {{#_schema}}
+                      <li>Schema: {{_schema}}</li>
+                      {{/_schema}}                  
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              {{/Format}}
+            </ul>
+          </li>
+          {{/ComplexData}}
+        </ul>
+      </li>
+      {{/Input}}
+    </ul>
+  </li>
+  
+  <li>ProcessOutputs
+    <ul>
+      {{#Output}}
+      <li>Output
+        <ul>
+          <li>Identifier: {{Identifier}}</li>
+          <li>Title: {{Title}}</li>
+          <li>Abstract: {{Abstract}}</li>
+          {{#LiteralData}}
+          <li>LiteralOutput
+            <ul>
+              <li>DataType: {{LiteralDataDomain.DataType}}</li>
+            </ul>
+          </li>
+          {{/LiteralData}}
+          
+          {{#ComplexData}}
+          <li>ComplexOutput
+            <ul>
+              {{#Format}}
+              <li>Default
+                <ul>
+                  <li>Format {{#_default}}(default){{/_default}}
+                    <ul>
+                      {{#_encoding}}
+                      <li>Encoding: {{_encoding}}</li>
+                      {{/_encoding}}
+                      {{#_mimeType}}
+                      <li>MimeType: {{_mimeType}}</li>
+                      {{/_mimeType}}
+                      {{#_schema}}
+                      <li>Schema: {{_schema}}</li>
+                      {{/_schema}}                  
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              {{/Format}}
+            </ul>
+          </li>
+          {{/ComplexData}}
+          
+          {{#BoundingBoxOutput}}
+          <li>BoundingBoxOutput
+            <ul>
+              {{#Default}}
+              <li>Default
+                <ul>
+                  <li>{{CRS}}</li>
+                </ul>
+              </li>
+              {{/Default}}
+              {{#Supported}}
+              <li>Supported
+                <ul>
+                  <li>{{CRS}}</li>
+                </ul>
+              </li>
+              {{/Supported}}
+            </ul>
+          </li>
+          {{/BoundingBoxOutput}}
+        </ul>
+      </li>
+      {{/Output}}
+    </ul>
+  </li>
+</ul>
+{{/Process}}
+{{/ProcessOfferings.ProcessOffering}}
+{{/ProcessOfferings}}

@@ -1,0 +1,8 @@
+<li class="#if $lcount==$default#active#end if# list-group-item" id="bl_$lcount">
+<a href="#" class="base_layer#if $lcount==$default# bl_selected#end if#" data-toggle="tooltip" data-placement="top" title="$t" id="base_layer_$(l.replace(".","_"))">
+<span class="col-xs-2 col-md-2">
+<img class="img-responsive" id="base_layer_${l.replace(".","_")}_img" src="" />
+</span>
+<span class="base_layer_title">$t</span>
+</a>
+</li>

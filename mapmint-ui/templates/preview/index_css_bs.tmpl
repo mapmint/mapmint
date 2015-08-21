@@ -1,0 +1,142 @@
+#import mapscript
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/project_"+$conf["senv"]["last_map"]+".map")
+#if $m.web.metadata.get('mmOT')
+#set f0=$m.web.metadata.get('mmOT').split(',')
+#else
+#set f0=[]
+#end if
+
+body{
+#if $m.web.metadata.get("ffamily")!=""
+	font-family: $m.web.metadata.get("ffamily") !important;
+#end if
+#if $m.web.metadata.get("fsize")!=""
+	font-size: $m.web.metadata.get("fsize") !important;
+#end if
+#if $m.web.metadata.get("font-colorpicker")!=""
+	font-color: $m.web.metadata.get("font-colorpicker") !important;
+#end if
+}
+
+#for i in range(0,$m.numlayers)
+#set l=$m.getLayer($i)
+#if $l.numclasses == 1
+#layer_$(i) label .fa-circle:before{
+    background:url('#if $l.metadata.get('mmIcon') is not None#$l.metadata.get('mmIcon')#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_$(conf["senv"]["last_map"])_$(l.name).map&LAYERS=$(l.name)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat scroll 0 0 transparent !important;
+    content: " ";
+    display: block;
+    height: 16px;
+    width: 16px;
+}
+#else
+#if $l.type==3
+#for j in range(0,$l.numclasses)
+#set ic=$l.getClass($j).getStyle(0).color
+#set oc=$l.getClass($j).getStyle(0).outlinecolor
+.layer_$(i)_class$(j){
+    background: url('$conf["main"]["publicationUrl"]/img/transparent.png') !immportant;
+    background-color: #$('%02x%02x%02x' % ($ic.red,$ic.green,$ic.blue));
+    border: 2px solid #$('%02x%02x%02x' % ($oc.red,$oc.green,$oc.blue));
+    margin-right: 6px;
+    content: " ";
+    display: block;
+    height: 16px;
+    width: 16px;
+}
+#end for
+#else
+#if $l.metadata.get('mmSprite') is not None
+#set cn=0
+#import base64
+#set fs=open($l.metadata.get('mmSprite').replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
+#set fc=base64.b64encode(fs.read())
+#for j0 in range(0,$l.numclasses)##if $cn>0#,#end if#.layer_$(i)_class$(j0)#set $cn+=1##end for#{
+    background:	url(data:image/png;base64,$fc) no-repeat;
+}
+#end if
+#for j in range(0,$l.numclasses)
+.layer_$(i)_class$(j){
+#if $l.metadata.get('mmSprite') is None
+    background:url('#if $l.metadata.get('mmIcon_'+str($j)) is not None#$l.metadata.get('mmIcon_'+str($j))#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_$(conf["senv"]["last_map"])_$(l.name).map&LAYERS=$(l.name)_$(j+1)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat !important;
+#else
+    background-position: -$($j*16)px 0px;
+#end if
+    content: " ";
+    height: 16px;
+    width: 16px;
+}
+#end for
+#end if
+#end if
+#if $l.metadata.get("mmClass")=="tl"
+#set steps=$l.metadata.get("mmSteps").split(',')
+.tree_layer$(i){
+    background:url('$conf["main"]["publicationUrl"]/img/timeline.png') no-repeat;
+    width: 26px;
+}
+#set $cnt=0
+#for kk in steps
+#set m0=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/timeline_"+$conf["senv"]["last_map"]+"_"+$l.name+"_step"+str($cnt)+".map")
+#set layer=m0.getLayer($i)
+#set res=$m0.web.metadata.set("cstep",str($cnt))
+#if $layer.metadata.get('mmSprite') is not None
+#set cn=0
+#import base64
+#set fs=open($layer.metadata.get('mmSprite').replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
+#set fc=base64.b64encode(fs.read())
+#for j0 in range(0,$layer.numclasses)##if $cn>0#,#end if#.tree_layer$(i)_step$(cnt)_class$(j0)#set $cn+=1##end for#{
+    background:	url(data:image/png;base64,$fc) no-repeat;
+}
+#end if
+#for j in range(0,$layer.numclasses)
+.tree_layer$(i)_step$(cnt)_class$(j){
+#if $layer.metadata.get('mmSprite') is None
+    background:url('#if $layer.metadata.get('mmIcon_'+str($j)) is not None#$layer.metadata.get('mmIcon_'+str($j))#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_$(conf["senv"]["last_map"])_$(l.name)_step$($cnt).map&LAYERS=$(l.name)_$(j+1)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=20&HEIGHT=20&r=1315253453.18#end if#') no-repeat;
+#else
+    background-position: -$($j*20)px 0;
+#end if
+    width: 23px;
+}
+#end for
+#set $cnt=$cnt+1
+#end for
+#end if
+#end for
+     
+#if $m.web.metadata.get("mmBProject")
+#set projects=$m.web.metadata.get("mmBProject").split(',')
+#for i in $projects
+#import os
+#try
+#set $p=os.readlink($conf["main"]["dataPath"]+"/public_maps/"+$i)
+#set project=$p.replace($conf["main"]["dataPath"]+"/maps/project_","").replace(".map","")
+#except
+#set $p=$conf["main"]["dataPath"]+"/public_maps/"+$i
+#end try
+
+#set m1=mapscript.mapObj($p)
+#set wmsl=[]
+#set ll=m1.web.metadata.get('mmActivatedLayers')
+#if $m1.web.metadata.get('max_minx') and $m1.web.metadata.get('max_minx')!=""
+#set a={"minx": float($m1.web.metadata.get('max_minx')),"miny": float($m1.web.metadata.get('max_miny')),"maxx": float($m1.web.metadata.get('max_maxx')),"maxy":float($m1.web.metadata.get('max_maxy'))}
+#else
+#set a=$m1.getLayer(0).getExtent()
+#try
+/* BaseLayer $a.project(m.getLayer(0).getProjection()),mapscript.projectionObj(m.getProjection())) */
+#except
+/* BaseLayer */
+#end try
+#end if
+#set x=(($a.maxx-$a.minx)/2)+$a.minx
+#set y=(($a.maxy-$a.miny)/2)+$a.miny
+#base_layer_${i}{
+    background:url('$conf["main"]["mapserverAddress"]?map=${p}&LAYERS=$(ll)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$x,$y,$(x+0.01),$(y+0.01)&SRS=EPSG:4326&WIDTH=30&HEIGHT=30&r=1315253453.18') no-repeat scroll 0 0 transparent;
+}
+#end for
+
+#end if
+
+#if $conf["senv"]["last_map"]=="indicateurs" or $f0.count("AddLayer")>0
+#set searchList=[{"tmpl": "natureparif-indicateurs"},{"conf": $conf},{"inputs":$inputs}]
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/indexes/overlays_css.tmpl",searchList=$searchList))
+#end if

@@ -1,0 +1,130 @@
+@font-face {
+	font-family: 'icomoon';
+	src:url('../fonts/icomoon.eot?-q7359e');
+	src:url('./fonts/icomoon.eot?#iefix-q7359e') format('embedded-opentype'),
+		url('../fonts/icomoon.woff?-q7359e') format('woff'),
+		url('../fonts/icomoon.ttf?-q7359e') format('truetype'),
+		url('../fonts/icomoon.svg?-q7359e#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-uniEA29:before {
+	content: "\ea29";
+}
+.icon-uniEA2A:before {
+	content: "\ea2a";
+}
+.icon-uniEA2B:before {
+	content: "\ea2b";
+}
+.icon-uniEA2C:before {
+	content: "\ea2c";
+}
+.icon-uniEA2D:before {
+	content: "\ea2d";
+}
+.icon-uniEA2E:before {
+	content: "\ea2e";
+}
+.icon-uniEA2F:before {
+	content: "\ea2f";
+}
+.icon-uniEA30:before {
+	content: "\ea30";
+}
+.icon-uniEA31:before {
+	content: "\ea31";
+}
+.icon-uniEA32:before {
+	content: "\ea32";
+}
+.icon-uniEA33:before {
+	content: "\ea33";
+}
+.icon-uniEA34:before {
+	content: "\ea34";
+}
+.icon-uniEA51:before {
+	content: "\ea51";
+}
+.icon-uniEA53:before {
+	content: "\ea53";
+}
+.icon-uniEA5C:before {
+	content: "\ea5c";
+}
+.icon-location:before {
+	content: "\e600";
+}
+.icon-location2:before {
+	content: "\e601";
+}
+.icon-facebook:before {
+	content: "\e602";
+}
+.icon-twitter:before {
+	content: "\e603";
+}
+.icon-location3:before {
+	content: "\e604";
+}
+.icon-arrow-left:before {
+	content: "\e605";
+}
+.icon-arrow-down:before {
+	content: "\e606";
+}
+.icon-arrow-up:before {
+	content: "\e607";
+}
+.icon-arrow-right:before {
+	content: "\e608";
+}
+.icon-arrow-left2:before {
+	content: "\e609";
+}
+.icon-arrow-down2:before {
+	content: "\e60a";
+}
+.icon-arrow-up2:before {
+	content: "\e60b";
+}
+.icon-arrow-right2:before {
+	content: "\e60c";
+}
+.icon-arrow-left3:before {
+	content: "\e60d";
+}
+.icon-arrow-down3:before {
+	content: "\e60e";
+}
+.icon-arrow-up3:before {
+	content: "\e60f";
+}
+.icon-uniE610:before {
+	content: "\e610";
+}
+.icon-twitter2:before {
+	content: "\e611";
+}
+.icon-facebook2:before {
+	content: "\e612";
+}
+.icon-linkedin:before {
+	content: "\e613";
+}

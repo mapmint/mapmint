@@ -1,0 +1,15 @@
+{{#ExecuteResponse}}
+  {{#Status}}
+    <div>{{ProcessSucceeded}}</div>
+  {{/Status}}
+  {{#ProcessOutputs}}
+    {{#Output}}
+      {{#Data}}
+        <div>{{LiteralData}}</div>
+      {{/Data}}
+      {{#Reference}}
+        <a href="{{_href}}" target="_blank">{{_href}}</a>
+      {{/Reference}}
+    {{/Output}}
+  {{/ProcessOutputs}}
+{{/ExecuteResponse}}

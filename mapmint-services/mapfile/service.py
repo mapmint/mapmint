@@ -379,7 +379,7 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
 		if m.getLayer(0).connectiontype==mapscript.MS_WMS:
 			
 			print >> sys.stderr,m.web.metadata.get("ows_srs")
-			m.web.metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:900914")
+			m.web.metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
 			print >> sys.stderr,m.web.metadata.get("ows_srs")
 			print >> sys.stderr,dir(m)
 			for i in range(0,m.numlayers):
@@ -2513,7 +2513,7 @@ def getShortDescription(conf,m):
 
 def saveLegendIconsForLayer(conf,m,lm,layer,i,step=None):
 	import time,mapscript
-	lm.setSize(20,20)
+	lm.setSize(16,16)
 	lm.setExtent(-1.5,-1.5,7.5,7.5)
 	if layer.numclasses==1:
 		lm.getLayer(0).status=mapscript.MS_ON
@@ -2532,7 +2532,7 @@ def saveLegendIconsForLayer(conf,m,lm,layer,i,step=None):
 			lm=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/map4legend_"+conf["senv"]["last_map"]+"_"+layer.name+".map")
 		else:
 			lm=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/map4legend_"+conf["senv"]["last_map"]+"_"+layer.name+"_step"+str(step)+".map")
-		lm.setSize(20,20)
+		lm.setSize(16,16)
 		lm.setExtent(-1.5,-1.5,7.5,7.5)
 		for k in range(0,layer.numclasses):
 			for j in range(0,lm.numlayers):
@@ -2698,7 +2698,7 @@ def savePublishMap(conf,inputs,outputs):
         if m.getLayer(l).metadata.get('mmLabelMaxScale') is not None and m.getLayer(l).metadata.get('mmLabelMaxScale')!='None':
             m.getLayer(l).labelmaxscaledenom=int(m.getLayer(l).metadata.get('mmLabelMaxScale'))
         if inputs["mmProprietaryBaseLayers"]["value"]==conf["mm"]["biName"]:
-            m.getLayer(l).metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:900914")
+            m.getLayer(l).metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
     m.web.metadata.set("ows_title",inputs["mmTitle"]["value"]);
 
     saveProjectMap(m,mapfile)

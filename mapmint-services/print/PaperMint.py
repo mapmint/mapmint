@@ -146,7 +146,9 @@ class LOClient:
         @param name Document filename
         """
         tmp=name.split('/')
+        print(tmp,file=sys.stderr)
         tmp=tmp[len(tmp)-1].split('.')
+        print(tmp,file=sys.stderr)
         prop1Fich = (
             PropertyValue( "FilterName" , 0, self.outputFormat[self.format][tmp[len(tmp)-1]][1] , 0 ),
             PropertyValue( "Overwrite" , 0, True , 0 )
