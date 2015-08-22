@@ -329,6 +329,7 @@ define([
 	    target: "#context-menu"
 	});
 
+	authenticateSetup();
 	//$("[rel='dropdown']").dropdown("toggle");
 
 	$('.selectpicker').selectpicker();
@@ -975,21 +976,27 @@ define([
 				for(j in Bands[i]["data"])
 				    Bands[i]["data"][j]=parseFloat(Bands[i]["data"][j]);
 
-			    if(!$('#mmm_table-content-display_'+layer).length){
-				$("#mmm_table-wrapper-header").append('<li role="presentation" class="active"><a id="mmm_table-content-display_'+layer+'" title="'+oLayers[layer]["alias"]+'" data-toggle="tab" data-target="#output-histogram-'+layer+'" href="#output-histogram-'+layer+'"><i class="fa fa-area-chart"></i><b class="ncaret"> </b><span class="hidden-xs hidden-sm">'+oLayers[layer]["alias"]+'</span> </a>  </li>');
-			    }else
-				$('#output-profile-'+layer).remove();
+			    for(var i in {"container":0,"header":0})
+				$("#mmm_table-wrapper-"+i).find(".active").each(function(){
+				    $(this).removeClass("active");
+				});
 
-			    $("#mmm_table-wrapper-container").append('<div class="output-profile tab-pane active" id="output-histogram-'+layer+'" style="height: '+($(window).height()/3)+'px;"></div>');
+			    $("#mmm_table-wrapper-container").append('<div class="output-profile tab-pane active" id="output-histogram-'+key+'" style="height: '+($(window).height()/3)+'px;"></div>');
 			    
-			    $('#mmm_table-content-display_'+layer).tab("show");
+			    if(!$('#mmm_table-content-display_'+layer).length){
+				$("#mmm_table-wrapper-header").append('<li role="presentation" class="active"><a id="mmm_table-content-display_'+key+'" title="'+oLayers[key]["alias"]+'" data-toggle="tab" data-target="#output-histogram-'+key+'" href="#output-histogram-'+layer+'"><i class="fa fa-area-chart"></i><b class="ncaret"> </b><span class="hidden-xs hidden-sm">'+oLayers[key]["alias"]+'</span> </a>  </li>');
+			    }else
+				$('#output-histogram-'+key).remove();
+
 			    if(!$("#table-wrapper").hasClass("in"))
 				$("#table-wrapper").collapse("show");
+
+			    $('#mmm_table-content-display_'+key).tab("show");
 
 			    var chart = new Highcharts.Chart({
 				chart: {
 				    zoomType: 'x',
-				    renderTo: 'output-histogram-'+layer
+				    renderTo: 'output-histogram-'+key
 				},
 				title: {
 				    text: "Raster Histogram"
@@ -1686,6 +1693,11 @@ define([
 					    sspoints.push([data.coordinates[i][0],data.coordinates[i][1]]);
 					}
 					
+					for(var i in {"container":0,"header":0})
+					    $("#mmm_table-wrapper-"+i).find(".active").each(function(){
+						$(this).removeClass("active");
+					    });
+
 					if(!$('#mmm_table-content-display_'+layer).length){
 					    $("#mmm_table-wrapper-header").append('<li role="presentation" class="active"><a id="mmm_table-content-display_'+layer+'" title="'+oLayers[layer]["alias"]+'" data-toggle="tab" data-target="#output-profile-'+layer+'" href="#output-profile-'+layer+'"><i class="fa fa-area-chart"></i><b class="ncaret"> </b><span class="hidden-xs hidden-sm">'+oLayers[layer]["alias"]+'</span> </a>  </li>');
 					}else
@@ -1709,9 +1721,6 @@ define([
 						    formatter: function(){
 							var tmp=this.value+"";
 							return tmp;
-							/*if(tmp.indexOf('.')!=0)
-							  if(distances[tmp])
-							  return parseDistance(Math.round(distances[tmp]*111120));*/
 						    }
 						},
 						title: { text: 'Points' },
@@ -2343,6 +2352,28 @@ define([
 	    }
 	});
 
+    }
+
+    function authenticateSetup(){
+	$("#authenticate_setup").click(function(){
+	    $("#mmtabs").append($("#auth_header_template")[0].innerHTML);
+	    //Load the template page to display the result
+	    $.ajax({
+		url: 'modules/auth/login',
+		method: 'GET',
+		success: function(){
+		    console.log(arguments);
+		    $("#mmtabs").next().prepend($('<div role="tabpanel" class="tab-pane" id="authTab"></div>'));
+		    $("#authTab").append(arguments[0]);
+		    $("#authAction").tab('show');
+		    $("#authTab").bind("removeClass",function(){
+			console.log(arguments);
+			$("#authAction").parent().remove();
+			$(this).remove();
+		    });
+		}
+	    })
+	});
     }
 
     function printPreview(){

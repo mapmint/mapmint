@@ -155,8 +155,8 @@ $printItem($nids[cid],$nclassess[cid],$nnames[cid],True,$nidxs.count($nids[cid])
       <li class="dropdown"  data-toggle="tooltip" data-placement="left" title="$zoo._($nnames[cid])">
         <a href="#" id="($nids[cid]" class="dropdown-toggle" data-toggle="dropdown"><i class="#if $nclassess[cid].count("fa-")>0#fa #end if##if $nclassess[cid].count("i-")>0#i #end if#$nclassess[cid]"></i><b class="caret"></b><b class="ncaret hidden-sm hidden-md hidden-lg"></b><span class="hidden-sm hidden-md hidden-lg">$zoo._($nnames[cid])</span></a>
 	<ul class="dropdown-menu  padd pull-right">
-	 <form role="form">
 #if $conf["senv"]["loggedin"]=="false"
+	 <form role="form">
 	  <div class="form-group">
 	   <label>$zoo._("User name")</label>
 	   <input type="text" class="form-control" placeholder="user name">
@@ -165,12 +165,16 @@ $printItem($nids[cid],$nclassess[cid],$nnames[cid],True,$nidxs.count($nids[cid])
 	   <label>$zoo._("Password")</label>
 	   <input type="password" class="form-control" placeholder="$zoo._("Password")">
 	  </div>
-	  <button type="submit" class="btn btn-sm btn-default">$zoo._("Login")</button> </form>
-#else
-	  <button type="submit" class="btn btn-sm btn-default">$zoo._("Parameters")</button> </form>
-	  <button type="submit" class="btn btn-sm btn-default">$zoo._("Logout")</button> </form>
-#end if
+	  <button type="submit" class="btn btn-sm btn-default">$zoo._("Login")</button> 
 	 </form>
+#else
+	<li>
+	  <a id="authenticate_setup" href="#" type="submit" class="btn btn-sm btn-default">$zoo._("Setup")</a>
+	</li>
+	<li>
+	  <a id="authenticate_logout" href="#" type="submit" class="btn btn-sm btn-default">$zoo._("Logout")</a>
+	</li>
+#end if
 	</ul>
 #* $printItem($nids[cid],$nclassess[cid],$nnames[cid],True,$nidxs.count($nids[cid])>0) *#
 #else

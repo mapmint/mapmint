@@ -407,6 +407,14 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/toolbar_bs.tmpl",search
   </li>
  </script>
 
+ <script type="template/text" id="auth_header_template">
+  <li role="presentation" data-toggle="tooltip" data-placement="bottom" title="$zoo._("Authenticate")">
+   <a id="authAction" href="#authTab" aria-controls="settings" role="tab" data-target="#authTab" data-toggle="tab">
+    <i class="fa fa-user"></i>
+   </a>
+  </li>
+ </script>
+
 </body>
 </html>
 #end if
