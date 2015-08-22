@@ -940,16 +940,133 @@ define([
 	    "run": function(layer){
 
 		var key=getLayerById(layer);
-		myMMDataTableObject.display(key,{
-		    url: msUrl,
-		    data: {
-			"map":oLayers[key]["map"],
-			version: "1.0.0",
-			service: "WFS",
-			request: 'GetFeature',
-			typename: key
-		    }
-		});
+		console.log(oLayers[key]);
+		if(oLayers[key]["dataType"]=="raster"){
+		    zoo.execute({
+			"identifier": "mapfile.getInitialInfo",
+			"type": "POST",
+			dataInputs: [
+			    {"identifier":"map","value":lastMap,"dataType":"string"},
+			    {"identifier":"layer","value":key,"dataType":"string"}
+			],
+			dataOutputs: [
+			    {"identifier":"Result","type":"raw"},
+			],
+			success: function(data){
+			    console.log("SUCCESS");
+			    console.log(data);
+			    var layer=key;
+
+			    var Bands=[];
+			    if(data["datasource"]["Band"].length){
+				for(i in data["datasource"]["Band"])
+				    Bands.push({
+					name: "Band "+i,
+					data: data["datasource"]["Band"]["histogram"].split(",")
+				    });
+			    }
+			    else
+				Bands.push({
+				    name: "Band 1",
+				    data: data["datasource"]["Band"]["histogram"].split(",")
+				});
+
+			    for(i in Bands)
+				for(j in Bands[i]["data"])
+				    Bands[i]["data"][j]=parseFloat(Bands[i]["data"][j]);
+
+			    if(!$('#mmm_table-content-display_'+layer).length){
+				$("#mmm_table-wrapper-header").append('<li role="presentation" class="active"><a id="mmm_table-content-display_'+layer+'" title="'+oLayers[layer]["alias"]+'" data-toggle="tab" data-target="#output-histogram-'+layer+'" href="#output-histogram-'+layer+'"><i class="fa fa-area-chart"></i><b class="ncaret"> </b><span class="hidden-xs hidden-sm">'+oLayers[layer]["alias"]+'</span> </a>  </li>');
+			    }else
+				$('#output-profile-'+layer).remove();
+
+			    $("#mmm_table-wrapper-container").append('<div class="output-profile tab-pane active" id="output-histogram-'+layer+'" style="height: '+($(window).height()/3)+'px;"></div>');
+			    
+			    $('#mmm_table-content-display_'+layer).tab("show");
+			    if(!$("#table-wrapper").hasClass("in"))
+				$("#table-wrapper").collapse("show");
+
+			    var chart = new Highcharts.Chart({
+				chart: {
+				    zoomType: 'x',
+				    renderTo: 'output-histogram-'+layer
+				},
+				title: {
+				    text: "Raster Histogram"
+				},
+				xAxis: {
+				    labels: {
+					formatter: function(){
+					    var tmp=this.value+"";
+					    return tmp;
+					}
+				    },
+				    title: { text: 'Points' },
+				    maxZoom: 0
+				},
+				yAxis: {
+				    //max: mmax*2,
+				    title: { text: null },
+				    startOnTick: false,
+				    showFirstLabel: false
+				},
+				legend: {
+				    enabled: false
+				},
+				plotOptions: {
+				    area: {
+					cursor: 'pointer',
+					fillColor: {
+					    linearGradient: [0, 0, 0, 300],
+					    stops: [
+						[0, '#74B042'],
+						[1, 'rgba(255,255,255,0)']
+					    ]
+					},
+					lineWidth: 1,
+					marker: {
+					    enabled: false,
+					    states: {
+						hover: {
+						    enabled: true,
+						    radius: 3
+						}
+					    }
+					},
+					shadow: false,
+					states: {
+					    hover: {
+						lineWidth: 1
+					    }
+					}
+				    }
+				},
+				tooltip: {
+				    formatter: function() {
+					return '<h1>'+this.x+': '+Highcharts.numberFormat(this.y, 0)+"</h1>";
+				    }
+				},
+				series: Bands
+			    });
+			    
+			},
+			error: function(data){
+			    console.log("ERROR");
+			    console.log(data);
+			}
+		    });
+		}
+		else
+		    myMMDataTableObject.display(key,{
+			url: msUrl,
+			data: {
+			    "map":oLayers[key]["map"],
+			    version: "1.0.0",
+			    service: "WFS",
+			    request: 'GetFeature',
+			    typename: key
+			}
+		    });
 
 	    }
 	},
