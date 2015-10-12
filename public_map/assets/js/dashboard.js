@@ -311,7 +311,7 @@ define([
 	    ));
 	} );
 
-	$("."+ltype+"SubmitForm").click(function(e){
+	$('#'+lid).parent().find("."+ltype+"SubmitForm").click(function(e){
 	    var params=[];
 	    var set={};
 	    var rType=null;
