@@ -77,20 +77,20 @@ function startMozaic(){
                 type: "GET",
                 url: "./MapDetails;id="+System.hoverMap,
                 complete: function(xml,status) {
-var map_details = '<div id="moreinfo-dialog" title="Map details"></div>';
+var map_details = '<div id="moreinfo-dialog" title="'+Styem.messages["Map details"]+'"></div>';
 bootbox.dialog({
   message: map_details,
-  title: "Map details",
+  title: Styem.messages["Map details"],
   buttons: {
     view: {
-      label: "View map",
+      label: System.messages["View map"],
       className: "map-btn",
       callback: function() {
 	  document.location="./"+System.hoverMap;
       }
     },
     cancel: {
-      label: "cancel",
+      label: System.messages["Cancel"],
       className: "map-btn",
       callback: function() {
       }

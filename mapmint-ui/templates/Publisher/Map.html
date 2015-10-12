@@ -1,0 +1,138 @@
+#encoding UTF-8
+#import zoo,mapscript
+
+<form class="form-horizontal mtpp" method="get" >
+  <h1> <i class="fa fa-map-o"></i> $zoo._("Display")</h1>
+  <div class="row">
+    <label class="col-sm-3 control-label">$zoo._("Navigation Toolbar")</label>
+    <div class="col-sm-9 range">
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",searchList={"conf": $conf,"prefix":"","selected": $m.web.metadata.get('tprj')}))
+    </div>
+  </div>
+<!--
+  <div class="row">
+    <label class="col-sm-3 control-label">$zoo._("Renderer Method")</label>
+    <div class="col-sm-9 range">
+      <select name="render" class="form-control">
+	<option value="SVG" #if $m.web.metadata.get('mmRenderer') is None or $m.web.metadata.get('mmRenderer')=='SVG'#selected#end if#>SVG</option>
+	<option value="Canvas" #if $m.web.metadata.get('mmRenderer') is not None and $m.web.metadata.get('mmRenderer')=='Canvas'#selected#end if#>Canvas</option>
+      </select>	    
+    </div>
+  </div>
+  <div class="row">
+    <label class="col-sm-3 control-label">$zoo._("Other Tools")</label>
+    <div class="col-sm-9 range">
+      <select name="render" class="form-control">
+	<option value="SVG" #if $m.web.metadata.get('mmRenderer') is None or $m.web.metadata.get('mmRenderer')=='SVG'#selected#end if#>SVG</option>
+	<option value="Canvas" #if $m.web.metadata.get('mmRenderer') is not None and $m.web.metadata.get('mmRenderer')=='Canvas'#selected#end if#>Canvas</option>
+      </select>	    
+    </div>
+  </div>
+  -->
+  <div class="row">
+    <div class="col-sm-12">
+  	<table class="gen">
+	    <thead>
+	      <tr>
+		<th valign="middle" style="width:120px;">$zoo._("Extent")</th>
+		<th>X min</th>
+		<th>Y min</th>
+		<th>X max</th>
+		<th>Y max</th>
+		<th style="width: 30px;"></th>
+	      </tr>
+	    </thead>
+	    <tbody>
+#set labels=[$zoo._("Default"),$zoo._("Maximum"),$zoo._("Minimum")]
+#set j=0
+#for i in ['default','max','min']
+	      <tr>
+		<td valign="middle" style="width:120px;">
+		  $labels[$j]
+		  #if $i=="max"
+		  <input id="mmRestricted" class="rounded" type="checkbox" value="true" #if $m.web.metadata.get("mmRestricted")=="true"#checked="true"#end if# data-toggle="tooltip" title="$zoo._("Restricted")" />
+		  #end if
+		</td>
+#for k in ['minx','miny','maxx','maxy']
+		<td><input id="${i}_${k}" class="rounded" type="text" value="#if $m.web.metadata.get($i+'_'+$k)#$m.web.metadata.get($i+'_'+$k)#end if#" /></td>
+#end for
+		<td style="width: 150px;">
+		<div id="form_move_$(i)" >
+		  <select  class="form-control" id="form_move_layer_$(i)" onchange="if(this.options[this.selectedIndex].value=='-1'){\$('#${i}_minx')[0].value='';\$('#${i}_miny')[0].value='';\$('#${i}_maxx')[0].value='';\$('#${i}_maxy')[0].value='';}else{var tmp=this.value.split(' ');\$('#${i}_minx')[0].value=tmp[0];\$('#${i}_miny')[0].value=tmp[1];\$('#${i}_maxx')[0].value=tmp[2];\$('#${i}_maxy')[0].value=tmp[3];}">
+		    <option value="-1">$zoo._("Select")</option>
+
+#for k in range(0,$m.numlayers)
+#set l=$m.getLayer($k)
+#if $l.name.count("grid_")==0
+#try
+#set iproj=mapscript.projectionObj($l.getProjection())
+#except
+#set iproj=mapscript.projectionObj("epsg:4326")
+#end try
+#set oproj=mapscript.projectionObj($m.getProjection())
+#set toto=$l.getExtent()
+#set va=$toto.project(iproj,oproj)
+		    <option value="$toto.minx $toto.miny $toto.maxx $toto.maxy">$m.getLayer($k).name</option>
+#end if
+#end for
+
+		  </select>
+		</div>
+		</td>
+	      </tr>
+#set j=$j+1
+#end for
+	    </tbody>
+	  </table>
+    </div>
+  </div>
+
+  <h1> <i class="fa fa-th-large"></i> $zoo._("Layout")</h1>
+  <div class="row">
+    <label class="col-sm-3 control-label">$zoo._("Text settings")</label>
+    <div class="col-sm-3 range">
+      <select name="layoutFont" class="form-control">
+	<option value="-1" #if $m.web.metadata.get("ffamily")==""#selected="selected"#end if#>$zoo._("Font-family")</option>
+#set fonts=["Arial","Courier","Georgia","Helvetica","Lucida","Tahoma","Trebuchet"]
+#for i in fonts		    
+	<option style="font-family:${i};font-size:1.1em;" value="${i}" #if $m.web.metadata.get("ffamily")==$i#selected="selected"#end if#>${i}</option>
+#end for
+      </select>	    
+    </div>
+    <div class="col-sm-3 range">
+      <select name="layoutFontSize" class="form-control">
+	<option value="-1" #if $m.web.metadata.get("fsize")==""#selected="selected"#end if#>$zoo._("Font-size")</option>
+#for i in range(9,15)
+	<option style="font-size:${i}px;" value="$i" #if $m.web.metadata.get("fsize")==str($i)#selected="selected"#end if#>${i}px</option>
+#end for
+      </select>	    
+    </div>
+    <div class="col-sm-3 range">
+      <div class="input-group cpicker">
+	<input type="text" class="form-control" id="mmFontColor" name="layoutFontColor" value="#if $m.web.metadata.get("font-colorpicker")==""#selected="selected"#\#333333#else#$m.web.metadata.get("font-colorpicker")#end if#" />
+	<span class="input-group-addon"><i></i></span>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <label class="col-sm-3 control-label">$zoo._("Layer Switcher Position")</label>
+    <div class="col-sm-3 range">
+      <select name="layerswitcherPosition" class="form-control">
+#set fonts=[zoo._("Left"),zoo._("Right")]
+#for i in fonts		    
+	<option value="${i}" #if $m.web.metadata.get("mmLSPosition")==$i#selected="selected"#end if#>${i}</option>
+#end for
+      </select>	    
+    </div>
+    <label class="col-sm-3 control-label">$zoo._("Layer Switcher")</label>
+    <div class="col-sm-3 range">
+      <select name="layerswitcherOpen" class="form-control">
+#set fonts=[zoo._("Open"),zoo._("Close")]
+#for i in fonts		    
+	<option value="${i}" #if $m.web.metadata.get("mmLSPosition")==$i#selected="selected"#end if#>${i}</option>
+#end for
+      </select>	    
+    </div>
+  </div>  
+</form>    

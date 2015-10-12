@@ -23,7 +23,7 @@
    Abstract = The welcome message created by service.
    <ComplexData>
     <Default>
-     mimeType = text/html 
+     mimeType = application/json
      encoding = utf-8
     </Default>
    </ComplexData>

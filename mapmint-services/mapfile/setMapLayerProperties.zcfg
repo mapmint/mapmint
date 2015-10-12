@@ -1,6 +1,6 @@
 [setMapLayerProperties]
- Title = List all key value from a configuration maps.
- Abstract = List all the key value pairs from the main configuration file.
+ Title = Define properties of a layer using metadata fields in the mapfile
+ Abstract = Define properties of a layer using metadata fields in the mapfile.
  processVersion = 2
  storeSupported = true
  statusSupported = true
@@ -32,7 +32,7 @@
    Abstract = The welcome message created by service.
    <ComplexData>
     <Default>
-     mimeType = application/json
+     mimeType = text/plain
      encoding = utf-8
     </Default>
    </ComplexData>

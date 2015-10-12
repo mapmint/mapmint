@@ -1,0 +1,21 @@
+
+#def printLine(obj)
+      <div class="form-group require-raster">
+	<label class="col-sm-3 control-label">$obj["name"]</label>
+        <div class="col-sm-9 ">
+#if $obj.keys().count("type")==0	  
+	  <input name="$obj["id"]" class="form-control" type="text" />
+#else
+#if $obj["type"]!="select"
+	  <input name="$obj["id"]" class="form-control" type="password" />
+#else
+	  <select name="$obj["id"]" class="form-control">
+#for a in $obj["options"]
+	    <option value="$a">$a</option>
+#end for	    
+	  </select>
+#end if	  
+#end if	  
+	</div>
+      </div>
+#end def

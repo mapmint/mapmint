@@ -1,0 +1,86 @@
+#import zoo
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#set fields="id,login,firstname,lastname,mail,phone,passwd,last_con,last_map"
+#if $inputs.has_key("clause")
+#set haveGroup=True
+#if $inputs["clause"]["value"]=="id="
+#set q=[["","","","","","","","","",""]]
+#else
+#set q=cur.execute("SELECT "+$fields+" from "+$prefix+"users where "+$inputs["clause"]["value"])
+#set q=cur.fetchall()
+#end if
+#else
+#set haveGroup=False
+#set q=cur.execute("SELECT "+$fields+" from "+$prefix+"users where login='"+$conf["senv"]["login"]+"'")
+#set q=cur.fetchall()
+#end if
+#set titles=['id','login','first name','last name','email','phone','password','last_con','last_map']
+<div id="add-user" class="collapse">
+<form class="form-inline mt">
+<fieldset class="mbp mtp">
+<legend>General information</legend>
+<div class="form-group">
+#if not($inputs.has_key("type")) or ($inputs.has_key("type") and $inputs["type"]["value"]!="delete")
+#set j=1
+#for i in titles
+#set ii=$i.replace(' ','_')
+#if i!='last_map' and i!='last_con' and i!='id'
+#if i!='password'
+<label for="up_$ii">$zoo._(i.title()): </label>
+<input id="up_$ii" value="$q[0][$j]"/>
+#if i=="login"
+#set login=$q[0][$j]
+#end if
+#else
+</div>
+<div class="row">
+<div class="col-md-6 col-xs-12">
+<fieldset>
+<legend>$zoo._("Password:") <input type="checkbox" id="up_cp" data-toggle="collapse" data-target="#userPassword" /></legend>
+<div id="userPassword" class="collapse">
+<label for="up_$i">$zoo._($i): </label>
+<input id="up_$i" type="password" value=""/>
+<label for="up_confirm_$i">$zoo._("Confirm") $zoo._($i): </label>
+<input id="up_confirm_$i" type="password" value=""/>
+</div>
+</fieldset>
+</div>
+#end if
+#set j=$j+1
+#end if
+#end for
+
+#if haveGroup
+<div class="col-md-6 col-xs-12">
+#include $conf["main"]["templatesPath"]+"/UsersManagement/GroupList.html"
+</div>
+#end if
+</div>
+
+#else
+#set i=titles[1]
+#set ii=$i.replace(' ','_')
+#set login=$q[0][1]
+<label for="up_$ii">$zoo._(i.title()): </label>
+<input id="up_$ii" value="$q[0][1]"/>
+#end if
+
+#if $inputs.has_key("clause")
+<input id="um_uclause" type="hidden" value="$login" />
+#end if
+#if $inputs.has_key("type")
+<input id="um_utype" type="hidden" value="$inputs["type"]["value"]" />
+#end if
+#if $inputs.has_key('type')
+<button href="#">
+#if $inputs["type"]["value"]=="delete"#$zoo._("Delete")#else##if $inputs["type"]["value"]=="update"#$zoo._("Save")#else#$zoo._("Add")#end if##end if#
+</button>
+#else
+<a href="#" class="easyui-linkbutton" onclick="System.updateUserPreferences();">$zoo._("Save")</a>
+#end if
+</fieldset>
+</form>
+</div>

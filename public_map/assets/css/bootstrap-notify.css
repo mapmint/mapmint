@@ -8,8 +8,7 @@
 /* Positioning */ 
 .notifications.top-right {
   right: 20px;
-  top: 70px;
-z-index:100000;
+  z-index:100000;
 }
 
 .notifications.top-left {

@@ -1,0 +1,177 @@
+#encoding UTF-8
+#import zoo
+#attr $js1 = ["main_js"] 
+#attr $js3 = [] 
+#attr $mmodule = "Distiller"
+#attr $mmenu = None
+#attr $istyles = None
+#import zoo
+#try
+#set verr=$errorMsg
+#except
+#set verr=None
+#end try
+<!DOCTYPE html>
+<html lang="$(conf["main"]["lang"].split('-')[0])">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="$zoo._("MapMint: Professional SDI manager")">
+<meta name="keywords" content="MapMint, SDI, Geospatial, Web GIS, GIS, WPS, WMS, WFS, WCS, ZOO-Project, ZOO, ZOO WPS, MapServer, GDAL, OSGeo, FOSS4G, OGC, OWS">
+<meta name="copyright" content="$conf["provider"]["providerName"]">
+<meta name="author" content="$conf["provider"]["providerName"]">
+<link rel="shortcut icon" href="$conf["main"]["mmAddress"]/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title="MapMint RSS Feed" href="$(conf["main"]["applicationAddress"])public/rss" />
+<title>$page_title</title>
+
+
+<link href="$conf["main"]["publicationUrl"]/css/bootstrap.min.css" rel="stylesheet">
+<link href="$conf["main"]["publicationUrl"]/css/metisMenu.min.css" rel="stylesheet">
+<link href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-notify.css" rel="stylesheet">
+<link href="$conf["main"]["publicationUrl"]/assets/css/summernote.css" rel="stylesheet">
+<link href="$conf["main"]["publicationUrl"]/css/mapmint-admin.css" rel="stylesheet">
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+
+#if $istyles is not None
+$istyles
+#end if
+</head>
+<body>
+#if $mmodule!="public"
+#if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false") and not($verr)
+<div id="wrapper">
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
+   <div class="navbar-header">
+     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+     <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+     </button>
+     <a class="navbar-brand" href="#"><i class="mmi mmi-$(mmodule.lower())"></i> <span class="hid">$zoo._($mmodule)</span></a>
+   </div>
+   <!-- /.navbar-header -->
+
+   <ul class="nav navbar-top-links navbar-right">
+     <li class="dropdown">
+	        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+	          <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+	        </a>
+	        <ul class="dropdown-menu dropdown-user">
+		  <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
+		  </li>
+		  <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+		  </li>
+		  <li class="divider"></li>
+		  <li><a href="#"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+		  </li>
+		</ul>
+		<!-- /.dropdown-user -->
+	      </li>
+</ul>
+	    
+#if $conf["mm"]["indexes"]=="true"
+#set menu=['Dashboard','Distiller','Territories','Indexes','Themes','Documents','Manager','Publisher']
+#else
+#if $conf["mm"]["documents"]=="true"
+#set menu=['Dashboard','Distiller','Manager','Themes','Documents','Publisher']
+#else
+#set menu=['Dashboard','Distiller','Manager','Themes','Publisher']
+#end if
+#end if
+	    
+	  <div class="navbar-default sidebar" role="navigation">
+	  <div class="sidebar-nav navbar-collapse">
+	    <ul class="nav" id="side-menu">
+
+	      <li class="sidebar-search">
+	      <div class="input-group custom-search-form">
+		<input type="text" class="form-control" placeholder="Search...">
+		<span class="input-group-btn">
+		<button class="btn btn-default" type="button">
+		<i class="fa fa-search"></i>
+		</button>
+		</span>
+	      </div>
+	      <!-- /input-group -->
+	      </li>
+#for a in $menu
+	      <li #if $inputs['tmpl']['value']==$a+"_bs"#class="active"#end if#>
+	      <a href="#if $inputs['tmpl']['value']==$a+"_bs"#\#" class="active"#else#./$(a)_bs"#end if#><i class="mmi mmi-$(a.lower()) fa-fw"></i> $zoo._($a)
+#if $mmenu is not None and $inputs['tmpl']['value']==$a+"_bs"
+<span class="fa arrow"></span>
+	      </a>
+	      $mmenu
+#else	      
+	      </a>
+#end if	      
+	      </li>
+#end for
+		</ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+	<div id="page-wrapper">
+
+	<div class='notifications top-right'></div>
+
+	    
+	    
+	    <!--  
+
+
+<div class="admin">
+    <h2 class="ad">$conf["senv"]["firstname"] $conf["senv"]["lastname"]</h2>
+<ul class="sets">
+                <li class="sett"><a href="#" id="users_admin" title="" onclick="System.UserPreferences()">$zoo._("Preferences")</a></li>
+#import mm_access
+#set groups=mm_access.getGroup($conf)
+#if $groups.count("admin")>0
+                <li class="user"><a href="#" id="user_management" title="" onclick="System.UserManagement()">$zoo._("Users management")</a></li>
+#end if
+                <li class="logt"><a href="#" id="logout" title="">$zoo._("Log out")</a></li>
+        </ul>
+        
+</div>
+
+#end if
+#end if
+-->
+
+
+$body
+
+#if $mmodule!="public" and ($conf.keys().count("senv")>0 and $conf["senv"]["loggedin"]!="false" and $conf["senv"].keys().count("firstname")>0) and not($verr)
+<div class="ui-layout-south"> 
+  <p class="credits">&copy; copyright <a href="$conf["provider"]["providerSite"]">$conf["provider"]["providerName"]</a></p>
+
+<div id="progress_bar" class="ui-progress-bar ui-container">
+<div class="ui-progress" style="width: 79%;">
+  <span class="ui-label" style="display:none;"><b class="value">79%</b></span>
+</div>
+</div>
+#else
+#if $conf["mm"].keys().count("nofooter")==0 or ($conf["mm"]["nofooter"]!="true" and $conf["mm"].keys().count("nofooter")>0)
+<footer>
+  <div class="container text-center">
+#from datetime import datetime
+#set d=datetime.today()
+    <p>Copyright &copy; <a href="$conf["provider"]["providerSite"]">$conf["provider"]["providerName"]</a> $d.year</p>
+  </div>
+</footer>
+#end if
+#end if
+
+</div>
+
+<script data-main="$conf["main"]["mmAddress"]/admin;module=$mmodule" src="$conf["main"]["publicationUrl"]/assets/js/lib/require.js"></script>
+
+</body>
+</html>

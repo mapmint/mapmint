@@ -99,11 +99,38 @@ define([
 	};
 
 
+	try{
+	    var imsUrl=msUrl;
+	    this.msUrl=imsUrl;
+	}catch(e){
+	    this.msUrl=(params.msUrl?params.msUrl:"");
+	}
+
+	try{
+	    var ipmapfile=pmapfile;
+	    this.pmapfile=ipmapfile;
+	}catch(e){
+	    this.pmapfile=(params.pmapfile?params.pmapfile:{});
+	}
+	
+	try{
+	    var ioLayers=oLayers;
+	    this.oLayers=ioLayers;
+	}catch(e){
+	    console.log(e);
+	    this.oLayers=(params.oLayers?params.oLayers:{});
+	}
+
+	this.container=(params.container?params.container:$("#mmm_table-wrapper-container"));
+
 	this.display = function(layer,localUrl,lforce){
 	    var closure = this;
 	    var isForced;
 	    var alreadyExist=false;
-	    
+	    var oLayers=this.oLayers;
+	    var msUrl=this.msUrl;
+	    var pmapfile=this.pmapfile;
+
 	    console.log(localUrl);
 
 	    var key=layer;//getLayerById(layer);
@@ -135,7 +162,8 @@ define([
 			$(this).removeClass("active");
 		    });
 		
-		$("#mmm_table-wrapper-container").append($('<div id="mmm_table-content-wrapper_'+key+'" class="tab-pane active"></div>').append('<table id="mmm_table-content_'+key+'" class="display" width="100%"></table>'));
+
+		this.container.append($('<div id="mmm_table-content-wrapper_'+key+'" class="tab-pane active"></div>').append('<table id="mmm_table-content_'+key+'" class="display" width="100%"></table>'));
 		$("#mmm_table-wrapper-header").append('<li role="presentation" class="active"><a id="mmm_table-content-display_'+key+'" title="'+oLayers[key]["alias"]+'" data-toggle="tab" data-target="#mmm_table-content-wrapper_'+key+'" href="#mmm_table-content-wrapper_'+key+'"><i class="fa fa-table"></i><b class="ncaret"> </b><span class="hidden-xs hidden-sm">'+oLayers[key]["alias"]+'</span> </a>  </li>');
 		
 		
@@ -169,16 +197,19 @@ define([
 		var featureCount=0;
 		var cnt=0;
 		var CFeatures=[];
+		console.log(columns);
+
 		console.log("HEIGHT: "+$("#map").height()/2);
 		
 		
-		
+		var lheight=$("#map").height();
 		$('#mmm_table-content_'+key).DataTable( {
 		    data: [],
-		    "scrollY":        ($("#map").height()/5)+"px",
+		    "dom": 'Zlfrtip',
+		    "scrollY":  ((lheight)-($(".navbar").height()*4))+"px",
 		    "scrollCollapse": true,
 		    "scrollX": true,
-		    "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+		    "lengthMenu": [[5, 10, 25, 50, 1000], [5, 10, 25, 50, "All"]],
 		    "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
 			console.log(aoData);
 			var myAoData=[];

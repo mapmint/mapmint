@@ -1,0 +1,26 @@
+#import zoo
+#def printDenom(name,title)
+<div class="form-group">
+  <label class="col-md-3 control-label">$title</label>
+  <div class="col-md-9">
+    <div class="input-group">
+      <input class="form-control" name="$name" type="text" placeholder="$zoo._("Not defined")" />
+      <span class="input-group-btn">
+        <button class="btn btn-default mm-scale" type="button">$zoo._("Use Map Scale")</button>
+      </span>
+    </div>
+  </div>
+</div>
+#end def
+
+<form class="form-horizontal mtpp" method="get" >
+<h4>$zoo._("Layer settings")</h4>
+$printDenom("minDisplay",$zoo._("Min Scale"))
+$printDenom("maxDisplay",$zoo._("Max Scale"))
+
+<h4>$zoo._("Label settings")</h4>
+$printDenom("minLabel",$zoo._("Min Scale"))
+$printDenom("maxLabel",$zoo._("Max Scale"))
+
+<button class="btn btn-default mm-layer-save" href="#" >$zoo._("Save")</button>
+</form>

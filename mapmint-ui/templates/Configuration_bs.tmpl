@@ -1,0 +1,108 @@
+#import zoo
+<!-- Configuration layout -->
+#set i=0
+#set sections=['main','provider','identification']
+#set aliases=['main','provider','identification']
+#set icons=["laptop","user","lock"]
+#if $conf.keys().count($conf["main"]["dbuser"])>0
+#set sections+=[$conf["main"]["dbuser"]]
+#set icons+=["database"]
+#set aliases+=["database"]
+#end if
+#set textarea=['abstract','keywords']
+
+#for a in $sections
+
+<div id="dash$(a.title())Form" role="tabpanel" class="mmform tab-pane" >
+
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header"><i class="fa fa-wrench fa-fw"></i> $zoo._("Settings")</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+	  <i class="fa fa-$icons[$i] fa-fw"></i>
+	  $(zoo._("%s configuration")%$zoo._($aliases[$i].title()))
+#import mm_access
+#set groups=mm_access.getGroup($conf)
+#if groups.count("admin")
+	  <div class="pull-right">
+	    <button type="button" href="#" data-target="#dash$(a.title())Form" class="btn btn-default btn-xs dropdown-toggle">
+	    $zoo._("Save")
+	    </button>
+	  </div>
+#end if
+	</div>
+	<div class="panel-body">
+	  <div class="row">
+
+	    <div class="col-lg-6">
+	      <form role="form">
+	      <input type="hidden" name="section" value="$a" />
+	      #try
+	      #set cfields=$conf[$a+"_help"].keys()
+	      #set hasHelp=True
+	      #except
+	      #set cfields=$conf[$a].keys()
+	      #set hasHelp=False
+	      #end try
+	      #for kk in range(0,(len($cfields)/2)+1)
+	        <div class="form-group">
+		  <label>$cfields[$kk]</label>
+#if $cfields[$kk]=="abstract"
+<textarea class="form-control" name="$cfields[$kk]" value="$conf[$a][$cfields[$kk]]">#if $conf[$a]["abstract"].count($conf["main"]["tmpUrl"])>0
+#set f=open($conf[$a]["abstract"].replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
+$f.read()
+#else
+$conf[$a]["abstract"].replace("[BR]","</p><p>")
+#end if
+</textarea>
+#else
+		  <input class="form-control" name="$cfields[$kk]" value="$conf[$a][$cfields[$kk]]" />
+#end if
+#if $hasHelp
+		  <p class="help-block">$conf[$a+"_help"][$cfields[$kk]].</p>
+#end if
+		</div>
+	      #end for
+	      </form>
+	    </div>
+	  
+	    <div class="col-lg-6">
+	      <form role="form">
+	      #for kk in range(1+(len($cfields)/2),len($cfields))
+	        <div class="form-group">
+		  <label>$cfields[$kk]</label>
+#if $cfields[$kk]=="abstract"
+<textarea class="form-control hide" name="$cfields[$kk]">#if $conf[$a]["abstract"].count($conf["main"]["tmpUrl"])>0
+#set f=open($conf[$a]["abstract"].replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
+$f.read()
+#else
+$conf[$a]["abstract"].replace("[BR]","</p><p>")
+#end if
+</textarea>
+#else
+		  <input class="form-control" name="$cfields[$kk]" value="$conf[$a][$cfields[$kk]]" />
+#end if
+#if $hasHelp
+		  <p class="help-block">$conf[$a+"_help"][$cfields[$kk]].</p>
+#end if
+		</div>
+	      #end for
+	      </form>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+#set i=i+1
+#end for
+

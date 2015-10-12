@@ -1,0 +1,119 @@
+#encoding UTF-8
+#from Skeleton_bs import Skeleton_bs
+#extends Skeleton_bs
+
+#attr $mmodule = "Publisher"
+
+#attr $ocss = []
+
+#def istyles
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/font-mfizz.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.2.0/css/colReorder.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/1.0.7/css/responsive.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.0.0/css/select.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/dataTables.bootstrap.min.css"/>
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/ol.css"/>
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-colorpicker.min.css"/>
+#end def
+
+#def page_title
+MapMint: $mmodule
+#end def
+
+#def mmenu
+ <ul class="nav nav-first-level collapse in">
+  <li>
+    <div class="input-group">
+      <span class="input-group-addon">
+       <i class="fa fa-map-o br"></i>
+      </span>
+      <input class="form-control" id="save-map" placeholder="$zoo._("Map Name")"
+      type="text" value="$conf["senv"]["last_map"]" />
+      <span class="input-group-btn" title="$zoo._("Load Map")" rel="tooltip">
+       <button class="btn btn-default disabled" type="button">$zoo._("Load")</button>
+      </span>
+    </div>
+  </li>
+ </ul>
+
+#end def
+
+#def body
+#import zoo
+
+
+#def printTabHeader(id,title,font,classe)
+<li role="presentation" #if $classe is not None#class="$classe"#end if#>
+  <a id="$(id)_Toggler" href="#$id" aria-controls="home" role="tab" data-toggle="tab">
+    <i class="#if $font.count("fa-")>0#fa#end if# $font fa-fw"></i>
+    <span class="hidden-xs hidden-sm hidden-md">
+      $title
+    </span>
+  </a>
+</li>
+#end def
+
+#import mapscript
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$conf["senv"]["last_map"]+".map")
+
+        <div id="manaMap" class="col-md-12" style="padding:0;margin:0;">
+	      <div class="font-bold txtsh">
+	      	  <h2 class="mm_layerName">$zoo._("Project: ")$conf["senv"]["last_map"]
+		  <div class="btn-group pull-right" role="group" aria-label="...">
+  		    <button type="button" class="btn btn-default" data-act="publish">$zoo._("Publish")</button>
+  		    <button type="button" class="btn btn-default" data-act="publishPreview">$zoo._("Publish Map Preview")</button>
+  		    <a class="btn btn-default" href="./preview/leftcol_bs" target="_blank">$zoo._("Preview")</a>
+  		    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#removeModal">$zoo._("Remove")</button>
+		  </div>
+		  </h2>
+	      </div>
+
+	    <ul class="nav nav-tabs" role="tablist">
+	      $printTabHeader("mm_property_display",$zoo._("General"),"fa-info",None)
+	      $printTabHeader("mm_layers_display",$zoo._("Layers"),"mm0-layers mm-layers-layers",None)
+	      $printTabHeader("mm_mapp_display",$zoo._("Map"),"fa-map-o",None)
+	      $printTabHeader("mm_services_display",$zoo._("Services"),"fa-gear",None)
+	    </ul>
+	    <div class="tab-content">
+	      <div role="tabpanel" class="tab-pane active" id="mm_property_display">
+#set searchList1=[{"m":$m,"conf":$conf,"inputs":$inputs}]
+	      	  $(Template(file=$conf["main"]["templatesPath"]+"/Publisher/Properties.html",searchList=$searchList1))
+	      </div>
+	      <div role="tabpanel" class="tab-pane" id="mm_layers_display">
+	      	$(Template(file=$conf["main"]["templatesPath"]+"/Publisher/Layers.html",searchList=$searchList1))
+	      </div>
+	      <div role="tabpanel" class="tab-pane" id="mm_mapp_display">
+	      	$(Template(file=$conf["main"]["templatesPath"]+"/Publisher/Map.html",searchList=$searchList1))
+	      </div>
+	      <div role="tabpanel" class="tab-pane" id="mm_services_display">
+	      	$(Template(file=$conf["main"]["templatesPath"]+"/Publisher/Controls.html",searchList=$searchList1))
+	      </div>
+	    </div>
+	</div>
+
+#end def
+
+#def tfooter
+
+<!-- Remove Modal -->
+<div class="modal fade" id="removeModal" tabindex="-1" role="dialog" aria-labelledby="removeModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="removeModalLabel">$zoo._("Do you really want to remove") $conf["senv"]["last_map"] ?</h4>
+      </div>
+      <div class="modal-body">
+        <p>$zoo._("Once removed, you cannot access the project anymore. You cannot recover a removed project. Deleting a project may destroy important data and make other projects unstable.")</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">$zoo._("No")</button>
+        <button type="button" class="btn btn-primary">$zoo._("Yes")</button>
+      </div>
+    </div>
+  </div>
+</div>
+   
+#end def 

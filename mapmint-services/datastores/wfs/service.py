@@ -24,6 +24,24 @@ def load(conf,inputs,outputs):
 	outputs["Result"]["value"]=values+', "link": "'+inputs["name"]["value"]+'", "stype": "'+pl[0]+'"'+"}"
 	return 3
 
+def details(conf,inputs,outputs):
+	res={}
+	try: 
+		import os
+		pl=inputs["name"]["value"].split(":")
+		if os.path.exists(conf["main"]["dataPath"]+"/"+pl[0].upper()+"/"+pl[1]+".txt"):
+		    res["name"]=pl[1]
+		    res["stype"]=pl[0]
+		    f = open(conf["main"]["dataPath"]+"/"+pl[0].upper()+"/"+pl[1]+".txt", 'r')
+		    res["link"]=f.read()
+		    f.close()
+	except Exception,e:
+		conf["lenv"]["message"]=zoo._("Unable to parse the file")
+		return 4
+	import json
+	outputs["Result"]["value"]=json.dumps(res)
+	return 3
+
 def delete(conf,inputs,outputs):
 	try: 
 		os.unlink(conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"+inputs["name"]["value"]+".txt")
@@ -52,7 +70,7 @@ def save(conf,inputs,outputs):
 
 def test(conf,inputs,outputs):
 	try:
-		if inputs["type"]["value"]=="WMS":
+		if inputs["type"]["value"].upper()=="WMS":
 			import osgeo.gdal
 			ds=osgeo.gdal.Open(inputs["type"]["value"]+":"+inputs["url"]["value"])
 			ds.GetDriver()
@@ -132,9 +150,6 @@ def displayJSON(conf,inputs,outputs):
 	default_dir=conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"
 	original_dir=conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"
 	label_dir=""
-	#print >> sys.stderr, conf["main"]["dataPath"]+"/PostGIS/"
-	#print >> sys.stderr, original_dir
-	#print >> sys.stderr, inputs["dir"]["value"]
 	try:
 		tmp=os.listdir(original_dir)
 	except:

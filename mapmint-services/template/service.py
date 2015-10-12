@@ -98,7 +98,8 @@ def display(conf,inputs,outputs):
 			conf["senv"]["isTrial"]="true"
 			if toLoad is not None:
 				conf["senv"]["toLoad"]=toLoad
-			conf["senv"]["project"]=nameSpace["project"]		
+			conf["senv"]["project"]=nameSpace["project"]
+			conf["senv"]["tmpl"]=inputs["tmpl"]["value"]
 			if verif:
 				conf["lenv"]["cookie"]="MMID="+conf["senv"]["MMID"]+"; path=/"
 
@@ -145,7 +146,7 @@ def display(conf,inputs,outputs):
 				import cssmin
 				outputs["Result"]["value"]=cssmin.cssmin(outputs["Result"]["value"])
 			outputs["Result"]["mimeType"]="text/css"
-		if inputs["tmpl"]["value"].count('_js'):
+		if inputs["tmpl"]["value"].count('_js')>0 or inputs["tmpl"]["value"].count('.js')>0:
 			if conf["main"].has_key('jsCache') and conf["main"]["jsCache"]=="prod":
 				try:
 					from slimit import minify
@@ -182,8 +183,11 @@ def display(conf,inputs,outputs):
 		if conf and conf.keys().count('senv') and conf["senv"].keys().count("MMID") > 0:
 			conf["lenv"]["cookie"]="MMID="+conf["senv"]["MMID"]+"; path=/"
 	else:
-		page="/login.tmpl"
-		if inputs["tmpl"]["value"].count("_js")>0:
+		if inputs["tmpl"]["value"].count("_bs")>0:
+			page="/login_bs.tmpl"
+		else:
+			page="/login.tmpl"
+		if inputs["tmpl"]["value"].count("_js")>0 or inputs["tmpl"]["value"].count('.js')>0:
 			page="/"+inputs["tmpl"]["value"]+".tmpl"
 		t = Template(file=conf["main"]["templatesPath"]+page,searchList=nameSpace)
 		if not(conf.has_key("senv")):

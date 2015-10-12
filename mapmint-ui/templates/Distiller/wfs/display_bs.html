@@ -1,0 +1,18 @@
+#import zoo
+
+#set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
+#include $tmpl
+#set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
+
+<div id="add-wfs-dialog">
+  <h2>$zoo._("Add OGC Server")</h2>
+  <div>
+    <form class="form-horizontal mtpp" >
+    $ftmpl.printLine({"id":"name","name":$zoo._("Name")}) 
+    $ftmpl.printLine({"id":"url","name":$zoo._("URL")}) 
+    $ftmpl.printLine({"id":"type","name":$zoo._("Type"),"type":"select","options":["WMS","WFS"]})
+    $ftmpl.printButton({"id":"test","name":$zoo._("Test")}) 
+    $ftmpl.printButton({"id":"add","name":$zoo._("Add")}) 
+    </form>
+  </div>
+</div>

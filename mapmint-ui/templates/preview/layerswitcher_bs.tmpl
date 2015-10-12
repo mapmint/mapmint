@@ -39,19 +39,6 @@ $Template(file=$conf['main']['templatesPath']+"layer_tree_bs.tmpl",searchList={"
      </li>
 #end if
 
-
-#*
-	      <ul id="layers_bg" style="display:none">
-#for i in range(0,len($a[0]["children"]))
-
-$Template(file=$conf['main']['templatesPath']+"preview/modules/layer_fees/list.tmpl",searchList={"m": $m,"elem": $a[0]["children"],"i": $i,"conf": $conf})
-
-#end for
-#if $conf["senv"]["last_map"]=="indicateurs"
-     <li id="IndicateursFees">
-     </li>
-#end if
-*#
 	      </ul>
 	      </li>
 	      </ul>
@@ -60,6 +47,7 @@ $Template(file=$conf['main']['templatesPath']+"preview/modules/layer_fees/list.t
 
 </div>
     <div role="tabpanel" class="tab-pane" id="mm_bs_display">
+
 $Template(file=$conf['main']['templatesPath']+"/preview/baselayers_bs_new.tmpl",searchList={"m": $m,"conf": $conf})
 
     </div>

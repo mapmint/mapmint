@@ -627,7 +627,7 @@
 		      //tmpFeature
 		      finalLayers[tmpId+2].addFeatures([System.references["layer_"+p.id][this.local_id].clone()]);
 		      if(!$("#feature-edit-dialog")[0])
-			$( "body" ).append('<div id="feature-edit-dialog" title="Feature details"></div>');
+			$( "body" ).append('<div id="feature-edit-dialog" title="'+System.messages["Feature Details"]+'"></div>');
 		      else
 			$( "#feature-edit-dialog" ).html("");
 		      var asStr="<table>";

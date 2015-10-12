@@ -1,0 +1,339 @@
+#encoding UTF-8
+#from Skeleton_bs import Skeleton_bs
+#extends Skeleton_bs
+
+#attr $mmodule = "Distiller"
+
+#attr $ocss = []
+
+#def istyles
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/font-mfizz.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.2.0/css/colReorder.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/1.0.7/css/responsive.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.0.0/css/select.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/dataTables.bootstrap.min.css"/>
+#end def
+
+#def page_title
+MapMint: $mmodule
+#end def
+
+#def mmenu
+
+#import json
+#import datastores.service as datastores
+#set inputs1=$inputs
+#set $inputs1["state"]={"value":"open"}
+#set outputs1={"Result":{"value":""}}
+#set res=datastores.list($conf,$inputs1,$outputs1)
+#set dirStr=json.loads($outputs1["Result"]["value"])
+
+<ul class="nav nav-second-level collapse in">
+  <li class="active">
+   <a id="distOverviewAction" href="#distOverview" role="tab" data-toggle="tab" class="active"><i class="fa fa-plus fa-fw"></i> $zoo._("Datastores")</a>
+  </li>
+  <li>
+   <a href="#settings"><i class="fa fa-database fa-fw"></i> $zoo._("Databases") <span class="fa arrow"></span></a>
+   <ul class="nav nav-third-level">
+#set classes0=["icon-mysql","icon-postgres-alt","fa-folder-open","wms","wfs"]
+#set classes1=["fa-database","fa-database","fa-folder","wms","wfs"]
+#set cnt=0
+#for i in ["MySQL","PostGIS"]
+     <li class="active">
+       <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $i 
+#if $dirStr.keys().count($i)>0
+       <span class="fa arrow"></span></a>
+       <ul class="nav nav-forth-level">
+#for j in $dirStr[$i]
+	 <li class="active">
+	   <a class="mmdatastore" data-store-type="$(i.lower())" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes1[$cnt] fa-fw"></i>$j["name"]</a>
+			
+	 </li>
+#end for
+       </ul>
+#else
+       </a>
+#end if
+     </li>
+#set $cnt+=1
+#end for
+    </ul>
+  </li>
+#set classes0=["fa-folder-open"]
+#set classes1=["fa-folder"]
+#set cnt=0
+#for i in ["Directories"]
+  <li>
+    <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $i 
+#if $dirStr.keys().count($i)>0
+    <span class="fa arrow"></span></a>
+      <ul class="nav nav-forth-level">
+#for j in $dirStr[$i]
+	<li>
+	  <a class="mmdatastore"  data-store-type="mainDirectories" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes1[$cnt] fa-fw"></i>$j["name"]</a>		
+	</li>
+#end for
+       </ul>
+#else
+     </a>
+#end if
+  </li>
+#set $cnt+=1
+#end for
+
+  <li>
+    <a href="#settings"><i class="fa fa-globe fa-fw"></i> $zoo._("OGC Web Services") <span class="fa arrow"></span></a>
+    <ul class="nav nav-third-level">
+#set classes0=["fa-server","fa-server"]
+#set classes1=["fa-server","fa-server"]
+#set cnt=0
+#for i in ["WMS","WFS"]
+      <li>
+        <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $i 
+#if $dirStr.keys().count($i)>0
+        <span class="fa arrow"></span></a>
+        <ul class="nav nav-forth-level">
+#for j in $dirStr[$i]
+	  <li>
+	    <a class="mmdatastore" data-store-type="$(i.lower())" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes1[$cnt] fa-fw"></i>$j["name"]</a>		
+	  </li>
+#end for
+	</ul>
+#else
+        </a>
+#end if
+      </li>
+#set $cnt+=1
+#end for
+   </ul>
+  </li>
+</ul>
+#end def
+
+#def body
+#import zoo
+#import mm_access
+
+#from datastores.directories.service import *
+
+#set loutputs={"Result":{"value":""}}
+#set a=displayJSON($conf,$inputs,$loutputs)
+#set b=eval($loutputs["Result"]["value"])
+#from datastores.postgis.service import displayJson
+#set dbs=[]
+#for i in ('PostGIS','MySQL')
+#set l1outputs={"Result":{"value":""}}
+#set linputs=$inputs
+#set $linputs["type"]={"value":$i}
+#set c=displayJson($conf,$inputs,$l1outputs)
+#if $l1outputs["Result"]["value"] == "" or $l1outputs["Result"]["value"] == " "
+#set dbs=$dbs+[[]]
+#else
+#set tmp=eval($l1outputs["Result"]["value"])
+#set dbs=$dbs+[tmp["sub_elements"]]
+#end if
+#end for
+
+<div class="tab-content">  
+  
+	<div id="distOverview" role="tabpanel" class="tab-pane active">
+	    <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header"><i class="fa fa-plus fa-fw"></i> $zoo._("Datastores")</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+	    <div class="row">
+	    	 <div class="btn-group">	
+		      <a class="btn btn-default btn-sm fa fa-folder-open" title="$zoo._("Add Directory")" role="tab" data-toggle="tab" data-target="#add-directory" href="#add-directory"></a>
+		      <a class="btn btn-default btn-sm fa fa-database" title="$zoo._("Add DB Connection")" role="tab" data-toggle="tab" data-target="#add-database" href="#add-database"></a>
+		      <a class="btn btn-default btn-sm fa fa-globe" title="$zoo._("Add OGC Server")"  role="tab" data-toggle="tab" data-target="#add-ows" href="#add-ows"></a>
+		 </div>
+            </div>
+	    <div class="row">
+	    	 <div class="tab-content">
+		      <div role="tabpanel" class="tab-pane active" id="add-directory">
+#include $conf['main']['templatesPath']+"/Distiller/dirs/display_bs.html"
+		      </div>
+		      <div role="tabpanel" class="tab-pane" id="add-database">
+#include $conf['main']['templatesPath']+"/Distiller/db/display_bs.html"
+		      </div>
+		      <div role="tabpanel" class="tab-pane" id="add-ows">
+#include $conf['main']['templatesPath']+"/Distiller/wfs/display_bs.tmpl"
+		      </div>
+		 </div>
+            </div>
+            </div>
+            <!-- /.row -->
+
+	<div id="distDetails" role="tabpanel" class="tab-pane">
+	    <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header"><i class="fa fa-cube fa-fw"></i> $zoo._("Datastores")</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+	</div>
+
+</div>
+
+
+
+  </div>
+</div>
+
+<script type="template/text" id="dataStoreEmpty_template">
+<span><i class="fa fa-warning fa-fw"></i>$zoo._("No data source found")</span>
+</script>
+
+<script type="template/text" id="dataStore_template">
+#set objs=[
+{"name": "select","title": $zoo._('Select all'),"font":"fa-square-o"},
+{"name": "download","title": $zoo._('Download selection'),"font":"fa-download","optional":True},
+{"name": "open","title": $zoo._('Open selection in Manager'),"font":"fa-share","optional":True},
+{"name": "settings","title": $zoo._('Settings'),"font":"fa-gear"},
+{"name": "delete","title": $zoo._('Delete'),"font":"fa-trash"}, 
+{"name": "refresh","title": $zoo._('Refresh'),"font":"fa-refresh"},
+{"name": "toggle","title": $zoo._('Toggle table'),"font":"fa-toggle-up"},
+{"name": "remove","title": $zoo._('Close'),"font":"fa-close"},
+]
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+	<h4><i class="fa [font] fa-fw" ></i> [datastore]
+        <div class="pull-right">
+	  <div class="btn-group">
+#for i in $objs
+	    <button type="button" class="btn btn-default btn-xs
+	    hidden-md hidden-xs hidden-sm #if $i.keys().count('optional')>0#hide require-select#end if#"  data-toggle="tooltip" data-mmaction="$i.name" title="$i.title">
+	    <i class="fa $i.font fa-fw"></i>
+	    </button>
+#end for
+	    <button type="button" class="btn btn-default btn-xs dropdown-toggle hidden-lg" data-toggle="dropdown">
+	    <span class="caret"></span>
+	    </button>
+	    <ul class="dropdown-menu pull-right" role="menu">
+#for i in $objs
+	      <li>
+	        <a href="#" data-mmaction="$i.name" ><i class="fa $i.font fa-fw"></i> $i.title</a>
+	      </li>
+#end for
+	    </ul>
+	  </div>
+	</div>
+	</h4>
+      </div>
+      <div class="panel-body collapse in">
+	<i class="fa fa-spinner fa-spin"></i> $zoo._("Loading datastore ...")
+      </div>	
+    </div>
+  </div>
+</div>
+</script>
+
+<script type="template/text" id="dataSource_template">
+#set objs=[
+{"name": "select","title": $zoo._('Select'),"font":"fa-square-o"},
+{"name": "preview","title": $zoo._('Preview'),"font":"fa-eye"},
+{"name": "process","title": $zoo._('Process'),"font":"fa-gear"},
+{"name": "download","title": $zoo._('Download'),"font":"fa-download"},
+{"name": "open","title": $zoo._('Open in Manager'),"font":"fa-share"},
+{"name": "delete","title": $zoo._('Delete'),"font":"fa-trash"},
+{"name": "toggle","title": $zoo._('Toggle table'),"font":"fa-toggle-down"},
+]
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+	<span><i class="fa [font] fa-fw" ></i> [datasource]
+        <div class="pull-right">
+	  <div class="btn-group">
+#for i in $objs
+	    <button data-mmaction="$i.name" data-toggle="tooltip" title="$i.title"
+	    type="button" class="btn btn-default btn-xs hidden-md
+	    hidden-xs hidden-sm #if $i.font=="fa-toggle-down"#collapser#end if#">
+	    <i class="fa $i.font fa-fw"></i>
+	    </button>
+#end for	    
+	    <button type="button" class="btn btn-default btn-xs dropdown-toggle hidden-lg" data-toggle="dropdown">
+	    <span class="caret"></span>
+	    </button>
+	    <ul class="dropdown-menu pull-right" role="menu">
+#for i in $objs
+	      <li><a  data-mmaction="$i.name" href="#"><i class="fa $i.font fa-fw"></i> $i.title</a></li>
+#end for
+	    </ul>
+	  </div>
+	</div>
+	</span>
+      </div>
+      <div class="panel-body collapse in">
+	<i class="fa fa-spinner fa-spin"></i> $zoo._("Loading datasource ...")
+      </div>	
+    </div>
+  </div>
+</div>
+</script>
+
+<script type="template/text" id="dataSource_raster_Process_template">
+#include $conf['main']['templatesPath']+"/Distiller/RasterWindow_bs.html"
+</script>
+
+<script type="template/text" id="dataSource_vector_Process_template">
+#include $conf['main']['templatesPath']+"/Distiller/VectorConverter_bs.html"
+</script>
+
+
+<script type="template/text" id="dataSource_preview_template">
+<div>
+<img style="width:500px" class="img-responsive" src="[datasource]" />
+</div>
+</script>
+
+
+#end def
+
+#def tfooter
+
+<!-- Remove Modal -->
+<div class="modal fade" id="removeModal" tabindex="-1" role="dialog" aria-labelledby="removeModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="removeModalLabel">$zoo._("Do you really want to remove the datasource ?") </h4>
+      </div>
+      <div class="modal-body">
+        <p>$zoo._("Once removed, you cannot access the datasource anymore. You cannot recover a removed datasource. Deleting a datasource may destroy important data and make any project using it unstable.")</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">$zoo._("No")</button>
+        <button type="button" class="btn btn-primary">$zoo._("Yes")</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Remove Modal -->
+<div class="modal fade" id="removeDSModal" tabindex="-1" role="dialog" aria-labelledby="removeDSModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="removeDSModalLabel">$zoo._("Do you really want to remove the datastore ?") </h4>
+      </div>
+      <div class="modal-body">
+        <p>$zoo._("Once removed, you cannot access the datastore anymore. You cannot recover a removed datastore. Deleting a datastore may destroy important data and make any project using it unstable.")</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">$zoo._("No")</button>
+        <button type="button" class="btn btn-primary">$zoo._("Yes")</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+#end def 

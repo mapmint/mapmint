@@ -1,0 +1,45 @@
+#encoding UTF-8
+#import zoo
+
+#def printText(obj)
+  <div class="form-group">
+    <label class="col-sm-3 control-label">$obj["title"]</label>
+    <div class="col-sm-9 range">
+#if $obj.keys().count("textarea")==0
+      <input type="text" name="$obj["name"]" class="form-control" value="$obj["value"]"  />
+#else
+      <textarea name="$obj["name"]" class="form-control mm-editor">$obj["value"]</textarea>
+#end if
+    </div>
+  </div>
+#end def
+
+
+<form class="form-horizontal mtpp" method="get" >
+  <h1> <i class="fa fa-info"></i> $zoo._("General")</h1>
+  $printText({"name":"projectTitle","title":$zoo._("Project Title"),"value":$m.web.metadata.get("ows_title")})
+  <div class="form-group">
+    <label class="col-sm-3 control-label">$zoo._("Access privileges")</label>
+    <div class="col-sm-9">
+      #set searchList1=[{"m":$m,"conf":$conf,"inputs":$inputs}]
+      #include $conf["main"]["templatesPath"]+"/UsersManagement/GroupList_bs.html"
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-3 control-label">$zoo._("Classify in theme")</label>
+    <div class="col-sm-9">
+      #set searchList1=[{"m":$m,"conf":$conf,"inputs":$inputs}]
+      #include $conf["main"]["templatesPath"]+"/ThemesManagement/list_bs.html"
+    </div>
+  </div>
+  $printText({"name":"projectLanguage","title":$zoo._("Language"),"value": $conf["main"]["language"] })
+  $printText({"name":"projectKeywords","title":$zoo._("Keywords"),"value": $m.web.metadata.get("mmKeywords")})
+  $printText({"name":"projectAuthor","title":$zoo._("Author"), "value": $m.web.metadata.get("mmAuthor")})
+  $printText({"name":"projectCopyright","title":$zoo._("Copyright"),"value": $m.web.metadata.get("mmCopyright")})
+#try
+#set val=open($m.web.metadata.get("ows_abstract").replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"])).read()
+#except
+#set val=$m.web.metadata.get("ows_abstract")
+#end try
+  $printText({"textarea":True,"name":"projectDescription","title":$zoo._("Description"),"value":$val})
+</form>

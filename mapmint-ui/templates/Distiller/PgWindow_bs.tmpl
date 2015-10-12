@@ -1,0 +1,31 @@
+#encoding "UTF-8"
+#import zoo
+<form method="post" id="db_access">
+ <h3>$zoo._("Database Access")</h3>
+ <div class="form-group">
+  <label for="pg_schema">Schemas:</label>
+#from datastores.postgis import pgConnection
+#set demo=pgConnection.listSchemas($conf,$inputs,$outputs)
+#set ress=eval($outputs["Result"]["value"])
+  <select id="pg_schema" class="input-form">
+#set j=0
+#for i in ress
+#if $j==0
+#set tmp=$inputs
+#set tmp["schema"]={"value": $i[0]}
+#end if
+   <option value="$i[0]">$i[0]</option>
+#set j=$j+1
+#end for
+  </select>
+  <label for="pg_table">Tables:</label>
+  <select id="pg_table" class="input-form">
+   <option value="-1">Choose</option>
+#set demo=pgConnection.listTables($conf,$inputs,$outputs)
+#set rest=eval($outputs["Result"]["value"])
+#for i in rest
+   <option value="$i[0]">$i[1]</option>
+#end for
+  </select>
+ </div>
+</form>

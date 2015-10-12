@@ -1,0 +1,49 @@
+#encoding UTF-8
+#import zoo
+
+<form class="form-horizontal mtpp" method="get" >
+  <div class="form-group">
+    <label class="col-sm-4 control-label">$zoo._("Label Format")</label>
+    <div class="col-sm-4 ">
+      <input type="text" class="form-control" name="labelFormat"
+  value="DDMM" data-toggle="tooltip" title="$zoo._("Format of the label. “DD” for degrees, “DDMM” for degrees minutes, and “DDMMSS” for degrees, minutes, seconds. A C-style formatting string is also allowed, such as “%g°” to show decimal degrees with a degree symbol.")" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-4 control-label">$zoo._("Min / Max Arcs")</label>
+    <div class="col-sm-4 ">
+      <input type="text" class="form-control" name="minArcs"
+  value="0" data-toggle="tooltip" title="$zoo._("The minimum number of arcs to draw. Increase this parameter to get more lines.  Optional, set to '0' to deactivate.")" />
+    </div>
+    <div class="col-sm-4 ">
+      <input type="text" class="form-control" name="maxArcs"
+  value="25" data-toggle="tooltip" title="$zoo._("The minimum number of arcs to draw. Increase this parameter to get more lines.  Optional, set to '0' to deactivate.")" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-4 control-label">$zoo._("Min / Max Interval")</label>
+    <div class="col-sm-4 ">
+      <input type="text" class="form-control" name="minInterval"
+  value="0" data-toggle="tooltip" title="$zoo._("The minimum number of intervals to try to use. The distance between the grid lines, in the units of the grid’s coordinate system.  Optional, set to '0' to deactivate.")" />
+    </div>
+    <div class="col-sm-4 ">
+      <input type="text" class="form-control" name="maxInterval"
+  value="25" data-toggle="tooltip" title="$zoo._("The maximum number of intervals to try to use.  The distance between the grid lines, in")" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="col-sm-4 control-label">$zoo._("Min / Max Subdivide")</label>
+    <div class="col-sm-4 ">
+      <input type="text" class="form-control" name="minSubdivide"
+  value="0" data-toggle="tooltip" title="$zoo._("The minimum number of segments to use when rendering an arc.  If the lines should be very curved, use this to smooth the lines by adding more segments.  Optional, set to '0' to deactivate.")" />
+    </div>
+    <div class="col-sm-4 ">
+      <input type="text" class="form-control" name="maxSubdivide"
+  value="2" data-toggle="tooltip" title="$zoo._("The maximum number of segments to use when rendering an arc. If the graticule should be very straight, use this to minimize the number of points for faster rendering.  Optional, set to '0' to deactivate.")" />
+    </div>
+  </div>
+  <div class="form-group">
+    <button class="btn btn-default">$zoo._("Apply")</button>
+  </div>
+  
+</form>    

@@ -304,7 +304,7 @@ __declspec(dllexport)
 	    }
 
 	    //lid=msGetLayerIndex(mymap,mylayer->name);
-	    /*preparse the filter for gml aliases*/
+	    /* preparse the filter for gml aliases */
 	    FLTPreParseFilterForAlias(fen, mymap, lid, "G");
 
 	    /* run filter.  If no results are found, do not throw exception */

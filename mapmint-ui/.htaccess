@@ -1,4 +1,8 @@
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*);module=(.*).js$ /~djay/progede2/mapmint-ui/$1.js;module=$2 [L,QSA]
+RewriteRule ^preview/assets/(.*)$ /~djay/progede2/public_map/assets/$1 [L,QSA]
+RewriteRule ^preview/css/(.*)$ /~djay/progede2/public_map/css/$1 [L,QSA]
+RewriteRule ^preview/fonts/(.*)$ /~djay/progede2/public_map/fonts/$1 [L,QSA]
 RewriteRule ^(.*)$ /cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=template.display&DataInputs=tmpl=$1&RawDataOutput=Result [L,QSA]

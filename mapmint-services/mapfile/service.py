@@ -633,39 +633,26 @@ def getGroupList(conf,mapfile):
             for j in groups.split(","):
                 print >> sys.stderr,"JJ "+j
                 if j!="":
-                    print >> sys.stderr,"groups "+allGroups[i-1]
                     resGroups[allGroups[i-1]]+=[{j: []}]
-                    print >> sys.stderr,"res "+str(resGroups)
         else:
             for j in groups.split(";"):
                 inheritance=j.split("|")
                 elem=None
-                #print >> sys.stderr,"Inheritance "+str(inheritance)
                 for k in resGroups:
                     if len(inheritance)>1 and k==inheritance[1]:
                         elem=resGroups[k]
                         break
                 if elem is None:
                     for k in resGroups:
-                        #print >> sys.stderr,k
                         for l in range(0,len(resGroups[k])):
-                            #print >> sys.stderr,l
                             for n in resGroups[k][l]:
-                                #print >> sys.stderr,n
                                 if len(inheritance)>1 and n==inheritance[1]:
                                     elem=resGroups[k][l][n]
                                     break
-                #print >> sys.stderr,elem
                 if elem is not None:
                     for k in inheritance[0].split(","):
                         if k!="":
                             elem+=[{k: []}]
-                #print >> sys.stderr,resGroups
-            #print >> sys.stderr,resGroups
-        #except:
-        #    print >> sys.stderr,"No group for level "+str(i)
-        #    break
-        #print >> sys.stderr," RES GROUP : "+str(resGroups)
         for i in range(0,m.numlayers):
             j=m.getLayer(i)
             if j is not None:
@@ -673,14 +660,7 @@ def getGroupList(conf,mapfile):
                 if g is None:
                     break
                 d=getThemArray(resGroups,g)
-                #print >> sys.stderr,"BLAH\n"
-                #print >> sys.stderr,g
-                #print >> sys.stderr,resGroups
-                #print >> sys.stderr,j
-                #print >> sys.stderr,[]+[{"layer": j.name}]
                 addLayerToThem(resGroups,g,{"layer": j.name});
-            #d+=[{"layer": j.name}]
-                #print >> sys.stderr,resGroups
 
     return resGroups
 
@@ -802,12 +782,443 @@ def recursGroupList1(group,pref):
     return res
 
 def getGroupList1(conf,inputs,outputs):
+    import json
     d=getGroupList(conf,conf["main"]["dataPath"]+"/maps/project_"+inputs["name"]["value"]+".map")
     #print >> sys.stderr, recursGroupList1(d,"")
-    outputs["Result"]["value"]=str(d)
-    return 3
+    outputs["Result"]["value"]=json.dumps(d)
+    return zoo.SERVICE_SUCCEEDED
+
+def loadLegendMapfile(conf,inputs):
+    import math
+    import mapscript
+    mapPath=conf["main"]["dataPath"]+"/maps/"
+    if inputs.has_key("prefix"):
+	    if inputs["prefix"]["value"]=="indexes":
+		    try:
+			    open(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
+		    except:
+			    if inputs.has_key("orig"):
+				m=mapscript.mapObj(conf["main"]["dataPath"]+"/PostGIS/"+inputs["orig"]["value"]+"ds_ows.map")
+			    else:
+				m=mapscript.mapObj(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_Index"+conf["senv"]["last_index"]+".map")			    
+			    removeAllLayers(m,inputs["layer"]["value"])
+			    saveProjectMap(m,conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
+			    pass
+	    mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/"
+    #d=getGroupList(conf,mapPath+"project_"+inputs["name"]["value"]+".map")
+    if inputs.has_key("mmStep"):
+        try:
+            m=mapscript.mapObj(mapPath+"/timeline_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"]+"_step"+inputs["mmStep"]["value"]+".map")
+        except:
+            m=mapscript.mapObj(mapPath+"/timeline_Index"+conf["senv"]["last_index"]+"_indexes_view_idx"+conf["senv"]["last_index"]+"_step"+inputs["mmStep"]["value"]+".map")
+        inputs["isStep"]={"value": "true"}
+    else:
+        m=mapscript.mapObj(mapPath+"/project_"+inputs["name"]["value"]+".map")
+        l=m.getLayerByName(inputs["layer"]["value"])
+        if l.metadata.get("mmClass")=="tl":
+            m=mapscript.mapObj(mapPath+"/timeline_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step0.map")
+            inputs["isStep"]={"value": "true"}
+    print >> sys.stderr,mapPath+" \n\n project \n\n\n"
+    return m
+
+def createLegend0(conf,inputs,outputs):
+    import math
+    import mapscript
+    mapPath=conf["main"]["dataPath"]+"/maps/"
+    if inputs.has_key("prefix"):
+	    if inputs["prefix"]["value"]=="indexes":
+		    try:
+			    open(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
+		    except:
+			    if inputs.has_key("orig"):
+				m=mapscript.mapObj(conf["main"]["dataPath"]+"/PostGIS/"+inputs["orig"]["value"]+"ds_ows.map")
+			    else:
+				m=mapscript.mapObj(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_Index"+conf["senv"]["last_index"]+".map")			    
+			    removeAllLayers(m,inputs["layer"]["value"])
+			    saveProjectMap(m,conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
+			    pass
+	    mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/"
+    #d=getGroupList(conf,mapPath+"project_"+inputs["name"]["value"]+".map")
+    if inputs.has_key("mmStep"):
+	try:
+		m=mapscript.mapObj(mapPath+"/timeline_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"]+"_step"+inputs["mmStep"]["value"]+".map")
+	except:
+		m=mapscript.mapObj(mapPath+"/timeline_Index"+conf["senv"]["last_index"]+"_indexes_view_idx"+conf["senv"]["last_index"]+"_step"+inputs["mmStep"]["value"]+".map")
+	inputs["isStep"]={"value": "true"}
+    else:
+	m=mapscript.mapObj(mapPath+"/project_"+inputs["name"]["value"]+".map")
+	l=m.getLayerByName(inputs["layer"]["value"])
+	if l.metadata.get("mmClass")=="tl":
+		m=mapscript.mapObj(mapPath+"/timeline_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step0.map")
+		inputs["isStep"]={"value": "true"}
+    print >> sys.stderr,mapPath+" \n\n project \n\n\n"
+    i=0
+    inColor=""
+    outColor=""
+    oldM=m.clone()
+    mmClass=0
+    if inputs.keys().count("mmClass")>0:
+        mmClass=int(inputs["mmClass"]["value"])
+    mmStyle=0
+    if inputs.keys().count("mmStyle")>0:
+        mmStyle=int(inputs["mmStyle"]["value"])
+    i=m.numlayers-1
+    layers=[]
+    numClasses=1
+    while i >= 0:
+        if m.getLayer(i).name==inputs["layer"]["value"]:
+            if m.getLayer(i).getClass(mmClass) is not None:
+                if m.getLayer(i).getClass(mmClass).numstyles<=2:
+                    print >> sys.stderr,"Create new style for symbol fill"
+                    m.getLayer(i).getClass(mmClass).insertStyle(m.getLayer(i).getClass(mmClass).getStyle(0).clone())
+                ic=m.getLayer(i).getClass(mmClass).getStyle(mmStyle).color
+                oc=m.getLayer(i).getClass(mmClass).getStyle(mmStyle).outlinecolor
+                if m.getLayer(i).getClass(mmClass).numstyles>1:
+                    oc=m.getLayer(i).getClass(mmClass).getStyle(1).outlinecolor
+                numClasses=m.getLayer(i).numclasses
+                inColor='#%02x%02x%02x' % (ic.red,ic.green,ic.blue)
+                outColor='#%02x%02x%02x' % (oc.red,oc.green,oc.blue)
+        else:
+            m.removeLayer(i)
+        i-=1
+
+
+    ct=oldM.getLayer(0).connectiontype
+
+    #if oldM.getLayer(0).connectiontype!=mapscript.MS_WMS:
+    i=oldM.numlayers-1
+    #else:
+    #i=-1
+
+    while i >= 0 :
+        if oldM.getLayer(i).name==inputs["layer"]["value"]:
+            if oldM.getLayer(i).getClass(mmClass) is not None:
+                if oldM.getLayer(i).getClass(mmClass).numstyles<=2:
+                    print >> sys.stderr,"Create new style for symbol fill"
+                    oldM.getLayer(i).getClass(mmClass).insertStyle(oldM.getLayer(i).getClass(mmClass).getStyle(0).clone())
+
+                ic=oldM.getLayer(i).getClass(mmClass).getStyle(mmStyle).color
+                oc=oldM.getLayer(i).getClass(mmClass).getStyle(mmStyle).outlinecolor
+                if oldM.getLayer(i).getClass(mmClass).numstyles>1:
+                    oc=oldM.getLayer(i).getClass(mmClass).getStyle(1).outlinecolor
+                inColor='#%02x%02x%02x' % (ic.red,ic.green,ic.blue)
+                outColor='#%02x%02x%02x' % (oc.red,oc.green,oc.blue)
+            nbClasses=oldM.getLayer(i).numclasses-1
+            j=nbClasses
+            oldM.getLayer(i).setProjection("EPSG:4326")
+            layers+=[oldM.getLayer(i).clone()]
+            while j >= 0:
+                if j < nbClasses:
+                    layers+=[layers[0].clone()]
+                oldM.getLayer(i).setProjection("EPSG:4326")
+                if j!=mmClass:
+                    oldM.getLayer(i).removeClass(j)
+                else:
+                    oldM.getLayer(i).getClass(j).setExpression(None)
+                j-=1
+            k=0
+            for j in layers:
+                j.name+="_"+str(k+1)
+                j.metadata.set("ows_name",j.name)
+                #print >> sys.stderr,j.name
+                l=j.numclasses-1
+                while l >= 0:
+                    if l!=k:
+                        j.removeClass(l)
+                    else:
+                        j.getClass(l).setExpression(None)
+                    l-=1
+                #print >> sys.stderr,"INSERT Layer: "+j.name
+                oldM.insertLayer(j)
+                k+=1
+	i-=1 
+
+    layer=oldM.getLayerByName(inputs["layer"]["value"])
+    if layer is None:
+	    layer=oldM.getLayer(0)
+    layer.connection=None
+    layer.data=None
+    feature=mapscript.shapeObj(layer.type)
+    if layer.type==mapscript.MS_LAYER_POINT:
+	    feature=feature.fromWKT("POINT(3 3)")
+    elif layer.type==mapscript.MS_LAYER_LINE:
+	    feature=feature.fromWKT("LINESTRING(0 0,2 4,4 2,6 6)")
+    else:
+	    angle1=(2*math.pi)/5
+	    angle2=math.pi-((4*math.pi)/5)
+	    feature=feature.fromWKT("POLYGON((6 3,"+str(3+(3*math.cos(angle1)))+" "+str(3+(3*math.sin(angle1)))+","+str(3-(3*math.cos(angle2)))+" "+str(3+(3*math.sin(angle2)))+","+str(3-(3*math.cos(angle2)))+" "+str(3-(3*math.sin(angle2)))+","+str(3+(3*math.cos(angle1)))+" "+str(3-(3*math.sin(angle1)))+",6 3))")
+	    #if l.type==mapscript.MS_LAYER_RASTER:
+        #    feature=feature.fromWKT("POLYGON((5 1,5 5,1 5,1 1,5 1))")
+
+    layer.addFeature(feature)
+
+    if numClasses > 1:
+        i=numClasses
+        while i > 0:
+            #print >> sys.stderr,"Produce layer "+layer.name+"_"+str(i)
+            l=oldM.getLayerByName(layer.name+"_"+str(i))
+            l.connection=None
+            l.data=None
+            if l.type==mapscript.MS_LAYER_RASTER:
+                l.type=mapscript.MS_LAYER_POLYGON
+                feature=feature.fromWKT("POLYGON((5 1,5 5,1 5,1 1,5 1))")
+            l.addFeature(feature)
+            i-=1
+    layer.setExtent(-1,-1,-1,-1)
+    layer.setProjection("EPSG:4326")
+    
+    index=oldM.numlayers-1
+
+    while index >= 0:
+        l=oldM.getLayer(index)
+        #print >> sys.stderr,"LNAME 11 "+l.name+" == "+layer.name
+        if l is not None and l.name.count(layer.name)>0:
+            l.setExtent(-1,-1,1,1)
+            l.minscaledenom=-1
+            l.maxscaledenom=-1
+            l.labelminscaledenom=-1
+            l.labelmaxscaledenom=-1
+        else:
+            oldM.removeLayer(index)
+        index-=1
+
+    
+    mapfile0=mapPath+"/map4legend_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+".map"
+    mapfile1=mapPath+"/map4symbols_"+inputs["name"]["value"]+".map"
+    if inputs.has_key("mmStep"):
+	    mapfile0=mapPath+"/map4legend_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step"+inputs["mmStep"]["value"]+".map"
+	    mapfile1=mapPath+"/map4symbols_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step"+inputs["mmStep"]["value"]+".map"
+
+    saveProjectMap(oldM,mapfile0)
+    img_url=conf["main"]["mapserverAddress"]+"?map="+mapfile0+"&LAYERS="+inputs["layer"]["value"]+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=24&HEIGHT=24"
+    saveProjectMap(m,mapfile1)
+    if inputs["name"]["value"].count("grid_")>0:
+        m=mapscript.mapObj(mapfile1)
+    i=0
+    images=[]
+
+ 
+    if ct!=mapscript.MS_WMS:
+	    while i < m.getNumSymbols():
+		    m.symbolset.getSymbol(i)
+		    symb=m.symbolset.getSymbol(i)
+		    if symb.name is not None and symb.name.count('polygon_')==0:
+			    layer=mapscript.layerObj(m)
+			    layer.type=mapscript.MS_LAYER_POINT
+			    feature=mapscript.shapeObj(mapscript.MS_SHAPE_POINT)
+			    layer.addFeature(feature.fromWKT("POINT(0.001 0.001)"))
+			    layer.connection=None
+			    layer.name="Symbol_"+symb.name
+			    layer.data=None
+			    layer.tileitem=None
+			    layer.units=mapscript.MS_PIXELS
+			    layer.sizeunits=mapscript.MS_PIXELS
+			    layer.toleranceunits=mapscript.MS_PIXELS
+			    tmpClass=mapscript.classObj(layer)
+			    tmpClass.name="Symbol_"+symb.name+"0"
+			    tmpStyle=mapscript.styleObj(tmpClass)
+			    tmpStyle.updateFromString('STYLE COLOR 0 0 0 OUTLINECOLOR 225 225 225 SYMBOL "'+symb.name+'" SIZE 20 END')
+			    layer.status=True
+			    img_name="Symbol_"+symb.name+".png"
+			    m.setSize(24,24)
+			    m.setExtent(0,0,0.002,0.002)
+			    tmpImage=m.draw()#
+			    images+=[{"id": layer.name,"value": conf["main"]["mapserverAddress"]+"?map="+mapfile1+"&LAYERS="+layer.name+"&SRS=EPSG%3A4326&amp;FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&BBOX=0,0,0.002,0.002&WIDTH=24&HEIGHT=24&format=png"}]
+			    tmpImage=tmpClass.createLegendIcon(m,layer,24,24)
+            #print >> sys.stderr,tmpImage
+            #print >> sys.stderr,conf["main"]["dataPath"]+"/maps/"+img_name
+            #print >> sys.stderr,"Try to save"
+			    tmpImage.write(mapPath+"/"+img_name)
+		    i+=1
+
+    try:
+        inColor1=oldM.getLayerByName(inputs["layer"]["value"]).metadata.get("mmColor").split(" ")
+        #print >> sys.stderr,"InColor: "+str(inColor1)
+        outColor1=oldM.getLayerByName(inputs["layer"]["value"]).metadata.get("mmOutColor").split(" ")
+        #print >> sys.stderr,outColor1
+        inColor1='#%02x%02x%02x' % (int(inColor1[0]),int(inColor1[1]),int(inColor1[2]))
+        outColor1='#%02x%02x%02x' % (int(outColor1[0]),int(outColor1[1]),int(outColor1[2]))
+    except:
+        inColor1=None
+        outColor1=None
+
+
         
+    nameSpace = {'images': images, 'colors': [inColor,outColor,img_url,inColor1,outColor1]}
+    myLayer=m.getLayerByName(inputs["layer"]["value"])
+    processingDirective=""
+    if myLayer.type==mapscript.MS_LAYER_RASTER:
+        processingDirective=myLayer.getProcessing(0)
+        if processingDirective is not None:
+            processingDirective=processingDirective.replace("RESAMPLE=","")
+    label=None
+    litem=None
+    try:
+        labelLayer=myLayer
+        label=myLayer.getClass(0).getLabel(0)
+        litem=myLayer.labelitem
+    except:
+        try:
+            labelLayer=m.getLayerByName(inputs["layer"]["value"]+"_mmlabel").getClass(0)
+            label=labelLayer.getLabel(0)
+            litem=labelLayer.labelitem
+        except:
+            pass
+    gridInfo={}
+    if myLayer.name.count("grid_")>0:
+        gridInfo["labelFormat"]=myLayer.metadata.get('mmLabelFormat')
+        for j in ('Arcs','Interval','Subdivide'):
+            for i in ('min','max'):
+                gridInfo["symb_"+i+j]=myLayer.metadata.get("mm"+i+j)
+    labelInfo={}
+    if label is not None:
+        labelInfo["field"]=litem
+        labelInfo["afield"]=labelLayer.metadata.get("label_angle_field")
+        labelInfo["angle"]=label.angle
+        labelInfo["cleanSize"]=label.buffer
+        labelInfo["font"]=label.font.title()
+        labelInfo["size"]=label.size
+        labelInfo["color"]='#%02x%02x%02x' % (label.color.red,label.color.green,label.color.blue)
+        labelInfo["bufferSize"]=label.outlinewidth
+        labelInfo["bufferColor"]='%02x%02x%02x' % (label.outlinecolor.red,label.outlinecolor.green,label.outlinecolor.blue)
+        values=['ul','uc','ur','cl','cc','cr','ll','lc','lr']
+        from mapscript import MS_UL,MS_UC,MS_UR,MS_CL,MS_CC,MS_CR,MS_LL,MS_LC,MS_LR
+        msValues=[MS_UL,MS_UC,MS_UR,MS_CL,MS_CC,MS_CR,MS_LL,MS_LC,MS_LR]
+        for i in range(0,len(msValues)):
+            if label.position==msValues[i]:
+                labelInfo["position"]=values[i]
+    nameSpace["Style"]={
+        "numclasses": myLayer.numclasses,
+        "expr": myLayer.metadata.get("mmMExpr"),
+        "class": myLayer.metadata.get("mmClass"),
+        "class_field": myLayer.metadata.get("mmField"),
+        "discretisation": myLayer.metadata.get("mmMethod"),
+        "processing": processingDirective,
+        "label": labelInfo,
+        "grid": gridInfo,
+        "classes": []
+        }
+    mmStyle=0
+    import time
+
+    for i in range(0,myLayer.numclasses):
+        layerSuffix=""
+        if myLayer.numclasses>1:
+            layerSuffix="_"+str(i+1)
+        myClass=myLayer.getClass(i)
+        ic=myClass.getStyle(mmStyle).color
+        oc=myClass.getStyle(mmStyle).outlinecolor
+        styleStroke=0
+        
+        if inputs.has_key('mmStep'):
+            mapfile=mapPath+"/map4legend_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step"+inputs["mmStep"]["value"]+".map"
+        else:
+            mapfile=mapPath+"/map4legend_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+".map"
+        idStyle=0
+        style=[]
+        if myClass.numstyles>=1:
+            styleStroke=1
+            if myClass.numstyles>1:
+                oc=myClass.getStyle(1).outlinecolor
+                idStyle=1
+            for j in range(0,myClass.numstyles):
+                lic=myClass.getStyle(j).color
+                loc=myClass.getStyle(j).outlinecolor
+                style+=[{
+                    "symbol": myClass.getStyle(j).symbolname,
+                    "width": myClass.getStyle(j).width,
+                    "owidth": myClass.getStyle(j).outlinewidth,
+                    "size": myClass.getStyle(j).size,
+                    "gap": myClass.getStyle(j).gap,
+                    "fill": '#%02x%02x%02x' % (lic.red,lic.green,lic.blue),
+                    "stroke": '#%02x%02x%02x' % (loc.red,loc.green,loc.blue),
+                    }]
+        pattern=myLayer.metadata.get("mmPattern_"+str(i))
+        if myClass.getStyle(0).patternlength==0:
+            pattern=""
+        nameSpace["Style"]["classes"]+=[{
+            "name": myClass.name,
+            "fill": '#%02x%02x%02x' % (ic.red,ic.green,ic.blue),
+            "symbol": myClass.getStyle(0).symbolname,
+            "hatchAngle": myClass.getStyle(0).angle,
+            "hatchSize": myClass.getStyle(0).size,
+            "hatchWidth": myClass.getStyle(0).width,
+            "size": myClass.getStyle(0).size,
+            "width": myClass.getStyle(0).width,
+            "owidth": myClass.getStyle(0).outlinewidth,
+            "stroke": '#%02x%02x%02x' % (oc.red,oc.green,oc.blue),
+            "opacity": myClass.getStyle(0).opacity,
+            "pattern": pattern,
+            "expr": myClass.getExpressionString(),
+            "legend": conf["main"]["mapserverAddress"]+"?map="+mapfile+"&SERVICE=WMS&&version=1.0.0&request=Getmap&LAYERS="+myLayer.name+layerSuffix+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-0.2,-0.2,6.2,6.2&SRS=EPSG:4326&WIDTH=14&HEIGHT=14&mmtime"+str(time.time()),
+            "styles": style
+            }]
+        
+
+    res={}
+
+    m2=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["name"]["value"]+".map")
+    layer=m2.getLayerByName(inputs["layer"]["value"])
+
+    for i in ["default","click"]:
+        tmpl=conf["main"]["dataPath"]+"/templates/"+inputs["layer"]["value"]+"_"+inputs["name"]["value"]+"_tmpl.html"
+        if i=="click":
+            tmpl=conf["main"]["dataPath"]+"/templates/click_"+inputs["layer"]["value"]+"_"+inputs["name"]["value"]+"_tmpl.html"
+        try:
+            f=open(tmpl,"r")
+            nameSpace[i+"_tmpl"]=f.read().replace("<!-- MapServer Template -->\n","")
+        except:
+            nameSpace[i+"_tmpl"]=""
+    
+
+    nameSpace["name"]=layer.name
+    metadataKeys={
+        "title": "ows_title",
+        "abstract": "ows_abstract",
+        "keywords": "ows_keywordlist",
+        "fees": "ows_fees",
+        "query": "mmQuery",
+        "export": "mmExport",
+        "zfilter": "mmZFilter",
+        "zfilter_field": "mmZFilterField",
+        "filter": "mmFilter",
+        "filter_field": "mmFilterField",
+        "search": "mmSearch",
+        "search_field": "mmSearchField",
+        "squery": "mmSpatialQuery",
+        "squery_type": "mmSpatialQueryType",
+        "scaleMin": "mmMinScale",
+        "scaleMax": "mmMaxScale",
+        "labelMin": "mmLabelMinScale",
+        "labelMax": "mmLabelMaxScale",
+        "bands": "ows_bandnames",
+        "tiled": "mmTiled",
+        }
+    for i in metadataKeys.keys():
+        nameSpace[i]=layer.metadata.get(metadataKeys[i])
+    metadataKeys={
+        "mm_interval": "interval",
+        "Band1_interval": "band1",
+        "Band2_interval": "band2",
+        "Band3_interval": "band3",
+        "Band4_interval": "band4",
+        }
+    for i in metadataKeys.keys():
+        if layer.metadata.get(i) is not None:
+            tmpv=layer.metadata.get(i).split(" ")
+            nameSpace[metadataKeys[i]]=[float(tmpv[0]),float(tmpv[1])]
+    nameSpace["type"]=layer.type
+    nameSpace["connection"]=layer.connection
+    nameSpace["data"]=layer.data
+
+    import json
+    #nameSpace["properties"]=json.loads(outputs1["Result"]["value"])
+    saveProjectMap(m,mapfile1)
+    outputs["Result"]["value"]=json.dumps(nameSpace,ensure_ascii=False)
+    return zoo.SERVICE_SUCCEEDED
+
 def createLegend(conf,inputs,outputs):
+    import json
     print >>sys.stderr,"INPUTS "+str(inputs)
     import math
     import mapscript
@@ -1024,8 +1435,17 @@ def createLegend(conf,inputs,outputs):
         inColor1=None
         outColor1=None
 
-    nameSpace = {'conf': conf,'inputs': inputs, 'outputs': outputs, 'images': images, 'colors': [inColor,outColor,img_url,inColor1,outColor1],"m": m}
-
+    nameSpace = {'conf': conf,'inputs': inputs, 'outputs': outputs, 'images': images, 'colors': [inColor,outColor,img_url,inColor1,outColor1],"m":m}
+    #outputs1={"Result":{"value":""}}
+    #res=createLegend0(conf,inputs,outputs1)
+    #print >> sys.stderr,str(json.loads(outputs1["Result"]["value"]))
+    #print >> sys.stderr,nameSpace
+    #nameSpace=json.loads(outputs1["Result"]["value"])
+    #print >> sys.stderr,m
+    #myMap=loadLegendMapfile(conf,inputs)
+    #print >> sys.stderr,nameSpace
+    #print >> sys.stderr,myMap
+    #nameSpace["m"]=myMap
     if inputs.has_key("prefix"):
 	    if inputs.has_key("mmClass"):
 		    t = Template(file=conf["main"]["templatesPath"]+"/Manager/Styler/UniqSymb.tmpl",searchList=nameSpace)
@@ -1045,35 +1465,37 @@ def createLegend(conf,inputs,outputs):
 def listMap(conf,inputs,outputs):
     import os,glob,time
     import locale
+    import json
     res=[]
     prefix="";
     if inputs.keys().count("prefix")>0:
         prefix=inputs["prefix"]["value"]
     files = filter(os.path.isfile, glob.glob(conf["main"]["dataPath"]+"/"+prefix+"maps/" + "project_*.map"))
+
     if inputs.keys().count('orderList'):
         files.sort(key=lambda x: -os.path.getmtime(x))
     else:
         files.sort()
-    import json
+                
     for i in files:
-        print >> sys.stderr,"Project map "+str(i)
         i=i.replace(conf["main"]["dataPath"]+"/"+prefix+"maps/","").replace(conf["main"]["dataPath"]+"/"+prefix+"maps\\","")
         print >> sys.stderr,str(i)+' '+conf["main"]["dataPath"]+"/"+prefix+"maps/"+i
         if i!="project_Untitled_0.map":
             try:
-		    oloc=locale.getlocale(locale.LC_ALL)
-		    locale.setlocale(locale.LC_ALL,'')
-	    except:
-		    pass
-	    try:
-	    	mTime=time.strftime(conf["mm"]["dateFormat"].encode(locale.getlocale()[1]),time.localtime(os.path.getmtime(conf["main"]["dataPath"]+"/"+prefix+"maps/"+i))).decode(locale.getlocale()[1])
-	    except Exception,e:
-		mTime=time.strftime(conf["mm"]["dateFormat"].encode("utf-8"),time.localtime(os.path.getmtime(conf["main"]["dataPath"]+"/"+prefix+"maps/"+i))).decode("utf-8")
-            res+=[{"id": i.replace("project_","").replace(".map",""),"value": i, "mTime": mTime.encode('utf-8')}]
-	    try:
-		    locale.setlocale(locale.LC_ALL,oloc)
-	    except:
-		    pass
+                oloc=locale.getlocale(locale.LC_ALL)
+                locale.setlocale(locale.LC_ALL,'')
+            except:
+                pass
+            try:
+                mTime=time.strftime(conf["mm"]["dateFormat"].encode(locale.getlocale()[1]),time.localtime(os.path.getmtime(conf["main"]["dataPath"]+"/"+prefix+"maps/"+i)))
+            except Exception,e:
+                print >> sys.stderr,e
+                mTime=time.strftime(conf["mm"]["dateFormat"].encode("utf-8"),time.localtime(os.path.getmtime(conf["main"]["dataPath"]+"/"+prefix+"maps/"+i)))
+            res+=[{"id": i.replace("project_","").replace(".map",""),"value": i, "mTime": mTime}]
+            try:
+                locale.setlocale(locale.LC_ALL,oloc)
+            except:
+                pass
         print >> sys.stderr,str(i)+' '+str(i)
     outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
     return 3
@@ -1156,6 +1578,238 @@ def addGroup(conf,inputs,outputs):
     saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
     return 4
 
+def saveLayerStyle0(conf,inputs,outputs):
+    import mapscript
+    mapPath=conf["main"]["dataPath"]+"/maps"
+    if inputs.has_key("prefix"):
+	    mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps"
+    if inputs.has_key("mmStep"):
+	    m=mapscript.mapObj(mapPath+"/timeline_"+inputs["map"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step"+inputs["mmStep"]["value"]+".map")
+    else:
+	    m=mapscript.mapObj(mapPath+"/project_"+inputs["map"]["value"]+".map")
+    layer=m.getLayerByName(inputs["layer"]["value"])
+
+    try:
+        noColor=False
+        fillColor=None
+        strokeColor=None
+        if inputs.has_key("mmFill") and inputs["mmFill"]["value"]!="":
+            fillColor=[int(n, 16) for n in (inputs["mmFill"]["value"][:2],inputs["mmFill"]["value"][2:4],inputs["mmFill"]["value"][4:6])]
+        if inputs.has_key("mmStroke") and inputs["mmStroke"]["value"]!="":
+            strokeColor=[int(n, 16) for n in (inputs["mmStroke"]["value"][:2],inputs["mmStroke"]["value"][2:4],inputs["mmStroke"]["value"][4:6])]
+        if fillColor is None and strokeColor is None:
+            noColor=True
+        #layer.setMetaData("mmStrokeColor",inputs["mmStroke"]["value"])
+        #layer.setMetaData("mmFillColor",inputs["mmFill"]["value"])
+    except:
+        noColor=True
+
+    if inputs.keys().count("mmClass"):
+        nClass=int(inputs["mmClass"]["value"])
+    else:
+        nClass=0
+
+
+    print >> sys.stderr,"Edit the "+str(nClass)+" classe "
+    mmStyle=0
+    if inputs.keys().count("mmStyle")>0:
+        mmStyle=int(inputs["mmStyle"]["value"])
+        if layer.getClass(nClass).numstyles<=2:
+            print >> sys.stderr,"Create new style for symbol fill"
+            layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
+            layer.getClass(nClass).getStyle(2).angle=0
+
+    if layer.type==mapscript.MS_LAYER_POLYGON:
+        if inputs.keys().count('mmSymbolFill')==0 and \
+            inputs.keys().count("mmStyle")==0 and \
+            inputs.keys().count('mmHatchWidth')==0:
+            if layer.getClass(nClass).numstyles>1:
+                lStyle=layer.getClass(nClass).getStyle(0)
+                lStyle.angle=0
+                lStyle.size=-1
+                lStyle.symbol=0
+                lStyle.symbolname=None
+                lStyle.width=layer.getClass(nClass).getStyle(1).width
+                                        
+    if inputs.keys().count('mmSymbolFill')>0:
+        if layer.getClass(nClass).numstyles<=2:
+            layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
+            layer.getClass(nClass).getStyle(layer.getClass(nClass).numstyles-1).angle=0
+    else:
+        if layer.type==mapscript.MS_LAYER_POLYGON:
+            if inputs.keys().count("mmStyle")==0:
+                if layer.getClass(nClass).numstyles>2:
+                    layer.getClass(nClass).removeStyle(layer.getClass(nClass).numstyles-1)
+    if inputs.has_key("mmClassName") and layer.getClass(nClass) is not None:
+	    layer.getClass(nClass).name=inputs["mmClassName"]["value"]
+    if inputs.has_key("mmExpr"):
+	    layer.getClass(nClass).setExpression(inputs["mmExpr"]["value"])
+	    print >> sys.stderr,layer.getClass(nClass).getExpressionString()
+
+
+    print >> sys.stderr,"Edit the "+str(nClass)+" classe "+str(not(noColor))
+    if not(noColor):
+        layer.getClass(nClass).getStyle(mmStyle).opacity=int(inputs["mmOpacity"]["value"])
+        if inputs.keys().count('noFill') > 0 or inputs.keys().count('mmFill')==0:
+            layer.getClass(nClass).getStyle(mmStyle).color.setRGB(-1,-1,-1)
+        else:
+            setRGB(layer.getClass(nClass).getStyle(mmStyle).color,fillColor)
+            print >> sys.stderr,"Fill  "+str(fillColor)
+
+        if inputs.keys().count('noStroke') > 0 or inputs.keys().count('mmStroke')==0:
+            layer.getClass(nClass).getStyle(mmStyle).outlinecolor.setRGB(-1,-1,-1)
+        else:
+            setRGB(layer.getClass(nClass).getStyle(mmStyle).outlinecolor,strokeColor)
+            print >> sys.stderr,"Stroke "+str(strokeColor)
+    if inputs.keys().count("mmStrokeWidth") > 0  and inputs.keys().count('mmStroke')>0:
+        layer.getClass(nClass).getStyle(mmStyle).outlinewidth=float(inputs["mmStrokeWidth"]["value"])
+
+    if inputs.keys().count("force")>0:
+        layer.metadata.set("mmClass","us")
+        j=layer.numclasses-1
+        while j >= 0:
+            if j!=0:
+                layer.removeClass(j)
+            else:
+                if inputs.keys().count("mmExpr")==0:
+			layer.getClass(j).setExpression(None)
+		if inputs.keys().count('noFill')>0 or inputs.keys().count('mmFill')==0:
+                        layer.getClass(j).getStyle(mmStyle).color.setRGB(-1,-1,-1)
+		else:
+                        setRGB(layer.getClass(j).getStyle(mmStyle).color,fillColor)
+		if inputs.keys().count('noStroke') or inputs.keys().count('mmStroke')==0:
+                        layer.getClass(j).getStyle(mmStyle).outlinecolor.setRGB(-1,-1,-1)
+		else:
+                        setRGB(layer.getClass(j).getStyle(mmStyle).outlinecolor,strokeColor)
+            j-=1
+    if inputs.keys().count("mmSize"):
+        layer.getClass(nClass).getStyle(mmStyle).size=float(inputs["mmSize"]["value"])
+    if inputs.keys().count("mmAngle"):
+	try:
+		layer.getClass(nClass).getStyle(mmStyle).angle=float(inputs["mmAngle"]["value"])
+	except:
+		layer.getClass(nClass).getStyle(mmStyle).angle=inputs["mmAngle"]["value"]
+    if inputs.keys().count("mmSymb") > 0 and inputs["mmSymb"]["value"]!="":
+        layer.getClass(nClass).getStyle(mmStyle).symbolname=inputs["mmSymb"]["value"].replace("Symbol_","")
+        if inputs["mmSymb"]["value"]=="polygon_hatch":
+            print >> sys.stderr,"layer.getClass(nClass).numstyles 1 - "+str(layer.getClass(nClass).numstyles)
+            if layer.getClass(nClass).numstyles==1:
+                layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
+                print >> sys.stderr,"layer.getClass(nClass).numstyles 2 - "+str(layer.getClass(nClass).numstyles)
+
+            layer.getClass(nClass).getStyle(1).color.setRGB(-1,-1,-1)
+            layer.getClass(nClass).getStyle(1).symbol=0
+            layer.getClass(nClass).getStyle(1).angle=0
+            layer.getClass(nClass).getStyle(1).symbolname=None
+            layer.getClass(nClass).getStyle(1).size=-1
+            layer.getClass(nClass).getStyle(1).patternlength=0
+            print >> sys.stderr,"layer.getClass(nClass).numstyles 3 - "+str(layer.getClass(nClass).numstyles)
+            style=layer.getClass(nClass).getStyle(1)
+            setRGB(style.outlinecolor,strokeColor)
+    else:
+        if inputs.keys().count("mmSymb") > 0:
+            layer.getClass(nClass).getStyle(mmStyle).symbol=0
+            layer.getClass(nClass).getStyle(mmStyle).symbolname=None
+
+    if layer.type != mapscript.MS_LAYER_RASTER:
+        if inputs.keys().count('mmSymbolFill'):
+            myStyle=layer.getClass(nClass).getStyle(layer.getClass(nClass).numstyles-1)
+            myStyle.symbolname=inputs["mmSymbolFill"]["value"]
+            myStyle.size=float(inputs["mmSymbolSize"]["value"])
+            myStyle.width=float(inputs["mmSymbolWidth"]["value"])
+            fColor=[int(n, 16) for n in (inputs["mmSymbolFillColor"]["value"][:2],inputs["mmSymbolFillColor"]["value"][2:4],inputs["mmSymbolFillColor"]["value"][4:6])]
+            sColor=[int(n, 16) for n in (inputs["mmSymbolStrokeColor"]["value"][:2],inputs["mmSymbolStrokeColor"]["value"][2:4],inputs["mmSymbolStrokeColor"]["value"][4:6])]
+            setRGB(myStyle.color,fColor)
+            setRGB(myStyle.outlinecolor,sColor)
+            myStyle.gap=float(inputs["mmSymbolGap"]["value"])
+        if inputs.keys().count("mmStyle")==0:
+            if inputs.keys().count("pattern") > 0:
+                print >> sys.stderr,"PATTERN (" +inputs["pattern"]["value"]+")"
+                layer.getClass(nClass).getStyle(0).patternlength=0
+                layer.getClass(nClass).getStyle(0).linecap=mapscript.MS_CJC_BUTT
+                layer.setMetaData("mmPattern_"+str(nClass),inputs["pattern"]["value"])
+                layer.getClass(nClass).getStyle(0).updateFromString("STYLE PATTERN "+inputs["pattern"]["value"]+" END END")
+                if layer.type==mapscript.MS_LAYER_POLYGON:
+                    print >> sys.stderr,"NUMSTYLES "+str(layer.getClass(nClass).numstyles)
+                    if layer.getClass(nClass).numstyles==1:
+                        layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
+                    myStyle=layer.getClass(nClass).getStyle(1)
+                    layer.getClass(nClass).getStyle(0).outlinecolor.setRGB(-1,-1,-1)
+                    layer.getClass(nClass).getStyle(0).patternlength=0
+                    layer.getClass(nClass).getStyle(1).color.setRGB(-1,-1,-1)
+                    layer.getClass(nClass).getStyle(1).symbol=0
+                    layer.getClass(nClass).getStyle(1).angle=0
+                    layer.getClass(nClass).getStyle(1).symbolname=None
+                    layer.getClass(nClass).getStyle(1).size=-1
+                    layer.getClass(nClass).getStyle(1).patternlength=0
+                    layer.getClass(nClass).getStyle(1).updateFromString("STYLE PATTERN "+inputs["pattern"]["value"]+" END END")
+            else:
+                layer.getClass(nClass).getStyle(mmStyle).patternlength=0
+                layer.getClass(nClass).getStyle(mmStyle).linecap=mapscript.MS_CJC_ROUND
+                if layer.type==mapscript.MS_LAYER_POLYGON and layer.getClass(nClass).numstyles>1:
+                    if noColor:
+                        layer.getClass(nClass).removeStyle(1)
+                    else:
+                        layer.getClass(nClass).getStyle(1).patternlength=0
+                        layer.getClass(nClass).getStyle(1).linecap=mapscript.MS_CJC_ROUND
+    else:
+        if inputs.has_key("resm"):
+            updateProcessing(layer,inputs["resm"])
+        if layer.numclasses==0:
+            layer.opacity=int(inputs["mmOpacity"]["value"])
+	if inputs.keys().count("mmOffsite")>0:
+            layer.offsite.setHex("#"+inputs["mmOffsite"]["value"])
+	else:
+            layer.offsite.setRGB(-1,-1,-1)
+
+    if inputs.has_key("mmOpacity"):
+	layer.opacity=int(inputs["mmOpacity"]["value"])
+    if inputs.keys().count("mmGap") > 0 :
+        layer.getClass(nClass).getStyle(mmStyle).gap=float(inputs["mmGap"]["value"])
+    if inputs.keys().count("mmWidth") > 0 :
+        layer.getClass(nClass).getStyle(mmStyle).width=float(inputs["mmWidth"]["value"])
+        if layer.getClass(nClass).numstyles>1:
+            layer.getClass(nClass).getStyle(1).width=float(inputs["mmWidth"]["value"])
+            if inputs.keys().count("mmHatchWidth")>0:
+                layer.getClass(nClass).getStyle(0).width=float(inputs["mmHatchWidth"]["value"])
+
+    if ( inputs.keys().count('noStroke') or inputs.keys().count('mmStroke')==0 ) and layer.getClass(nClass).numstyles > 1:
+        layer.getClass(nClass).removeStyle(1)
+
+    if inputs.keys().count("noSymbolFill")>0 or inputs.keys().count('mmSymbolFill')==0:
+        if layer.getClass(nClass).numstyles>2:
+            layer.getClass(nClass).removeStyle(2)
+
+    m.web.metadata.set("wms_feature_info_mime_type","text/html")
+    if layer.name.count("grid_")>0:
+        layer.connectiontype=-1
+
+    if inputs.has_key("mmStep"):
+	    saveProjectMap(m,mapPath+"/timeline_"+inputs["map"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step"+inputs["mmStep"]["value"]+".map")
+    else:
+	    saveProjectMap(m,mapPath+"/project_"+inputs["map"]["value"]+".map")
+    outputs["Message"]["value"]=zoo._("Layer Style saved.")
+    import json
+    outputs["Result"]["value"]=json.dumps(getClassObject(conf,inputs,layer,layer.getClass(nClass),nClass))
+    outputs1={"Result": {"value": ""}}
+    inputs["name"]={"value":inputs["map"]["value"]}
+    createLegend(conf,inputs,outputs1)
+    if layer.type==mapscript.MS_LAYER_RASTER  and layer.numclasses>1:
+	    if layer.metadata.get("mmTiled") is not None:
+		    createColorRamp(conf,m,layer,int(layer.metadata.get("mmTiled")));
+	    else:
+		    createColorRamp(conf,m,layer);
+    try:
+	    if inputs.has_key("mmStep"):
+		    f = open(conf["main"]["publicationPath"]+'/styles/'+layer.name+'_'+conf["senv"]["last_map"]+"_step"+inputs["mmStep"]["value"]+"_sld.xml", 'w')
+	    else:
+		    f = open(conf["main"]["publicationPath"]+'/styles/'+layer.name+'_'+conf["senv"]["last_map"]+"_sld.xml", 'w')
+	    f.write(layer.generateSLD())
+	    f.close()
+    except:
+	    pass
+    return 3
+
 def saveLayerStyle(conf,inputs,outputs):
     import mapscript
     mapPath=conf["main"]["dataPath"]+"/maps"
@@ -1197,6 +1851,27 @@ def saveLayerStyle(conf,inputs,outputs):
             layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
             layer.getClass(nClass).getStyle(2).angle=0
 
+    if layer.type==mapscript.MS_LAYER_POLYGON:
+        if inputs.keys().count('mmSymbolFill')==0 and \
+            inputs.keys().count("mmStyle")==0 and \
+            inputs.keys().count('mmHatchWidth')==0:
+            if layer.getClass(nClass).numstyles>1:
+                lStyle=layer.getClass(nClass).getStyle(0)
+                lStyle.angle=0
+                lStyle.size=-1
+                lStyle.symbol=0
+                lStyle.symbolname=None
+                lStyle.width=layer.getClass(nClass).getStyle(1).width
+                                        
+    if inputs.keys().count('mmSymbolFill')>0:
+        if layer.getClass(nClass).numstyles<=2:
+            layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
+            layer.getClass(nClass).getStyle(layer.getClass(nClass).numstyles-1).angle=0
+    else:
+        if layer.type==mapscript.MS_LAYER_POLYGON:
+            if inputs.keys().count("mmStyle")==0:
+                if layer.getClass(nClass).numstyles>2:
+                    layer.getClass(nClass).removeStyle(layer.getClass(nClass).numstyles-1)
     if inputs.has_key("mmClassName") and layer.getClass(nClass) is not None:
 	    layer.getClass(nClass).name=inputs["mmClassName"]["value"]
     if inputs.has_key("mmExpr"):
@@ -1269,6 +1944,16 @@ def saveLayerStyle(conf,inputs,outputs):
             layer.getClass(nClass).getStyle(mmStyle).symbolname=None
 
     if layer.type != mapscript.MS_LAYER_RASTER:
+        if inputs.keys().count('mmSymbolFill'):
+            myStyle=layer.getClass(nClass).getStyle(layer.getClass(nClass).numstyles-1)
+            myStyle.symbolname=inputs["mmSymbolFill"]["value"]
+            myStyle.size=float(inputs["mmSymbolSize"]["value"])
+            myStyle.width=float(inputs["mmSymbolWidth"]["value"])
+            fColor=[int(n, 16) for n in (inputs["mmSymbolFillColor"]["value"][:2],inputs["mmSymbolFillColor"]["value"][2:4],inputs["mmSymbolFillColor"]["value"][4:6])]
+            sColor=[int(n, 16) for n in (inputs["mmSymbolStrokeColor"]["value"][:2],inputs["mmSymbolStrokeColor"]["value"][2:4],inputs["mmSymbolStrokeColor"]["value"][4:6])]
+            setRGB(myStyle.color,fColor)
+            setRGB(myStyle.outlinecolor,sColor)
+            myStyle.gap=float(inputs["mmSymbolGap"]["value"])
         if inputs.keys().count("mmStyle")==0:
             if inputs.keys().count("pattern") > 0:
                 print >> sys.stderr,"PATTERN (" +inputs["pattern"]["value"]+")"
@@ -1335,7 +2020,7 @@ def saveLayerStyle(conf,inputs,outputs):
 	    saveProjectMap(m,mapPath+"/timeline_"+inputs["map"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step"+inputs["mmStep"]["value"]+".map")
     else:
 	    saveProjectMap(m,mapPath+"/project_"+inputs["map"]["value"]+".map")
-    outputs["Result"]["value"]="Layer Style saved."
+    outputs["Result"]["value"]=zoo._("Layer Style saved.")
     outputs1={"Result": {"value": ""}}
     inputs["name"]={"value":inputs["map"]["value"]}
     createLegend(conf,inputs,outputs1)
@@ -1453,8 +2138,432 @@ def createColorRamp(conf,m,layer,useTile=0):
     else:
 	    l.data=value
     m2.save(conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+".map")
+
     
 
+def getClassObject(conf,inputs,myLayer,myClass,index):
+    import time
+
+    mapPath=conf["main"]["dataPath"]+"/maps"
+    if inputs.has_key('prefix'):
+	    mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps"
+    mapfile=mapPath+"/project_"+inputs["map"]["value"]+".map"
+
+    if inputs.has_key('mmStep'):
+        mapfile=mapPath+"/map4legend_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step"+inputs["mmStep"]["value"]+".map"
+    else:
+        mapfile=mapPath+"/map4legend_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+".map"
+
+    
+    layerSuffix=""
+    if myLayer.numclasses>1:
+        layerSuffix="_"+str(index+1)
+
+    ic=myClass.getStyle(0).color
+    oc=myClass.getStyle(0).outlinecolor
+    styleStroke=0        
+    idStyle=0
+    style=[]
+    if myClass.numstyles>=1:
+        styleStroke=1
+        ic=myClass.getStyle(0).color
+        oc=myClass.getStyle(0).outlinecolor
+        if myClass.numstyles>1:
+            oc=myClass.getStyle(1).outlinecolor
+            idStyle=1
+        for j in range(0,myClass.numstyles):
+            lic=myClass.getStyle(j).color
+            loc=myClass.getStyle(j).outlinecolor
+            style+=[{
+                "symbol": myClass.getStyle(j).symbolname,
+                "width": myClass.getStyle(j).width,
+                "owidth": myClass.getStyle(j).outlinewidth,
+                "size": myClass.getStyle(j).size,
+                "gap": myClass.getStyle(j).gap,
+                "fill": '#%02x%02x%02x' % (lic.red,lic.green,lic.blue),
+                "stroke": '#%02x%02x%02x' % (loc.red,loc.green,loc.blue),
+                }]
+    pattern=myLayer.metadata.get("mmPattern_"+str(index))
+    if myClass.getStyle(0).patternlength==0:
+        pattern=""
+    return {
+        "name": myClass.name,
+        "fill": '#%02x%02x%02x' % (ic.red,ic.green,ic.blue),
+        "symbol": myClass.getStyle(0).symbolname,
+        "hatchAngle": myClass.getStyle(0).angle,
+        "hatchSize": myClass.getStyle(0).size,
+        "hatchWidth": myClass.getStyle(0).width,
+        "size": myClass.getStyle(0).size,
+        "width": myClass.getStyle(0).width,
+        "owidth": myClass.getStyle(0).outlinewidth,
+        "stroke": '#%02x%02x%02x' % (oc.red,oc.green,oc.blue),
+        "opacity": myClass.getStyle(0).opacity,
+        "pattern": pattern,
+        "expr": myClass.getExpressionString(),
+        "legend": conf["main"]["mapserverAddress"]+"?map="+mapfile+"&SERVICE=WMS&&version=1.0.0&request=Getmap&LAYERS="+myLayer.name+layerSuffix+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-0.2,-0.2,6.2,6.2&SRS=EPSG:4326&WIDTH=14&HEIGHT=14&mmtime"+str(time.time()),
+        "styles": style
+        }
+
+def getLayerStylesArray(conf,inputs,myLayer):
+    import mapscript,time
+    res={}
+    processingDirective=""
+    mapPath=conf["main"]["dataPath"]+"/maps"
+    if inputs.has_key('prefix'):
+	    mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps"
+    mapfile=mapPath+"/project_"+inputs["map"]["value"]+".map"
+    
+    if myLayer.type==mapscript.MS_LAYER_RASTER:
+        processingDirective=myLayer.getProcessing(0)
+        if processingDirective is not None:
+            processingDirective=processingDirective.replace("RESAMPLE=","")
+            
+    res["Style"]={
+        "numclasses": myLayer.numclasses,
+        "expr": myLayer.metadata.get("mmMExpr"),
+        "class": myLayer.metadata.get("mmClass"),
+        "class_field": myLayer.metadata.get("mmField"),
+        "discretisation": myLayer.metadata.get("mmMethod"),
+        "processing": processingDirective,
+        "classes": []
+        }
+    for i in range(0,myLayer.numclasses):
+        myClass=myLayer.getClass(i)
+        res["Style"]["classes"]+=[getClassObject(conf,inputs,myLayer,myClass,i)]
+    return res
+
+def classifyMap0(conf,inputs,outputs):
+    import mapscript
+    import sqlite3
+    import time
+    import json
+    import sys
+    import classifier.service as cs
+    #try:
+    mapPath=conf["main"]["dataPath"]+"/maps"
+    if inputs.has_key('prefix'):
+	    mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps"
+    mapfile=mapPath+"/project_"+inputs["map"]["value"]+".map"
+
+    isStep=False
+    if inputs .has_key("mmStep"):
+	    m=mapscript.mapObj(mapfile)
+	    l=m.getLayerByName(inputs["layer"]["value"])
+	    l.metadata.set("mmClass","tl")
+	    saveProjectMap(m,mapfile)
+	    mapfile=mapPath+"/timeline_"+inputs["map"]["value"]+"_"+l.name.replace(".","_")+"_step"+inputs["mmStep"]["value"]+".map"
+	    isStep=True
+    m=mapscript.mapObj(mapfile)
+    m1=m.clone()
+    #sys.path+=["../"]
+    #print >> sys.stderr,sys.path
+    import vector_tools.vectSql as vt
+    layer=m.getLayerByName(inputs["layer"]["value"])
+    #print >> sys.stderr,layer
+
+
+    if layer.encoding is None:
+        layer.encoding="utf-8"
+
+    layer.metadata.set("mmField",inputs["field"]["value"])
+    layerName=inputs["layer"]["value"]
+    if inputs.has_key("formula") and inputs["layer"]["value"].count("indexes.") and not(inputs.has_key("noDataUpdate") and inputs["noDataUpdate"]["value"]):
+	layer.metadata.set("mmFormula",inputs["formula"]["value"])
+	import authenticate.service as auth
+	con=auth.getCon(conf)
+	cur=con.conn.cursor()
+	cid=inputs["layer"]["value"].replace("indexes.view_idx","")
+	ocid=cid
+	if inputs.has_key("mmStep"):
+		cid+="_"+inputs["mmStep"]["value"]
+	try:
+		cur.execute("DROP VIEW indexes.view_idx_"+cid)
+	except Exception,e:
+		print >> sys.stderr,e
+		con.conn.commit()
+	try:
+		con.conn.commit()
+		cur.execute("CREATE VIEW indexes.view_idx_"+cid+" AS (SELECT ogc_fid,wkb_geometry,"+(inputs["formula"]["value"].replace("[_X_]",inputs["field"]["value"]))+" as "+inputs["field"]["value"]+" from indexes.view_idx"+ocid+")")
+		layer.data="indexes.view_idx_"+cid
+		layerName=layer.data
+	except Exception,e:
+		print >> sys.stderr,e
+		con.conn.commit()
+	con.conn.commit()
+
+    cond=""
+    if inputs.keys().count("mmMExpr")>0 and inputs["mmMExpr"]["value"]!="":
+	    cond=" WHERE "+inputs["mmMExpr"]["value"].replace("\"[","").replace("]\"","")
+	    cond=cond.replace("[","").replace("]","")
+    lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layerName+" "+cond+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
+
+    rClass=False
+    if layer.metadata.get("mmMethod"):
+	    layer.metadata.remove("mmMethod")
+    if inputs.has_key("type"):
+	if inputs.has_key("method") and conf["main"].has_key("Rpy2") and conf["main"]["Rpy2"]=="true":
+		lInputs1={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT "+inputs["field"]["value"]+" as val FROM "+layerName}}
+		vt.vectInfo(conf,lInputs,outputs)
+		ll=json.loads(outputs["Result"]["value"])
+		vals=[]
+		for i in range(0,len(ll)):
+			for j in ll[i]:
+				vals+=[ll[i][j]]
+		try:
+			classif=json.loads(cs._discretise(vals,inputs["nbClasses"]["value"],inputs["method"]["value"]))
+		except Exception,e:
+			conf["lenv"]["message"]=str(e)
+			return zoo.SERVICE_FAILED
+		layer.metadata.set("mmMethod",inputs["method"]["value"])
+		rClass=True
+		print >> sys.stderr,"OKOK\n\n"
+		print >> sys.stderr,classif
+        if inputs["type"]["value"]=="gs":
+            lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT MIN("+inputs["field"]["value"]+") as min, MAX("+inputs["field"]["value"]+") as max FROM "+layerName}}
+
+    #print >> sys.stderr,lInputs
+    output1={"Result": {"value":""}}
+    isRaster=-1
+    try:
+	if not(rClass):
+		print >> sys.stderr,"OK"
+                print >> sys.stderr,lInputs
+		vt.vectInfo(conf,lInputs,outputs)
+		print >> sys.stderr,"OK"
+		#print >> sys.stderr,outputs["Result"]["value"]
+	tmp=eval(outputs["Result"]["value"])
+    except Exception,e:
+        try:
+	    k=inputs.keys()
+	    print >> sys.stderr,e.message
+	    print >> sys.stderr,"/ERROR"
+	    
+	    if inputs["mmType"]["value"]!="uniqVal":
+		    if k.count("min")==0 :
+			    import osgeo.gdal
+			    d=osgeo.gdal.Open(layer.data)
+			    b=d.GetRasterBand(int(inputs["field"]["value"]))
+			    layer.clearProcessing()
+			    layer.setProcessing("BAND="+inputs["field"]["value"])
+			    tmp=[{"min": b.GetMinimum(),"max": b.GetMaximum()}]
+		    else:
+			    tmp=[{"min": inputs["min"]["value"],"max": inputs["max"]["value"]}]
+			    layer.metadata.set("mm_interval",inputs["min"]["value"]+" "+inputs["max"]["value"])
+	    else:
+		    import osgeo.gdal
+		    import sys
+		    import math
+		    d=osgeo.gdal.Open(layer.data)
+		    xsize = d.RasterXSize
+		    ysize = d.RasterYSize
+		    print >> sys.stderr,inputs["field"]["value"]
+		    b=d.GetRasterBand(int(inputs["field"]["value"]))
+		    raster = b.ReadAsArray( )
+		    print >> sys.stderr,raster
+		    count = {}
+		    tmp=[]
+		    for col in range( xsize ):
+			    for row in range( ysize ):
+				    cell_value = raster[row, col]
+				    if math.isnan(cell_value):
+					    cell_value = 'Null'
+					    
+				    # add cell_value to dictionary
+				    try:
+					    count[cell_value] += 1
+				    except:
+					    count[cell_value] = 1
+					    tmp+=[{"pixel": cell_value}]
+		    sorted(tmp, key=lambda x: x["pixel"])
+		    layer.clearProcessing()
+		    layer.setProcessing("BAND="+inputs["field"]["value"])
+		    #tmp=[{"min": b.GetMinimum(),"max": b.GetMaximum()}]
+		    #print >> sys.stderr,tmp
+		    
+            inputs["field"]["value"]="pixel"
+            isRaster=1
+        except Exception, e:
+            conf["lenv"]["message"]=zoo._("Unable to classify using this raster band.")+str(e)
+            return zoo.SERVICE_FAILED
+
+    if inputs.has_key("resm"):
+        updateProcessing(layer,inputs["resm"])
+
+    i=layer.numclasses-1
+    while i >= 0:
+        layer.removeClass(i)
+        i-=1
+
+    i=0
+    if inputs.keys().count("mmType")>0:
+        if inputs["mmType"]["value"]=="uniqVal":
+            layer.metadata.set("mmClass","uv")
+        elif inputs["mmType"]["value"]=="gradSymb":
+            layer.metadata.set("mmClass","gs")
+        else:
+            layer.metadata.set("mmClass","cc")
+    else:
+        layer.metadata.set("mmClass","uv")
+
+    
+    lOutputs={"Result": {"value": ""}}
+    #print >> sys.stderr,inputs
+    sr=eval('0x'+inputs["from"]["value"][:2])
+    sg=eval('0x'+inputs["from"]["value"][2:4])
+    sb=eval('0x'+inputs["from"]["value"][4:6])
+    er=eval('0x'+inputs["to"]["value"][:2])
+    eg=eval('0x'+inputs["to"]["value"][2:4])
+    eb=eval('0x'+inputs["to"]["value"][4:6])
+    layer.metadata.set("mmColor",str(sr)+" "+str(sg)+" "+str(sb)+" ")
+    layer.metadata.set("mmOutColor",str(er)+" "+str(eg)+" "+str(eb)+" ")
+    try:
+	    nbClasses=len(tmp)
+    except:
+	    pass
+    colspan=0
+    if inputs.keys().count("nbClasses")>0:
+        nbClasses=int(inputs["nbClasses"]["value"])
+        #print >> sys.stderr,"Colspan: "+str(tmp[0])
+	try:
+		colspan=(float(tmp[0]["max"])-float(tmp[0]["min"]))/float(nbClasses)
+	except:
+		pass
+    if rClass:
+	    nbClasses=len(classif)
+
+
+    cs.write_png_in_mem(lOutputs, 1, nbClasses, cs.gradient([
+                (1.0, (sr, sg, sb), (er, eg, eb)),
+                ]))
+	#cs._discretise()
+    #print >> sys.stderr, lOutputs
+    #print >> sys.stderr, lOutputs["Result1"]["value"]
+
+    tmpColor=lOutputs["Result1"]["value"]
+    l=m.getLayerByName(layer.name)
+
+
+    #if l.type==mapscript.MS_LAYER_RASTER and nbClasses>1:
+    #	    color_file=open(conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr","w+")
+
+    while i < nbClasses:
+	try:
+		tmpClass=mapscript.classObj(layer)
+		tmpClass.name="Class_"+str(i)
+		
+		style=mapscript.styleObj(tmpClass)
+
+		style.color.red=tmpColor[i][0]
+		style.color.green=tmpColor[i][1]
+		style.color.blue=tmpColor[i][2]
+		
+		style.outlinecolor.red=tmpColor[i][0]
+		style.outlinecolor.green=tmpColor[i][1]
+		style.outlinecolor.blue=tmpColor[i][2]
+
+		style.opacity=int(inputs["mmOpacity"]["value"])
+
+		if layer.type==mapscript.MS_LAYER_POINT:
+			style.size=15
+			style.symbolname="circle"
+        
+			#print >> sys.stderr,"Keys: "+str(inputs.keys().count("nbClasses"))
+        
+		layer.metadata.set("mmName",inputs["field"]["value"])
+		try:
+			minVal=int(tmp[0]["min"])
+		except:
+			try:
+				minVal=float(tmp[0]["min"])
+			except:
+				
+				pass
+
+		precond=""
+		if inputs.keys().count("mmMExpr") > 0:
+			precond=" AND "+inputs["mmMExpr"]["value"]+" "
+			layer.metadata.set("mmMExpr",inputs["mmMExpr"]["value"])
+		else:
+			try:
+				layer.metadata.remove("mmMExpr")
+			except:
+				pass
+		if inputs.keys().count("nbClasses")>0:
+			if rClass:
+				if i==0:
+					tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) '+precond+' )')
+				else:
+					tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] > '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) '+precond+' )')
+			elif i==0:
+				tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(minVal+(colspan*i))+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(minVal+(colspan*(i+1)))+' ) '+precond+' )')
+			else:
+				tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] > '+str(minVal+(colspan*i))+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(minVal+(colspan*(i+1)))+' ) '+precond+' )')
+                
+		else:
+			for j in tmp[i]:
+				try:
+					if j=="pixel":
+						tmpClass.setExpression('( ['+j+'] = '+str(tmp[i][j])+' '+precond+' )')
+					else:
+						try:
+							tmpClass.setExpression('( ['+j+'] = '+str(int(tmp[i][j]))+' '+precond+' )')
+						except:
+							tmpClass.setExpression('( "['+j+']" = '+json.dumps(tmp[i][j])+' '+precond+' )')
+				except Exception,e:
+					print >> sys.stderr,e
+					iEnc=layer.encoding
+					oEnc=m.web.metadata.get("ows_encoding")
+					tmpClass.setExpression('( "['+j+']" = "'+tmp[i][j].decode(oEnc).encode(iEnc)+'" '+precond+' )')
+				print >> sys.stderr,tmpClass.getExpressionString()
+				if inputs.has_key("mmFAS") and inputs["mmFAS"]["value"]=="true":
+					try:
+						style.size=eval(inputs["mmFASF"]["value"].replace(j,tmp[i][j]));
+						layer.metadata.set("mmFAS","true")
+						layer.metadata.set("mmFASF",inputs["mmFASF"]["value"])
+					except Exception,e:
+						print >> sys.stderr,e
+				else:
+					try:
+						layer.metadata.remove("mmFAS")
+						layer.metadata.remove("mmFASF")
+					except:
+						pass
+				layer.metadata.set("mmName",tmp[i][j])
+				tmpClass.name=tmp[i][j]
+	except Exception,e:
+		#print >> sys.stderr,e
+		pass
+        i+=1
+    if l.type==mapscript.MS_LAYER_RASTER  and nbClasses>1:
+	    if inputs.keys().count("tiled"):
+		    l.metadata.set("mmTiled",inputs["tiled"]["value"])
+		    createColorRamp(conf,m,l,int(inputs["tiled"]["value"]));
+	    else:
+		    try:
+			    l.metadata.remove("mmTiled")
+		    except:
+			    pass
+		    createColorRamp(conf,m,l);
+    inputs["name"]=inputs["map"]
+    if inputs.keys().count("mmType")>0:
+        nameSpace={"conf": conf, "inputs": inputs, "outputs": outputs, "m": m, "mmType": inputs["mmType"]["value"]}
+    else:
+        nameSpace={"conf": conf, "inputs": inputs, "outputs": outputs, "m": m, "mmType": "uniqVal"}
+    #t=Template(file=conf["main"]["templatesPath"]+"/Manager/Styler/ClassLegend.tmpl",searchList=nameSpace)
+    #outputs["Result"]["value"]=t.__str__()
+    outputs["Message"]["value"]=zoo._("Layer classified")
+    import json
+    outputs["Result"]["value"]=json.dumps(getLayerStylesArray(conf,inputs,l))
+    saveProjectMap(m,mapfile)
+    print >> sys.stderr,isRaster < 0
+    #if isRaster < 0:
+    inputs1=inputs
+    inputs1["name"]=inputs["map"]
+    outputs1={"Result": {"value": ""}}
+    createLegend0(conf,inputs1,outputs1)
+    return zoo.SERVICE_SUCCEEDED
+
+    
 def classifyMap(conf,inputs,outputs):
     import mapscript
     import sqlite3
@@ -2095,7 +3204,10 @@ def setMapLayerProperties(conf,inputs,outputs):
 		    except:
 			    pass
     l.metadata.set("mmSpatialQuery",inputs["sq"]["value"])
-    l.metadata.set("mmSpatialQueryType",inputs["sqt"]["value"])
+    if inputs.keys().count("sqf")>0:
+        l.metadata.set("mmSpatialQueryType",inputs["sqf"]["value"])
+    else:
+        l.metadata.set("mmSpatialQueryType",inputs["sqt"]["value"])
     l.metadata.set("ows_abstract",urllib.unquote(inputs["ab"]["value"]))
     l.metadata.set("ows_keywordlist",urllib.unquote(inputs["kl"]["value"]))
     l.metadata.set("ows_fees",urllib.unquote(inputs["f"]["value"]))
@@ -2235,12 +3347,39 @@ def removeLayer(conf,inputs,outputs):
     return 3
 
 def setLayerScale(conf,inputs,outputs):
+    if inputs["st"].keys().count("isArray"):        
+        for i in range(0,len(inputs["st"]["value"])):
+            input0={}
+            for j in inputs:
+                if j!="st" and j!="sv":
+                    input0[j]=inputs[j]
+            print >> sys.stderr,str(inputs)
+            print >> sys.stderr,i
+            output1=outputs
+            #switch inputs["st"]["value"][i]:
+            input0["st"]={"value":inputs["st"]["value"][i][:3].title()}
+            input0["sv"]={"value":inputs["sv"]["value"][i]}
+            if inputs["st"]["value"][i][3:]=="Display":
+                res=_setLayerScale(conf,input0,outputs)
+            else:
+                res=setLayerLabelScale(conf,input0,outputs)
+        return res
+    else:
+        return _setLayerScale(conf,inputs,outputs)
+    
+def _setLayerScale(conf,inputs,outputs):
     import mapscript
     m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
     i=0
     while i < m.numlayers:
         if m.getLayer(i).name==inputs["layer"]["value"]:
-            m.getLayer(i).metadata.set("mm"+inputs["st"]["value"]+"Scale",str(int(float(inputs["sv"]["value"]))))
+            if int(float(inputs["sv"]["value"]))!=-1:
+                m.getLayer(i).metadata.set("mm"+inputs["st"]["value"]+"Scale",str(int(float(inputs["sv"]["value"]))))
+            else:
+                try:
+                    m.getLayer(i).metadata.remove("mm"+inputs["st"]["value"]+"Scale")
+                except:
+                    pass
             if inputs["st"]["value"]=="Min":
                 m.getLayer(i).minscaledenom=int(float(inputs["sv"]["value"]))
             else:
@@ -2258,7 +3397,13 @@ def setLayerLabelScale(conf,inputs,outputs):
     i=0
     while i < m.numlayers:
         if m.getLayer(i).name==inputs["layer"]["value"]:
-            m.getLayer(i).metadata.set("mmLabel"+inputs["st"]["value"]+"Scale",str(int(float(inputs["sv"]["value"]))))
+            if int(float(inputs["sv"]["value"]))!=-1:
+                m.getLayer(i).metadata.set("mmLabel"+inputs["st"]["value"]+"Scale",str(int(float(inputs["sv"]["value"]))))
+            else:
+                try:
+                    m.getLayer(i).metadata.remove("mmLabel"+inputs["st"]["value"]+"Scale")
+                except:
+                    pass
             if inputs["st"]["value"]=="Min":
                 m.getLayer(i).labelminscaledenom=int(float(inputs["sv"]["value"]))
             else:
@@ -2283,8 +3428,58 @@ def saveMapFor(conf,inputs,outputs):
     outputs["Result"]["value"]=zoo._("Map saved")
     return 3
 
+def doGroupLists0(mmGroups,layers,groups,i):
+    print >> sys.stderr, "groups"
+    print >> sys.stderr, groups
+    print >> sys.stderr, "groups"
+    if groups.keys().count("children") > 0:
+        if mmGroups[i]=='':
+            mmGroups[i]=groups["id"]
+        else:
+            if mmGroups[i].count(";")>0:
+                mmGroups[i]+=groups["id"]
+            else:
+                mmGroups[i]+=","+groups["id"]
+        for j in range(0,len(groups["children"][0])):
+            doGroupLists0(mmGroups,layers,groups["children"][0][j],i+1)
+        if i == 1 and mmGroups[i+1][len(mmGroups[i+1])-1]!=';':
+            mmGroups[i+1]+=',|'+groups["id"]+";"
+            print >> sys.stderr,mmGroups[i+1]
+    else:
+        tmp=mmGroups[i-1].split(',')
+        if tmp[len(tmp)-1].count(";"):
+            tmp[len(tmp)-1]=tmp[len(tmp)-1].split(";")[1]
+        layers+=[{"name": groups["id"], "group": tmp[len(tmp)-1]}]
+
+def updateMapOrder0(conf,inputs,outputs):    
+    import mapscript,json
+    mmGroups=['','','']
+    layers=[]
+
+    print >> sys.stderr,json.loads(inputs["jsonStr"]["value"])[0]
+    doGroupLists0(mmGroups,layers,json.loads(inputs["jsonStr"]["value"])[0],0)
+    print >> sys.stderr,str(mmGroups)
+    print >> sys.stderr,str(layers)
+    m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+    i=0
+    order=0
+    while i < 3:
+        m.web.metadata.set("mm_group_"+str(i),mmGroups[i])
+        i+=1
+    for a in layers:
+        l=m.getLayerByName(a["name"])
+        if l is not None:
+            l.setMetaData("mm_group",a["group"])
+            l.setMetaData("mm_order",str(order))
+        order+=1
+    saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+    outputs["Result"]["value"]=zoo._("Map saved")
+    return 3
+
 def doGroupLists(mmGroups,layers,groups,i):
-    #print >> sys.stderr, i
+    print >> sys.stderr, "groups"
+    print >> sys.stderr, groups
+    print >> sys.stderr, "groups"
     if groups.keys().count("children") > 0:
         if mmGroups[i]=='':
             mmGroups[i]=groups["id"]
@@ -2305,15 +3500,17 @@ def doGroupLists(mmGroups,layers,groups,i):
         layers+=[{"name": groups["id"], "group": tmp[len(tmp)-1]}]
 
 def updateMapOrder(conf,inputs,outputs):    
-    import mapscript
+    import mapscript,json
     mmGroups=['','','']
     layers=[]
 
-    doGroupLists(mmGroups,layers,eval(inputs["jsonStr"]["value"])[0],0)
+    print >> sys.stderr,json.loads(inputs["jsonStr"]["value"])[0]
+    doGroupLists(mmGroups,layers,json.loads(inputs["jsonStr"]["value"])[0],0)
     print >> sys.stderr,str(mmGroups)
     print >> sys.stderr,str(layers)
     m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
     i=0
+    order=0
     while i < 3:
         m.web.metadata.set("mm_group_"+str(i),mmGroups[i])
         i+=1
@@ -2321,6 +3518,8 @@ def updateMapOrder(conf,inputs,outputs):
         l=m.getLayerByName(a["name"])
         if l is not None:
             l.setMetaData("mm_group",a["group"])
+            l.setMetaData("mm_order",str(order))
+        order+=1
     saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
     outputs["Result"]["value"]=zoo._("Map saved")
     return 3
@@ -2589,7 +3788,7 @@ def savePublishMap(conf,inputs,outputs):
     mapfile=conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map"
     destMapfile=mapfile.replace("maps","public_maps")
     m = mapscript.mapObj(mapfile)
-    args=["mmPopupList","mmWindowList","mmProjectName","mmTitle","mmKeywords","mmAuthor","mmCopyright","mmRestricted","mmMBaseLayers","mmPBaseLayers","mmProprietaryBaseLayers","mmOSMBaseLayers","mmActivatedBaseLayers","mmBAK","mmOT","mmVT","mmNav","mmBProject","mmRenderer","default_minx","default_maxx","default_miny","default_maxy","max_minx","max_miny","max_maxx","max_maxy","mmActivatedLayers","layout_t","mmProjectName","vectorLayers","rasterLayers","mmLayoutColor","base_osm","tuom","tprj","fsize","ffamily","font-colorpicker"]
+    args=["mmPopupList","mmWindowList","mmProjectName","mmTitle","mmKeywords","mmAuthor","mmCopyright","mmRestricted","mmMBaseLayers","mmPBaseLayers","mmProprietaryBaseLayers","mmOSMBaseLayers","mmActivatedBaseLayers","mmBAK","mmOT","mmVT","mmNav","mmBProject","mmRenderer","default_minx","default_maxx","default_miny","default_maxy","max_minx","max_miny","max_maxx","max_maxy","mmActivatedLayers","layout_t","mmProjectName","vectorLayers","rasterLayers","mmLayoutColor","base_osm","tuom","tprj","fsize","ffamily","font-colorpicker","mmLSPos","mmLSAct"]
     isPassed=-1
     for i in args:
         if inputs.keys().count(i)>0:
@@ -2616,13 +3815,13 @@ def savePublishMap(conf,inputs,outputs):
             except:
                 pass
 
-
     if inputs.has_key("mmDescription"):
 	    import time,random
 	    cid=time.clock()+random.randrange(100000)
 	    cid=str(cid).split(".")[0]
 	    open(conf["main"]["tmpPath"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html","w").write(inputs["mmDescription"]["value"].replace("&39;","&#39;"))
 	    m.web.metadata.set("ows_abstract",conf["main"]["tmpUrl"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html")
+    print >> sys.stderr,"OK "
 	    
     if inputs.has_key("mm_access_groups"):
 	    if inputs["mm_access_groups"].has_key("length"):
@@ -2644,7 +3843,7 @@ def savePublishMap(conf,inputs,outputs):
 		    m.web.metadata.set("mm_themes_class",tmpS)
 	    else:
 		    m.web.metadata.set("mm_themes_class",inputs["mm_themes_class"]["value"])
-
+        
     minScales=inputs["minScales"]["value"].split(',')
     maxScales=inputs["maxScales"]["value"].split(',')
     lminScales=inputs["lminScales"]["value"].split(',')
@@ -3049,3 +4248,38 @@ def setDefaultExtent(conf,inputs,outputs):
 	outputs["Result"]["value"]=zoo._("Default extent set.")
 	return zoo.SERVICE_SUCCEEDED
 
+def getFullLayerProperties(conf,inputs,outputs):
+    import mapscript,mm_access,json
+    res={}
+    m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+    if not(mm_access.checkLayerPriv(conf,m,inputs["layer"]["value"],"rwx")):
+        conf["lenv"]["message"]=zoo._("You're not allowed to access this layer")
+        return zoo.SERVICE_SUCCEEDED
+    layer=m.getLayerByName(inputs["layer"]["value"])
+    res["name"]=layer.name
+    metadataKeys={
+        "title": "ows_title",
+        "keywords": "ows_keywordlist",
+        "fees": "ows_fees",
+        "query": "mmQuery",
+        "export": "mmExport",
+        "zfilter": "mmZFilter",
+        "zfilter_field": "mmZFilterField",
+        "filter": "mmFilter",
+        "filter_field": "mmFilterField",
+        "search": "mmSearch",
+        "search_field": "mmSearchField",
+        "squery": "mmSpatialQuery",
+        "squery_type": "mmSpatialQueryType",
+        "scaleMin": "mmMinScale",
+        "scaleMax": "mmMaxScale",
+        "labelMin": "mmLabelMinScale",
+        "labelMax": "mmLabelMaxScale",
+        }
+    for i in metadataKeys.keys():
+        res[i]=layer.metadata.get(metadataKeys[i])
+    res["type"]=layer.type
+    res["connection"]=layer.connection
+    res["data"]=layer.data
+    outputs["Result"]["value"]=json.dumps(res)
+    return zoo.SERVICE_SUCCEEDED

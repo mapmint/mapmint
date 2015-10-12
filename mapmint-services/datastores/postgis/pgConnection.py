@@ -332,5 +332,11 @@ def testDesc(val,desc):
             tmp=val.split("/")
             return "'"+tmp[2]+"-"+tmp[1]+"-"+tmp[0]+"'"
         else:
-            return val
+            if desc.count("geometry")>0:
+                if val!='NULL':
+                    return "'"+val+"'"
+                else:
+                    return val
+            else:
+                return val
 

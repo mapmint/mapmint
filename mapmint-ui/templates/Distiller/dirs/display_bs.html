@@ -1,0 +1,53 @@
+#import zoo
+#import datastores.directories.service as ds
+#import os
+#import mm_access 
+
+#set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
+#include $tmpl
+#set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
+
+#def listDir($conf,$dir)
+#if $mm_access.checkDataStorePriv($conf,$dir,"rx")
+#set res=ds.mmListDir($dir)
+#for i in $res
+#if $os.path.isdir(os.path.join($dir,$i))
+    <div class="form-group">
+      <div class="col-sm-9 ">
+	<i class="fa fa-arrow-right fa-fw"></i>
+	<input type="radio" name="browse" value="$os.path.join($dir,$i)" />
+	$i
+      </div>
+    </div>
+    $listDir($conf,os.path.join($dir,$i))
+#end if		
+#end for
+#end if    
+#end def
+
+
+<div>
+  <h2>$zoo._("Add new directory")</h2>
+  <form class="form-horizontal mtpp" action="" method="#" >
+    $ftmpl.printLine({"id":"name","name":$zoo._("Name")})
+    <div class="form-group">
+      <label class="col-sm-3 control-label">$zoo._("Directory")</label>
+      <div class="col-sm-9 ">
+	<input type="radio" name="Distiller.form.type" id="Distiller.form.type" onclick="\$(this).parent().parent().next().hide();\$(this).parent().parent().next().next().show();" value="use" checked="checked"/>$zoo._("Browse")
+	<input type="radio" name="Distiller.form.type"
+  id="Distiller.form.type" value="new"
+  onclick="\$(this).parent().parent().next().show();\$(this).parent().parent().next().next().hide();"
+  />$zoo._("New")
+      </div>
+    </div>
+    $ftmpl.printLine({"id":"path","name":$zoo._("Path"),"classe":"collapse"})
+    <div class="form-group">
+      <label class="col-sm-3 control-label">$zoo._("Path")</label>
+      <div class="col-sm-9 ">
+#set dir=$conf["main"]["dataPath"]+"/ftp/"
+       $listDir($conf,$dir)
+      </div>
+    </div>
+    $ftmpl.printButton({"id":"add","name":$zoo._("Add")}) 
+  </form>
+</div>

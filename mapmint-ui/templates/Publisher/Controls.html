@@ -1,0 +1,66 @@
+#encoding UTF-8
+#import zoo
+
+#if $m.web.metadata.get('mmNav')
+#set mmNav=$m.web.metadata.get('mmNav').split(',')
+#else
+#set mmNav=[]
+#end if
+#if $m.web.metadata.get('mmOT')
+#set mmOT=$m.web.metadata.get('mmOT').split(',')
+#else
+#set mmOT=[]
+#end if
+
+#set tn=$conf["navbar"]["name"].split(',')
+#set tv=$conf["navbar"]["id"].split(',')
+
+<form class="form-horizontal mtpp" method="get" >
+  <h1> <i class="fa fa-gear"></i> $zoo._("Controls")</h1>
+  <div class="row">
+    <label class="col-sm-3 control-label">$zoo._("Navigation Toolbar")</label>
+    <div class="col-sm-9 range">
+      <select id="mmNav" multiple class="form-control">
+	<option value="-1" #if len(mmNav)==0 or $mmNav.count("-1")#selected="true"#end if#>None</option>
+#for i in range(0,len(tv))
+	<option value="$tv[$i]" #if $mmNav.count($tv[$i])#selected="selected"#end if#>$zoo._($tn[$i])</option>
+#end for	
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <label class="col-sm-3 control-label">$zoo._("Other Tools")</label>
+    <div class="col-sm-9 range">
+      <select id="mmOT" multiple class="form-control">
+	<option value="-1" #if len(mmOT)==0 or $mmOT.count("-1")#selected="true"#end if#>$zoo._("None")</option>
+#set otids=$conf["othertools"]["ids"].split(',')
+#set otnames=$conf["othertools"]["names"].split(',')
+#for i in range(0,len(otids))
+	<option value="$otids[$i]" #if $mmOT.count($otids[$i])>0#selected="selected"#end if#>$zoo._($otnames[$i])</option>
+#end for
+      </select>
+    </div>
+  </div>
+#if $m.web.metadata.get('mmVT')
+#set mmVT=$m.web.metadata.get('mmVT').split(',')
+#else
+#set mmVT=[]
+#end if
+
+#set toolbars=$conf["mm"]["toolbars"].split(',')
+#for i in range(0,len($toolbars))
+  <div class="row">
+    <label class="col-sm-3 control-label">$zoo._($toolbars[$i])</label>
+    <div class="col-sm-9 range">
+      <select id="mmVT" multiple class="form-control">
+#set items=$conf["mm"][$toolbars[$i].lower()+"Toolbar"].split(',')
+#set items_alias=$conf["mm"][$toolbars[$i].lower()+"ToolbarAlias"].split(',')
+	    <option value="-1" #if len(mmVT)==0 or $mmVT.count("-1")#selected="true"#end if#>None</option>
+#for j in range(0,len($items))
+	    <option value="$items[$j]" #if $mmVT.count($items[$j])>0#selected="true"#end if#>$items_alias[$j]</option>
+#end for
+      </select>
+    </div>
+  </div>
+#end for  
+</form>    

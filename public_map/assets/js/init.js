@@ -52,7 +52,9 @@ define([
 
 
     function setTreeHeight(){
-	var theight= $("html").height() - $('.navbar-header').height() - (2*$('.nav-tabs').height()) - $('#mmcdts').height() - 30;
+	console.log("************ Tree view height !!!!!!");
+	console.log($(window).height()- $('.navbar-header').height() - (2*$('.nav-tabs').height()) - $('#mmcdts').height() - 30);
+	var theight= $(window).height() - ((3*$('.navbar-header').height()) + $('#mmcdts').height() + 30);
 	$('.baselayers,.tree-container,.info-container,.sources-container').height(theight);
     }
 

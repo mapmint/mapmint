@@ -24,13 +24,13 @@ $Template(file=$conf["main"]["templatesPath"]+$page,searchList=$nameSpace)
 <meta name="description" content="mapmint,webgis,app" /> 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" /> 
 <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
-<link rel="stylesheet" href="css/ol.css">
-<link rel="stylesheet" href="css/fonts.css">
-<link rel="stylesheet" href="css/bootstrap.min.css" />
-<link rel="stylesheet" href="css/bootstrap-slider.css">
-<link rel="stylesheet" href="css/context.bootstrap.css">
-<link rel="stylesheet" href="assets/css/bootstrap-window.css">
-<link rel="stylesheet" type="text/css" href="assets/css/bootstrap-select.min.css"/>
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/ol.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/fonts.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/bootstrap.min.css" />
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/bootstrap-slider.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/context.bootstrap.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-window.css">
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-select.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.2.0/css/colReorder.dataTables.min.css"/>
@@ -40,9 +40,9 @@ $Template(file=$conf["main"]["templatesPath"]+$page,searchList=$nameSpace)
 <link rel="stylesheet"
 href="https://cdn.datatables.net/r/dt/dt-1.10.8,b-1.0.0,b-colvis-1.0.0,cr-1.2.0,r-1.0.7,se-1.0.0/datatables.min.css"/>
 -->
-<link rel="stylesheet" href="css/mapmint-default.css">
-<link rel="stylesheet" href="css/mapmint-layout.css">
-<link rel="stylesheet" href="css/mapmint-map.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-default.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-layout.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-map.css">
 <link rel="stylesheet" href="./index_css_bs" type="text/css" />
 <style>
 
@@ -59,8 +59,64 @@ href="https://cdn.datatables.net/r/dt/dt-1.10.8,b-1.0.0,b-colvis-1.0.0,cr-1.2.0,
 <script src="js/ie/excanvas.js">
 </script> <![endif]-->
 </head>
-
 <body>
+
+
+#def printWrapper()
+ <div id="main-wrapper" class="col-md-9">
+  <div id="main">
+    <a href="#" data-toggle="tooltip" data-placement="right" title="Show" class="op"><i class="i i-arrow-right4"></i></a>
+    <div id="map"></div>
+    <div id="gmap"></div>
+  </div>
+  <div id="table-wrapper" class="fixed-bottom collapse">
+   <div class="switch">
+   <ul id="mmm_table-wrapper-header" class="nav nav-tabs">
+   <li class="pull-right">
+     <a href="#" data-toggle="collapse" title="Hide" class="btn-default hidden-xs" data-target="#table-wrapper">
+       <i class="i i-arrow-down4"></i>
+     </a>
+   </li>
+   </ul>
+   </div>
+   <div class="well well-table">
+   <h3>
+   <span id="mmm_table-wrapper-header-title-pre">$zoo._("Table:")</span>
+   <span id="mmm_table-wrapper-header-title"></span>
+   <span class="pull-right">
+   <div class="btn-group" role="group" aria-label="...">
+      <button href="#" class="btn btn-default table-toggle grey require-select" title="$zoo._("Zoom to selected elements")" rel="tooltip" href="#" data-toggle="zoomToElement"> <i class="icon-search"></i></button>
+      <div class="btn-group dropdown">
+      <button href="#" class="btn btn-default table-toggle grey require-select" title="Export" rel="tooltip" href="#" data-toggle="dropdown" data-mapaction="export" "> <i class="fa fa-share"></i></button>
+      <ul id="exportFormats" class="dropdown-menu pull-right padd">
+      <li>
+       	 <form id="formLExport"> 
+	 <div>Format: 
+	 <select id="sSelectedFormat" class="selectpicker">
+          <option value="application/vnd.google-earth.kml">Vector File (KML)</option>
+          <option value="application/shp+zip">Vector File (Shapefile)</option>
+          <option value="text/csv">Attributes File (CSV)</option>
+         </select>
+	 </div>
+	 <div>
+      	 <button href="#" class="btn btn-default table-toggle grey" title="Export" rel="tooltip" href="#" data-toggle="dropdown" data-mapaction="export" "> <i class="fa fa-share"></i> Export</button>
+	 </div>
+	 </form>
+	 </li>
+       </ul>
+      </div>
+      <button href="#" class="btn btn-default table-toggle grey" title="Close" rel="tooltip" href="#" data-toggle="remove"> <i class="fa fa-close"></i></button>
+   </div>
+   </span>
+   </h3>
+   <div id="mmm_table-wrapper-container" class="tab-content">
+   </div>
+   </div>
+  </div>
+ </div>
+#end def
+
+
 #if m.web.metadata.get("mmTitle") is not None and m.web.metadata.get("mmTitle")!=""
 #set title=m.web.metadata.get("mmTitle")
 #else
@@ -74,91 +130,17 @@ href="https://cdn.datatables.net/r/dt/dt-1.10.8,b-1.0.0,b-colvis-1.0.0,cr-1.2.0,
     </button>
     <span class="navbar-brand" href="#">$title</span>
   </div>
- #set searchList=[{"m": $m}, {"tmpl": "fullscreen"},{"conf": $conf},{"inputs":$inputs}]
+#set searchList=[{"m": $m}, {"tmpl": "fullscreen"},{"conf": $conf},{"inputs":$inputs}]
 #from Cheetah.Template import Template
 $(Template(file=$conf["main"]["templatesPath"]+"/preview/toolbar_bs.tmpl",searchList=$searchList))
-<!--
-  <nav class="collapse navbar-collapse">
-    <ul class="nav navbar-nav toolbar">
-      <li data-toggle="tooltip" data-placement="bottom" title="$zoo._("Zoom by rectangle")">
-       <a href="#" class="ol-zoombox"><i class="icon-search"></i><b class="ncaret"></b></a>
-      </li>
-      <li class="dropdown" data-toggle="tooltip" data-placement="left" title="Geolocation">
-       <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="i i-compass"></i><b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a href="#"><i class="icon-location-2"></i> My position</a></li>
-          <li><a href="#"><i class="fa fa-play"></i> Track my position</a></li>
-        </ul>
-      </li>
-      <li class="dropdown"  data-toggle="tooltip" data-placement="left" title="Query">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="i i-arrow-up-left2"></i><b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a href="#"><i class="i i-check"></i> Query by rectangle</a></li>
-          <li><a href="#"><i class="i i-circle-o"></i> Query by circle</a></li>
-        </ul>
-      </li>
-      <li data-toggle="tooltip" data-placement="bottom" title="Elevation profile">
-       <a href="#"><i class="fa fa-area-chart"></i><b class="ncaret"></b></a>
-      </li>
-      <li class="dropdown" data-toggle="tooltip" data-placement="left" title="Measure">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-ruler"></i><b class="caret"></b></a>
-        <ul class="dropdown-menu pers">
-          <li><a href="#">Distance</a></li>
-          <li><a href="#">Area</a></li>
-        </ul>
-      </li>
-      <li class="dropdown" data-toggle="tooltip" data-placement="left" title="Share map">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="i i-share3"></i><b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a href="#"><i class="fa fa-link"></i> Permalink</a></li>
-          <li><a href="#"><i class="fa fa-code"></i> Embbed</a></li>
-          <li><a href="#"><i class="fa fa-twitter-square"></i> Twitter</a></li>
-          <li><a href="#"><i class="fa fa-facebook-square"></i> Facebook</a></li>
-        </ul>
-      </li>
-      <li data-toggle="tooltip" data-placement="bottom" title="Print">
-       <a href="#"><i class="fa fa-print"></i><b class="ncaret"></b></a>
-      </li>
-    </ul>
-    <div class="col-sm-3 col-md-3">
-      <form class="navbar-form" role="search">
-       <div class="input-group">
-       <div class="input-group-btn search-panel">
-	 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-	  <span id="search_concept">Layer</span> <span class="caret"></span>
-	 </button>
-	 <ul class="dropdown-menu" role="menu">
-	   <li><a href="#">...</a></li>
-	   <li><a href="#">...</a></li>
-	 </ul>
-       </div>
-       <input type="hidden" name="search_param" value="all" id="search_param" />         
-       <input type="text" class="form-control" id="x" name="x" placeholder="Search..." />
-       <span class="input-group-btn">
-       <button class="btn btn-default" type="button"><span class="icon-search"></span></button>
-       </span>
-       </div>
-      </form>
-    </div>
-    <ul class="nav navbar-nav pull-right">
-      <li>
-       <a href="#" data-toggle="tooltip" data-placement="bottom" title="Home"><i class="icon-home"></i></a>
-      </li>
-      <li class="dropdown" data-toggle="tooltip" data-placement="left" title="Login">
-       <a href="#" id="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i><b class="caret"></b></a>
-       <ul class="dropdown-menu pull-right padd">
-	 <form class="navbar-form" id="formLogin"> 
-	  <input name="username" id="username" class="form-control mb" type="text" placeholder="Username"> 
-	  <input name="password" id="password" class="form-control mb"  type="password" placeholder="Password"><br>
-	  <button type="button" id="btnLogin" class="btn btn-default">Login</button>
-	 </form>
-       </ul>
-     </li>
-   </ul>
-   </nav>
-   -->
  </div>
  <div id="wrapper">
+
+#if $m.web.metadata.get("mmLSPos")=="Right"
+$(printWrapper())
+#end if
+
+
   <div id="sidebar-wrapper" class="col-md-3 fill">
    <div id="sidebar" class="fill">
     <div role="tabpanel" class="fill">
@@ -229,6 +211,12 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/toolbar_bs.tmpl",search
  </div> 
  </div>
  </div>
+
+#if $m.web.metadata.get("mmLSPos")=="Left"
+$(printWrapper())
+#end if
+
+
  </div>
 
  <div id="context-menu" style="display:none"> 
@@ -243,13 +231,6 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/toolbar_bs.tmpl",search
        <option value="ESRI Shapefile">Vector File (Shapefile)</option>
        <option value="CSV">Attributes File (CSV)</option>
       </select>
-<!--
-      <select id="sGSelectedFormat" class="selectpicker">
-       <option value="application/vnd.google-earth.kml">Vector File (KML)</option>
-       <option value="application/shp+zip">Vector File (Shapefile)</option>
-       <option value="text/csv">Attributes File (CSV)</option>
-      </select>
--->
      </form>
     </a>
     </li>
@@ -264,59 +245,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/toolbar_bs.tmpl",search
   </ul>
  </div>
 
- <div id="main-wrapper" class="col-md-9 pull-right">
-  <div id="main">
-    <a href="#" data-toggle="tooltip" data-placement="right" title="Show" class="op"><i class="i i-arrow-right4"></i></a>
-    <div id="map"></div>
-    <div id="gmap"></div>
-  </div>
-  <div id="table-wrapper" class="fixed-bottom collapse">
-   <div class="switch">
-   <ul id="mmm_table-wrapper-header" class="nav nav-tabs">
-   <li class="pull-right">
-     <a href="#" data-toggle="collapse" title="Hide" class="btn-default hidden-xs" data-target="#table-wrapper">
-       <i class="i i-arrow-down4"></i>
-     </a>
-   </li>
-   </ul>
-   </div>
-   <div class="well well-table">
-   <h5>
-   <span id="mmm_table-wrapper-header-title-pre">$zoo._("Table:")</span>
-   <span id="mmm_table-wrapper-header-title"></span>
-   <span class="pull-right">
-   <div class="btn-group" role="group" aria-label="...">
-      <button href="#" class="btn btn-default table-toggle grey require-select" title="$zoo._("Zoom to selected elements")" rel="tooltip" href="#" data-toggle="zoomToElement"> <i class="icon-search"></i></button>
-      <div class="btn-group dropdown">
-      <button href="#" class="btn btn-default table-toggle grey require-select" title="Export" rel="tooltip" href="#" data-toggle="dropdown" data-mapaction="export" "> <i class="fa fa-share"></i></button>
-      <ul id="exportFormats" class="dropdown-menu pull-right padd">
-      <li>
-       	 <form id="formLExport"> 
-	 <div>Format: 
-	 <select id="sSelectedFormat" class="selectpicker">
-          <option value="application/vnd.google-earth.kml">Vector File (KML)</option>
-          <option value="application/shp+zip">Vector File (Shapefile)</option>
-          <option value="text/csv">Attributes File (CSV)</option>
-         </select>
-	 </div>
-	 <div>
-      	 <button href="#" class="btn btn-default table-toggle grey" title="Export" rel="tooltip" href="#" data-toggle="dropdown" data-mapaction="export" "> <i class="fa fa-share"></i> Export</button>
-	 </div>
-	 </form>
-	 </li>
-       </ul>
-      </div>
-      <button href="#" class="btn btn-default table-toggle grey" title="Close" rel="tooltip" href="#" data-toggle="remove"> <i class="fa fa-close"></i></button>
-   </div>
-   </span>
-   </h5>
-   <div id="mmm_table-wrapper-container" class="tab-content">
-   </div>
-   </div>
-  </div>
- </div>
-
-<script data-main="assets/js/cfg" src="$conf["main"]["publicationUrl"]/assets/js/lib/require.js"></script>
+<script data-main="$conf["main"]["publicationUrl"]/assets/js/cfg" src="$conf["main"]["publicationUrl"]/assets/js/lib/require.js"></script>
 
  <script type="template/text" id="printtab_loading_bg_template">
   <div>

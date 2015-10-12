@@ -1,0 +1,29 @@
+#import zoo
+#import mm_access
+#import mapscript
+#if $inputs.has_key("dataStore")
+#import datastores.service as ds
+#set m=mapscript.mapObj(ds.getPath($conf,$inputs["dataStore"]["value"])+"ds_ows.map")
+#else
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$conf["senv"]["last_map"]+".map")
+#end if
+#set inputs1=$inputs
+#set $inputs1["prefix"]={"value":"layer_","dataType":"string"}
+<div id="datasourcePrivileges">
+#if ($inputs.has_key("dataStore") and $mm_access.checkDataSourcePriv($conf,$m,$inputs["dataStore"]["value"],$inputs["layer"]["value"],"rwx")) or not($inputs.has_key("dataStore"))
+<form>
+<div>
+$(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/GroupList_bs.html",searchList={"conf": $conf,"prefix":"","m": $m,"inputs": $inputs1}))
+</div>
+<div>
+<input type="hidden" id="am_layerName" value="$inputs["layer"]["value"]" />
+#if $inputs.has_key("dataStore")
+<input type="hidden" id="am_dataStoreName" value="$inputs["dataStore"]["value"]" />
+#end if
+<button class="btn btn-default" value="" onclick="return false">$zoo._("Valid")</button>
+</div>
+</form>
+#else
+<div class="errormsg">$zoo._("You don't have permission to access this ressource !")</div>
+#end if
+</div>

@@ -1,0 +1,22 @@
+#import zoo
+
+#set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
+#include $tmpl
+#set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
+
+<div id="database_add">
+  <h2>$zoo._("Add Database")</h2>
+  <div>
+    <form class="form-horizontal mtpp" method="get" >
+    $ftmpl.printLine({"id":"name","name":$zoo._("Name")})
+    $ftmpl.printLine({"id":"host","name":$zoo._("Host")})
+    $ftmpl.printLine({"id":"port","name":$zoo._("Port")})
+    $ftmpl.printLine({"id":"user","name":$zoo._("Login")})
+    $ftmpl.printLine({"id":"password","name":$zoo._("Password"),"type":"password"})
+    $ftmpl.printLine({"id":"type","name":$zoo._("Type"),"type":"select","options":["PostGIS","MySQL"]})
+    $ftmpl.printLine({"id":"dbname","name":$zoo._("Database")})
+    $ftmpl.printButton({"id":"test","name":$zoo._("Test")}) 
+    $ftmpl.printButton({"id":"add","name":$zoo._("Add")}) 
+    </form>
+  </div>
+</div>

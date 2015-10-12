@@ -1,0 +1,27 @@
+#encoding UTF-8
+#import zoo
+var zooUrl="$conf["main"]["serverAddress"]";
+#if $conf["mm"].keys().count("indexes")>0 and $conf["mm"]["indexes"]=="true"
+var hasIIndexes=true;
+#else
+var hasIIndexes=false;
+#end if
+#if $conf.keys().count("senv")>0
+var mapfile="$conf["main"]["dataPath"]/public_maps/project_$(conf["senv"]["last_map"]).map";
+#end if
+#if $conf["main"].keys().count("dbuserName")>0
+var dbuser="$conf["main"]["dbuserName"]";
+#end if
+#import authenticate.service as auth
+var prefix="$(auth.getPrefix($conf))";
+var dataPath="$conf["main"]["dataPath"]";
+var mapUrl="$conf["main"]["mapserverAddress"]";
+var public_map_url="$conf["main"]["publicationUrl"]";
+var dbuserName="$conf["main"]["dbuserName"]";
+var indexMap="$conf["main"]["dataPath"]/PostGIS/$(conf["main"]["dbuserName"])ds_ows.map";
+var tmpPath="$conf["main"]["tmpPath"]";
+var tmpUrl="$conf["main"]["tmpUrl"]";
+#if $conf.has_key("senv") and $conf["senv"].has_key("last_index")
+var initialIndex=$conf["senv"]["last_index"];
+#end if
+

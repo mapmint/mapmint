@@ -1,0 +1,8 @@
+#encoding UTF-8
+#import zoo
+<div class="warning">
+  <h1>$zoo._("Do you really want to remove") $conf["senv"]["last_map"] ?</h1>
+  <p>$zoo._("Once removed, you cannot access the project anymore. You cannot recover a removed project. Deleting a project may destroy important data and make other projects unstable.")</p>
+  <a href="#" onclick="removePublishedMap()" class="mmbutton ui-state-default ui-corner-all">$zoo._("Yes")</a>
+  <a href="#" onclick="\$('#confirmRemoveProject').window('close');"  class="mmbutton ui-state-default ui-state-default ui-corner-all">$zoo._("No")</a>
+</div>

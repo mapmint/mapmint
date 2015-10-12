@@ -1,0 +1,67 @@
+.dataTables_wrapper .dataTables_paginate .paginate_button{
+    padding: 0;
+}
+
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
+}
+
+ul.draggable li{
+    cursor: "pointer";
+}
+
+ul.draggable li.placeholder {
+  position: relative;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  margin-bottom: -1px;
+  /** More li styles **/
+}
+
+ul.draggable li.placeholder:before {
+  position: absolute;
+  content: ">";
+  /** Define arrowhead **/
+}
+
+#dashUsers .tab-pane{
+    display: none;
+}
+
+#dashUsers .tab-pane.active{
+    display: block;
+}
+
+i{
+    font-style: unset;
+}
+
+[class*=" mif-"], [class^="mif-"] {
+    vertical-align: unset;
+}
+
+.ds_um_groups_f .col-sm-1, .ds_um_groups_f .col-sm-2, .ds_um_groups_f .col-sm-3, .ds_um_groups_f .col-sm-4, .ds_um_groups_f .col-sm-5, .ds_um_groups_f .col-sm-6, .ds_um_groups_f .col-sm-7, .ds_um_groups_f .col-sm-8, .ds_um_groups_f .col-sm-9, .ds_um_groups_f .col-sm-10, .ds_um_groups_f .col-sm-11, .ds_um_groups_f .col-sm-12{
+    align-content: center; 
+    text-align: center;
+}
+
+.symbol-up {
+    color: #b4b4b4;
+    display: inline-block;
+    margin-left: -1.28571em;
+    margin-right: -1.28571em;
+    margin-top: 0;
+    position: relative;
+}
+
+.symbol-multi{
+    position: relative; 
+    display: inline-flex; 
+    width: 1.28571em;
+}

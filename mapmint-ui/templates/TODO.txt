@@ -1,0 +1,24 @@
+
+1) base layers (done)
+
+2) settings
+
+3) privileges (done)
+
+4) create tileindex
+
+db access
+
+symbol gesture
+
+mozaic a set of images
+
+add data
+
+routing
+
+indicateurs
+
+tests
+
+fix font content

@@ -1,0 +1,168 @@
+#encoding UTF-8
+#import zoo
+
+#def printTabHeader(id,title,font,classe)
+<li role="presentation" #if $classe is not None#class="$classe"#end if#>
+  <a id="$(id)_Toggler" href="#$id" aria-controls="home" role="tab" data-toggle="tab">
+    <i class="fa $font fa-fw"></i>
+    <span class="hidden-xs hidden-sm hidden-md">
+      $title
+    </span>
+  </a>
+</li>
+#end def
+
+
+
+<ul class="nav nav-tabs" role="tablist">
+  $printTabHeader("mm_layer_property_style_display",$zoo._("Symbology"),"fa-image",None)
+  $printTabHeader("mm_layer_property_label_display",$zoo._("Labels"),"fa-file-text-o","no-raster")
+  $printTabHeader("mm_layer_property_grid_display",$zoo._("Grid"),"fa-th","require-grid")
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active"
+  id="mm_layer_property_style_display">
+    <form class="form-horizontal mtpp" method="get" >
+      <div class="form-group require-raster">
+	<label class="col-sm-3 control-label">$zoo._(" Resampling method: ")</label>
+        <div class="col-sm-9 ">
+	  <select type="text" name="resample" class="form-control">
+	    <option value="-1">$zoo._("Choose")</option>
+	    #set tmp=["NEAREST","AVERAGE","BILINEAR"]
+	    #for a in tmp
+	    <option value="$a">$a</option>
+	    #end for
+	  </select>
+	</div>
+      </div>
+      <div class="form-group">
+	<label class="col-sm-3 control-label">$zoo._("Opacity")</label>
+	<div class="col-sm-9 ">
+	  <div class="range">
+	    <input type="range" name="styleOpacity" min="1" max="100" value="100"
+  onchange="\$(this).next().html(\$(this).val() + '%')" oninput="\$(this).next().html(\$(this).val() + '%')"/>
+	    <output>100%</output>
+	  </div>
+	</div>
+      </div>
+      <div class="form-group no-grid">
+	<label class="col-sm-3 control-label">$zoo._("Legend Type: ")</label>
+	<div class="col-sm-9 ">
+	  <select name="classification" class="form-control" onchange="\$(this).find('option').each(function(){if(!\$(this).is(':selected'))\$('.no-'+\$(this).attr('value')).show();});\$(this).find('option:selected').each(function(){\$('.no-'+\$(this).attr('value')).hide();});">
+#set choices={
+	"us": $zoo._("Unique Symbol"),
+	"gs": $zoo._("Graduated Symbol"),
+	"cc": $zoo._("Continuous Color"),
+	"uv": $zoo._("Unique Value"),
+	"tl": $zoo._("Time line")
+	}
+	#for a in $choices.keys()
+	    <option value="$a">$choices[$a]</otion>
+	#end for
+	  </select>
+	</div>
+      </div>
+      <div class="form-group require-raster">
+	<label class="col-sm-3 control-label">$zoo._("Tiled version")</label>
+        <div class="col-sm-9">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	    <input name="tileSizec" type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" />
+	    </span>
+	    <input type="text" class="form-control" name="tileSize" disabled="disabled" value="" />
+	  </div>
+	</div>
+      </div>
+      <div class="form-group require-raster">
+	<label class="col-sm-3 control-label">$zoo._("Min / Max values")</label>
+        <div class="col-sm-4">
+	  <input type="text" class="form-control" name="minBandValue" value="" />
+	  <p class="help-block"></p>
+	</div>
+        <div class="col-sm-5">
+	  <input type="text" class="form-control" name="maxBandValue" value="" />
+	  <p class="help-block"></p>
+	</div>
+      </div>
+      <div class="form-group no-us">
+	<label class="col-sm-3 control-label">$zoo._("Min / Max color")</label>
+        <div class="col-sm-9 ">
+	  <div class="col-sm-5">
+	    <div class="input-group cpicker">
+	      <input type="text" class="form-control" name="minColorValue" value="#ffffff" />
+	      <span class="input-group-addon"><i></i></span>
+	    </div>
+	  </div>
+	  <div class="col-sm-5">
+	    <div class="input-group cpicker">
+	      <input type="text" class="form-control" name="maxColorValue"  value="#ffffff" />
+	      <span class="input-group-addon"><i></i></span>
+	    </div>
+	  </div>
+	</div>
+      </div>
+      <div class="form-group">
+	<label class="col-sm-3 control-label">$zoo._("Expression settings")</label>
+        <div class="col-sm-9 ">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	    <input name="expressionc" type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" />
+	    </span>
+	    <textarea class="form-control" disabled="disabled" name="expression0"></textarea>
+	  </div>
+	</div>
+      </div>
+      <div class="form-group no-us">
+	<label class="col-sm-3 control-label">$zoo._("Classification field")</label>
+        <div class="col-sm-9 ">
+	  <select name="classField" class="form-control  mmField">
+	  </select>
+	</div>
+      </div>
+      <div class="form-group no-us require-point">
+	<label class="col-sm-3 control-label">$zoo._("Size field")</label>
+        <div class="col-sm-9 ">
+	  <div class="input-group">
+	    <span class="input-group-addon">
+	    <input name="classField1c" type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" />
+	    </span>
+	    <input type="text" name="classField1" disabled="disabled" class="form-control"
+	      data-toggle="tooltip" title="$zoo._("Use the formula you want (ie. MY_FIELD*10).")" />	    
+	  </div>
+	</div>
+      </div>
+      <div class="form-group no-us no-uv require-gs">
+	<label class="col-sm-3 control-label">$zoo._("Classes number: ")</label>
+        <div class="col-sm-9 ">
+	  <input type="text" name="nbclass" class="form-control"
+	  data-toggle="tooltip" title="$zoo._("Define the number of classes you want to be generated.")" />	    
+	</div>
+      </div>
+      <div class="form-group no-us no-uv require-gs no-raster">
+	<label class="col-sm-3 control-label">$zoo._("Discretization: ")</label>
+        <div class="col-sm-9 ">
+	  <select type="text" name="discretization" class="form-control">
+	    <option value="-1">$zoo._("Choose")</option>
+	    #set tmp=["equal","jenks","quantile","pretty","kmeans","fisher"]
+	    #for a in tmp
+	    <option value="$a">$a</option>
+	    #end for
+	  </select>
+	</div>
+      </div>
+      <div class="col-sm-12 no-grid">
+	<button href="#" class="btn btn-default mmClassifier">$zoo._("Classify")</button>
+      </div>
+      <div class="col-sm-12 classesTable">
+	<table id="classes"></table>
+      </div>
+    </form>    
+  </div>
+  <div role="tabpanel" class="tab-pane" id="mm_layer_property_label_display">
+    #include $conf['main']['templatesPath']+"/Manager/Styler/Label_bs.html"
+  </div>
+  <div role="tabpanel" class="tab-pane" id="mm_layer_property_grid_display">
+    #include $conf['main']['templatesPath']+"/Manager/Styler/Grid_bs.html"
+  </div>
+</div>

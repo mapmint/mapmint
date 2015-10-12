@@ -64,7 +64,7 @@ def checkLayerPriv(conf,map,layer,typ):
                         lcnt=0
                         for k in ctypes:
                             for i in range(0,len(mmatypes)):
-                                if k==mmatypes[i] and "1"==tmp1[i]:
+                                if k==mmatypes[i] and ("1"==tmp1[i] or "true"==tmp1[i]):
                                     lcnt+=1
                         return (lcnt==len(ctypes))
             return False
@@ -103,7 +103,7 @@ def checkDataStorePriv(conf,ds,priv):
                 for k in cpriv:
                     for j in range(0,3):
                         if k==mmatypes[j]:
-                            if i[j+1]=="1":
+                            if i[j+1]=="1" or i[j+1]=="true":
                                 ecnt+=1
                 return (len(cpriv)==ecnt)
     return False

@@ -1,0 +1,212 @@
+#encoding UTF-8
+#import zoo,mapscript
+
+<ul class="nav nav-tabs" role="tablist">
+  <li role="presentation" >
+    <a id="mm_baselayers_display_Toggler" href="#mm_baselayers_display" aria-controls="home" role="tab" data-toggle="tab">
+      <span class="symbol-multi" >
+        <i class="mm0-layers mm-layers-baseonly fa-fw"></i>
+        <i class="mm0-layers mm-layers-overlays-only fa-fw symbol-up"></i>
+      </span>
+      <span class="hidden-xs hidden-sm hidden-md">
+        $zoo._("Base Layers")
+      </span>
+    </a>
+  </li>
+  <li role="presentation" >
+    <a id="mm_layers_display_Toggler" href="#mm_olayers_display" aria-controls="home" role="tab" data-toggle="tab">
+      <span class="symbol-multi" >
+        <i class="mm0-layers mm-layers-overlays-only fa-fw"></i>
+        <i class="mm0-layers mm-layers-baseonly fa-fw symbol-up"></i>
+      </span>
+      <span class="hidden-xs hidden-sm hidden-md">
+        $zoo._("Overlay Layers")
+      </span>
+    </a>
+  </li>
+</ul>
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="mm_baselayers_display">
+    <form class="form-horizontal mtpp" method="get" >
+      <h1>
+       <span class="symbol-multi">
+         <i class="mm0-layers mm-layers-baseonly fa-fw"></i>
+         <i class="mm0-layers mm-layers-overlays-only fa-fw symbol-up"></i>
+       </span>
+       $zoo._("Base Layers")
+
+      </h1>
+      <div class="row">
+	<label class="col-sm-3 control-label">$zoo._("Default")</label>
+        <div class="col-sm-9 range">
+	  <select id="base_layer_active" class="form-control" onchange="\$('#base_layer_active_sel').val(this.value);">
+	  </select>
+	  <input type="hidden" id="base_layer_active_sel" value="$m.web.metadata.get('mmActivatedBaseLayers')" />
+	</div>
+      </div>
+      <div class="row">
+	<label class="col-sm-3 control-label">$conf["mm"]["boLayerAlias"]</label>
+        <div class="col-sm-9 range">
+	  <input type="checkbox" id="base_osm" value="true" #if $m.web.metadata.get("mmOSMBaseLayers")=="true"#checked="true"#end if# onchange="app.updateBaseLayers();"/>
+	</div>
+      </div>
+      <div class="row">
+	<label class="col-sm-3 control-label">$conf["mm"]["boLayerAlias"]</label>
+        <div class="col-sm-9 range">
+	  <select multiple id="mapquest" class="form-control" onchange="app.updateBaseLayers();">
+	    <option value="-1" #if not($m.web.metadata.get('mmMBaseLayers'))#selected="true"#end if#>$zoo._("None")</option>
+#set a=$conf["mm"]["bmLayers"].split(",")
+#set b=$conf["mm"]["bmLayerAlias"].split(",")
+#if $m.web.metadata.get('mmMBaseLayers')
+#set setM=$m.web.metadata.get('mmMBaseLayers').split(',')
+#else
+#set setM=[]
+#end if
+#for i in range(0,len(a))
+	    <option value="$a[$i]" #if $setM.count($a[$i])>0#selected="true"#end if#>$b[$i]</option>
+#end for
+	  </select>
+	</div>
+      </div>
+      <div class="row">
+	<label class="col-sm-3 control-label">$zoo._("Proprietary:")</label>
+        <div class="col-sm-9 range">
+#if $m.web.metadata.get("mmProprietaryBaseLayers")
+#set lname=$m.web.metadata.get("mmProprietaryBaseLayers")
+#else
+#set lname=$conf["mm"]["bpDefault"]
+#end if
+#set k=0
+	  <select class="select-window form-control" id="mmBBDefault" onchange="\$('#'+this.value).show();var tmp=[#for i in $conf["mm"]["bpList"].split(',')#'$conf["mm"]["b"+$i+"Name"]',#end for#];for(i in tmp){if(this.value!=tmp[i])\$('#'+tmp[i]).hide();else \$('#'+tmp[i]).show();}if(this.value=='-1' || #for i in $conf["mm"]["bpNoKey"].split(',')#this.value=='$conf["mm"]["b"+$i+"Name"]'#if $k+1<len($conf["mm"]["bpNoKey"].split(','))# || #end if##set $k=$k+1##end for#)\$(this).parent().parent().next().next().hide();else \$(this).parent().parent().next().next().show();">
+	    <option value="-1" #if $lname=="None"#selected="true"#end if#>None</option>
+#for i in $conf["mm"]["bpList"].split(',')
+	    <option value="$conf["mm"]["b"+$i+"Name"]" #if $lname==$conf["mm"]["b"+$i+"Name"]#selected="true"#end if#>$conf["mm"]["b"+$i+"Name"]</option>
+#end for
+	  </select>
+	</div>
+      </div>
+      <div class="row">
+	<label class="col-sm-3 control-label"> </label>
+        <div class="col-sm-9 range">
+#for j in $conf["mm"]["bpList"].split(',')
+	      <select multiple class="form-control select-window b$(j)Select" id="$conf["mm"]["b"+$j+"Name"]"  #if $lname!=$conf["mm"]["b"+$j+"Name"]#style="display: none"#end if# onchange="app.updateBaseLayers();">
+		<option value="-1" #if $m.web.metadata.get('mmProprietaryBaseLayers')!=$conf["mm"]["b"+$j+"Name"] or $m.web.metadata.get('mmPBaseLayers')==""#selected="true"#end if#>None</option>
+#set a=$conf["mm"]["b"+$j+"LayerAlias"].split(",")
+#set b=$conf["mm"]["b"+$j+"Layers"].split(",")
+#if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"] and $m.web.metadata.get('mmPBaseLayers')!=""
+#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+#else
+#set setM=[]
+#end if
+#for i in range(0,len(a))
+		<option value="$b[$i]" #if $setM.count($b[$i])>0#selected="true"#end if#>$a[$i]</option>
+#end for
+	      </select>
+#end for
+	</div>
+      </div>
+      <div class="row" #if $m.web.metadata.get("mmProprietaryBaseLayers")!=$conf["mm"]["bbName"] and $m.web.metadata.get("mmProprietaryBaseLayers")!=$conf["mm"]["biName"]#style="display:none"#end if#>
+	<label class="col-sm-3 control-label">$zoo._("API Key")</label>
+        <div class="col-sm-9 range">
+	  <input class="form-control" name="mmBAK" value="$m.web.metadata.get('mmBAK')" />
+	</div>
+      </div>
+      <div class="row">
+	<label class="col-sm-3 control-label">$zoo._("Created layers")</label>
+        <div class="col-sm-9 range">
+	  <select multiple id="mmBProject" class="select-window form-control" onchange="app.updateBaseLayers();">
+	    <option value="-1">$zoo._("None")</option>
+#try
+#set sel=$m.web.metadata.get('mmBProject').split(",")
+#except
+#set sel=[]
+#end try
+#import os
+#for i in os.listdir($conf["main"]["dataPath"]+"/public_maps/")
+#if $i.count(".map")==0
+#try 
+#set t=os.readlink($conf["main"]["dataPath"]+"/public_maps/"+$i)
+	    <option value="$i" #if sel.count($i)>0#selected="true"#end if#>$i</option>		
+#except
+#set t=None
+#end try
+#end if
+#end for
+	  </select>
+	</div>
+      </div>
+    </form>
+  </div>
+  <div role="tabpanel" class="tab-pane" id="mm_olayers_display">
+    <form class="form-horizontal mtpp" method="get" >
+      <h1>
+        <span class="symbol-multi" >
+          <i class="mm0-layers mm-layers-overlays-only fa-fw"></i>
+          <i class="mm0-layers mm-layers-baseonly fa-fw symbol-up"></i>
+        </span>
+        $zoo._("Overlay Layers")
+      </h1>
+      <div class="row">
+	<table id="datasources_list">
+	  <thead>
+	  <th width="350">$zoo._("Layer Name")</th>
+	  <th width="50">$zoo._("Popup")</th>
+	  <th width="50">$zoo._("Window")</th>
+	  <th width="50">$zoo._("Vector")</th>
+	  <th width="50">$zoo._("Raster")</th>
+	  <th width="50">$zoo._("Activated")</th>
+	  <th width="75">$zoo._("Min Zoom")</th>
+	  <th width="75">$zoo._("Max Zoom")</th>
+	  <th width="75">$zoo._("Label Min Zoom")</th>
+	  <th width="75">$zoo._("Label Max Zoom")</th>
+	  <th width="50">$zoo._("Access")</th>
+	  </thead>
+	  <tbody>
+#if $m.web.metadata.get('mmActivatedLayers')
+#set activatedLayers=$m.web.metadata.get('mmActivatedLayers').split(",")
+#else
+#set activatedLayers=[]
+#end if
+#if $m.web.metadata.get('mmPopupList')
+#set popupList=$m.web.metadata.get('mmPopupList').split(",")
+#else
+#set popupList=[]
+#end if
+#if $m.web.metadata.get('mmWindowList')
+#set windowList=$m.web.metadata.get('mmWindowList').split(",")
+#else
+#set windowList=[]
+#end if
+#if $m.web.metadata.get('rasterLayers')
+#set rasterLayers=$m.web.metadata.get('rasterLayers').split(",")
+#else
+#set rasterLayers=[]
+#end if
+#if $m.web.metadata.get('vectorLayers')
+#set vectorLayers=$m.web.metadata.get('vectorLayers').split(",")
+#else
+#set vectorLayers=[]
+#end if
+#for i in range(0,$m.numlayers)
+#if $m.getLayer($i).name.count("_mmlabel")==0
+	    <tr>
+	      <td>$m.getLayer($i).name</td>
+	      <td><input name="popup" type="checkbox" value="p$i" id="layer_has_popup_$m.getLayer($i).name" #if ($popupList.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>
+	      <td><input name="windows" type="checkbox" value="w$i" id="layer_has_click_$m.getLayer($i).name" #if ($windowList.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>
+	      <td><input type="radio" id="layer_type_$m.getLayer($i).name" name="layer_type_$m.getLayer($i).name" #if vectorLayers.count($m.getLayer($i).name)>0#checked="checked"#end if# value="vector" #if $m.getLayer($i).type==3#disabled="true"#end if# /></td>
+	      <td><input type="radio" id="layer_type1_$m.getLayer($i).name" name="layer_type_$m.getLayer($i).name" #if rasterLayers.count($m.getLayer($i).name)>0#checked="checked"#end if# value="raster" /></td>
+	      <td><input name="activate" type="checkbox" value="a$i" id="is_activated_layer_$m.getLayer($i).name" #if ($activatedLayers.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>
+	      <td><input name="minScale" type="text" style="width:75px;" id="min_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmMinScale")" /></td>
+	      <td><input name="maxScale" type="text" style="width:75px;" id="max_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmMaxScale")" /></td>
+	      <td><input name="lminScale" type="text" style="width:75px;" id="label_min_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmLabelMinScale")" /></td>
+	      <td><input name="lmaxScale" type="text" style="width:75px;" id="label_max_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmLabelMaxScale")" /></td>
+	      <td><a href="#access" onclick="MapMintUsersManager.editPrivilege('$m.getLayer($i).name')">priv.</a></td>
+	    </tr>
+#end if
+#end for
+	  </tbody>
+	</table>
+      </div>
+    </form>
+  </div>
+</div>  

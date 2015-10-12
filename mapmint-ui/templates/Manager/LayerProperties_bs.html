@@ -1,0 +1,79 @@
+#import zoo
+
+#def printCheckbox(obj)
+<div class="form-group #if $obj.keys().count("classe")>0#$obj["classe"]#end if#">
+  <label class="col-sm-3 control-label">$obj["title"]</label>
+  <div class="col-sm-9 ">
+#if $obj.keys().count("select")
+    <div class="input-group">
+      <span class="input-group-addon">
+        <input name="$obj["name"]"
+      type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" />
+      </span>
+      <select class="form-control #if $obj["select"].keys().count("class")>0# $obj["select"]["class"]#end if#" disabled="disabled"
+	name="$obj["select"]["name"]" >
+#if $obj["select"].keys().count("options")
+#for j in $obj["select"]["options"]
+	<option value="$j">$j.title()</option>
+#end for
+#end if
+      </select>
+    </div>
+#else
+      <input name="$obj["name"]" type="checkbox" />
+#end if
+  </div>
+</div>
+#end def
+
+#def printText(obj)
+<div class="form-group">
+  <label class="col-sm-3 control-label">$obj["title"]</label>
+  <div class="col-sm-9">
+    <input name="$obj["name"]" class="form-control" placeholder="$obj["placeholder"]" type="text" />
+  </div>
+</div>
+#end def
+
+#def printTextarea(name,title,placeholder)
+<div class="form-group">
+  <label class="col-sm-3 control-label">$title</label>
+  <div class="col-sm-9">
+    <textarea name="$name" class="form-control" placeholder="$placeholder" type="text"></textarea>
+  </div>
+</div>
+#end def
+
+
+<form class="form-horizontal mtpp" method="get" >
+#set obj={"name":"name","title": $zoo._("Name"),"placeholder":$zoo._("Sample Name")}
+$printText($obj)
+#if $conf["main"].has_key("3D") and $conf["main"]["3D"]=="true"
+#set obj={"name":"fly","title": $zoo._("TE Fly URL"),"placeholder":$zoo._("Sample.fly")}
+$printText($obj)
+#end if
+#set objs=[
+{"name":"title","title":$zoo._("Title"),"placeholder":$zoo._("Sample Title")},
+{"type":"area","name":"abstract","title":$zoo._("Abstract"),"placeholder":$zoo._("Layer Abstract")},
+{"name":"keywords","title":$zoo._("Keywords"),"placeholder":$zoo._("Sample kewords")},
+{"name":"fees","title":$zoo._("Fees"),"placeholder":$zoo._("Sample attribution")},
+{"type":"select","name":"query","title":$zoo._("Query"),"placeholder":$zoo._("Layer Query")},
+{"type":"select","name":"export","title":$zoo._("Export"),"placeholder":$zoo._("Layer Export"),"classe": "no-grid no-raster"},
+{"type":"select","name":"filter","title":$zoo._("Filtering"),"placeholder":$zoo._("Layer Filtering"),"select":{"name":"filter_field","class":"mmField"},"classe": "no-grid no-raster"},
+{"type":"select","name":"zfilter","title":$zoo._("Zoom on"),"placeholder":$zoo._("Zoom Filtering"),"select":{"name":"zfilter_field","class":"mmField"},"classe": "no-grid no-raster"},
+{"type":"select","name":"search","title":$zoo._("Search"),"placeholder":$zoo._("Layer Search"),"select":{"name":"search_field","class":"mmField"},"classe": "no-grid no-raster"},
+{"type":"select","name":"squery","title":$zoo._("Spatial Query"),"placeholder":$zoo._("Layer Spatial Query"),"select":{"name":"squery_field","options":[$zoo._("none"),$zoo._("contained"),$zoo._("contains"),$zoo._("both")]},"classe": "no-grid no-raster"},
+]
+#for i in $objs
+#if i.keys().count("type")>0
+#if $i.type=="area"
+$printTextarea($i.name,$i.title,$i.placeholder)
+#else
+$printCheckbox($i)
+#end if
+#else
+$printText($i)
+#end if
+#end for
+<button class="btn btn-default mm-layer-save" >$zoo._("Save")</button>
+</form>

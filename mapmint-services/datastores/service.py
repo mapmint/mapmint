@@ -138,6 +138,57 @@ def list(conf,inputs,outputs):
     return 3
 
 
+def options1(conf,inputs,outputs):
+    import datastores.service as ds
+    import mm_access
+    ds.list(conf,inputs,outputs)
+    elements=eval(outputs["Result"]["value"])
+    print >>sys.stderr,str(elements)
+    li=[]
+    dsList=None
+    dstnStr=""
+    for a in elements:
+        if a=="Directories":
+            #print >> sys.stderr,"ELEMENTS A 0 "+str(elements[a][0])
+            for j in range(0,len(elements[a])):
+                if mm_access.checkDataStorePriv(conf,elements[a][j]["name"],"rx"):
+                    dstnStr=elements[a][j]["name"]
+                    print >> sys.stderr,"DSTN : "+dstnStr
+                    outputs["Result"]["value"]="[]"
+                    ds.listDataSource(conf,{"dstn":{"value": elements[a][j]["name"]+"/"}},outputs)
+                    dsList=eval(outputs["Result"]["value"])
+                    break
+            #print >> sys.stderr,str(dsList)
+        li+=[{"name": a}]
+ 
+    import template.service as tmpl
+    
+    #print >> sys.stderr,conf
+    mapfile=conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map"
+    import mapscript
+    m = mapscript.mapObj(mapfile)
+    levels=[m.web.metadata.get("mm_group_0")]
+    try:
+        level1=m.web.metadata.get("mm_group_1").split(',')
+    except:
+        level1=None
+    try:
+        level2=m.web.metadata.get("mm_group_2").split(';')
+    except:
+        level2=None
+    if level1 is not None:
+        for a in level1:
+            levels+=["- "+a]
+            if level2 is not None: 
+                for b in level2:
+                    tmp=b.split('|')
+                    if len(tmp)>1 and tmp[1]==a:
+                        tmp1=tmp[0].split(',')
+                        for c in tmp1:
+                            levels+=["-- "+c]
+    import json
+    outputs["Result"]["value"]=json.dumps(elements)
+
 def options(conf,inputs,outputs):
     import datastores.service as ds
     import mm_access
@@ -267,10 +318,20 @@ def saveDataStorePrivileges(conf,inputs,outputs):
                 cStr+="\n"
             cStr+=inputs["group"]["value"][i]
             for j in ["r","w","x"]:
+                if inputs["ds_"+j]["value"][i]=="true":
+                    inputs["ds_"+j]["value"][i]="1"
+                else:
+                    if inputs["ds_"+j]["value"][i]=="false":
+                        inputs["ds_"+j]["value"][i]="0"
                 cStr+=","+inputs["ds_"+j]["value"][i]
     else:
         cStr+=inputs["group"]["value"]
         for j in ["r","w","x"]:
+            if inputs["ds_"+j]["value"]=="true":
+                inputs["ds_"+j]["value"]="1"
+            else:
+                if inputs["ds_"+j]["value"]=="false":
+                    inputs["ds_"+j]["value"]="0"
             cStr+=","+inputs["ds_"+j]["value"]
     f=open(path+".mmpriv","wb")
     f.write(cStr)

@@ -1,0 +1,421 @@
+#import zoo
+#import mapscript
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/project_"+$conf["senv"]["last_map"]+".map")
+#import mm_access
+#if not($mm_access.checkMapPriv($conf,$m))
+#set page="/error.tmpl"
+#set nameSpace={"conf":$conf, "errorMsg": $zoo._("You're not authorized to access this content")}
+$Template(file=$conf["main"]["templatesPath"]+$page,searchList=$nameSpace)
+#else
+#if m.web.metadata.get("mmTitle") is not None and m.web.metadata.get("mmTitle")!=""
+#set title=m.web.metadata.get("mmTitle")
+#else
+#set title=$zoo._("Preview")
+#end if
+#set searchList=[{"m": $m}, {"tmpl": "fullscreen"},{"conf": $conf},{"inputs":$inputs}]
+#from Cheetah.Template import Template
+#import mapfile.service as mms
+
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+<meta charset="utf-8" /> 
+<title>MapMint | $title</title> 
+<meta name="description" content="mapmint,webgis,app" /> 
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" /> 
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/ol.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/fonts.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/bootstrap.min.css" />
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/bootstrap-slider.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/context.bootstrap.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-window.css">
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-select.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.2.0/css/colReorder.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/1.0.7/css/responsive.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.0.0/css/select.dataTables.min.css"/>
+<!--
+<link rel="stylesheet"
+href="https://cdn.datatables.net/r/dt/dt-1.10.8,b-1.0.0,b-colvis-1.0.0,cr-1.2.0,r-1.0.7,se-1.0.0/datatables.min.css"/>
+-->
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-default.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-layout.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-map.css">
+<link rel="stylesheet" href="./index_css_bs" type="text/css" />
+<style>
+
+</style>
+
+
+<script src="http://maps.google.com/maps/api/js?v=3.5&sensor=false"></script>
+
+<!--[if lt IE 9]> 
+<script src="js/ie/html5shiv.js">
+</script> 
+<script src="js/ie/respond.min.js">
+</script> 
+<script src="js/ie/excanvas.js">
+</script> <![endif]-->
+</head>
+
+<body>
+#if m.web.metadata.get("mmTitle") is not None and m.web.metadata.get("mmTitle")!=""
+#set title=m.web.metadata.get("mmTitle")
+#else
+#set title=$zoo._("Preview")
+#end if
+
+<div id="header" class="navbar navbar-default navbar-fixed-top">
+  <div class="navbar-header">
+    <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+      <i class="fa fa-wrench"></i>
+    </button>
+    <span class="navbar-brand" href="#">$title</span>
+  </div>
+ #set searchList=[{"m": $m}, {"tmpl": "fullscreen"},{"conf": $conf},{"inputs":$inputs}]
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/toolbar_bs.tmpl",searchList=$searchList))
+
+<!--
+  <nav class="collapse navbar-collapse">
+    <ul class="nav navbar-nav toolbar">
+      <li data-toggle="tooltip" data-placement="bottom" title="$zoo._("Zoom by rectangle")">
+       <a href="#" class="ol-zoombox"><i class="icon-search"></i><b class="ncaret"></b></a>
+      </li>
+      <li class="dropdown" data-toggle="tooltip" data-placement="left" title="Geolocation">
+       <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="i i-compass"></i><b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <li><a href="#"><i class="icon-location-2"></i> My position</a></li>
+          <li><a href="#"><i class="fa fa-play"></i> Track my position</a></li>
+        </ul>
+      </li>
+      <li class="dropdown"  data-toggle="tooltip" data-placement="left" title="Query">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="i i-arrow-up-left2"></i><b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <li><a href="#"><i class="i i-check"></i> Query by rectangle</a></li>
+          <li><a href="#"><i class="i i-circle-o"></i> Query by circle</a></li>
+        </ul>
+      </li>
+      <li data-toggle="tooltip" data-placement="bottom" title="Elevation profile">
+       <a href="#"><i class="fa fa-area-chart"></i><b class="ncaret"></b></a>
+      </li>
+      <li class="dropdown" data-toggle="tooltip" data-placement="left" title="Measure">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-ruler"></i><b class="caret"></b></a>
+        <ul class="dropdown-menu pers">
+          <li><a href="#">Distance</a></li>
+          <li><a href="#">Area</a></li>
+        </ul>
+      </li>
+      <li class="dropdown" data-toggle="tooltip" data-placement="left" title="Share map">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="i i-share3"></i><b class="caret"></b></a>
+        <ul class="dropdown-menu">
+          <li><a href="#"><i class="fa fa-link"></i> Permalink</a></li>
+          <li><a href="#"><i class="fa fa-code"></i> Embbed</a></li>
+          <li><a href="#"><i class="fa fa-twitter-square"></i> Twitter</a></li>
+          <li><a href="#"><i class="fa fa-facebook-square"></i> Facebook</a></li>
+        </ul>
+      </li>
+      <li data-toggle="tooltip" data-placement="bottom" title="Print">
+       <a href="#"><i class="fa fa-print"></i><b class="ncaret"></b></a>
+      </li>
+    </ul>
+    <div class="col-sm-3 col-md-3">
+      <form class="navbar-form" role="search">
+       <div class="input-group">
+       <div class="input-group-btn search-panel">
+	 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+	  <span id="search_concept">Layer</span> <span class="caret"></span>
+	 </button>
+	 <ul class="dropdown-menu" role="menu">
+	   <li><a href="#">...</a></li>
+	   <li><a href="#">...</a></li>
+	 </ul>
+       </div>
+       <input type="hidden" name="search_param" value="all" id="search_param" />         
+       <input type="text" class="form-control" id="x" name="x" placeholder="Search..." />
+       <span class="input-group-btn">
+       <button class="btn btn-default" type="button"><span class="icon-search"></span></button>
+       </span>
+       </div>
+      </form>
+    </div>
+    <ul class="nav navbar-nav pull-right">
+      <li>
+       <a href="#" data-toggle="tooltip" data-placement="bottom" title="Home"><i class="icon-home"></i></a>
+      </li>
+      <li class="dropdown" data-toggle="tooltip" data-placement="left" title="Login">
+       <a href="#" id="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i><b class="caret"></b></a>
+       <ul class="dropdown-menu pull-right padd">
+	 <form class="navbar-form" id="formLogin"> 
+	  <input name="username" id="username" class="form-control mb" type="text" placeholder="Username"> 
+	  <input name="password" id="password" class="form-control mb"  type="password" placeholder="Password"><br>
+	  <button type="button" id="btnLogin" class="btn btn-default">Login</button>
+	 </form>
+       </ul>
+     </li>
+   </ul>
+   </nav>
+   -->
+ </div>
+ <div id="wrapper">
+  <div id="sidebar-wrapper" class="col-md-3 fill">
+   <div id="sidebar" class="fill">
+    <div role="tabpanel" class="fill">
+      <ul id="mmtabs" class="nav nav-tabs" role="tablist">
+	<li id="laywrap" role="layers" data-toggle="tooltip" data-placement="bottom" title="Legend" class="active">
+	 <a href="#ltree" aria-controls="ltree" role="tab" data-toggle="tab"><i class="i i-stack"></i></a>
+	</li>
+	<li role="presentation">
+	 <a href="#datasources" aria-controls="datasources" role="tab" data-toggle="tab"><i class="fa fa-copyright"></i></a>
+	</li>
+	<li role="presentation" data-toggle="tooltip" data-placement="bottom" title="Information">
+	 <a href="#info" aria-controls="settings" role="tab" data-toggle="tab"><i class="fa fa-info-circle"></i></a>
+	</li>
+
+	<a href="#" data-toggle="tooltip" data-placement="left" title="Hide" class="btn-cp tp pull-right hidden-xs"><i class="i i-arrow-left4"></i></a>
+      </ul>
+    <div class="tab-content">
+      
+     <div role="tabpanel" class="tab-pane" id="datasources">
+       <div class="well sources-container">
+        <div class="padder">
+	 <h5 class="sbt"><i class="fa fa-copyright"></i> Data sources</h5>
+	</div>
+       </div>
+     </div>
+     <div role="tabpanel" class="tab-pane" id="info">
+      <div class="well info-container">
+       <div class="padder">
+	 <h5 class="sbt"><i class="fa fa-info-circle"></i> Information</h5>
+            <div class="info1 thumbnail">
+
+                <div class="info-img-content">
+		  <div class="col-xs-12">
+#if $m.web.metadata.get("previewUrl")
+                    <img src="$m.web.metadata.get("previewUrl")" class="img-responsive"/>
+#else
+                    <img src="http://placehold.it/460x250/FF0000/ffffff&text=No Preview." class="col-xs-12 img-responsive"/>
+#end if		  
+     		  </div>
+                </div>
+
+                <div class="content1">
+		    <h5 class="info-title">$title</h5>
+                    <div class="info-date">
+                        <time datetime=""><i class="fa fa-clock-o"> $(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($conf["main"]["dataPath"]+"/public_maps/project_"+$conf["senv"]["last_map"]+".map"))))</i> </time>
+                    </div>
+                    <p>
+		    $(mms.getDescription($conf,$m))
+                    </p>
+                </div>
+
+	    </div>
+       </div>
+       </div>
+     </div>
+     <div role="tabpanel" class="tab-pane active " id="ltree">
+       $(Template(file=$conf["main"]["templatesPath"]+"/preview/layerswitcher_bs.tmpl",searchList=$searchList))
+
+  </div>
+
+  <div id="mmcdts" class="text-center">
+    <p>&copy; Copyright
+     <a href="http://mapmint.com" target="_blank "href="http://geolabs.fr" target="_blank">GeoLabs</a> | Powered by <i class="iconmm-logo"></i> <a href="http://mapmint.com" target="_blank"> MapMint</a>
+    </p>
+  </div>
+  
+ </div>
+ </div> 
+ </div>
+ </div>
+ </div>
+
+ <div id="context-menu" style="display:none"> 
+  <ul class="dropdown-menu">
+    <li><a tabindex="-1" class="mm-menu" id="mmm_zoomTo"><i class="i i-search"></i> $zoo._("Zoom to")</a></li>
+    <li><a tabindex="-1" class="mm-menu" id="mmm_query"><i class="fa fa-table"></i> $zoo._("View table")</a></li>
+    <li>
+    <a tabindex="-1" class="mm-menu" id="mmm_export"><i class="i i-share3"></i> $zoo._("Export data")
+     <form id="formExport"> 
+      <select id="sGSelectedFormat" class="selectpicker">
+       <option value="KML">Vector File (KML)</option>
+       <option value="ESRI Shapefile">Vector File (Shapefile)</option>
+       <option value="CSV">Attributes File (CSV)</option>
+      </select>
+<!--
+      <select id="sGSelectedFormat" class="selectpicker">
+       <option value="application/vnd.google-earth.kml">Vector File (KML)</option>
+       <option value="application/shp+zip">Vector File (Shapefile)</option>
+       <option value="text/csv">Attributes File (CSV)</option>
+      </select>
+-->
+     </form>
+    </a>
+    </li>
+    <li class="divider"></li>
+    <li class="nb"><a href="#" tabindex="-1"><i class="fa fa-adjust"></i> $zoo._("Set opacity")</a>
+     <div class="range">
+       <input id="mmm_opacity" type="range" name="mmm_range" min="1" max="100" value="100"
+  onchange="mmm_range.value=value+ '%'" oninput="mmm_range.value=value + '%'">
+       <output id="mmm_range">100%</output>
+     </div>
+     </li>
+  </ul>
+ </div>
+
+ <div id="main-wrapper" class="col-md-9 pull-right">
+  <div id="main">
+    <a href="#" data-toggle="tooltip" data-placement="right" title="Show" class="op"><i class="i i-arrow-right4"></i></a>
+    <div id="map"></div>
+    <div id="gmap"></div>
+  </div>
+  <div id="table-wrapper" class="fixed-bottom collapse">
+   <div class="switch">
+   <ul id="mmm_table-wrapper-header" class="nav nav-tabs">
+   <li class="pull-right">
+     <a href="#" data-toggle="collapse" title="Hide" class="btn-default hidden-xs" data-target="#table-wrapper">
+       <i class="i i-arrow-down4"></i>
+     </a>
+   </li>
+   </ul>
+   </div>
+   <div class="well well-table">
+   <h5>
+   <span id="mmm_table-wrapper-header-title-pre">$zoo._("Table:")</span>
+   <span id="mmm_table-wrapper-header-title"></span>
+   <span class="pull-right">
+   <div class="btn-group" role="group" aria-label="...">
+      <button href="#" class="btn btn-default table-toggle grey require-select" title="$zoo._("Zoom to selected elements")" rel="tooltip" href="#" data-toggle="zoomToElement"> <i class="icon-search"></i></button>
+      <div class="btn-group dropdown">
+      <button href="#" class="btn btn-default table-toggle grey require-select" title="Export" rel="tooltip" href="#" data-toggle="dropdown" data-mapaction="export" "> <i class="fa fa-share"></i></button>
+      <ul id="exportFormats" class="dropdown-menu pull-right padd">
+      <li>
+       	 <form id="formLExport"> 
+	 <div>Format: 
+	 <select id="sSelectedFormat" class="selectpicker">
+          <option value="application/vnd.google-earth.kml">Vector File (KML)</option>
+          <option value="application/shp+zip">Vector File (Shapefile)</option>
+          <option value="text/csv">Attributes File (CSV)</option>
+         </select>
+	 </div>
+	 <div>
+      	 <button href="#" class="btn btn-default table-toggle grey" title="Export" rel="tooltip" href="#" data-toggle="dropdown" data-mapaction="export" "> <i class="fa fa-share"></i> Export</button>
+	 </div>
+	 </form>
+	 </li>
+       </ul>
+      </div>
+      <button href="#" class="btn btn-default table-toggle grey" title="Close" rel="tooltip" href="#" data-toggle="remove"> <i class="fa fa-close"></i></button>
+   </div>
+   </span>
+   </h5>
+   <div id="mmm_table-wrapper-container" class="tab-content">
+   </div>
+   </div>
+  </div>
+ </div>
+
+<script data-main="$conf["main"]["publicationUrl"]/assets/js/cfg" src="$conf["main"]["publicationUrl"]/assets/js/lib/require.js"></script>
+
+ <script type="template/text" id="printtab_loading_bg_template">
+  <div>
+   <i class="fa fa-spinner fa-spin"> </i>
+   $zoo._("Loading the base layer for printing ...")
+  </div>
+ </script>
+
+ <script type="template/text" id="printtab_loading_print_template">
+  <div>
+   <i class="fa fa-spinner fa-spin"> </i>
+   $zoo._("Printing the document ...")
+  </div>
+ </script>
+
+ <script type="template/text" id="printtab_loading_print_error_template">
+  <div class="error">
+   <i class="fa fa-exclamation"> </i>
+   $zoo._("Error occured when trying to print the document.")
+   <div id="print-error-details" class="more-details">
+   </div>
+  </div>
+ </script>
+
+ <script type="template/text" id="printtab_loading_print_success_template">
+  <div class="success padd">
+   <i class="fa fa-file"> </i>
+   <a id="printtab_res_link" href="#" target="_blank">
+    $zoo._("The document printed.")
+   </a>
+   <div class="print-preview padd">
+     <img id="print-preview-img" class="img-responsive" title="$zoo._("Preview")" src="http://placehold.it/1024x768/CCCCCC/ffffff&text=Preview ..." />
+    </span>
+   </div>
+  </div>
+ </script>
+
+
+ <script type="template/text" id="printtab_loading_print_preview_success_template">
+  <div class="success">
+   <i class="fa fa-file"> </i>   
+   <a id="printtab_res_link" href="#" target="_blank">
+    $zoo._("The printed document.")
+   </a>
+  </div>
+ </script>
+
+
+ <script type="template/text" id="printtab_header_template">
+  <li role="presentation" data-toggle="tooltip" data-placement="bottom" title="Print">
+   <a id="mmprintAction" href="#mmprintTab" aria-controls="settings" role="tab" data-target="#mmprintTab" data-toggle="tab">
+    <i class="fa fa-print"></i>
+   </a>
+  </li>
+ </script>
+
+ <script type="template/text" id="printtab_template">
+  <div class="padd" title="$zoo._("Print Document").replace("'","\\'")">
+   <div id="print-content"">
+    <label for="iFormat">Select template</label>
+    <div class="styled-select">
+     <select id="iFormat">
+      <option value="A4l">A4 Landscape</option>
+      <option value="A4">A4</option>
+     </select>
+    </div>
+    <div id="print-map" style="with:100%;height:150px;">
+    </div>
+    <div class="print-map-info">
+    $zoo._("The geographical zone displayed on this map will be printed.")
+    </div>
+    <input type="submit" onclick="app.printDocument()" value="Print"/>
+    <div id="print-loader" style="display:none">
+     <div id="print-loader-info"></div>
+    </div>
+    <div id="print-result" style="display:none">
+     <a target="_blank" id="printer-link" href="#"><img src="$conf["main"]["mmAddress"]/images/pdf.png"/></a>
+    </div>
+   </div>
+  </div> 
+ </script>
+
+ <script type="template/text" id="permalink_header_template">
+  <li role="presentation" data-toggle="tooltip" data-placement="bottom" title="QRCode">
+   <a id="qrcodeAction" href="#qrcodeTab" aria-controls="settings" role="tab" data-target="#qrcodeTab" data-toggle="tab">
+    <i class="fa fa-link"></i>
+   </a>
+  </li>
+ </script>
+
+ <script type="template/text" id="auth_header_template">
+  <li role="presentation" data-toggle="tooltip" data-placement="bottom" title="$zoo._("Authenticate")">
+   <a id="authAction" href="#authTab" aria-controls="settings" role="tab" data-target="#authTab" data-toggle="tab">
+    <i class="fa fa-user"></i>
+   </a>
+  </li>
+ </script>
+
+</body>
+</html>
+#end if

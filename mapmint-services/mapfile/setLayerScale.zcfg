@@ -25,6 +25,24 @@
     DataType = string
     <Default />
    </LiteralData>
+  [st]
+   Title = Scale Type
+   Abstract = The Scale Types.
+   minOccurs = 1
+   maxOccurs = 4
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [sv]
+   Title = Scale Value
+   Abstract = The Scale Values.
+   minOccurs = 1
+   maxOccurs = 4
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
  </DataInputs>
  <DataOutputs>
   [Result]
@@ -32,7 +50,7 @@
    Abstract = The welcome message created by service.
    <ComplexData>
     <Default>
-     mimeType = application/json
+     mimeType = text/plain
      encoding = utf-8
     </Default>
    </ComplexData>

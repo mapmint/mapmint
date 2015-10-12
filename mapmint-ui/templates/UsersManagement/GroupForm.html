@@ -1,0 +1,33 @@
+#encoding "utf-8"
+#import zoo
+#if $inputs["type"]["value"]=="delete"
+#set titles=['id','name']
+#set names=['id','name']
+#else
+#set titles=['id','name','description','admin access']
+#set names=['id','name','description','adm']
+#end if
+<div id="$inputs["type"]["value"]-group" class="collapse groupBaseEditForm #if $inputs["type"]["value"]!="insert"#groupEditForm#end if#">
+  <form class="form-inline mt" data-toggle="validator" role="form">
+  <fieldset class="mbp mtp">
+  <legend>$zoo._("General informations")</legend>
+#set cnt=0
+#for i in $titles
+#set j=$names[$cnt]
+  <div class="form-group">
+  #set ii=$i.replace(' ','_')
+#if $cnt>0 and ($inputs["type"]["value"]=="update" or $cnt+1==len(titles))
+    <label for="up_$ii" class="control-label">$zoo._(i.title()): </label>
+#end if
+    <input name="$j" id="up_$ii" class="form-control" #if $cnt==0#type="hidden"#else##if $cnt+1==len(titles) and $inputs["type"]["value"]!="delete"#type="checkbox"#end if##end if# #if $inputs["type"]["value"]=="insert"#placeholder="$zoo._(i.title())"#end if# />
+
+#set $cnt+=1
+  </div>
+#end for
+  <input id="um_utype" type="hidden" value="$inputs["type"]["value"]" />
+  <button type="submit" href="#" class="btn btn-primary groupSubmitForm">
+  #if $inputs["type"]["value"]=="delete"#$zoo._("Delete")#else##if $inputs["type"]["value"]=="update"#$zoo._("Save")#else#$zoo._("Add")#end if##end if#
+  </button>
+  </fieldset>
+  </form>
+</div>

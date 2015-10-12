@@ -547,6 +547,10 @@ System.postMap[System.postMap.length]={
 			}
 #if $m.getLayerByName(lname).metadata.get('mmZFilterField') and $inputs.has_key('filter')
     			map.zoomToExtent(this.getDataExtent());
+#if $conf["senv"].keys().count("previous_map")>0 and $conf["senv"]["previous_map"]!="Default"
+    			\$('.fg-toolbar').find(".fg-button").first().attr("href",\$('.fg-toolbar').find(".fg-button").first().attr("href")+"$conf["senv"]["previous_map"]");
+#end if
+
 #end if
 		    }
 		});
@@ -631,6 +635,9 @@ System.postMap[System.postMap.length]={
 		layersList[this.localID].events.register('loadend', layersList[this.localID], function(){
 		    if(this.localID>=0){
 			map.zoomToExtent(this.getDataExtent());
+#if $conf["senv"].keys().count("previous_map")>0 and $conf["senv"]["previous_map"]!="Default"
+			\$('.fg-toolbar').find(".fg-button").first().attr("href",\$('.fg-toolbar').find(".fg-button").first().attr("href")+"$conf["senv"]["previous_map"]");
+#end if
 		    }
 		});
 #end if
@@ -708,6 +715,9 @@ System.postMap[System.postMap.length]={
 			});
 		features=gmlr.read(xml.responseText);
 		map.zoomToExtent(features[0].geometry.getBounds());
+#if $conf["senv"].keys().count("previous_map")>0 and $conf["senv"]["previous_map"]!="Default"
+		\$('.fg-toolbar').find(".fg-button").first().attr("href",\$('.fg-toolbar').find(".fg-button").first().attr("href")+"$conf["senv"]["previous_map"]");
+#end if
 	    }catch(e){alert(e);}
 	}
     });
@@ -835,7 +845,7 @@ var ok=1;
 		resizable: false,
 		minimizable:false,
 		collapsible: false,
-		width:250,
+		width:350,
 		top:100,
 		left: 358
 	    });
@@ -1273,13 +1283,13 @@ var react=Array(
 #if $m.web.metadata.get('layout_t')=="mobile"
 	    \$.mobile.changePage("#popup", "none"); 
 #else
-	    \$("#dialog-featureInfo")[0].title="Feature Details";
+	    \$("#dialog-featureInfo")[0].title=System.messages["Feature Details"];
 	    \$("#dialog-featureInfo").window({
 		maximizable:false,
 		resizable: false,
 		minimizable:false,
 		collapsible: false,
-		width:250,
+		width:350,
 		top:100,
         left: 358
 		

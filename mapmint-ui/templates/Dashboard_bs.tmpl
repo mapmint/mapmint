@@ -1,0 +1,407 @@
+#encoding UTF-8
+#from Skeleton_bs import Skeleton_bs
+#extends Skeleton_bs
+
+#attr $mmodule = "Dashboard"
+
+#attr $ocss = []
+
+#def istyles
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.2.0/css/colReorder.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/1.0.7/css/responsive.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.0.0/css/select.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/dataTables.bootstrap.min.css"/>
+#end def
+
+#attr $js = ['jquery.tipsy.js','jquery.hoverIntent.min.js','jquery.jqplot.min.js','plugins/jqplot.dateAxisRenderer.js','plugins/jqplot.highlighter.js','plugins/jqplot.cursor.js','plugins/jqplot.pieRenderer.min.js','plugins/jqplot.donutRenderer.min.js','progress-bar.js','Meta.js','jquery.cookie.js','wps.js','ckeditor.js']
+
+#attr $js1 = ['main_js']
+
+#def page_title
+MapMint: Dashboard
+#end def
+
+#def mmenu
+	      <ul class="nav nav-second-level collapse in">
+		<li>
+		<a id="dashOverviewAction" href="#dashOverview" role="tab" data-toggle="tab"><i class="fa fa-eye fa-fw"></i> $zoo._("Overview")</a>
+		</li>
+		<li>
+		<a href="#dashUsers" role="tab" data-toggle="tab"><i class="fa fa-users fa-fw"></i> $zoo._("Users")</a>
+		</li>
+		<li>
+		<a href="#settings"><i class="fa fa-wrench fa-fw"></i> $zoo._("Settings") <span class="fa arrow"></span></a>
+		<ul class="nav nav-third-level">
+#set i=0
+#set sections=['main','provider','identification']
+#set aliases=['main','provider','identification']
+#set icons=["laptop","user","lock"]
+#if $conf.keys().count($conf["main"]["dbuser"])>0
+#set sections+=[$conf["main"]["dbuser"]]
+#set icons+=["database"]
+#set aliases+=["database"]
+#end if
+#for a in $sections
+		    <li>
+			<a class="mmaction" role="tab" href="#dash$(a.title())Form" data-toggle="tab"><i class="fa fa-$icons[$i] fa-fw"></i> $zoo._(aliases[i].title())</a>
+		    </li>
+#set i=i+1
+#end for
+		</ul>
+		</li>
+	      </ul>
+#end def
+
+#def body
+#import zoo
+#import mm_access
+
+#from datastores.directories.service import *
+#set loutputs={"Result":{"value":""}}
+#set a=displayJSON($conf,$inputs,$loutputs)
+#set b=eval($loutputs["Result"]["value"])
+#from datastores.postgis.service import displayJson
+#set dbs=[]
+#for i in ('PostGIS','MySQL')
+#set l1outputs={"Result":{"value":""}}
+#set linputs=$inputs
+#set $linputs["type"]={"value":$i}
+#set c=displayJson($conf,$inputs,$l1outputs)
+#if $l1outputs["Result"]["value"] == "" or $l1outputs["Result"]["value"] == " "
+#set dbs=$dbs+[[]]
+#else
+#set tmp=eval($l1outputs["Result"]["value"])
+#set dbs=$dbs+[tmp["sub_elements"]]
+#end if
+#end for
+
+#set layersNumber=0
+#import mapscript
+#set ln=0
+#set ln1=1
+#for i in range(len($b))
+#try
+#set mm1=mapscript.mapObj($b[$i]["id"].replace("__","/")+"/ds_ows.map")
+#for kk in range(0,mm1.numlayers):
+#set j=$mm1.getLayer($kk)
+#if $mm_access.checkLayerPriv($conf,$mm1,$j.name,"rx")
+#set $ln+=1
+#end if
+#end for
+#except
+#set $ln1+=1
+#end try
+#end for
+
+
+#set layersNumber=0
+#for i in range(len($dbs))
+#for j in range(len($dbs[i]))
+#try
+#set mm1=mapscript.mapObj($conf["main"]["dataPath"]+"/"+$dbs[$i][$j]['type']+"/"+$dbs[$i][$j]['name']+"ds_ows.map")
+#for kk in range(0,mm1.numlayers):
+#set j=$mm1.getLayer($kk)
+#if $mm_access.checkLayerPriv($conf,$mm1,$j.name,"rx")
+#set $ln+=1
+#end if
+#end for
+#except
+#set layersNumber+=0
+#end try
+#end for
+#end for
+
+#from mapfile.service import listMap
+#import json
+#set loutputs={"Result":{"value":""}}
+#set a1=listMap($conf,$inputs,$loutputs)
+#set nmaps=json.loads($loutputs["Result"]["value"])
+
+<div class="tab-content">  
+
+	<div id="dashOverview" role="tabpanel" class="tab-pane active">
+	    <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header"><i class="fa fa-eye fa-fw"></i> $zoo._("Overview")</h1>
+		    <h6>$zoo._("Last connected on ")$conf['senv']['last_con']</h6>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+	    <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="mmi mmi-distiller fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">$(len(b)+len(dbs[0])+len(dbs[1]))</div>
+                                    <div>#if len(b)+len(dbs[0])+len(dbs[1]) > 1#$zoo._("Data stores")#else#$zoo._("Data store")#end if#</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="dashOverviewBody" class="panel-body collapse ">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item">
+                                     $zoo._("Directories")
+                                    <span class="pull-right text-muted small"><em>$(len(b))</em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                     $zoo._("PostGIS databases")
+                                    <span class="pull-right text-muted small"><em>$(len(dbs[0]))</em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                     $zoo._("MySQL databases")
+                                    <span class="pull-right text-muted small"><em>$(len(dbs[1]))</em>
+                                    </span>
+                                </a>
+                                <a href="#" class="list-group-item">
+                                     #if $ln > 1#$zoo._("Data sources")#else#$zoo._("Data source")#end if#
+                                    <span class="pull-right text-muted small"><em>$(ln)</em>
+                                    </span>
+                                </a>
+                            </div>
+                            <!-- /.list-group -->
+                            <a href="#" class="btn btn-default btn-block">$zoo._("Launch the Distiller")</a>
+                        </div>
+                        <a  href="#dashOverviewBody" data-toggle="collapse">
+                            <div class="panel-footer">
+                                <span class="pull-left">$zoo._("View Details")</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="panel panel-green">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="mmi mmi-manager fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">$(len(nmaps))</div>
+                                    <div>#if len(b)>1#$zoo._("Maps")#else#$zoo._("Map")#end if#</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="dashManagerBody" class="panel-body collapse ">
+                            <ul class="chat">
+#import mapfile.service as mms
+
+#set limit=3
+#if len($nmaps)<3
+#set limit=len($nmaps)
+#end if
+#for i in range(0,$limit)
+#set mpath=$conf["main"]["dataPath"]+"/maps/"+$nmaps[i]["value"]
+#set mm=mapscript.mapObj($mpath)
+#set purl=$mm.web.metadata.get('previewUrl')
+#try
+#if $mm.web.metadata.get("previewUrl")
+#set purl=$mm.web.metadata.get('previewUrl')
+#else
+#set ll=$mm.web.metadata.get('mmActivatedLayers')
+#if ll==""
+#for kk in range(0,$mm.numlayers)
+#set $ll+=$mm.getLayer(0).name
+#if $kk+1<$mm.numlayers
+#set $ll+=","
+#end if
+#end for
+#end if
+#set a=$mm.getLayer(0).getExtent()
+#set tmp=$a.project(mapscript.projectionObj(mm.getLayer(0).getProjection()),mapscript.projectionObj("+init=EPSG:4326"))
+#set x=(($a.maxx-$a.minx)/2)+$a.minx
+#set y=(($a.maxy-$a.miny)/2)+$a.miny
+#set purl=$conf["main"]["mapserverAddress"]+"?map="+$mpath+"&LAYERS="+$ll+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX="+str($a.minx)+","+str($a.miny)+","+str($a.maxx)+","+str($a.maxy)+"&SRS=EPSG:4326&WIDTH=230&HEIGHT=170"
+#end if
+#except Exception,e
+$e
+#set purl="http://placehold.it/50/55C1E7/fff"
+#end try
+
+
+                                <li class="left clearfix">
+                                    <span class="chat-img pull-left">
+
+                                        <img src="$purl" alt="Preview" class="img-circle" width="50" />
+
+                                    </span>
+                                    <div class="chat-body clearfix">
+                                        <div class="header">
+                                            <strong class="primary-font">$mm.web.metadata.get('ows_title')</strong>
+                                            <a class="pull-right text-muted" href="#">
+                                                <i class="glyphicon glyphicon-pencil fa-fw"></i>
+                                            </a>
+                                        </div>
+                                        <p>
+                                           $(mms.getDescription($conf,$mm))
+                                        </p>
+                                        <div class="footer">
+                                            <small class="text-muted">
+					    	<i class="fa fa-user fa-fw"></i> Jack Sparrow
+					    </small>
+                                            <small class="pull-right text-muted">
+                                                <i class="fa fa-clock-o fa-fw"></i> $nmaps[$i]["mTime"]
+                                            </small>
+                                        </div>
+                                    </div>
+                                </li>
+#end for
+                            </ul>
+                            <a href="#" class="btn btn-default btn-block">$zoo._("Launch the Distiller")</a>
+                        </div>
+                        <a href="#dashManagerBody" data-toggle="collapse">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-yellow">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="icon-mm-logo fa-5x"></i>
+                                </div>
+#try
+#import socket
+#set s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#set res=$s.connect(("gmail.com",80))
+#set lip=$s.getsockname()[0]
+#set res=$s.close()
+#except
+#set lip=$zoo._("Unknown")
+#end try
+
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">$zoo.VERSION</div>
+                                    <div>$(zoo._("%s version")%("ZOO-Project"))</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="dashMapMintBody" class="panel-body collapse ">
+                            <div class="list-group">
+
+#def printVersion(soft,vers)
+                                <a href="#" class="list-group-item">
+#if $soft.count(" ")==0
+				     $(zoo._("%s version")%(soft))
+#else
+				     $(zoo._(soft))
+#end if
+                                    <span class="pull-right text-muted small"><em>$vers
+				    </em></span>
+                                </a>
+#end def
+
+#try
+#set msVers=$mapscript.MS_VERSION
+#except
+#set msVers=$zoo._("Unknown")
+#end try				    
+#try
+#set gdalVers=$osgeo.gdal.__version__
+#except
+#set gdalVers=$zoo._("Unknown")
+#end try				    
+#try
+#import sqlite3	
+#set sqliteVers=sqlite3.version
+#except
+#set sqliteVers=$zoo._("Unknown")
+#end try				    
+
+#set softs=[
+     ["MapServer",$msVers],
+     ["GDAL",$gdalVers],
+     ["SQLite",$sqliteVers],
+     ["Server IP",$lip],
+]
+#for i in range(0,len($softs))
+$(printVersion($softs[i][0],$softs[i][1]))
+#end for
+			    </div>
+			</div>
+                        <a href="#dashMapMintBody" data-toggle="collapse">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+#import sqlite_module as sql
+#set t=$sql.request($conf,"SELECT count(*) as nb from spatial_ref_sys where fav")
+#set prjNumber=0
+#for i in $t
+#set prjNumber=$i[0]
+#end for
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-red">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-globe fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge" id="srsNb">$prjNumber</div>
+                                    <div>$zoo._("Favorite SRS")</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="dashSrsBody" class="panel-body collapse ">
+#set t=$sql.request($conf,"SELECT code from spatial_ref_sys where fav")
+                            <div class="list-group">
+#for i in $t
+                                <a href="#" class="list-group-item">
+				   <span>$i[0]</span>
+				   <button value="$i[0]" class="badge srsDel btn trash grey" href="#" data-placement="left" data-toggle="tooltip" title="Delete"><span class="glyphicon glyphicon-trash"></span></button>
+                                </a>
+#end for
+
+			    </div>
+			    <div id="scrollable-dropdown-menu" class="form-group">
+			      <div class="input-group">
+			        <input class="form-control typeahead" type="text" placeholder="SRS Code" />
+				<span id="srsAdd" class="input-group-addon disabled" value="$zoo._("Add")">$zoo._("Add") </span>
+			      </div>
+			    </div>
+
+			  <table id="dashSrsTable"></table>
+                        </div>
+                        <a href="#dashSrsBody" data-toggle="collapse">
+                            <div class="panel-footer">
+                                <span class="pull-left">View Details</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- /.row -->
+</div>
+
+
+      #include $conf['main']['templatesPath']+"/UsersManagement.tmpl"
+      #include $conf['main']['templatesPath']+"/Configuration_bs.tmpl"
+
+</div>
+
+
+
+  </div>
+</div> 
+#end def

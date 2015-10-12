@@ -3,7 +3,11 @@
 #set m=mapscript.mapObj($inputs["dst"]["value"]+"/ds_ows.map")
 #set l=m.getLayerByName($inputs["dso"]["value"])
 #set tmp=$l.metadata.get("ows_extent")
+#if $tmp is not None
 #set tmp1=$tmp.split(' ')
+#else
+#set tmp1=[$l.extent.minx,$l.extent.miny,$l.extent.maxx,$l.extent.maxy]
+#end if
 #set p1=mapscript.pointObj(float($tmp1[0]),float($tmp1[1]))
 #set p2=mapscript.pointObj(float($tmp1[2]),float($tmp1[3]))
 #set q1=$p1.project(mapscript.projectionObj(l.getProjection()),mapscript.projectionObj("epsg:4326"))

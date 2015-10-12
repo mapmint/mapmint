@@ -208,7 +208,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
                <p class="meta">$(mms.getShortDescription($conf,$mm))</p>
 	<ul class="dtls">
               <li><a href="#" id="$i[1]" class="map-btn minfo">Information</a></li>
-             <li>       <a href="$conf["main"]["rootUrl"]#if $conf["main"]["rootUrl"][len($conf["main"]["rootUrl"])-1]!="/"#/#end if#$i[1]" class="map-btn">View</a></li>
+             <li>       <a href="$conf["main"]["rootUrl"]#if $conf["main"]["rootUrl"][len($conf["main"]["rootUrl"])-1]!="/"#/#end if#$i[1]" class="map-btn">$zoo._("View")</a></li>
         </ul>
        </div>
 

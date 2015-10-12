@@ -72,6 +72,12 @@ define([
         /**
          * @access public
 	 * @memberof ZooProcess#
+	 * @var version {String} The WPS version
+	 */
+        this.version = params.version?params.version:"1.0.0";
+        /**
+         * @access public
+	 * @memberof ZooProcess#
 	 * @var language {String} The language to be used to request the WPS Server
 	 * @default "en-US"
 	 */
@@ -136,7 +142,7 @@ define([
             var zoo_request_params = {
                 request: 'GetCapabilities',
                 service: 'WPS',
-                version: '1.0.0',
+                version: (params.hasOwnProperty('version')?params.version:closure.version),
             }
 
             this.request(zoo_request_params, params.success, params.error, params.type);
@@ -169,7 +175,7 @@ define([
                 Identifier: params.identifier,
                 request: 'DescribeProcess',
                 service: 'WPS',
-                version: '1.0.0',
+                version: (params.hasOwnProperty('version')?params.version:closure.version),
             }
 
             this.request(zoo_request_params, params.success, params.error, params.type);
@@ -197,15 +203,19 @@ define([
             var zoo_request_params = {
                 request: 'Execute',
                 service: 'WPS',
-                version: '1.0.0',
+                version: (params.hasOwnProperty('version')?params.version:closure.version),
                 Identifier: params.identifier,
                 DataInputs: params.dataInputs ? params.dataInputs : '',
                 DataOutputs: params.dataOutputs ? params.dataOutputs : '',
             }
 
+	    console.log(zoo_request_params);
 
             if (params.hasOwnProperty('responseDocument')) {
                 zoo_request_params.ResponseDocument = params.responseDocument;
+            }
+            if (params.hasOwnProperty('mode')) {
+                zoo_request_params.mode = params.mode;
             }
             if (params.hasOwnProperty('storeExecuteResponse') &&  params.storeExecuteResponse) {
                 zoo_request_params.storeExecuteResponse = 'true';
@@ -256,6 +266,7 @@ define([
 		if(closure.debug){
                     console.log("======== POST PAYLOAD ========");
                     console.log(payload);
+		    console.log(params);
 		}
 
                 headers = {
@@ -366,15 +377,27 @@ define([
 			    data._origin=tmpD;
 			}
 			var launched;
-			
-			if (params.storeExecuteResponse == 'true' && params.status == 'true') {
-			    launched = closure.parseStatusLocation(data);            
-			    closure.statusLocation[launched.sid] = launched.statusLocation;
-			    
-			    if ( launched.hasOwnProperty('sid') && 
-				 !closure.launched.hasOwnProperty(launched.sid)) {
-				closure.launched[launched.sid] = launched.statusLocation;
+			var version=(params.version?params.version:closure.version);
+			if(version=="1.0.0"){
+			    if (params.storeExecuteResponse == 'true' && params.status == 'true') {
+				launched = closure.parseStatusLocation(data);            
+				closure.statusLocation[launched.sid] = launched.statusLocation;
+				
+				if ( launched.hasOwnProperty('sid') && 
+				     !closure.launched.hasOwnProperty(launched.sid)) {
+				    closure.launched[launched.sid] = launched.statusLocation;
+				}
 			    }
+			}
+			else{
+			    if (params.mode == 'async') {
+				launched = closure.parseJobID(data);
+				closure.statusLocation[launched.sid] = closure.url+"?request=GetStatus&service=WPS&version=2.0.0&JobID="+launched.jobid;
+				if ( launched.hasOwnProperty('sid') && 
+				     !closure.launched.hasOwnProperty(launched.sid)) {
+				    closure.launched[launched.sid] = launched.jobid;
+				}
+			    }	    
 			}
 
 			if(onSuccess)
@@ -443,6 +466,79 @@ define([
 		if(closure.debug){
                     console.log("++++ getStatus SUCCESS "+sid);
                     console.log(data);
+		}
+
+		if(data.StatusInfo || data.Result){
+		    if (data.Result) {
+
+			var ret = {
+                            sid: sid,
+                            text: "",
+                            result: data
+			};
+
+			if (handlers.onProcessSucceeded instanceof Function) {
+                            handlers.onProcessSucceeded(ret);
+			}
+
+			return;
+		    }
+		    if (data.StatusInfo.Status == "Running") {
+			if(closure.debug){
+			    console.log("#### ProcessStarted");
+			}
+			
+			var message="";
+			for(index=0;index<data._origin.childNodes[0].childNodes.length;index++){
+			    if(data._origin.childNodes[0].childNodes[index].nodeType==8){
+				message=data._origin.childNodes[0].childNodes[index].textContent;
+			    }
+			}
+			var ret = {
+                            sid: sid,
+                            percentCompleted: (data.StatusInfo.PercentCompleted?data.StatusInfo.PercentCompleted:0),
+                            text: message,
+                            creationTime: "",
+			};
+
+			if (handlers.onPercentCompleted instanceof Function) {
+                            handlers.onPercentCompleted(ret);
+			}
+                    }
+                    else if (data.StatusInfo.Status == "Succeeded") {
+			if(closure.debug){
+			    console.log("#### ProcessSucceeded");
+			}
+
+			var text = "";
+			closure.terminated[sid] = true;
+
+			ret = {
+                            sid: sid,
+                            text: text,
+                            result: data
+			};
+			
+			closure.getResult(sid, onSuccess, onError);
+                    }
+                    else {
+			if(closure.debug){
+			    console.log("#### UNHANDLED EXCEPTION");
+			}
+			closure.terminated[sid] = true;
+			ret = {
+                            sid: sid,
+                            code: 'BAD',
+                            text: 'UNHANDLED EXCEPTION'
+			};
+			
+			//closure.emit('exception', ret);
+			if (handlers.onError instanceof Function) {
+                            handlers.onError(ret);
+			}
+                    }
+
+		    return
 		}
 
 		if (data.ExecuteResponse.Status.ProcessAccepted) {
@@ -528,6 +624,7 @@ define([
 		if(closure.debug){
                     console.log("PING: "+sid);
 		}
+
                 closure.getStatus(sid, onSuccess, onError);
                 if (closure.terminated[sid]) {
 		    if(closure.debug){
@@ -582,6 +679,55 @@ define([
 
             $.ajax({
 		url: closure.statusLocation[sid]
+	    })
+		.fail(
+                    function(jqXHR, textStatus, errorThrown) {
+			if(closure.debug){
+			    console.log("======== ERROR ========");
+			}
+			var robj=_x2js.xml2json( jqXHR.responseXML );
+			if(closure.debug){
+			    console.log(robj);
+			}
+			if(onError)
+			    onError(robj);
+                    }
+		)
+		.done(
+                    function(data, textStatus, jqXHR) {
+			if(closure.debug){
+			    console.log("======== SUCCESS ========2");
+			    console.log(data);
+			}
+			var ctype=jqXHR.getResponseHeader("Content-Type").split(";")[0];
+			if( ctype=="text/xml" ){
+			    var tmpD=data;
+			    data = _x2js.xml2json( data );
+			    data._origin=tmpD;
+			}
+			if(onSuccess)
+			    onSuccess(data);
+		    });
+        };
+
+	/**
+	 * The getResult method is used by {@link ZooProcess#watch} to get the
+	 * final result of services called asynchronously.
+	 * 
+	 * @method getResult
+	 * @memberof ZooProcess#
+	 * @param {Integer} sid Service Identifier
+	 * @param {Function} onSuccess callback 
+	 * @param {Function} onError callback 
+	 */
+        this.getResult = function(sid, onSuccess, onError) {
+            var closure = this;
+	    if(closure.debug){
+		console.log("GET STATUS: "+sid);
+		console.log(closure.statusLocation[sid].replace(/GetStatus/g,"GetResult"));
+	    }
+            $.ajax({
+		url: closure.statusLocation[sid].replace(/GetStatus/g,"GetResult")
 	    })
 		.fail(
                     function(jqXHR, textStatus, errorThrown) {
@@ -790,6 +936,65 @@ define([
                 return {sid: lsid, statusLocation: statusLocation};
             }
         };        
+
+	/**
+	 * The parseJobID method parse the JobID and return an
+	 * object with sid and the JobID attributes which contains
+	 * respectively: a unique identifier named sid and the JobID
+	 * value returned by the WPS server.
+	 * 
+	 * @method parseJobID
+	 * @memberof ZooProcess#
+	 * @param {Object} data The XML response parsed by x2js.xml2json
+	 * @returns {Object} The result is an object with sid and jobID
+	 */
+        this.parseJobID = function(data) {
+            var closure = this;
+
+            if (jobID = data.StatusInfo.JobID) {
+
+		var lsid=0;
+		for(i in closure.statusLocation)
+		    lsid++;
+		
+                return {sid: lsid, jobid: jobID};
+            }
+        }; 
+
+	/**
+	 * The dismiss method run the Dismiss request by calling {@link ZooProcess#request}.
+	 * 
+	 * @method dismiss
+	 * @memberof ZooProcess#
+	 * @param {Object} params 
+	 * @example
+	 * // Log x2js representation of all available services in console
+	 * myZooObject.dismiss({
+	 *     type: 'POST',
+	 *     jobid: "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+	 *     success: function(data){
+	 *         console.log(data);
+	 *     }
+	 * });
+	 */
+        this.dismiss = function(params) {
+            var closure = this;
+
+            if (!params.hasOwnProperty('type')) {
+                params.type = 'GET';
+            }
+
+            var zoo_request_params = {
+                Identifier: params.identifier,
+                request: 'Dismiss',
+                service: 'WPS',
+		jobid: params.jobid,
+                version: "2.0.0",
+            }
+
+            this.request(zoo_request_params, params.success, params.error, params.type);
+        };
+
     };
     
 

@@ -1,0 +1,126 @@
+#import zoo
+
+	<div id="dashUsers" role="tabpanel" class="tab-pane">
+	    <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header"><i class="fa fa-users fa-fw"></i> $zoo._("Users management")</h1>
+                </div>
+                <!-- /.col-lg-12 -->
+            </div>
+#def printTabHeader(id,title,font,classe)
+<li role="presentation" #if $classe is not None#class="$classe"#end if#>
+  <a id="$(id)_Toggler" href="#$id" aria-controls="home" role="tab" data-toggle="tab">
+    <i class="fa $font fa-fw"></i>
+    <span class="hidden-xs hidden-sm hidden-md">
+      $title
+    </span>
+  </a>
+</li>
+#end def
+
+	    <ul class="nav nav-tabs" role="tablist">
+	      $printTabHeader("users_management",$zoo._("Users"),"fa-user",None)
+	      $printTabHeader("groups_management",$zoo._("Groups"),"fa-users",None)
+	    </ul>
+	    <div id="users_management" class="tab-pane active">	    
+	    <div class="row">
+	        <div class="btn-group">
+		    <a class="btn btn-default btn-sm fa fa-user-plus"
+	    title="$zoo._("Add user")" data-toggle="collapse"
+	    data-target="#insert-user" href="#insert-user"></a>
+		    <a class="require-select require-user-select btn btn-default btn-sm fa
+	    fa-user-times disabled" title="$zoo._("Delete user")" role="tab"  data-toggle="collapse" data-target="#delete-user"></a>
+		    <a class="require-select require-user-select btn btn-default btn-sm fa
+	    fa-edit disabled" title="$zoo._("Edit user")" role="tab"  data-toggle="collapse" data-target="#update-user"></a>
+		</div>
+	    </div>
+
+	    <div class="tab-content">
+	    <div class="row">
+#set inputs1=$inputs
+#set $inputs1["clause"]={"value":"id="}
+#set $inputs1["type"]={"value":"insert"}
+#set searchList1=$searchList
+      $(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/UserForm.tmpl",searchList=[{"conf":$conf,"inputs":$inputs1}]))
+	    </div>
+
+	    <div class="row">
+#set inputs1=$inputs
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#set $inputs1["clause"]={"value":"id=(select id from "+$prefix+"users where login='"+$conf["senv"]["login"]+"')"}
+#set $inputs1["type"]={"value":"delete"}
+#set searchList1=$searchList
+      $(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/UserForm.tmpl",searchList=[{"conf":$conf,"inputs":$inputs1}]))
+	    </div>
+	    
+	    <div class="row">
+#set inputs1=$inputs
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#set $inputs1["clause"]={"value":"id=(select id from "+$prefix+"users where login='"+$conf["senv"]["login"]+"')"}
+#set $inputs1["type"]={"value":"update"}
+#set searchList1=$searchList
+      $(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/UserForm.tmpl",searchList=[{"conf":$conf,"inputs":$inputs1}]))
+	    </div>
+	    </div>
+	    <div class="row">
+	    	<table id="dashUsersTable"></table> 
+	    </div>
+	</div>
+	    <div id="groups_management" class="tab-pane">
+	    <div class="row">
+	        <div class="btn-group">
+		    <a class="btn btn-default btn-sm fa fa-user-plus"
+	    title="$zoo._("Add group")" data-toggle="collapse"
+	    data-target="#insert-group" href="#insert-group"></a>
+		    <a class="require-group-select btn btn-default btn-sm fa
+	    fa-user-times disabled" title="$zoo._("Delete group")" role="tab"  data-toggle="collapse" data-target="#delete-group"></a>
+		    <a class="require-group-select btn btn-default btn-sm fa
+	    fa-edit disabled" title="$zoo._("Edit group")" role="tab"  data-toggle="collapse" data-target="#update-group"></a>
+		</div>
+	    </div>
+
+	    <div class="tab-content">
+	    <div class="row">
+#set inputs1=$inputs
+#set $inputs1["clause"]={"value":"id="}
+#set $inputs1["type"]={"value":"insert"}
+#set searchList1=$searchList
+      $(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/GroupForm.html",searchList=[{"conf":$conf,"inputs":$inputs1}]))
+	    </div>
+
+	    <div class="row">
+#set inputs1=$inputs
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#set $inputs1["clause"]={"value":"id=(select id from "+$prefix+"users where login='"+$conf["senv"]["login"]+"')"}
+#set $inputs1["type"]={"value":"delete"}
+#set searchList1=$searchList
+      $(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/GroupForm.html",searchList=[{"conf":$conf,"inputs":$inputs1}]))
+	    </div>
+	    
+	    <div class="row">
+#set inputs1=$inputs
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#set $inputs1["clause"]={"value":"id=(select id from "+$prefix+"users where login='"+$conf["senv"]["login"]+"')"}
+#set $inputs1["type"]={"value":"update"}
+#set searchList1=$searchList
+      $(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/GroupForm.html",searchList=[{"conf":$conf,"inputs":$inputs1}]))
+	    </div>
+	    </div>
+	    <div class="row">
+	    	<table id="dashGroupsTable"></table> 
+	    </div>
+
+	    </div>
+	</div>

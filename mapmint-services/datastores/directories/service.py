@@ -277,18 +277,34 @@ def load(conf,inputs,outputs):
 	#print >> sys.stderr, b[len(b)-1]
 	outputs["Result"]["value"]=json.dumps({"name": b[len(b)-1], "link":os.readlink(a[0:len(a)-1])})
 	return 3
-					      
+
+
+def details(conf,inputs,outputs):
+	a=inputs["name"]["value"]
+	a=a.replace("__","/")
+	b=a[1:len(a)].split("/")
+	#print >> sys.stderr, a[0:len(a)-1]
+	#print >> sys.stderr, b[len(b)-1]
+	link=os.readlink(a).replace("//","/")
+	if link[len(link)-1]=="/":
+		link=link[0:len(link)-1]
+	outputs["Result"]["value"]=json.dumps({"name": b[len(b)-1], "link":link})
+    
+	return 3
+    
 def delete(conf,inputs,outputs):
-	a=conf["main"]["dataPath"]+"/dirs/"+inputs["name"]["value"]
-	try:
-		if os.path.exists(a):
-			os.unlink(a)
-	except:
+    a=conf["main"]["dataPath"]+"/dirs/"+inputs["name"]["value"]
+    if inputs["name"]["value"].count(conf["main"]["dataPath"]):
+		a=inputs["name"]["value"]
+		a=a[0:len(a)-1]
+    try:
+		os.unlink(a)
+    except:
 		er=sys.exc_info()
 		conf["lenv"]["message"]="Unable to drop directory ("+a[0:len(a)-1]+"): "+er[1][1]
 		return 4
-	outputs["Result"]["value"]="Datastore deleted"
-	return 3
+    outputs["Result"]["value"]="Datastore deleted"
+    return 3
 
 def getDirSize(folder):
 	folder_size = 0

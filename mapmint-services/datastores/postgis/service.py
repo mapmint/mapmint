@@ -59,6 +59,33 @@ def load(conf,inputs,outputs):
 	outputs["Result"]["value"]=values+', "name": "'+inputs["name"]["value"]+'", "stype": "'+inputs["type"]["value"]+'"'+"}"
 	return 3
 
+def details(conf,inputs,outputs):
+	dbParams=['dbname','user','password','host','port']
+	res={}
+	values="{"
+	try: 
+		parse_options = libxml2.XML_PARSE_DTDLOAD + libxml2.XML_PARSE_NOENT
+		libxml2.initParser()
+		xqf = libxml2.readFile(conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"+inputs["name"]["value"]+".xml", None, parse_options)
+		cnt=0
+		for j in dbParams:
+			print >> sys.stderr,j
+			#print >> sys.stderr, j
+			try:
+				items = xqf.xpathEval("/connection/"+j)
+				for i in items:
+				    res[i.name]=str(i.children.get_content())
+			except:
+				res[j]=""
+				pass
+	except Exception,e:
+		conf["lenv"]["message"]=zoo._("Unable to parse the file: ")+e
+		return zoo.SERVICE_FAILED
+	import json
+	outputs["Result"]["value"]=json.dumps(res)
+	return zoo.SERVICE_SUCCEEDED
+
+
 def delete(conf,inputs,outputs):
 	try: 
 		#print >> sys.stderr, conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"+inputs["name"]["value"]+".xml"

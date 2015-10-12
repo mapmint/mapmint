@@ -1,0 +1,37 @@
+#import zoo
+<div class="tab-content">
+  <div class="row">
+#set inputs1=$inputs
+#set $inputs1["clause"]={"value":"id="}
+#set $inputs1["type"]={"value":"insert"}
+    $inputs1
+#*    
+#set searchList1=$searchList
+    $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/PgEditorWindow_bs.tmpl",searchList=[{"conf":$conf,"inputs":$inputs1}]))
+  </div>
+  <div class="row">
+#set inputs1=$inputs
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#set $inputs1["clause"]={"value":"id=1"}
+#set $inputs1["type"]={"value":"delete"}
+#set searchList1=$searchList
+    $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/PgEditorWindow_bs.tmp",searchList=[{"conf":$conf,"inputs":$inputs1}]))
+  </div>
+	    
+  <div class="row">
+#set inputs1=$inputs
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#set $inputs1["clause"]={"value":"id=1"}
+#set $inputs1["type"]={"value":"update"}
+#set searchList1=$searchList
+    $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/PgEditorWindow_bs.tml",searchList=[{"conf":$conf,"inputs":$inputs1}]))
+  </div>
+*#
+  
+</div>
