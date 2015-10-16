@@ -222,6 +222,7 @@ def openInManager(conf,inputs,outputs):
         if l.name!=inputs["dson"]["value"]:
             m.removeLayer(i)
         else:
+            l.setMetaData("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
             l.setMetaData("mm_group","Group")
 	    l.setMetaData("mmDSTN",inputs["dstn"]["value"])
         i-=1
@@ -286,7 +287,7 @@ def refreshLayerInfo(conf,inputs,outputs):
     llayer.setExtent(ext.minx,ext.miny,ext.maxx,ext.maxy)
 
     lmap.save(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
-    outputs["Result"]["value"]=zoo._("Layer %s is now up-to-date in your %s project." % (inputs["layer"]["value"], inputs["map"]["value"]))
+    outputs["Result"]["value"]=zoo._("Layer %s is now up-to-date in your %s project.") % (inputs["layer"]["value"], inputs["map"]["value"])
     import mmsession
     mmsession.save(conf)
     return zoo.SERVICE_SUCCEEDED
@@ -560,12 +561,14 @@ def _loadMapForDs(conf,inputs,outputs):
             if m2.getLayer(i).name==inputs["dsoName"]["value"]:
                 demo=m2.getLayer(i).clone()
                 demo.metadata.set("mm_group",inputs["dsgName"]["value"])
-		demo.metadata.set("mmDSTN",inputs["dstName"]["value"])
+                demo.metadata.set("mmDSTN",inputs["dstName"]["value"])
+                demo.metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
                 m1.insertLayer(demo)
     m1.setProjection("EPSG:4326")
     mapfile=conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map"
     #print >> sys.stderr, m1
     #print >> sys.stderr, mapfile
+    m1.web.metadata.set("mmEditor",conf["senv"]["login"])
     saveProjectMap(m1,mapfile)
 
     initMintMapfile(conf,m1,inputs["map"]["value"],inputs["dsoName"]["value"])
@@ -793,18 +796,19 @@ def loadLegendMapfile(conf,inputs):
     import mapscript
     mapPath=conf["main"]["dataPath"]+"/maps/"
     if inputs.has_key("prefix"):
-	    if inputs["prefix"]["value"]=="indexes":
-		    try:
-			    open(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
-		    except:
-			    if inputs.has_key("orig"):
-				m=mapscript.mapObj(conf["main"]["dataPath"]+"/PostGIS/"+inputs["orig"]["value"]+"ds_ows.map")
-			    else:
-				m=mapscript.mapObj(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_Index"+conf["senv"]["last_index"]+".map")			    
-			    removeAllLayers(m,inputs["layer"]["value"])
-			    saveProjectMap(m,conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
-			    pass
-	    mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/"
+        if inputs["prefix"]["value"]=="indexes":
+            try:
+                open(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
+            except:
+                if inputs.has_key("orig"):
+                    m=mapscript.mapObj(conf["main"]["dataPath"]+"/PostGIS/"+inputs["orig"]["value"]+"ds_ows.map")
+                else:
+                    m=mapscript.mapObj(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_Index"+conf["senv"]["last_index"]+".map")			    
+                    removeAllLayers(m,inputs["layer"]["value"])
+                    m.web.metadata.set("mmEditor",conf["senv"]["login"])
+                    saveProjectMap(m,conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
+                pass
+        mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/"
     #d=getGroupList(conf,mapPath+"project_"+inputs["name"]["value"]+".map")
     if inputs.has_key("mmStep"):
         try:
@@ -818,7 +822,6 @@ def loadLegendMapfile(conf,inputs):
         if l.metadata.get("mmClass")=="tl":
             m=mapscript.mapObj(mapPath+"/timeline_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step0.map")
             inputs["isStep"]={"value": "true"}
-    print >> sys.stderr,mapPath+" \n\n project \n\n\n"
     return m
 
 def createLegend0(conf,inputs,outputs):
@@ -826,32 +829,32 @@ def createLegend0(conf,inputs,outputs):
     import mapscript
     mapPath=conf["main"]["dataPath"]+"/maps/"
     if inputs.has_key("prefix"):
-	    if inputs["prefix"]["value"]=="indexes":
-		    try:
-			    open(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
-		    except:
-			    if inputs.has_key("orig"):
-				m=mapscript.mapObj(conf["main"]["dataPath"]+"/PostGIS/"+inputs["orig"]["value"]+"ds_ows.map")
-			    else:
-				m=mapscript.mapObj(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_Index"+conf["senv"]["last_index"]+".map")			    
-			    removeAllLayers(m,inputs["layer"]["value"])
-			    saveProjectMap(m,conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
-			    pass
-	    mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/"
+        if inputs["prefix"]["value"]=="indexes":
+            try:
+                open(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
+            except:
+                if inputs.has_key("orig"):
+                    m=mapscript.mapObj(conf["main"]["dataPath"]+"/PostGIS/"+inputs["orig"]["value"]+"ds_ows.map")
+                else:
+                    m=mapscript.mapObj(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_Index"+conf["senv"]["last_index"]+".map")			    
+                removeAllLayers(m,inputs["layer"]["value"])
+                m.web.metadata.set("mmEditor",conf["senv"]["login"])
+                saveProjectMap(m,conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
+                pass
+        mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/"
     #d=getGroupList(conf,mapPath+"project_"+inputs["name"]["value"]+".map")
     if inputs.has_key("mmStep"):
-	try:
-		m=mapscript.mapObj(mapPath+"/timeline_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"]+"_step"+inputs["mmStep"]["value"]+".map")
-	except:
-		m=mapscript.mapObj(mapPath+"/timeline_Index"+conf["senv"]["last_index"]+"_indexes_view_idx"+conf["senv"]["last_index"]+"_step"+inputs["mmStep"]["value"]+".map")
-	inputs["isStep"]={"value": "true"}
+        try:
+            m=mapscript.mapObj(mapPath+"/timeline_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"]+"_step"+inputs["mmStep"]["value"]+".map")
+        except:
+            m=mapscript.mapObj(mapPath+"/timeline_Index"+conf["senv"]["last_index"]+"_indexes_view_idx"+conf["senv"]["last_index"]+"_step"+inputs["mmStep"]["value"]+".map")
+        inputs["isStep"]={"value": "true"}
     else:
-	m=mapscript.mapObj(mapPath+"/project_"+inputs["name"]["value"]+".map")
-	l=m.getLayerByName(inputs["layer"]["value"])
-	if l.metadata.get("mmClass")=="tl":
-		m=mapscript.mapObj(mapPath+"/timeline_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step0.map")
-		inputs["isStep"]={"value": "true"}
-    print >> sys.stderr,mapPath+" \n\n project \n\n\n"
+        m=mapscript.mapObj(mapPath+"/project_"+inputs["name"]["value"]+".map")
+    l=m.getLayerByName(inputs["layer"]["value"])
+    if l.metadata.get("mmClass")=="tl":
+        m=mapscript.mapObj(mapPath+"/timeline_"+inputs["name"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step0.map")
+        inputs["isStep"]={"value": "true"}
     i=0
     inColor=""
     outColor=""
@@ -885,10 +888,7 @@ def createLegend0(conf,inputs,outputs):
 
     ct=oldM.getLayer(0).connectiontype
 
-    #if oldM.getLayer(0).connectiontype!=mapscript.MS_WMS:
     i=oldM.numlayers-1
-    #else:
-    #i=-1
 
     while i >= 0 :
         if oldM.getLayer(i).name==inputs["layer"]["value"]:
@@ -931,7 +931,7 @@ def createLegend0(conf,inputs,outputs):
                 #print >> sys.stderr,"INSERT Layer: "+j.name
                 oldM.insertLayer(j)
                 k+=1
-	i-=1 
+        i-=1 
 
     layer=oldM.getLayerByName(inputs["layer"]["value"])
     if layer is None:
@@ -1098,6 +1098,8 @@ def createLegend0(conf,inputs,outputs):
         "grid": gridInfo,
         "classes": []
         }
+    if myLayer.offsite is not None:
+        nameSpace["Style"]["offsite"]='%02x%02x%02x' %(myLayer.offsite.red,myLayer.offsite.green,myLayer.offsite.blue)
     mmStyle=0
     import time
 
@@ -1507,19 +1509,19 @@ def saveMap(conf,inputs,outputs):
     try:
         m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["mapOrig"]["value"]+".map")
         m.web.metadata.set("mmProjectName",inputs["map"]["value"])
-	if m.web.metadata.get("mmTitle")=="" or m.web.metadata.get("mmTitle") is None :
-		m.web.metadata.set("mmTitle",inputs["map"]["value"])
-        saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
-	import authenticate.service as auth
+        if m.web.metadata.get("mmTitle")=="" or m.web.metadata.get("mmTitle") is None :
+            m.web.metadata.set("mmTitle",inputs["map"]["value"])
+            saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+        import authenticate.service as auth
         con = auth.getCon(conf)
         prefix = auth.getPrefix(conf)
-	conn = con.conn.cursor()
+        conn = con.conn.cursor()
         conn.execute("update "+prefix+"users set last_map='"+inputs["map"]["value"]+"' where login='"+conf["senv"]["login"]+"'")
         conf["senv"]["last_map"]=inputs["map"]["value"]
         con.conn.commit()
         con.conn.close()
-	import mmsession
-	mmsession.save(conf)
+        import mmsession
+        mmsession.save(conf)
         #conf["lenv"]["cookie"]="MMID=MM"+str(time.time()).split(".")[0]+"; path=/"
         for i in range(m.numlayers):
             if m.getLayer(i) and m.getLayer(i).type!=mapscript.MS_LAYER_RASTER:
@@ -1534,7 +1536,6 @@ def saveMap(conf,inputs,outputs):
                         f = open(conf["main"]["publicationPath"]+'/styles/'+layer.name+'_'+conf["senv"]["last_map"]+"_sld.xml", 'w')
                         f.write(layer.generateSLD())
                         f.close()
-
                     except:
                         print >> sys.stderr,"Unable to create the file: "+conf["main"]["publicationPath"]+'/styles/'+layer.name+'_'+conf["senv"]["last_map"]+"_sld.xml"
                     
@@ -1544,10 +1545,10 @@ def saveMap(conf,inputs,outputs):
                     initMintMapfile(conf,m,inputs["map"]["value"],lname)
 
         outputs["Result"]["value"]=zoo._("Map saved")
-        return 3
+        return zoo.SERVICE_SUCCEEDED
     except Exception,e:
         conf["lenv"]["message"]=zoo._("An error occured when trying to save the map: ")+str(e)
-        return 4
+        return zoo.SERVICE_FAILED
 
 def setRGB(myColor,fillColor):
     myColor.red=fillColor[0]
@@ -1783,6 +1784,14 @@ def saveLayerStyle0(conf,inputs,outputs):
     m.web.metadata.set("wms_feature_info_mime_type","text/html")
     if layer.name.count("grid_")>0:
         layer.connectiontype=-1
+        layer.connection=None
+        layer.tileitem=None
+        inputs0={}
+        for j in ('Arcs','Interval','Subdivide'):
+            for i in ('min','max'):
+                inputs0["mm"+i+j]={"value": layer.metadata.get("mm"+i+j)}
+        gridStr=createGridString(inputs0,layer)
+        layer.updateFromString(gridStr)
 
     if inputs.has_key("mmStep"):
 	    saveProjectMap(m,mapPath+"/timeline_"+inputs["map"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step"+inputs["mmStep"]["value"]+".map")
@@ -2261,6 +2270,29 @@ def classifyMap0(conf,inputs,outputs):
     layer=m.getLayerByName(inputs["layer"]["value"])
     #print >> sys.stderr,layer
 
+    if inputs.keys().count("field")==0:
+        inputs0=inputs
+        inputs0["mmType"]["value"]="greyScale"
+        if inputs.keys().count("nodata"):
+            inputs0["mmOffsite"]={"value": inputs["nodata"]["value"]}
+        inputs0["force"]={"value": "true"}
+        inputs0["mmFill"]={"value": "000000"}
+        inputs0["mmStroke"]={"value": "000000"}
+        outputs1={"Result":{"value":""}}
+        try:
+            res=saveLayerStyle(conf,inputs0,outputs1)
+        except:
+            inputs0.pop("force")
+            inputs0.pop("mmFill")
+            inputs0.pop("mmStroke")
+            res=saveLayerStyle(conf,inputs0,outputs1)
+        #inputs0["mmFill"]={"value": "000000"}
+        #inputs0["mmStroke"]={"value": "000000"}
+        outputs["Message"]=outputs1["Result"]
+        import json
+        outputs["Result"]["value"]=json.dumps(getLayerStylesArray(conf,inputs,layer))
+        return res
+    
 
     if layer.encoding is None:
         layer.encoding="utf-8"
@@ -3792,6 +3824,11 @@ def savePublishMap(conf,inputs,outputs):
     isPassed=-1
     for i in args:
         if inputs.keys().count(i)>0:
+            if inputs.keys().count(i)>0 and inputs[i].keys().count("value")>0:
+                if inputs[i].keys().count("value")>0:
+                    m.web.metadata.set(i,inputs[i]["value"])
+                else:
+                    m.web.metadata.set(i,"")
             m.web.metadata.set(i,inputs[i]["value"]);
             if i=="mmProjectName" and isPassed<0:
                 import os
@@ -3822,7 +3859,8 @@ def savePublishMap(conf,inputs,outputs):
 	    open(conf["main"]["tmpPath"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html","w").write(inputs["mmDescription"]["value"].replace("&39;","&#39;"))
 	    m.web.metadata.set("ows_abstract",conf["main"]["tmpUrl"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html")
     print >> sys.stderr,"OK "
-	    
+    m.web.metadata.set("mmEditor",conf["senv"]["login"])
+  
     if inputs.has_key("mm_access_groups"):
 	    if inputs["mm_access_groups"].has_key("length"):
 		    tmpS=""
@@ -3843,11 +3881,23 @@ def savePublishMap(conf,inputs,outputs):
 		    m.web.metadata.set("mm_themes_class",tmpS)
 	    else:
 		    m.web.metadata.set("mm_themes_class",inputs["mm_themes_class"]["value"])
-        
-    minScales=inputs["minScales"]["value"].split(',')
-    maxScales=inputs["maxScales"]["value"].split(',')
-    lminScales=inputs["lminScales"]["value"].split(',')
-    lmaxScales=inputs["lmaxScales"]["value"].split(',')
+
+    if inputs["minScales"].keys().count("value")>0:
+        minScales=inputs["minScales"]["value"].split(',')
+    else:
+        minScales=[]
+    if inputs["maxScales"].keys().count("value")>0:
+        maxScales=inputs["maxScales"]["value"].split(',')
+    else:
+        maxScales=[]
+    if inputs["lminScales"].keys().count("value")>0:
+        lminScales=inputs["lminScales"]["value"].split(',')
+    else:
+        lminScales=[]
+    if inputs["lmaxScales"].keys().count("value")>0:
+        lmaxScales=inputs["lmaxScales"]["value"].split(',')
+    else:
+        lmaxScales=[]
     for l in range(0,m.numlayers):
 
         if len(minScales)>l and minScales[l]!="":
@@ -4075,6 +4125,19 @@ def listStep(conf,inputs,outputs):
 	    outputs["Result"]["value"]="NULL";
     return 3
 
+def createGridString(inputs,layer):
+    gridParams=('mmminArcs','mmmaxArcs','mmminInterval','mmmaxInterval','mmminSubdivide','mmmaxSubdivide','mmLabelFormat')
+    gridStr="LAYER\n GRID\n"
+    for i in gridParams:
+        if inputs.keys().count(i) and inputs[i]["value"]!="-1":
+            layer.metadata.set(i,inputs[i]["value"])
+            if i=="mmLabelFormat":
+                gridStr+=i.upper().replace("MM","")+" '"+inputs[i]["value"]+"'\n"
+            else:
+                gridStr+=i.upper().replace("MM","")+" "+inputs[i]["value"]+"\n"
+    gridStr+=" END\nEND\n"
+    return gridStr
+    
 def saveLayerGrid(conf,inputs,outputs):
     import mapscript
     mapfile=conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map"

@@ -77,10 +77,10 @@ function startMozaic(){
                 type: "GET",
                 url: "./MapDetails;id="+System.hoverMap,
                 complete: function(xml,status) {
-var map_details = '<div id="moreinfo-dialog" title="'+Styem.messages["Map details"]+'"></div>';
+var map_details = '<div id="moreinfo-dialog" title="'+System.messages["Map details"]+'"></div>';
 bootbox.dialog({
   message: map_details,
-  title: Styem.messages["Map details"],
+  title: System.messages["Map details"],
   buttons: {
     view: {
       label: System.messages["View map"],

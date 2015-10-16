@@ -46,24 +46,53 @@
 	  </div>
 	</div>
       </div>
-      <div class="form-group no-grid">
-	<label class="col-sm-3 control-label">$zoo._("Legend Type: ")</label>
+#def printSelect($classes,$title,$name,$choices)
+      <div class="form-group no-grid $classes">
+	<label class="col-sm-3 control-label">$title</label>
 	<div class="col-sm-9 ">
-	  <select name="classification" class="form-control" onchange="\$(this).find('option').each(function(){if(!\$(this).is(':selected'))\$('.no-'+\$(this).attr('value')).show();});\$(this).find('option:selected').each(function(){\$('.no-'+\$(this).attr('value')).hide();});">
-#set choices={
-	"us": $zoo._("Unique Symbol"),
-	"gs": $zoo._("Graduated Symbol"),
-	"cc": $zoo._("Continuous Color"),
-	"uv": $zoo._("Unique Value"),
-	"tl": $zoo._("Time line")
-	}
+	  <select name="$name" class="form-control class-switcher">
 	#for a in $choices.keys()
-	    <option value="$a">$choices[$a]</otion>
+	    <option value="$a" #if $choices[$a][1]#class="no-raster"#end if##if $choices[$a][2]#class="require-raster"#end if#>$choices[$a][0]</otion>
 	#end for
 	  </select>
 	</div>
       </div>
-      <div class="form-group require-raster">
+#end def
+#set choices={
+	"us": [$zoo._("Unique Symbol"),False,False],
+	"gs": [$zoo._("Graduated Symbol"),False,False],
+	"cc": [$zoo._("Continuous Color"),True,False],
+	"uv": [$zoo._("Unique Value"),False,False],
+	"tl": [$zoo._("Time line"),True,False]
+	}
+      $printSelect("",$zoo._("Legend Type: "),"classification",$choices)
+      <div class="form-group require-tl no-grid no-us no-gs no-cc no-uv">
+	<label class="col-sm-3 control-label">$zoo._("Steps")</label>
+	<div class="col-sm-9 ">
+	  <select name="step" class="form-control" onchange="if(\$(this).val()=='-1') \$(this).parent().parent().next().show();else \$(this).parent().parent().next().hide();">
+	    <option value="-2">$zoo._("Choose a step")</option>
+	    <option value="-1">$zoo._("Add a step")</option>
+	  </select>
+	</div>
+      </div>
+      <div class="form-group require-tl no-us no-gs no-cc no-uv col-sm-12">
+	<label class="col-sm-3 control-label">$zoo._("Step name")</label>
+        <div class="col-sm-5">
+	  <input type="text" class="form-control" name="stepName" placeholder="$zoo._("1789")" value="" />
+	  <p class="help-block"></p>
+	</div>
+        <button class="btn btn-default col-sm-4">
+	  $zoo._("Add")
+	</button>
+      </div>      
+#set choices={
+	"us": [$zoo._("Unique Symbol"),False,False],
+	"gs": [$zoo._("Graduated Symbol"),False,False],
+	"cc": [$zoo._("Continuous Color"),True,False],
+	"uv": [$zoo._("Unique Value"),False,False]
+	}
+      $printSelect("require-tl no-us no-gs no-cc no-uv",$zoo._("Legend Type for this step"),"step_classification",$choices)
+      <div class="form-group require-raster no-us">
 	<label class="col-sm-3 control-label">$zoo._("Tiled version")</label>
         <div class="col-sm-9">
 	  <div class="input-group">
@@ -74,27 +103,39 @@
 	  </div>
 	</div>
       </div>
-      <div class="form-group require-raster">
+      <div class="form-group require-raster no-us">
 	<label class="col-sm-3 control-label">$zoo._("Min / Max values")</label>
         <div class="col-sm-4">
 	  <input type="text" class="form-control" name="minBandValue" value="" />
 	  <p class="help-block"></p>
 	</div>
-        <div class="col-sm-5">
+        <div class="col-sm-4">
 	  <input type="text" class="form-control" name="maxBandValue" value="" />
 	  <p class="help-block"></p>
+	</div>
+      </div>
+      <div class="form-group require-raster no-gs no-uv">
+	<label class="col-sm-3 control-label">$zoo._("No-data value")</label>
+        <div class="col-sm-9 ">
+	  <div class="input-group cpicker">
+	    <span class="input-group-addon">
+	    <input name="expressionc" type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" />
+	    </span>
+	    <input type="text" class="form-control" name="nodataColorValue" value="#000000" />
+	    <span class="input-group-addon"><i></i></span>
+	  </div>
 	</div>
       </div>
       <div class="form-group no-us">
 	<label class="col-sm-3 control-label">$zoo._("Min / Max color")</label>
         <div class="col-sm-9 ">
-	  <div class="col-sm-5">
+	  <div class="col-sm-6">
 	    <div class="input-group cpicker">
 	      <input type="text" class="form-control" name="minColorValue" value="#ffffff" />
 	      <span class="input-group-addon"><i></i></span>
 	    </div>
 	  </div>
-	  <div class="col-sm-5">
+	  <div class="col-sm-6">
 	    <div class="input-group cpicker">
 	      <input type="text" class="form-control" name="maxColorValue"  value="#ffffff" />
 	      <span class="input-group-addon"><i></i></span>
@@ -133,14 +174,14 @@
 	</div>
       </div>
       <div class="form-group no-us no-uv require-gs">
-	<label class="col-sm-3 control-label">$zoo._("Classes number: ")</label>
+	<label class="col-sm-3 control-label">$zoo._("Classes number")</label>
         <div class="col-sm-9 ">
 	  <input type="text" name="nbclass" class="form-control"
 	  data-toggle="tooltip" title="$zoo._("Define the number of classes you want to be generated.")" />	    
 	</div>
       </div>
       <div class="form-group no-us no-uv require-gs no-raster">
-	<label class="col-sm-3 control-label">$zoo._("Discretization: ")</label>
+	<label class="col-sm-3 control-label">$zoo._("Discretization")</label>
         <div class="col-sm-9 ">
 	  <select type="text" name="discretization" class="form-control">
 	    <option value="-1">$zoo._("Choose")</option>

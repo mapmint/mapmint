@@ -316,60 +316,62 @@ def GetUserInfo(conf,inputs,outputs):
 		return 4
 
 def AddUser(conf,inputs,outputs):
-	if is_connected(conf):
-		c = auth.getCon(conf)
-		prefix=auth.getPrefix(conf)
-		if c.is_admin(conf["senv"]["login"]):
-			try:
-				user = json.loads(inputs["user"]["value"])
-                	except Exception,e:
-				print >> sys.stderr,inputs["user"]["value"]
-                        	print >> sys.stderr,e
-                        	conf["lenv"]["message"] = zoo._("invalid user parameter: ")+inputs["user"]["value"]
-                        	return 4
-			for (i,j) in user.items():
-				if not manage_users.check_user_params(i,j):
-					conf["lenv"]["message"] = 'Parametre %s incorrect'%(i)
-					return 4
-			if c.add_user(user):
-				outputs["Result"]["value"] = inputs["user"]["value"]
-				if inputs.has_key("group"):
-					if inputs["group"].has_key("length"):
-						for i in range(0,len(inputs["group"]["value"])):
-							linkGroupToUser(conf,c,prefix,inputs["group"]["value"],inputs["login"]["value"])
-					else:
-						linkGroupToUser(conf,c,prefix,inputs["group"]["value"],user["login"])
-				return 3
-			else:
-				conf["lenv"]["message"] = zoo._("SQL Error")
-				return 4
-		else:
-			conf["lenv"]["message"]= zoo._("Action not permited")
-			return 4
-	else:
-		conf["lenv"]["message"]=zoo._("User not authenticated")
+    if is_connected(conf):
+        c = auth.getCon(conf)
+        prefix=auth.getPrefix(conf)
+        if c.is_admin(conf["senv"]["login"]):
+            try:
+                user = json.loads(inputs["user"]["value"])
+            except Exception,e:
+                print >> sys.stderr,inputs["user"]["value"]
+                print >> sys.stderr,e
+                conf["lenv"]["message"] = zoo._("invalid user parameter: ")+inputs["user"]["value"]
                 return 4
+            for (i,j) in user.items():
+                if not manage_users.check_user_params(i,j):
+                    conf["lenv"]["message"] = 'Parametre %s incorrect'%(i)
+                    return 4
+            if c.add_user(user):
+                outputs["Result"]["value"] = zoo._("User successfully inserted")
+                #outputs["Result"]["value"] = inputs["user"]["value"]
+                if inputs.has_key("group"):
+                    if inputs["group"].has_key("length"):
+                        for i in range(0,len(inputs["group"]["value"])):
+                            linkGroupToUser(conf,c,prefix,inputs["group"]["value"],inputs["login"]["value"])
+                    else:
+                        linkGroupToUser(conf,c,prefix,inputs["group"]["value"],user["login"])
+                return 3
+            else:
+                conf["lenv"]["message"] = zoo._("SQL Error")
+                return 4
+        else:
+            conf["lenv"]["message"]= zoo._("Action not permited")
+            return 4
+    else:
+        conf["lenv"]["message"]=zoo._("User not authenticated")
+        return 4
 
 def AddGroup(conf,inputs,outputs):
-	if is_connected(conf):
-		c = auth.getCon(conf)
-		if c.is_admin(conf["senv"]["login"]):
-			for i in ['name','description']:
-				if not manage_users.check_group_params(i,inputs[i]['value']):
-					conf['lenv']['message'] = zoo._('%s value is not acceptable'%(i))
-					return 4
-			if c.add_group(inputs['name']['value'],inputs['description']["value"]):
-				outputs["Result"]["value"] = json.dumps([inputs['name']['value'],inputs['description']['value']])
-				return 3
-			else:
-				conf["lenv"]["message"] = 'Erreur sql'
-				return 4
-		else:
-			conf["lenv"]["message"]= zoo._("Action not permited")
-			return 4
-	else:
-		conf["lenv"]["message"]=zoo._("User not authenticated")
-                return 4
+    if is_connected(conf):
+        c = auth.getCon(conf)
+        if c.is_admin(conf["senv"]["login"]):
+            for i in ['name','description']:
+                if not manage_users.check_group_params(i,inputs[i]['value']):
+                    conf['lenv']['message'] = zoo._('%s value is not acceptable'%(i))
+                    return zoo.SERVICE_FAILED
+            if c.add_group(inputs['name']['value'],inputs['description']["value"]):
+                #outputs["Result"]["value"] = json.dumps([inputs['name']['value'],inputs['description']['value']])
+                outputs["Result"]["value"] = zoo._("User successfully inserted")
+                return zoo.SERVICE_SUCCEEDED
+            else:
+                conf["lenv"]["message"] = 'Erreur sql'
+                return zoo.SERVICE_FAILED
+        else:
+            conf["lenv"]["message"]= zoo._("Action not permited")
+            return zoo.SERVICE_FAILED
+    else:
+        conf["lenv"]["message"]=zoo._("User not authenticated")
+        return zoo.SERVICE_FAILED
 
 import psycopg2
 from psycopg2.extensions import *
@@ -410,85 +412,94 @@ def UpdateGroup(conf,inputs,outputs):
         c.cur.execute(req)
         c.conn.commit()
         c.close()
-        outputs["Result"]["value"]=zoo._("Group succcessfully "+inputs["type"]["value"]+"d")
+        tmpStr=zoo._('Group succcessfully %s')
+        tmpStr=tmpStr % (inputs["type"]["value"]+'d')
+        outputs["Result"]["value"]=tmpStr
         return zoo.SERVICE_SUCCEEDED
     else:
         conf["lenv"]["message"]=zoo._("Not allowed to access this information")
         return zoo.SERVICE_FAILED
             
 def UpdateUser(conf,inputs,outputs):
-	if is_connected(conf):
-		prefix=auth.getPrefix(conf)
-		c = auth.getCon(conf)
+    if is_connected(conf):
+        prefix=auth.getPrefix(conf)
+        c = auth.getCon(conf)
 		
-		try:
-			user = json.loads(inputs["set"]["value"])
-               	except Exception,e:
-			user={}
-			print >> sys.stderr,inputs["set"]["value"]
-                       	print >> sys.stderr,e
-                       	conf["lenv"]["message"] = zoo._("invalid set parameter :")+inputs["set"]["value"]
-                       	#return 4
+        try:
+            user = json.loads(inputs["set"]["value"])
+        except Exception,e:
+            user={}
+            print >> sys.stderr,inputs["set"]["value"]
+            print >> sys.stderr,e
+            conf["lenv"]["message"] = zoo._("invalid set parameter :")+inputs["set"]["value"]
+            return 4
 
-		if inputs['id']["value"] == "NULL":
-			userl=conf["senv"]["login"]
-			if not(inputs.has_key("type")) or inputs["type"]["value"]!="delete":
-				for (i,j) in user.items():
-					if not manage_users.check_user_params(i,j):
-						conf["lenv"]["message"] = 'Parametre %s incorrect'%(i)
-						return 4
-					if i=="login":
-						userl=j
-			if inputs.has_key("login"):
-				userl=inputs["login"]["value"].decode("utf-8")
-			if inputs.has_key("type") and inputs["type"]["value"]=="delete":
-				try:
-					c.cur.execute("DELETE FROM "+prefix+"users WHERE login='"+userl+"'")
-				except Exception,e:
-					print >> sys.stderr,e
-					pass
-				c.conn.commit()
-				outputs["Result"]["value"] = inputs["set"]["value"]
-				return 3
+        if inputs['id']["value"] == "NULL":
+            userl=conf["senv"]["login"]
+            if not(inputs.has_key("type")) or inputs["type"]["value"]!="delete":
+                for (i,j) in user.items():
+                    if not manage_users.check_user_params(i,j):
+                        conf["lenv"]["message"] = 'Parametre %s incorrect'%(i)
+                        return 4
+                    if i=="login":
+                        userl=j
+            if inputs.has_key("login"):
+                userl=inputs["login"]["value"].decode("utf-8")
+            if inputs.has_key("type") and inputs["type"]["value"]=="delete":
+                try:
+                    c.cur.execute("DELETE FROM "+prefix+"users WHERE login='"+userl+"'")
+                except Exception,e:
+                    print >> sys.stderr,e
+                    pass
+                c.conn.commit()
+                tmpStr=zoo._('Group succcessfully %s')
+                tmpStr=tmpStr % (inputs["type"]["value"]+'d')
+                outputs["Result"]["value"]=tmpStr
+
+                #outputs["Result"]["value"] = inputs["set"]["value"]
+                return 3
 				
-			if c.update_user_by_login(user,userl):
-				outputs["Result"]["value"] = inputs["set"]["value"]
-				print >> sys.stderr,inputs["group"]["value"]
-				if inputs.has_key("group") and inputs["group"]["value"]!="NULL":
-					print >> sys.stderr,inputs["group"]
-					try:
-						c.cur.execute("DELETE FROM "+prefix+"user_group where id_user=(select id from "+prefix+"users where login='"+userl+"')")
-						c.con.commit()
-					except:
-						pass
-					if inputs["group"].has_key("length"):
-						for i in range(0,len(inputs["group"]["value"])):
-							linkGroupToUser(conf,c,prefix,inputs["group"]["value"][i],inputs["login"]["value"])
-					else:
-						linkGroupToUser(conf,c,prefix,inputs["group"]["value"],inputs["login"]["value"])
-				return 3
-			else:
-				conf["lenv"]["message"] = zoo._("Update failed")
-				return 4
-		elif re.match(r"(^\d+$)",inputs["id"]["value"]):
-			if c.is_admin(conf["senv"]["login"]):
-				if c.update_user_by_id(user,int(inputs["id"]["value"])):
-					c.conn.commit()
-					c.close()
-					outputs["Result"]["value"] = inputs["set"]["value"]
-					return 3
-				else:
-					conf["lenv"]["message"] = zoo._("Update failed")
-					return 4
-			else:
-				conf["lenv"]["message"]= zoo._("Action not permited")
-				return 4
-		else:
-			conf["lenv"]["message"] = zoo._("Parameter id invalid")
-			return 4
-	else:
-		conf["lenv"]["message"]=zoo._("User not authenticated")
-		return 4
+            if c.update_user_by_login(user,userl):
+                #outputs["Result"]["value"] = inputs["set"]["value"]
+                tmpStr=zoo._('User succcessfully %s')
+                tmpStr=tmpStr % (inputs["type"]["value"]+'d')
+                outputs["Result"]["value"]=tmpStr
+                print >> sys.stderr,inputs["group"]["value"]
+                if inputs.has_key("group") and inputs["group"]["value"]!="NULL":
+                    print >> sys.stderr,inputs["group"]
+                    try:
+                        c.cur.execute("DELETE FROM "+prefix+"user_group where id_user=(select id from "+prefix+"users where login='"+userl+"')")
+                        c.con.commit()
+                    except:
+                        pass
+                    if inputs["group"].has_key("length"):
+                        for i in range(0,len(inputs["group"]["value"])):
+                            linkGroupToUser(conf,c,prefix,inputs["group"]["value"][i],inputs["login"]["value"])
+                    else:
+                        linkGroupToUser(conf,c,prefix,inputs["group"]["value"],inputs["login"]["value"])
+                return 3
+            else:
+                conf["lenv"]["message"] = zoo._("Update failed")
+                return 4
+        elif re.match(r"(^\d+$)",inputs["id"]["value"]):
+            if c.is_admin(conf["senv"]["login"]):
+                if c.update_user_by_id(user,int(inputs["id"]["value"])):
+                    c.conn.commit()
+                    c.close()
+                    outputs["Result"]["value"] = inputs["set"]["value"]
+                    return 3
+                else:
+                    conf["lenv"]["message"] = zoo._("Update failed")
+                    return 4
+            else:
+                conf["lenv"]["message"]= zoo._("Action not permited")
+                return 4
+        else:
+            conf["lenv"]["message"] = zoo._("Parameter id invalid")
+            return 4
+    else:
+        conf["lenv"]["message"]=zoo._("User not authenticated")
+        return 4
 
 def linkGroupToUser(conf,c,prefix,gname,login):
 	try:

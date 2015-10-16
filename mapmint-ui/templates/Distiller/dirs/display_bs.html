@@ -7,21 +7,33 @@
 #include $tmpl
 #set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
 
-#def listDir($conf,$dir)
+#def listDir($conf,$dir,$level)
 #if $mm_access.checkDataStorePriv($conf,$dir,"rx")
 #set res=ds.mmListDir($dir)
+      <ul class="list-group level-$level">
 #for i in $res
 #if $os.path.isdir(os.path.join($dir,$i))
-    <div class="form-group">
-      <div class="col-sm-9 ">
-	<i class="fa fa-arrow-right fa-fw"></i>
+	<li class="list-group-item">
 	<input type="radio" name="browse" value="$os.path.join($dir,$i)" />
+#set res1=ds.mmListDir(os.path.join($dir,$i))
+#set res2=[]
+#for j in $res1
+#if $os.path.isdir(os.path.join(os.path.join($dir,$i),$j))
+#set res2+=[$j]
+#end if
+#end for
+	<i class="fa fa-folder#if len(res2)>0#-open#end if# fa-fw"> </i>
 	$i
-      </div>
-    </div>
-    $listDir($conf,os.path.join($dir,$i))
+#if len(res2)>0
+	<a href="#">
+	<span class="fa arrow"></span>
+	</a>
+#end if
+	$listDir($conf,os.path.join($dir,$i),$level+1)
+	</li>
 #end if		
 #end for
+      </ul>
 #end if    
 #end def
 
@@ -45,7 +57,7 @@
       <label class="col-sm-3 control-label">$zoo._("Path")</label>
       <div class="col-sm-9 ">
 #set dir=$conf["main"]["dataPath"]+"/ftp/"
-       $listDir($conf,$dir)
+       $listDir($conf,$dir,0)
       </div>
     </div>
     $ftmpl.printButton({"id":"add","name":$zoo._("Add")}) 

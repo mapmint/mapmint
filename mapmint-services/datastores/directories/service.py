@@ -38,7 +38,7 @@ def getOriginalDir(conf,val):
 def saveDir(conf,inputs,outputs):
 	if inputs.keys().count("path") and inputs["path"].keys().count("value"):
 		od=getOriginalDir(conf,inputs["path"]["value"])
-	if inputs["type"]["value"] == "new":
+	if inputs["type"].keys().count("value") and inputs["type"]["value"] == "new":
 		try:
 			os.mkdir(conf["main"]["dataPath"]+"/ftp/"+inputs["name"]["value"])
 			inputs["path"]["value"]=conf["main"]["dataPath"]+"/ftp/"+inputs["name"]["value"]

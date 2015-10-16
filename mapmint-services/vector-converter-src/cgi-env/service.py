@@ -58,7 +58,7 @@ def Recode(conf,inputs,outputs):
         source.close()
         target.close()
         shutil.move(inputs["file"]["value"]+"1",inputs["file"]["value"])
-        outputs["Result"]["value"]="File converted"
+        outputs["Result"]["value"]=zoo._("File converted")
         return zoo.SERVICE_SUCCEEDED
     except Exception,e:
         conf["lenv"]["message"]=str(e)
@@ -90,6 +90,6 @@ def cleanUp(conf,inputs,outputs):
     for name in glob.glob(conf["main"]["tmpPath"]+"/"+tmp[0]+".*"):
         print >> sys.stderr,name.replace("\\","/")
         os.remove(name.replace("\\","/"))
-    outputs["Result"]["value"]=zoo._("Cleaup done")
+    outputs["Result"]["value"]=zoo._("Cleanup done")
     return 3
     
