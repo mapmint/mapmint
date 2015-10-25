@@ -1,14 +1,14 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# MapMint User Interface and Services messages file.
+# Copyright (C) 2015 GeoLabs SARL
+# This file is distributed under the same license as the MapMint package.
+# FIRST AUTHOR <gerald.fenoy@geolabs.fr>, 2015.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: MapMint 2.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-17 02:21+0200\n"
+"POT-Creation-Date: 2015-10-25 17:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: mapmint-services//authenticate/service.py:42
-#: mapmint-services//mapfile/service.py:4311
+#: mapmint-services//mapfile/service.py:4395
 msgid "Default extent set."
 msgstr ""
 
@@ -133,8 +133,8 @@ msgstr ""
 #: mapmint-services//datastores/postgis/pgConnection.py:134
 #: mapmint-services//np/service.py:1172 mapmint-services//np/service.py:1213
 #: mapmint-services//np/service.py:1294 mapmint-services//np/service.py:1302
-#: mapmint-services//np/service.py:1335 mapmint-services//np/service.py:1507
-#: mapmint-services//np/service.py:1513 mapmint-services//np/service.py:1520
+#: mapmint-services//np/service.py:1335 mapmint-services//np/service.py:1508
+#: mapmint-services//np/service.py:1514 mapmint-services//np/service.py:1521
 #: mapmint-services//np/service.py:1792
 msgid "Unable to identify your parameter as table or field name"
 msgstr ""
@@ -178,17 +178,17 @@ msgstr ""
 #: mapmint-services//mapfile/service.py:211
 #: mapmint-services//mapfile/service.py:271
 #: mapmint-services//mapfile/service.py:313
-#: mapmint-services//mapfile/service.py:426
-#: mapmint-services//mapfile/service.py:519
-#: mapmint-services//mapfile/service.py:558
-#: mapmint-services//mapfile/service.py:597
-#: mapmint-services//mapfile/service.py:617
-#: mapmint-services//mapfile/service.py:753
+#: mapmint-services//mapfile/service.py:435
+#: mapmint-services//mapfile/service.py:528
+#: mapmint-services//mapfile/service.py:567
+#: mapmint-services//mapfile/service.py:606
+#: mapmint-services//mapfile/service.py:626
+#: mapmint-services//mapfile/service.py:770
 msgid "Unable to open the mapfile"
 msgstr ""
 
 #: mapmint-services//datastores/service.py:339
-#: mapmint-services//mapfile/service.py:3709
+#: mapmint-services//mapfile/service.py:3786
 msgid "Privileges saved"
 msgstr ""
 
@@ -237,12 +237,12 @@ msgstr ""
 msgid "Unable to find any CSV files associated with the file."
 msgstr ""
 
-#: mapmint-services//georeferencer/service.py:161
-#: mapmint-services//georeferencer/service.py:196
+#: mapmint-services//georeferencer/service.py:164
+#: mapmint-services//georeferencer/service.py:199
 msgid "Georeference Project saved"
 msgstr ""
 
-#: mapmint-services//georeferencer/service.py:221
+#: mapmint-services//georeferencer/service.py:224
 msgid "CSV file saved."
 msgstr ""
 
@@ -342,18 +342,18 @@ msgid "Gometry Type Updated"
 msgstr ""
 
 #: mapmint-services//mapfile/service.py:66
-#: mapmint-services//mapfile/service.py:1547
-#: mapmint-services//mapfile/service.py:3011
-#: mapmint-services//mapfile/service.py:3097
-#: mapmint-services//mapfile/service.py:3117
-#: mapmint-services//mapfile/service.py:3139
-#: mapmint-services//mapfile/service.py:3378
-#: mapmint-services//mapfile/service.py:3423
-#: mapmint-services//mapfile/service.py:3445
-#: mapmint-services//mapfile/service.py:3460
-#: mapmint-services//mapfile/service.py:3508
-#: mapmint-services//mapfile/service.py:3556
-#: mapmint-services//mapfile/service.py:3574
+#: mapmint-services//mapfile/service.py:1591
+#: mapmint-services//mapfile/service.py:3057
+#: mapmint-services//mapfile/service.py:3143
+#: mapmint-services//mapfile/service.py:3163
+#: mapmint-services//mapfile/service.py:3185
+#: mapmint-services//mapfile/service.py:3424
+#: mapmint-services//mapfile/service.py:3469
+#: mapmint-services//mapfile/service.py:3491
+#: mapmint-services//mapfile/service.py:3537
+#: mapmint-services//mapfile/service.py:3585
+#: mapmint-services//mapfile/service.py:3633
+#: mapmint-services//mapfile/service.py:3651
 msgid "Map saved"
 msgstr ""
 
@@ -378,98 +378,98 @@ msgstr ""
 msgid "Layer %s is now up-to-date in your %s project."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:497
+#: mapmint-services//mapfile/service.py:506
 msgid "Layer added to the Map."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:1463
+#: mapmint-services//mapfile/service.py:1507
 msgid "An error occured ("
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:1550
+#: mapmint-services//mapfile/service.py:1594
 msgid "An error occured when trying to save the map: "
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:1800
-#: mapmint-services//mapfile/service.py:2032
+#: mapmint-services//mapfile/service.py:1844
+#: mapmint-services//mapfile/service.py:2076
 msgid "Layer Style saved."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:2418
-#: mapmint-services//mapfile/service.py:2751
+#: mapmint-services//mapfile/service.py:2464
+#: mapmint-services//mapfile/service.py:2797
 msgid "Unable to classify using this raster band."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:2586
+#: mapmint-services//mapfile/service.py:2632
 msgid "Layer classified"
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:3597
+#: mapmint-services//mapfile/service.py:3674
 msgid "Directory added."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:3612
+#: mapmint-services//mapfile/service.py:3689
 msgid "Directory renamed."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:3623
-#: mapmint-services//mapfile/service.py:3628
+#: mapmint-services//mapfile/service.py:3700
+#: mapmint-services//mapfile/service.py:3705
 msgid "Unable to remove the group as it is the only one remaining."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:3636
+#: mapmint-services//mapfile/service.py:3713
 msgid "Directory deleted."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:3700
+#: mapmint-services//mapfile/service.py:3777
 msgid "Layer privileges saved."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:3964
+#: mapmint-services//mapfile/service.py:4041
 msgid "Project saved"
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:3975
+#: mapmint-services//mapfile/service.py:4052
 msgid "Project preview generated"
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:4004
+#: mapmint-services//mapfile/service.py:4081
 msgid "Template saved"
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:4020
+#: mapmint-services//mapfile/service.py:4097
 msgid "Resampling method saved."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:4055
+#: mapmint-services//mapfile/service.py:4132
 msgid "The step "
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:4055
+#: mapmint-services//mapfile/service.py:4132
 msgid " already exists."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:4067
+#: mapmint-services//mapfile/service.py:4146
 msgid "Step added to existsing steps."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:4105
+#: mapmint-services//mapfile/service.py:4189
 msgid "Step "
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:4105
+#: mapmint-services//mapfile/service.py:4189
 msgid " removed successfully"
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:4166
+#: mapmint-services//mapfile/service.py:4250
 msgid "Grid configuration saved."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:4211
+#: mapmint-services//mapfile/service.py:4295
 msgid "Grid Layer was successfully added to the project."
 msgstr ""
 
-#: mapmint-services//mapfile/service.py:4319
+#: mapmint-services//mapfile/service.py:4403
 msgid "You're not allowed to access this layer"
 msgstr ""
 
@@ -559,7 +559,6 @@ msgstr ""
 
 #: mapmint-services//np/service.py:1218 mapmint-services//np/service.py:1323
 #: mapmint-services//np/service.py:1362 mapmint-services//np/service.py:1499
-#: mapmint-services//np/service.py:1538
 msgid "Done"
 msgstr ""
 
@@ -582,6 +581,10 @@ msgstr ""
 
 #: mapmint-services//np/service.py:1497
 msgid "Unable to copy uploaded file: "
+msgstr ""
+
+#: mapmint-services//np/service.py:1538
+msgid "Element deleted"
 msgstr ""
 
 #: mapmint-services//np/service.py:2267 mapmint-services//np/service.py:2275
@@ -709,7 +712,7 @@ msgstr ""
 msgid "Cleanup done"
 msgstr ""
 
-#: mapmint-services//vector-tools-src/cgi-env/service.py:596
+#: mapmint-services//vector-tools-src/cgi-env/service.py:597
 msgid "No feature found !"
 msgstr ""
 
@@ -722,6 +725,12 @@ msgstr ""
 #: mapmint-ui/templates//Configuration_bs.html:44
 #: mapmint-ui/templates//Configuration_bs.tmpl:36
 #: mapmint-ui/templates//Documents.tmpl:84
+#: mapmint-ui/templates//Documents_bs.html:91
+#: mapmint-ui/templates//Documents_bs.tmpl:125
+#: mapmint-ui/templates//Documents_bs.tmpl:188
+#: mapmint-ui/templates//Georeferencer/GCPForm_bs.tmpl:14
+#: mapmint-ui/templates//Georeferencer_bs.tmpl:76
+#: mapmint-ui/templates//Georeferencer_bs.tmpl:160
 #: mapmint-ui/templates//Indexes/GraphPart.tmpl:90
 #: mapmint-ui/templates//Indexes/repportSettings.tmpl:67
 #: mapmint-ui/templates//Indexes/TablePart.tmpl:31
@@ -730,7 +739,8 @@ msgstr ""
 #: mapmint-ui/templates//Manager/ComplexSearch.tmpl:52
 #: mapmint-ui/templates//Manager/Display_bs.html:25
 #: mapmint-ui/templates//Manager/LayerProperties.tmpl:143
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:78
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:97
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:134
 #: mapmint-ui/templates//Manager/LayerProperties_bs.tmpl:145
 #: mapmint-ui/templates//Manager/TemplateEditor_bs.html:25
 #: mapmint-ui/templates//Manager/TemplateEditor_bs.tmpl:23
@@ -738,14 +748,17 @@ msgstr ""
 #: mapmint-ui/templates//Manager_bs.html:36
 #: mapmint-ui/templates//Manager_bs.html:260
 #: mapmint-ui/templates//Manager_bs.html:269
-#: mapmint-ui/templates//Manager_bs.tmpl:56
+#: mapmint-ui/templates//Manager_bs.tmpl:72
 #: mapmint-ui/templates//Manager_bs.tmpl:282
 #: mapmint-ui/templates//Manager_bs.tmpl:291
 #: mapmint-ui/templates//preview/modules/edit/view.html:41
 #: mapmint-ui/templates//preview/modules/routing/view.html:40
 #: mapmint-ui/templates//Projections.tmpl:45
 #: mapmint-ui/templates//Territories.tmpl:72
-#: mapmint-ui/templates//Themes.tmpl:91
+#: mapmint-ui/templates//Themes.tmpl:91 mapmint-ui/templates//Themes_bs.html:34
+#: mapmint-ui/templates//Themes_bs.html:138
+#: mapmint-ui/templates//Themes_bs.tmpl:34
+#: mapmint-ui/templates//Themes_bs.tmpl:111
 #: mapmint-ui/templates//UserPreferences.tmpl:75
 #: mapmint-ui/templates//UserPreferences.tmpl:77
 #: mapmint-ui/templates//UsersManagement/EditForm.tmpl:82
@@ -763,6 +776,43 @@ msgstr ""
 #: mapmint-ui/templates//Configuration_bs.tmpl:30
 #, c-format
 msgid "%s configuration"
+msgstr ""
+
+#: mapmint-ui/templates//contextmenu_bs.html:3
+#: mapmint-ui/templates//Manager.tmpl:37
+#: mapmint-ui/templates//Manager_bs.html:212
+#: mapmint-ui/templates//Manager_bs.html:221
+#: mapmint-ui/templates//Manager_bs.tmpl:234
+#: mapmint-ui/templates//Manager_bs.tmpl:243
+#: mapmint-ui/templates//preview/index_bs.tmpl:237
+#: mapmint-ui/templates//preview/layerswitcher.tmpl:43
+#: mapmint-ui/templates//preview/layerswitcher.tmpl:50
+#: mapmint-ui/templates//preview/leftcol.tmpl:57
+#: mapmint-ui/templates//preview/leftcol_bs.tmpl:226
+#: mapmint-ui/templates//preview/rightcol.tmpl:68
+msgid "Zoom to"
+msgstr ""
+
+#: mapmint-ui/templates//contextmenu_bs.html:4
+#: mapmint-ui/templates//Manager_bs.html:214
+#: mapmint-ui/templates//Manager_bs.html:223
+#: mapmint-ui/templates//Manager_bs.tmpl:236
+#: mapmint-ui/templates//Manager_bs.tmpl:245
+#: mapmint-ui/templates//preview/index_bs.tmpl:238
+#: mapmint-ui/templates//preview/leftcol_bs.tmpl:227
+msgid "View table"
+msgstr ""
+
+#: mapmint-ui/templates//contextmenu_bs.html:6
+#: mapmint-ui/templates//preview/index_bs.tmpl:240
+#: mapmint-ui/templates//preview/leftcol_bs.tmpl:229
+msgid "Export data"
+msgstr ""
+
+#: mapmint-ui/templates//contextmenu_bs.html:17
+#: mapmint-ui/templates//preview/index_bs.tmpl:258
+#: mapmint-ui/templates//preview/leftcol_bs.tmpl:240
+msgid "Set opacity"
 msgstr ""
 
 #: mapmint-ui/templates//Dashboard.tmpl:24
@@ -906,6 +956,7 @@ msgstr ""
 
 #: mapmint-ui/templates//Dashboard_bs.tmpl:190
 #: mapmint-ui/templates//Georeferencer.tmpl:140
+#: mapmint-ui/templates//Georeferencer_bs.tmpl:153
 #: mapmint-ui/templates//preview/mobile.tmpl:53
 #: mapmint-ui/templates//preview/mobile.tmpl:82
 #: mapmint-ui/templates//preview/mobile.tmpl:99
@@ -947,15 +998,18 @@ msgstr ""
 #: mapmint-ui/templates//Distiller/wfs/display_bs.tmpl:15
 #: mapmint-ui/templates//Distiller_db_display.tmpl:48
 #: mapmint-ui/templates//Documents.tmpl:113
+#: mapmint-ui/templates//Documents_bs.html:120
+#: mapmint-ui/templates//Documents_bs.tmpl:57
+#: mapmint-ui/templates//Documents_bs.tmpl:217
 #: mapmint-ui/templates//Indexes.tmpl:439
 #: mapmint-ui/templates//Manager/AddLayer.tmpl:44
-#: mapmint-ui/templates//Manager/Styler_bs.html:85
+#: mapmint-ui/templates//Manager/Styler_bs.html:86
 #: mapmint-ui/templates//Manager_bs.html:99
 #: mapmint-ui/templates//Manager_bs.html:119
 #: mapmint-ui/templates//Manager_bs.html:120
-#: mapmint-ui/templates//Manager_bs.tmpl:121
-#: mapmint-ui/templates//Manager_bs.tmpl:141
+#: mapmint-ui/templates//Manager_bs.tmpl:136
 #: mapmint-ui/templates//Manager_bs.tmpl:142
+#: mapmint-ui/templates//Manager_bs.tmpl:298
 #: mapmint-ui/templates//preview/modules/addLayer/display.html:33
 #: mapmint-ui/templates//preview/modules/addLayer/display.html:40
 #: mapmint-ui/templates//preview/modules/indexes/AddLayer.tmpl:14
@@ -976,6 +1030,8 @@ msgstr ""
 #: mapmint-ui/templates//Distiller_db_display.tmpl:6
 #: mapmint-ui/templates//Distiller_db_remove.tmpl:10
 #: mapmint-ui/templates//Documents.tmpl:38
+#: mapmint-ui/templates//Documents_bs.html:45
+#: mapmint-ui/templates//Documents_bs.tmpl:142
 #: mapmint-ui/templates//Indexes.tmpl:58
 #: mapmint-ui/templates//Manager/addGridWindow.tmpl:3
 #: mapmint-ui/templates//Manager/LayerProperties.tmpl:6
@@ -1017,6 +1073,10 @@ msgstr ""
 #: mapmint-ui/templates//Distiller_db_display.tmpl:47
 #: mapmint-ui/templates//Documents.tmpl:114
 #: mapmint-ui/templates//Documents.tmpl:127
+#: mapmint-ui/templates//Documents_bs.html:121
+#: mapmint-ui/templates//Documents_bs.html:134
+#: mapmint-ui/templates//Documents_bs.tmpl:218
+#: mapmint-ui/templates//Documents_bs.tmpl:231
 #: mapmint-ui/templates//Indexes.tmpl:440
 #: mapmint-ui/templates//Indexes.tmpl:453
 #: mapmint-ui/templates//Territories.tmpl:120
@@ -1095,7 +1155,12 @@ msgstr ""
 #: mapmint-ui/templates//Distiller/dirs/display_bs.html:44
 #: mapmint-ui/templates//Distiller/wfs/display_bs.html:11
 #: mapmint-ui/templates//Distiller/wfs/display_bs.tmpl:11
+#: mapmint-ui/templates//Documents_bs.html:27
+#: mapmint-ui/templates//Documents_bs.tmpl:67
+#: mapmint-ui/templates//Documents_bs.tmpl:77
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:124
 #: mapmint-ui/templates//Manager/Styler/ClassLegend.tmpl:33
+#: mapmint-ui/templates//Themes_bs.tmpl:61
 #: mapmint-ui/templates//UsersManagement/MainWindow.tmpl:39
 msgid "Name"
 msgstr ""
@@ -1111,7 +1176,7 @@ msgstr ""
 #: mapmint-ui/templates//Distiller/db/display_bs.html:14
 #: mapmint-ui/templates//login.tmpl:9 mapmint-ui/templates//login_bs.html:9
 #: mapmint-ui/templates//login_bs.tmpl:9 mapmint-ui/templates//login_bs.tmpl:47
-#: mapmint-ui/templates//preview/toolbar_bs.tmpl:168
+#: mapmint-ui/templates//preview/toolbar_bs.tmpl:160
 #: mapmint-ui/templates//public-access.tmpl:135
 #: mapmint-ui/templates//UsersManagement/MainWindow.html:10
 #: mapmint-ui/templates//UsersManagement/MainWindow.tmpl:17
@@ -1119,7 +1184,7 @@ msgid "Login"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/db/display_bs.html:15
-#: mapmint-ui/templates//preview/toolbar_bs.tmpl:165
+#: mapmint-ui/templates//preview/toolbar_bs.tmpl:157
 msgid "Password"
 msgstr ""
 
@@ -1149,19 +1214,19 @@ msgid "Data Source:"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:19
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:7
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:9
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:5
 msgid "Band:"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:26
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:10
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:16
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:8
 msgid "Method:"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:28
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:12
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:20
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:10
 #: mapmint-ui/templates//Indexes.tmpl:306
 #: mapmint-ui/templates//Manager/ComplexSearch.tmpl:69
@@ -1169,10 +1234,11 @@ msgstr ""
 #: mapmint-ui/templates//Manager/ComplexSearch.tmpl:152
 #: mapmint-ui/templates//Manager/Styler/Vector.tmpl:144
 #: mapmint-ui/templates//Manager/Styler.tmpl:144
-#: mapmint-ui/templates//Manager/Styler_bs.html:31
-#: mapmint-ui/templates//Manager/Styler_bs.html:187
+#: mapmint-ui/templates//Manager/Styler_bs.html:29
+#: mapmint-ui/templates//Manager/Styler_bs.html:188
 #: mapmint-ui/templates//Manager/TemplateEditor_bs.html:12
 #: mapmint-ui/templates//Manager/TemplateEditor_bs.tmpl:12
+#: mapmint-ui/templates//Themes_bs.html:64
 #: mapmint-ui/templates//ThemesManagement/list.html:54
 #: mapmint-ui/templates//ThemesManagement/list_bs.html:54
 #: mapmint-ui/templates//Upload.tmpl:7
@@ -1185,7 +1251,7 @@ msgid "Choose"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:34
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:18
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:28
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:16
 msgid ""
 "This mode will take a DEM raster and output a 32-bit float raster with slope "
@@ -1196,15 +1262,15 @@ msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:35
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:64
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:19
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:48
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:31
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:64
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:17
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:46
 msgid "Scale"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:39
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:23
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:39
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:21
 msgid ""
 "This mode outputs an 8-bit raster with a nice shaded relief effect. It's "
@@ -1215,31 +1281,31 @@ msgid ""
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:42
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:26
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:42
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:24
 msgid "Z-Factor"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:47
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:31
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:47
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:29
 msgid "Azimuth / Altitude parameters:"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:53
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:37
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:53
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:35
 msgid "Azimuth"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:60
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:44
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:60
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:42
 msgid "Altitude"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:70
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:54
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:70
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:52
 msgid ""
 "This command outputs a 32-bit float raster with values between 0° and 360° "
@@ -1252,19 +1318,19 @@ msgid ""
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:73
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:57
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:73
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:55
 msgid "This command builds vector contour lines from a raster elevation model"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:75
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:59
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:75
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:57
 msgid "Elevation interval between contours"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:79
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:63
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:79
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:61
 msgid ""
 "Name for the attribute in which to put the elevation. If not provided no "
@@ -1272,7 +1338,7 @@ msgid ""
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:84
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:68
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:84
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:66
 msgid ""
 "Terrain Ruggedness Index, which is defined as the mean difference between a "
@@ -1281,7 +1347,7 @@ msgid ""
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:87
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:71
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:87
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:69
 msgid ""
 "Topographic Position Index, which is defined as the difference between a "
@@ -1290,7 +1356,7 @@ msgid ""
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:90
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:74
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:90
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:72
 msgid ""
 "Roughness is the largest inter-cell difference of a central pixel and its "
@@ -1298,12 +1364,13 @@ msgid ""
 msgstr ""
 
 #: mapmint-ui/templates//Distiller/RasterWindow.tmpl:94
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:78
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:94
 #: mapmint-ui/templates//Distiller/RasterWindow_bs.tmpl:76
 msgid "Filename"
 msgstr ""
 
-#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:83
+#: mapmint-ui/templates//Distiller/RasterWindow_bs.html:99
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:76
 msgid "Run"
 msgstr ""
 
@@ -1374,6 +1441,7 @@ msgstr ""
 #: mapmint-ui/templates//Distiller/VectorConverter_bs.html:28
 #: mapmint-ui/templates//Distiller/VectorConverter_bs.tmpl:28
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:31
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:34
 msgid "Datastore:"
 msgstr ""
 
@@ -1427,6 +1495,7 @@ msgstr ""
 
 #: mapmint-ui/templates//Distiller/wfs/display_bs.html:12
 #: mapmint-ui/templates//Distiller/wfs/display_bs.tmpl:12
+#: mapmint-ui/templates//Documents_bs.tmpl:100
 msgid "URL"
 msgstr ""
 
@@ -1497,8 +1566,8 @@ msgstr ""
 #: mapmint-ui/templates//Distiller_bs.html:144
 #: mapmint-ui/templates//Distiller_bs.html:174
 #: mapmint-ui/templates//Distiller_bs.tmpl:35
-#: mapmint-ui/templates//Distiller_bs.tmpl:171
-#: mapmint-ui/templates//Distiller_bs.tmpl:201
+#: mapmint-ui/templates//Distiller_bs.tmpl:175
+#: mapmint-ui/templates//Distiller_bs.tmpl:205
 msgid "Datastores"
 msgstr ""
 
@@ -1508,27 +1577,27 @@ msgid "OGC Web Services"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller_bs.html:188
-#: mapmint-ui/templates//Distiller_bs.tmpl:219
+#: mapmint-ui/templates//Distiller_bs.tmpl:223
 msgid "No data source found"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller_bs.html:229
-#: mapmint-ui/templates//Distiller_bs.tmpl:263
+#: mapmint-ui/templates//Distiller_bs.tmpl:269
 msgid "Loading datastore ..."
 msgstr ""
 
 #: mapmint-ui/templates//Distiller_bs.html:273
-#: mapmint-ui/templates//Distiller_bs.tmpl:308
+#: mapmint-ui/templates//Distiller_bs.tmpl:313
 msgid "Loading datasource ..."
 msgstr ""
 
 #: mapmint-ui/templates//Distiller_bs.html:306
-#: mapmint-ui/templates//Distiller_bs.tmpl:353
+#: mapmint-ui/templates//Distiller_bs.tmpl:392
 msgid "Do you really want to remove the datasource ?"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller_bs.html:309
-#: mapmint-ui/templates//Distiller_bs.tmpl:356
+#: mapmint-ui/templates//Distiller_bs.tmpl:395
 msgid ""
 "Once removed, you cannot access the datasource anymore. You cannot recover a "
 "removed datasource. Deleting a datasource may destroy important data and "
@@ -1537,8 +1606,8 @@ msgstr ""
 
 #: mapmint-ui/templates//Distiller_bs.html:312
 #: mapmint-ui/templates//Distiller_bs.html:331
-#: mapmint-ui/templates//Distiller_bs.tmpl:359
-#: mapmint-ui/templates//Distiller_bs.tmpl:378
+#: mapmint-ui/templates//Distiller_bs.tmpl:398
+#: mapmint-ui/templates//Distiller_bs.tmpl:416
 #: mapmint-ui/templates//Publisher/confirmRemove.html:7
 #: mapmint-ui/templates//Publisher/confirmRemove.tmpl:7
 #: mapmint-ui/templates//Publisher_bs.tmpl:112
@@ -1547,8 +1616,8 @@ msgstr ""
 
 #: mapmint-ui/templates//Distiller_bs.html:313
 #: mapmint-ui/templates//Distiller_bs.html:332
-#: mapmint-ui/templates//Distiller_bs.tmpl:360
-#: mapmint-ui/templates//Distiller_bs.tmpl:379
+#: mapmint-ui/templates//Distiller_bs.tmpl:399
+#: mapmint-ui/templates//Distiller_bs.tmpl:417
 #: mapmint-ui/templates//Publisher/confirmRemove.html:6
 #: mapmint-ui/templates//Publisher/confirmRemove.tmpl:6
 #: mapmint-ui/templates//Publisher_bs.tmpl:113
@@ -1556,25 +1625,62 @@ msgid "Yes"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller_bs.html:325
-#: mapmint-ui/templates//Distiller_bs.tmpl:372
+#: mapmint-ui/templates//Distiller_bs.tmpl:410
 msgid "Do you really want to remove the datastore ?"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller_bs.html:328
-#: mapmint-ui/templates//Distiller_bs.tmpl:375
+#: mapmint-ui/templates//Distiller_bs.tmpl:413
 msgid ""
 "Once removed, you cannot access the datastore anymore. You cannot recover a "
 "removed datastore. Deleting a datastore may destroy important data and make "
 "any project using it unstable."
 msgstr ""
 
-#: mapmint-ui/templates//Distiller_bs.tmpl:215
+#: mapmint-ui/templates//Distiller_bs.tmpl:219
 msgid ""
 "Please wait while loading [nb] datasources from the [datastore] datastore..."
 msgstr ""
 
-#: mapmint-ui/templates//Distiller_bs.tmpl:317
+#: mapmint-ui/templates//Distiller_bs.tmpl:322
 msgid "Table: "
+msgstr ""
+
+#: mapmint-ui/templates//Distiller_bs.tmpl:350
+msgid "Mozaic a set of images"
+msgstr ""
+
+#: mapmint-ui/templates//Distiller_bs.tmpl:351
+msgid "Mozaic Name"
+msgstr ""
+
+#: mapmint-ui/templates//Distiller_bs.tmpl:351
+msgid "Mozaic"
+msgstr ""
+
+#: mapmint-ui/templates//Distiller_bs.tmpl:357
+msgid ""
+"You can mozaic only raster data, please change your selection and try again."
+msgstr ""
+
+#: mapmint-ui/templates//Distiller_bs.tmpl:363
+msgid "Create a TileIndex"
+msgstr ""
+
+#: mapmint-ui/templates//Distiller_bs.tmpl:364
+msgid "TileIndex Name"
+msgstr ""
+
+#: mapmint-ui/templates//Distiller_bs.tmpl:364
+msgid "TileIndex"
+msgstr ""
+
+#: mapmint-ui/templates//Distiller_bs.tmpl:366
+msgid "Projection System"
+msgstr ""
+
+#: mapmint-ui/templates//Distiller_bs.tmpl:373
+msgid "Filename extension"
 msgstr ""
 
 #: mapmint-ui/templates//Distiller_db_remove.tmpl:4
@@ -1582,41 +1688,61 @@ msgid "Please, confirm that you want to remove the following DataStore:"
 msgstr ""
 
 #: mapmint-ui/templates//Documents.tmpl:32
+#: mapmint-ui/templates//Documents_bs.html:25
+#: mapmint-ui/templates//Documents_bs.html:39
 #: mapmint-ui/templates//preview/modules/routing/view.html:42
 #: mapmint-ui/templates//Territories.tmpl:26
-#: mapmint-ui/templates//Themes.tmpl:32
+#: mapmint-ui/templates//Themes.tmpl:32 mapmint-ui/templates//Themes_bs.html:79
+#: mapmint-ui/templates//Themes_bs.tmpl:59
 msgid "Informations"
 msgstr ""
 
 #: mapmint-ui/templates//Documents.tmpl:32
+#: mapmint-ui/templates//Documents_bs.html:39
+#: mapmint-ui/templates//Documents_bs.tmpl:45
+#: mapmint-ui/templates//Documents_bs.tmpl:136
 msgid "Name of the selected document"
 msgstr ""
 
 #: mapmint-ui/templates//Documents.tmpl:43
+#: mapmint-ui/templates//Documents_bs.html:50
+#: mapmint-ui/templates//Documents_bs.tmpl:147
 msgid "Themes:"
 msgstr ""
 
 #: mapmint-ui/templates//Documents.tmpl:56
+#: mapmint-ui/templates//Documents_bs.html:63
+#: mapmint-ui/templates//Documents_bs.tmpl:160
 #: mapmint-ui/templates//Indexes.tmpl:62
 #: mapmint-ui/templates//Publisher.tmpl:133
 msgid "Description:"
 msgstr ""
 
 #: mapmint-ui/templates//Documents.tmpl:61
+#: mapmint-ui/templates//Documents_bs.html:68
+#: mapmint-ui/templates//Documents_bs.tmpl:165
 msgid "File:"
 msgstr ""
 
-#: mapmint-ui/templates//Documents.tmpl:74 mapmint-ui/templates//Themes.tmpl:69
+#: mapmint-ui/templates//Documents.tmpl:74
+#: mapmint-ui/templates//Documents_bs.html:81
+#: mapmint-ui/templates//Documents_bs.tmpl:178
+#: mapmint-ui/templates//Themes.tmpl:69
+#: mapmint-ui/templates//Themes_bs.html:116
 msgid "Groups:"
 msgstr ""
 
 #: mapmint-ui/templates//Documents.tmpl:90
+#: mapmint-ui/templates//Documents_bs.html:97
+#: mapmint-ui/templates//Documents_bs.tmpl:194
 #: mapmint-ui/templates//public-access.tmpl:46
 #: mapmint-ui/templates//public-access.tmpl:431
 msgid "Documents"
 msgstr ""
 
 #: mapmint-ui/templates//Documents.tmpl:94
+#: mapmint-ui/templates//Documents_bs.html:101
+#: mapmint-ui/templates//Documents_bs.tmpl:198
 #: mapmint-ui/templates//Manager/LayerProperties.tmpl:95
 #: mapmint-ui/templates//Manager/LayerProperties_bs.tmpl:97
 #: mapmint-ui/templates//public-access.tmpl:443
@@ -1625,14 +1751,77 @@ msgid "Search:"
 msgstr ""
 
 #: mapmint-ui/templates//Documents.tmpl:126
+#: mapmint-ui/templates//Documents_bs.html:133
+#: mapmint-ui/templates//Documents_bs.tmpl:61
+#: mapmint-ui/templates//Documents_bs.tmpl:230
 #: mapmint-ui/templates//Indexes.tmpl:452
+#: mapmint-ui/templates//Manager/Styler_bs.html:76
 #: mapmint-ui/templates//preview/modules/edit/list.html:15
 #: mapmint-ui/templates//preview/modules/routing/saveList.tmpl:12
 #: mapmint-ui/templates//preview/modules/routing/view.html:35
 #: mapmint-ui/templates//Territories.tmpl:119
 #: mapmint-ui/templates//Themes.tmpl:130
+#: mapmint-ui/templates//Themes_bs.html:42
+#: mapmint-ui/templates//Themes_bs.tmpl:42
 #: mapmint-ui/templates//UserPreferences.tmpl:75
 msgid "Delete"
+msgstr ""
+
+#: mapmint-ui/templates//Documents_bs.html:25
+#: mapmint-ui/templates//Themes.tmpl:32 mapmint-ui/templates//Themes_bs.html:79
+#: mapmint-ui/templates//Themes_bs.tmpl:59
+msgid "Name of the selected theme"
+msgstr ""
+
+#: mapmint-ui/templates//Documents_bs.tmpl:43
+#: mapmint-ui/templates//Documents_bs.tmpl:136
+msgid "Document"
+msgstr ""
+
+#: mapmint-ui/templates//Documents_bs.tmpl:53
+msgid "Add a document"
+msgstr ""
+
+#: mapmint-ui/templates//Documents_bs.tmpl:54
+msgid "Dele a document"
+msgstr ""
+
+#: mapmint-ui/templates//Documents_bs.tmpl:57
+msgid "Document Name"
+msgstr ""
+
+#: mapmint-ui/templates//Documents_bs.tmpl:60
+msgid "Do you really want to delete the document ?"
+msgstr ""
+
+#: mapmint-ui/templates//Documents_bs.tmpl:66
+msgid "Id"
+msgstr ""
+
+#: mapmint-ui/templates//Documents_bs.tmpl:86
+msgid "Theme"
+msgstr ""
+
+#: mapmint-ui/templates//Documents_bs.tmpl:87
+#: mapmint-ui/templates//Publisher/Properties.html:44
+#: mapmint-ui/templates//UsersManagement/MainWindow.tmpl:40
+msgid "Description"
+msgstr ""
+
+#: mapmint-ui/templates//Documents_bs.tmpl:98
+#: mapmint-ui/templates//Indexes.tmpl:137
+msgid "File"
+msgstr ""
+
+#: mapmint-ui/templates//Documents_bs.tmpl:124
+#: mapmint-ui/templates//Indexes.tmpl:88
+#: mapmint-ui/templates//Themes_bs.tmpl:93
+#: mapmint-ui/templates//UsersManagement/GroupList.html:77
+#: mapmint-ui/templates//UsersManagement/GroupList.tmpl:55
+#: mapmint-ui/templates//UsersManagement/GroupList_bs.html:77
+#: mapmint-ui/templates//UsersManagement/MainWindow.tmpl:11
+#: mapmint-ui/templates//UsersManagement.tmpl:23
+msgid "Groups"
 msgstr ""
 
 #: mapmint-ui/templates//error.tmpl:13
@@ -1643,27 +1832,78 @@ msgstr ""
 msgid "Requested page could not be loaded"
 msgstr ""
 
+#: mapmint-ui/templates//Georeferencer/CropeImage_bs.html:4
+#: mapmint-ui/templates//Georeferencer/CropeImage_bs.tmpl:4
+#: mapmint-ui/templates//Georeferencer.tmpl:29
+#: mapmint-ui/templates//Georeferencer_bs.tmpl:90
+msgid "Georeference"
+msgstr ""
+
+#: mapmint-ui/templates//Georeferencer/CropeImage_bs.html:8
+#: mapmint-ui/templates//Georeferencer/CropImage_bs.html:9
+msgid "Datastore"
+msgstr ""
+
+#: mapmint-ui/templates//Georeferencer/CropImage_bs.html:5
+#: mapmint-ui/templates//Georeferencer_bs.tmpl:42
+msgid "Crop Raster"
+msgstr ""
+
+#: mapmint-ui/templates//Georeferencer/CropImage_bs.html:36
+msgid "Crop"
+msgstr ""
+
+#: mapmint-ui/templates//Georeferencer/GCPForm_bs.tmpl:5
+#: mapmint-ui/templates//Georeferencer/SaveGCP.tmpl:4
+msgid "Replace existing files:"
+msgstr ""
+
+#: mapmint-ui/templates//Georeferencer/GCPForm_bs.tmpl:7
+#: mapmint-ui/templates//Georeferencer/SaveGCP.tmpl:6
+msgid "Filename:"
+msgstr ""
+
+#: mapmint-ui/templates//Georeferencer/GCPList_bs.html:3
+#: mapmint-ui/templates//Georeferencer/GCPList_bs.tmpl:3
+#: mapmint-ui/templates//Georeferencer/LoadGCP.tmpl:3
+msgid "CSV File:"
+msgstr ""
+
+#: mapmint-ui/templates//Georeferencer/GCPList_bs.html:19
+#: mapmint-ui/templates//Georeferencer_bs.tmpl:85
+#: mapmint-ui/templates//Manager_bs.html:45
+#: mapmint-ui/templates//Manager_bs.tmpl:81
+#: mapmint-ui/templates//Publisher_bs.tmpl:35
+msgid "Load"
+msgstr ""
+
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:4
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:3
 msgid "Transformation type:"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:6
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:7
 msgid "Polynomial one"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:7
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:8
 msgid "Polynomial two"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:8
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:9
 msgid "Polynomial three"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:9
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:10
 msgid "Thin Plate Spline"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:13
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:14
 #: mapmint-ui/templates//Manager/Styler/Vector.tmpl:291
 #: mapmint-ui/templates//Manager/Styler/Vector.tmpl:487
 #: mapmint-ui/templates//Manager/Styler.tmpl:291
@@ -1672,55 +1912,53 @@ msgid "Resampling method:"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:15
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:16
 msgid "Nearest Neighbour"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:16
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:17
 msgid "Bilinear"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:17
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:18
 msgid "Cubic"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:18
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:19
 msgid "Cubic Spline"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:19
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:20
 msgid "Lanczos"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:23
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:24
 msgid "Compression:"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:49
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:54
 msgid "Raster filename:"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:53
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:61
 msgid "Set target resolution"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:56
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:64
 msgid "Horizontal:"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer/Georeference.tmpl:60
+#: mapmint-ui/templates//Georeferencer/Georeference_bs.html:68
 msgid "Vertical:"
-msgstr ""
-
-#: mapmint-ui/templates//Georeferencer/LoadGCP.tmpl:3
-msgid "CSV File:"
-msgstr ""
-
-#: mapmint-ui/templates//Georeferencer/SaveGCP.tmpl:4
-msgid "Replace existing files:"
-msgstr ""
-
-#: mapmint-ui/templates//Georeferencer/SaveGCP.tmpl:6
-msgid "Filename:"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer.tmpl:21
@@ -1729,10 +1967,6 @@ msgstr ""
 
 #: mapmint-ui/templates//Georeferencer.tmpl:28
 msgid "Save Project"
-msgstr ""
-
-#: mapmint-ui/templates//Georeferencer.tmpl:29
-msgid "Georeference"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer.tmpl:73
@@ -1756,7 +1990,16 @@ msgid "Open"
 msgstr ""
 
 #: mapmint-ui/templates//Georeferencer.tmpl:133
+#: mapmint-ui/templates//Georeferencer_bs.tmpl:146
 msgid "Image"
+msgstr ""
+
+#: mapmint-ui/templates//Georeferencer_bs.tmpl:119
+msgid "Image to georeference: "
+msgstr ""
+
+#: mapmint-ui/templates//Georeferencer_bs.tmpl:129
+msgid "Ground Control Points"
 msgstr ""
 
 #: mapmint-ui/templates//help.tmpl:14
@@ -1792,7 +2035,7 @@ msgid "Add layers"
 msgstr ""
 
 #: mapmint-ui/templates//help.tmpl:56
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:64
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:83
 #: mapmint-ui/templates//preview/mobile.tmpl:138
 #: mapmint-ui/templates//preview/modules/routing/ddview.html:11
 #: mapmint-ui/templates//preview/modules/routing/ddview.html:26
@@ -1860,18 +2103,9 @@ msgstr ""
 msgid "Keywords:"
 msgstr ""
 
-#: mapmint-ui/templates//Indexes.tmpl:88
-#: mapmint-ui/templates//UsersManagement/GroupList.html:77
-#: mapmint-ui/templates//UsersManagement/GroupList.tmpl:55
-#: mapmint-ui/templates//UsersManagement/GroupList_bs.html:77
-#: mapmint-ui/templates//UsersManagement/MainWindow.tmpl:11
-#: mapmint-ui/templates//UsersManagement.tmpl:23
-msgid "Groups"
-msgstr ""
-
 #: mapmint-ui/templates//Indexes.tmpl:119
 #: mapmint-ui/templates//preview/index_bs.tmpl:286
-#: mapmint-ui/templates//preview/leftcol_bs.tmpl:84
+#: mapmint-ui/templates//preview/leftcol_bs.tmpl:86
 msgid "Table:"
 msgstr ""
 
@@ -1879,12 +2113,9 @@ msgstr ""
 msgid "Select a territory"
 msgstr ""
 
-#: mapmint-ui/templates//Indexes.tmpl:137
-msgid "File"
-msgstr ""
-
 #: mapmint-ui/templates//Indexes.tmpl:138
 #: mapmint-ui/templates//Manager/ComplexSearch.tmpl:59
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:61
 #: mapmint-ui/templates//Manager.tmpl:38
 #: mapmint-ui/templates//preview/leftcol.tmpl:59
 #: mapmint-ui/templates//preview/rightcol.tmpl:70
@@ -1938,8 +2169,8 @@ msgstr ""
 #: mapmint-ui/templates//Manager/Styler.tmpl:35
 #: mapmint-ui/templates//Manager/Styler.tmpl:79
 #: mapmint-ui/templates//Manager/Styler.tmpl:341
-#: mapmint-ui/templates//Manager/Styler_bs.html:65
-#: mapmint-ui/templates//Manager/Styler_bs.html:92
+#: mapmint-ui/templates//Manager/Styler_bs.html:63
+#: mapmint-ui/templates//Manager/Styler_bs.html:93
 msgid "Unique Value"
 msgstr ""
 
@@ -1951,8 +2182,8 @@ msgstr ""
 #: mapmint-ui/templates//Manager/Styler.tmpl:33
 #: mapmint-ui/templates//Manager/Styler.tmpl:77
 #: mapmint-ui/templates//Manager/Styler.tmpl:340
-#: mapmint-ui/templates//Manager/Styler_bs.html:63
-#: mapmint-ui/templates//Manager/Styler_bs.html:90
+#: mapmint-ui/templates//Manager/Styler_bs.html:61
+#: mapmint-ui/templates//Manager/Styler_bs.html:91
 msgid "Graduated Symbol"
 msgstr ""
 
@@ -1963,7 +2194,7 @@ msgstr ""
 #: mapmint-ui/templates//Indexes.tmpl:274
 #: mapmint-ui/templates//Manager/Styler/Vector.tmpl:36
 #: mapmint-ui/templates//Manager/Styler.tmpl:36
-#: mapmint-ui/templates//Manager/Styler_bs.html:66
+#: mapmint-ui/templates//Manager/Styler_bs.html:64
 msgid "Time line"
 msgstr ""
 
@@ -1982,7 +2213,7 @@ msgstr ""
 #: mapmint-ui/templates//Indexes.tmpl:284
 #: mapmint-ui/templates//Manager/Styler/Vector.tmpl:58
 #: mapmint-ui/templates//Manager/Styler.tmpl:58
-#: mapmint-ui/templates//Manager/Styler_bs.html:74
+#: mapmint-ui/templates//Manager/Styler_bs.html:72
 msgid "Add a step"
 msgstr ""
 
@@ -1997,8 +2228,8 @@ msgstr ""
 #: mapmint-ui/templates//Manager/Styler/Vector.tmpl:78
 #: mapmint-ui/templates//Manager/Styler.tmpl:34
 #: mapmint-ui/templates//Manager/Styler.tmpl:78
-#: mapmint-ui/templates//Manager/Styler_bs.html:64
-#: mapmint-ui/templates//Manager/Styler_bs.html:91
+#: mapmint-ui/templates//Manager/Styler_bs.html:62
+#: mapmint-ui/templates//Manager/Styler_bs.html:92
 msgid "Continuous Color"
 msgstr ""
 
@@ -2029,7 +2260,7 @@ msgstr ""
 #: mapmint-ui/templates//Manager/Styler.tmpl:230
 #: mapmint-ui/templates//Manager/Styler.tmpl:396
 #: mapmint-ui/templates//Manager/Styler.tmpl:468
-#: mapmint-ui/templates//Manager/Styler_bs.html:196
+#: mapmint-ui/templates//Manager/Styler_bs.html:197
 msgid "Classify"
 msgstr ""
 
@@ -2071,7 +2302,7 @@ msgid "Ok"
 msgstr ""
 
 #: mapmint-ui/templates//Manager/AddGroup.tmpl:14
-#: mapmint-ui/templates//Themes.tmpl:43
+#: mapmint-ui/templates//Themes.tmpl:43 mapmint-ui/templates//Themes_bs.html:90
 msgid "Parent:"
 msgstr ""
 
@@ -2101,7 +2332,7 @@ msgstr ""
 #: mapmint-ui/templates//Manager/Styler/ClassLegend.tmpl:31
 #: mapmint-ui/templates//Manager_bs.html:148
 #: mapmint-ui/templates//Manager_bs.tmpl:170
-#: mapmint-ui/templates//preview/layerswitcher_bs.tmpl:10
+#: mapmint-ui/templates//preview/layerswitcher_bs.tmpl:16
 msgid "Legend"
 msgstr ""
 
@@ -2123,6 +2354,7 @@ msgid "First choose a table"
 msgstr ""
 
 #: mapmint-ui/templates//Manager/ComplexSearch.tmpl:106
+#: mapmint-ui/templates//Themes_bs.tmpl:101
 msgid "Color"
 msgstr ""
 
@@ -2147,6 +2379,7 @@ msgid "Field"
 msgstr ""
 
 #: mapmint-ui/templates//Manager/ComplexSearch.tmpl:188
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:125
 msgid "Label"
 msgstr ""
 
@@ -2336,97 +2569,122 @@ msgstr ""
 msgid "Spatial Query:"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:56
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:60
+#: mapmint-ui/templates//Publisher/Properties.html:19
+#: mapmint-ui/templates//Publisher.tmpl:52
+#: mapmint-ui/templates//Publisher_bs.tmpl:74
+msgid "General"
+msgstr ""
+
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:75
 msgid "Title"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:56
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:75
 msgid "Sample Title"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:57
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:76
 msgid "Abstract"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:57
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:76
 msgid "Layer Abstract"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:58
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:77
 #: mapmint-ui/templates//Publisher/Properties.html:36
 msgid "Keywords"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:58
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:77
 msgid "Sample kewords"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:59
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:78
 msgid "Fees"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:59
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:78
 msgid "Sample attribution"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:60
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:79
 msgid "Query"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:60
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:79
 msgid "Layer Query"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:61
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:80
 msgid "Export"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:61
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:80
 msgid "Layer Export"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:62
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:81
 msgid "Filtering"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:62
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:81
 msgid "Layer Filtering"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:63
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:82
 msgid "Zoom on"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:63
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:82
 msgid "Zoom Filtering"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:64
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:83
 msgid "Layer Search"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:65
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:84
 msgid "Spatial Query"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:65
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:84
 msgid "Layer Spatial Query"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:65
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:84
 msgid "none"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:65
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:84
 msgid "contained"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:65
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:84
 msgid "contains"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/LayerProperties_bs.html:65
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:84
 msgid "both"
+msgstr ""
+
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:117
+msgid "Table configuration"
+msgstr ""
+
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:122
+msgid "D."
+msgstr ""
+
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:123
+msgid "E."
+msgstr ""
+
+#: mapmint-ui/templates//Manager/LayerProperties_bs.html:126
+#: mapmint-ui/templates//Manager/Styler/UniqSymb_bs.html:109
+#: mapmint-ui/templates//Manager/Styler/UniqSymb_bs.html:137
+msgid "Width"
 msgstr ""
 
 #: mapmint-ui/templates//Manager/OpenMap.tmpl:3
@@ -2441,7 +2699,7 @@ msgstr ""
 
 #: mapmint-ui/templates//Manager/Styler/ExprSettings.tmpl:3
 #: mapmint-ui/templates//Manager/Styler/UniqSymb_bs.html:10
-#: mapmint-ui/templates//Manager/Styler_bs.html:147
+#: mapmint-ui/templates//Manager/Styler_bs.html:148
 msgid "Expression settings"
 msgstr ""
 
@@ -2598,11 +2856,6 @@ msgstr ""
 msgid "Stroke color"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler/UniqSymb_bs.html:109
-#: mapmint-ui/templates//Manager/Styler/UniqSymb_bs.html:137
-msgid "Width"
-msgstr ""
-
 #: mapmint-ui/templates//Manager/Styler/UniqSymb_bs.html:115
 msgid "Gap"
 msgstr ""
@@ -2621,19 +2874,19 @@ msgstr ""
 
 #: mapmint-ui/templates//Manager/Styler/Vector.tmpl:7
 #: mapmint-ui/templates//Manager/Styler.tmpl:7
-#: mapmint-ui/templates//Manager/Styler_bs.html:18
+#: mapmint-ui/templates//Manager/Styler_bs.html:16
 msgid "Symbology"
 msgstr ""
 
 #: mapmint-ui/templates//Manager/Styler/Vector.tmpl:8
 #: mapmint-ui/templates//Manager/Styler.tmpl:8
-#: mapmint-ui/templates//Manager/Styler_bs.html:19
+#: mapmint-ui/templates//Manager/Styler_bs.html:17
 msgid "Labels"
 msgstr ""
 
 #: mapmint-ui/templates//Manager/Styler/Vector.tmpl:10
 #: mapmint-ui/templates//Manager/Styler.tmpl:10
-#: mapmint-ui/templates//Manager/Styler_bs.html:20
+#: mapmint-ui/templates//Manager/Styler_bs.html:18
 msgid "Grid"
 msgstr ""
 
@@ -2659,8 +2912,8 @@ msgstr ""
 #: mapmint-ui/templates//Manager/Styler/Vector.tmpl:76
 #: mapmint-ui/templates//Manager/Styler.tmpl:32
 #: mapmint-ui/templates//Manager/Styler.tmpl:76
-#: mapmint-ui/templates//Manager/Styler_bs.html:62
-#: mapmint-ui/templates//Manager/Styler_bs.html:89
+#: mapmint-ui/templates//Manager/Styler_bs.html:60
+#: mapmint-ui/templates//Manager/Styler_bs.html:90
 msgid "Unique Symbol"
 msgstr ""
 
@@ -2720,63 +2973,64 @@ msgstr ""
 msgid "Min (%s) / Max (%s):"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:28
+#: mapmint-ui/templates//Manager/Styler_bs.html:26
+#: mapmint-ui/templates//Themes_bs.html:61
 msgid " Resampling method: "
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:40
+#: mapmint-ui/templates//Manager/Styler_bs.html:38
 msgid "Opacity"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:68
+#: mapmint-ui/templates//Manager/Styler_bs.html:66
 msgid "Legend Type: "
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:70
+#: mapmint-ui/templates//Manager/Styler_bs.html:68
 msgid "Steps"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:73
+#: mapmint-ui/templates//Manager/Styler_bs.html:71
 msgid "Choose a step"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:79
+#: mapmint-ui/templates//Manager/Styler_bs.html:80
 msgid "Step name"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:94
+#: mapmint-ui/templates//Manager/Styler_bs.html:95
 msgid "Legend Type for this step"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:96
+#: mapmint-ui/templates//Manager/Styler_bs.html:97
 msgid "Tiled version"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:107
+#: mapmint-ui/templates//Manager/Styler_bs.html:108
 msgid "Min / Max values"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:118
+#: mapmint-ui/templates//Manager/Styler_bs.html:119
 msgid "No-data value"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:130
+#: mapmint-ui/templates//Manager/Styler_bs.html:131
 msgid "Min / Max color"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:158
+#: mapmint-ui/templates//Manager/Styler_bs.html:159
 msgid "Classification field"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:165
+#: mapmint-ui/templates//Manager/Styler_bs.html:166
 msgid "Size field"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:177
+#: mapmint-ui/templates//Manager/Styler_bs.html:178
 msgid "Classes number"
 msgstr ""
 
-#: mapmint-ui/templates//Manager/Styler_bs.html:184
+#: mapmint-ui/templates//Manager/Styler_bs.html:185
 msgid "Discretization"
 msgstr ""
 
@@ -2819,20 +3073,6 @@ msgstr ""
 
 #: mapmint-ui/templates//Manager.tmpl:21
 msgid "Data Layers"
-msgstr ""
-
-#: mapmint-ui/templates//Manager.tmpl:37
-#: mapmint-ui/templates//Manager_bs.html:212
-#: mapmint-ui/templates//Manager_bs.html:221
-#: mapmint-ui/templates//Manager_bs.tmpl:234
-#: mapmint-ui/templates//Manager_bs.tmpl:243
-#: mapmint-ui/templates//preview/index_bs.tmpl:237
-#: mapmint-ui/templates//preview/layerswitcher.tmpl:43
-#: mapmint-ui/templates//preview/layerswitcher.tmpl:50
-#: mapmint-ui/templates//preview/leftcol.tmpl:57
-#: mapmint-ui/templates//preview/leftcol_bs.tmpl:224
-#: mapmint-ui/templates//preview/rightcol.tmpl:68
-msgid "Zoom to"
 msgstr ""
 
 #: mapmint-ui/templates//Manager.tmpl:40
@@ -2885,7 +3125,7 @@ msgstr ""
 
 #: mapmint-ui/templates//Manager.tmpl:64
 #: mapmint-ui/templates//Manager_bs.html:63
-#: mapmint-ui/templates//Manager_bs.tmpl:85
+#: mapmint-ui/templates//Manager_bs.tmpl:100
 msgid "Add Layer"
 msgstr ""
 
@@ -2905,14 +3145,8 @@ msgstr ""
 msgid "Set Master Fly"
 msgstr ""
 
-#: mapmint-ui/templates//Manager_bs.html:45
-#: mapmint-ui/templates//Manager_bs.tmpl:65
-#: mapmint-ui/templates//Publisher_bs.tmpl:35
-msgid "Load"
-msgstr ""
-
 #: mapmint-ui/templates//Manager_bs.html:50
-#: mapmint-ui/templates//Manager_bs.tmpl:70
+#: mapmint-ui/templates//Manager_bs.tmpl:86
 #: mapmint-ui/templates//preview/mobile.tmpl:25
 #: mapmint-ui/templates//preview/mobile.tmpl:54
 #: mapmint-ui/templates//Publisher_bs.tmpl:75
@@ -2921,43 +3155,43 @@ msgstr ""
 
 #: mapmint-ui/templates//Manager_bs.html:66
 #: mapmint-ui/templates//Manager_bs.html:88
-#: mapmint-ui/templates//Manager_bs.tmpl:88
-#: mapmint-ui/templates//Manager_bs.tmpl:110
+#: mapmint-ui/templates//Manager_bs.tmpl:103
+#: mapmint-ui/templates//Manager_bs.tmpl:125
 msgid "Data Store"
 msgstr ""
 
 #: mapmint-ui/templates//Manager_bs.html:74
-#: mapmint-ui/templates//Manager_bs.tmpl:96
+#: mapmint-ui/templates//Manager_bs.tmpl:111
 msgid "Choose a Data Store"
 msgstr ""
 
 #: mapmint-ui/templates//Manager_bs.html:90
-#: mapmint-ui/templates//Manager_bs.tmpl:112
+#: mapmint-ui/templates//Manager_bs.tmpl:127
 msgid "First Choose a Data Store"
 msgstr ""
 
 #: mapmint-ui/templates//Manager_bs.html:94
-#: mapmint-ui/templates//Manager_bs.tmpl:116
+#: mapmint-ui/templates//Manager_bs.tmpl:131
 msgid "Target Group"
 msgstr ""
 
 #: mapmint-ui/templates//Manager_bs.html:119
-#: mapmint-ui/templates//Manager_bs.tmpl:141
+#: mapmint-ui/templates//Manager_bs.tmpl:142
 msgid "Add Grid"
 msgstr ""
 
 #: mapmint-ui/templates//Manager_bs.html:119
-#: mapmint-ui/templates//Manager_bs.tmpl:141
+#: mapmint-ui/templates//Manager_bs.tmpl:142
 msgid "Set Grid Name"
 msgstr ""
 
 #: mapmint-ui/templates//Manager_bs.html:120
-#: mapmint-ui/templates//Manager_bs.tmpl:142
+#: mapmint-ui/templates//Manager_bs.tmpl:298
 msgid "Add Group"
 msgstr ""
 
 #: mapmint-ui/templates//Manager_bs.html:120
-#: mapmint-ui/templates//Manager_bs.tmpl:142
+#: mapmint-ui/templates//Manager_bs.tmpl:298
 msgid "Set Group Name"
 msgstr ""
 
@@ -2988,15 +3222,6 @@ msgstr ""
 msgid "Display"
 msgstr ""
 
-#: mapmint-ui/templates//Manager_bs.html:214
-#: mapmint-ui/templates//Manager_bs.html:223
-#: mapmint-ui/templates//Manager_bs.tmpl:236
-#: mapmint-ui/templates//Manager_bs.tmpl:245
-#: mapmint-ui/templates//preview/index_bs.tmpl:238
-#: mapmint-ui/templates//preview/leftcol_bs.tmpl:225
-msgid "View table"
-msgstr ""
-
 #: mapmint-ui/templates//Manager_bs.html:215
 #: mapmint-ui/templates//Manager_bs.html:224
 #: mapmint-ui/templates//Manager_bs.tmpl:237
@@ -3014,47 +3239,41 @@ msgstr ""
 msgid "Organize Legend"
 msgstr ""
 
+#: mapmint-ui/templates//Manager_bs.tmpl:54
+msgid "Colored base layer"
+msgstr ""
+
 #: mapmint-ui/templates//preview/copyright.tmpl:5
 msgid "Powered by"
 msgstr ""
 
-#: mapmint-ui/templates//preview/index_bs.tmpl:240
-#: mapmint-ui/templates//preview/leftcol_bs.tmpl:227
-msgid "Export data"
-msgstr ""
-
-#: mapmint-ui/templates//preview/index_bs.tmpl:258
-#: mapmint-ui/templates//preview/leftcol_bs.tmpl:238
-msgid "Set opacity"
-msgstr ""
-
 #: mapmint-ui/templates//preview/index_bs.tmpl:325
-#: mapmint-ui/templates//preview/leftcol_bs.tmpl:253
+#: mapmint-ui/templates//preview/leftcol_bs.tmpl:255
 msgid "Loading the base layer for printing ..."
 msgstr ""
 
 #: mapmint-ui/templates//preview/index_bs.tmpl:332
-#: mapmint-ui/templates//preview/leftcol_bs.tmpl:260
+#: mapmint-ui/templates//preview/leftcol_bs.tmpl:262
 msgid "Printing the document ..."
 msgstr ""
 
 #: mapmint-ui/templates//preview/index_bs.tmpl:339
-#: mapmint-ui/templates//preview/leftcol_bs.tmpl:267
+#: mapmint-ui/templates//preview/leftcol_bs.tmpl:269
 msgid "Error occured when trying to print the document."
 msgstr ""
 
 #: mapmint-ui/templates//preview/index_bs.tmpl:349
-#: mapmint-ui/templates//preview/leftcol_bs.tmpl:277
+#: mapmint-ui/templates//preview/leftcol_bs.tmpl:279
 msgid "The document printed."
 msgstr ""
 
 #: mapmint-ui/templates//preview/index_bs.tmpl:363
-#: mapmint-ui/templates//preview/leftcol_bs.tmpl:291
+#: mapmint-ui/templates//preview/leftcol_bs.tmpl:293
 msgid "The printed document."
 msgstr ""
 
 #: mapmint-ui/templates//preview/index_bs.tmpl:390
-#: mapmint-ui/templates//preview/leftcol_bs.tmpl:318
+#: mapmint-ui/templates//preview/leftcol_bs.tmpl:320
 msgid "The geographical zone displayed on this map will be printed."
 msgstr ""
 
@@ -3066,7 +3285,7 @@ msgstr ""
 msgid "Download data"
 msgstr ""
 
-#: mapmint-ui/templates//preview/layerswitcher_bs.tmpl:9
+#: mapmint-ui/templates//preview/layerswitcher_bs.tmpl:12
 #: mapmint-ui/templates//Publisher/Layers.html:12
 #: mapmint-ui/templates//Publisher/Layers.html:36
 #: mapmint-ui/templates//Publisher.tmpl:324
@@ -3335,7 +3554,9 @@ msgid "Select territory"
 msgstr ""
 
 #: mapmint-ui/templates//preview/modules/indexes/SelectIdx.tmpl:19
-#: mapmint-ui/templates//Themes.tmpl:96
+#: mapmint-ui/templates//Themes.tmpl:96 mapmint-ui/templates//Themes_bs.html:15
+#: mapmint-ui/templates//Themes_bs.html:143
+#: mapmint-ui/templates//Themes_bs.tmpl:15
 #: mapmint-ui/templates//ThemesManagement/list.html:43
 #: mapmint-ui/templates//ThemesManagement/list_bs.html:43
 msgid "Themes"
@@ -3424,19 +3645,23 @@ msgstr ""
 msgid "Preview of "
 msgstr ""
 
-#: mapmint-ui/templates//preview/toolbar_bs.tmpl:128
+#: mapmint-ui/templates//preview/toolbar_bs.tmpl:58
+msgid "Layer"
+msgstr ""
+
+#: mapmint-ui/templates//preview/toolbar_bs.tmpl:120
 msgid "navbar"
 msgstr ""
 
-#: mapmint-ui/templates//preview/toolbar_bs.tmpl:161
+#: mapmint-ui/templates//preview/toolbar_bs.tmpl:153
 msgid "User name"
 msgstr ""
 
-#: mapmint-ui/templates//preview/toolbar_bs.tmpl:172
+#: mapmint-ui/templates//preview/toolbar_bs.tmpl:164
 msgid "Setup"
 msgstr ""
 
-#: mapmint-ui/templates//preview/toolbar_bs.tmpl:175
+#: mapmint-ui/templates//preview/toolbar_bs.tmpl:167
 msgid "Logout"
 msgstr ""
 
@@ -3640,12 +3865,6 @@ msgstr ""
 msgid "Layer Switcher"
 msgstr ""
 
-#: mapmint-ui/templates//Publisher/Properties.html:19
-#: mapmint-ui/templates//Publisher.tmpl:52
-#: mapmint-ui/templates//Publisher_bs.tmpl:74
-msgid "General"
-msgstr ""
-
 #: mapmint-ui/templates//Publisher/Properties.html:20
 msgid "Project Title"
 msgstr ""
@@ -3668,11 +3887,6 @@ msgstr ""
 
 #: mapmint-ui/templates//Publisher/Properties.html:38
 msgid "Copyright"
-msgstr ""
-
-#: mapmint-ui/templates//Publisher/Properties.html:44
-#: mapmint-ui/templates//UsersManagement/MainWindow.tmpl:40
-msgid "Description"
 msgstr ""
 
 #: mapmint-ui/templates//Publisher.tmpl:34
@@ -3788,6 +4002,10 @@ msgstr ""
 msgid "Terms of use"
 msgstr ""
 
+#: mapmint-ui/templates//Skeleton_bs.tmpl:173
+msgid "User Settings"
+msgstr ""
+
 #: mapmint-ui/templates//Territories.tmpl:26
 #: mapmint-ui/templates//Territories.tmpl:27
 msgid "Name of the selected territory"
@@ -3805,24 +4023,31 @@ msgstr ""
 msgid "Set order"
 msgstr ""
 
-#: mapmint-ui/templates//Themes.tmpl:32
-msgid "Name of the selected theme"
-msgstr ""
-
-#: mapmint-ui/templates//Themes.tmpl:38
+#: mapmint-ui/templates//Themes.tmpl:38 mapmint-ui/templates//Themes_bs.html:85
 msgid "Nom:"
 msgstr ""
 
-#: mapmint-ui/templates//Themes.tmpl:46
+#: mapmint-ui/templates//Themes.tmpl:46 mapmint-ui/templates//Themes_bs.html:93
+#: mapmint-ui/templates//Themes_bs.tmpl:70
 msgid "Select a theme"
 msgstr ""
 
 #: mapmint-ui/templates//Themes.tmpl:57
+#: mapmint-ui/templates//Themes_bs.html:104
 msgid "Index:"
 msgstr ""
 
 #: mapmint-ui/templates//Themes.tmpl:77
+#: mapmint-ui/templates//Themes_bs.html:124
 msgid "Color:"
+msgstr ""
+
+#: mapmint-ui/templates//Themes_bs.tmpl:67
+msgid "Parent"
+msgstr ""
+
+#: mapmint-ui/templates//Themes_bs.tmpl:81
+msgid "Indicator"
 msgstr ""
 
 #: mapmint-ui/templates//uoms.tmpl:2
