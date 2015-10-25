@@ -23,6 +23,12 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
+.mm-layers-measure-area:before {
+        content: "\e900";
+}
+.mm-layers-measure-distance:before {
+        content: "\e901";
+}
 .mm-layers-add:before {
 	content: "\e800";
 }

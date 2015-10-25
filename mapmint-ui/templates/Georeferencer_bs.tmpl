@@ -1,0 +1,201 @@
+#encoding UTF-8
+#from Skeleton_bs import Skeleton_bs
+#extends Skeleton_bs
+
+#attr $mmodule = "Georeferencer"
+
+#attr $ocss = []
+
+#def istyles
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/font-mfizz.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.2.0/css/colReorder.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/1.0.7/css/responsive.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.0.0/css/select.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowreorder/1.0.0/css/rowReorder.dataTables.min.css" />
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/jquery.splitter.css"/>
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/ol.css"/>
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-colorpicker.min.css"/>
+#end def
+
+#def page_title
+MapMint: $mmodule
+#end def
+
+#def admin_menu
+     <li class="dropdown geotools hide">
+       <a class="dropdown-toggle" data-toggle="dropdown" href="#empty">
+         <i class="fa fa-gears"></i><i class="fa fa-caret-down"></i>
+       </a>
+       <ul class="dropdown-menu dropdown-bl">
+	 <li>     
+	   <div class="range">
+	     <div class="col-xs-9">
+	     <input id="mmm_opacity" type="range" name="mmm_range" min="1" max="100" value="100" onchange="mmm_range.value=value+ '%'" oninput="mmm_range.value=value + '%'">
+	     </div>
+	     <div class="col-xs-3">
+             <output id="mmm_range">100%</output>
+	     </div>
+           </div>
+  	 </li>
+	 <li><a href="#" class="geoCrop"><i class="fa fa-crop"></i> $zoo._("Crop Raster")</a></li>
+       </ul>
+       <!-- /.dropdown-user -->
+     </li>
+     <li class="dropdown">
+       <a class="dropdown-toggle" data-toggle="dropdown" href="#empty">
+         <img width="24" height="24" id="sbl" class="img-responsive blp" src="http://a.tile.openstreetmap.org/0/0/0.png" /> <i class="fa fa-caret-down"></i>
+       </a>
+       <ul class="dropdown-menu dropdown-bl">
+	 <li><a href="#"><img width="24" height="24" class="img-responsive blp" src="http://a.tile.openstreetmap.org/0/0/0.png" /> OpenStreetMap</a>
+	 </li>
+	 <li><a href="#"><img width="24" height="24" class="img-responsive blp" src="http://otile1.mqcdn.com/tiles/1.0.0/map/0/0/0.png" />  MapQuest map</a>
+	 </li>
+	 <li><a href="#"><img width="24" height="24" class="img-responsive blp" src="http://otile1.mqcdn.com/tiles/1.0.0/sat/0/0/0.png" />  MapQuest satellite</a>
+	 </li>
+	 <li class="divider"></li>
+	 <li><a href="#"><img width="24" height="24" id="blcolpicker" class="img-responsive blp" src="http://placehold.it/24/000000/000000/" /> Colored base layer</a>
+	 </li>
+       </ul>
+       <!-- /.dropdown-user -->
+     </li>
+#end def
+
+#def mmenu
+ <ul class="nav nav-first-level collapse in">
+  <li>
+    <div class="input-group">
+      <span class="input-group-btn" title="$zoo._("Open Map")" rel="tooltip">
+       <button id="mm_loadMapToggler" class="btn btn-default" type="button" href="#mm_loadMap"><i class="fa fa-map-o br"></i> </button>
+      </span>
+      <input id="save-map-orig" type="hidden" value="$conf["senv"]["mmGeoMap"]" />
+      <input class="form-control" id="save-map" placeholder="$zoo._("Map Name")"
+      type="text" value="$conf["senv"]["mmGeoMap"]" />
+      <span class="input-group-btn" title="$zoo._("Save Map")" rel="tooltip">
+       <button class="btn btn-default" type="button">$zoo._("Save")</button>
+      </span>
+    </div>
+  </li>
+  <li class="hide" id="mm_loadMap">
+    <div class="input-group">
+      <input class="form-control" id="load-map" placeholder="$zoo._("Search a Map")"
+      type="text" />
+      <span class="input-group-btn" title="$zoo._("Load Map")" rel="tooltip">
+       <button class="btn btn-default disabled" type="button">$zoo._("Load")</button>
+      </span>
+    </div>
+  </li>
+  <li id="layerswitcher">
+    <a class="mmaction" href="#" ><i class="fa fa-folder fa-fw"></i> $zoo._("Georeference")<span class="fa arrow"></span></a>	
+   <ul class="nav nav-second-level collapse" id="geoForm">
+#include $conf['main']['templatesPath']+"/Georeferencer/Georeference_bs.html"
+   </ul>
+  </li>
+#include $conf['main']['templatesPath']+"/Georeferencer/CropImage_bs.html"
+     
+</ul>
+
+#end def
+
+#def body
+#import zoo
+
+
+#def printTabHeader(id,title,font,classe)
+<li role="presentation" #if $classe is not None#class="$classe"#end if#>
+  <a id="$(id)_Toggler" href="#$id" aria-controls="home" role="tab" data-toggle="tab">
+    <i class="#if $font.count("fa-")#fa#end if# $font fa-fw"></i>
+    <span class="hidden-xs hidden-sm hidden-md">
+      $title
+    </span>
+  </a>
+</li>
+#end def
+
+        <div id="manaMap" class="col-md-12" style="padding:0;margin:0;">
+	  <div id="manaLayerProperties" class="col-sm-6">
+	      <h4 class="font-bold txtsh">
+	        <span class="mm_layerName">$zoo._("Image to georeference: ")$conf["senv"]["mmGeoImg"]</span>
+	      </h4>
+	    <div id="imap"></div>
+#set objs=[
+{"name": "save","title": $zoo._('Save'),"font":"fa-floppy-o"},
+{"name": "load","title": $zoo._('Load'),"font":"fa-folder-open-o"},
+{"name": "add","title": $zoo._('Add a GCP'),"font":"fa-plus"},
+{"name": "edit","title": $zoo._('Edit a GCP'),"font":"fa-edit","optional":True},
+{"name": "delete","title": $zoo._('Delete a GCP'),"font":"fa-trash","optional":True},
+]
+	    <h4>$zoo._("Ground Control Points")
+	    <div class="pull-right">
+	      <div class="btn-group">
+#for i in $objs
+	    <button type="button" class="btn btn-default btn-xs hidden-md hidden-xs hidden-sm #if $i.keys().count('optional')>0#disabled require-select#end if#"  data-toggle="tooltip" data-mmaction="$i.name" title="$i.title">
+	    <i class="fa $i.font fa-fw"></i>
+	    </button>
+#end for
+		</div>
+		</div>
+	    </h4>
+	<div class="gcpTable-container">    
+	<div id="gcpSave"></div>
+	<div id="gcpLoad"></div>
+<div id="gcp-editor" class="collapse" title="$zoo._("GCP Editor")">
+<form id="gcp_editor">
+<fieldset>
+<legend>$zoo._("Image")</legend>
+<label for="gcp_editor_imgx">X: </label>
+<input id="gcp_editor_imgx" name="imgx" value=""/>
+<label for="gcp_editor_imgy" >Y: </label>
+<input id="gcp_editor_imgy" name="imgy" />
+</fieldset>
+<fieldset>
+<legend>$zoo._("Map")</legend>
+<label for="gcp_editor_mapx">X: </label>
+<input id="gcp_editor_mapx" name="mapx" value=""/>
+<label for="gcp_editor_mapy">Y: </label>
+<input id="gcp_editor_mapy"  name="mapy" />
+</fieldset>
+<button class="btn btn-default" onclick="app.saveGCPEditing();">
+$zoo._("Save")
+</button>
+<input type="submit" value="$zoo._("save")" onclick="try{app.saveGCPEditing();}catch(e){console.log(e);}return false;" />
+</form>
+</div>
+
+	<table id="gcpTable">
+	<thead>
+	<tr>
+	<th width="20">id</th>
+	<th width="150">Image X</th>
+	<th width="150">Image Y</th>
+	<th width="150">Map X</th>
+	<th width="150">Map Y</th>
+	</tr>
+	</thead>
+	<tbody>
+	</tbody>
+	</table>
+	</div>
+	  </div>
+	  <div id="main" class="col-sm-6">
+	    <div id="map"></div>
+	  </div>
+	</div>
+
+#end def
+
+#def tfooter
+
+ <script type="template/text" id="georeferencer_gcp_line_template">
+   <tr id="gcp_[id]">
+     <td>[id]</td>
+     <td>[ix]</td>
+     <td>[iy]</td>
+     <td>[mx]</td>
+     <td>[my]</td>
+   </tr>
+ </script>
+
+   
+#end def 

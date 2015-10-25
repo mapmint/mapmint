@@ -209,7 +209,7 @@ define([
                 DataOutputs: params.dataOutputs ? params.dataOutputs : '',
             }
 
-	    console.log(zoo_request_params);
+	    //console.log(zoo_request_params);
 
             if (params.hasOwnProperty('responseDocument')) {
                 zoo_request_params.ResponseDocument = params.responseDocument;

@@ -6163,15 +6163,15 @@ ZOO.Process = ZOO.Class({
    */
   Execute: function(inputs,outputs) {
     if (this.identifier == null)
-      return null;
-    var body = new XML('<wps:Execute service="WPS" version="1.0.0" xmlns:wps="'+this.namespaces['wps']+'" xmlns:ows="'+this.namespaces['ows']+'" xmlns:xlink="'+this.namespaces['xlink']+'" xmlns:xsi="'+this.namespaces['xsi']+'" xsi:schemaLocation="'+this.schemaLocation+'"><ows:Identifier>'+this.identifier+'</ows:Identifier>'+this.buildDataInputsNode(inputs)+this.buildDataOutputsNode(outputs)+'</wps:Execute>');
-    body = body.toXMLString();
-    var headers=['Content-Type: text/xml; charset=UTF-8'];
+	return null;
+      var body = new XML('<wps:Execute service="WPS" version="1.0.0" xmlns:wps="'+this.namespaces['wps']+'" xmlns:ows="'+this.namespaces['ows']+'" xmlns:xlink="'+this.namespaces['xlink']+'" xmlns:xsi="'+this.namespaces['xsi']+'" xsi:schemaLocation="'+this.schemaLocation+'"><ows:Identifier>'+this.identifier+'</ows:Identifier>'+this.buildDataInputsNode(inputs)+this.buildDataOutputsNode(outputs)+'</wps:Execute>');
+      body = body.toXMLString();
+      var headers=['Content-Type: text/xml; charset=UTF-8'];
       if(arguments.length>2){
-	headers[headers.length]=arguments[2];
+	  headers[headers.length]=arguments[2];
       }
-    var response = ZOO.Request.Post(this.url,body,headers);
-    return response;
+      var response = ZOO.Request.Post(this.url,body,headers);
+      return response;
   },
   buildOutput:{
     /**
@@ -6262,15 +6262,15 @@ ZOO.Process = ZOO.Class({
     'literal': function(identifier,data) {
 	if(data && !eval(data["isArray"])){
 	    var input = new XML('<wps:Input xmlns:wps="'+this.namespaces['wps']+'"><ows:Identifier xmlns:ows="'+this.namespaces['ows']+'">'+identifier+'</ows:Identifier><wps:Data><wps:LiteralData>'+data.value+'</wps:LiteralData></wps:Data></wps:Input>');
-      if (data.type)
-        input.*::Data.*::LiteralData.@dataType = data.type;
-      if (data.uom)
-        input.*::Data.*::LiteralData.@uom = data.uom;
-      input = input.toXMLString();
-      return input;
+	    if (data.type)
+		input.*::Data.*::LiteralData.@dataType = data.type;
+	    if (data.uom)
+		input.*::Data.*::LiteralData.@uom = data.uom;
+	    input = input.toXMLString();
+	    return input;
 	}else if(data){
 	    var inputf="";
-	    for(i=0;i<parseInt(data["length"]);i++){
+	    for(i=0;i<parseInt(data["value"].length);i++){
 		var input = new XML('<wps:Input xmlns:wps="'+this.namespaces['wps']+'"><ows:Identifier xmlns:ows="'+this.namespaces['ows']+'">'+identifier+'</ows:Identifier><wps:Data><wps:LiteralData>'+data.value[i]+'</wps:LiteralData></wps:Data></wps:Input>');
 		if (data.type)
 		    input.*::Data.*::LiteralData.@dataType = data.type;
@@ -6278,6 +6278,7 @@ ZOO.Process = ZOO.Class({
 		    input.*::Data.*::LiteralData.@uom = data.uom;
 		inputf += input.toXMLString();
 	    }
+	    alert(inputf);
 	    return inputf;
 	}
 	
@@ -6293,20 +6294,28 @@ ZOO.Process = ZOO.Class({
    * Returns:
    * {E4XElement} The WPS DataInputs node for Execute query.
    */
-  buildDataInputsNode:function(inputs){
-    var data, builder, inputsArray=[];
-    for (var attr in inputs) {
-      data = inputs[attr];
-	if (data && (data.mimetype || data.type == 'complex'))
-        builder = this.buildInput['complex'];
-	else if (data && (data.type == 'reference' || data.type == 'url'))
-        builder = this.buildInput['reference'];
-      else
-        builder = this.buildInput['literal'];
-      inputsArray.push(builder.apply(this,[attr,data]));
-    }
-    return '<wps:DataInputs xmlns:wps="'+this.namespaces['wps']+'">'+inputsArray.join('\n')+'</wps:DataInputs>';
-  },
+    buildDataInputsNode:function(inputs){
+      var data, builder, inputsArray=[];
+      for (var attr in inputs) {
+	  data = inputs[attr];
+	  alert(attr);
+	  alert(data.dataType);
+	  if (data && (data.mimetype || data.type == 'complex')){
+              builder = this.buildInput['complex'];
+	      alert('complex');
+	  }
+	  else if (data && (data.type == 'reference' || data.type == 'url')){
+              builder = this.buildInput['reference'];
+	      alert('ref');
+	  }
+	  else{
+              builder = this.buildInput['literal'];
+	      alert('literal');
+	  }
+	  inputsArray.push(builder.apply(this,[attr,data]));
+      }
+      return '<wps:DataInputs xmlns:wps="'+this.namespaces['wps']+'">'+inputsArray.join('\n')+'</wps:DataInputs>';
+    },
 
   buildDataOutputsNode:function(outputs){
     var data, builder, outputsArray=[];

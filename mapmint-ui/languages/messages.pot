@@ -1,14 +1,14 @@
-# MapMint User Interface and Services messages file.
-# Copyright (C) 2015 GeoLabs SARL
-# This file is distributed under the same license as the MapMint package.
-# FIRST AUTHOR <gerald.fenoy@geolabs.fr>, 2015.
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: MapMint 2.0.0\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-17 00:16+0200\n"
+"POT-Creation-Date: 2015-10-17 02:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1512,22 +1512,22 @@ msgstr ""
 msgid "No data source found"
 msgstr ""
 
-#: mapmint-ui/templates//Distiller_bs.html:230
+#: mapmint-ui/templates//Distiller_bs.html:229
 #: mapmint-ui/templates//Distiller_bs.tmpl:263
 msgid "Loading datastore ..."
 msgstr ""
 
-#: mapmint-ui/templates//Distiller_bs.html:274
+#: mapmint-ui/templates//Distiller_bs.html:273
 #: mapmint-ui/templates//Distiller_bs.tmpl:308
 msgid "Loading datasource ..."
 msgstr ""
 
-#: mapmint-ui/templates//Distiller_bs.html:307
+#: mapmint-ui/templates//Distiller_bs.html:306
 #: mapmint-ui/templates//Distiller_bs.tmpl:353
 msgid "Do you really want to remove the datasource ?"
 msgstr ""
 
-#: mapmint-ui/templates//Distiller_bs.html:310
+#: mapmint-ui/templates//Distiller_bs.html:309
 #: mapmint-ui/templates//Distiller_bs.tmpl:356
 msgid ""
 "Once removed, you cannot access the datasource anymore. You cannot recover a "
@@ -1535,8 +1535,8 @@ msgid ""
 "make any project using it unstable."
 msgstr ""
 
-#: mapmint-ui/templates//Distiller_bs.html:313
-#: mapmint-ui/templates//Distiller_bs.html:332
+#: mapmint-ui/templates//Distiller_bs.html:312
+#: mapmint-ui/templates//Distiller_bs.html:331
 #: mapmint-ui/templates//Distiller_bs.tmpl:359
 #: mapmint-ui/templates//Distiller_bs.tmpl:378
 #: mapmint-ui/templates//Publisher/confirmRemove.html:7
@@ -1545,8 +1545,8 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: mapmint-ui/templates//Distiller_bs.html:314
-#: mapmint-ui/templates//Distiller_bs.html:333
+#: mapmint-ui/templates//Distiller_bs.html:313
+#: mapmint-ui/templates//Distiller_bs.html:332
 #: mapmint-ui/templates//Distiller_bs.tmpl:360
 #: mapmint-ui/templates//Distiller_bs.tmpl:379
 #: mapmint-ui/templates//Publisher/confirmRemove.html:6
@@ -1555,12 +1555,12 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: mapmint-ui/templates//Distiller_bs.html:326
+#: mapmint-ui/templates//Distiller_bs.html:325
 #: mapmint-ui/templates//Distiller_bs.tmpl:372
 msgid "Do you really want to remove the datastore ?"
 msgstr ""
 
-#: mapmint-ui/templates//Distiller_bs.html:329
+#: mapmint-ui/templates//Distiller_bs.html:328
 #: mapmint-ui/templates//Distiller_bs.tmpl:375
 msgid ""
 "Once removed, you cannot access the datastore anymore. You cannot recover a "

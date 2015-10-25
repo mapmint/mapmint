@@ -8,14 +8,6 @@
   <nav class="collapse navbar-collapse">
     <ul class="nav navbar-nav toolbar">
 
-<!--
-
-		<a href="../public/" class="fg-button ui-state-default ui-corner-all fg-button-icon-solo" title="$zoo._("Home")" ><span class="ui-icon home"></span></a>
-#if $m.web.metadata.get('layout_t')!="natureparif-indicateurs" and $conf["senv"]["login"]!="anonymous"
-		<a href="#" class="fg-button ui-state-default ui-corner-all fg-button-icon-solo" title="$zoo._("Favoris")" onclick="setFavoriteMap();" ><span class="ui-icon star"></span></a>
-#end if
--->
-
 #set nnames=$conf["navbar"]["name"].split(',')
 #set nids=$conf["navbar"]["id"].split(',')
 #set nidxs=$conf["navbar"]["idX"].split(',')
@@ -63,27 +55,27 @@
        <div class="input-group">
        <div class="input-group-btn search-panel">
 	 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-	  <span id="search_concept">Layer</span> <span class="caret"></span>
+	  <span id="search_concept">$zoo._("Layer")</span> <span class="caret"></span>
 	 </button>
 	 <ul class="dropdown-menu" role="menu">
-	   <li>
-	   <div class="input-group-btn">
-	 <button id="id-du-dropdown" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-	  <span id="search_concept">Layer</span> <span class="caret"></span>
-	 </button>
-	 <ul class="dropdown-menu" role="menu">
-	   <li><a href="#">...</a></li>
-	   <li><a href="#">...</a></li>
-	 </ul>
-	 </div>
-	   </li>
-	   <li><a href="#">...</a></li>
+#set nbSearch=0
+#for i in range(0,$m.numlayers)
+#if $m.getLayer(i).metadata.get('mmSearchField') is not None
+#if $m.getLayer(i).metadata.get('ows_title') is not None
+#set title=$m.getLayer(i).metadata.get('ows_title')
+#else
+#set title=$m.getLayer(i).name
+#end if
+	   <li><a href="#" data-field="$m.getLayer(i).metadata.get('mmSearchField')" data-name="$m.getLayer(i).name">#if $nbSearch==0#<i class="fa fa-check"></i>#end if# $title</a></li>
+#set nbSearch+=1
+#end if
+#end for
 	 </ul>
        </div>
-       <input type="hidden" name="search_param" value="all" id="search_param">         
-       <input type="text" class="form-control" id="x" name="x" placeholder="Search...">
+       <input type="hidden" name="search_param" value="all" id="search_param" />         
+       <input type="text" class="form-control" id="search_value" name="search_value" placeholder="$zoo._("Search...")" />
        <span class="input-group-btn">
-       <button class="btn btn-default" type="button"><span class="icon-search"></span></button>
+       <button class="btn btn-default disabled" type="button"><span class="icon-search"></span></button>
        </span> 
        </div>
       </form>

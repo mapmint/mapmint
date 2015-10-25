@@ -143,6 +143,10 @@ MapMint: $mmodule
 #import zoo
 #import mm_access
 
+#set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
+#include $tmpl
+#set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
+
 #from datastores.directories.service import *
 
 #set loutputs={"Result":{"value":""}}
@@ -223,10 +227,12 @@ MapMint: $mmodule
 #set objs=[
 {"name": "select","title": $zoo._('Select all'),"font":"fa-square-o"},
 {"name": "db-access","title": $zoo._('Access database'),"font":"fa-database require-db"},
+{"name": "mozaic","title": $zoo._('Mozaic a set of images'),"font":"fa-th require-raster","optional":True},
 {"name": "download","title": $zoo._('Download selection'),"font":"fa-download","optional":True},
 {"name": "open","title": $zoo._('Open selection in Manager'),"font":"fa-share","optional":True},
+{"name": "tileindex","title": $zoo._('Create TileIndex'),"font":"fa-th"},
 {"name": "privileges","title": $zoo._('Privileges'),"font":"fa-users"},
-{"name": "settings","title": $zoo._('Settings'),"font":"fa-gear"},
+{"name": "settings","title": $zoo._('Settings'),"font":"fa-wrench"},
 {"name": "delete","title": $zoo._('Delete'),"font":"fa-trash"}, 
 {"name": "refresh","title": $zoo._('Refresh'),"font":"fa-refresh"},
 {"name": "toggle","title": $zoo._('Toggle table'),"font":"fa-toggle-up"},
@@ -275,6 +281,7 @@ MapMint: $mmodule
 {"name": "process","title": $zoo._('Process'),"font":"fa-gear"},
 {"name": "download","title": $zoo._('Download'),"font":"fa-download"},
 {"name": "open","title": $zoo._('Open in Manager'),"font":"fa-share"},
+{"name": "georeference","title": $zoo._('Open in Georeferencer'),"font":"fa-share"},
 {"name": "delete","title": $zoo._('Delete'),"font":"fa-trash"},
 {"name": "toggle","title": $zoo._('Toggle table'),"font":"fa-toggle-down"},
 ]
@@ -286,9 +293,7 @@ MapMint: $mmodule
         <div class="pull-right">
 	  <div class="btn-group">
 #for i in $objs
-	    <button data-mmaction="$i.name" data-toggle="tooltip" title="$i.title"
-	    type="button" class="btn btn-default btn-xs hidden-md
-	    hidden-xs hidden-sm #if $i.font=="fa-toggle-down"#collapser#end if#">
+	    <button data-mmaction="$i.name" data-toggle="tooltip" title="$i.title" type="button" class="btn btn-default btn-xs #if $i.name=="georeference"#hide#end if# hidden-md hidden-xs hidden-sm #if $i.font=="fa-toggle-down"#collapser#end if#">
 	    <i class="fa $i.font fa-fw"></i>
 	    </button>
 #end for	    
@@ -340,6 +345,41 @@ MapMint: $mmodule
 </div>
 </script>
 
+<script type="template/text" id="dataStore_mozaic_template">
+<div id="mozaic-form" class="myWell">
+<h2>$zoo._("Mozaic a set of images") <i class="fa fa-spinner fa-spin hide"> </i></h2>
+$ftmpl.printAdder({"id":"mozaic-submit","name": "mozaic_name","Name":$zoo._("Mozaic Name"),"title":$zoo._("Mozaic")})
+</div>
+</script>
+
+<script type="template/text" id="dataStore_mozaic_error_template">
+<div id="mozaic-form" class="myWell alert alert-danger">
+$zoo._("You can mozaic only raster data, please change your selection and try again.")
+</div>
+</script>
+
+<script type="template/text" id="dataStore_tileindex_template">
+<div id="tileindex-form" class="myWell">
+<h2>$zoo._("Create a TileIndex") <i class="fa fa-spinner fa-spin hide"> </i></h2>
+$ftmpl.printAdder({"id":"tileindex-submit","name": "tileindex_name","Name":$zoo._("TileIndex Name"),"title":$zoo._("TileIndex")})
+  <div class="row myWell">
+    <label class="col-sm-3 control-label"><span>$zoo._("Projection System")</label>
+    <div class="col-sm-9">
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection_bs.html",searchList={"conf": $conf,"prefix":"tileindex","selected": "EPSG:4326"}))
+    </div>
+  </div>
+  <div class="row myWell">
+    <label class="col-sm-3 control-label"><span>$zoo._("Filename extension")</label>
+    <div class="col-sm-9">
+      <input name="filenameExt" value="tif" class="form-control" type="text" />
+    </div>
+  </div>
+  <div class="row myWell">
+  </div>
+</div>
+</script>
+
 #end def
 
 #def tfooter
@@ -349,7 +389,6 @@ MapMint: $mmodule
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="removeModalLabel">$zoo._("Do you really want to remove the datasource ?") </h4>
       </div>
       <div class="modal-body">
@@ -368,7 +407,6 @@ MapMint: $mmodule
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="removeDSModalLabel">$zoo._("Do you really want to remove the datastore ?") </h4>
       </div>
       <div class="modal-body">

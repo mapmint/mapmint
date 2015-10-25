@@ -13,6 +13,7 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.2.0/css/colReorder.dataTables.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/1.0.7/css/responsive.dataTables.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.0.0/css/select.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/rowreorder/1.0.0/css/rowReorder.dataTables.min.css" />
 <link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/jquery.splitter.css"/>
 <link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/ol.css"/>
 <link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-colorpicker.min.css"/>
@@ -20,6 +21,21 @@
 
 #def page_title
 MapMint: $mmodule
+#end def
+
+#def printAdder($obj)
+     <#if $obj.keys().count("ltype")>0#$obj["ltype"]#else#li#end if# class="hide" id="$obj["id"]">
+       <div class="padder">
+	 <h4>$obj["title"]</h4>
+	 <hr />
+       </div>
+       <div class="input-group">
+	 <input class="form-control" id="$obj["id"]" placeholder="$obj["placeholder"]" type="text" />
+	 <span class="input-group-btn" title="$obj["title"]" rel="tooltip">
+	   <button class="btn btn-default" id="$obj["action"]["name"]" onclick="app.basic('$(obj["action"]["name"])',\$(this).parent().prev());" type="button">$obj["action"]["title"]</button>
+	 </span>
+       </div>   
+     </#if $obj.keys().count("ltype")>0#$obj["ltype"]#else#li#end if#>
 #end def
 
 #def admin_menu
@@ -35,7 +51,7 @@ MapMint: $mmodule
 	 <li><a href="#"><img width="24" height="24" class="img-responsive blp" src="http://otile1.mqcdn.com/tiles/1.0.0/sat/0/0/0.png" />  MapQuest satellite</a>
 	 </li>
 	 <li class="divider"></li>
-	 <li><a href="#"><img width="24" height="24" id="blcolpicker" class="img-responsive blp" src="http://placehold.it/24/000000/000000/" /> Colored base layer</a>
+	 <li><a href="#"><img width="24" height="24" id="blcolpicker" class="img-responsive blp" src="http://placehold.it/24/000000/000000/" /> $zoo._("Colored base layer")</a>
 	 </li>
        </ul>
        <!-- /.dropdown-user -->
@@ -67,7 +83,7 @@ MapMint: $mmodule
     </div>    
   </li>
   <li class="active" id="layerswitcher">
-   <a  href="#settings"><i class="fa fa-database fa-fw"></i> $zoo._("Layers") <span class="fa arrow"></span></a>
+   <a  href="#settings"><i class="mm0-layers mm-layers-layers fa-fw"></i> $zoo._("Layers") <span class="fa arrow"></span></a>
    <ul class="nav nav-first-level">
      <li>
        <div class="btn-group">
@@ -75,7 +91,6 @@ MapMint: $mmodule
 		  <i class="mm0-layers mm-layers-add"></i>
 	 </button>
 	 <button id="mm_addGridToggler" class="btn btn-default" type="button" data-toggle="tooltip" title="$zoo._("Add grid Layer")"><i class="fa fa-plus br"></i></button>
-	 <button id="mm_addDirToggler" class="btn btn-default" type="button" data-toggle="tooltip" title="$zoo._("Add group node")"><i class="fa fa-plus br"></i></button>
 	 <button id="mm_layerOrderToggler" class="btn btn-default" type="button"  data-toggle="tooltip" title="$zoo._("Set layers order")" ><i class="mm mm-layers-order br"></i></button>
        </div>
 
@@ -123,23 +138,8 @@ MapMint: $mmodule
      </li>
 
      
-#def printAdder($obj)
-     <li class="hide" id="$obj["id"]">
-       <div class="padder">
-	 <h4>$obj["title"]</h4>
-	 <hr />
-       </div>
-       <div class="input-group">
-	 <input class="form-control" id="$obj["id"]" placeholder="$obj["placeholder"]" type="text" />
-	 <span class="input-group-btn" title="$obj["title"]" rel="tooltip">
-	   <button class="btn btn-default" id="$obj["action"]["name"]" onclick="app.basic('$(obj["action"]["name"])',\$(this).parent().prev());" type="button">$obj["action"]["title"]</button>
-	 </span>
-       </div>   
-     </li>
-#end def
 
 $printAdder({"id":"mm_addGrid","title":$zoo._("Add Grid"),"placeholder":$zoo._("Set Grid Name"),"action":{"name":"addGrid","title":$zoo._("Add")}})
-$printAdder({"id":"mm_addDir","title":$zoo._("Add Group"),"placeholder":$zoo._("Set Group Name"),"action":{"name":"addDir","title":$zoo._("Add")}})
      
     </ul>
   </li>
@@ -164,7 +164,7 @@ $printAdder({"id":"mm_addDir","title":$zoo._("Add Group"),"placeholder":$zoo._("
 #end def
 
         <div id="manaMap" class="col-md-12" style="padding:0;margin:0;">
-	  <div id="manaLayerOrder" class="col-sm-6 collapse">
+	  <div id="manaLayerOrder" class="col-sm-6 collapse myWell">
 	    <ul class="nav nav-tabs" role="tablist">
 	      $printTabHeader("mm_layer_order_display",$zoo._("Layer Order"),"mm  mm-layers-order",None)
 	      $printTabHeader("mm_layer_legend_display",$zoo._("Legend"),"mm mm-legend",None)
@@ -292,7 +292,10 @@ $printAdder({"id":"mm_addDir","title":$zoo._("Add Group"),"placeholder":$zoo._("
  </script>
 
  <script type="template/text" id="layerLegend_header_template">
-   <h4>$zoo._("Organize Legend")</h4>
+   <h4>$zoo._("Organize Legend")
+     <button id="mm_addDirToggler" class="btn btn-default" type="button" data-toggle="tooltip" title="$zoo._("Add group node")"><i class="fa fa-plus br"></i></button>
+   </h4>
+$printAdder({"ltype": "div","id":"mm_addDir","title":$zoo._("Add Group"),"placeholder":$zoo._("Set Group Name"),"action":{"name":"addDir","title":$zoo._("Add")}})
  </script>
 
  <script type="template/text" id="layerLegend_group_template">

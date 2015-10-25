@@ -30,10 +30,8 @@
   [Result]
    Title = The welcome message
    Abstract = The welcome message created by service.
-   <ComplexData>
-    <Default>
-     mimeType = application/json
-     encoding = utf-8
-    </Default>
-   </ComplexData>
+   <LiteralData>
+    dataType = string
+    <Default />
+   </LiteralData>
  </DataOutputs>

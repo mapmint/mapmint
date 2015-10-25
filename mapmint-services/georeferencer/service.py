@@ -155,6 +155,9 @@ def saveGeoreferencedProject(conf,inputs,outputs):
     if inputs.keys().count("gcpfile")>0:
 	    m.web.metadata.set("mmGeoGCPFile",inputs["gcpfile"]["value"])
 	    conf["senv"]["mmGeoGCPFile"]=inputs["gcpfile"]["value"]
+    if inputs.keys().count("size")>0:
+	    m.web.metadata.set("mmGeoSize",inputs["size"]["value"])
+	    conf["senv"]["mmGeoSize"]=inputs["size"]["value"]
     mmsession.save(conf)
     if not(os.path.isfile(conf["main"]["dataPath"]+"/georeferencer_maps/project_"+inputs["dso"]["value"]+".map")):
         m.save(conf["main"]["dataPath"]+"/georeferencer_maps/project_"+inputs["dso"]["value"]+".map")

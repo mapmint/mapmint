@@ -10,11 +10,19 @@
 #end if
 #set p1=mapscript.pointObj(float($tmp1[0]),float($tmp1[1]))
 #set p2=mapscript.pointObj(float($tmp1[2]),float($tmp1[3]))
+#try
 #set q1=$p1.project(mapscript.projectionObj(l.getProjection()),mapscript.projectionObj("epsg:4326"))
 #set q2=$p2.project(mapscript.projectionObj(l.getProjection()),mapscript.projectionObj("epsg:4326"))
+#except
+#set q1=[]
+#set q2=[]
+#set c=$inputs
+#set $c["basic"]={"value":""}
+#end try
 #if $inputs.keys().count("basic")==0
 #set d1=$p2.x-$p1.x
 #set d2=$p2.x-$p1.x
+#try
 #if $d1>$d2
 #set width=400
 #set height=(400*$d2)/$d1
@@ -22,13 +30,25 @@
 #set height=400
 #set width=(400*$d1)/$d2
 #end if
+#except
+#set height=400
+#set width=400
+#set f="image/png"
+#end try
 #set f="image/png"
 #else
 #set r=osgeo.gdal.Open($l.data)
-#set p1=mapscript.pointObj($p1.x-1,$p1.y)
-#set p2=mapscript.pointObj($p2.x,$p2.y+1)
+#*set p1=mapscript.pointObj($p1.x-1,$p1.y)
+#set p2=mapscript.pointObj($p2.x,$p2.y+1)*#
+#set p1=mapscript.pointObj($p1.x,$p1.y)
+#set p2=mapscript.pointObj($p2.x+$r.RasterXSize+2,$p2.y+$r.RasterYSize+2)
 #set width=$r.RasterXSize
 #set height=$r.RasterYSize
-#set f="image/tiff"
+#if $width>1024 or height>1024
+#set $width=$width/2
+#set $height=$height/2
+#end if
+#set f="image/png"
+#*set f="image/tiff"*#
 #end if
 $conf["main"]["mapserverAddress"]?map=$inputs["dst"]["value"]/ds_ows.map&service=WMS&version=1.0.0&request=GetMap&srs=epsg:4326&bbox=$p1.x,$p1.y,$p2.x,$p2.y&layers=$inputs["dso"]["value"]&width=$width&height=$height&format=$f

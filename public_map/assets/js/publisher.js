@@ -175,11 +175,19 @@ define([
 	    "dataType": "string"
 	});
 
-	inputs.push({
-	    "identifier": "mmPBaseLayers",
-	    "value": $("#"+$("#mmBBDefault").val()).val().join(','),
-	    "dataType": "string"
-	});
+	if($("#"+$("#mmBBDefault").val()).val())
+	    inputs.push({
+		"identifier": "mmPBaseLayers",
+		"value": $("#"+$("#mmBBDefault").val()).val().join(','),
+		"dataType": "string"
+	    });
+	else
+	    inputs.push({
+		"identifier": "mmPBaseLayers",
+		"value": "",
+		"dataType": "string"
+	    });
+	    
 
 	inputs.push({
 	    "identifier": "mmProprietaryBaseLayers",
@@ -389,7 +397,7 @@ define([
     };
     var initialize=function(){
 
-	adminBasic.initialize(true);
+	adminBasic.initialize(zoo);
 	loadBaseLayers();
 	$("#manaMap").find(".btn-group").first().find("button").click(function(e){
 	    if($(this).attr("data-act"))

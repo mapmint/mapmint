@@ -199,6 +199,7 @@ def access(conf,inputs,outputs):
     print >> sys.stderr,str(inputs);
     osgeo.gdal.FileFromMemBuffer('/vsimem//temp1',inputs["InputData"]["value"])
     ds = osgeo.ogr.Open('/vsimem//temp1')
+    print >> sys.stderr,ds
     displayCnt=0
     geometry=[]
     if inputs["sql"].keys().count("value")>0:

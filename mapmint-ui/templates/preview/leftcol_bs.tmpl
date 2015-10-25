@@ -23,13 +23,14 @@ $Template(file=$conf["main"]["templatesPath"]+$page,searchList=$nameSpace)
 <title>MapMint | $title</title> 
 <meta name="description" content="mapmint,webgis,app" /> 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" /> 
-<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
-<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/ol.css">
-<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/fonts.css">
+<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/mm-font.css" />
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/ol.css" />
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/fonts.css" />
 <link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/bootstrap.min.css" />
-<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/bootstrap-slider.css">
-<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/context.bootstrap.css">
-<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-window.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/bootstrap-slider.css" />
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/context.bootstrap.css" />
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-window.css" />
 <link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-select.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>
@@ -40,9 +41,10 @@ $Template(file=$conf["main"]["templatesPath"]+$page,searchList=$nameSpace)
 <link rel="stylesheet"
 href="https://cdn.datatables.net/r/dt/dt-1.10.8,b-1.0.0,b-colvis-1.0.0,cr-1.2.0,r-1.0.7,se-1.0.0/datatables.min.css"/>
 -->
-<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-default.css">
-<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-layout.css">
-<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-map.css">
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-default.css" />
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-layout.css" />
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-map.css" />
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/mapmint-fixes.css" />
 <link rel="stylesheet" href="./index_css_bs" type="text/css" />
 <style>
 
@@ -146,7 +148,7 @@ $(printWrapper())
     <div role="tabpanel" class="fill">
       <ul id="mmtabs" class="nav nav-tabs" role="tablist">
 	<li id="laywrap" role="layers" data-toggle="tooltip" data-placement="bottom" title="Legend" class="active">
-	 <a href="#ltree" aria-controls="ltree" role="tab" data-toggle="tab"><i class="i i-stack"></i></a>
+	 <a href="#ltree" aria-controls="ltree" role="tab" data-toggle="tab"><i class="mm0-layers mm-layers-layers fa-fw"></i></a>
 	</li>
 	<li role="presentation">
 	 <a href="#datasources" aria-controls="datasources" role="tab" data-toggle="tab"><i class="fa fa-copyright"></i></a>
@@ -342,6 +344,19 @@ $(printWrapper())
     <i class="fa fa-user"></i>
    </a>
   </li>
+ </script>
+
+ <script type="template/text" id="basic_window_template">
+  <div class="window">
+   <div class="window-header">
+    <button type="button" class="close" data-dismiss="window" aria-hidden="true">
+     x
+    </button>
+    <h4 class="window-title"></h4>
+   </div>
+   <div class="window-body">
+   </div>
+  </div>
  </script>
 
 </body>

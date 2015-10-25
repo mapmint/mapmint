@@ -18,7 +18,7 @@
 #set q=cur.fetchall()
 #end if
 #set titles=['id','login','first name','last name','email','phone','password','last_con','last_map']
-<div id="$inputs["type"]["value"]-user" class="collapse userBaseEditForm #if $inputs["type"]["value"]!="insert"#userEditForm#end if#">
+<div id="$inputs["type"]["value"]-user#if $inputs.keys().count("pref")>0#-preferences#end if#" class="collapse userBaseEditForm #if $inputs["type"]["value"]!="insert"#userEditForm#end if#">
 <form class="form-inline mt" data-toggle="validator" role="form">
 <fieldset class="mbp mtp">
 <legend>$zoo._("General informations")</legend>
@@ -43,7 +43,7 @@
 <div class="row">
 <div class="col-md-6 col-xs-12">
 <fieldset>
-<legend>$zoo._("Password:") <input type="checkbox" id="up_cp" data-toggle="collapse" data-target="#userPassword$inputs["type"]["value"].title()" /></legend>
+<legend>$zoo._("Password:") <input type="checkbox" id="up_cp" #if $inputs.keys().count("pref")==0#data-toggle="collapse"#end if# data-target="#userPassword$inputs["type"]["value"].title()" /></legend>
 <div id="userPassword$inputs["type"]["value"].title()" class="collapse">
 <label class="control-label" for="up_$i">$zoo._($i): </label>
 <input id="up_$(inputs["type"]["value"].title())_$i" name="user_$(fields.split(',')[$cnt])" data-minlength="6" class="form-control" type="password" value=""/>

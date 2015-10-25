@@ -2,8 +2,8 @@
 
 
 define([
-    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic', 'ol','datasources','mmDataTables','colorpicker','slider',"sortable"
-], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,ol,datasources,MMDataTable,colorpicker,slider,sortable) {
+    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic', 'ol','datasources','mmDataTables','rowReorder','colorpicker','slider',"sortable"
+], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,ol,datasources,MMDataTable,rowReorder,colorpicker,slider,sortable) {
     
 
     (function(){
@@ -143,47 +143,57 @@ define([
     var llevelInit=false;
     var mlegend=null;
     var mmenu=[[],[],[],[]];
+    var legendSteps={};
+    var colorRamps={};
     function addToLayerSwitcher(oid,data,level){
 	for(var id in data){
-	    console.log(id);
-	    if(level>0)
-		console.log(mmenu[level-1]);
-	    if($.isArray(data[id])){
-		//llevelInit=false;
-		mmenu[level].push(id);
-		var lid=id.replace(/ /g,"-_-");
-		var regs=[
-		    new RegExp("\\[id\\]","g"),
-		    new RegExp("\\[lid\\]","g"),
-		    new RegExp("\\[level\\]","g")
-		];
-		var myHTML=$("#layerswitcher_group_template")[0].innerHTML
-		    .replace(regs[0],id)
-		    .replace(regs[1],lid)
-		    .replace(regs[2],llevels[level]);
-		if(!llevelInit){
-		    llevelInit=true;
-		    $("#layerswitcher").parent().append(myHTML);
-		}
-		else{
-		    $("#layerswitcher").parent().find('ul#'+oid).last().append(myHTML);
-		}
-		for(var index in data[id]){
-		    addToLayerSwitcher(id,data[id][index],level+1);
-		}
+	    if(id=="steps"){
+		legendSteps[data["layer"]]=data[id];
+	    }
+	    else if(id=="tiled"){
+		colorRamps[data["layer"]]=data[id];
 	    }else{
-		var regs=[
-		    new RegExp("\\[id\\]","g")
-		];
-		var myHTML=$("#layerswitcher_item_template")[0].innerHTML
-		    .replace(regs[0],data[id]);
-		if(!llevelInit){
-		    llevelInit=true;
-		    $("#layerswitcher").parent().append(myHTML);
-		}
-		else{
-		    console.log(data);
-		    $("#layerswitcher").parent().find('ul#'+oid).last().append(myHTML);
+		console.log(id);
+		if(level>0)
+		    console.log(mmenu[level-1]);
+		if($.isArray(data[id])){
+		    //llevelInit=false;
+		    mmenu[level].push(id);
+		    var lid=id.replace(/ /g,"-_-");
+		    var cid=id.replace(/-_-/g," ");
+		    var regs=[
+			new RegExp("\\[id\\]","g"),
+			new RegExp("\\[lid\\]","g"),
+			new RegExp("\\[level\\]","g")
+		    ];
+		    var myHTML=$("#layerswitcher_group_template")[0].innerHTML
+			.replace(regs[0],cid)
+			.replace(regs[1],lid)
+			.replace(regs[2],llevels[level]);
+		    if(!llevelInit){
+			llevelInit=true;
+			$("#layerswitcher").parent().append(myHTML);
+		    }
+		    else{
+			$("#layerswitcher").parent().find('ul#'+oid).last().append(myHTML);
+		    }
+		    for(var index in data[id]){
+			addToLayerSwitcher(id,data[id][index],level+1);
+		    }
+		}else{
+		    var regs=[
+			new RegExp("\\[id\\]","g")
+		    ];
+		    var myHTML=$("#layerswitcher_item_template")[0].innerHTML
+			.replace(regs[0],data[id]);
+		    if(!llevelInit){
+			llevelInit=true;
+			$("#layerswitcher").parent().append(myHTML);
+		    }
+		    else{
+			console.log(data);
+			$("#layerswitcher").parent().find('ul#'+oid).last().append(myHTML);
+		    }
 		}
 	    }
 	}
@@ -191,47 +201,49 @@ define([
 
     var llevelInit0=false;
     function addToLayerLegend(oid,data,level){
-	for(var id in data){
-	    if($.isArray(data[id])){
-		var lid=id.replace(/ /g,"-_-");
-		var regs=[
-		    new RegExp("\\[id\\]","g"),
-		    new RegExp("\\[lid\\]","g"),
-		    new RegExp("\\[level\\]","g")
-		];
-		var myHTML=$("#layerLegend_group_template")[0].innerHTML
-		    .replace(regs[0],id)
-		    .replace(regs[1],lid)
-		    .replace(regs[2],llevels[level]);
-		if(!llevelInit0){
-		    llevelInit0=true;
-		    $("#layerLegend_drag").append(myHTML);
-		}
-		else{
-		    $("#layerLegend_drag").find('ul#'+oid).last().append(myHTML);
-		}
-		for(var index in data[id]){
-		    addToLayerLegend(id,data[id][index],level+1);
-		}
-	    }else{
-		var regs=[
-		    new RegExp("\\[id\\]","g")
-		];
-		console.log(data[id]);
-		var myHTML=$("#layerLegend_item_template")[0].innerHTML
-		    .replace(regs[0],data[id]);
-		if(!llevelInit){
-		    llevelInit=true;
-		    $("#layerLegend_drag").append(myHTML);
-		}
-		else{
-		    $("#layerLegend_drag").find('ul#'+oid).last().append(myHTML);
+	for(var id in data)
+	    if(id!="steps" && id!="tiled"){
+		if($.isArray(data[id])){
+		    var lid=id.replace(/ /g,"-_-");
+		    var cid=id.replace(/-_-/g," ");
+		    var regs=[
+			new RegExp("\\[id\\]","g"),
+			new RegExp("\\[lid\\]","g"),
+			new RegExp("\\[level\\]","g")
+		    ];
+		    var myHTML=$("#layerLegend_group_template")[0].innerHTML
+			.replace(regs[0],cid)
+			.replace(regs[1],lid)
+			.replace(regs[2],llevels[level]);
+		    if(!llevelInit0){
+			llevelInit0=true;
+			$("#layerLegend_drag").append(myHTML);
+		    }
+		    else{
+			$("#layerLegend_drag").find('ul#'+oid).last().append(myHTML);
+		    }
+		    for(var index in data[id]){
+			addToLayerLegend(id,data[id][index],level+1);
+		    }
+		}else{
+		    var regs=[
+			new RegExp("\\[id\\]","g")
+		    ];
+		    console.log(data[id]);
+		    var myHTML=$("#layerLegend_item_template")[0].innerHTML
+			.replace(regs[0],data[id]);
+		    if(!llevelInit){
+			llevelInit=true;
+			$("#layerLegend_drag").append(myHTML);
+		    }
+		    else{
+			$("#layerLegend_drag").find('ul#'+oid).last().append(myHTML);
+		    }
 		}
 	    }
-	}
     }
 
-    function redrawLayer(layer){
+    function getLayerIndexByName(layer){
 	var lindex=myBaseLayers.length;
 	for(var i in oLayers){
 	    if(i==layer){
@@ -239,7 +251,22 @@ define([
 	    }
 	    lindex+=1;
 	}
-	map.getLayers().item(lindex).getSource().updateParams({time_: (new Date()).getTime()});
+	return lindex;
+    }
+
+    function redrawLayer(layer,url,opts){
+	var lindex=getLayerIndexByName(layer);
+	var params={time_: (new Date()).getTime()};
+	if(!opts)
+	    map.getLayers().item(lindex).getSource().updateParams(params);
+	else{
+	    for(var a in opts)
+		params[a]=opts[a];
+	    map.getLayers().item(lindex).getSource().updateParams(params);
+	}
+	if(url){
+	    map.getLayers().item(lindex).getSource().setUrl(url);
+	}
 	map.getLayers().item(lindex).getSource().changed();
 	map.updateSize();
     }
@@ -615,7 +642,7 @@ define([
 			if(myClass[n]){
 			    rootLocation.find("input[name="+(lbindings[n]?lbindings[n]:n)+"]").val(myClass[n]).change();
 			    if(rootLocation.find("input[name="+(lbindings[n]?lbindings[n]:n)+"]").prev().first().children().first().length)
-				rootLocation.find("input[name="+(lbindings[n]?lbindings[n]:n)+"]").prev().first().children().first().prop("checked",true).change();
+				rootLocation.find("input[name="+(lbindings[n]?lbindings[n]:n)+"]").prev().first().children().first().prop("checked",(myClass[n]=="#-1-1-1"?false:true)).change();
 			}else
 			    if(rootLocation.find("input[name="+(lbindings[n]?lbindings[n]:n)+"]").prev().first().children().first().length)
 				rootLocation.find("input[name="+(lbindings[n]?lbindings[n]:n)+"]").prev().first().children().first().prop("checked",false).change();
@@ -667,7 +694,7 @@ define([
 		
 		tr.addClass('shown');
 		rootLocation.find(".cpicker").each(function(){
-		    $(this).colorpicker({input: $(this).find("input[type=text]")});
+		    $(this).colorpicker({format: "hex",input: $(this).find("input[type=text]")});
 		});
 		rootLocation.find("button").last().click(function(e){
 		    try{
@@ -741,9 +768,18 @@ define([
 			"value": $("#save-map").val(),
 			"dataType": "string"
 		    });
+		    if($("#mm_layer_property_style_display").find("select[name=step_classification]").is(":visible"))
+			inputs.push({
+			    "identifier": "mmStep",
+			    "value": $("#mm_layer_property_style_display").find("select[name=step]").val(),
+			    "dataType": "string"
+			});
+		
+		    var hasStep=$("#mm_layer_property_style_display").find("select[name=step_classification]").is(":visible");
+		    var cfield=(hasStep?"step_classification":"classification");
 		    inputs.push({
 			"identifier": "mmType",
-			"value": cbindings[$("#mm_layer_property_style_display").find("select[name=classification]").val()],
+			"value": cbindings[$("#mm_layer_property_style_display").find("select[name="+cfield+"]").val()],
 			"dataType": "string"
 		    });
 		    inputs.push({
@@ -761,7 +797,7 @@ define([
 			"value": $("#mm_layer_property_style_display").find("input[type=range]").first().val(),
 			"dataType": "integer"
 		    });
-		    if($("#mm_layer_property_style_display").find("select[name=classification]").val()=="us")
+		    if($("#mm_layer_property_style_display").find("select[name="+cfield+"]").val()=="us")
 			inputs.push({"identifier": "force","value": "true","dataType": "boolean"});
 		    
 		    zoo.execute({
@@ -781,7 +817,18 @@ define([
 				type: 'success',
 			    }).show();
 			    ldata.Style.classes[index]=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
-			    redrawLayer(layer);
+			    /* ici */
+			    if(hasStep){
+				console.log(elem);
+				var originalValue=$("#mm_layer_property_style_display").find("select[name=step]").val();
+				var lmapfile="timeline_"+module.config().pmapfile+"_"+cLayer+"_step"+originalValue+".map";
+				var url=module.config().msUrl+"?map="+module.config().dataPath+"/maps/"+lmapfile;
+				console.log(url);
+				redrawLayer(layer,url);
+				$("#"+cId).find("img").first().attr('src',ldata.Style.classes[index].legend);
+			    }
+			    else
+				redrawLayer(layer);
 			    var tmpVal=$("#"+cId).find("img").first().attr('src');
 			    $("#"+cId).find("img").first().removeAttr("src").attr('src',tmpVal+"&timestamp=" + new Date().getTime());
 			    for(var i in inputs){
@@ -825,8 +872,8 @@ define([
 		$(".mm_layerName").text(layer);
 		$(".mm_layerName").append('<i class="fa fa-spinner fa-spin"></i>');
 
-		$("#mm_layer_property_style_display").height($(window).height()-($("nav").height())*4);
-		$("#mm_layer_property_style_display").css({"overflow-y":"auto","overflow-x":"hidden"});
+		$("#mm_layer_property_style_display,#mm_layer_property_property_display").height($(window).height()-($("nav").height())*3.5);
+		$("#mm_layer_property_style_display,#mm_layer_property_property_display").css({"overflow-y":"auto","overflow-x":"hidden"});
 
 		$("#manaLayerProperties").collapse("show").show();
 		map.updateSize();
@@ -871,136 +918,37 @@ define([
 			    success: function(data){
 				console.log("SUCCESS");
 				var ldata=JSON.parse(data);
-				//console.log(ldata);
-
-				toggleStylerForms($("#manaLayerProperties"),ldata.type);
-				$("#mm_layer_property_label_display").find('input[name="displayLabels"]').prop("checked",false).change();
-				if(ldata.name.replace(/grid_/g,"")!=ldata.name){
-				    $(".require-grid").show();
-				    $("#mm_layer_property_label_display").find('input[name="displayLabels"]').prop("checked",true).change();
-				    $(".no-grid").hide();
-				    loadGridTab(ldata);
-				}else{
-				    $(".require-grid").hide();
-				    $(".no-grid").each(function(){
-					if(!$(this).hasClass("no-raster"))
-					    $(this).show();
-				    });
-				    $("#mm_layer_property_label_display").find('input[name="displayLabels"]').prop("checked",false).change();
-				}
-
-
-				    
-				loadLabelTab(ldata);
-
-				var bindings={
-				    "scaleMin": "minDisplay",
-				    "scaleMax": "maxDisplay",
-				    "labelMin": "minLabel",
-				    "labelMax": "maxLabel",
-				    "default_tmpl": "editor"
-				};
-
-				$("select[name=resample]").val(ldata.Style["processing"]).change();
-				$("input[name=styleOpacity]").val(ldata.Style.classes[0]["opacity"]).change();
-				//$("input[name=styleOpacity]").next().html(ldata.Style.classes[0]["opacity"]+"%");
-				if(ldata["bands"]!=null){
-				    var myData=ldata["bands"].split(',');
-				    $("#manaLayerProperties").find('select.mmField').each(function(){
-					for(i in myData){
-					    $(this).append('<option value="'+myData[i].replace(/Band/g,"")+'">'+myData[i]+'</option>');
-					}
-				    });
-				}
-
-				bindLayerProperties(ldata);
-				bindLayerStyle(ldata);
-				bindLayerTemplates(ldata);
-				bindLayerScales(ldata);
-
-				$("#mm_layer_property_style_display").find("input[name=nbclass]").val(ldata["Style"].numclasses);
-				for(i in ldata){
-				    if(ldata[i]!="false" && ldata[i]!="true"){
-					console.log(i+" not boolean");
-					if(i=="Style"){
-					    if(ldata[i].class==null || ldata[i].class=="us"){
-						$("#mm_layer_property_style_display").find("select[name=classification]").val("us");
-						$(".no-us").hide();
-					    }else{
-						$("#mm_layer_property_style_display").find("select[name=classField]").val(ldata[i].class_field);
-						$("#mm_layer_property_style_display").find("select[name=classification]").val(ldata[i].class);
-						$(".no-us").show();
-					    }
-					    if(ldata[i].class=="gs"){
-						$(".require-gs").show();
-					    }else{
-						$(".require-gs").hide();
-					    }
-
-					    if(ldata.type==3){
-						var lbindings={
-						    "interval": ["minBandValue","maxBandValue"],
-						};
-						for(var kk in lbindings){
-						    if(ldata[kk].length){
-							for(var l in lbindings[kk]){
-							    $("#mm_layer_property_style_display").find("input[name="+lbindings[kk][l]+"]").val(ldata[kk][l]);
-							    $("#mm_layer_property_style_display").find("input[name="+lbindings[kk][l]+"]").next().first().html("");
-							    $("#mm_layer_property_style_display").find("input[name="+lbindings[kk][l]+"]").next().first().html(ldata["band1"][l]);
-							}
-						    }
-						}
-					    }
-
-					    $("#mm_layer_property_style_display").find("input[name=minColorValue]").first().val(ldata["colors"][3]).change();
-					    $("#mm_layer_property_style_display").find("input[name=maxColorValue]").first().val(ldata["colors"][4]).change();
-					    if(ldata[i].expr!=null){
-						$("#mm_layer_property_style_display").find("input[name=expression]").val(ldata[i].expr);
-						$("#mm_layer_property_style_display").find("input[name=expressionc]").prop("checked",true).change();
-					    }else{
-						$("#mm_layer_property_style_display").find("input[name=expressionc]").prop("checked",false).change();
-					    }
-					    
-					    loadStyleTable(ldata);
-
-					}
-					if(i!="colors" && i!="Style" && i!="band1")
-					if(!$("#manaLayerProperties").find('textarea[name="'+(bindings[i]?bindings[i]:i)+'"]').length){
-					    console.log(i+" not textearea");
-					    //console.log($("#manaLayerProperties").find('select[name="'+(bindings[i]?bindings[i]:i)+'"]').length);
-					    if(!$("#manaLayerProperties").find('select[name="'+(bindings[i]?bindings[i]:i)+'"]').length){
-						console.log(i+" text");
-						$("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
-						//console.log($("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]'));
-						//console.log(i);
-					    }
-					    else{
-						$("#manaLayerProperties").find('select.mmField[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
-						//console.log($("#manaLayerProperties").find('select[name="'+(bindings[i]?bindings[i]:i)+'"]'));
-						//console.log(i);
-					    }
-					}else{
-					    //console.log($("#manaLayerProperties").find('textarea[name="'+(bindings[i]?bindings[i]:i)+'"]'));
-					    $("#manaLayerProperties").find('textarea[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
-					    if((bindings[i]?bindings[i]:i)=="editor")
-						$(".mm-editor").code(ldata[i]);
-					}
+				var myRootLocation=$("#mm_layer_property_style_display");
+				myRootLocation.find('.mmstep-list').change(function(){
+				    var originalValue=$(this).val();
+				    var lmapfile="timeline_"+module.config().pmapfile+"_"+layer+"_step"+originalValue+".map";
+				    var url=module.config().msUrl+"?map="+module.config().dataPath+"/maps/"+lmapfile;
+				    redrawLayer(layer,url);
+				    console.log($(this).parent().next());
+				    $(this).parent().next().addClass("disabled");
+				    if($(this).val()==0){
+					loadStyleDisplay(ldata);
+					console.log($(this).parent().next());
+					$(this).parent().next().removeClass("disabled");
 				    }
 				    else{
-					$("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').prop("checked",ldata[i]=="true").change();
+					if($(this).val()>0){
+					    console.log($(this).parent().next());
+					    loadStyleDisplay(ldata.mmSteps[$(this).val()-1]);
+					    $(this).parent().next().removeClass("disabled");
+					}
+					if($(this).val()=='-1') 
+					    $(this).parent().parent().next().show();
+					else 
+					    $(this).parent().parent().next().hide();
 				    }
-				}
-				if(shouldInit){
-				    window.setTimeout(function () { 
-					$(".mm-editor").summernote({height: 500});
-				    }, 50);
-				    shouldInit=false;
-				}
-				$("#mm_layer_template_display").find("select[name=case]").change(function(e){
-				    e.stopPropagation();
-				    $(".mm-editor").code(ldata[($(this).val()=="On Click"?"click_tmpl":"default_tmpl")]);
+				    myRootLocation.find(".require-tl").show();
+				    $(this).val(originalValue);
+				    if(ldata.type!=3)
+					myRootLocation.find(".require-raster").hide();
 				});
-				
+				loadAllDisplay(ldata);
+				loadTableDefinition(obj,ldata);
 				$(".mm_layerName").find("i").remove();
 			    },
 			    error: function(data){
@@ -1017,8 +965,8 @@ define([
 	},
 	"query": {
 	    "run": function(layer){
-		console.log(layer);
-		console.log(($(window).height()-$(".nav").height())/2);
+		//console.log(layer);
+		//console.log(($(window).height()-$(".nav").height())/2);
 		loadDataSource($('#save-map').val(),layer);
 		$("#map").css({"height":(($(window).height()-$("nav").height())/2)+"px"});
 		$("#manaTable").css({"height":(($(window).height()-$("nav").height())/2)+"px"});
@@ -1032,8 +980,486 @@ define([
 	    }
 	},
     };
-    var selectedLayer=null;
 
+    var llcnt=0;
+
+    function generateLineTemplate(values){
+	var template=$("#layer_property_table_line_template")[0].innerHTML;
+	var reg=[
+	    {
+		"reg": new RegExp("\\[order\\]","g"),
+		"value": values[0]
+	    },
+	    {
+		"reg": new RegExp("\\[display\\]","g"),
+		"value": values[1]
+	    },
+	    {
+		"reg": new RegExp("\\[export\\]","g"),
+		"value": values[2]
+	    },
+	    {
+		"reg": new RegExp("\\[name\\]","g"),
+		"value": values[3]
+	    },
+	    {
+		"reg": new RegExp("\\[label\\]","g"),
+		"value": values[4]
+	    },
+	    {
+		"reg": new RegExp("\\[width\\]","g"),
+		"value": values[5]
+	    },
+	];
+	for(var j=0;j<reg.length;j++)
+	    template=template.replace(reg[j]["reg"],reg[j]["value"]);
+	return template;
+    }
+
+    function loadTableDefinition(obj,data){
+	var alreadyDisplayed=[];
+	var tbody="";
+	if(!obj.schema.complexType)
+	    return;
+	var ldata=obj.schema.complexType.complexContent.extension.sequence.element;
+	if(data["gfi_aliases"] && data["gfi_aliases"].length>0){
+	    for(var i=0;i<data["gfi_aliases"].length;i++){
+		if(ldata[i+1]){
+		    tbody+=generateLineTemplate([
+			i+1,
+			(data["gfi_fields"][i]?'checked="checked"':''),
+			(data["exp_fields"] && data["exp_fields"][i]?'checked="checked"':''),
+			(data["gfi_fields"][i]?data["gfi_fields"][i]:ldata[i+1]["_name"]),
+			data["gfi_aliases"][i],
+			(data["gfi_width"] && data["gfi_width"][i]?data["gfi_width"][i]:"110"),
+		    ]);
+		    alreadyDisplayed.push((data["gfi_fields"][i]?data["gfi_fields"][i]:ldata[i+1]["_name"]));
+		}
+	    }
+	}
+	var cnt=(data["gfi_aliases"]?data["gfi_aliases"].length:0);
+	if(cnt<ldata.length-1)
+	    for(var i in ldata){
+		if(ldata[i]["_name"]!="msGeometry" && $.inArray(ldata[i]["_name"], alreadyDisplayed) == -1){
+		    tbody+=generateLineTemplate([
+			cnt+1,
+			"",
+			($.inArray(ldata[i]["_name"],data["exp_fields"])!==-1?'checked="checked"':""),
+			ldata[i]["_name"],
+			ldata[i]["_name"],
+			(data["gfi_width"] && data["gfi_width"][i]?data["gfi_width"][i]:"110"),
+		    ]);
+		    cnt+=1;
+		}
+	    }
+	var reg=new RegExp("\\[tbody\\]","g");
+	var template=$("#layer_property_table_template")[0].innerHTML;
+	$("#mm_layer_property_table_display").html(template.replace(reg,tbody));
+	/*$("#mm_layer_property_table_display").find('input[type="checkbox"]').each(function(){
+	    console.log($(this));
+	    console.log($(this).attr("checked"));
+	    if($(this).attr("checked"))
+		$(this).prop("checked",true);
+	});*/
+	$('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
+            $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+	} );
+	var table = $('#layer_property_table_table_display').DataTable( {
+            rowReorder:       true,
+	    "scrollX":        true,
+	    "scrollY":        (($("#map").height())-($(".navbar").height()*4))+"px",
+	    "scrollCollapse": true,
+	    autoWidth:        false,
+	    "paging":         false,
+	    "info":           false,
+	    "responsive":     true,
+	    deferRender:      true,
+	    bFilter:          false
+	} );
+	$("#mm_layer_property_table_display").find("button").first().off('click');
+	$("#mm_layer_property_table_display").find("button").first().click(function(){
+	    var params=[];
+	    $("#mm_layer_property_table_display").find("tbody").find("tr").each(function(){
+		$(this).find("td").find("input").each(function(){
+		    if($(this).attr('type')=="checkbox"){
+			params.push({
+			    "identifier": $(this).attr('name'),
+			    "value": $(this).prop('checked')+"",
+			    "dataType": "boolean"
+			});
+		    }else
+			params.push({
+			    "identifier": $(this).attr('name'),
+			    "value": $(this).val(),
+			    "dataType": "string"
+			});
+		});
+	    });
+	    params.push({
+		"identifier": "map",
+		"value": $("#save-map").val(),
+		"dataType": "string"
+	    });
+	    params.push({
+		"identifier": "layer",
+		"value": data.name,
+		"dataType": "string"
+	    });
+	    zoo.execute({
+		identifier: "mapfile.saveLayerFields",
+		type: "POST",
+		dataInputs: params,
+		dataOutputs: [
+		    {"identifier":"Result","type":"raw"},
+		],
+		success: function(data){
+		    console.log(data);
+		    $(".notifications").notify({
+			message: { text: data },
+			type: 'success',
+		    }).show();			
+		},
+		error: function(data){
+		    $(".notifications").notify({
+			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			type: 'danger',
+		    }).show();
+		}
+	    });
+	    
+	    console.log(params);
+	    return false;
+	});
+
+    }
+
+    function loadStyleDisplay(ldata){
+	if(!ldata)
+	    return;
+	var myRootLocation=$("#mm_layer_property_style_display");
+
+	if(ldata.Style.classes[0])
+	    myRootLocation.find("input[name=styleOpacity]").val(ldata.Style.classes[0]["opacity"]).change();
+	else
+	    myRootLocation.find("input[name=styleOpacity]").val(100).change();
+
+	if(ldata.type==3){
+	    var lbindings={
+		"interval": ["minBandValue","maxBandValue"],
+	    };
+	    if(ldata["bands"]!=null){
+		var myData=ldata["bands"].split(',');
+		for(k=0;k<myData.length;k++)
+		    for(var kk in lbindings){
+			if(ldata[kk] && ldata[kk].length){
+			    for(var l in lbindings[kk]){
+				myRootLocation.find("input[name="+lbindings[kk][l]+"]").val(ldata[kk][l]);
+				myRootLocation.find("input[name="+lbindings[kk][l]+"]").next().first().html("");
+				
+			    }
+			}
+		    }
+		for(var kk in lbindings){
+		    for(var l in lbindings[kk]){
+			if(ldata["band1"] && ldata["band1"].length)
+			    myRootLocation.find("input[name="+lbindings[kk][l]+"]").next().first().html(ldata["band1"][l]);
+		    }
+		}
+	    }
+	}
+	
+	myRootLocation.find("input[name=nbclass]").val(ldata["Style"].numclasses);
+	var i="Style";
+	//$("#mm_layer_property_style_display").find("select[name=classification]").val(-1).change();
+	if(ldata[i].class==null || ldata[i].class=="us"){
+	   myRootLocation.find("select[name=classification]").val("us").change();
+	    $(".no-us").hide();
+	}else{
+	    //$(".no-us").show();
+	    myRootLocation.find("select[name=classField]").val(ldata[i].class_field);
+	    myRootLocation.find("select[name=classification]").val(ldata[i].class).change();
+	}
+	if(ldata[i].class=="gs"){
+	    $(".require-gs").show();
+	}else{
+	    $(".require-gs").hide();
+	}
+	//toggleStylerForms($("#manaLayerProperties"),ldata.type);
+	if(legendSteps[ldata["name"]]){
+	    var d=legendSteps[ldata["name"]];
+	    myRootLocation.find(".mmstep-list").find("option").each(function(){
+		if($(this).attr("value")!="-1" && $(this).attr("value")!="-2"){
+		    $(this).remove();
+		}
+	    });
+	    for(var j=0;j<d.length;j++){
+		myRootLocation.find(".mmstep-list").append('<option value="'+j+'">'+d[j]+'</option>');
+	    }
+	    myRootLocation.find(".mmstep-list").val(0);
+	    var originalValue=myRootLocation.find("select[name=classification]").val();
+	    myRootLocation.find("select[name=classification]").val("tl").change();
+	    myRootLocation.find("select[name=step_classification]").val(originalValue).change();
+	}
+	
+	
+	myRootLocation.find("input[name=minColorValue]").first().val(ldata["colors"][3]).change();
+	myRootLocation.find("input[name=maxColorValue]").first().val(ldata["colors"][4]).change();
+	if(ldata[i].expr!=null){
+	    myRootLocation.find("input[name=expression]").val(ldata[i].expr);
+	    myRootLocation.find("input[name=expressionc]").prop("checked",true).change();
+	}else{
+	    myRootLocation.find("input[name=expressionc]").prop("checked",false).change();
+	}
+	
+	loadStyleTable(ldata);
+	
+    }
+
+    function loadAllDisplay(ldata){
+	toggleStylerForms($("#manaLayerProperties"),ldata.type);
+	$("#mm_layer_property_label_display").find('input[name="displayLabels"]').prop("checked",false).change();
+	if(ldata.name.replace(/grid_/g,"")!=ldata.name){
+	    $(".require-grid").show();
+	    $("#mm_layer_property_label_display").find('input[name="displayLabels"]').prop("checked",true).change();
+	    $(".no-grid").hide();
+	    loadGridTab(ldata);
+	}else{
+	    $(".require-grid").hide();
+	    $(".no-grid").each(function(){
+		if(!$(this).hasClass("no-raster"))
+		    $(this).show();
+	    });
+	    $("#mm_layer_property_label_display").find('input[name="displayLabels"]').prop("checked",false).change();
+	}
+	
+	
+	
+	loadLabelTab(ldata);
+	
+	var bindings={
+	    "offsite": "nodataColorValue",
+	    "scaleMin": "minDisplay",
+	    "scaleMax": "maxDisplay",
+	    "labelMin": "minLabel",
+	    "labelMax": "maxLabel",
+	    "default_tmpl": "editor"
+	};
+	
+	if(!ldata.Style["processing"])
+	    $("select[name=resample]").val(ldata.Style["processing"]).change();
+	else
+	    $("select[name=resample]").val("NEAREST").change();
+
+	//$("input[name=styleOpacity]").next().html(ldata.Style.classes[0]["opacity"]+"%");
+	if(ldata["bands"]!=null){
+	    var myData=ldata["bands"].split(',');
+	    $("#manaLayerProperties").find('select.mmField').each(function(){
+		for(i in myData){
+		    $(this).append('<option value="'+myData[i].replace(/Band/g,"")+'">'+myData[i]+'</option>');
+		}
+	    });
+	}
+	
+	bindLayerProperties(ldata);
+	bindLayerStyle(ldata);
+	bindLayerTemplates(ldata);
+	bindLayerScales(ldata);
+	
+	$(".class-switcher").off('change');
+	$(".class-switcher").change(function(){
+	    console.log(".class-switcher CHANGE ! "+llcnt);
+	    llcnt+=1;
+	    var myRootLocation=$(this).parent().parent().parent();
+	    var index=0;
+	    var hasElement=true;
+	    var closure=$(this);
+	    myRootLocation.find('.class-switcher').each(function(){
+		if(closure[0]==$(this)[0]){
+		    hasElement=false;
+		}
+		else
+		    if(hasElement)
+			index+=1;
+	    });
+	    $(this).find('option').each(function(){
+		if(!$(this).is(':selected'))
+		    myRootLocation.find('.no-'+$(this).attr('value')).show();
+	    });
+	    $(this).find('option:selected').each(function(){
+		myRootLocation.find('.no-'+$(this).attr('value')).hide();
+	    });
+	    if(index>0)
+		myRootLocation.find(".require-tl").show();
+	    if(ldata.type!=3)
+		myRootLocation.find(".require-raster").hide();
+	    myRootLocation.find(".require-add-step").hide();
+	});
+
+	var myRootLocation=$("#mm_layer_property_style_display");
+	myRootLocation.find('.mmstep-add').off('click');
+	myRootLocation.find('.mmstep-add').click(function(){
+	    var params=[
+		{"identifier": "layer","value":ldata.name,"dataType":"string"},
+		{"identifier": "name","value":$(this).parent().find('input[name="stepName"]').val(),"dataType":"string"}
+	    ];
+	    if($("#mmPrefix").val()){
+		params.push({
+		    "identifier": "prefix",
+		    "value": $("#mmPrefix").val(),
+		    "dataType":"string"
+		});
+	    }
+	    var closure=$(this);
+	    zoo.execute({
+		identifier: "mapfile.saveStep",
+		type: "POST",
+		dataInputs: params,
+		dataOutputs: [
+		    {"identifier":"Result","type":"raw"},
+		],
+		success: function(data){
+		    console.log("SUCCESS");
+		    console.log(data);
+		    $(".notifications").notify({
+			message: { text: data },
+			type: 'success',
+		    }).show();
+		    closure.parent().hide();
+		    loadStepList(ldata.name,function(l,d){
+			//console.log(d);
+			//console.log(myRootLocation.find(".mmstep-list"));
+			myRootLocation.find(".mmstep-list").find("option").each(function(){
+			    //console.log($(this).attr("value"));
+			    if($(this).attr("value")!="-1" && $(this).attr("value")!="-2"){
+				$(this).remove();
+			    }
+			});
+			for(var i=0;i<d.length;i++){
+			    myRootLocation.find(".mmstep-list").append('<option value="'+i+'">'+d[i]+'</option>');
+			}
+			myRootLocation.find(".mmstep-list").val(d[d.length-1]).change();
+			$("#mmm_properties").click();
+		    });
+		},
+		error: function(data){
+		    console.log(data);
+		    $(".notifications").notify({
+			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			type: 'danger',
+		    }).show();
+		}
+	    });
+	    return false;
+	});
+	myRootLocation.find('.mmstep-delete').off('click');
+	myRootLocation.find('.mmstep-delete').click(function(){
+	    var params=[
+		{"identifier": "layer","value":ldata.name,"dataType":"string"},
+		{"identifier": "name","value":$(this).parent().find('select[name="step"]').find('option:selected').html(),"dataType":"string"}
+	    ];
+	    if($("#mmPrefix").val()){
+		params.push({
+		    "identifier": "prefix",
+		    "value": $("#mmPrefix").val(),
+		    "dataType":"string"
+		});
+	    }
+	    var closure=$(this);
+	    zoo.execute({
+		identifier: "mapfile.deleteStep",
+		type: "POST",
+		dataInputs: params,
+		dataOutputs: [
+		    {"identifier":"Result","type":"raw"},
+		],
+		success: function(data){
+		    console.log("SUCCESS");
+		    console.log(data);
+		    $(".notifications").notify({
+			message: { text: data },
+			type: 'success',
+		    }).show();
+		    closure.parent().hide();
+		    loadStepList(ldata.name,function(l,d){
+			console.log(d);
+			console.log(myRootLocation.find(".mmstep-list"));
+			myRootLocation.find(".mmstep-list").find("option").each(function(){
+			    console.log($(this).val());
+			    if($(this).val()!=-1 && $(this).val()!=-2){
+				$(this).remove();
+			    }
+			});
+			for(var i=0;i<d.length;i++){
+			    myRootLocation.find(".mmstep-list").append('<option value="'+i+'">'+d[i]+'</option>');
+			}
+			myRootLocation.find(".mmstep-list").val(d[d.length-1]).change();
+			$("#mmm_properties").click();
+		    });
+		},
+		error: function(data){
+		    console.log(data);
+		    $(".notifications").notify({
+			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			type: 'danger',
+		    }).show();
+		}
+	    });
+	    return false;
+	});
+	
+
+	loadStyleDisplay(ldata);
+
+	for(i in ldata){
+	    if(ldata[i]!="false" && ldata[i]!="true"){
+		if(i!="colors" && i!="Style" && i!="mmSteps" && i!="band1")
+		    if(!$("#manaLayerProperties").find('textarea[name="'+(bindings[i]?bindings[i]:i)+'"]').length){
+			console.log(i+" not textearea");
+			//console.log($("#manaLayerProperties").find('select[name="'+(bindings[i]?bindings[i]:i)+'"]').length);
+			if(!$("#manaLayerProperties").find('select[name="'+(bindings[i]?bindings[i]:i)+'"]').length){
+			    console.log(i+" text");
+			    $("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
+			    if($("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').parent().find('input[type="checkbox"]').first().length){
+				if(!ldata[i] || ldata[i]=="#-1-1-1" || ldata[i]=="")
+				    $("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').parent().find('input[type="checkbox"]').first().prop("checked",false).change();
+				else{
+				    $("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').parent().find('input[type="checkbox"]').first().prop("checked",true).change();
+				}
+			    }
+			    //console.log($("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]'));
+			    //console.log(i);
+			}
+			else{
+			    $("#manaLayerProperties").find('select.mmField[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
+			    //console.log($("#manaLayerProperties").find('select[name="'+(bindings[i]?bindings[i]:i)+'"]'));
+			    //console.log(i);
+			}
+		    }else{
+			//console.log($("#manaLayerProperties").find('textarea[name="'+(bindings[i]?bindings[i]:i)+'"]'));
+			$("#manaLayerProperties").find('textarea[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
+			if((bindings[i]?bindings[i]:i)=="editor")
+			    $(".mm-editor").code(ldata[i]);
+		    }
+	    }
+	    else{
+		$("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').prop("checked",ldata[i]=="true").change();
+	    }
+	}
+	if(shouldInit){
+	    window.setTimeout(function () { 
+		$(".mm-editor").summernote({height: $(window).height()/3});
+	    }, 50);
+	    shouldInit=false;
+	}
+	$("#mm_layer_template_display").find("select[name=case]").change(function(e){
+	    e.stopPropagation();
+	    $(".mm-editor").code(ldata[($(this).val()=="On Click"?"click_tmpl":"default_tmpl")]);
+	});
+	
+    }
+    
+    var selectedLayer=null;
+    
     function unloadMapLayers(){
 	for(var i=map.getLayers().getLength()-1;i>=myBaseLayers.length;i--){
 	    map.removeLayer(map.getLayers().item(i));
@@ -1058,7 +1484,6 @@ define([
 		mmenu=[[],[],[],[]];
 		llevelInit=false;
 		mlegend=data;
-		console.log($("#layerswitcher").next());
 		if($("#layerswitcher").next().hasClass("active"))
 		    $("#layerswitcher").next().remove();
 		for(var i in data){
@@ -1088,7 +1513,7 @@ define([
 		    return false;
 		});
 		$(".mm-menu").each(function(){
-		    console.log($(this));
+		    //console.log($(this));
 		    $(this).on('click',function(){
 			contextualMenu[$(this).attr("id").replace(/mmm_/,"")]["run"](selectedLayer);
 		    });
@@ -1098,6 +1523,33 @@ define([
 	    },
 	    error: function(data){
 		console.log("ERROR");
+		$(".notifications").notify({
+		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+		    type: 'danger',
+		}).show();
+	    }
+	});
+    }
+
+    function loadStepList(layer,func){
+	var closure=$(this);
+	var params=[
+	    {"identifier": "layer","value":layer,"dataType":"string"}
+	];
+
+	zoo.execute({
+	    identifier: "mapfile.listStep",
+	    type: "POST",
+	    dataInputs: params,
+	    dataOutputs: [
+		{"identifier":"Result","type":"raw"},
+	    ],
+	    success: function(data){
+		console.log(data);
+		if(func)
+		    func(layer,data);
+	    },
+	    error: function(data){
 		$(".notifications").notify({
 		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
 		    type: 'danger',
@@ -1116,14 +1568,32 @@ define([
 		var ext=myWMSLayers["Capability"]["Layer"]["Layer"][i]["BoundingBox"][0]["extent"];
 		var name=myWMSLayers["Capability"]["Layer"]["Layer"][i]["Name"];
 
-		var layer=new ol.layer.Tile({
-		    visible: false,
-		    source: new ol.source.TileWMS({
-			url: module.config().msUrl+"?map="+module.config().dataPath+"/maps/project_"+module.config().pmapfile+".map",
-			params: {'LAYERS': name, 'TILED': true},
-			serverType: 'mapserver'
-		    })
-		});
+		lmapfile="project_"+module.config().pmapfile+".map";
+		if(legendSteps[name])
+		    lmapfile="timeline_"+module.config().pmapfile+"_"+name+"_step0.map";
+		if(colorRamps[name])
+		    lmapfile="color_ramp_"+module.config().pmapfile+"_"+name+".map";
+		var layer;
+		if(name.indexOf("grid_")==-1)
+		    layer=new ol.layer.Tile({
+			visible: false,
+			source: new ol.source.TileWMS({
+			    url: module.config().msUrl+"?map="+module.config().dataPath+"/maps/"+lmapfile,
+			    params: {'LAYERS': name, 'TILED': true},
+			    serverType: 'mapserver'
+			})
+		    });
+		else
+		    layer=new ol.layer.Image({
+			visible: false,
+			source: new ol.source.ImageWMS({
+			    ratio: 1,
+			    url: module.config().msUrl+"?map="+module.config().dataPath+"/maps/"+lmapfile,
+			    params: {'LAYERS': name,"format":"image/png"},
+			    serverType: ('mapserver')
+			})
+		    });
+
 		map.addLayer(layer);
 		oLayers[name]={"extent": [
 		    ext[1],
@@ -1166,15 +1636,21 @@ define([
 		"minBandValue": "min",
 		"maxBandValue": "max",
 		"classField": "field",
+		"nodataColorValue": "nodata",
 		"minColorValue": "from",
 		"maxColorValue": "to",
 		"styleOpacity": "mmOpacity",
 		"nbclass": "nbClasses",
 		"discretization": "method",
 		"mmType": "mmType",
-		"resample": "resm"
+		"resample": "resm",
+		"step": "mmStep",
+		"tileSize": "tiled"
 	    };
-	    params.push({"id":"mmType","value": cbindings[myLocation.find("select[name=classification]").val()]});
+	    var hasStep=$("#mm_layer_property_style_display").find("select[name=step_classification]").is(":visible");
+	    var cfield=(hasStep?"step_classification":"classification");
+
+	    params.push({"id":"mmType","value": cbindings[myLocation.find("select[name="+cfield+"]").val()]});
 	    myLocation.find("input[type=text],input[type=range],textarea,select").each(function(){
 		if($(this).is(":visible") && $(this).is(":disabled"))
 		    edisabled.push($(this).attr('name'));
@@ -1353,8 +1829,8 @@ define([
      * @param ldata the JSON object containing layer informations
      */
     function bindLayerTemplates(ldata){
-	$("#mm_layer_template_display").find("button").off("click");
-	$("#mm_layer_template_display").find("button").click(function(e){
+	$("#mm_layer_template_display").find("button").last().off("click");
+	$("#mm_layer_template_display").find("button").last().click(function(e){
 	    var myLocation=$(this).parent().parent();
 	    var params=[];
 	    params.push({
@@ -1560,6 +2036,7 @@ define([
 	    console.log(mlegend);
 	    $("#mm_layer_order_display").html($("#layerOrder_template")[0].innerHTML);
 	    $("#mm_layer_legend_display").html($("#layerLegend_template")[0].innerHTML);
+
 	    llevelInit0=false;
 	    for(var i in mlegend){
 		addToLayerLegend(i,mlegend,0);
@@ -1610,7 +2087,7 @@ define([
 		    }
 		});
 	    });
-	    $("#mm_layer_legend_display").find("button").first().click(function(){
+	    $("#mm_layer_legend_display").find("button").last().click(function(){
 		var data = group.sortable("serialize").get();
 		var jsonString = JSON.stringify(data[0], null, ' ');
 		zoo.execute({
@@ -1646,6 +2123,28 @@ define([
 	    $("#main").removeClass("col-sm-12").addClass("col-sm-6");
 	    $("#manaLayerOrder").collapse("show").show();
 	    map.updateSize();
+
+	    var togglers=["addDir"];
+	    //var dtogglers=["addDir"];
+	    console.log("******* click toggler on "+$("#mm_layer_legend_display").find('#mm_'+togglers[0]+'Toggler'));
+	    for(var i=0;i<togglers.length;i++){
+		console.log("******* click toggler on "+$("#mm_layer_legend_display").find('#mm_'+togglers[i]+'Toggler'));
+		$("#mm_layer_legend_display").find('#mm_'+togglers[i]+'Toggler').click(function(e){
+		    console.log("******* click toggler");
+		    e.stopPropagation();
+		    var target=$(this).attr('id').replace(/Toggler/g,"");
+		    console.log(target);
+		    /*for(var j in dtogglers){
+			if('mm_'+dtogglers[j]!=target){
+			    if($("#mm_layer_legend_display").find('#mm_'+dtogglers[j]+'Toggler').is(":visible"))
+				$("#mm_layer_legend_display").find('#mm_'+dtogglers[j]).addClass("hide");
+			}
+		    }*/
+		    $("#mm_layer_legend_display").find('#'+target).toggleClass("hide");
+		    $("#mm_layer_legend_display").find('#'+target).find(".hide").toggleClass("hide");
+		});
+	    }
+
 	});
 
 	$('#side-menu').css({"max-height": ($(window).height()-50)+"px","overflow":"scroll"});
@@ -1663,7 +2162,7 @@ define([
 	//$("#main").split({orientation:'horizontal', limit:300});
 	//$('#manaMap div').width($(window).width()/2);
 	//$("#manaMap").split({orientation:'vertical', limit:400});
-	adminBasic.initialize();
+	adminBasic.initialize(zoo);
 	console.log("Set Map Height !");
 
 	var olMapDiv = document.getElementById('map');
@@ -1726,7 +2225,7 @@ define([
 
 	loadMapLayers();
 
-	$('.cpicker').colorpicker();
+	$('.cpicker').colorpicker({format: "hex"});
 	window.setTimeout(function () { 
 	    adminBasic.typeaheadMap(module,zoo,[$("#load-map"),$("#load-map")]);
 	},100);
@@ -1886,6 +2385,14 @@ define([
 	    "bindings": "layer",
 	    "hide": [true,2]
 	},
+	"addDir": {
+	    "identifier": "mapfile.addGroupToMap",
+	    "bindings": "group",
+	    "hide": [true,2],
+	    "func": function(){
+		$("#mm_layerOrderToggler").click();
+	    }
+	},
 	"addLayer": {
 	    "identifier": "mapfile.loadMapForDs",
 	    "bindings": {
@@ -2012,6 +2519,11 @@ define([
 		}
 		unloadMapLayers();
 		loadMapLayers();
+		window.setTimeout(function () { 
+		    if(operations[action]["func"]){
+			operations[action]["func"]();
+		    }
+		}, 50);
 	    },
 	    error: function(data){
 		console.log("ERROR");

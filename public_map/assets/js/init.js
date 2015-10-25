@@ -292,6 +292,11 @@ define([
 
 	console.log('START !');
 
+	$('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
+            $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+	} );
+
+
 	enquire.register("screen and (max-width:980px)", {
 	    setup : function() {
 		setMapHeight();

@@ -21,8 +21,10 @@
   [Result]
    Title = The resulting message
    Abstract = The message providing informations about step creation.
-   <LiteralData>
-   dataType = string
-    <Default />
-   </LiteralData>
+   <ComplexData>
+    <Default>
+      mimeType = applciation/json
+      encoding = utf-8
+    </Default>
+   </ComplexData>
  </DataOutputs>

@@ -52,7 +52,17 @@ $istyles
 #if $mmodule!="public"
 #if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false") and not($verr)
 <div id="wrapper">
-
+#set lfonts={
+	"dashboard": "tachometer",
+	"distiller": "cubes",
+	"manager": "map-o",
+	"themes": "th",
+	"territories": "sitemap",
+	"indexes": "bar-chart",
+	"documents": "file-text-o",
+	"publisher": "laptop",
+	"georeferencer": "globe",
+}
   <!-- Navigation -->
   <nav class="navbar navbar-default navbar-fixed-top" role="navigation" style="margin-bottom: 0">
    <div class="navbar-header">
@@ -62,7 +72,7 @@ $istyles
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
      </button>
-     <a class="navbar-brand" href="#"><i class="mmi mmi-$(mmodule.lower())"></i> <span class="hid">$zoo._($mmodule)</span></a>
+     <a class="navbar-brand" href="#"><i class="fa fa-$lfonts[$mmodule.lower()]"></i> <span class="hid">$zoo._($mmodule)</span></a>
    </div>
    <!-- /.navbar-header -->
 
@@ -75,12 +85,10 @@ $istyles
          <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
        </a>
        <ul class="dropdown-menu dropdown-user">
-	 <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a>
-	 </li>
-	 <li><a href="#"><i class="fa fa-gear fa-fw"></i> Settings</a>
+	 <li><a href="#" id="mmmUserPreferences"><i class="fa fa-user fa-fw"></i> User Profile</a>
 	 </li>
 	 <li class="divider"></li>
-	 <li><a href="#"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+	 <li><a href="#" id="mmmUserLogOut"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
 	 </li>
        </ul>
        <!-- /.dropdown-user -->
@@ -104,7 +112,7 @@ $istyles
 
 #for a in $menu
 	      <li #if $inputs['tmpl']['value']==$a+"_bs"#class="active"#end if#>
-	      <a href="#if $inputs['tmpl']['value']==$a+"_bs"#\#" class="active"#else#./$(a)_bs"#end if#><i class="mmi mmi-$(a.lower()) fa-fw"></i> $zoo._($a)
+	      <a href="#if $inputs['tmpl']['value']==$a+"_bs"#\#" class="active"#else#./$(a)_bs"#end if#><i class="fa fa-$(lfonts[a.lower()]) fa-fw"></i> $zoo._($a)
 #if $mmenu is not None and $inputs['tmpl']['value']==$a+"_bs"
 <span class="fa arrow"></span>
 	      </a>
@@ -114,6 +122,10 @@ $istyles
 #end if	      
 	      </li>
 #end for
+#if $menu.count($inputs['tmpl']['value'].replace("_bs",""))==0
+	      $mmenu
+#end if
+
 	    </ul>
 	  </div>
 	  <!-- /.sidebar-collapse -->
@@ -150,6 +162,22 @@ $tfooter
 <!--
 <button style="position:absolute;bottom:0px" onclick="if(\$('.sidebar').is(':visible')){\$('#page-wrapper').css({'margin':'50px 0 0 0px'});\$('.sidebar').hide();}else{\$('#page-wrapper').css({'margin':'50px 0 0 250px'});\$('.sidebar').show();}" class="btn btn-default"><i class="fa fa-eye"></i></button>
 -->
+</div>
+
+<!-- User Preferences Modal -->
+<div class="modal fade" id="userPreferencesModal" tabindex="-1" role="dialog" aria-labelledby="removeModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="removeModalLabel"><i class="fa fa-user"></i> $zoo._("User Settings") </h4>
+      </div>
+      <div class="modal-body">
+        <div class="myWell">
+	</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script data-main="$conf["main"]["mmAddress"]/admin;module=$mmodule" src="$conf["main"]["publicationUrl"]/assets/js/lib/require.js"></script>

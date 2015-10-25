@@ -45,6 +45,25 @@
 #end def
 
 
+#def printTabHeader(id,title,font,classe)
+<li role="presentation" #if $classe is not None#class="$classe"#end if#>
+  <a id="$(id)_Toggler" href="#$id" aria-controls="home" role="tab" data-toggle="tab">
+    <i class="fa $font fa-fw"></i>
+    <span class="hidden-xs hidden-sm hidden-md">
+      $title
+    </span>
+  </a>
+</li>
+#end def
+
+<ul class="nav nav-tabs" role="tablist">
+  $printTabHeader("mm_layer_property_property_display",$zoo._("General"),"fa-info",None)
+  $printTabHeader("mm_layer_property_table_display",$zoo._("Table"),"fa-th","no-raster no-grid")
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="mm_layer_property_property_display">
+
 <form class="form-horizontal mtpp" method="get" >
 #set obj={"name":"name","title": $zoo._("Name"),"placeholder":$zoo._("Sample Name")}
 $printText($obj)
@@ -77,3 +96,47 @@ $printText($i)
 #end for
 <button class="btn btn-default mm-layer-save" >$zoo._("Save")</button>
 </form>
+
+  </div>
+  <div role="tabpanel" class="tab-pane" id="mm_layer_property_table_display">
+  </div>
+</div>
+
+ <script type="template/text" id="layer_property_table_line_template">
+      <tr>
+	<td><i class="fa fa-arrows-v"> </i>[order]</td>
+	<td><input name="display" type="checkbox" [display] /></td>
+	<td><input name="export" type="checkbox" [export] /></td>
+	<td>[name] <input name="oname" type="hidden" value="[name]" /></td>
+	<td><input name="label" type="text" value="[label]" /></td>
+	<td><input name="width" type="text" value="[width]" /></td>
+      </tr>
+ </script>
+
+ <script type="template/text" id="layer_property_table_template">
+  <h3>$zoo._("Table configuration")</h3>
+  <table id="layer_property_table_table_display">
+    <thead>
+      <tr>
+	<th style="width:25px"></th>
+	<th style="width:25px">$zoo._("D.")</th>
+	<th style="width:25px">$zoo._("E.")</th>
+	<th style="width:25px">$zoo._("Name")</th>
+	<th style="width:25px">$zoo._("Label")</th>
+	<th style="width:25px">$zoo._("Width")</th>
+      </tr>
+    </thead>
+    <tbody>
+      [tbody]
+    </tbody>
+  </table>
+  <button class="btn btn-default">
+    $zoo._("Save")
+  </button>
+ </script>
+
+   <script type="template/text" id="layer_property_export_template">
+   <li class="list-group-item" data-id="[id]">
+    [id]
+   </li>
+ </script>

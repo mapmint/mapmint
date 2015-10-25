@@ -12,8 +12,6 @@
 </li>
 #end def
 
-
-
 <ul class="nav nav-tabs" role="tablist">
   $printTabHeader("mm_layer_property_style_display",$zoo._("Symbology"),"fa-image",None)
   $printTabHeader("mm_layer_property_label_display",$zoo._("Labels"),"fa-file-text-o","no-raster")
@@ -66,22 +64,25 @@
 	"tl": [$zoo._("Time line"),True,False]
 	}
       $printSelect("",$zoo._("Legend Type: "),"classification",$choices)
-      <div class="form-group require-tl no-grid no-us no-gs no-cc no-uv">
+      <div class="form-group require-tl no-grid no-us no-gs no-cc no-uv col-sm-12">
 	<label class="col-sm-3 control-label">$zoo._("Steps")</label>
-	<div class="col-sm-9 ">
-	  <select name="step" class="form-control" onchange="if(\$(this).val()=='-1') \$(this).parent().parent().next().show();else \$(this).parent().parent().next().hide();">
+	<div class="col-sm-5 ">
+	  <select name="step" class="form-control mmstep-list" onchange="if(\$(this).val()=='-1') \$(this).parent().parent().next().show();else \$(this).parent().parent().next().hide();">
 	    <option value="-2">$zoo._("Choose a step")</option>
 	    <option value="-1">$zoo._("Add a step")</option>
 	  </select>
 	</div>
+        <button class="btn btn-default disabled col-sm-4 mmstep-delete">
+	  $zoo._("Delete")
+	</button>
       </div>
-      <div class="form-group require-tl no-us no-gs no-cc no-uv col-sm-12">
+      <div class="form-group require-add-step no-us no-gs no-cc no-uv col-sm-12">
 	<label class="col-sm-3 control-label">$zoo._("Step name")</label>
         <div class="col-sm-5">
 	  <input type="text" class="form-control" name="stepName" placeholder="$zoo._("1789")" value="" />
 	  <p class="help-block"></p>
 	</div>
-        <button class="btn btn-default col-sm-4">
+        <button class="btn btn-default col-sm-4 mmstep-add">
 	  $zoo._("Add")
 	</button>
       </div>      

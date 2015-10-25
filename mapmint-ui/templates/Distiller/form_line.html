@@ -1,24 +1,77 @@
+#def printAdder($obj)
+<div class="input-group">
+  <input class="form-control" name="$obj["name"]" placeholder="$obj["Name"]" type="text" />
+  <span class="input-group-btn">
+    <button class="btn btn-default" id="$obj["id"]" type="button">$obj["title"]</button>
+  </span>
+</div>   
+#end def
+
+#def printButtonGroupA($obj)
+<div class="btn-group">
+#for o in $obj
+  $printButtonA($o)
+#end for
+</div>
+#end def
+
+#def printButtonA($obj)
+  <a class="btn btn-default btn-sm $obj["classes"]" title="$obj["title"]" data-toggle="collapse" data-target="#$obj["target"]" href="#$obj["target"]"></a>
+#end def
+
+
+#def printTabHeader(id,title,font,classe)
+<li role="presentation" #if $classe is not None#class="$classe"#end if#>
+  <a id="$(id)_Toggler" href="#$id" aria-controls="home" role="tab" data-toggle="tab">
+    <i class="fa $font fa-fw"></i>
+    <span class="hidden-xs hidden-sm hidden-md">
+      $title
+    </span>
+  </a>
+</li>
+#end def
+
+#def printBasicLine(obj)
+<div class="form-group #if $obj.keys().count("classes")>0#$obj["classes"]#end if#">
+  <label class="col-sm-3 control-label">
+  $obj["label"]
+  </label>
+  <div class="col-sm-9 ">
+   $obj["content"]
+  </div>
+</div>
+#end def
+
 #def printLine(obj)
-      <div class="form-group #if $obj.keys().count("classe")>0#$obj["classe"]#end if#">
-	<label class="col-sm-3 control-label">$obj["name"]</label>
-        <div class="col-sm-9 ">
+#set ltypes=["select","multiple","textarea"]
+<div class="form-group #if $obj.keys().count("classe")>0#$obj["classe"]#end if#">
+  <label class="col-sm-3 control-label">$obj["name"]</label>
+  <div class="col-sm-9 ">
 #if $obj.keys().count("type")==0	  
-	  <input name="$obj["id"]" class="form-control" type="text" />
+    <input name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="text" />
 #else
-#if $obj["type"]!="select"
-	  <input name="$obj["id"]" class="form-control" type="password" />
+#if $ltypes.count($obj["type"])==0
+    <input name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="password" />
 #else
-	  <select name="$obj["id"]" class="form-control">
+#if $obj["type"]=="textarea"
+    <textarea name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control"></textarea>
+#else	  
+    <select #if $obj["type"]=="multiple"#multiple="multiple"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control">
 #for a in $obj["options"]
-	    <option value="$a">$a</option>
-#end for	    
-	  </select>
-#end if	  
-#end if	  
-	</div>
-      </div>
+#if type($a)==type("")	    
+      <option value="$a">$a</option>
+#else
+      <option value="$a[0]">$a[1]</option>
+#end if
+#end for
+    </select>
+#end if
+#end if
+#end if
+  </div>
+</div>
 #end def
 
 #def printButton(obj)
-      <button class="btn btn-default" data-mmaction="$obj["id"]">$obj["name"]</button>
+<button class="btn btn-default" data-mmaction="$obj["id"]">$obj["name"]</button>
 #end def

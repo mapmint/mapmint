@@ -101,7 +101,7 @@ define([
 		    var set={};
 		    var rType=null;
 		    var attId="obj";
-		    var ltype1=$(this).parent().find("#um_type").val();
+		    var ltype1=$(this).parent().find("#um_utype").val();
 		    var pIdentifier="datastores.postgis."+(ltype1=="delete"?"deleteTuple":"editTuple");
 		    var myForm=$(this).parent()
 		    
@@ -146,7 +146,7 @@ define([
 		    
 		    //params.push({identifier: "login",value: user.login,dataType: "string"});
 		    console.log(params);
-		    return false;
+		    //return false;
 		    zoo.execute({
 			identifier: pIdentifier,
 			type: "POST",
@@ -532,17 +532,20 @@ define([
 
     function displayRaster(data,param,dsid,datasource){
 	var Bands=[];
+	var colors=["#ff0000","#00ff00","#0000ff","#000000","#ffff99","#f2af81","#81f2f1","#e181f2"]
 	if(data["datasource"]["Band"].length){
 	    for(i in data["datasource"]["Band"])
 		Bands.push({
 		    name: "Band "+i,
-		    data: data["datasource"]["Band"]["histogram"].split(",")
+		    data: data["datasource"]["Band"][i]["histogram"].split(","),
+		    color: colors[i]
 		});
 	}
 	else
 	    Bands.push({
 		name: "Band 1",
-		data: data["datasource"]["Band"]["histogram"].split(",")
+		data: data["datasource"]["Band"]["histogram"].split(","),
+		color: "#7c7c7c"
 	    });
 	
 	for(i in Bands)
@@ -1082,6 +1085,7 @@ define([
 
     var OWSSetupCallBacks={
 	"add": function(obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		e.preventDefault();
 		e.stopPropagation();
@@ -1091,6 +1095,7 @@ define([
 	    });
 	},
 	"test": function(obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		e.preventDefault();
 		e.stopPropagation();
@@ -1101,6 +1106,7 @@ define([
 
     var DBSetupCallBacks={
 	"add": function(obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		e.preventDefault();
 		e.stopPropagation();
@@ -1110,6 +1116,7 @@ define([
 	    });
 	},
 	"test": function(obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		e.preventDefault();
 		e.stopPropagation();
@@ -1118,8 +1125,46 @@ define([
 	},
     };
 
+    function doCleanup(data,param,dsid,dataType,obj){
+	zoo.execute({
+	    identifier: "datastores.directories.cleanup",
+	    type: "POST",
+	    dataInputs: [
+		{
+		    "identifier": "dsType",
+		    "value": dataType,
+		    "dataType": "string"
+		},
+		{
+		    "identifier": "dsName",
+		    "value": param,
+		    "dataType": "string"
+		},
+	    ],
+	    dataOutputs: [
+		{"identifier":"Result","type":"raw"},
+	    ],
+	    success: function(data){
+		console.log("SUCCESS");
+		$(".notifications").notify({
+		    message: { text: data },
+		    type: 'success',
+		}).show();
+		loadDatastore(param,dsid,dataType);
+	    },
+	    error: function(data){
+		$(".notifications").notify({
+		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+		    type: 'danger',
+		}).show();
+	    }
+	});
+
+    }
+
     var DSTSetupCallBacks={
 	"delete": function(data,param,dsid,dataType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		$('#removeDSModal').modal("show");
 		$("#removeDSModal").find(".modal-footer").find("button").last().attr("data-store",param);
@@ -1127,12 +1172,14 @@ define([
 	    });
 	},
 	"remove": function(data,param,dsid,dataType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		$(".tooltip").remove();
 		$("#DS_"+dsid).remove();
 	    });
 	},
 	"toggle": function(data,param,dsid,dataType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		if($(this).find('i').first().hasClass("fa-toggle-up")){
 		    $("#DS_"+dsid).find(".panel-body").first().collapse('hide');
@@ -1144,12 +1191,14 @@ define([
 	    });
 	},
 	"privileges": function(data,param,dsid,dataType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		bindPrivileges(dsid,"datastorePrivileges",param,dataType);
 		return false;
 	    });
 	},
 	"db-access": function(data,param,dsid,dataType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		console.log("fetch db access template");
 		if($("#DS_"+dsid).find(".panel-body").first().find("#db_access").length)
@@ -1202,7 +1251,7 @@ define([
 				],
 				success: function(data){
 				    console.log("SUCCESS");
-				    console.log(data);
+				    //console.log(data);
 				    var reg0=new RegExp("\\[table\\]","g");
 				    var reg1=new RegExp("\\[tableid\\]","g");
 				    if($("#DS_"+dsid).find(".panel-body").first().find(".db_access_display").length)
@@ -1251,6 +1300,7 @@ define([
 	    });
 	},
 	"settings": function(data,param,dsid,dataType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		console.log(dataType);
 		var myLocation=$("#DS_"+dsid).find(".panel-body").first();
@@ -1259,14 +1309,38 @@ define([
 		    if(!myLocation.children().length)
 			hasLocation=true;
 		    console.log(dataType);
-		    if(dataType=="mainDirectories")
+		    if(dataType=="mainDirectories"){
 			myLocation.prepend($("#add-directory").find("form").first()[0].outerHTML);
-		    else{
-			if(dataType[0]=="W" && dataType[2]=="S")
-			    myLocation.prepend($("#add-ows").find("form").first()[0].outerHTML);
-			else
-			    myLocation.prepend($("#add-database").find("form").first()[0].outerHTML);
 		    }
+		    else{
+			if(dataType[0]=="W" && dataType[2]=="S"){
+			    myLocation.prepend($("#add-ows").find("form").first()[0].outerHTML);
+			    myLocation.find("form").first().find("button").each(function(){
+				if($(this).attr("data-mmaction"))
+				    try{
+					OWSSetupCallBacks[$(this).attr("data-mmaction")](this);
+				    }catch(e){
+					console.log("CallBack issue ("+$(this).attr("data-mmaction")+"): "+e);
+				    }	    
+			    });
+			    
+			}
+			else{
+			    myLocation.prepend($("#add-database").find("form").first()[0].outerHTML);
+			    myLocation.find("form").first().find("button").each(function(){
+				if($(this).attr("data-mmaction"))
+				    try{
+					DBSetupCallBacks[$(this).attr("data-mmaction")](this);
+				    }catch(e){
+					console.log("CallBack issue ("+$(this).attr("data-mmaction")+"): "+e);
+				    }	    
+			    });
+			}
+		    }
+
+		    console.log(myLocation.find("#database_add"));
+		    console.log(myLocation.find("#add-wfs-dialog"));
+
 		    var lmappings={
 			"url": "link",
 			"stype": "type",
@@ -1318,48 +1392,163 @@ define([
 	    });
 	},
 	"refresh": function(data,param,dsid,dataType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
-		
-		zoo.execute({
-		    identifier: "datastores.directories.cleanup",
-		    type: "POST",
-		    dataInputs: [
-			{
-			    "identifier": "dsType",
-			    "value": dataType,
-			    "dataType": "string"
-			},
-			{
-			    "identifier": "dsName",
-			    "value": param,
-			    "dataType": "string"
-			},
-		    ],
-		    dataOutputs: [
-			{"identifier":"Result","type":"raw"},
-		    ],
-		    success: function(data){
-			console.log("SUCCESS");
-			$(".notifications").notify({
-			    message: { text: data },
-			    type: 'success',
-			}).show();
-			loadDatastore(param,dsid,dataType);
-			console.log(data);
-		    },
-		    error: function(data){
-			$(".notifications").notify({
-			    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
-			    type: 'danger',
-			}).show();
-		    }
-		});
+		doCleanup(data,param,dsid,dataType,obj);
 	    });
-	}
+	},
+	"mozaic": function(data,param,dsid,dataType,obj){
+	    var ldata=data;
+	    $(obj).off("click");
+	    $(obj).click(function(e){
+		if($("#DS_"+dsid).find(".panel-body").first().find("#mozaic-form").length){
+		    $("#DS_"+dsid).find(".panel-body").first().find("#mozaic-form").remove();
+		    return;
+		}
+		console.log(selectedDatasourceTypes["DS_"+dsid]);
+		for(var i=0;i<selectedDatasourceTypes["DS_"+dsid].length;i++)
+		    if(selectedDatasourceTypes["DS_"+dsid][i]!="raster"){
+			$("#DS_"+dsid).find(".panel-body").first().prepend($("#dataStore_mozaic_error_template")[0].innerHTML);
+			return;
+		    }
+		console.log("launch mozaic module");
+		console.log(dsid);
+		console.log(selectedDatasource);
+		console.log(selectedDatasourceTypes);
+		$("#DS_"+dsid).find(".panel-body").first().prepend($("#dataStore_mozaic_template")[0].innerHTML);
+		$("#mozaic-submit").click(function(){
+		    $("#DS_"+dsid).find(".panel-body").first().find("#mozaic-form").find(".fa-spin").removeClass('hide');
+		    var params=[
+			{
+			    "identifier": "dst",
+			    "value": dsid,
+			    "dataType": "string"
+			},
+			{
+			    "identifier": "iname",
+			    "value": $("#mozaic-form").find('input[name="mozaic_name"]').val(),
+			    "dataType": "string"
+			},
+		    ];
+		    for(var i=0;i<selectedDatasource["DS_"+dsid].length;i++){
+			params.push({
+			    "identifier": "dso",
+			    "value": selectedDatasource["DS_"+dsid][i],
+			    "dataType": "string"
+			});
+		    }		    
+		    zoo.execute({
+			identifier: "raster-tools.Gdal_Merge",
+			type: "POST",
+			dataInputs: params,
+			dataOutputs: [
+			    {"identifier":"Result","type":"raw"},
+			],
+			success: function(data){
+			    console.log("SUCCESS");
+			    $(".notifications").notify({
+				message: { text: data },
+				type: 'success',
+			    }).show();
+			    $("#DS_"+dsid).find(".panel-body").first().find("#mozaic-form").remove();
+			    $("#DS_"+dsid).find(".panel-body").first().find("#mozaic-form").find(".fa-spin").addClass('hide');
+			    doCleanup(ldata,param,dsid,dataType,obj);
+			    //loadDatastore(param,dsid,dataType);
+			    //console.log(data);
+			},
+			error: function(data){
+			    $(".notifications").notify({
+				message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				type: 'danger',
+			    }).show();
+			}
+		    });		    
+		});
+		return;
+	    });
+	},
+	"tileindex": function(data,param,dsid,dataType,obj){
+	    var ldata=data;
+	    $(obj).off("click");
+	    $(obj).click(function(e){
+		if($("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").length){
+		    $("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").remove();
+		    return;
+		}
+		console.log(selectedDatasourceTypes["DS_"+dsid]);
+		console.log("launch mozaic module");
+		console.log(dsid);
+		console.log(selectedDatasource);
+		console.log(selectedDatasourceTypes);
+		$("#DS_"+dsid).find(".panel-body").first().prepend($("#dataStore_tileindex_template")[0].innerHTML);
+		console.log($("#add-directory").find(".form-group").last());
+		$("#tileindex-form").find(".row").last().html($("#add-directory").find(".form-group").last()[0].outerHTML);
+		$("#tileindex-submit").click(function(){
+		    $("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").find(".fa-spin").removeClass('hide');
+		    var params=[
+			{
+			    "identifier": "idir",
+			    "value": dsid,
+			    "dataType": "string"
+			},
+			{
+			    "identifier": "dir",
+			    "value": $("#tileindex-form").find('input[name="browse"]:checked').val()+"/",
+			    "dataType": "string"
+			},
+			{
+			    "identifier": "iname",
+			    "value": $("#tileindex-form").find('input[name="tileindex_name"]').val(),
+			    "dataType": "string"
+			},
+			{
+			    "identifier": "ext",
+			    "value": $("#tileindex-form").find('input[name="filenameExt"]').val(),
+			    "dataType": "string"
+			},
+			{
+			    "identifier": "srs",
+			    "value": $("#tileindex-form").find('input#tileindextprj').val(),
+			    "dataType": "string"
+			},
+		    ];
+		    zoo.execute({
+			identifier: "raster-tools.createTindex",
+			type: "POST",
+			dataInputs: params,
+			dataOutputs: [
+			    {"identifier":"Result","type":"raw"},
+			],
+			success: function(data){
+			    console.log("SUCCESS");
+			    $(".notifications").notify({
+				message: { text: data },
+				type: 'success',
+			    }).show();
+			    $("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").remove();
+			    $("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").find(".fa-spin").addClass('hide');
+			    doCleanup(ldata,param,dsid,dataType,obj);
+			    //loadDatastore(param,dsid,dataType);
+			    //console.log(data);
+			},
+			error: function(data){
+			    $(".notifications").notify({
+				message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				type: 'danger',
+			    }).show();
+			}
+		    });		    
+		});
+		return;
+	    });
+	},
     };
 
+    var selectedDatasource={};
+    var selectedDatasourceTypes={};
     var DSSetupCallBacks={
 	"select": function(data,param,dsid,datasource,geometryType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		e.preventDefault();
 		if(!Datastores["DS_"+dsid+"_"+datasource])
@@ -1372,35 +1561,32 @@ define([
 		    else
 			Datastores["DS_"+dsid+"_"+datasource]="vector";
 		}
-		var panelRoot=null;
+		var panelRoot=$("#DS_"+dsid+"_"+datasource).children().children();
+		var panelRoot1=panelRoot.parent().parent().parent().parent();
 		if($(obj).children().first().hasClass('fa-square-o')){
 		    $(obj).children().first().removeClass("fa-square-o").addClass("fa-check-square-o");
-		    //panelRoot=$(obj).parent().parent().parent().parent().parent()
-		    panelRoot=$("#DS_"+dsid+"_"+datasource).children().children();
 		    panelRoot.removeClass("panel-default").addClass("panel-success");
+		    if(!selectedDatasource["DS_"+dsid]){
+			selectedDatasource["DS_"+dsid]=[];
+			selectedDatasourceTypes["DS_"+dsid]=[];
+		    }
+		    selectedDatasource["DS_"+dsid].push(datasource);
+		    selectedDatasourceTypes["DS_"+dsid].push(geometryType);
 		}
 		else{
 		    $(obj).children().first().removeClass("fa-square-check-o").addClass("fa-square-o");
-		    //panelRoot=$(obj).parent().parent().parent().parent().parent()
-		    panelRoot=$("#DS_"+dsid+"_"+datasource).children().children();
 		    panelRoot.removeClass("panel-success").addClass("panel-default");
+		    panelRoot1.removeClass("panel-success").addClass("panel-default");
+		    selectedDatasource["DS_"+dsid].pop(selectedDatasource["DS_"+dsid].indexOf(datasource));
+		    selectedDatasourceTypes["DS_"+dsid].pop(selectedDatasourceTypes["DS_"+dsid].indexOf(datasource));
 		}
-		var panelRoot1=panelRoot.parent().parent().parent().parent();
-		console.log(panelRoot1);
-		console.log(panelRoot1.children().find(".panel"));
-		console.log(panelRoot1.children().find(".panel").length+" "+panelRoot1.find(".panel-success").length+" "+(panelRoot1.find(".panel-success").length==panelRoot1.find(".panel").length));
 		if(panelRoot1.children().find(".panel").length==panelRoot1.find(".panel-success").length){
 		    panelRoot1.removeClass("panel-default").addClass("panel-success");
 		    panelRoot1.find(".panel-heading").first().find(".btn-group").find("button,a").first().find('i').removeClass("fa-minus-square-o").addClass("fa-check-square-o ");
 		}
 		else{
-		    panelRoot1.removeClass("panel-success").addClass("panel-default");
-		    console.log("LA");
-		    console.log(panelRoot1.find(".panel-body").first());
-		    console.log(panelRoot1.find(".panel-heading").first().find(".btn-group"));
 		    if(panelRoot1.find(".panel-success").length){
 			panelRoot1.find(".panel-heading").first().find(".btn-group").find("button,a").first().find('i').removeClass("fa-square-o").addClass("fa-minus-square-o ");
-			console.log(panelRoot.find(".panel-heading").first().find(".btn-group").find(".require-select"));
 			panelRoot1.find(".panel-heading").first().find(".btn-group").find(".require-select").removeClass("hide");
 		    }
 		    else{
@@ -1412,11 +1598,13 @@ define([
 	    });
 	},
 	"privileges": function(data,param,dsid,datasource,geometryType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		bindPrivileges(dsid+"_"+datasource,"datasourcePrivileges",param,geometryType,datasource);
 	    });
 	},
 	"preview": function(data,param,dsid,datasource,geometryType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		if($(obj).is("a")){
 		    e.preventDefault();
@@ -1475,6 +1663,7 @@ define([
 	    });
 	},
 	"process": function(data,param,dsid,datasource,geometryType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		e.preventDefault();
 		console.log(geometryType);
@@ -1519,6 +1708,10 @@ define([
 			    .find("select#ofband").append(
 				'<option value="'+(i+1)+'">Band '+(i+1)+'</option>'
 			    );
+			window.setTimeout(function(){
+			    $("#DS_"+dsid+"_"+datasource).find('[data-toggle="tooltip"]').tooltip({container: 'body'});
+			},50);
+
 			$("#DS_"+dsid+"_"+datasource).find(".raster_p").hide();
 			$("#DS_"+dsid+"_"+datasource).find(".raster_azimuth").hide();
 			$("#DS_"+dsid+"_"+datasource).find("#ofname").val(param+datasource+"."+raster_extensions[data.datasource.dataType]);
@@ -1541,6 +1734,7 @@ define([
 	    });
 	},
 	"toggle": function(data,param,dsid,datasource,geometryType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		e.preventDefault();
 		var initial=$("#DS_"+dsid+"_"+datasource).find(".panel-body").first().hasClass("in");
@@ -1560,7 +1754,53 @@ define([
 		
 	    });
 	},
+	"georeference": function(data,param,dsid,datasource,geometryType,obj){
+	    $(obj).off("click");
+	    $(obj).click(function(e){
+		zoo.execute({
+		    identifier: "georeferencer.saveGeoreferencedProject",
+		    type: "POST",
+		    dataInputs: [
+			{
+			    "identifier": "dst",
+			    "value": param,
+			    "dataType": "string"
+			},
+			{
+			    "identifier": "dso",
+			    "value": datasource,
+			    "dataType": "string"
+			},
+			{
+			    "identifier": "size",
+			    "value": data.datasource.size,
+			    "dataType": "string"
+			},
+		    ],
+		    dataOutputs: [
+			{"identifier":"Result","type":"raw"},
+		    ],
+		    success: function(data){
+			console.log("SUCCESS");
+			$(".notifications").notify({
+			    message: { text: data },
+			    type: 'success',
+			}).show();
+			document.location="./Georeferencer_bs";
+		    },
+		    error: function(data){
+			console.log("ERROR");
+			$(".notifications").notify({
+			    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			    type: 'danger',
+			}).show();
+		    }
+		});
+		
+	    });
+	},
 	"open": function(data,param,dsid,datasource,geometryType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		zoo.execute({
 		    identifier: "mapfile.openInManager",
@@ -1594,6 +1834,7 @@ define([
 	    });
 	},
 	"download": function(data,param,dsid,datasource,geometryType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
 		zoo.execute({
 		    identifier: "vector-converter.doZip",
@@ -1621,8 +1862,16 @@ define([
 	    });
 	},
 	"delete": function(data,param,dsid,datasource,geometryType,obj){
+	    $(obj).off("click");
 	    $(obj).click(function(e){
+		var myRootLocation=$(obj);
+		for(var i=0;i<5;i++)
+		    myRootLocation=myRootLocation.parent();
+		myRootLocation.removeClass("panel-default").addClass("panel-danger");
 		$('#removeModal').modal("show");
+		$("#removeModal").find(".modal-footer").find("button").first().click(function(){
+		    myRootLocation.removeClass("panel-danger").addClass("panel-default");
+		});
 		$("#removeModal").find(".modal-footer").find("button").last().attr("data-store",param);
 		$("#removeModal").find(".modal-footer").find("button").last().attr("data-source",datasource);
 	    });
@@ -1642,7 +1891,7 @@ define([
 	});
 	window.setTimeout(function(){
 	    $("#DS_"+dsid+"_"+datasource).find('[data-toggle="tooltip"]').tooltip({container: 'body'});
-	},500);
+	},50);
 	if(data!=null){
 	    var font="";
 	    if(data.datasource.geometry=="Polygon")
@@ -1671,6 +1920,17 @@ define([
 		{"identifier":"Result","type":"raw"},
 	    ],
 	    success: function(data){
+		if(!data.datasource.origin){
+		    $("#DS_"+dsid+"_"+datasource).find(".panel-heading").first().find("button,a").each(function(){
+			if($(this).attr("data-mmaction")=="georeference"){
+			    $(this).removeClass("hide");
+			    $("#DS_"+dsid+"_"+datasource).find(".panel-heading").first().find("button,a").each(function(){
+				if($(this).attr("data-mmaction")=="open")
+				    $(this).addClass("hide");
+			    });
+			}
+		    });
+		}
 		doOnLoadDataSource(param,dsid,datasource,geometryType,ldata,originType,data);
 	    },
 	    error: function(data){
@@ -1704,7 +1964,7 @@ define([
 		    }).show();
 		}else{
 		    $("#DS_"+localDSId).find(".panel").first().removeClass("panel-warning").addClass("panel-default");
-		    if(!data.datasource.layer.length)
+		    if(!data.datasource.layer || !data.datasource.layer.length)
 			data.datasource.layer=[layer];
 		    $("#DS_"+localDSId).find(".panel-body").first().html("");
 		    var reg0=new RegExp("\\[datastore\\]","g");
@@ -1718,11 +1978,12 @@ define([
 			var reg=new RegExp("\\[datasource\\]","g");
 			var reg1=new RegExp("\\[font\\]","g");
 			if(data.datasource.layer[i].geometry=="raster"){
-			    font="mm mm-raster";
+			    font="fa fa-image";
 			}
 			else{
 			    font="fa fa-question";
 			}
+			console.log("FONT !! "+font);
 			$("#DS_"+localDSId).find(".panel-body").first().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg,(localDataType=="WMS"?data.datasource.layer[i].label:data.datasource.layer[i].name))).attr("id","DS_"+localDSId+"_"+data.datasource.layer[i].name));
 			console.log(localDataType);
 			if(localDataType!="WMS")
@@ -1759,7 +2020,7 @@ define([
 
 	$('#side-menu').css({"max-height": ($(window).height()-50)+"px","overflow":"scroll"});
 
-	adminBasic.initialize(false);
+	adminBasic.initialize(zoo);
 
 	$(".mmdatastore").click(function(e){
 	    var localDSId=$(this).text();

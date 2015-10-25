@@ -7,10 +7,28 @@
  serviceType = Python
  serviceProvider = merge
  <DataInputs>
+  [dst]
+   Title = The output datastore name
+   Abstract = The output datastore name.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [dso]
+   Title = The data source names
+   Abstract = The data source set to mozaic.
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
   [dir]
    Title = The output data source name
    Abstract = The output data source name to use as source for convertion.
-   minOccurs = 1
+   minOccurs = 0
    maxOccurs = 1
    <LiteralData>
     DataType = string
@@ -19,7 +37,7 @@
   [ext]
    Title = The output data source name
    Abstract = The output data source name to use as source for convertion.
-   minOccurs = 1
+   minOccurs = 0
    maxOccurs = 1
    <LiteralData>
     DataType = string
@@ -28,7 +46,7 @@
   [OutputDSN]
    Title = The output data source name
    Abstract = The output data source name to use as source for convertion.
-   minOccurs = 1
+   minOccurs = 0
    maxOccurs = 1
    <LiteralData>
     DataType = string

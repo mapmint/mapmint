@@ -62,7 +62,7 @@ define([
 	    });
 	});
 
-
+	var myRootLocation=$('#'+lid).parent().parent();
 
 	$('#'+lid).DataTable( {
 	    data: [],
@@ -311,7 +311,12 @@ define([
 	    ));
 	} );
 
-	$('#'+lid).parent().find("."+ltype+"SubmitForm").click(function(e){
+	console.log("***************************************");
+	console.log("."+ltype+"SubmitForm");
+	console.log(myRootLocation);
+	console.log(myRootLocation.find("."+ltype+"SubmitForm"));
+	console.log($('#'+lid).parent().find("."+ltype+"SubmitForm"));
+	myRootLocation.find("."+ltype+"SubmitForm").click(function(e){
 	    var params=[];
 	    var set={};
 	    var rType=null;
@@ -349,9 +354,6 @@ define([
 			    }
 			}
 			else{
-			    console.log("OK 1");
-			    console.log($(this));
-			    console.log($(this).val());
 			    if($(this).val()!="")
 				params.push({identifier: "clause",value: 'id='+$(this).val().replace(reg1,""),dataType: "string"});
 			}
@@ -359,11 +361,14 @@ define([
 		}
 	    });	    
 	    $(this).parent().find("select").each(function(){
-		if($(this).attr('name')=="user_group")
+		if($(this).attr('name')=="group")
 		    params.push({identifier: $(this).attr("name").replace(reg0,""),value: $(this).val(),dataType: "string"});
 	    });
 	    params.push({identifier: attId,value: JSON.stringify(set),mimeType: "application/json"});
 	    //if(rType!="insert")
+	    if(ltype=="user" && rType!="insert")
+		params.push({identifier: "login",value: set.login,dataType: "string"});
+
 	    
 	    console.log(CRowSelected[0]);
 
@@ -412,7 +417,7 @@ define([
     var initialize=function(){
 	var closure=this;
 
-	adminBasic.initialize();
+	adminBasic.initialize(zoo);
 
 	$('#side-menu').css({"max-height": ($(window).height()-50)+"px","overflow":"scroll"});
 	//console.log($(window).height());
@@ -612,6 +617,7 @@ define([
 	    return false;
 	});
 
+	/*
 	$(".userSubmitForm").click(function(e){
 	    var params=[];
 	    var user={};
@@ -640,7 +646,7 @@ define([
 		}
 	    });	    
 	    $(this).parent().find("select").each(function(){
-		if($(this).attr('name')=="user_group")
+		if($(this).attr('name')=="group")
 		    params.push({identifier: $(this).attr("name").replace(/user_/g,""),value: $(this).val(),dataType: "string"});
 	    });
 	    params.push({identifier: attId,value: JSON.stringify(user),mimeType: "application/json"});
@@ -687,6 +693,8 @@ define([
 
 	    return false;
 	});
+	*/
+
 	var cnt=0;
 
 	window.setTimeout(function () { 

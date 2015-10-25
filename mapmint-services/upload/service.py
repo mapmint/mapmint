@@ -64,7 +64,7 @@ def saveOnServer(conf,inputs,outputs):
     conf["senv"]["last_ufile"]=outFileName
     import mmsession
     mmsession.save(conf)
-    print >> sys.stderr,"ok5 "+str(inputs)
+    print >> sys.stderr,"ok5 "+str(outFileName)
     outputs["Result"]["value"]="Your "+tmp[len(tmp)-1]+" file was uploaded on the server"
     print >> sys.stderr,"ok6 "+str(inputs)
     return 3

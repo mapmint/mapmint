@@ -6,7 +6,7 @@
     <select name="$name" class="form-control #if $options is None# mmField#end if#" >
 #if $options is not None
 #for i in $options
-       <option value="$i">$i</option>
+       <option value="$i[0]">$i[1]</option>
 #end for
 #else
        <option value="-1">$zoo._("Choose")</option>
@@ -17,7 +17,7 @@
 #end def
 
 <form class="form-horizontal mtpp" method="get" >
-$printSelect("case",$zoo._("Choose case"),[$zoo._("On feature over"),$zoo._("On Click")])
+$printSelect("case",$zoo._("Choose case"),[["over",$zoo._("On feature over")],["click",$zoo._("On Click")]])
 $printSelect("field",$zoo._("Field"),None)
 <div class="col-md-12">
   <textarea name="editor" class="mm-editor"></textarea>

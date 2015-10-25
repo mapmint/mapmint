@@ -6,8 +6,14 @@
 
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation"><a href="#mm_bs_display" aria-controls="home" role="tab" data-toggle="tab"><i class="i i-stack"></i> $zoo._("Base Layers")</a></li>
-    <li role="presentation"  class="active"><a href="#mm_layers_display" aria-controls="profile" role="tab" data-toggle="tab"><i class="i i-stack"></i> $zoo._("Legend")</a></li>
+    <li role="presentation"><a href="#mm_bs_display" aria-controls="home" role="tab" data-toggle="tab"><span class="symbol-multi">
+         <i class="mm0-layers mm-layers-baseonly fa-fw"></i>
+         <i class="mm0-layers mm-layers-overlays-only fa-fw symbol-up"></i>
+       </span> $zoo._("Base Layers")</a></li>
+    <li role="presentation"  class="active"><a href="#mm_layers_display" aria-controls="profile" role="tab" data-toggle="tab"><span class="symbol-multi">
+          <i class="mm0-layers mm-layers-overlays-only fa-fw"></i>
+          <i class="mm0-layers mm-layers-baseonly fa-fw symbol-up"></i>
+        </span> $zoo._("Legend")</a></li>
   </ul>
 
   <!-- Tab panes -->
@@ -17,11 +23,6 @@
 	<ul class="list-group tree">
 	  <li class="list-group-item">
 	   <ul class="list-group tree">
-#*
-$Template(file=$conf['main']['templatesPath']+"/preview/baselayers_bs.tmpl",searchList={"m": $m,"conf": $conf})
-*#
-
-
 
 #from mapfile.service import getMapList
 #set linputs={"name": {"value": $conf["senv"]["last_map"]},"prefix": {"value": "public_"}}

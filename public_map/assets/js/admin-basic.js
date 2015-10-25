@@ -39,6 +39,7 @@ define([
 	return res;
     }
     
+    var zoo=null;
     var initialize=function(){
 
 	$('[data-toggle="tooltip"]').tooltip();
@@ -62,9 +63,151 @@ define([
 	if (element.is('li')) {
             element.addClass('active');
 	}
+	if(arguments[0]){
+	    zoo=arguments[0];
+	    bindUserPreferences();
+	    bindUserLogOut();
+	}
     }
 
-    function typeaheadMap(module,zoo,elem){
+    function bindUserLogOut(){
+	$("#mmmUserLogOut").off("click");
+	$("#mmmUserLogOut").click(function(){
+	    zoo.execute({
+		identifier: "authenticate.logOut",
+		type: "POST",
+		dataInputs: [],
+		dataOutputs: [
+		    {"identifier":"Result","type":"raw"},
+		],
+		success: function(data){
+		    $(".notifications").notify({
+			message: { text: data },
+			type: 'success',
+		    }).show();
+		    document.location.reload(false);
+		},
+		error: function(data){
+		    console.log(data);
+		    $(".notifications").notify({
+			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			type: 'danger',
+		    }).show();
+		}
+	    });
+	    return false;
+	});
+    }
+
+    function bindUserPreferences(){
+	$("#mmmUserPreferences").off("click");
+	$("#mmmUserPreferences").click(function(){
+	    console.log("ok");
+	    zoo.execute({
+		identifier: "template.display",
+		type: "POST",
+		dataInputs: [
+		    {"identifier": "tmpl","value": "UsersManagement/UserForm","dataType":"string"},
+		    {"identifier": "type","value": "update","dataType":"string"},
+		    {"identifier": "pref","value": "true","dataType":"boolean"},
+		],
+		dataOutputs: [
+		    {"identifier":"Result","type":"raw"},
+		],
+		success: function(data){
+		    $('#userPreferencesModal').find(".modal-body").children().first().html(data);
+		    $('#userPreferencesModal').find(".modal-body").children().first().children().first().collapse('show');
+		    $('#userPreferencesModal').find("#up_cp").off("change");
+		    $('#userPreferencesModal').find("#up_cp").change(function(e){
+			e.preventDefault();
+			e.stopPropagation();
+			if($(this).is(":checked"))
+			    $(this).parent().next().addClass("in");
+			else
+			    $(this).parent().next().removeClass("in");
+			return false;
+		    });
+		    $("#userPreferencesModal").find("#update-user-preferences").find('button').last().off('click');
+		    $("#userPreferencesModal").find("#update-user-preferences").find('button').last().click(function(){
+			var ltype="user";
+			var reg0=new RegExp(ltype+'_',"g");
+			var reg1=new RegExp(ltype+'s_',"g");
+			var params=[];
+			var set={};
+			$(this).parent().find("input").each(function(){
+			    if($(this).attr('id')=="um_utype"){
+				rType=$(this).val();
+				params.push({identifier: "type",value: $(this).val(),dataType: "string"});
+				if(rType=="insert"){
+				    if(ltype=="user")
+					pIdentifier="manage-users.AddUser";
+				    attId=ltype;
+				}
+			    }
+			    else{
+				if($(this).attr("name")){
+				    if($(this).attr("name")!="id"){
+					if($(this).is(":visible")){
+					    if($(this).attr("type")=="checkbox"){
+						set[$(this).attr("name").replace(reg0,"")]=$(this).is(":checked");
+					    }
+					    else
+						set[$(this).attr("name").replace(reg0,"")]=$(this).val();
+					}
+					else{
+					    console.log("OK 0");
+					    console.log($(this));
+					    console.log($(this).val());
+					}
+				    }
+				    else{
+					if($(this).val()!="")
+					    params.push({identifier: "clause",value: 'id='+$(this).val().replace(reg1,""),dataType: "string"});
+				    }
+				}
+			    }
+			});
+			params.push({identifier: "set",value: JSON.stringify(set),mimeType: "application/json"});
+			params.push({identifier: "login",value: set.login,dataType: "string"});
+			zoo.execute({
+			    identifier: "manage-users.UpdateUser",
+			    type: "POST",
+			    dataInputs: params,
+			    dataOutputs: [
+				{"identifier":"Result","type":"raw"},
+			    ],
+			    success: function(data){
+				$(".notifications").notify({
+				    message: { text: data },
+				    type: 'success',
+				}).show();
+				$("#userPreferencesModal").modal("hide");
+			    },
+			    error: function(data){
+				console.log(data);
+				$(".notifications").notify({
+				    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				    type: 'danger',
+				}).show();
+			    }
+			});
+			return false;
+		    });
+		    $("#userPreferencesModal").modal("show");
+		    
+		},
+		error: function(data){
+		    $(".notifications").notify({
+			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			type: 'danger',
+		    }).show();
+		}
+	    });
+
+	});
+    }
+
+    function typeaheadMap(module,zoo,elem,extra,onLoad){
 	var substringMatcher = function(strs) {
 	    return function findMatches(q, cb) {
 		var matches, substringRegex;
@@ -91,7 +234,7 @@ define([
 	    };
 	};
 	$.ajax({
-	    url: module.config().url+"?request=Execute&service=WPS&version=1.0.0&Identifier=mapfile.listMap&RawDataOutput=Result&DataInputs=",
+	    url: module.config().url+"?request=Execute&service=WPS&version=1.0.0&Identifier=mapfile.listMap&RawDataOutput=Result&DataInputs="+(extra?extra:""),
 	    method: 'GET',
 	    dataType: "json",
 	    success: function(data){
@@ -105,7 +248,10 @@ define([
 		var loadButton=elem[0].next().find("button").first();
 		loadButton.click(function(e){
 		    if(!$(this).hasClass("disabled")){
-			loadMap(zoo,[elem[0].val(),elem[1].val()]);
+			if(!onLoad)
+			    loadMap(zoo,[elem[0].val(),elem[1].val()]);
+			else
+			    onLoad(zoo,[elem[0].val(),elem[1].val()]);
 		    }
 		});
 		

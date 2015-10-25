@@ -14,6 +14,7 @@ requirejs.config({
 	bootselect: 'js/lib/bootstrap-select.min',
         notify: 'js/lib/bootstrap-notify',
 	slider: 'js/lib/bootstrap-slider',
+	window: 'js/lib/bootstrap-window',
 
 	mmDataTables: 'js/lib/mapmint/mapmint.datatables',
 	dataTables: 'js/lib/jquery/jquery.dataTables.min',
@@ -24,6 +25,8 @@ requirejs.config({
 	select: 'js/lib/datatables/dataTables.select.min',
 	colResize: 'js/lib/datatables/dataTables.colResize',
 	highcharts: 'js/lib/highcharts/highcharts',
+
+	typeahead: 'js/lib/typeahead.jquery.min',
 
 	// Unable to load datatables from one file
 	//datatables: 'js/lib/datatables.min',
@@ -41,16 +44,25 @@ requirejs.config({
 
         domReady: 'js/lib/domReady',
         myApp: 'js/index_js_bs',
-        app: 'js/init',
+        app: 'js/map-client',
             
     },
     shim: {
+	typeahead: {
+	    deps: ['jquery'],
+	    init: function ($) {
+            	   return require.s.contexts._.registry['typeahead.js'].factory( $ );
+       	    }
+	},
 	mmDataTables: {
 	        deps: ['notify']
 	},
         bootstrap: {
             deps: ['jquery'],
         },
+	window: {
+	    deps: ['bootstrap'],
+	},
 	cmenu: {
 	    deps: ['jquery'],
 	},
@@ -117,7 +129,7 @@ requirejs.config({
             exports: 'ol',
         },
 	app: {
-	    deps: ['highcharts','mmDataTables','olpopup', 'slider','cmenu','treeview','notify','colResize','enquire','bootselect','select','responsive','notify','myApp']
+	    deps: ['highcharts','mmDataTables','olpopup', 'slider','cmenu','treeview','notify','colResize','enquire','bootselect','select','responsive','notify','window','myApp']
 	}
     },
     waitSeconds: 0

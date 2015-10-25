@@ -175,22 +175,24 @@ define([
 		var order="";
 		var j=0;
 		for(var i in oLayers[key]["queryParams"]["fields"]){
-		    columns.push({ 
-			data: oLayers[key]["queryParams"]["fields"][i], 
-			name: oLayers[key]["queryParams"]["fields"][i], 
-			title: oLayers[key]["queryParams"]["aliases"][i],
-			width: oLayers[key]["queryParams"]["sizes"][i]
-		    });
-		    closestproperties+=oLayers[key]["queryParams"]["fields"][i]+",";
-		    clause+="CAST("+oLayers[key]["queryParams"]["fields"][i]+" AS character(255)) like '%dd%'"+
-			" OR "+
-			"CAST("+oLayers[key]["queryParams"]["fields"][i]+" AS character(255)) like 'dd%'"+
-			" OR "+
-			"CAST("+oLayers[key]["queryParams"]["fields"][i]+" AS character(255)) like 'dd'"+
-			(j+1<oLayers[key]["queryParams"]["fields"].length?" OR ":"");
-		    if(i==0)
-			order=oLayers[key]["queryParams"]["fields"][i];
-		    j++;
+		    if(oLayers[key]["queryParams"]["fields"][i]!=""){
+			columns.push({ 
+			    data: oLayers[key]["queryParams"]["fields"][i], 
+			    name: oLayers[key]["queryParams"]["fields"][i], 
+			    title: oLayers[key]["queryParams"]["aliases"][i],
+			    width: oLayers[key]["queryParams"]["sizes"][i]
+			});
+			closestproperties+=oLayers[key]["queryParams"]["fields"][i]+",";
+			clause+="CAST("+oLayers[key]["queryParams"]["fields"][i]+" AS character(255)) like '%dd%'"+
+			    " OR "+
+			    "CAST("+oLayers[key]["queryParams"]["fields"][i]+" AS character(255)) like 'dd%'"+
+			    " OR "+
+			    "CAST("+oLayers[key]["queryParams"]["fields"][i]+" AS character(255)) like 'dd'"+
+			    (j+1<oLayers[key]["queryParams"]["fields"].length?" OR ":"");
+			if(i==0)
+			    order=oLayers[key]["queryParams"]["fields"][i];
+			j++;
+		    }
 		}
 		closestproperties+="msGeometry";
 		var _x2js = new X2JS();
@@ -202,11 +204,12 @@ define([
 		console.log("HEIGHT: "+$("#map").height()/2);
 		
 		
-		var lheight=$("#map").height();
+		var lheight=$(window).height();
 		$('#mmm_table-content_'+key).DataTable( {
 		    data: [],
 		    "dom": 'Zlfrtip',
-		    "scrollY":  ((lheight)-($(".navbar").height()*4))+"px",
+		    "colReorder": true,
+		    "scrollY":  ((lheight/2.5)-($(".navbar").height()*4))+"px",
 		    "scrollCollapse": true,
 		    "scrollX": true,
 		    "lengthMenu": [[5, 10, 25, 50, 1000], [5, 10, 25, 50, "All"]],
@@ -240,7 +243,8 @@ define([
 			    console.log(oLayers[key]["queryParams"]["fields"]);
 			    var lprop=[];
 			    for(i in oLayers[key]["queryParams"]["fields"])
-				lprop.push(oLayers[key]["queryParams"]["fields"][i]);
+				if(oLayers[key]["queryParams"]["fields"][i]!="")
+				    lprop.push(oLayers[key]["queryParams"]["fields"][i]);
 			    lprop.push("msGeometry");
 			    window["complexPayload_InputData_GML_"+key] = function(){
 				var format=new ol.format.WFS();
@@ -334,13 +338,13 @@ define([
 			    fnCallback(opts);
 
 			    for(d in data){
-				console.log("ROW ID="+data[d].DT_RowId);
+				/*console.log("ROW ID="+data[d].DT_RowId);
 				console.log("ROW ID="+data[d].fid);
 				console.log($.inArray(data[d].fid, CRowSelected) !== -1 );
 				console.log($("#"+data[d].fid));
-				console.log($("#"+data[d].DT_RowId));
+				console.log($("#"+data[d].DT_RowId));*/
 				if ( $.inArray(data[d].fid+"", CRowSelected) !== -1 ) {
-				    console.log(data[d].fid);
+				    //console.log(data[d].fid);
 				    $('#mmm_table-content_'+key).DataTable().row($("#"+data[d].DT_RowId)).select();
 				}else{
 				    $('#mmm_table-content_'+key).DataTable().row($("#"+data[d].DT_RowId)).deselect();
@@ -466,6 +470,7 @@ define([
 		    }
 		    //do stuff here
 		});
+		    
 		}		
 	    }
 	}

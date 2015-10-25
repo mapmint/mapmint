@@ -31,6 +31,7 @@ requirejs.config({
 	buttons: 'js/lib/datatables/dataTables.buttons.min',
 	buttonsCol: 'js/lib/datatables/buttons.colVis.min',
 	colReorder: 'js/lib/datatables/dataTables.colReorder.min',
+	rowReorder: 'js/lib/datatables/dataTables.rowReorder.min',
 	responsive: 'js/lib/datatables/dataTables.responsive.min',
 	select: 'js/lib/datatables/dataTables.select.min',
 	colResize: 'js/lib/datatables/dataTables.colResize',
@@ -143,12 +144,27 @@ requirejs.config({
     config: {
         app: {
             url: '$conf["main"]["serverAddress"]',
+            db: '$conf["main"]["dbuserName"]',
             delay: 2000,
             language: '$conf["main"]["language"]',
+	    tmpUrl: '$conf["main"]["tmpUrl"]',
+	    publicationUrl: '$conf["main"]["publicationUrl"]',
 	    dataPath: '$conf["main"]["dataPath"]',
 	    msUrl: '$conf["main"]["mapserverAddress"]',
 #if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false")
 	    pmapfile: '$conf["senv"]["last_map"]',
+#end if
+#if $inputs["module"]["value"].lower()=="georeferencer"
+	    georef: {
+	    	    img: '$conf["senv"]["mmGeoImg"]',
+#if $conf["senv"].keys().count("mmGeoSize")>0
+	    	    size: '$conf["senv"]["mmGeoSize"]',
+#end if
+	    	    map: '$conf["senv"]["mmGeoMap"]',
+	    	    gcp: '$conf["senv"]["mmGeoGCPFile"]',
+	    	    dst: '$conf["senv"]["mmGeoDST"]',
+	    	    dso: '$conf["senv"]["mmGeoDSO"]',
+	    },
 #end if
         }
     } 

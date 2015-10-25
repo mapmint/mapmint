@@ -1503,30 +1503,31 @@ def deleteElement(conf,inputs,outputs):
     con=auth.getCon(conf)
     con.connect()
     cur=con.conn.cursor()
+    prefix=auth.getPrefix(conf)
     if not(auth.is_ftable(inputs["table"]["value"])):
-	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
-	return zoo.SERVICE_FAILED
+        conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+        return zoo.SERVICE_FAILED
     if inputs.has_key("atable") and inputs["atable"]["value"]!="NULL":
         if inputs["atable"]["value"].__class__.__name__ in ('list', 'tuple'):
             for i in range(0,len(inputs["atable"]["value"])):
-            	if not(auth.is_ftable(inputs["atable"]["value"][i])):
-			conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
-			return zoo.SERVICE_FAILED
-			#req="DELETE FROM "+inputs["atable"]["value"][i]+" WHERE "+inputs["akey"]["value"][i]+"=[_id_]"
-                req="DELETE FROM "+inputs["atable"]["value"][i]+" WHERE "+inputs["akey"]["value"][i]+"=[_id_]"
-		con.pexecute_req([req,{"id":{"value":inputs["id"]["value"],"format":"s"}}])
+                if not(auth.is_ftable(inputs["atable"]["value"][i])):
+                    conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+                    return zoo.SERVICE_FAILED
+                req="DELETE FROM "+prefix+inputs["atable"]["value"][i]+" WHERE "+inputs["akey"]["value"][i]+"=[_id_]"
+                con.pexecute_req([req,{"id":{"value":inputs["id"]["value"],"format":"s"}}])
+                con.conn.commit()
         else:
             if not(auth.is_ftable(inputs["atable"]["value"])):
-            	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
-		return zoo.SERVICE_FAILED
-            req="DELETE FROM "+inputs["atable"]["value"]+" WHERE "+inputs["akey"]["value"]+"=[_id_]"
+                conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+                return zoo.SERVICE_FAILED
+            req="DELETE FROM "+prefix+inputs["atable"]["value"]+" WHERE "+inputs["akey"]["value"]+"=[_id_]"
             con.pexecute_req([req,{"id":{"value":inputs["id"]["value"],"format":"s"}}])
+            con.conn.commit()
     try:
         if inputs["table"]["value"]=="themes":
-            prefix=auth.getPrefix(conf)
             con.pexecute_req(["DELETE FROM "+prefix+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
         else:
-            con.pexecute_req(["DELETE FROM "+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
+            con.pexecute_req(["DELETE FROM "+prefix+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
             if inputs["table"]["value"]=="indicateurs":
                 import glob,os,shutil
                 rpath=conf["main"]["dataPath"]+"/indexes_maps/"
@@ -1534,8 +1535,7 @@ def deleteElement(conf,inputs,outputs):
                     os.unlink(rpath+"project_PIndex"+inputs["id"]["value"]+".map")
                 except:
                     pass
-
-        outputs["Result"]["value"]=zoo._("Done")
+        outputs["Result"]["value"]=zoo._("Element deleted")
     except Exception,e:
         conf["lenv"]["message"]=zoo._("An error occured when processing your request: ")+str(e)
         return zoo.SERVICE_FAILED
@@ -1556,7 +1556,7 @@ def detailsDocuments(con,val,prefix):
         res["url"]=vals[0][4]
     
     req1="select * from "+prefix+"themes where id in (select t_id from "+prefix+"documents_themes where d_id=[_id_])"
-    con.pexecute_req([req0,{"id":{"value":str(val),"format":"s"}}])
+    con.pexecute_req([req1,{"id":{"value":str(val),"format":"s"}}])
     vals=con.cur.fetchall()
     res["documents_themes"]=[]
     if len(vals)>0:

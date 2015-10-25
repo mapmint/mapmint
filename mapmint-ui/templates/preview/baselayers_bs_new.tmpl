@@ -17,6 +17,7 @@
 #pass
 #end try
 #end for
+
 #if nbBL>1
     <ul class="baselayers list-group">
 #if $getVar('bpLayer','Untitled') != "Untitled"
@@ -58,11 +59,11 @@
 #else
 #set setM=[]
 #end if
+
 #for i in range(0,len(a1))
-#if $i>=1 and i<=2
+#if $i>=1 and i<=3
 #if $setM.count($a1[$i])
 $Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $conf["mm"]["bmName"]+" "+$b1[$i],"l": $a1[$i],"lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))})
-
 #set lcount=$lcount+1
 #end if
 #else

@@ -5,11 +5,11 @@
 #set pprefix=""
 #end try
 #if $elem[$i].keys().count("children") > 0 
-    <li class="list-group-item"><input type="checkbox" /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$elem[$i]["text"].decode('raw_unicode_escape') </label>
+    <li class="list-group-item"><input type="checkbox" /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$elem[$i]["text"].decode('raw_unicode_escape').replace("-_-"," ") </label>
     	<ul class="list-group tree">
 #for k in range(0,len($elem[$i]["children"]))
 #if $elem[$i]["children"][$k].keys().count("children") > 0
-    <li class="list-group-item"><input type="checkbox" /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$elem[$i]["children"][$k]["text"].decode('raw_unicode_escape') </label>
+    <li class="list-group-item"><input type="checkbox" /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$elem[$i]["children"][$k]["text"].decode('raw_unicode_escape').replace("-_-"," ") </label>
     	<ul class="list-group tree">
 #for mm in range(0,len($elem[$i]["children"][$k]["children"]))
 #if $elem[$i]["children"][$k]["children"][$mm].has_key("mmType")

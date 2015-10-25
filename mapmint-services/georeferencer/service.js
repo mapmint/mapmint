@@ -30,12 +30,15 @@ function georeference(conf,inputs,outputs){
     var inputs0={
 	"layer":{"value": conf["senv"]["mmGeoDSO"]}	
     }
-    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'georeferencer.copyLayerFile');
-    alert("GCPs",inputs["gcp"]["length"]);
+    var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"],'georeferencer.copyLayerFile');
+    alert("GCPs",inputs["gcp"]["value"].length);
+    for(i in inputs["gcp"])
+	alert(i+" = "+inputs["gcp"][i]);
+    
     for(i=0;i<parseInt(inputs["gcp"]["length"]);i++)
 	alert("GCPs",inputs["gcp"]["value_"+i]);
-    var myExecuteResult=myProcess.Execute(inputs0,myOutputs);
-    alert("Copy original file into dataPath");
+    var myExecuteResult=myProcess0.Execute(inputs0,myOutputs);
+    alert("Copy original file into dataPath",myOutputs);
 
     /**
      * Add GCPs to the original file and store the result in tmpPath
@@ -43,12 +46,12 @@ function georeference(conf,inputs,outputs){
     var inputs1={
 	"InputDSN": {"dataType":"string","value":conf["senv"]["mmGeoImg"]},
 	"OutputDSN": {"dataType":"string","value":conf["senv"]["mmGeoDSO"]+"_georef"},
-	"gcp": inputs["gcp"],
+	"gcp": {"dataType": "string","value":inputs["gcp"]["value"],"isArray":"true"},
 	"SRS": {"dataType":"string","value": "epsg:4326"}
     };
     var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.Gdal_Translate');
     var myExecuteResult1=myProcess1.Execute(inputs1,myOutputs);
-    alert("Copy original file into dataPath",myExecuteResult1);
+    alert("Add gcps ...",myExecuteResult1);
 
     /**
      * Copy resulting file into dataPath
@@ -81,7 +84,7 @@ function georeference(conf,inputs,outputs){
     }
     var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.Gdal_Warp');
     var myExecuteResult2=myProcess2.Execute(inputs2,myOutputs);
-    alert("Copy original file into dataPath",myExecuteResult2);
+    alert("raster-tools.Gdal_Warp",myExecuteResult2);
 
     /**
      * Copy resulting file into dataPath
@@ -103,14 +106,20 @@ function georeference(conf,inputs,outputs){
     };
     var myProcess3 = new ZOO.Process(conf["main"]["serverAddress"],'datastores.directories.cleanup');
     myExecuteResult0=myProcess3.Execute(inputs3,myOutputs);
-    alert("Copy original file into dataPath",myExecuteResult0);
+    alert("datastores.directories.cleanup",myExecuteResult0);
 
     var inputs4={
 	"dataSource": {"dataType": "string","value": conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/"}
     };
     var myProcess4 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.mmVectorInfo2Map');
     myExecuteResult0=myProcess4.Execute(inputs4,myOutputs);
-    alert("Copy original file into dataPath",myExecuteResult0);
+    alert("vector-tools.mmVectorInfo2Map",myExecuteResult0);
+    var inputs4={
+	"dataStore": {"dataType": "string","value": conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/"}
+    };
+    var myProcess5 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.mmVectorInfo2MapPy');
+    myExecuteResult0=myProcess5.Execute(inputs4,myOutputs);
+    alert("vector-tools.mmVectorInfo2Map",myExecuteResult0);
 
     var inputs5={
 	"dso": {"dataType": "string","value": conf["senv"]["mmGeoDSO"]},
@@ -150,6 +159,7 @@ function cropImage(conf,inputs,outputs){
     var inputs1={
 	"InputDSN": {"dataType":"string","value":myExecuteResult},
 	"OutputDSN": {"dataType":"string","value":inputs["dsot"]["value"]+""},
+	"SRS": {"dataType":"string","value":"EPSG:4326"},
 	"ProjWin": {"dataType": "sting","value": inputs["ProjWin"]["value"]}
     };
     var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.Gdal_Translate');
@@ -179,6 +189,12 @@ function cropImage(conf,inputs,outputs){
     var myProcess4 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.mmVectorInfo2Map');
     myExecuteResult0=myProcess4.Execute(inputs4,myOutputs);
     alert("Copy original file into dataPath",myExecuteResult0);
+    var inputs4={
+	"dataStore": {"dataType": "string","value": conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/"}
+    };
+    var myProcess5 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.mmVectorInfo2MapPy');
+    myExecuteResult0=myProcess5.Execute(inputs4,myOutputs);
+    alert("vector-tools.mmVectorInfo2Map",myExecuteResult0);
 
     var inputs5={
 	"dso": {"dataType": "string","value": conf["senv"]["mmGeoDSO"]},

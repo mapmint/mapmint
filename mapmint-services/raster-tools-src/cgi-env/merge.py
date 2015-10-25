@@ -282,15 +282,25 @@ def Gdal_Merge( conf,inputs,outputs ):
         conf["lenv"]["message"]=zoo._("Unable to fetch any parameters")
         return zoo.SERVICE_FAILED
 
-    # Parse command line arguments.
+    # Parse arguments.
     i = 1
-    if inputs.has_key("OutputDSN"):
+    out_file = conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/"+inputs["iname"]["value"]+".tif"
+    if inputs.has_key("OutputDSN") and inputs["OutputDSN"]["value"]!="NULL":
         out_file = inputs["OutputDSN"]["value"]
     quiet = 1
-    import glob
-    listing = glob.glob(inputs["dir"]["value"]+"/*."+inputs["ext"]["value"])
-    for filename in listing:
-        names.append(filename)
+    if inputs.keys().count("dir") and inputs["dir"]["value"]!="NULL":
+        import glob
+        listing = glob.glob(inputs["dir"]["value"]+"/*."+inputs["ext"]["value"])
+        for filename in listing:
+            names.append(filename)
+    else:
+        import mapscript
+        m=mapscript.mapObj(conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/ds_ows.map")
+        print >> sys.stderr,inputs["dso"]["value"]
+        for i in range(0,len(inputs["dso"]["value"])):
+            l=m.getLayerByName(inputs["dso"]["value"][i])
+            if l is not None:
+                names.append(l.data)
     print >> sys.stderr,out_file
     print >> sys.stderr,str(names)
     

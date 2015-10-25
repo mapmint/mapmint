@@ -26,7 +26,7 @@ var _MMID="MMID=$conf["senv"]["MMID"]";
 #if $m.web.metadata.get("default_minx")
 var original_extent=[$m.web.metadata.get("default_minx"),$m.web.metadata.get("default_miny"),$m.web.metadata.get("default_maxx"),$m.web.metadata.get("default_maxy")];
 #else
-var original_extent=[];
+var original_extent=[-179.9,-89.9,179.9,89.9];
 #end if
 var mmCenter=[0.0,0.0];
 var mmZoom=10;
@@ -96,6 +96,16 @@ var baseLayers={
 
 #set rl=$m.web.metadata.get("rasterLayers").split(',')
 #set vl=$m.web.metadata.get("vectorLayers").split(',')
+#if $m.web.metadata.get("mmPopupList")	
+#set popups=$m.web.metadata.get("mmPopupList").split(',')
+#else
+#set popups=[]
+#end if
+#if $m.web.metadata.get("mmWindowList")	
+#set windows=$m.web.metadata.get("mmWindowList").split(',')
+#else
+#set windows=[]
+#end if
 
 var oLayers={
 #set cnt=0
@@ -105,10 +115,23 @@ var oLayers={
     ,
 #end if
      "$m.getLayer($l).name":{ 
+        "index": $m.getLayer($l).index,
         "ot": $m.getLayer($l).type,
         "type": "#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER#raster#else#vector#end if#",
         "alias": #if $m.getLayer($l).metadata.get('ows_title')!=""#"$m.getLayer($l).metadata.get('ows_title')"#else#"$m.getLayer($l).name"#end if#,
+	"click": $(str(windows.count($m.getLayer($l).name)>0).lower()),
+	"over": $(str(popups.count($m.getLayer($l).name)>0).lower()),
+#if $m.getLayer($l).metadata.get("mmSteps") is not None
+#set steps=$m.getLayer($l).metadata.get("mmSteps").split(',')
+        "maps": [
+#for i in range(0,len(steps))
+       	  "$conf["main"]["dataPath"]/public_maps/timeline_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)_step$(i).map",
+#end for
+	],
+     	"map": "$conf["main"]["dataPath"]/public_maps/timeline_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)_step0.map",
+#else
      	"map": "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($m.getLayer($l).metadata.get('mmFilterField') or $m.getLayer($l).metadata.get('mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map",
+#end if
 	"search": "$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map",
 	"dataType": #if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER or $m.getLayer($l).type==$mapscript.MS_LAYER_TILEINDEX#"raster"#else##if $m.getLayer($l).type==$mapscript.MS_LAYER_POINT#"point"#else##if $m.getLayer($l).type==$mapscript.MS_LAYER_LINE#"line"#else#"polygon"#end if##end if##end if#,
 	"display": #if vl.count($m.getLayer($l).name)>0#"vector"#else#"raster"#end if#,
@@ -141,17 +164,21 @@ var oLayers={
 #set tmp=$m.getLayer($l).metadata.get('mmGFIFieldsWidth').split(",")
 #set cnt=0
 #for i in tmp
+#if i!=""
 #set cnt+=float(i)
+#end if
 #end for
 #set proplist=[]
 #for i in tmp
+#if i!=""
 #set $proplist+=[float(float(i)*100)/float(cnt)]
+#end if
 #end for
         	"propsizes": $json.dumps($proplist),
 #end if
 #try
-#if $m.getLayer($l).metadata.get('mmAliasFieldsAliases') is not None
-        	"aliases": $json.dumps($m.getLayer($l).metadata.get('mmAliasFieldsAliases').split(",")),
+#if $m.getLayer($l).metadata.get('mmGFIFieldsAliases') is not None
+        	"aliases": $json.dumps($m.getLayer($l).metadata.get('mmGFIFieldsAliases').split(",")),
 #else
 #if $m.getLayer($l).metadata.get('mmGFIFields') is not None
             	"aliases": $json.dumps($m.getLayer($l).metadata.get('mmGFIFields').split(",")),
