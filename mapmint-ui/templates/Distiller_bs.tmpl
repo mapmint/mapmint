@@ -380,6 +380,18 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection_bs.html",s
 </div>
 </script>
 
+<script type="template/text" id="dataSource_srs_template">
+<span class="col-sm-2">$zoo._("SRS:") [srs]</span>
+<form class="form-inline pull-right">
+<label class="control-label">$zoo._("Encoding:")</label>
+<div class="input-group">
+  <input class="form-control" name="encoding" type="text" placeholder="$zoo._("Encoding")" value="[encoding]" />
+  <span class="input-group-btn">
+    <button class="btn btn-default" type="button">$zoo._("Set")</button>
+  </span>
+</div>
+</form>
+</script>
 #end def
 
 #def tfooter

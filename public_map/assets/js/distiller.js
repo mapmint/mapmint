@@ -422,9 +422,18 @@ define([
 
     function displayVector(data,param,dsid,datasource){
 	console.log(data);
-	$("#DS_"+dsid+"_"+datasource).find(".panel-body").first().html('<div class="col-md-12"><table id="DS_table_'+dsid+'_'+datasource+'" ></table></div>')
+	var regs=[
+	    new RegExp("\\[srs\\]","g"),
+	    new RegExp("\\[encoding\\]","g")
+	];
+	$("#DS_"+dsid+"_"+datasource).find(".panel-body").first().html('<div class="col-md-12">'+$("#dataSource_srs_template")[0].innerHTML.replace(regs[0],data.datasource.srs).replace(regs[1],data.datasource.encoding)+'</h4> <table id="DS_table_'+dsid+'_'+datasource+'" ></table></div>')
 	if(!data.datasource.fields.field.length)
 	    data.datasource.fields.field=[data.datasource.fields.field];
+	var celem=$("#DS_"+dsid+"_"+datasource).find(".panel-body").find("input[name=encoding]").next().children().first();
+	celem.off('click');
+	celem.click(function(){
+	    $('#DS_table_'+dsid+'_'+datasource).dataTable().fnDraw();
+	});
 	var lcolumns=[];
 	for(var i in data.datasource.fields.field){
 	    console.log(data.datasource.fields.field);
@@ -484,6 +493,7 @@ define([
 			{"identifier":"limit","value":llimit[1],"dataType":"integer"},
 			{"identifier":"sortorder","value":llimit[3],"dataType":"string"},
 			{"identifier":"sortname","value":(lcolumns[llimit[2]].data),"dataType":"string"},
+			{"identifier":"encoding","value":$("#DS_"+dsid+"_"+datasource).find(".panel-body").find("input[name=encoding]").val(),"dataType":"string"}
 		    ],
 		    dataOutputs: [
 			{"identifier":"Result","mimeType":"text/xml","type":"raw"}
@@ -1668,7 +1678,7 @@ define([
 		e.preventDefault();
 		console.log(geometryType);
 
-		var initial=!$("#DS_"+dsid+"_"+datasource).find(".panel-body").first().find('form').length;
+		var initial=!$("#DS_"+dsid+"_"+datasource).find(".panel-body").first().find('#vectorProcessing').length;
 
 		if(initial){
 		    $("#DS_"+dsid+"_"+datasource).find(".panel-body").first().html("");
@@ -1920,7 +1930,7 @@ define([
 		{"identifier":"Result","type":"raw"},
 	    ],
 	    success: function(data){
-		if(!data.datasource.origin){
+		if(data.datasource.size && !data.datasource.origin){
 		    $("#DS_"+dsid+"_"+datasource).find(".panel-heading").first().find("button,a").each(function(){
 			if($(this).attr("data-mmaction")=="georeference"){
 			    $(this).removeClass("hide");
