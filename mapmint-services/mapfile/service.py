@@ -4265,6 +4265,7 @@ def addGridToMap(conf,inputs,outputs):
    "mmmaxArcs" "25"
    "mmmaxInterval" "25"
    "mmmaxSubdivide" "2"
+   "ows_srs" "EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914"
  END
  TYPE LINE
  STATUS ON
