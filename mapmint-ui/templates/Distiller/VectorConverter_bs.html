@@ -5,15 +5,15 @@
     <legend>$zoo._("Source")</legend>
     <input disabled="true" type="hidden" id="dst_in" value=""/>
     <input type="hidden" id="dso_in1" value=""/>
-    <input disabled="true" type="text" id="dso_in" value=""/>
+    <input disabled="true" type="text" class="form-control" id="dso_in" value=""/>
   #import sqlite_module as sql
   #set v="SELECT code as id,name, fav from spatial_ref_sys where fav order by name"
   #set t=sql.request($conf,v)
     <label for="chk1">$zoo._("SRS:")</label>
     <input type="checkbox" id="chk1" onclick="if(this.checked) this.nextSibling.nextSibling.style.display='inline';else this.nextSibling.nextSibling.style.display='none';"/>
-    <select id="s_srs" style="display:none">
+    <select id="s_srs" class="form-control" style="display:none">
     #for i in $t
-      <option value="$i[0]">$i[1]</option>
+      <option value="$i[0].lower()">$i[1]</option>
     #end for
     </select>
   </fieldset>
@@ -26,7 +26,7 @@
 #set elements=eval($outputs["Result"]["value"])
     <div>
       <label for="tdso">$zoo._("Datastore:")</label>
-      <select id="tdso" onchange="var hasVal=false;for(var i=this.selectedIndex;i>=0;i--) if(this.options[i].value=='PostGIS') {hasVal=true;var opt=\$('#tdso_format')[0].options;for(var j=0;j<opt.length;j++) {if(opt[j].value!='PostgreSQL') opt[j].disabled=true;};\$('#tdso_format').val('PostgreSQL');\$('#tdso_format').attr('disabled', true);}; if(!hasVal) {var opt=\$('#tdso_format')[0].options;for(var j=0;j<opt.length;j++){if(opt[j].value=='PostgreSQL') opt[j].disabled=true; else opt[j].disabled=false;};\$('#tdso_format').removeAttr('disabled');\$('#tdso_format').val('ESRI Shapefile');}">
+      <select id="tdso"  class="form-control" onchange="var hasVal=false;for(var i=this.selectedIndex;i>=0;i--) if(this.options[i].value=='PostGIS') {hasVal=true;var opt=\$('#tdso_format')[0].options;for(var j=0;j<opt.length;j++) {if(opt[j].value!='PostgreSQL') opt[j].disabled=true;};\$('#tdso_format').val('PostgreSQL');\$('#tdso_format').attr('disabled', true);}; if(!hasVal) {var opt=\$('#tdso_format')[0].options;for(var j=0;j<opt.length;j++){if(opt[j].value=='PostgreSQL') opt[j].disabled=true; else opt[j].disabled=false;};\$('#tdso_format').removeAttr('disabled');\$('#tdso_format').val('ESRI Shapefile');}">
 #for ij in $elements
 #if $ij!="WFS"
 	<option disabled="true" style="font-weight: bold;color: #111">$ij</option>
@@ -41,18 +41,18 @@
     </div>
     <div>
       <label for="out_name">$zoo._("Datasource Name:")</label>
-      <input type="text" id="out_name" value="new_layer"/>
+      <input type="text" id="out_name" class="form-control" value="new_layer"/>
     </div>
     <div>
       <label for="tdso_chk_srs">SRS:</label>
       <input type="checkbox" id="tdso_chk_srs" onclick="\$(this).next().css({'display':(this.checked?'inline':'none')});"/>
-      <select id="tdso_srs" style="display: none;">
+      <select  class="form-control" id="tdso_srs" style="display: none;">
 #for i in $t
 	<option value="$i[0]">$i[1]</option>
 #end for
       </select>
       <label for="tdso_format">$zoo._("Format:")</label>
-      <select id="tdso_format">
+      <select id="tdso_format" class="form-control">
 #import osgeo.ogr as ogr
 #for iDriver in range(ogr.GetDriverCount()):
 	<option>$ogr.GetDriver(iDriver).GetName()</option>
@@ -66,11 +66,11 @@
     <div>
       <fieldset>
       <legend>$zoo._("Simplify") <input id="simplify_chk" type="checkbox" onclick="\$(this).parent().next().css({'display':(this.checked?'inline':'none')});"/></legend>
-      <input type="text" id="simplify" value="" style="display:none" />
+      <input type="text" class="form-control" id="simplify" value="" style="display:none" />
       </fieldset>
       <fieldset>
       <legend>$zoo._("SQL") <input id="sql_chk" type="checkbox" onclick="\$(this).parent().next().css({'display':(this.checked?'inline':'none')});"/></legend>
-      <textarea id="sql" style="width:470px;display:none;">SELECT * FROM layer</textarea>
+      <textarea id="sql" class="form-control" style="width:470px;display:none;">SELECT * FROM layer</textarea>
       </fieldset>
     </div>
   </fieldset>

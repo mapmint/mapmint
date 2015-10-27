@@ -3286,9 +3286,10 @@ def setMapLayerProperties(conf,inputs,outputs):
         l.metadata.set("mmSpatialQueryType",inputs["sqf"]["value"])
     else:
         l.metadata.set("mmSpatialQueryType",inputs["sqt"]["value"])
-    l.metadata.set("ows_abstract",urllib.unquote(inputs["ab"]["value"]))
-    l.metadata.set("ows_keywordlist",urllib.unquote(inputs["kl"]["value"]))
-    l.metadata.set("ows_fees",urllib.unquote(inputs["f"]["value"]))
+    for a in ["ab","kl","f"]:
+        if inputs[a].keys().count("value")>0:
+            l.metadata.set("ows_abstract",urllib.unquote(inputs[a]["value"]))
+            
     if inputs["q"]["value"]=="true":
         i=0
         l.header=conf["main"]["dataPath"]+"/templates/"+l.name+"_"+inputs["map"]["value"]+"_header.html"

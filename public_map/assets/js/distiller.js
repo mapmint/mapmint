@@ -700,6 +700,7 @@ define([
     }
     
     function runConversion(elem){
+	try{
 	var myLocation=elem.parent();
 	var inputs=[];
 	var checkboxes={
@@ -783,7 +784,9 @@ define([
 		}).show();
 	    }
 	});
-	
+	}catch(e){
+	    console.log(e);
+	}	
     }
 
     function deleteDatastore(elem){

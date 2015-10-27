@@ -139,7 +139,7 @@ function convert(conf,inputs,outputs){
 	alert(i+" => "+inputs3[i]["value"]);
     }
   var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
-  var myFinalOutputs= {"Result": { "type": 'ResponseDocument', "dataType": "string" }};
+  var myFinalOutputs= {"Result": { "type": 'RawDataOutput', "dataType": "string" }};
   var myFinalResult=myProcess2.Execute(inputs3,myFinalOutputs);
   alert(myFinalResult);
   /**
