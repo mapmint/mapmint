@@ -269,7 +269,7 @@ define([
     /** 
      * 
      */
-    function loadMap(zoo,val){
+    function loadMap(zoo,val,func){
 	var inputs=[];
 	var names=["map","mapOrig"];
 	for(var i=0;i<2;i++)
@@ -278,30 +278,35 @@ define([
 		"value": val[i],
 		"dataType": "string"
 	    });
-	zoo.execute({
-	    identifier: "mapfile.saveMap",
-	    type: "POST",
-	    dataInputs: inputs,
-	    dataOutputs: [
-		{"identifier":"Result","type":"raw"},
-	    ],
-	    success: function(data){
-		console.log("SUCCESS");
-		console.log(data);
-		$(".notifications").notify({
-		    message: { text: data },
-		    type: 'success',
-		}).show();
-		document.location.reload(false);
-	    },
-	    error: function(data){
-		console.log("ERROR");
-		$(".notifications").notify({
-		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
-		    type: 'danger',
-		}).show();
-	    }
-	});
+	(function(func){
+	    zoo.execute({
+		identifier: "mapfile.saveMap",
+		type: "POST",
+		dataInputs: inputs,
+		dataOutputs: [
+		    {"identifier":"Result","type":"raw"},
+		],
+		success: function(data){
+		    console.log("SUCCESS");
+		    console.log(data);
+		    $(".notifications").notify({
+			message: { text: data },
+			type: 'success',
+		    }).show();
+		    if(func)
+			func();
+		    else
+			document.location.reload(false);
+		},
+		error: function(data){
+		    console.log("ERROR");
+		    $(".notifications").notify({
+			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			type: 'danger',
+		    }).show();
+		}
+	    });
+	})(func);
     }
 
     /**

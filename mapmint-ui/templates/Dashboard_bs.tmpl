@@ -167,7 +167,7 @@ MapMint: Dashboard
                                 </a>
                             </div>
                             <!-- /.list-group -->
-                            <a href="#" class="btn btn-default btn-block">$zoo._("Launch the Distiller")</a>
+                            <a href="./Distiller_bs#" class="btn btn-default btn-block">$zoo._("Launch the Distiller")</a>
                         </div>
                         <a  href="#dashOverviewBody" data-toggle="collapse">
                             <div class="panel-footer">
@@ -237,7 +237,8 @@ $e
                                     <div class="chat-body clearfix">
                                         <div class="header">
                                             <strong class="primary-font">$mm.web.metadata.get('ows_title')</strong>
-                                            <a class="pull-right text-muted" href="#">
+#set cname=$nmaps[i]["value"].replace(".map","").replace("project_","")
+                                            <a class="pull-right text-muted" href="#" onclick="try{app.adminBasic.loadMap(app.zoo,['$cname','$cname'],function(){document.location='./Manager_bs'});}catch(e){console.log(e);}">
                                                 <i class="glyphicon glyphicon-pencil fa-fw"></i>
                                             </a>
                                         </div>
@@ -246,7 +247,7 @@ $e
                                         </p>
                                         <div class="footer">
                                             <small class="text-muted">
-					    	<i class="fa fa-user fa-fw"></i> Jack Sparrow
+					    	<i class="fa fa-user fa-fw"></i>#if $mm.web.metadata.get('mmEditor') is not None#$mm.web.metadata.get('mmEditor')#else#$zoo._("Unknown")#end if#
 					    </small>
                                             <small class="pull-right text-muted">
                                                 <i class="fa fa-clock-o fa-fw"></i> $nmaps[$i]["mTime"]
@@ -256,7 +257,7 @@ $e
                                 </li>
 #end for
                             </ul>
-                            <a href="#" class="btn btn-default btn-block">$zoo._("Launch the Distiller")</a>
+                            <a href="./Manager_bs#" class="btn btn-default btn-block">$zoo._("Launch the Manager") ($conf["senv"]["last_map"])</a>
                         </div>
                         <a href="#dashManagerBody" data-toggle="collapse">
                             <div class="panel-footer">

@@ -995,7 +995,9 @@ define([
 
     // Return public methods
     return {
-        initialize: initialize
+        initialize: initialize,
+	adminBasic: adminBasic,
+	zoo: zoo
     };
 
 
