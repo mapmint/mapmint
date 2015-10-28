@@ -119,9 +119,12 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",sear
     <label class="col-sm-3 control-label">$zoo._("Layer Switcher Position")</label>
     <div class="col-sm-3 range">
       <select name="layerswitcherPosition" class="form-control">
-#set fonts=[zoo._("Left"),zoo._("Right")]
+#set fonts=[
+	[zoo._("Left"),"Left"],
+	[zoo._("Right"),"Right"]
+	]
 #for i in fonts		    
-	<option value="${i}" #if $m.web.metadata.get("mmLSPosition")==$i#selected="selected"#end if#>${i}</option>
+	<option value="${i[1]}" #if $m.web.metadata.get("mmLSPosition")==$i#selected="selected"#end if#>${i[0]}</option>
 #end for
       </select>	    
     </div>

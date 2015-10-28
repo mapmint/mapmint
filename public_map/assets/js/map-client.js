@@ -729,15 +729,47 @@ define([
 		if(oLayers[layerName].maps)
 		    lmapfile=oLayers[layerName].map;
 		var layer;
-		if(layerName.indexOf("grid_")===-1)
-		    layer=new ol.layer.Tile({
-			visible: oLayers[layerName]["activated"],
-			source: new ol.source.TileWMS({
-			    url: msUrl+"?map="+lmapfile,
-			    params: {'LAYERS': layerName, 'TILED': true},
-			    serverType: 'mapserver'
-			})
-		    });
+		if(layerName.indexOf("grid_")===-1){
+		    if(!oLayers[layerName].labels)
+			layer=new ol.layer.Tile({
+			    visible: oLayers[layerName]["activated"],
+			    source: new ol.source.TileWMS({
+				url: msUrl+"?map="+lmapfile,
+				params: {'LAYERS': layerName, 'TILED': true},
+				serverType: 'mapserver'
+			    })
+			});
+		    else{
+			layer=new ol.layer.Group({
+			    visible: oLayers[layerName]["activated"],
+			    layers: [
+				new ol.layer.Tile({
+				    source: new ol.source.TileWMS({
+					url: msUrl+"?map="+lmapfile,
+					params: {'LAYERS': layerName, 'TILED': true},
+					serverType: 'mapserver'
+				    })
+				}),
+				/*new ol.layer.Image({
+				    source: new ol.source.ImageWMS({
+					ratio: 1,
+					url: module.config().msUrl+"?map="+layerLabels[name],
+					params: {'LAYERS': "Result","format":"image/png"},
+					serverType: ('mapserver')
+				    })
+				})*/
+				new ol.layer.Tile({
+				    source: new ol.source.TileWMS({
+					url: msUrl+"?map="+oLayers[layerName].labels,
+					params: {'LAYERS': "Result", 'TILED': true},
+					serverType: 'mapserver'
+				    })
+				})
+			    ]
+			});
+		    }
+
+		}
 		else
 		    layer=new ol.layer.Image({
 			visible: oLayers[layerName]["activated"],

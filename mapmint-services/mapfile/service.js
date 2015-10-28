@@ -105,7 +105,7 @@ function saveLabelJS(conf,inputs,outputs){
 		    inputs2["omap"]={"type": "string","value": omap};
 		    inputs2["layer"]["value"]=lname;
 		    var myOutputs2= {"Result": { type: 'RawDataOutput'}};
-		    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.addLabelLayer');
+		    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.addLabelLayer0');
 		    var myExecuteResult2=myProcess2.Execute(inputs2,myOutputs2,"Cookie: MMID="+conf["senv"]["MMID"]);
 		    alert(myExecuteResult2);
 		    

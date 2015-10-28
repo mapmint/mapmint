@@ -145,9 +145,13 @@ define([
     var mmenu=[[],[],[],[]];
     var legendSteps={};
     var colorRamps={};
+    var layerLabels={};
     function addToLayerSwitcher(oid,data,level){
 	for(var id in data){
-	    if(id=="steps"){
+	    if(id=="labels"){
+		layerLabels[data["layer"]]=data[id];
+	    }
+	    else if(id=="steps"){
 		legendSteps[data["layer"]]=data[id];
 	    }
 	    else if(id=="tiled"){
@@ -431,6 +435,10 @@ define([
 	    }
 	}
 	console.log("/loadLabelTab !");
+	if(ldata.Style.label.field)
+	    rootLocation.find("input[name=displayLabels]").prop("checked",true).change();
+	if(ldata.Style.label.bufferSize)
+	    rootLocation.find("input[name=displayBufferLabels]").prop("checked",true);
 	rootLocation.find("button").last().off("click");
 	rootLocation.find("button").last().click(function(e){
 	    try{
@@ -529,6 +537,10 @@ define([
 		    message: { text: data },
 		    type: 'success',
 		}).show();
+		console.log(ldata);
+		if(ldata.type==2){
+		    document.location.reload(false);
+		}
 		redrawLayer(layer);
 	    },
 	    error: function(data){
@@ -1508,16 +1520,22 @@ define([
 		    $(".li-layer").removeClass("active");
 		    $(e.currentTarget).addClass("active");
 		    selectedLayer=$(e.currentTarget).children().first().children().first().val();
-		    //$('body, #context-menu > ul > li > a').on('click', function (e) {$(".tree li").find(".active").removeClass('active');});
-		    console.log(selectedLayer);
 		    return false;
 		});
 		$(".mm-menu").each(function(){
-		    //console.log($(this));
 		    $(this).on('click',function(){
 			contextualMenu[$(this).attr("id").replace(/mmm_/,"")]["run"](selectedLayer);
 		    });
 		});
+
+		$(".layer-cmenu").each(function(){
+		    $(this).on('click',function(a){
+			$(".li-layer").removeClass("active");
+			$(this).parent().parent().parent().addClass("active");
+			selectedLayer=$(this).parent().parent().children().first().val();
+		    });
+		});
+
 
 		loadLayersFromWMS();
 	    },
@@ -1574,15 +1592,46 @@ define([
 		if(colorRamps[name])
 		    lmapfile="color_ramp_"+module.config().pmapfile+"_"+name+".map";
 		var layer;
-		if(name.indexOf("grid_")==-1)
-		    layer=new ol.layer.Tile({
-			visible: false,
-			source: new ol.source.TileWMS({
-			    url: module.config().msUrl+"?map="+module.config().dataPath+"/maps/"+lmapfile,
-			    params: {'LAYERS': name, 'TILED': true},
-			    serverType: 'mapserver'
-			})
-		    });
+		if(name.indexOf("grid_")==-1){
+		    if(!layerLabels[name])
+			layer=new ol.layer.Tile({
+			    visible: false,
+			    source: new ol.source.TileWMS({
+				url: module.config().msUrl+"?map="+module.config().dataPath+"/maps/"+lmapfile,
+				params: {'LAYERS': name, 'TILED': true},
+				serverType: 'mapserver'
+			    })
+			});
+		    else{
+			layer=new ol.layer.Group({
+			    visible: false,
+			    layers: [
+				new ol.layer.Tile({
+				    source: new ol.source.TileWMS({
+					url: module.config().msUrl+"?map="+module.config().dataPath+"/maps/"+lmapfile,
+					params: {'LAYERS': name, 'TILED': true},
+					serverType: 'mapserver'
+				    })
+				}),
+				/*new ol.layer.Image({
+				    source: new ol.source.ImageWMS({
+					ratio: 1,
+					url: module.config().msUrl+"?map="+layerLabels[name],
+					params: {'LAYERS': "Result","format":"image/png"},
+					serverType: ('mapserver')
+				    })
+				})*/
+				new ol.layer.Tile({
+				    source: new ol.source.TileWMS({
+					url: module.config().msUrl+"?map="+layerLabels[name],
+					params: {'LAYERS': "Result", 'TILED': true},
+					serverType: 'mapserver'
+				    })
+				})
+			    ]
+			});
+		    }
+		}
 		else
 		    layer=new ol.layer.Image({
 			visible: false,

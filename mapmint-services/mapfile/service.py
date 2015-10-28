@@ -677,6 +677,8 @@ def getGroupList(conf,mapfile):
                     dict["steps"]=j.metadata.get('mmSteps').split(',')
                 if j.metadata.get('mmTiled') is not None and j.metadata.get('mmTiled')!="":
                     dict["tiled"]=j.metadata.get('mmTiled')
+                if j.metadata.get('mmLabelsMap') is not None and j.metadata.get('mmLabelsMap')!="":
+                    dict["labels"]=j.metadata.get('mmLabelsMap')
                 addLayerToThem(resGroups,g,dict);
 
     return resGroups
@@ -1087,9 +1089,16 @@ def createLegend0(conf,inputs,outputs):
     label=None
     litem=None
     try:
-        labelLayer=myLayer
-        label=myLayer.getClass(0).getLabel(0)
-        litem=myLayer.labelitem
+        if myLayer.metadata.get("mmLabelsMap") is not None:
+            m00=mapscript.mapObj(myLayer.metadata.get("mmLabelsMap"))
+            myLayer0=m00.getLayerByName("Result")
+            label=myLayer0.getClass(0).getLabel(0)
+            litem=myLayer0.labelitem
+            labelLayer=myLayer0
+        else:
+            labelLayer=myLayer
+            label=myLayer.getClass(0).getLabel(0)
+            litem=myLayer.labelitem
     except:
         try:
             labelLayer=m.getLayerByName(inputs["layer"]["value"]+"_mmlabel").getClass(0)
@@ -3160,6 +3169,33 @@ def removeLabelLayer(conf,inputs,outputs):
             m.removeLayer(i)
         i-=1
     m.save(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
+    outputs["Result"]["value"]=zoo._("Map saved")
+    return zoo.SERVICE_SUCCEEDED
+
+
+def addLabelLayer0(conf,inputs,outputs):
+    import mapscript
+    m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["omap"]["value"]+".map")
+    i=m.numlayers-1
+    while i >= 0:
+	    l0=m.getLayer(i)
+	    if l0.name==inputs["layer"]["value"]+"_mmlabel":
+		    m.removeLayer(i)
+	    i-=1
+    m1=mapscript.mapObj(inputs["map"]["value"])
+    l1=m1.getLayerByName("Result")
+    l1.getClass(0).removeStyle(0)
+    l1.setMetaData("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
+    m1.save(inputs["map"]["value"])
+    f=open(inputs["map"]["value"],"r")
+    tmpStr=f.read().replace('MAP\n  EXTENT','MAP\n FONTSET "'+conf["main"]["dataPath"]+'/fonts/list.txt"\n  EXTENT')
+    f.close()
+    f1=open(inputs["map"]["value"],"w")
+    f1.write(tmpStr)
+    f1.close()
+    l=m.getLayerByName(inputs["layer"]["value"])
+    l.metadata.set("mmLabelsMap",inputs["map"]["value"])
+    m.save(conf["main"]["dataPath"]+"/maps/project_"+inputs["omap"]["value"]+".map")
     outputs["Result"]["value"]=zoo._("Map saved")
     return zoo.SERVICE_SUCCEEDED
 

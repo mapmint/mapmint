@@ -121,6 +121,9 @@ var oLayers={
         "alias": #if $m.getLayer($l).metadata.get('ows_title')!=""#"$m.getLayer($l).metadata.get('ows_title')"#else#"$m.getLayer($l).name"#end if#,
 	"click": $(str(windows.count($m.getLayer($l).name)>0).lower()),
 	"over": $(str(popups.count($m.getLayer($l).name)>0).lower()),
+#if $m.getLayer($l).metadata.get("mmLabelsMap") is not None
+	"labels": "$m.getLayer($l).metadata.get("mmLabelsMap")",
+#end if
 #if $m.getLayer($l).metadata.get("mmSteps") is not None
 #set steps=$m.getLayer($l).metadata.get("mmSteps").split(',')
         "maps": [
