@@ -380,7 +380,20 @@ define([
 		gmap.setZoom(mmview.getZoom());
 	    });
 	}
-	
+
+	if(baseLayers["myBaseLayers"] && baseLayers["myBaseLayers"].length>=1){
+	    for(var j=0;j<baseLayers["myBaseLayers"].length;j++){
+		layer=new ol.layer.Tile({
+		    visible: false,
+		    source: new ol.source.TileWMS({
+			url: cacheUrl,
+			params: {'LAYERS': baseLayers["myBaseLayers"][j], 'TILED': true},
+			serverType: 'mapserver'
+		    })
+		});
+		myBaseLayers.push(layer);
+	    }
+	}	
     };
 
     var finalizeBaseLayers=function(){
@@ -1201,6 +1214,47 @@ define([
 	});
 	map.addLayer(selectLayer);
 	myToolsLayers.push(selectLayer);
+
+	/*vstyles=[new ol.style.Style({
+	    image: new ol.style.Icon({
+		anchor: [12, 0.5],
+		size: [24, 24],
+		scale: 0.7,
+		anchorXUnits: 'pixel',
+		anchorYUnits: 'fraction',
+		src: 
+            })
+	})];*/
+
+	vstyles=[new ol.style.Style({
+	    image: new ol.style.RegularShape({
+		fill: new ol.style.Fill({color: "#FF0000"}),
+		stroke: new ol.style.Stroke({color: "#FF0000",width: 2}),
+		points: 4,
+		radius: 10,
+		radius2: 0,
+		angle: 0
+	    })
+	})];
+
+	vstylesSelected=[new ol.style.Style({
+	    image: new ol.style.RegularShape({
+		fill: new ol.style.Fill({color: "#FF0000"}),
+		stroke: new ol.style.Stroke({color: "#FF0000",width: 2}),
+		points: 4,
+		radius: 10,
+		radius2: 0,
+		angle: 0
+	    })
+	})];
+
+	features0 = new ol.Collection();
+	featureOverlay0 = new ol.layer.Vector({
+	    source: new ol.source.Vector({features: features0}),
+	    style: vstyles
+	});
+	featureOverlay0.setMap(map);
+	myToolsLayers.push(featureOverlay0);
 
 	myMMDataTableObject = new MMDataTable({"selectLayer": selectLayer, "zook": zoo});
 
@@ -2629,6 +2683,69 @@ define([
 	return clayer;
     }
 
+    // @see https://groups.google.com/forum/#!topic/ol3-dev/a7jcO3LPGac
+    svgToImage = function(src, width, height) {
+	var canvas = $('<canvas/>')[0],
+	    context,
+	    svgImage = new Image(),
+	    image = new Image();
+	
+	canvas.height = height;
+	canvas.width = width;
+	
+	context = canvas.getContext('2d');
+	
+	svgImage.src = src;
+	context.drawImage(svgImage, 0, 0, width, height);
+	image.src = canvas.toDataURL();
+	return image;
+    }
+
+    var features0,featureOverlay0;
+    var draw0;
+
+    function addInteraction() {
+	var closure=arguments[0];
+	var hasDraw0=true;
+	//if(!draw0){
+	    draw0 = new ol.interaction.Draw({
+		features: features0,
+		type: /** @type {ol.geom.GeometryType} */ ('Point'),
+		style: vstyles
+	    });
+	    hasDraw0=false;
+	//}
+	map.addInteraction(draw0);
+	//if(!hasDraw0)
+	//draw0.off('drawend');
+	    draw0.on('drawend',function(evt) {
+		var coords=ol.proj.transform(evt.feature.getGeometry().getCoordinates(),map.getView().getProjection(),'EPSG:4326');
+		//service=WPS&version=1.0.0&request=Execute&Identifier=routing.reverseGeocode&DataInputs=x=-17.48072498333403;y=14.721039482797247&RawDataOutput=Result&language=en-US&_=1446079261587
+		zoo.execute({
+		    identifier: "routing.reverseGeocode",
+		    dataInputs: [
+			{"identifier":"x","value":coords[0],"dataType":"float"},
+			{"identifier":"y","value":coords[1],"dataType":"float"}
+		    ],
+		    dataOutputs: [
+			{"identifier":"Result","type":"raw"},
+		    ],
+		    type: 'POST',
+		    success: function(data){
+			console.log("SUCCESS");
+			console.log(closure.parent().prev());
+			closure.parent().prev().val(data.address);
+		    },
+		    error: function(data){
+			console.log("ERRROR");
+			console.log(data);
+		    }
+		});
+		map.removeInteraction(draw0);
+		//evt.stopPropagation();
+	    });
+    }
+
     var printDocument = function() {
 	console.log("run print");
 	$("#print-loader").show();
@@ -2749,7 +2866,7 @@ define([
     return {
         initialize: initialize,
 	printDocument: printDocument,
-	cgalProcessing: cgalProcessing
+	addInteraction: addInteraction
     };
 
 

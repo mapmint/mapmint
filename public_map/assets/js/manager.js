@@ -1805,6 +1805,10 @@ define([
 		"value": ldata.name,
 		"dataType": "string"
 	    });
+	    if(ldata.datasource.type==1 && ldata.datasource.connection.indexOf("PG:")!==-1)
+		$(".only-pline").show();
+	    else
+		$(".only-pline").hide();
 	    myLocation.find("input[type=text],input[type=checkbox],textarea,select").each(function(){
 		console.log($(this).attr("name"));
 		for(var i in propertiesBindings){

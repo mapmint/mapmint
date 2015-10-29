@@ -756,6 +756,7 @@ define([
 		"dataType": "string"
 	    });
 	}
+
 	console.log(inputs);
 	var myRootLocation=myLocation.parent().parent();
 	myRootLocation.addClass("panel-warning");
@@ -1978,7 +1979,7 @@ define([
 		}else{
 		    $("#DS_"+localDSId).find(".panel").first().removeClass("panel-warning").addClass("panel-default");
 		    if(!data.datasource.layer || !data.datasource.layer.length)
-			data.datasource.layer=[layer];
+			data.datasource.layer=[data.datasource.layer];
 		    $("#DS_"+localDSId).find(".panel-body").first().html("");
 		    var reg0=new RegExp("\\[datastore\\]","g");
 		    var reg1=new RegExp("\\[nb\\]","g");

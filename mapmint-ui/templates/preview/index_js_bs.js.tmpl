@@ -13,6 +13,7 @@ var pmapfile="$conf["main"]["dataPath"]/public_maps/project_$(conf["senv"]["last
 var msUrl="$conf["main"]["mapserverAddress"]";
 var tmpUrl="$conf["main"]["tmpUrl"]";
 var tmpPath="$conf["main"]["tmpPath"]";
+var cacheUrl="$conf["mm"]["mapcacheUrl"]";
 var zooUrl="$conf["main"]["serverAddress"]";
 var pubUrl="$conf["main"]["publicationUrl"]";
 var templatesUrl="$conf["main"]["templatesAddress"]";
@@ -90,7 +91,11 @@ var baseLayers={
 #end for
 #end if
 #if $cnt==0
-"proprietary": {'type':'None'}    
+"proprietary": {'type':'None'}
+#end if
+#if $m.web.metadata.get('mmBProject')
+#set setM=$m.web.metadata.get('mmBProject').split(',')
+,"myBaseLayers": $(json.dumps(setM))
 #end if
 };
 

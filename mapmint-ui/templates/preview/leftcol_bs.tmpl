@@ -150,6 +150,15 @@ $(printWrapper())
 	<li id="laywrap" role="layers" data-toggle="tooltip" data-placement="bottom" title="Legend" class="active">
 	 <a href="#ltree" aria-controls="ltree" role="tab" data-toggle="tab"><i class="mm0-layers mm-layers-layers fa-fw"></i></a>
 	</li>
+
+#if $m.web.metadata.get('mmOT')
+#set f0=$m.web.metadata.get('mmOT').split(',')
+#if $f0.count('Routing')>0
+	<li role="presentation">
+	 <a href="#routing-ui" aria-controls="datasources" role="tab" data-toggle="tab"><i class="fa fa-road"></i></a>
+	</li>
+#end if
+#end if
 	<li role="presentation">
 	 <a href="#datasources" aria-controls="datasources" role="tab" data-toggle="tab"><i class="fa fa-copyright"></i></a>
 	</li>
@@ -168,6 +177,7 @@ $(printWrapper())
 	</div>
        </div>
      </div>
+     $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/routing/display_bs.html",searchList=$searchList))
      <div role="tabpanel" class="tab-pane" id="info">
       <div class="well info-container">
        <div class="padder">
@@ -200,8 +210,7 @@ $(printWrapper())
      </div>
      <div role="tabpanel" class="tab-pane active " id="ltree">
        $(Template(file=$conf["main"]["templatesPath"]+"/preview/layerswitcher_bs.tmpl",searchList=$searchList))
-
-  </div>
+     </div>
 
   <div id="mmcdts" class="text-center">
     <p>&copy; Copyright
