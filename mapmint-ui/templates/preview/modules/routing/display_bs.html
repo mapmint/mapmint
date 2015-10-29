@@ -1,0 +1,56 @@
+#encoding UTF-8
+
+#import zoo
+#if $m.web.metadata.get('mmOT')
+#set f0=$m.web.metadata.get('mmOT').split(',')
+#if $f0.count('Routing')>0
+
+#def printInputGroup($obj)
+      <div class="input-group">
+	<input class="form-control" id="$obj["id"]" placeholder="$obj["placeholder"]" type="text" />
+	<span class="input-group-btn" title="$obj["title"]" rel="tooltip">
+	  <button class="btn btn-default" id="$obj["action"]["name"]"
+      type="button" onclick="app.addInteraction(\$(this));"><i class="fa $obj["action"]["type"]"></i></button>
+	</span>
+      </div>   
+#end def
+      
+<div role="tabpanel" class="tab-pane" id="routing-ui">
+  <div class="well sources-container">
+    <div class="padder">
+      <h5 class="sbt"><i class="fa fa-road"></i> $zoo._("Routing")</h5>
+      <div>
+	$zoo._("Starting point:")
+      </div>
+      $printInputGroup({"id":"start","title":$zoo._("Starting point"),"action":{"name":"setStart","type":"fa-flag"},"placeholder":$zoo._("Type an address")})
+      
+      <div>
+	$zoo._("Destination:")
+      </div>
+      $printInputGroup({"id":"start","title":$zoo._("End point"),"action":{"name":"setEnd","type":"fa-flag-checkered"},"placeholder":$zoo._("Type an address")})
+      
+      <div>
+	<a class="ui-state-default ui-corner-all" href="#" title="$zoo._("Compute route")" onclick="pgrouting(points_layer);">$zoo._("Compute route")</a>	
+    </div>
+
+    
+<!--
+    <div id="etapes">
+
+      <div id="etapes2">
+	<form id="formulaire_etapes" action="#" onsubmit="return false;">
+	$zoo._("Add a step:")
+	<input id="Image1" type="image" src="$conf["main"]["publicationUrl"]/img/zoomin.png" align="absmiddle" height="15" width="15" onclick="routingFormAddPOI();" value="+" />
+	<input id="routingDeletePoi"  type="image" src="$conf["main"]["publicationUrl"]/img/zoomout.png" align="absmiddle" height="15" width="15" onclick="routingFormDeletePOI();" class="hidden" value="-" />
+	</form>
+        <div id="etapes_2">
+        </div>
+      </div>
+    </div>
+-->
+    </div>
+  </div>
+</div>
+
+#end if
+#end if
