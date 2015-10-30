@@ -73,7 +73,9 @@
 #if $i[2].count("varchar")>0 and int($i[2][8:len($i[2])-1])==40
 <input class="form-control" name="$i[1]" id="pg_tuple_$i[1]" type="password" value="" />
 #else
+#if $i[3]!="PRI" and $inputs["type"]["value"]=="insert"
 <input class="form-control" name="$i[1]" id="pg_tuple_$i[1]" value="#if len($tmp1.rows)>0 and $tmp1.rows[0].cell[$j]!="None"#$tmp1.rows[0].cell[$j]#end if#" />
+#end if
 #end if
 #if $i[2]=="date"
 <script>\$("#pg_tuple_$i[1]").datepicker();</script>

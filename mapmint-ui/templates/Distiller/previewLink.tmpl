@@ -1,6 +1,17 @@
 #import mapscript
 #import osgeo.gdal
-#set m=mapscript.mapObj($inputs["dst"]["value"]+"/ds_ows.map")
+#if $inputs["dst"]["value"].count($conf["main"]["dataPath"])>0
+#set mapfile=$inputs["dst"]["value"]+"/ds_ows.map"
+#set m=mapscript.mapObj($mapfile)
+#else
+#for i in $conf["main"]["supportedDbs"].split(',')
+#set tmapfile=$conf["main"]["dataPath"]+"/"+$i+"/"+$inputs["dst"]["value"]+"ds_ows.map"
+#if os.path.isfile($tmapfile)
+#set m=mapscript.mapObj($tmapfile)
+#set mapfile=$tmapfile
+#end if
+#end for
+#end if
 #set l=m.getLayerByName($inputs["dso"]["value"])
 #set tmp=$l.metadata.get("ows_extent")
 #if $tmp is not None
@@ -51,4 +62,4 @@
 #set f="image/png"
 #*set f="image/tiff"*#
 #end if
-$conf["main"]["mapserverAddress"]?map=$inputs["dst"]["value"]/ds_ows.map&service=WMS&version=1.0.0&request=GetMap&srs=epsg:4326&bbox=$p1.x,$p1.y,$p2.x,$p2.y&layers=$inputs["dso"]["value"]&width=$width&height=$height&format=$f
+$conf["main"]["mapserverAddress"]?map=$(mapfile)&service=WMS&version=1.0.0&request=GetMap&srs=epsg:4326&bbox=$p1.x,$p1.y,$p2.x,$p2.y&layers=$inputs["dso"]["value"]&width=$width&height=$height&format=$f
