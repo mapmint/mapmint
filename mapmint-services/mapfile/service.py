@@ -3124,8 +3124,8 @@ def saveLabel(conf,inputs,outputs):
 			pass
 		    print >> sys.stderr,dir(layer.metadata)
 	        except Exception,e:
-		    l.updateFromString("LABEL ANGLE "+angle+" END")
-		    layer.metadata.set("label_angle_field",angle)
+		    l.updateFromString("LABEL ANGLE "+str(angle)+" END")
+		    layer.metadata.set("label_angle_field",str(angle))
             # Set buffer
             l.buffer=int(inputs["bs"]["value"])
             # Set position

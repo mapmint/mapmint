@@ -422,17 +422,18 @@ define([
 
     function displayVector(data,param,dsid,datasource){
 	console.log(data);
+	var ldatasource=datasource.replace(/\./g,"_");
 	var regs=[
 	    new RegExp("\\[srs\\]","g"),
 	    new RegExp("\\[encoding\\]","g")
 	];
-	$("#DS_"+dsid+"_"+datasource).find(".panel-body").first().html('<div class="col-md-12">'+$("#dataSource_srs_template")[0].innerHTML.replace(regs[0],data.datasource.srs).replace(regs[1],data.datasource.encoding)+'</h4> <table id="DS_table_'+dsid+'_'+datasource+'" ></table></div>')
+	$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().html('<div class="col-md-12">'+$("#dataSource_srs_template")[0].innerHTML.replace(regs[0],data.datasource.srs).replace(regs[1],data.datasource.encoding)+'</h4> <table id="DS_table_'+dsid+'_'+ldatasource+'" ></table></div>')
 	if(!data.datasource.fields.field.length)
 	    data.datasource.fields.field=[data.datasource.fields.field];
-	var celem=$("#DS_"+dsid+"_"+datasource).find(".panel-body").find("input[name=encoding]").next().children().first();
+	var celem=$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").find("input[name=encoding]").next().children().first();
 	celem.off('click');
 	celem.click(function(){
-	    $('#DS_table_'+dsid+'_'+datasource).dataTable().fnDraw();
+	    $('#DS_table_'+dsid+'_'+ldatasource).dataTable().fnDraw();
 	});
 	var lcolumns=[];
 	for(var i in data.datasource.fields.field){
@@ -442,7 +443,7 @@ define([
 
 	var cnt=0;
 	var ldata=data;
-	$('#DS_table_'+dsid+'_'+datasource).DataTable( {
+	$('#DS_table_'+dsid+'_'+ldatasource).DataTable( {
 	    data: [],
 	    "dom": 'Zlfrtip',
             "colResize": true,
@@ -493,7 +494,7 @@ define([
 			{"identifier":"limit","value":llimit[1],"dataType":"integer"},
 			{"identifier":"sortorder","value":llimit[3],"dataType":"string"},
 			{"identifier":"sortname","value":(lcolumns[llimit[2]].data),"dataType":"string"},
-			{"identifier":"encoding","value":$("#DS_"+dsid+"_"+datasource).find(".panel-body").find("input[name=encoding]").val(),"dataType":"string"}
+			{"identifier":"encoding","value":$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").find("input[name=encoding]").val(),"dataType":"string"}
 		    ],
 		    dataOutputs: [
 			{"identifier":"Result","mimeType":"text/xml","type":"raw"}
@@ -524,10 +525,10 @@ define([
 		    };
 		    fnCallback(opts);
 
-		    $('#DS_table_'+dsid+'_'+datasource).find(".selected").removeClass("selected");
+		    $('#DS_table_'+dsid+'_'+ldatasource).find(".selected").removeClass("selected");
 		    
 		    if(ldata.datasource.featureCount==0){
-			$('#DS_table_'+dsid+'_'+datasource).DataTable().clear();
+			$('#DS_table_'+dsid+'_'+ldatasource).DataTable().clear();
 		    }
 
 
@@ -1564,18 +1565,19 @@ define([
 	"select": function(data,param,dsid,datasource,geometryType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
+		var ldatasource=datasource.replace(/\./g,"_");
 		e.preventDefault();
-		if(!Datastores["DS_"+dsid+"_"+datasource])
-		    Datastores["DS_"+dsid+"_"+datasource]=(geometryType=="raster"?"raster":"vector");
+		if(!Datastores["DS_"+dsid+"_"+ldatasource])
+		    Datastores["DS_"+dsid+"_"+ldatasource]=(geometryType=="raster"?"raster":"vector");
 		else{
-		    if(Datastores["DS_"+dsid+"_"+datasource]!=geometryType && 
-		       (Datastores["DS_"+dsid+"_"+datasource]=="raster"
+		    if(Datastores["DS_"+dsid+"_"+ldatasource]!=geometryType && 
+		       (Datastores["DS_"+dsid+"_"+ldatasource]=="raster"
 			|| geometryType=="raster"))
-			Datastores["DS_"+dsid+"_"+datasource]="mixed";
+			Datastores["DS_"+dsid+"_"+ldatasource]="mixed";
 		    else
-			Datastores["DS_"+dsid+"_"+datasource]="vector";
+			Datastores["DS_"+dsid+"_"+ldatasource]="vector";
 		}
-		var panelRoot=$("#DS_"+dsid+"_"+datasource).children().children();
+		var panelRoot=$("#DS_"+dsid+"_"+ldatasource).children().children();
 		var panelRoot1=panelRoot.parent().parent().parent().parent();
 		if($(obj).children().first().hasClass('fa-square-o')){
 		    $(obj).children().first().removeClass("fa-square-o").addClass("fa-check-square-o");
@@ -1614,23 +1616,24 @@ define([
 	"privileges": function(data,param,dsid,datasource,geometryType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
-		bindPrivileges(dsid+"_"+datasource,"datasourcePrivileges",param,geometryType,datasource);
+		bindPrivileges(dsid+"_"+datasource.replace(/\./g,"_"),"datasourcePrivileges",param,geometryType,datasource);
 	    });
 	},
 	"preview": function(data,param,dsid,datasource,geometryType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
+		var ldatasource=datasource.replace(/\./g,"_");
 		if($(obj).is("a")){
 		    e.preventDefault();
 		    e.stopPropagation();
 		}
-		if(!DSPreviews["DS_"+dsid+"_"+datasource]){
+		if(!DSPreviews["DS_"+dsid+"_"+ldatasource]){
 		    var tmpPopover=$(obj).popover({
 			html: true,
 			placement: ($(obj).is("a")?'bottom':'left'),
 			trigger: 'click',
 			container: 'body',
-			viewport: { "selector": "#DS_"+dsid+"_"+datasource, "padding": 0 },
+			viewport: { "selector": "#DS_"+dsid+"_"+ldatasource, "padding": 0 },
 			content: function(){console.log("temp"); return '<i class="fa fa-spinner fa-spin"></i>';}
 		    });
 		    $(obj).popover('toggle');
@@ -1646,15 +1649,15 @@ define([
 			    {"identifier":"Result","type":"raw"},
 			],
 			success: function(data){
-			    DSPreviews["DS_"+dsid+"_"+datasource]=data;
+			    DSPreviews["DS_"+dsid+"_"+ldatasource]=data;
 			    $(obj).popover('destroy');
 			    $(obj).popover({
 				html: true,
 				placement: ($(obj).is("a")?'bottom':'left'),
 				trigger: 'click',
 				container: 'body',
-				viewport: { "selector": "#DS_"+dsid+"_"+datasource, "padding": 0 },
-				content: function(){return '<div><img style="width:500px" class="img-responsive" src="'+ DSPreviews["DS_"+dsid+"_"+datasource] + '" /></div>';}
+				viewport: { "selector": "#DS_"+dsid+"_"+ldatasource, "padding": 0 },
+				content: function(){return '<div><img style="width:500px" class="img-responsive" src="'+ DSPreviews["DS_"+dsid+"_"+ldatasource] + '" /></div>';}
 			    });
 			    $(obj).popover('hide');
 			    $(obj).popover('show');
@@ -1681,28 +1684,29 @@ define([
 	    $(obj).click(function(e){
 		e.preventDefault();
 		console.log(geometryType);
+		var ldatasource=datasource.replace(/\./g,"_");
 
-		var initial=!$("#DS_"+dsid+"_"+datasource).find(".panel-body").first().find('#vectorProcessing').length;
+		var initial=!$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().find('#vectorProcessing').length;
 
 		if(initial){
-		    $("#DS_"+dsid+"_"+datasource).find(".panel-body").first().html("");
-		    $("#DS_"+dsid+"_"+datasource).find(".panel-body").first().append(
+		    $("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().html("");
+		    $("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().append(
 			$("#dataSource_"+(geometryType=="raster"?geometryType:"vector")+"_Process_template")[0].innerHTML
 		    );
 		    if(geometryType!="raster"){
-			$("#DS_"+dsid+"_"+datasource).find(".panel-body").first().find("input#dst_in").val(param);
-			$("#DS_"+dsid+"_"+datasource).find(".panel-body").first().find("input#dso_in,input#dso_in1").val(datasource);
-			$("#DS_"+dsid+"_"+datasource)
+			$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().find("input#dst_in").val(param);
+			$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().find("input#dso_in,input#dso_in1").val(datasource);
+			$("#DS_"+dsid+"_"+ldatasource)
 			    .find(".panel-body")
 			    .first()
 			    .find("input#out_name")
 			    .val("new_"+datasource);
-			$("#DS_"+dsid+"_"+datasource)
+			$("#DS_"+dsid+"_"+ldatasource)
 			    .find(".panel-body")
 			    .first()
 			    .find("textarea#sql")
 			    .val("SELECT * FROM "+datasource);
-			$("#DS_"+dsid+"_"+datasource)
+			$("#DS_"+dsid+"_"+ldatasource)
 			    .find(".panel-body")
 			    .first()
 			    .find("button")
@@ -1716,21 +1720,21 @@ define([
 			if(!bands.length)
 			    bands=[data.datasource.Band];
 			for(var i=0;i<bands.length;i++)
-			    $("#DS_"+dsid+"_"+datasource)
+			    $("#DS_"+dsid+"_"+ldatasource)
 			    .find(".panel-body")
 			    .first()
 			    .find("select#ofband").append(
 				'<option value="'+(i+1)+'">Band '+(i+1)+'</option>'
 			    );
 			window.setTimeout(function(){
-			    $("#DS_"+dsid+"_"+datasource).find('[data-toggle="tooltip"]').tooltip({container: 'body'});
+			    $("#DS_"+dsid+"_"+ldatasource).find('[data-toggle="tooltip"]').tooltip({container: 'body'});
 			},50);
 
-			$("#DS_"+dsid+"_"+datasource).find(".raster_p").hide();
-			$("#DS_"+dsid+"_"+datasource).find(".raster_azimuth").hide();
-			$("#DS_"+dsid+"_"+datasource).find("#ofname").val(param+datasource+"."+raster_extensions[data.datasource.dataType]);
-			$("#DS_"+dsid+"_"+datasource).find("#ofdst").val(param);
-			$("#DS_"+dsid+"_"+datasource)
+			$("#DS_"+dsid+"_"+ldatasource).find(".raster_p").hide();
+			$("#DS_"+dsid+"_"+ldatasource).find(".raster_azimuth").hide();
+			$("#DS_"+dsid+"_"+ldatasource).find("#ofname").val(param+datasource+"."+raster_extensions[data.datasource.dataType]);
+			$("#DS_"+dsid+"_"+ldatasource).find("#ofdst").val(param);
+			$("#DS_"+dsid+"_"+ldatasource)
 			    .find(".panel-body")
 			    .first()
 			    .find("button")
@@ -1742,20 +1746,21 @@ define([
 		}
 		    
 		if(!initial)
-		    $("#DS_"+dsid+"_"+datasource).find(".panel-body").first().collapse('toggle');
+		    $("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().collapse('toggle');
 		else
-		    $("#DS_"+dsid+"_"+datasource).find(".panel-body").first().collapse('show');
+		    $("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().collapse('show');
 	    });
 	},
 	"toggle": function(data,param,dsid,datasource,geometryType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
 		e.preventDefault();
-		var initial=$("#DS_"+dsid+"_"+datasource).find(".panel-body").first().hasClass("in");
+		var ldatasource=datasource.replace(/\./g,"_");
+		var initial=$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().hasClass("in");
 		if( $(obj).children().first().hasClass("fa-toggle-down") && initial){
 		    initial=!initial;
 		}else
-		    $("#DS_"+dsid+"_"+datasource).find(".panel-body").first().collapse('toggle');
+		    $("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().collapse('toggle');
 		if(initial)
 		    $(obj).children().first().removeClass("fa-toggle-up").addClass("fa-toggle-down");
 		else{
@@ -1893,9 +1898,10 @@ define([
     }
 
     function doOnLoadDataSource(param,dsid,datasource,geometryType,ldata,originType,data){
-	$("#DS_"+dsid+"_"+datasource).find(".panel").first().removeClass("panel-warning").addClass("panel-default");
-	$("#DS_"+dsid+"_"+datasource).find(".panel-body").first().html("").collapse();
-	$("#DS_"+dsid+"_"+datasource).find(".panel-heading").first().find("button,a").each(function(){
+        var ldatasource=datasource.replace(/\./g,"_");
+	$("#DS_"+dsid+"_"+ldatasource).find(".panel").first().removeClass("panel-warning").addClass("panel-default");
+	$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().html("").collapse();
+	$("#DS_"+dsid+"_"+ldatasource).find(".panel-heading").first().find("button,a").each(function(){
 	    if($(this).attr("data-mmaction"))
 		try{
 		    DSSetupCallBacks[$(this).attr("data-mmaction")](data,param,dsid,datasource,geometryType,this,ldata);
@@ -1904,7 +1910,7 @@ define([
 		}
 	});
 	window.setTimeout(function(){
-	    $("#DS_"+dsid+"_"+datasource).find('[data-toggle="tooltip"]').tooltip({container: 'body'});
+	    $("#DS_"+dsid+"_"+ldatasource).find('[data-toggle="tooltip"]').tooltip({container: 'body'});
 	},50);
 	if(data!=null){
 	    var font="";
@@ -1917,12 +1923,13 @@ define([
 		    font="mm mm-point";
 		}
 	    }
-	    $("#DS_"+dsid+"_"+datasource).find('.fa-question').removeClass("fa fa-question").addClass(font);
+	    $("#DS_"+dsid+"_"+ldatasource).find('.fa-question').removeClass("fa fa-question").addClass(font);
 	}
     }
     
     function loadDataSource(param,dsid,datasource,geometryType,ldata,originType){
 	console.log(originType);
+	var ldatasource=datasource.replace(/\./g,"_");
 	zoo.execute({
 	    identifier: "vector-tools.mmExtractVectorInfo",
 	    type: "POST",
@@ -1935,10 +1942,10 @@ define([
 	    ],
 	    success: function(data){
 		if(data.datasource.size && !data.datasource.origin){
-		    $("#DS_"+dsid+"_"+datasource).find(".panel-heading").first().find("button,a").each(function(){
+		    $("#DS_"+dsid+"_"+ldatasource).find(".panel-heading").first().find("button,a").each(function(){
 			if($(this).attr("data-mmaction")=="georeference"){
 			    $(this).removeClass("hide");
-			    $("#DS_"+dsid+"_"+datasource).find(".panel-heading").first().find("button,a").each(function(){
+			    $("#DS_"+dsid+"_"+ldatasource).find(".panel-heading").first().find("button,a").each(function(){
 				if($(this).attr("data-mmaction")=="open")
 				    $(this).addClass("hide");
 			    });
@@ -1998,7 +2005,7 @@ define([
 			    font="fa fa-question";
 			}
 			console.log("FONT !! "+font);
-			$("#DS_"+localDSId).find(".panel-body").first().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg,(localDataType=="WMS"?data.datasource.layer[i].label:data.datasource.layer[i].name))).attr("id","DS_"+localDSId+"_"+data.datasource.layer[i].name));
+			$("#DS_"+localDSId).find(".panel-body").first().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg,(localDataType=="WMS"?data.datasource.layer[i].label:data.datasource.layer[i].name))).attr("id","DS_"+localDSId+"_"+data.datasource.layer[i].name.replace(/\./g,"_")));
 			console.log(localDataType);
 			if(localDataType!="WMS")
 			    loadDataSource(param,localDSId,data.datasource.layer[i].name,data.datasource.layer[i].geometry,data,localDataType);
