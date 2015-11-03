@@ -79,6 +79,8 @@ autoconf
 ./configure ./configure --with-mapserver=$SRC/mapserver-6.2.0/ --with-python --with-pyvers=2.7 --with-js=/usr/ --with-xsltconfig=/usr/bin/xslt-config
 sed "s:/usr/lib/x86_64-linux-gnu/libapr-1.la::g" -i ZOOMakefile.opts
 make
+make install
+ldconfig
 cp zoo_loader.cgi ../../../mapmint/mapmint-services/
 
 cd $SRC/zoo/zoo-project/zoo-services/ogr/ogr2ogr
@@ -215,7 +217,9 @@ Restart the apache web server
 sudo /etc/init.d/apache2 restart
 ```
 
-Download and use databases required by MapMint
+Download and use databases required by MapMint, you are invited to
+load the sql files related to the PostGIS module before loading the
+mmdb.sql file (the location will depend on your setup).
 ```
 sudo mkdir /var/data
 cd /var/data
@@ -233,7 +237,7 @@ Create required directories
 
 ```
 sudo cp -r $SRC/mapmint/template/data/* /var/data
-sudo mkdir /var/data/{templates,dirs,public_maps}
+sudo mkdir /var/data/{templates,dirs,public_maps,georeferencer_maps}
 sudo mkdir -p /var/www/html/tmp/descriptions
 sudo mkdir -p /var/www/html/pm/styles
 
