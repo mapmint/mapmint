@@ -2,8 +2,8 @@
 
 
 define([
-    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic'
-], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic) {
+    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic',"datepicker"
+], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,datepicker) {
     
 
     (function(){
@@ -53,6 +53,7 @@ define([
 	var CFeaturesSelected=[];
 	var CFeatures=[];
 
+	console.log(lid);
 	var myRootElement=$('#'+lid).parent().find(".btn-group").first().parent();
 
 	zoo.execute({
@@ -81,6 +82,7 @@ define([
 	    success: function(data){
 		console.log("SUCCESS");
 		console.log(data);
+		console.log(lid);
 		myRootElement.append(data);
 
 		$("."+lid+"BaseEditForm").on("addClass",function(){
@@ -95,6 +97,7 @@ define([
 		});
 
 		$("."+lid+"SubmitForm").click(function(e){
+		    console.log("VALIDATE FORM !");
 		    var params=[];
 		    params.push({"identifier": "dataStore","value": param,"dataType": "string"});
 		    params.push({"identifier": "table","value": ltype,"dataType": "string"});
@@ -770,6 +773,7 @@ define([
 	    ],
 	    success: function(data){
 		console.log("SUCCESS");
+		console.log(data);
 		myRootLocation.removeClass("panel-warning");
 		myRootLocation.addClass("panel-success");
 		myLocation.parent().collapse();
@@ -788,7 +792,8 @@ define([
 	});
 	}catch(e){
 	    console.log(e);
-	}	
+	}
+	return false;
     }
 
     function deleteDatastore(elem){
@@ -1205,11 +1210,58 @@ define([
 		}
 	    });
 	},
+	"open": function(data,param,dsid,dataType,obj){
+	    $(obj).off("click");
+	    $(obj).click(function(e){
+		var params=[{"identifier": "dstn","value":param,"dataType":"string"}];
+		for(var i=0;i<selectedDatasource["DS_"+dsid].length;i++){
+		    params.push({
+			"identifier": "dson",
+			"value": selectedDatasource["DS_"+dsid][i],
+			"dataType": "string"
+		    });
+		}
+		zoo.execute({
+		    identifier: "mapfile.openInManager",
+		    type: "POST",
+		    dataInputs: params,
+		    dataOutputs: [
+			{"identifier":"Result","type":"raw"},
+		    ],
+		    success: function(data){
+			$(".notifications").notify({
+			    message: { text: data },
+			    type: 'success',
+			}).show();
+			document.location="./Manager_bs";
+		    },
+		    error: function(data){
+			$(".notifications").notify({
+			    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			    type: 'danger',
+			}).show();
+		    }
+		});
+	    });
+	},
 	"privileges": function(data,param,dsid,dataType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
 		bindPrivileges(dsid,"datastorePrivileges",param,dataType);
 		return false;
+	    });
+	},
+	"select": function(data,param,dsid,dataType,obj){
+	    $(obj).off("click");
+	    $(obj).click(function(e){
+		var myLocalRoot=$(obj).parent().parent().parent().parent().parent();
+		myLocalRoot.find(".panel-body").first().each(function(){
+		    $(this).find('.panel-heading').each(function(){
+			$(this).find('.fa-square-o,.fa-check-square-o').each(function(){
+			    $(this).trigger('click');
+			});
+		    });
+		});
 	    });
 	},
 	"db-access": function(data,param,dsid,dataType,obj){
@@ -1713,6 +1765,7 @@ define([
 			    .last()
 			    .click(function(e){
 				runConversion($(this));
+				return false;
 			    });
 		    }else{
 			console.log(data);
@@ -1741,6 +1794,7 @@ define([
 			    .last()
 			    .click(function(e){
 				runRaster($(this));
+				return false;
 			    });
 		    }
 		}
@@ -2130,7 +2184,8 @@ define([
 
     // Return public methods
     return {
-        initialize: initialize
+        initialize: initialize,
+	datepicker: datepicker
     };
 
 

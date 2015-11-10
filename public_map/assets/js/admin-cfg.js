@@ -30,6 +30,9 @@ requirejs.config({
 	mmDataTables: {
 	        deps: ['notify']
 	},
+	datepicker: {
+	    deps: ['bootstrap'],
+	},
         bootstrap: {
             deps: ['jquery'],
         },
@@ -126,6 +129,8 @@ require(['domReady', 'app'], function(domReady, app) {
     });
     window.cgalProcessing=app.cgalProcessing;
     window.app=app;
+    if(app.datepicker)
+	window.datepicker=app.datepicker;
 });
 
 

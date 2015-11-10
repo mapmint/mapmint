@@ -16,6 +16,15 @@
     DataType = string
     <Default />
    </LiteralData>
+  [dson]
+   Title = Input string
+   Abstract = The name of the map to extract values from.
+   minOccurs = 1
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
  </DataInputs>
  <DataOutputs>
   [Result]

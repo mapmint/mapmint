@@ -104,8 +104,11 @@ def discretise(main,inputs,outputs):
     return 3 
     
 def _discretise(data,nbc,method):
+    print >> sys.stderr,sys.version
+    print >> sys.stderr,sys.path
+    import os
+    print >> sys.stderr,os.environ
     import rpy2.robjects as robjects
-
     # the following lines are need only because of
     # strange issue specific to R displaying msg :
     # Loading required package: class
@@ -113,20 +116,32 @@ def _discretise(data,nbc,method):
         sys.stdout.close()
     except:
         pass
-
+    print >> sys.stderr,"OK"
     # The logic code
     robjects.r('library(e1071)')
+    print >> sys.stderr,"OK"
     robjects.r('library(classInt)')
+    print >> sys.stderr,"OK"
     robjects.r('data(jenks71)')
+    print >> sys.stderr,"OK"
     jenksData = robjects.FloatVector(data)
+    print >> sys.stderr,"OK"
     ci = robjects.r.classIntervals
+    print >> sys.stderr,"OK"
     nbClasses=int(nbc)
+    print >> sys.stderr,"OK"
     classes=ci(jenksData, n = nbClasses, style = method)
+    print >> sys.stderr,"OK"
     trobj=classes.rx(-1)
+    print >> sys.stderr,"OK"
     tval=tuple(trobj)
+    print >> sys.stderr,"OK"
     res=[]
+    print >> sys.stderr,"OK"
     for i in range(0,len(tval[0])):
         if i!=0:
             res+=[[tval[0][i-1],tval[0][i]]]
+    print >> sys.stderr,"OK"
     import json
+    print >> sys.stderr,"OK"
     return json.dumps(res)

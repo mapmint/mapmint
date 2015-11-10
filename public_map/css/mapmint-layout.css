@@ -191,3 +191,9 @@ padding:6px;
     color: #000;
     z-index: 99;
 }
+
+.layer-active{
+    background: #eee;
+    /*border-bottom: 2px #eee solid;
+    text-decoration: underline;*/
+}

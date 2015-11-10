@@ -32,9 +32,10 @@
   [Result]
    Title = The result 
    Abstract = GeoJSON stream containint the splited line.
-   <LiteralData>
-    dataType=string
+   <ComplexData>
     <Default>
+      mimeType = application/json
+      encoding = utf-8
     </Default>
-   </LiteralData>
+   </ComplexData>
  </DataOutputs>  

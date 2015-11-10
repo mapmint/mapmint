@@ -1,5 +1,6 @@
 #import zoo
-<form id="$(inputs["type"]["value"])-tuple" class="form-inline $(inputs["table"]["value"].replace(".","_"))BaseEditForm #if $inputs["type"]["value"]!="insert"#$(inputs["table"]["value"].replace(".","_"))EditForm#end if# collapse">
+#set tblName=$inputs["table"]["value"].replace(".","_")
+<form id="$(inputs["type"]["value"])-tuple" class="form-inline $(tblName)BaseEditForm #if $inputs["type"]["value"]!="insert"#$(tblName)EditForm#end if# collapse">
 #from datastores.postgis import pgConnection
 #import json
 #set inputs1=$inputs
@@ -24,7 +25,7 @@
 #set clause="true"
 #end if
 #for i in tmp
-#if $i[2]!="geometry"
+#if $i[2]!="geometry" and ($i[3]!="PRI" or $inputs["type"]["value"]!="insert")
 <div class="form-group">
 <label for="="pg_tuple_$i[1]"">$i[1]:</label>
 #if $i[2]=="bool"
@@ -73,9 +74,7 @@
 #if $i[2].count("varchar")>0 and int($i[2][8:len($i[2])-1])==40
 <input class="form-control" name="$i[1]" id="pg_tuple_$i[1]" type="password" value="" />
 #else
-#if $i[3]!="PRI" and $inputs["type"]["value"]=="insert"
-<input class="form-control" name="$i[1]" id="pg_tuple_$i[1]" value="#if len($tmp1.rows)>0 and $tmp1.rows[0].cell[$j]!="None"#$tmp1.rows[0].cell[$j]#end if#" />
-#end if
+<input class="form-control" name="$i[1]" id="pg_tuple_$i[1]" value="#if len($tmp1.rows)>0 and $tmp1.rows[0].cell[$j]!="None"#$tmp1.rows[0].cell[$j]#end if#" #if $i[2]=="date"#data-date-format="dd/mm/yyyy"#end if#/>
 #end if
 #if $i[2]=="date"
 <script>\$("#pg_tuple_$i[1]").datepicker();</script>
@@ -91,7 +90,7 @@
 <input type="hidden" id="clause" value="$inputs1["clause"]["value"]" />
 #end if
   <input id="um_utype" type="hidden" value="$inputs["type"]["value"]">
-  <button type="submit" href="#" class="btn btn-default $(inputs["table"]["value"].replace(".","_"))SubmitForm">
+  <button type="submit" href="#" class="btn btn-default $(tblName)SubmitForm">
   #if $inputs["type"]["value"]=="delete"#$zoo._("Delete")#else##if $inputs["type"]["value"]=="update"#$zoo._("Save")#else#$zoo._("Add")#end if##end if#
   </button>
 </form>

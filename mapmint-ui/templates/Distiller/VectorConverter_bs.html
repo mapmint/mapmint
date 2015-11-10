@@ -48,7 +48,7 @@
       <input type="checkbox" id="tdso_chk_srs" onclick="\$(this).next().css({'display':(this.checked?'inline':'none')});"/>
       <select  class="form-control" id="tdso_srs" style="display: none;">
 #for i in $t
-	<option value="$i[0]">$i[1]</option>
+	<option value="$i[0].lower()">$i[1]</option>
 #end for
       </select>
       <label for="tdso_format">$zoo._("Format:")</label>

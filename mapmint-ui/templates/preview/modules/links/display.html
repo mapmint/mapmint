@@ -13,7 +13,7 @@
 #end if
 #set $clause+=" name = '"+$i+"' "
 #end for
-#set res=cur.execute('SELECT id,title,url from '+prefix+'links where id in (select l_id from '+prefix+'links_groups where g_id in (select id from '+prefix+'groups where name=\'public\' or '+$clause+')) order by id desc LIMIT 4')
+#set res=cur.execute('SELECT id,title,url from '+$prefix+'links where id in (select l_id from '+prefix+'links_groups where g_id in (select id from '+$prefix+'groups where name=\'public\' or '+$clause+')) order by id desc LIMIT 4')
 #set vals=cur.fetchall()
 <h3 class="lgb">$zoo._("Links")</h3>
 <ul>

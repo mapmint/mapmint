@@ -118,6 +118,40 @@ def save(conf,inputs,outputs):
 	outputs["Result"]["value"]="File "+inputs["name"]["value"]+" created"
 	return 3
 
+def displayJson(conf,inputs,outputs):
+    default_dir=conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"
+    original_dir=conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"
+    label_dir=""
+    res={}
+    try:
+        tmp=os.listdir(original_dir)
+    except:
+        return 4
+    try:
+        res["name"]=original_dir.split('/')[len(original_dir.split('/'))-2].replace(".xml","")
+        res["sub_elements"]=[]
+    except:
+        if original_dir!=default_dir:
+            res["name"]=original_dir.replace(".xml","")
+            res["sub_elements"]=[]
+    j=0
+    for t in tmp:
+        try:
+            tmp1=original_dir+t
+            tmp1.index(".xml")
+            j+=1;
+            res["sub_elements"]+=[{"name":t.replace(".xml",""),"type":inputs["type"]["value"]}]
+        except Exception,e:
+            print >> sys.stderr,str(e)
+            continue
+
+    import json
+    outputs["Result"]["value"]=json.dumps(res);
+    return zoo.SERVICE_SUCCEEDED
+
+    
+
+
 def display(conf,inputs,outputs):
 	default_dir=conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"
 	original_dir=conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"
@@ -178,42 +212,3 @@ def display(conf,inputs,outputs):
 				
 	return 3
 
-def displayJson(conf,inputs,outputs):
-	default_dir=conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"
-	original_dir=conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"
-	label_dir=""
-	#print >> sys.stderr, conf["main"]["dataPath"]+"/PostGIS/"
-	#print >> sys.stderr, original_dir
-	#print >> sys.stderr, inputs["dir"]["value"]
-	try:
-		tmp=os.listdir(original_dir)
-	except:
-		return 4
-	try:
-		outputs["Result"]["value"]='''{ "name": "'''+original_dir.split('/')[len(original_dir.split('/'))-2].replace(".xml","")+'''", "sub_elements": [ '''
-	except:
-		if original_dir!=default_dir:
-			outputs["Result"]["value"]='''{ "name": "'''+original_dir.replace(".xml","")+'''", "sub_elements": [ '''
-	
-	i=0
-	j=0
-	for t in tmp:
-		
-		try:
-			i+=1
-			tmp1=original_dir+t
-			tmp1.index(".xml")
-			if j>0:
-				outputs["Result"]["value"]+=''', '''
-			j+=1;
-			outputs["Result"]["value"]+='''{"name": "'''+t.replace(".xml","")+'''", "type": "'''+inputs["type"]["value"]+'''"}'''
-		except:
-			continue
-
-	outputs["Result"]["value"]+='''] }'''
-	if j==0:
-		outputs["Result"]["value"]=''' '''
-				
-	return 3
-
-    

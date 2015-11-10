@@ -258,20 +258,44 @@ define([
 	return lindex;
     }
 
-    function redrawLayer(layer,url,opts){
+    function redrawLayer(layer,url,opts,itemIndex){
 	var lindex=getLayerIndexByName(layer);
+	console.log(layer);
+	console.log(lindex);
+	var iId=(itemIndex?itemIndex:0);
 	var params={time_: (new Date()).getTime()};
-	if(!opts)
-	    map.getLayers().item(lindex).getSource().updateParams(params);
-	else{
+	if(opts)
 	    for(var a in opts)
 		params[a]=opts[a];
+	try{
 	    map.getLayers().item(lindex).getSource().updateParams(params);
+	}catch(e){
+	    try{
+		map.getLayers().item(lindex).getLayers().item(iId).getSource().updateParams(params);
+	    }catch(e){
+		console.log("Unable to update layer params.");
+	    }
 	}
 	if(url){
-	    map.getLayers().item(lindex).getSource().setUrl(url);
+	    try{
+		map.getLayers().item(lindex).getSource().setUrl(url);
+	    }catch(e){
+		try{
+		    map.getLayers().item(lindex).getLayers().item(iId).getSource().setUrl(url);
+		}catch(e){
+		    console.log("Unable to update layer url.");
+		}
+	    }
 	}
-	map.getLayers().item(lindex).getSource().changed();
+	try{
+	    map.getLayers().item(lindex).getSource().changed();
+	}catch(e){
+	    try{
+		map.getLayers().item(lindex).getLayers().item(iId).getSource().changed();
+	    }catch(e){
+		console.log("Unable to change layer source.");
+	    }
+	}
 	map.updateSize();
     }
 
@@ -414,9 +438,18 @@ define([
 	for(var n in ldata.Style.label){
 	    var localN=(lbindings[n]?lbindings[n]:n);
 	    console.log(n+" "+localN);
-	    console.log(rootLocation.find("input[name="+lbindings[n]+"],select[name="+localN+"]"));
+	    console.log(rootLocation.find("input[name="+localN+"],select[name="+localN+"]"));
+	    if(n=="position"){
+		rootLocation.find("input[name="+localN+"]").each(function(){
+		    if($(this).attr('value')==ldata.Style.label[n])
+			$(this).prop('checked',true);
+		    else
+			$(this).prop('checked',false);		    
+		});
+	    }
+	    else
 	    if(!rootLocation.find("textarea[name="+localN+"]").length){
-		if(ldata.Style.label[n]){
+		if(ldata.Style.label[n] || ldata.Style.label[n]==0){
 		    rootLocation.find("input[name="+localN+"],select[name="+localN+"]").val(ldata.Style.label[n]).change();
 		    if(rootLocation.find("input[name="+localN+"],select[name="+localN+"]").prev().first().children().first().length)
 			rootLocation.find("input[name="+localN+"],select[name="+localN+"]").prev().first().children().first().prop("checked",true).change();
@@ -449,6 +482,19 @@ define([
 	    }
 	    return false;
 	});
+    }
+
+    function recursGroup(data,layer){
+	for(var i in data){
+	    console.log(i);
+	    if(i=="layer" && data[i]==layer){
+		return data["labels"];
+	    }
+	    var res=recursGroup(data[i],layer);
+	    if(res)
+		return res;
+	}
+	return null;
     }
 
     function saveLabelSettings(layer,ldata){
@@ -539,9 +585,59 @@ define([
 		}).show();
 		console.log(ldata);
 		if(ldata.type==2){
-		    document.location.reload(false);
+		    //document.location.reload(false);
+		    zoo.execute({
+			identifier: "mapfile.getGroupList",
+			type: "POST",
+			dataInputs: [
+			    {"identifier": "name","value":module.config().pmapfile,"dataType":"string"}
+			],
+			dataOutputs: [
+			    {"identifier":"Result","type":"raw"},
+			],
+			success: function(data){
+			    var mapUrl=module.config().msUrl+"?map="+recursGroup(data,ldata.name);
+			    var lindex=getLayerIndexByName(ldata.name);
+			    console.log(lindex);
+			    try{
+				map.getLayers().item(lindex).getLayers();
+			    }catch(e){
+				console.log(e);
+				var lLayer=map.getLayers().item(lindex);
+				lLayer.unset('map');
+				console.log(lLayer.getSource().get('url'));
+				console.log(lLayer.getSource().get('params'));
+				console.log(lLayer.getSource().get('serverType'));
+				var layer0=new ol.layer.Group({
+				    visible: lLayer.getVisible(),
+				    layers: [
+					lLayer,
+					new ol.layer.Tile({
+					    source: new ol.source.TileWMS({
+						url: mapUrl,
+						params: {'LAYERS': "Result", 'TILED': true},
+						serverType: 'mapserver'
+					    })
+					})
+				    ]
+				});
+				map.getLayers().insertAt(lindex,layer0);
+				map.getLayers().removeAt(lindex+1);
+			    }
+			    console.log(mapUrl);
+			    redrawLayer(layer,mapUrl,null,1);
+			    return false;
+			},
+			error: function(data){
+			    $(".notifications").notify({
+				message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				type: 'danger',
+			    }).show();
+			}
+		    });
 		}
-		redrawLayer(layer);
+		else
+		    redrawLayer(layer);
 	    },
 	    error: function(data){
 		console.log("ERROR");
@@ -869,7 +965,42 @@ define([
 	    }
 	});
     }
-    
+
+    function callCreateLegend(layer,step,lfunction){
+	var params=[
+	    {"identifier": "name","value":$("#save-map").val(),"dataType":"string"},
+	    {"identifier": "layer","value":layer,"dataType":"string"}
+	];
+	if(step!=null)
+	    params.push({
+		"identifier": "mmStep",
+		"value": step,
+		"dataType":"integer"
+	    });
+	zoo.execute({
+	    identifier: "mapfile.createLegend0",
+	    type: "POST",
+	    dataInputs: params,
+	    dataOutputs: [
+		{"identifier":"Result","type":"raw"},
+	    ],
+	    success: function(data){
+		console.log("SUCCESS");
+		var ldata=JSON.parse(data);
+		var myRootLocation=$("#mm_layer_property_style_display");
+		lfunction(ldata);
+	    },
+	    error: function(data){
+		console.log("ERROR");
+		$(".notifications").notify({
+		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+		    type: 'danger',
+		}).show();
+	    }
+	});
+	
+    }
+
     var contextualMenu={
 	"zoomTo": {
 	    "run": function(layer){
@@ -1181,6 +1312,7 @@ define([
 	}
 	
 	myRootLocation.find("input[name=nbclass]").val(ldata["Style"].numclasses);
+	myRootLocation.find("select[name=discretization]").val(ldata["Style"].discretisation);
 	var i="Style";
 	//$("#mm_layer_property_style_display").find("select[name=classification]").val(-1).change();
 	if(ldata[i].class==null || ldata[i].class=="us"){
@@ -1272,6 +1404,11 @@ define([
 	    });
 	}
 	
+	if(ldata.datasource && ldata.datasource.type==1 && ldata.datasource.connection.indexOf("PG:")!==-1)
+	    $(".only-pline").show();
+	else
+	    $(".only-pline").hide();
+
 	bindLayerProperties(ldata);
 	bindLayerStyle(ldata);
 	bindLayerTemplates(ldata);
@@ -1322,6 +1459,9 @@ define([
 		});
 	    }
 	    var closure=$(this);
+	    $(this).prop("disabled",true);
+	    $(this).parent().append('<i class="fa fa-spin fa-spinner fa-fw"> </i>');
+	    var myElement=$(this);
 	    zoo.execute({
 		identifier: "mapfile.saveStep",
 		type: "POST",
@@ -1338,10 +1478,8 @@ define([
 		    }).show();
 		    closure.parent().hide();
 		    loadStepList(ldata.name,function(l,d){
-			//console.log(d);
-			//console.log(myRootLocation.find(".mmstep-list"));
+			legendSteps[ldata.name]=d;
 			myRootLocation.find(".mmstep-list").find("option").each(function(){
-			    //console.log($(this).attr("value"));
 			    if($(this).attr("value")!="-1" && $(this).attr("value")!="-2"){
 				$(this).remove();
 			    }
@@ -1349,8 +1487,16 @@ define([
 			for(var i=0;i<d.length;i++){
 			    myRootLocation.find(".mmstep-list").append('<option value="'+i+'">'+d[i]+'</option>');
 			}
-			myRootLocation.find(".mmstep-list").val(d[d.length-1]).change();
-			$("#mmm_properties").click();
+			callCreateLegend(ldata.name,(d.length-1),function(data){
+			    console.log(data);
+			    ldata["mmSteps"].push(data);
+			    myRootLocation.find(".mmstep-list").val((d.length-1)).change();
+			    myElement.parent().find("i").first().remove();
+			    myElement.prop("disabled",false);
+			});
+			
+			//$("#mmm_properties").trigger("click");
+			//myRootLocation.find(".mmstep-list").val((d.length-1)).change();
 		    });
 		},
 		error: function(data){
@@ -1393,6 +1539,7 @@ define([
 		    }).show();
 		    closure.parent().hide();
 		    loadStepList(ldata.name,function(l,d){
+			legendSteps[ldata.name]=d;
 			console.log(d);
 			console.log(myRootLocation.find(".mmstep-list"));
 			myRootLocation.find(".mmstep-list").find("option").each(function(){
@@ -1404,7 +1551,12 @@ define([
 			for(var i=0;i<d.length;i++){
 			    myRootLocation.find(".mmstep-list").append('<option value="'+i+'">'+d[i]+'</option>');
 			}
-			myRootLocation.find(".mmstep-list").val(d[d.length-1]).change();
+			/*callCreateLegend(ldata.name,(d.length-1),function(data){
+			    console.log(data);
+			    //ldata["mmSteps"].push(data);
+			    myRootLocation.find(".mmstep-list").val((d.length-1)).change();
+			});*/
+			//myRootLocation.find(".mmstep-list").val((d.length-1)).change();
 			$("#mmm_properties").click();
 		    });
 		},
@@ -1692,6 +1844,7 @@ define([
 		"nbclass": "nbClasses",
 		"discretization": "method",
 		"mmType": "mmType",
+		"type": "type",
 		"resample": "resm",
 		"step": "mmStep",
 		"tileSize": "tiled"
@@ -1700,6 +1853,9 @@ define([
 	    var cfield=(hasStep?"step_classification":"classification");
 
 	    params.push({"id":"mmType","value": cbindings[myLocation.find("select[name="+cfield+"]").val()]});
+	    if(cbindings[myLocation.find("select[name="+cfield+"]").val()])
+		params.push({"id":"type","value": cbindings[myLocation.find("select[name="+cfield+"]").val()]});
+
 	    myLocation.find("input[type=text],input[type=range],textarea,select").each(function(){
 		if($(this).is(":visible") && $(this).is(":disabled"))
 		    edisabled.push($(this).attr('name'));
@@ -1708,14 +1864,18 @@ define([
 	    });
 	    console.log(params);
 	    var inputs=[];
+	    var mmStep=-1;
 	    for(var i in classifierBindings){
 		for(var j in params){
 		    if(params[j].id==i){
-			inputs.push({
-			    "identifier": classifierBindings[i],
-			    "value": params[j].value,
-			    "dataType": "string"
-			});
+			if(params[j].value!=-1)
+			    inputs.push({
+				"identifier": classifierBindings[i],
+				"value": params[j].value,
+				"dataType": "string"
+			    });
+			if(classifierBindings[i]=="mmStep")
+			    mmStep=params[j].value;
 			break;
 		    }
 		}
@@ -1741,17 +1901,29 @@ define([
 		    {"identifier":"Result"},
 		],
 		success: function(data){
-		    console.log("SUCCESS");
 		    var outputs=data["ExecuteResponse"]["ProcessOutputs"]["Output"];
 		    $(".notifications").notify({
 			message: { text: outputs[0]["Data"]["LiteralData"]["__text"] },
 			type: 'success',
 		    }).show();
 		    var myNewData=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
-		    ldata["Style"]=myNewData["Style"];
-		    loadStyleTable(ldata);
+		    if(mmStep>=0){
+			console.log(mmStep-1);
+			loadStyleTable(myNewData);
+			if(mmStep==0){
+			    //ldata=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
+			    //loadStyleTable(ldata);
+			    $("#mmm_properties").trigger("click");
+			}
+			else{
+			    ldata["mmSteps"][mmStep-1]=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
+			}
+		    }
+		    else{
+			ldata["Style"]=myNewData["Style"];
+			loadStyleTable(ldata);
+		    }
 		    redrawLayer(ldata.name);
-		    console.log(data);
 		},
 		error: function(data){
 		    console.log("ERROR");
@@ -1805,10 +1977,11 @@ define([
 		"value": ldata.name,
 		"dataType": "string"
 	    });
-	    if(ldata.datasource.type==1 && ldata.datasource.connection.indexOf("PG:")!==-1)
+	    //console.log(ldata);
+	    /*if(ldata.datasource && ldata.datasource.type==1 && ldata.datasource.connection.indexOf("PG:")!==-1)
 		$(".only-pline").show();
 	    else
-		$(".only-pline").hide();
+		$(".only-pline").hide();*/
 	    myLocation.find("input[type=text],input[type=checkbox],textarea,select").each(function(){
 		console.log($(this).attr("name"));
 		for(var i in propertiesBindings){

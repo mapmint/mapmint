@@ -189,9 +189,16 @@ def options(conf,inputs,outputs):
 
 def openInManager(conf,inputs,outputs):
     import mm_access
-    if not(mm_access.checkDataSourcePriv(conf,None,inputs["dstn"]["value"],inputs["dson"]["value"],"r")):
-        conf["lenv"]["message"]=zoo._("You're not allowed to access the ressource")
-	return zoo.SERVICE_FAILED
+    
+    if inputs["dson"].keys().count('length')==0:
+        if not(mm_access.checkDataSourcePriv(conf,None,inputs["dstn"]["value"],inputs["dson"]["value"],"r")):
+            conf["lenv"]["message"]=zoo._("You're not allowed to access the ressource")
+            return zoo.SERVICE_FAILED
+    else:
+        for i in inputs["dson"]["value"]:
+            if not(mm_access.checkDataSourcePriv(conf,None,inputs["dstn"]["value"],i,"r")):
+                conf["lenv"]["message"]=zoo._("You're not allowed to access the ressource")
+                return zoo.SERVICE_FAILED
     import mapscript,sqlite3,time
     print >> sys.stderr,inputs["dstn"]["value"].replace(conf["main"]["dataPath"]+"/dirs/","")
     mapfile=conf["main"]["dataPath"]+"/dirs/"+inputs["dstn"]["value"].replace(conf["main"]["dataPath"]+"/dirs/","")+"/ds_ows.map"
@@ -205,6 +212,7 @@ def openInManager(conf,inputs,outputs):
                 mapfile=conf["main"]["dataPath"]+"/"+i+"/"+inputs["dstn"]["value"].replace("WFS:","").replace("WMS:","")+"ds_ows.map"
                 print >> sys.stderr,mapfile
                 m = mapscript.mapObj(mapfile)
+                break
             except:
                 pass
         if m is None:
@@ -219,7 +227,7 @@ def openInManager(conf,inputs,outputs):
     while i >= 0:
         l=m.getLayer(i)
         print >> sys.stderr,l.name
-        if l.name!=inputs["dson"]["value"]:
+        if (inputs["dson"].keys().count('length')==0 and l.name!=inputs["dson"]["value"]) or (inputs["dson"]["value"].count(l.name)==0):
             m.removeLayer(i)
         else:
             l.setMetaData("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
@@ -231,18 +239,20 @@ def openInManager(conf,inputs,outputs):
     m.web.metadata.set("mm_group_1","Legend,")
     m.web.metadata.set("mm_group_2","Group,|Legend;")
 
-    m.save(conf["main"]["dataPath"]+"/maps/project_Untitled_0.map")
+    llogin=conf["senv"]["login"].replace('.','_')
+    m.save(conf["main"]["dataPath"]+"/maps/project_Untitled_0_"+llogin+".map")
     import authenticate.service as auth
     con = auth.getCon(conf)
     prefix = auth.getPrefix(conf)
     conn = con.conn.cursor()
     #conn = sqlite3.connect(conf['main']['dblink'])
-    conn.execute("update "+prefix+"users set last_map='Untitled_0' where login='"+conf["senv"]["login"]+"'")
-    conf["senv"]["last_map"]="Untitled_0"
+    conn.execute("update "+prefix+"users set last_map='Untitled_0_+"+llogin+"' where login='"+conf["senv"]["login"]+"'")
+    conf["senv"]["last_map"]="Untitled_0_"+llogin
     con.conn.commit()
     con.conn.close()
     #conf["lenv"]["cookie"]="MMID=MM"+str(time.time()).split(".")[0]+"; path=/"
-    outputs["Result"]["value"]=zoo._("Project Untitled_0 is now available in your Manager.")
+    s=zoo._("Project %s is now available in your Manager.")
+    outputs["Result"]["value"]= s % ("Untitled_0_"+conf["senv"]["login"])
     import mmsession
     mmsession.save(conf)
     return zoo.SERVICE_SUCCEEDED
@@ -2292,6 +2302,8 @@ def getLayerStylesArray(conf,inputs,myLayer):
     for i in range(0,myLayer.numclasses):
         myClass=myLayer.getClass(i)
         res["Style"]["classes"]+=[getClassObject(conf,inputs,myLayer,myClass,i)]
+        if myLayer.metadata.get("mmClass")=="us":
+            break
     return res
 
 def classifyMap0(conf,inputs,outputs):
@@ -2345,6 +2357,8 @@ def classifyMap0(conf,inputs,outputs):
         #inputs0["mmStroke"]={"value": "000000"}
         outputs["Message"]=outputs1["Result"]
         import json
+        m=mapscript.mapObj(mapfile)
+        layer=m.getLayerByName(inputs["layer"]["value"])
         outputs["Result"]["value"]=json.dumps(getLayerStylesArray(conf,inputs,layer))
         return res
     
@@ -2387,26 +2401,28 @@ def classifyMap0(conf,inputs,outputs):
     rClass=False
     if layer.metadata.get("mmMethod"):
 	    layer.metadata.remove("mmMethod")
-    if inputs.has_key("type"):
-        if inputs.has_key("method") and conf["main"].has_key("Rpy2") and conf["main"]["Rpy2"]=="true":
-            lInputs1={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT "+inputs["field"]["value"]+" as val FROM "+layerName}}
-            vt.vectInfo(conf,lInputs,outputs)
-            ll=json.loads(outputs["Result"]["value"])
-            vals=[]
-            for i in range(0,len(ll)):
-                for j in ll[i]:
-                    vals+=[ll[i][j]]
-            try:
-                classif=json.loads(cs._discretise(vals,inputs["nbClasses"]["value"],inputs["method"]["value"]))
-            except Exception,e:
-                conf["lenv"]["message"]=str(e)
-                return zoo.SERVICE_FAILED
-            layer.metadata.set("mmMethod",inputs["method"]["value"])
-            rClass=True
-            print >> sys.stderr,"OKOK\n\n"
-            print >> sys.stderr,classif
-        if inputs["type"]["value"]=="gs":
-            lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT MIN("+inputs["field"]["value"]+") as min, MAX("+inputs["field"]["value"]+") as max FROM "+layerName}}
+    #if inputs.keys().count("mmType") and inputs["mmType"]["value"]=="gradSymb":
+    if inputs.keys().count("method")>0 and conf["main"].has_key("Rpy2") and conf["main"]["Rpy2"]=="true":
+        lInputs1={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT "+inputs["field"]["value"]+" as val FROM "+layerName}}
+        vt.vectInfo(conf,lInputs,outputs)
+        ll=json.loads(outputs["Result"]["value"])
+        vals=[]
+        for i in range(0,len(ll)):
+            for j in ll[i]:
+                vals+=[ll[i][j]]
+        try:
+            titi=cs._discretise(vals,inputs["nbClasses"]["value"],inputs["method"]["value"])
+            #toto=cs._discretise(vals,inputs["nbClasses"]["value"],inputs["method"]["value"])
+            classif=json.loads(titi)
+        except Exception,e:
+            conf["lenv"]["message"]=str(e)
+            return zoo.SERVICE_FAILED
+        layer.metadata.set("mmMethod",inputs["method"]["value"])
+        rClass=True
+        print >> sys.stderr,"OKOK\n\n"
+        print >> sys.stderr,classif
+    if inputs["mmType"]["value"]=="contCol" or inputs["mmType"]["value"]=="gradSymb" :
+        lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT MIN("+inputs["field"]["value"]+") as min, MAX("+inputs["field"]["value"]+") as max FROM "+layerName}}
 
     #print >> sys.stderr,lInputs
     output1={"Result": {"value":""}}
@@ -2487,6 +2503,8 @@ def classifyMap0(conf,inputs,outputs):
             layer.metadata.set("mmClass","uv")
         elif inputs["mmType"]["value"]=="gradSymb":
             layer.metadata.set("mmClass","gs")
+        elif inputs["mmType"]["value"]=="uniqSymb":
+            layer.metadata.set("mmClass","us")
         else:
             layer.metadata.set("mmClass","cc")
     else:
@@ -2513,7 +2531,8 @@ def classifyMap0(conf,inputs,outputs):
         #print >> sys.stderr,"Colspan: "+str(tmp[0])
 	try:
 		colspan=(float(tmp[0]["max"])-float(tmp[0]["min"]))/float(nbClasses)
-	except:
+	except Exception,e:
+		print >> sys.stderr,str(e)
 		pass
     if rClass:
 	    nbClasses=len(classif)
@@ -2640,14 +2659,16 @@ def classifyMap0(conf,inputs,outputs):
     #outputs["Result"]["value"]=t.__str__()
     outputs["Message"]["value"]=zoo._("Layer classified")
     import json
-    outputs["Result"]["value"]=json.dumps(getLayerStylesArray(conf,inputs,l))
+    #myMap=mapscript.mapObj(mapfile)
+    #l=myMap.getLayerByName(inputs["layer"]["value"])
+    #outputs["Result"]["value"]=json.dumps(getLayerStylesArray(conf,inputs,l))
     saveProjectMap(m,mapfile)
     print >> sys.stderr,isRaster < 0
     #if isRaster < 0:
     inputs1=inputs
     inputs1["name"]=inputs["map"]
     outputs1={"Result": {"value": ""}}
-    createLegend0(conf,inputs1,outputs1)
+    createLegend0(conf,inputs1,outputs)
     return zoo.SERVICE_SUCCEEDED
 
     
@@ -3168,6 +3189,10 @@ def removeLabelLayer(conf,inputs,outputs):
         if l0.name==inputs["layer"]["value"]+"_mmlabel":
             m.removeLayer(i)
         i-=1
+    try:
+        m.getLayerByName(inputs["layer"]["value"]).metadata.remove("mmLabelsMap")
+    except:
+        pass
     m.save(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
     outputs["Result"]["value"]=zoo._("Map saved")
     return zoo.SERVICE_SUCCEEDED
@@ -3848,12 +3873,12 @@ def getShortDescription(conf,m):
 		tmp=textHandler()
 		import HTMLParser
 		h = HTMLParser.HTMLParser()
-		#print >> sys.stderr,"<xml>"+h.unescape(description)+"</xml>"
-		xml.sax.parseString("<xml>".encode("utf-8")+h.unescape(description).encode("utf-8")+"</xml>".encode("utf-8"),tmp)
+		print >> sys.stderr,"*****<xml>".encode("utf-8")+h.unescape(description.decode('utf-8')).encode("utf-8")+"</xml>"
+		xml.sax.parseString("<xml>".encode("utf-8")+h.unescape(description.replace('<br>','<br/>').decode('utf-8')).encode("utf-8")+"</xml>".encode("utf-8"),tmp)
 		description=tmp.desc[:100]
 	except Exception,e:
 		print >> sys.stderr,e
-		description=m.web.metadata.get("ows_abstract")[:100]
+		description=str(e)+" "+m.web.metadata.get("ows_abstract")[:100]
 	return description
 
 def saveLegendIconsForLayer(conf,m,lm,layer,i,step=None):
@@ -4213,7 +4238,7 @@ def deleteStep(conf,inputs,outputs):
     print >> sys.stderr,cindex
     import shutil
     if cindex<cnt-1:
-        for i in range(cindex,cnt):
+        for i in range(cindex,cnt-1):
             print >> sys.stderr,"Rename "+str(i+1)+" to "+str(i)
             shutil.move(conf["main"]["dataPath"]+"/maps/timeline_"+conf["senv"]["last_map"]+"_"+inputs["layer"]["value"]+"_step"+str(i+1)+".map",conf["main"]["dataPath"]+"/maps/timeline_"+conf["senv"]["last_map"]+"_"+inputs["layer"]["value"]+"_step"+str(i)+".map")
     else:

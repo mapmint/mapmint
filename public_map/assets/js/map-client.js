@@ -523,7 +523,7 @@ define([
 	    //e.preventDefault();
 	    //e.stopPropagation();
 	    $(".tree li.layer").find(".layer-active").toggleClass("layer-active");
-	    $(this).toggleClass("layer-active");
+	    $(e.currentTarget).toggleClass("layer-active");
 	    console.log($(this).parent().parent().attr("id").replace(/layer_/,""));
 	    var cid=eval($(this).parent().parent().attr("id").replace(/layer_/,""));
 	    $(this).append($("#context-menu")[0].innerHTML);
@@ -555,19 +555,31 @@ define([
 	    myRootLocation.find("#mmm_opacity").val(oLayers[clayer]["opacity"]*100);
 	    myRootLocation.find("#mmm_range").val(Math.round(oLayers[clayer]["opacity"]*100).toFixed(0)+"%");
 
-	    $('body, #context-menu > ul > li > a').on('click', function (e) {$(".tree li.layer").find(".layer-active").removeClass('layer-active');});
-
 	    return true;
+	});
+
+	$("#context-menu").bind("removeClass",function(){
+	    console.log("context-menu removed");
+	    //$(".tree li.layer").removeClass("layer-active");
+	});
+	$("#context-menu").bind("addClass",function(){
+	    console.log("context-menu added");
+
+	    //$(".tree li.layer").removeClass("layer-active");
 	});
 
 	$('.cm').bind("contextmenu",function(e){
 
-	    //alert('Context Menu event has fired!'); 
-	    $(".tree li.layer").find(".layer-active").toggleClass("layer-active");
-	    $(this).toggleClass("layer-active");
+	    console.log(e);
+	    $(".tree li.layer").removeClass("layer-active");
+	    console.log($(e.currentTarget).attr("id"));
+	    console.log(e.currentTarget);
 	    console.log("************* ID : "+$(this).attr("id"));
 	    var cid=eval($(this).attr("id").replace(/layer_/,""));
+	    $(this).addClass("layer-active");
+	    console.log($(this));
 	    clayer=getLayerById(cid);
+	    console.log(oLayers[clayer]);
 	    console.log(oLayers[clayer]["query"]);
 	    
 	    var myRootLocation=$("#context-menu");
@@ -578,12 +590,12 @@ define([
 		    myRootLocation.find("#mmm_"+i).parent().removeClass("hidden");
 	    }
 
+	    myRootLocation.find("#mmm_opacity").off("input");
 	    myRootLocation.find("#mmm_opacity").on("input",function(){
 		myRootLocation.find("#mmm_range").val($(this).val()+"%");
 		var cLayer=$(".tree li").find(".layer-active");
 		if(!cLayer.attr("id"))
 		    cLayer=$(this).parent().parent().parent().parent().parent();
-		console.log(cLayer);
 		var cid=eval("myBaseLayers.length+"+(cLayer.attr("id").replace(/layer_/,"").split("_")[0]));
 		var clayer=getLayerById(eval(cLayer.attr("id").replace(/layer_/,"")));
 		oLayers[clayer]["opacity"]=$(this).val()/100;
@@ -594,7 +606,7 @@ define([
 	    myRootLocation.find("#mmm_opacity").val(oLayers[clayer]["opacity"]*100);
 	    myRootLocation.find("#mmm_range").val(Math.round(oLayers[clayer]["opacity"]*100).toFixed(0)+"%");
 
-	    $('body, #context-menu > ul > li > a').on('click', function (e) {$(".tree li.layer").find(".layer-active").removeClass('layer-active');});
+	    $('body, #context-menu > ul > li > a').on('click', function (e) {console.log("CLICK !! ");$(".tree").find(".layer-active").removeClass('layer-active');});
 	    return false;
 	});
 	
@@ -2675,8 +2687,7 @@ define([
 	var j=0;
 	for(i in oLayers){
 	    if(j==cid){
-		clayer=i;
-		return clayer;
+		return i;
 	    }
 	    j++;
 	}

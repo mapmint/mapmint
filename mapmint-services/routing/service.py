@@ -69,7 +69,7 @@ def reverseGeocode(conf,inputs,outputs):
     geolocator = eval("gc."+conf["main"]["geocoder"]+"()")
     location = geolocator.reverse(inputs["y"]["value"]+", "+inputs["x"]["value"])
     if location is not None:
-	outputs["Result"]["value"]=json.dumps(location)
+	outputs["Result"]["value"]=json.dumps({"address":location[0].address,"latitude":location[0].latitude,"longitude":location[0].longitude})
 	return zoo.SERVICE_SUCCEEDED
     else:
 	conf["lenv"]["message"]=zoo._("Unable to find any address for this locatiton")

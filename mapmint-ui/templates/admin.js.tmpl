@@ -43,6 +43,7 @@ requirejs.config({
 	treeview: 'js/lib/treeview',
 	cmenu: 'js/lib/bootstrap-contextmenu',
 	enquire: 'js/lib/enquire.min',
+        datepicker: 'js/lib/bootstrap-datepicker',
 
         hogan: 'js/lib/hogan/hogan-3.0.2',
         xml2json: 'js/lib/xml2json/xml2json.min',
@@ -81,6 +82,9 @@ requirejs.config({
 	},
 	validator: {
 	    deps: ['jquery'],
+	},
+	datepicker: {
+	    deps: ['bootstrap'],
 	},
 	dataTables: {
 	    deps: ['jquery'],

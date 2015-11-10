@@ -294,18 +294,21 @@ def getPath(conf,ds):
         else:
             return ds+"/"
     else:
-        print >> sys.stderr,conf["mm"]["supportedDbs"]
         if conf["mm"].has_key("supportedDbs"):
             for i in conf["mm"]["supportedDbs"].split(','):
                 if os.path.exists(conf["main"]["dataPath"]+"/"+i+"/"+ds+".xml"):
                     return conf["main"]["dataPath"]+"/"+i+"/"+ds
+        print >> sys.stderr,conf["mm"]["supportedDbs"]
+        print >> sys.stderr,os.path.exists(conf["main"]["dataPath"]+"/dirs/"+ds)
         if os.path.exists(conf["main"]["dataPath"]+"/dirs/"+ds):
             if ds[len(ds)-1]!="/":
                 return conf["main"]["dataPath"]+"/dirs/"+ds+"/"
             else:
                 return conf["main"]["dataPath"]+"/dirs/"+ds
+        print >> sys.stderr,conf["mm"]["supportedDbs"]
         if os.path.exists(conf["main"]["dataPath"]+"/WFS/"+ds.replace("WFS:","")+".txt"):
                 return conf["main"]["dataPath"]+"/WFS/"+ds.replace("WFS:","")
+        print >> sys.stderr,conf["mm"]["supportedDbs"]
         if os.path.exists(conf["main"]["dataPath"]+"/WMS/"+ds.replace("WMS:","")+".txt"):
                 return conf["main"]["dataPath"]+"/WMS/"+ds.replace("WMS:","")
 

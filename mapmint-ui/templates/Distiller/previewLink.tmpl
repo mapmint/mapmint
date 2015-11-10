@@ -4,7 +4,9 @@
 #set mapfile=$inputs["dst"]["value"]+"/ds_ows.map"
 #set m=mapscript.mapObj($mapfile)
 #else
-#for i in $conf["main"]["supportedDbs"].split(',')
+#set vals=$conf["main"]["supportedDbs"].split(',')
+#set $vals1=vals+["WMS"]
+#for i in $vals1
 #set tmapfile=$conf["main"]["dataPath"]+"/"+$i+"/"+$inputs["dst"]["value"]+"ds_ows.map"
 #if os.path.isfile($tmapfile)
 #set m=mapscript.mapObj($tmapfile)
@@ -62,4 +64,8 @@
 #set f="image/png"
 #*set f="image/tiff"*#
 #end if
+#if $tmp1[0]==-1.0 and $tmp1[1]==-1.0 and $tmp1[2]==-1.0 and $tmp1[3]==-1.0
+$l.connection
+#else
 $conf["main"]["mapserverAddress"]?map=$(mapfile)&service=WMS&version=1.0.0&request=GetMap&srs=epsg:4326&bbox=$p1.x,$p1.y,$p2.x,$p2.y&layers=$inputs["dso"]["value"]&width=$width&height=$height&format=$f
+#end if
