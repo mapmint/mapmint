@@ -1,7 +1,9 @@
 #encoding "UTF-8"
 #import zoo
 <form method="post">
+#if $inputs.keys().count("no-header")==0
  <h3>$zoo._("Database Access")</h3>
+#end if
  <div class="form-group">
   <label for="pg_schema">Schemas:</label>
 #from datastores.postgis import pgConnection

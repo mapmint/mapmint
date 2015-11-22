@@ -124,7 +124,7 @@ $(document).ready(function () {
 	widt = !widt;
     });
 
-    searchTable("indicateurs");
+    searchTable("indicators");
 
     refreshList();
     
@@ -213,7 +213,7 @@ function runQuery(){
 function updateSelectWithFields(){
     var selIds=arguments[0];
     //alert(selIds);
-    var tid=$("#indicateurs_indicateurs_territoires").val();
+    var tid=$("#indicateurs_indicators_territoires").val();
     if(arguments.length>1){
 	tid=arguments[1]+";layer=indexes."+($("#agregation").is(":visible")?"agregate_t"+$("#p_tname").val()+"_idx_":"view_idx_")+System.nodeId;
 	System.u0=true;
@@ -258,11 +258,11 @@ function updateSelectWithFields(){
 /**
  * Common part
  */
-var tableName="indicateurs";
+var tableName="indicators";
 function updateElement(){
     var params={id: System.nodeId};
     $("#"+tableName+"_edition_ui_step"+arguments[0]).find("input").each(function(){
-	if($(this)[0].id!='indicateurs_indicateurs_keywords' && $(this)[0].id && $(this)[0].id.replace(/indicateurs_/,"")!=$(this)[0].id)
+	if($(this)[0].id!='indicateurs_indicators_keywords' && $(this)[0].id && $(this)[0].id.replace(/indicateurs_/,"")!=$(this)[0].id)
 	    params[$(this)[0].id.replace(/indicateurs_/,"")]=$(this).val();
     });
     $("#indicateurs_description").val( CKEDITOR.instances.indicateurs_description.getData().replace(/\"/g,"\\\"") );
@@ -506,7 +506,7 @@ function insertAgregate(){
 function refreshList(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.list&DataInputs=table=indicateurs&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.list&DataInputs=table=indicators&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		var data=$.parseJSON(xml.responseText);

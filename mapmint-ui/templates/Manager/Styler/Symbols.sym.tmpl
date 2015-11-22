@@ -1,7 +1,7 @@
 SYMBOLSET
 #if $inputs.has_key('charcodes') and $inputs["ttf"]["value"]!="images"
 #set a=eval($inputs["charcodes"]["value"])
-#for i in a#
+#for i in a
 	SYMBOL
 		NAME "${inputs["ttf"]["value"]}|${i}"
 		TYPE truetype

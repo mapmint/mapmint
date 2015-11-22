@@ -55,7 +55,7 @@ $istyles
 	"manager": "map-o",
 	"themes": "th",
 	"territories": "sitemap",
-	"indexes": "bar-chart",
+	"indicators": "bar-chart",
 	"documents": "file-text-o",
 	"publisher": "laptop",
 	"georeferencer": "globe",
@@ -92,8 +92,8 @@ $istyles
      </li>
    </ul>
 	    
-#if $conf["mm"]["indexes"]=="true"
-#set menu=['Dashboard','Distiller','Territories','Indexes','Themes','Documents','Manager','Publisher']
+#if $conf["main"]["indicators"]=="true"
+#set menu=['Dashboard','Distiller','Territories','Indicators','Themes','Documents','Manager','Publisher']
 #else
 #if $conf["mm"]["documents"]=="true"
 #set menu=['Dashboard','Distiller','Manager','Themes','Documents','Publisher']

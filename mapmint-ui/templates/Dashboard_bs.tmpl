@@ -343,6 +343,77 @@ $(printVersion($softs[i][0],$softs[i][1]))
                         </a>
                     </div>
                 </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="row">
+                                <div class="col-xs-3">
+                                    <i class="fa fa-font fa-5x"></i>
+                                </div>
+                                <div class="col-xs-9 text-right">
+                                    <div class="huge">$(mm.getNumSymbols()-2)</div>
+                                    <div>#if ($mm.getNumSymbols()-2) > 1#$zoo._("Symbols")#else#$zoo._("Symbol")#end if#</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="dashFontBody" class="panel-body collapse ">
+#import symbol_tools.service as symbolstools
+#set myInputs={"map":{"value":"Georeferencer"},"tmpl":{"value":"/Manager/Styler/SymbolChooser_bs.html"}}
+#set myOutputs={"Result":{"value":""}}
+#set res=$symbolstools.getAllSymbolsForTTF($conf,$myInputs,$myOutputs)
+$myOutputs["Result"]["value"]
+<div class="row myWell">
+<div class="col-sm-6">
+<select class="form-control" id="symbolSelecter" onchange="displaySymbolAdd(this.value);">
+     <option value="-1">$zoo._("Select a font")</option>
+     <option value="images">$zoo._("External images")</option>
+#import os
+#set t=os.listdir($conf["main"]["dataPath"]+"/fonts/")
+$t.sort()
+#for i in $t
+#if $i.count(".TTF")>0 or $i.count(".ttf")>0
+     <option value="$i">$i.replace(".TTF","").replace(".ttf","")</option>
+#end if
+#end for
+</select>
+</div>
+<div class="btn-group">
+<button class="btn btn-default disabled" data-toggle="tooltip" title="$zoo._("Add selected symbols")" onclick="return app.addSymbols();">
+<i class="fa fa-plus"></i>
+</button>
+<button class="btn btn-default disabled" data-toggle="tooltip" title="$zoo._("Delete selected symbols")" onclick="return app.deleteSymbols();">
+<i class="fa fa-minus"></i>
+</button>
+</div>
+</div>
+
+<div id="symbolAdd"  class="point-symbol-container" style="max-height: 200px;overflow:auto;margin-top: 20px;">
+</div>
+<script type="text/javascript">
+function displaySymbolAdd(){
+	 app.displaySymbols();
+}
+function symbolAddToSelection(){
+	 app.symbolAddToS(arguments[0],\$("#dashFontBody").find("button").first());
+}
+function symbolAddToRSelection(){
+	 app.symbolAddToS(arguments[0],\$("#dashFontBody").find("button").last());
+}
+</script>
+
+                        </div>
+                        <a  href="#dashFontBody" data-toggle="collapse">
+                            <div class="panel-footer">
+                                <span class="pull-left">$zoo._("View Details")</span>
+                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                                <div class="clearfix"></div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+
 #import sqlite_module as sql
 #set t=$sql.request($conf,"SELECT count(*) as nb from spatial_ref_sys where fav")
 #set prjNumber=0

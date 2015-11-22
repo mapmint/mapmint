@@ -1036,15 +1036,19 @@ define([
 				aliases: [],
 				sizes: []
 			    };
+			    var lcnt=0;
 			    $("#manaLayerProperties").find('select.mmField').each(function(){
 				for(i in ldata){
 				    if(ldata[i]["_name"]!="msGeometry"){
-					oLayers[layer]["queryParams"].fields.push(ldata[i]["_name"]);
-					oLayers[layer]["queryParams"].aliases.push(ldata[i]["_name"]);
-					oLayers[layer]["queryParams"].sizes.push(100);
+					if(lcnt==0){
+					    oLayers[layer]["queryParams"].fields.push(ldata[i]["_name"]);
+					    oLayers[layer]["queryParams"].aliases.push(ldata[i]["_name"]);
+					    oLayers[layer]["queryParams"].sizes.push(100);
+					}
 					$(this).append('<option value="'+ldata[i]["_name"]+'">'+ldata[i]["_name"]+'</option>');
 				    }
 				}
+				lcnt+=1;
 			    });
 			}
 			
@@ -1130,33 +1134,45 @@ define([
 	var template=$("#layer_property_table_line_template")[0].innerHTML;
 	var reg=[
 	    {
-		"reg": new RegExp("\\[order\\]","g"),
+		"reg": new RegExp("\\[id\\]","g"),
 		"value": values[0]
 	    },
 	    {
-		"reg": new RegExp("\\[display\\]","g"),
+		"reg": new RegExp("\\[order\\]","g"),
 		"value": values[1]
 	    },
 	    {
-		"reg": new RegExp("\\[export\\]","g"),
+		"reg": new RegExp("\\[display\\]","g"),
 		"value": values[2]
 	    },
 	    {
-		"reg": new RegExp("\\[name\\]","g"),
+		"reg": new RegExp("\\[export\\]","g"),
 		"value": values[3]
 	    },
 	    {
-		"reg": new RegExp("\\[label\\]","g"),
+		"reg": new RegExp("\\[name\\]","g"),
 		"value": values[4]
 	    },
 	    {
-		"reg": new RegExp("\\[width\\]","g"),
+		"reg": new RegExp("\\[label\\]","g"),
 		"value": values[5]
+	    },
+	    {
+		"reg": new RegExp("\\[width\\]","g"),
+		"value": values[6]
 	    },
 	];
 	for(var j=0;j<reg.length;j++)
 	    template=template.replace(reg[j]["reg"],reg[j]["value"]);
 	return template;
+    }
+
+    function getTableIndex(data,name){
+	for(var i in data){
+	    if(data[i]["_name"]==name)
+		return i;
+	}
+	return -1;
     }
 
     function loadTableDefinition(obj,data){
@@ -1167,12 +1183,13 @@ define([
 	var ldata=obj.schema.complexType.complexContent.extension.sequence.element;
 	if(data["gfi_aliases"] && data["gfi_aliases"].length>0){
 	    for(var i=0;i<data["gfi_aliases"].length;i++){
-		if(ldata[i+1]){
+		if(data["gfi_fields"][i]){
 		    tbody+=generateLineTemplate([
+			getTableIndex(ldata,data["gfi_fields"][i]),
 			i+1,
-			(data["gfi_fields"][i]?'checked="checked"':''),
+			'checked="checked"',
 			(data["exp_fields"] && data["exp_fields"][i]?'checked="checked"':''),
-			(data["gfi_fields"][i]?data["gfi_fields"][i]:ldata[i+1]["_name"]),
+			data["gfi_fields"][i],
 			data["gfi_aliases"][i],
 			(data["gfi_width"] && data["gfi_width"][i]?data["gfi_width"][i]:"110"),
 		    ]);
@@ -1180,11 +1197,12 @@ define([
 		}
 	    }
 	}
-	var cnt=(data["gfi_aliases"]?data["gfi_aliases"].length:0);
+	var cnt=alreadyDisplayed.length;
 	if(cnt<ldata.length-1)
 	    for(var i in ldata){
 		if(ldata[i]["_name"]!="msGeometry" && $.inArray(ldata[i]["_name"], alreadyDisplayed) == -1){
 		    tbody+=generateLineTemplate([
+			i,
 			cnt+1,
 			"",
 			($.inArray(ldata[i]["_name"],data["exp_fields"])!==-1?'checked="checked"':""),
@@ -1219,6 +1237,41 @@ define([
 	    deferRender:      true,
 	    bFilter:          false
 	} );
+	$("#mm_layer_property_table_display").find("button").last().off('click');
+	$("#mm_layer_property_table_display").find("button").last().click(function(){
+	    var params=[];
+	    var params0=[];
+	    $("#mm_layer_property_table_display").find("tbody").find("tr").each(function(){
+		params0.push({"id":$(this).find("td").first().find("input[name=field_id]").val()});
+		$(this).find("td").find("input").each(function(){
+		    if($(this).attr('type')=="checkbox"){
+			params.push({
+			    "identifier": $(this).attr('name'),
+			    "value": $(this).prop('checked')+"",
+			    "dataType": "boolean"
+			});
+			if($(this).attr('name')=="display"){
+			    if($(this).prop('checked')){
+				params0[params0.length-1]["display"]=true;
+				table.column(params0[params0.length-1]["name"]).visible(true);
+			    }
+			    else{
+				params0[params0.length-1]["display"]=false;
+				table.column(params0[params0.length-1]["name"]).visible(false);
+			    }
+			}
+		    }else
+			params.push({
+			    "identifier": $(this).attr('name'),
+			    "value": $(this).val(),
+			    "dataType": "string"
+			});
+		});
+	    });
+	    console.log(params0);
+	    console.log(params);
+	    
+	});
 	$("#mm_layer_property_table_display").find("button").first().off('click');
 	$("#mm_layer_property_table_display").find("button").first().click(function(){
 	    var params=[];
@@ -1291,7 +1344,7 @@ define([
 		"interval": ["minBandValue","maxBandValue"],
 	    };
 	    if(ldata["bands"]!=null){
-		var myData=ldata["bands"].split(',');
+		var myData=ldata["bands"];
 		for(k=0;k<myData.length;k++)
 		    for(var kk in lbindings){
 			if(ldata[kk] && ldata[kk].length){
@@ -1396,7 +1449,7 @@ define([
 
 	//$("input[name=styleOpacity]").next().html(ldata.Style.classes[0]["opacity"]+"%");
 	if(ldata["bands"]!=null){
-	    var myData=ldata["bands"].split(',');
+	    var myData=ldata["bands"];
 	    $("#manaLayerProperties").find('select.mmField').each(function(){
 		for(i in myData){
 		    $(this).append('<option value="'+myData[i].replace(/Band/g,"")+'">'+myData[i]+'</option>');
@@ -1859,21 +1912,25 @@ define([
 	    myLocation.find("input[type=text],input[type=range],textarea,select").each(function(){
 		if($(this).is(":visible") && $(this).is(":disabled"))
 		    edisabled.push($(this).attr('name'));
-		if($(this).is(":visible") && !$(this).is(":disabled"))
+		if($(this).is(":visible") && !$(this).is(":disabled") && $(this).val()!=null)
 		    params.push({"id":$(this).attr('name'),"value": $(this).val().replace(/\#/g,"")});
 	    });
 	    console.log(params);
 	    var inputs=[];
 	    var mmStep=-1;
+	    var hasTiles=false;
 	    for(var i in classifierBindings){
 		for(var j in params){
 		    if(params[j].id==i){
-			if(params[j].value!=-1)
+			if(params[j].value!=-1){
 			    inputs.push({
 				"identifier": classifierBindings[i],
 				"value": params[j].value,
 				"dataType": "string"
 			    });
+			    if(classifierBindings[i]=="tiled")
+				hasTiles=true;
+			}
 			if(classifierBindings[i]=="mmStep")
 			    mmStep=params[j].value;
 			break;
@@ -1923,7 +1980,15 @@ define([
 			ldata["Style"]=myNewData["Style"];
 			loadStyleTable(ldata);
 		    }
-		    redrawLayer(ldata.name);
+		    console.log("LDATA TYPE: "+ldata.type);
+		    if(ldata.type==3){
+			var mapUrl=module.config().msUrl+"?map="+module.config().dataPath+"/maps/project_"+$("#save-map").val()+".map";
+			if(hasTiles)
+			    mapUrl=module.config().msUrl+"?map="+module.config().dataPath+"/maps/color_ramp_"+$("#save-map").val()+"_"+ldata.name+".map";
+			redrawLayer(ldata.name,mapUrl);
+		    }
+		    else
+			redrawLayer(ldata.name);
 		},
 		error: function(data){
 		    console.log("ERROR");

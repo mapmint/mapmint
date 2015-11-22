@@ -1,0 +1,115 @@
+#encoding UTF-8
+
+#from Skeleton_bs import Skeleton_bs
+#extends Skeleton_bs
+
+#attr $mmodule = "Territories"
+
+#attr $ocss = ['colorpicker.css']
+
+#def istyles
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/font-mfizz.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.2.0/css/colReorder.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/1.0.7/css/responsive.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.0.0/css/select.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/dataTables.bootstrap.min.css"/>
+#end def
+
+
+#def page_title
+MapMint: $zoo._("Territories")
+#end def
+
+#def body
+#import zoo
+#import mm_access
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set prefix=auth.getPrefix($conf)
+#set cur=con.connect()
+#set cur=con.conn.cursor()
+
+#set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
+#include $tmpl
+#set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
+<script>
+var counter=0;
+</script>
+<div class="row">
+  <h2>
+   <i class="fa fa-sitemap"></i>
+   $zoo._("Territory:")
+   <span class="project-title" id="name_title">
+    $zoo._("Name of the selected territory")
+   </span>
+   <i class="fa fa-spinner fa-spin"></i>
+  </h2>
+</div>
+<div class="row">
+<div class="col-sm-5 col-lg-4">
+ $ftmpl.printButtonGroupA([
+  {"target":"adder","title":$zoo._("Add a territory"),"classes": "fa fa-plus"},
+  {"target":"deleter","title":$zoo._("Dele a territory"),"classes": "fa fa-trash"}
+])
+    <div id="adder" class="myWell collapse">
+      $ftmpl.printAdder({"id":"add-document","name": "dname","Name":$zoo._("Document Name"),"title":$zoo._("Add")})
+    </div>
+    <div id="deleter" class="myWell collapse">
+      <p>$zoo._("Do you really want to delete the territory ?")</p>
+      <button class="btn btn-default pull-right" id="delete-document" type="button">$zoo._("Delete")</button>
+    </div>
+    <table id="listElements">
+      <thead>
+	<tr>
+	  <th>$zoo._("Id")</th>
+	  <th>$zoo._("Name")</th>
+	</tr>
+	</thead>
+      <tbody>
+      </tbody>
+    </table>
+</div>
+<div class="col-sm-7 col-lg-8">
+  <div class="form-horizontal mtpp theForm" method="get" >
+
+$ftmpl.printLine({"rid":"documents_name","id":"dname","name":$zoo._("Name")})
+
+
+#import authenticate.service as auth
+#set options1=[[-1,$zoo._("Select a datasource")]]
+#set con=auth.getCon($conf)
+#set prefix=auth.getPrefix($conf)
+#set cur=con.connect()
+#set cur=con.conn.cursor()
+#set res=cur.execute("SELECT f_table_schema||'.'||f_table_name as id,f_table_name as val from geometry_columns order by f_table_name")
+#set vals=cur.fetchall()
+#for i in range(0,len(vals))
+#set $options1+=[[$vals[i][0],$vals[i][1]]]
+#end for
+
+    $ftmpl.printLine({"rid":"documents_dataSource","id":"dataSource","name":$zoo._("Geographical data"),"type":"select","options":$options1})  
+
+#set options=[[-1,$zoo._("None")]]
+#set res=cur.execute("SELECT id,name as val from "+$prefix+"territories order by name")
+#set vals=cur.fetchall()
+#for i in range(0,len(vals))
+#set $options+=[[$vals[i][0],$vals[i][1]]]
+#end for
+
+$ftmpl.printLine({"rid":"documents_t_hierarchy","id":"documents_t_hierarchy","name":$zoo._("Territory"),"type":"multiple","options":$options})
+
+#set options=[]
+#set res=$cur.execute("SELECT id,name as val from "+$prefix+"groups order by name")
+#set vals=$cur.fetchall()
+#for i in range(0,len(vals))
+#set $options+=[[$vals[i][0],$vals[i][1]]]
+#end for
+    $ftmpl.printLine({"rid":"documents_territories_groups","id":"groups","name":$zoo._("Groups"),"type":"multiple","options":$options})  
+    $ftmpl.printButton({"id":"save","name":$zoo._("Save")})
+  </div>
+</div>
+</div>
+
+#end def

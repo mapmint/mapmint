@@ -53,4 +53,23 @@ $Template(file=$conf['main']['templatesPath']+"/preview/baselayers_bs_new.tmpl",
 
     </div>
   </div>
+
+#if $m.web.metadata.get('mmOT')
+#set f0=$m.web.metadata.get('mmOT').split(',')
+#if $f0.count('AddLayer')>0 or $f0.count('AddWMSLayer')>0
+<script id="addedLayer_item_template" type="template/text">
+  <li class="list-group-item addedLayer" id="overlays_[nn]">
+    <ul class="list-group tree">
+      <li class="list-group-item">
+        <input type="checkbox" checked="checked"/><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$zoo._("Added layer [n]") </label>
+	<button class="pull-right"><i class="fa fa-trash"></i></button>
+        <ul class="list-group tree">
+          [list]
+        </ul>
+      </li>
+    </ul>
+  </li>
+</script>
+#end if
+#end if
 </div>

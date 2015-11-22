@@ -197,3 +197,10 @@ padding:6px;
     /*border-bottom: 2px #eee solid;
     text-decoration: underline;*/
 }
+
+.mmbtn-small{
+    line-height: 20px;
+    font-size: 0.85em;
+    margin-top:5px;
+    margin-right:5px;
+}

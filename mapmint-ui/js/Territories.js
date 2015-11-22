@@ -53,7 +53,7 @@ $(document).ready(function () {
     });
 
     $(".view-territory").click(function(){
-	if($("#territoires_dataSource").val()!="-1")
+	if($("#territories_dataSource").val()!="-1")
 	    preview();
 	else
 	    alert("Merci de sélectionner un territoire ayant une données déjà associée");
@@ -74,7 +74,7 @@ $(document).ready(function () {
 	}
     });
 
-    searchTable("territoires");
+    searchTable("territories");
     refreshList();
     
 });
@@ -127,9 +127,9 @@ function updateElement(){
 	}
     });
     params=[
-	{name: "table", value: "territoires",dataType: "string"},
-	{name: "territoires_groups_in", value: "t_id",dataType: "string"},
-	{name: "territoires_groups_out", value: "g_id",dataType: "string"},
+	{name: "table", value: "territories",dataType: "string"},
+	{name: "territories_groups_in", value: "t_id",dataType: "string"},
+	{name: "territories_groups_out", value: "g_id",dataType: "string"},
 	{name: "t_hierarchy_in", value: "o_t_id",dataType: "string"},
 	{name: "t_hierarchy_out", value: "p_t_id",dataType: "string"},
 	{name: "tuple", value: $.stringify(params), mimeType: "application/json"}
@@ -157,7 +157,7 @@ function refreshDetails(){
 
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table=territoires;id="+System.nodeId+"&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table=territories;id="+System.nodeId+"&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		var data=$.parseJSON(xml.responseText);
@@ -199,7 +199,7 @@ function getCurrentElements(obj){
 
 function saveOrder(){
     nodes=$('#ttlo').tree('getRoots');
-    var params=new Array({name: "table", value: "territoires",dataType: "string"});
+    var params=new Array({name: "table", value: "territories",dataType: "string"});
     for(i=0;i<nodes.length;i++){
 	params.push({name: "node", value: nodes[i].id, dataType: "string"});
     }
@@ -246,7 +246,7 @@ function setOrder(){
 function refreshList(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.list&DataInputs=table=territoires&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.list&DataInputs=table=territories&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 		var data=$.parseJSON(xml.responseText);
@@ -307,10 +307,10 @@ function refreshList(){
 
 function deleteElement(){
     params=[
-	{name: "table", value: "territoires",dataType: "string"},
+	{name: "table", value: "territories",dataType: "string"},
 	{name: "atable", value: "t_hierarchy",dataType: "sting"},
 	{name: "akey", value: "o_t_id",dataType: "string"},
-	{name: "atable", value: "territoires_groups",dataType: "sting"},
+	{name: "atable", value: "territories_groups",dataType: "sting"},
 	{name: "akey", value: "t_id",dataType: "string"},
 	{name: "id", value: System.nodeId,dataType: "string"}
     ];
@@ -331,7 +331,7 @@ function deleteElement(){
 
 function insertElement(){
     params=[
-	{name: "table", value: "territoires",dataType: "string"},
+	{name: "table", value: "territories",dataType: "string"},
 	{name: "name", value: $("#eName").val(),dataType: "string"}
     ];
     data=WPSGetHeader("np.insertElement")+WPSGetInputs(params)+WPSGetOutput({"name": "Result"})+WPSGetFooter();
@@ -352,7 +352,7 @@ function insertElement(){
 function loadForm(){
     $.ajax({
 	type: "GET",
-	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table=territoires;name='+arguments[0]+'&RawDataOutput=Result",
+	url: System.zooUrl+"?service=WPS&version=1.0.0&request=Execute&Identifier=np.details&DataInputs=table=territories;name='+arguments[0]+'&RawDataOutput=Result",
 	complete: function(xml,status) {
 	    if(checkWPSResult(xml,false)){
 	    }

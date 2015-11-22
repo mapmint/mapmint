@@ -12,9 +12,9 @@
 #end if
 #set $clause+=" name = '"+$i+"' "
 #end for
-#set res=cur.execute('SELECT id,name from '+$prefix+'indicateurs where id in (select i_id from '+$prefix+'indicateurs_groups where g_id in (select id from '+prefix+'groups where name=\'public\' or '+$clause+')) order by id desc LIMIT 4')
+#set res=cur.execute('SELECT id,name from '+$prefix+'indicators where id in (select i_id from '+$prefix+'indicators_groups where g_id in (select id from '+prefix+'groups where name=\'public\' or '+$clause+')) order by id desc LIMIT 4')
 #set vals=cur.fetchall()
-<h3 class="idx">$zoo._("Indexes")</h2>
+<h3 class="idx">$zoo._("Indicators")</h2>
 <ul>
 #for i in range(0,len(vals))
 <li><a onclick="\$('#index_id').val($vals[i][0]);setCurrentIndex();displayIndexPage();" href="#indicateur_$vals[i][0]">$vals[i][1]</a>

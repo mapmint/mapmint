@@ -1,0 +1,466 @@
+#encoding UTF-8
+
+#from Skeleton_bs import Skeleton_bs
+#extends Skeleton_bs
+
+#attr $mmodule = "Indexes"
+
+#attr $ocss = ['colorpicker.css']
+
+#attr $js = ['jquery.tipsy.js','jquery.hoverIntent.min.js','colorpicker.js','progress-bar.js','Meta.js','jquery.cookie.js','jquery.colorPicker.js','jquery.xml2json.pack.js','wps.js','roundies.js','generic.js','Graphs.js','Table.js','ckeditor.js']
+
+#attr $js1 = ['main_js']
+
+#attr $js3 = ['highchart/js/highcharts.js',"OpenLayers.js"]
+
+#def page_title
+MapMint: Indexes
+#end def
+
+#def body
+#import zoo
+#import mm_access
+
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set prefix=auth.getPrefix($conf)
+#set cur=con.connect()
+#set cur=con.conn.cursor()
+
+<div class="ui-layout-center">
+  <div id="Indexes" class="inner-layout-container">   
+    
+    <div class="inner-center" id="indicateurs_edition_ui">
+      <h1 class="pane-title">$zoo._("Informations:")<span class="project-title" id="indicateurs_name_title">Nom de l'indicateur sélectionné</span></h1>
+      <div class="toolbar2">
+	<a class="fg-button ui-state-default ui-corner-all ui-icon metadata" id="metadata" href="#metadata" title="$zoo._("Metadata")"></a>
+        <a class="fg-button ui-state-default ui-corner-all ui-icon data" id="data" href="#data" title="$zoo._("Data")"></a>
+        <a class="fg-button ui-state-default ui-corner-all ui-icon symbology" id="layers-settings" href="#symbology" title="$zoo._("Symbology")"></a>
+        <a class="fg-button ui-state-default ui-corner-all ui-icon table" id="maps-settings" href="#table" title="$zoo._("Table")"></a>
+        <a class="fg-button ui-state-default ui-corner-all ui-icon chart" id="controls-settings" href="#chart" title="$zoo._("Chart")"></a>
+        <a class="fg-button ui-state-default ui-corner-all ui-icon repport" id="controls-settings" href="#repport" title="$zoo._("Repport")"></a>
+        <a class="fg-button ui-state-default ui-corner-all ui-icon aggregation" id="controls-settings" href="#agregation" title="$zoo._("Aggregate")"></a>
+	<a class="ui-state-default ui-button-text-only ui-corner-all save-as-map ipublish _nothidable"  href="#" title="" onclick="publishIndexMap();">$zoo._("Publish")</a>
+	<a class="ui-state-default ui-button-text-only ui-corner-all save-as-map iunpublish _nothidable"  href="#" title="" onclick="publishIndexMap('un');">$zoo._("Unpublish")</a>
+      </div>      
+      
+      <div class="center-container">
+	
+	<div class="tabs-project">
+	  
+          <div style="display:block;" id="metadata">
+	    <div class="loader-container">
+	      <div id="loader"> </div>
+	    </div>
+	    <table class="gen" id="indicateurs_edition_ui_step_metadata">
+	      <tbody>
+	 	<tr>
+	    	  <td valign="middle" style="width:200px;">$zoo._("Name:")</td>
+	    	  <td><input id="indicateurs_name" class="rounded frm" type="text" value="" /></td>
+		</tr>
+	 	<tr>
+	    	  <td valign="middle" style="width:200px;">$zoo._("Description:")</td>
+	    	  <td>
+	    	    <textarea id="indicateurs_description" class="rounded frm maincfg" rows="3" cols="17"></textarea>
+	    	  </td>
+		</tr>
+		<tr>
+		  <td valign="middle" style="width:200px;">Fichier: <input type="radio" name="doct" value="file"  selected="true" onclick="\$('#indicateurs_url').hide();\$('#file0').show();" /> URL: <input type="radio" name="doct" value="url" onclick="\$('#indicateurs_url').show();\$('#file0').hide();" /></td>
+		  <td>
+		    <input id="indicateurs_url" class="rounded frm maincfg url" style="display:none;" />
+		    <form id="fileUpload0" action="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=upload.saveOnServer&dataInputs=file=upload;filename=file" method="post" enctype="multipart/form-data" target="uploader">
+		    <input type="file" name="file" id="file0" class="rounded frm file" />
+		    <a id="indicateurs_file_link0" href="" target="_blank"></a>
+		    </form>
+		    <input type="hidden" id="indicateurs_filename" class="rounded frm file" />
+		    <iframe onload="if(counter>0){updateElement('_metadata');counter=1;}else counter+=1;" name="uploader" id="uploader" style="display:none"></iframe>
+		  </td>
+		</tr>
+		<tr>
+	    	  <td valign="middle" style="width:200px;">$zoo._("Sources:")</td>
+	    	  <td><input id="indicateurs_sources" class="rounded frm" type="text" value="" /></td>
+		</tr>
+		<tr>
+	    	  <td valign="middle" style="width:200px;">$zoo._("Keywords:")</td>
+	    	  <td><input id="indicateurs_indicateurs_keywords" class="rounded frm" type="text" value="" /></td>
+		</tr>
+		<tr>
+	    	  <td valign="middle" style="width:200px;">$zoo._("Groups")</td>
+	    	  <td>
+		    <select multiple="multiple" class="rounded mltp" id="indicateurs_indicateurs_groups">
+$(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/GroupMultipleList.html",searchList={"cur":$cur,"prefix":$prefix}))
+		    </select> 
+	    	  </td>
+		</tr>
+		<tr>
+	    	  <td valign="middle" style="width:200px;">Thèmes:</td>
+	    	  <td>
+		    <select multiple="multiple" class="rounded mltp" id="indicateurs_indicateurs_themes">
+#import np.service as np
+#import authenticate.service as auth
+#set thms=np.listThemes(cur,$auth.getPrefix($conf),$conf["senv"]["group"])
+$(Template(file=$conf["main"]["templatesPath"]+"/Indexes/displayThemes.html",searchList={"themes": $thms,"prefix":"","conf":$conf}))
+		    </select>
+	    	  </td>
+		</tr>
+	      </tbody>
+	    </table>
+	    <a href="#" class="wbutton ui-corner-all al" onclick="\$('#indicateurs_filename').val(\$('#file0').val());\$('#fileUpload0').submit();">$zoo._("Save")</a>
+	    
+	  </div>
+	  
+	  <div style="display:block;" id="data">
+	    <div class="loader-container">
+	      <div id="loader"> </div>
+	    </div>
+	    <table class="gen">
+	      <tbody>
+	 	<tr>
+	    	  <td valign="middle" style="width:200px;">$zoo._("Table:")</td>
+	    	  <td>
+	    	    <select id="indicateurs_indicateurs_territoires" class="gselect rounded" onchange="updateSelectWithFields(['indicateurs_indicateurs_territoires_key']);">
+		      <option value="-1">$zoo._("Select a territory")</option>
+#set res=cur.execute("SELECT id,name as val from "+$prefix+"territories order by name")
+#set vals=cur.fetchall()
+#for i in range(0,len(vals))
+		      <option value="$vals[i][0]">$vals[i][1]</option>
+#end for
+	    	    </select>
+	    	    <select id="indicateurs_indicateurs_territoires_key" class="gselect rounded">
+	    	    </select>
+	    	  </td>
+		</tr>
+	    </table>
+
+	    <div class=".tbl_part">
+	      <ul class="choice">
+		<li><input type="radio" name="group1" value="opt1" checked="checked" /><label>$zoo._("File")</label></li>
+		<li><input type="radio" name="group1" value="opt2" checked="checked" /><label>$zoo._("Table")</label></li>
+ 		<li><input type="radio" name="group1" value="opt3" /><label>$zoo._("SQL Query")</label></li>
+	      </ul>
+	      
+	      <div id="opt1" class="desc">
+	      <form id="fileUpload" action="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=upload.saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="uploader0">
+		<input type="file" name="file" id="file" class="rounded frm file" />
+		<a id="indicateurs_file_link" href="" target="_blank"></a>
+		  <a href="#" class="wbutton ui-corner-all al" onclick="\$('#indicateurs_territoires_filename').val(\$('#file').val());\$('#fileUpload').submit();">$zoo._("Import")</a>
+	      </form>
+	      <input type="hidden" id="indicateurs_territoires_filename" class="rounded frm file" />
+	      <iframe onload="if(counter>0){try{loadTableForFile();counter=1;}catch(e){alert(e);}}else counter+=1;" name="uploader0" id="uploader0" style="display:none"></iframe>
+		
+
+		<select id="dsFileSelect" style="display:none" onchange="">
+		</select>
+	      </div>
+	    </div>
+	    
+	    
+	    <div>
+
+	      <div id="opt2" class="desc">
+		<span>$zoo._("Schemas:")</span>
+		<input type="hidden" id="browser_selected_dsName" value="$conf["main"]["dbuserName"]" />
+#from datastores.postgis import pgConnection
+#set t=$inputs
+#set t["dataStore"]={"value": $conf["main"]["dbuserName"]}
+#set demo=pgConnection.listSchemas($conf,$t,$outputs)
+#set ress=eval($outputs["Result"]["value"])
+		<select id="pg_schema" onchange="MapMintDBManager.refreshTablesList();">
+#set j=0
+#for i in ress
+#if $j==0
+#set tmp=$inputs
+#set tmp["schema"]={"value": $i[0]}
+#end if
+		  <option value="$i[0]">$i[0]</option>
+#set j=$j+1
+#end for
+		</select>
+		<span>$zoo._("Tables:")</span>
+		<select id="pg_table" onchange="runQuery('basic');">
+		  <option value="-1">Choose</option>
+#set demo=pgConnection.listTables($conf,$inputs,$outputs)
+#set rest=eval($outputs["Result"]["value"])
+#for i in rest
+		  <option value="$i[0]">$i[1]</option>
+#end for
+		</select>
+
+	      </div>
+
+	      <div id="opt3" class="desc">
+		<table class="gen">
+		  <tbody>
+	 	    <tr>
+	    	      <td valign="middle" style="width:200px;">Base de données:</td>
+	    	      <td>
+	    		<select id="mmDbConnection" class="gselect rounded">
+	    		  <option  selected="selected" value="-1">$zoo._("Select a connection")</option>
+#import datastores.postgis.service as pg
+#import json
+#set ii=$inputs
+#set ii["type"]={"value": "PostGIS"}
+#set res=$pg.displayJson($conf,$ii,$outputs)
+#try
+#set t=json.loads($outputs["Result"]["value"])
+#for i in range(0,len($t["sub_elements"]))
+	    		  <option value="PostGIS:$t["sub_elements"][i]["name"]">$t["sub_elements"][i]["name"]</option>
+#end for
+#except
+#pass
+#end try
+#set ii=$inputs
+#set ii["type"]={"value": "MySQL"}
+#set res=$pg.displayJson($conf,$ii,$outputs)
+#try
+#set t=json.loads($outputs["Result"]["value"])
+#for i in range(0,len($t["sub_elements"]))
+	    		  <option value="MySQL:$t["sub_elements"][i]["name"]">$t["sub_elements"][i]["name"]</option>
+#end for
+#except
+#pass
+#end try
+	    		</select>
+	    	      </td>
+		    </tr>
+		    <tr>
+	    	      <td valign="middle" style="width:200px;">$zoo._("SQL Query:")</td>
+	    	      <td>
+	    		<textarea id="mmSQLQuery" class="rounded frm maincfg"></textarea>
+	    	      </td>
+		    </tr>
+		  </tbody>
+		</table>
+		<a href="#" class="wbutton ui-corner-all al sql_test">$zoo._("Test")</a>
+		<a href="#" class="wbutton ui-corner-all al sql_confirm">$zoo._("Launch")</a>
+	      </div>
+	    </div>
+
+		<div id="dsContainer" class="tbl_part">
+		 <table id="flex_csv">
+		 </table>
+		</div>
+
+	    <a href="#" class="wbutton ui-corner-all al" onclick="createIndex();">$zoo._("Confirm")</a>
+
+	  </div>
+	  
+	  <div style="display:block;" id="symbology">
+	    <div class="loader-container">
+	      <div id="loader"> </div>
+	    </div>	    
+	    <table class="gen" id="#">
+	      <tbody>
+		<tr>
+	    	  <td valign="middle" style="width:200px;">Variable:</td>
+	    	  <td>
+		    <select  id="s_fname" class="gselect rounded fselect">
+		    </select> 
+	    	  </td>
+		</tr>
+		<tr>
+	    	  <td valign="middle" style="width:200px;">Formule:</td>
+	    	  <td>
+		    <textarea id="s_formula" class="rounded frm maincfg" type="text"></textarea>
+	    	  </td>
+		</tr>
+		<tr>
+	    	  <td valign="middle" style="width:200px;">$zoo._("Classes")</td>
+	    	  <td>
+		    <select  id="s_ctype" class="gselect rounded" onchange="if(this.value=='gradSymb')\$('#discret').show(); else {\$('#discret').hide();\$('#dropdownd').val('-1');}">
+		      <option value="uniqVal" onclick="\$('.tl').hide();">$zoo._("Unique Value")</option>
+		      <option value="gradSymb" onclick="\$('.tl').hide();">$zoo._("Graduated Symbol")</option>
+		      <option value="contCol" onclick="\$('.tl').hide();">$zoo._("Cotinuous color")</option>
+		      <option value="timeline" onclick="\$('.tl').show();">$zoo._("Time line")</option>
+		    </select> 
+	    	  </td>
+		</tr>
+		<tr class="tl" #if not($inputs.has_key('isStep'))#style="display: none"#end if#>
+		  <td class="title">$zoo._("Steps:")</td>
+		  <td>
+		    <input type="hidden" id="mmPrefix" value="indexes_" />
+		    <select id="mmsteps" onchange="if(this.value=='add')MMStyler.Timeline.startStepEditor();if(this.selectedIndex>1){\$('#mmDeleteStep').show();MMStyler.startWindow(true);}else \$('#mmDeleteStep').hide();">
+		      <option value="-1">$zoo._("Select one step")</option>
+		      <option value="add">$zoo._("Add a step")</option>
+		    </select>
+		    <input id="mmDeleteStep" type="submit" value="$zoo._("Delete")" onclick="try{MMStyler.Timeline.deleteStep();}catch(e){}return false;" />	
+		  </td>
+		</tr>
+		<tr class="tl" #if not($inputs.has_key('isStep'))#style="display: none"#end if#>
+		  <td class="title">$zoo._("Legend Type for this step:")</td>
+		  <td>
+		    <form>
+		    
+		    <select id="dropdown1" name="dropdown1" class="select-window" onchange="if(\$(this).val()=='gradSymb') \$('#discret').show(); else {\$('#discret').hide();\$('#dropdownd').val('-1');}">
+		      <option value="gradSymb">$zoo._("Graduated Symbol")</option>
+		      <option value="contCol">$zoo._("Continuous Color")</option>
+		      <option value="uniqVal">$zoo._("Unique Value")</option>
+		    </select>
+		    </form>
+		  </td>
+		</tr>
+		<tr id="discret">
+		  <td class="title">$zoo._("Discretization:")</td>
+		  <td>
+		    <select id="dropdownd" name="dropdownd" class="select-window">
+		      <option value="-1">$zoo._("Choose")</option>
+#set tmp=["equal","jenks","quantile","kmeans","fisher"]
+#for a in tmp 
+		      <option value="$a">$zoo._(a)</option>
+#end for
+		    </select>
+		    </form>
+		  </td>
+		</tr>
+		<tr>
+		  <td valign="middle" style="width:200px;">$zoo._("Number of classes:")</td>
+		  <td><input id="s_nbc" class="rounded frm" type="text" value="" /></td>
+		</tr>
+		<tr>
+		  <td valign="middle" style="width:200px;">$zoo._("Min Color:")</td>
+		  <td>
+		    <div id="customWidget2">
+		    <div id="customWidget">
+		      <div id="colorSelector2"><div style="background-color:#9ACB6B"></div></div>
+	              <div id="colorpickerHolder2">
+	              </div>
+		    </div>
+		    </div>
+		    <input type="hidden" id="s_color2" value="ffffff" />
+	    	  </td>
+		</tr>
+	    <tr>
+	      <td valign="middle" style="width:200px;">$zoo._("Max Color:")</td>
+	      <td>
+		<div  id="customWidget3">
+		<div id="customWidget">
+		  <div id="colorSelector3"><div style="background-color:#67983A"></div></div>
+		  <div id="colorpickerHolder3">
+	          </div>
+		</div>
+		</div>
+		<input type="hidden" id="s_color3" value="ffffff" />
+	      </td>
+	    </tr>	    
+	    
+	      </tbody>
+	    </table>
+	    <a href="#" class="wbutton ui-corner-all al" onclick="classifyMap();">$zoo._("Classify")</a>
+	    <a href="#" class="wbutton ui-corner-all al" onclick="preview();">$zoo._("Preview")</a>
+
+	    <div id="indexStyle">
+	      
+	    </div>
+	  </div>
+
+#for k in ["Table","Graph"]
+#include $conf["main"]["templatesPath"]+"/Indexes/"+$k+"Part.tmpl"
+#end for
+	  
+
+	  <div style="display:block;" id="agregation">
+	    <table class="gen" id="#">
+	      <tbody>
+		<tr>
+		  <td valign="middle" style="width:200px;">$zoo._("Parent territoires:")</td>
+		  <td>
+		    <select  id="p_tname" class="gselect rounded tsellect" onchange="refreshAgregate();">
+		      <option value="-1">$zoo._("Select a parent territory")</option>
+		    </select> 
+		  </td>
+		</tr>
+	      </tbody>
+	    </table>
+	    
+	    <input type="checkbox" id="agregation_chk" name="agregation" value="agregation" class="chch" />
+	    <label class="ch">$zoo._("Generalize by using parent datasource")</label>
+
+	    <div id="agreg">
+	      <table class="gen">
+		<tbody>
+		  <tr id="agregate_steps" style="display:none;">
+		    <td>
+		      $zoo._("Step:")
+		    </td>
+		    <td>
+		      <select id="agregate_step" onchange="System.refreshSteps=false;refreshAgregate();">
+			</select>
+		      </td>
+		    </tr>
+		  <tr>
+		    <td valign="middle" style="width:200px;">zoo._("Agregation formula:")</td>
+		    <td>
+		      <textarea id="agregation_formula" class="rounded frm maincfg"></textarea>
+		    </td>
+		  </tr>
+		</tbody>
+	      </table>
+	      <a href="#" class="wbutton ui-corner-all al" onclick="insertAgregate();">$zoo._("Save")</a>
+	      <a href="#" class="wbutton ui-corner-all al" onclick="preview();">$zoo._("Preview")</a>
+	      <div id="agregate_flexi">
+		
+	      </div>
+	    </div>
+
+
+	  </div>
+
+#include $conf["main"]["templatesPath"]+"/Indexes/DocPart.tmpl"
+	</div>
+	
+      </div>
+      
+    </div>
+    
+    
+    <div class="inner-west" id="indexes-tree">
+      <h1 class="pane-title">$zoo._("Indicateurs")</h1>
+      <div class="toolbar">
+	<a class="fg-button ui-state-default ui-corner-all add-index"  id="add-index" href="#" title="$zoo._("Add index")"></a>
+	<a class="fg-button ui-state-default ui-corner-all delete-index"  id="delete-index" href="#" title="$zoo._("Delete index")"></a>
+	<label for="indicateurs_search">Search: </label>
+	<input id="indicateurs_search" type="text" value="" />
+      </div>
+      <div id='ltree'></div>
+    </div>
+    
+  </div>
+</div> 
+
+<div id="add-index-dialog" data-options="title:'$zoo._("Add index")'">
+  <table class="gen">
+    <tbody>
+      <tr>
+	<td valign="middle" style="width:100px;">Nom:</td>
+	<td><input id="eName" class="rounded wfrm" type="text" value="" /></td>
+      </tr>	        
+    </tbody>
+  </table>
+  <a href="#" class="wbutton ui-corner-all" onclick="insertElement();" >$zoo._("Add")</a>
+  <a href="#" class="wbuttonc ui-corner-all" onclick="\$('#add-index-dialog').window('close');">$zoo._("Cancel")</a>
+</div>
+
+<div id="remove-index-dialog" data-options="title:'Supprimer un indicateur'">
+  <table class="gen">
+    <tbody>
+      <tr>
+	<td valign="middle" style="width:100px;">Nom:</td>
+	<td><input id="dName" class="rounded wfrm" type="text" disabled="true" value="" /></td>
+      </tr>	        
+    </tbody>
+  </table>
+  <a href="#" class="wbutton ui-corner-all" onclick="removeElement();" >$zoo._("Delete")</a>
+  <a href="#" class="wbuttonc ui-corner-all" onclick="\$('#remove-index-dialog').window('close');">$zoo._("Cancel")</a>
+</div>
+
+<div id="class-dialog" title="$zoo._("Class")"></div>
+
+  <div id="preview-territory-dialog" data-options="title:'$zoo._("Preview")'">
+    <img src="" id="t_preview" />
+  </div>
+
+  <div id="preview-repport-dialog" data-options="title:'$zoo._("Preview")'">
+    <a id="prd_link" href="" target="_blank"><img src="" id="r_preview"  style="width:397px;height:561px"/></a>
+  </div>
+
+#end def

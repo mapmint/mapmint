@@ -993,10 +993,115 @@ define([
 
     };
 
+    function displaySymbols(){
+	var params=[
+	    {"identifier": "tmpl", "value": "/Manager/Styler/SymbolChooser_bs.html","dataType": "string"}
+	];
+	var myTarget=$("#symbolAdd").prev().prev();
+	if(arguments.length==0){
+	    params.push({"identifier": "ttf", "value": $("#symbolSelecter").val(),"dataType": "string"});
+	    myTarget=$("#symbolAdd");
+	}
+	zoo.execute({
+	    identifier: "symbol-tools.getSymbolChooser4TTF",
+	    type: "POST",
+	    dataInputs: params,
+	    dataOutputs: [
+		{"identifier":"Result","type":"raw"},
+	    ],
+	    success: function(data){
+		myTarget.html(data);
+		if(!myTarget.attr("id"))
+		    $("#dashFontBody").prev().find("div.huge").first().html(myTarget.find("i").length);
+	    },
+	    error: function(data){
+	    }
+	});
+    }
+
+    function deleteSymbols(){
+	var keycodes=[];
+	$("#symbolAdd").prev().prev().find("i.fa-check-square-o").each(function(){
+	    keycodes.push(
+		{"identifier": "name", "value": $(this).parent().attr("id"), "dataType": "string"}
+	    );
+	    $(this).addClass("fa-square-o").removeClass("fa-check-square-o").css({"margin-right":"-15px"});
+	});
+	$("#dashFontBody").find("button").last().addClass("disabled");
+	console.log(keycodes);
+	//return 1;
+	zoo.execute({
+	    identifier: "symbol-tools.deleteSymbolFromOrig",
+	    type: "POST",
+	    dataInputs: keycodes,
+	    dataOutputs: [
+		{"identifier":"Result","type":"raw"},
+	    ],
+	    success: function(data){
+		$(".notifications").notify({
+		    message: { text: data },
+		    type: 'success',
+		}).show();
+		displaySymbols(1)
+	    },
+	    error: function(data){
+	    }
+	});
+    }
+
+    function addSymbols(){
+	console.log("OKOK");
+	var keycodes=[];
+	$("#symbolAdd").find("i.fa-check-square-o").each(function(){
+	    console.log($(this).parent());
+	    var tmp=$(this).parent().attr("id").split('|');
+	    keycodes.push(tmp[1]);
+	    $(this).addClass("fa-square-o").removeClass("fa-check-square-o").css({"margin-right":"-15px"});
+	});
+	$("#dashFontBody").find("button").first().addClass("disabled");
+	console.log(keycodes);
+	//return 1;
+	zoo.execute({
+	    identifier: "symbol-tools.addSymbolToOrig",
+	    type: "POST",
+	    dataInputs: [
+		{"identifier": "ttf", "value": $("#symbolSelecter").val().replace(/\.ttf/g,""),"dataType": "string"},
+		{"identifier": "charcodes", "value": "["+keycodes.join(',')+"]","dataType": "string"}
+	    ],
+	    dataOutputs: [
+		{"identifier":"Result","type":"raw"},
+	    ],
+	    success: function(data){
+		$(".notifications").notify({
+		    message: { text: data },
+		    type: 'success',
+		}).show();
+		displaySymbols(1)
+	    },
+	    error: function(data){
+	    }
+	});
+    }
+    
+    function symbolAddToS(){
+	if(arguments[0].find("i").first().hasClass("fa-square-o"))
+	    arguments[0].find("i").first().addClass("fa-check-square-o").removeClass("fa-square-o").css({"margin-right":"-17px"});
+	else
+	    arguments[0].find("i").first().addClass("fa-square-o").removeClass("fa-check-square-o").css({"margin-right":"-15px"});
+	if(arguments[0].parent().find("i.fa-check-square-o").length>0)
+	    arguments[1].removeClass("disabled");
+	else
+	    arguments[1].addClass("disabled");
+    }
+    
     // Return public methods
     return {
         initialize: initialize,
 	adminBasic: adminBasic,
+	displaySymbols: displaySymbols,
+	addSymbols: addSymbols,
+	deleteSymbols: deleteSymbols,
+	symbolAddToS: symbolAddToS,
 	zoo: zoo
     };
 

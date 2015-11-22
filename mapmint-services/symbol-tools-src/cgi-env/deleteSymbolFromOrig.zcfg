@@ -1,0 +1,30 @@
+[deleteSymbolFromOrig]
+ Title = Remove one or more symbols from the list of available symbols to MapServer
+ Abstract = Add one or more symbols from the list of available symbols to MapServer.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [name]
+   Title = The symbol name
+   Abstract = The symbol name.
+   minOccurs = 1
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The success or failure message
+   Abstract = The success or failure message.
+   <ComplexData>
+    <Default>
+	mimeType=text/plain
+	encoding=utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

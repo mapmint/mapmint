@@ -50,15 +50,15 @@ def setIndexQuote(conf,inputs,outputs):
     con=auth.getCon(conf)
     cur=con.conn.cursor()
     tprefix=auth.getPrefix(conf)
-    req="SELECT count(*) from indicateurs_favoris WHERE i_id=[_id_] and u_id=(SELECT id from "+tprefix+"users WHERE login=[_login_])" 
+    req="SELECT count(*) from "+tprefix+"indicators_favoris WHERE i_id=[_id_] and u_id=(SELECT id from "+tprefix+"users WHERE login=[_login_])" 
     res=con.pexecute_req([req,{"id":{"value":inputs["id"]["value"],"format":"s"},"login":{"value":conf["senv"]["login"],"format":"s"}}])
     vals=con.cur.fetchone()
     if vals is not None and vals[0]>0:
-        req="UPDATE indicateurs_favoris set note=[_quote_] WHERE i_id=[_id_] and u_id=(SELECT id from "+tprefix+"users WHERE login=[_login_])"
+        req="UPDATE "+tprefix+"indicators_favoris set note=[_quote_] WHERE i_id=[_id_] and u_id=(SELECT id from "+tprefix+"users WHERE login=[_login_])"
     	con.pexecute_req([req,{"quote":{"value":inputs["quote"]["value"],"format":"s"},"id":{"value":inputs["id"]["value"],"format":"s"},"login":{"value":conf["senv"]["login"],"format":"s"}}])
         outputs["Result"]["value"]=zoo._("Index quote updated.")
     else:
-        req="INSERT INTO indicateurs_favoris (i_id,u_id,note) VALUES ([_id_],(SELECT id from "+tprefix+"users WHERE login=[_login_]),[_quote_])"
+        req="INSERT INTO "+tprefix+"indicators_favoris (i_id,u_id,note) VALUES ([_id_],(SELECT id from "+tprefix+"users WHERE login=[_login_]),[_quote_])"
     	con.pexecute_req([req,{"id":{"value":inputs["id"]["value"],"format":"s"},"login":{"value":conf["senv"]["login"],"format":"s"},"quote":{"value":inputs["quote"]["value"],"format":"s"}}])
         outputs["Result"]["value"]=zoo._("Index quote saved.")
     con.conn.commit()
@@ -93,9 +93,9 @@ def getIndexQuote(conf,inputs,outputs):
         clause=" i_id=[_id_]"
         params["id"]={"value":inputs["id"]["value"],"format":"s"}
     if conf["senv"]["login"]=="anonymous":
-        req="SELECT i_id,avg(note),true from indicateurs_favoris WHERE "+clause+" GROUP BY i_id" 
+        req="SELECT i_id,avg(note),true from "+tprefix+"indicators_favoris WHERE "+clause+" GROUP BY i_id" 
     else:
-        req="SELECT i_id,note,false from indicateurs_favoris WHERE "+clause+" and u_id=(SELECT id from "+tprefix+"users WHERE login='"+conf["senv"]["login"]+"')" 
+        req="SELECT i_id,note,false from "+tprefix+"indicators_favoris WHERE "+clause+" and u_id=(SELECT id from "+tprefix+"users WHERE login='"+conf["senv"]["login"]+"')" 
     res=con.pexecute_req([req,params])
     vals=con.cur.fetchall()
     if inputs["id"].has_key("length"):
@@ -193,8 +193,8 @@ def searchByName(conf,inputs,outputs):
             lclause+=" or "
         lclause+=" name = "+str(adapt(tmp[j]))
     suffix1=" (SELECT id FROM "+tprefix+"groups WHERE "+lclause+") "
-    suffix20="(SELECT DISTINCT i_id FROM ((select DISTINCT i_id from "+inputs["tbl"]["value"]+"_themes where t_id in (select DISTINCT t_id from "+tprefix+"themes_groups where g_id in "+suffix1+")) INTERSECT (select DISTINCT i_id from indicateurs_territoires where t_id in ( select DISTINCT t_id from territoires,territoires_groups where territoires.id=territoires_groups.t_id "+suffix10+" and g_id in "+suffix1+"))) as foo)"
-    suffix2=" and indicateurs.id in "+suffix20+" and "
+    suffix20="(SELECT DISTINCT i_id FROM ((select DISTINCT i_id from "+inputs["tbl"]["value"]+"_themes where t_id in (select DISTINCT t_id from "+tprefix+"themes_groups where g_id in "+suffix1+")) INTERSECT (select DISTINCT i_id from "+tprefix+"indicators_territories where t_id in ( select DISTINCT t_id from territories,territories_groups where territories.id=territories_groups.t_id "+suffix10+" and g_id in "+suffix1+"))) as foo)"
+    suffix2=" and "+tprefix+"indicators.id in "+suffix20+" and "
     suffix0=", "+inputs["tbl"]["value"]+"_groups "+suffix0+" "+inputs["tbl"]["value"]+"_groups.i_id="+inputs["tbl"]["value"]+".id "+suffix2+inputs["tbl"]["value"]+"_groups.g_id in "+suffix1+" and "
     req=" SELECT DISTINCT ON ("+prefix+"id) "+prefix+"id,"+prefix+"name from "+inputs["tbl"]["value"]+suffix0+" name like '%"+inputs["val"]["value"]+"%' "
     print >> sys.stderr,req
@@ -237,7 +237,7 @@ def parseDocAttr(conf,inputs,outputs):
 def setCurrentIndex(conf,inputs,outputs):
     import mapscript
     conf["senv"]["last_index"]=inputs["id"]["value"]
-    inputs0={"table":{"value":"indicateurs"},"id":inputs["id"]}
+    inputs0={"table":{"value":"indicators"},"id":inputs["id"]}
     if inputs.has_key('tid'):
         inputs0["tid"]=inputs["tid"]
     inputs0["public"]={"value":"true"}
@@ -275,8 +275,8 @@ def getLastPublishedIndex(conf):
 
 def getIndexDisplay(conf,inputs,outputs):
     id=inputs["id"]["value"]
-    req="select label,width from dtable where it_id=(select id from indicateurs_territoires where i_id="+id+") order by pos"
-    req="select label,width from dtable where it_id=(select id from indicateurs_territoires where i_id=[_id_]) order by pos"
+    req="select label,width from dtable where it_id=(select id from "+tprefix+"indicators_territories where i_id="+id+") order by pos"
+    req="select label,width from dtable where it_id=(select id from "+tprefix+"indicators_territories where i_id=[_id_]) order by pos"
     params={"id":{"value":id,"format":"s"}}
     import authenticate.service as auth
     con=auth.getCon(conf)
@@ -298,6 +298,7 @@ def getIndexDisplay(conf,inputs,outputs):
     return zoo.SERVICE_SUCCEEDED
 
 def getIndexDisplayJs(conf,inputs,outputs):
+    prefix=auth.getPrefix(conf)
     id=inputs["id"]["value"]
     id0=""
     if inputs.has_key("tid") and inputs["tid"]["value"]!="null":
@@ -313,9 +314,9 @@ def getIndexDisplayJs(conf,inputs,outputs):
         else:
             id+=" and (not(agregation) or agregation is null) and step is null"
             id0+=" and step is null"
-    req0="select name,order_by from d_table where i_id="+inputs["id"]["value"]+id0+""
+    req0="select name,order_by from "+prefix+"d_table where i_id="+inputs["id"]["value"]+id0+""
     print >> sys.stderr,req0
-    req="select var,label,width from dtable where it_id=(select id from indicateurs_territoires where i_id="+id+") "+id0+" order by pos"
+    req="select var,label,width from "+prefix+"dtable where it_id=(select id from "+tprefix+"indicators_territories where i_id="+id+") "+id0+" order by pos"
     print >> sys.stderr,req
     import authenticate.service as auth
     con=auth.getCon(conf)
@@ -371,7 +372,7 @@ def getIndexRequest(conf,inputs,outputs):
     if inputs.has_key("_id"):
         reqSuffix0+=" WHERE "+inputs["_id"]["value"]
         endReq=""
-    req="select value,var,label from dtable where it_id=(select id from indicateurs_territoires where i_id="+id+reqSuffix+") "+dtableSuffix+" order by pos"
+    req="select value,var,label from dtable where it_id=(select id from "+tprefix+"indicators_territories where i_id="+id+reqSuffix+") "+dtableSuffix+" order by pos"
     import authenticate.service as auth
     con=auth.getCon(conf)
     cur=con.conn.cursor()
@@ -437,7 +438,7 @@ def _getIndexValues(conf,inputs,fields):
     if inputs.has_key("_id"):
         reqSuffix0+=" WHERE "+inputs["_id"]["value"]
         endReq=""
-    req="select value,var from dtable where it_id=(select id from indicateurs_territoires where i_id="+id+reqSuffix+") "+dtableSuffix+" order by pos"
+    req="select value,var from dtable where it_id=(select id from "+tprefix+"indicators_territories where i_id="+id+reqSuffix+") "+dtableSuffix+" order by pos"
     import authenticate.service as auth
     con=auth.getCon(conf)
     cur=con.conn.cursor()
@@ -508,7 +509,7 @@ def getIndex(conf,inputs,outputs):
     con=auth.getCon(conf)
     cur=con.conn.cursor()
     prefix=auth.getPrefix(conf)
-    cur.execute("SELECT id, name, description from indicateurs where id="+inputs["id"]["value"])
+    cur.execute("SELECT id, name, description from "+tprefix+"indicators where id="+inputs["id"]["value"])
     vals=cur.fetchall()
     res={}
     for i in range(0,len(cur.description)):
@@ -619,11 +620,31 @@ def getIndexStyle(conf,inputs,outputs):
             outputs["Result"]["value"]=json.dumps({"var":l.metadata.get("mmField"),"formula":l.metadata.get("mmFormula"),"ctype": l.metadata.get("mmClass"),"cmethod": l.metadata.get("mmMethod"),"nbc":l.numclasses,"icol":icol,"ocol":ocol});
     return zoo.SERVICE_SUCCEEDED
 
+def saveIndexTable(conf,inputs,outputs):
+    con=auth.getCon(conf)
+    cur=con.conn.cursor()
+    prefix=auth.getPrefix(conf)
+    inputs0={
+        "table": inputs["table"],
+        "name": inputs["name"],
+        "i_id": inputs["i_id"],
+        }
+    if inputs.keys().count("id")>0:
+        inputs0["id"]=inputs["id"]
+    if inputs.keys().count("id")==0:
+        insertElem(conf,inputs0,outputs)
+        #obj=detailsIndicateurs(conf,inputs,cur,inputs["i_id"]["value"],"table",prefix)
+    else:
+        updateElem(conf,inputs0,outputs)
+        #obj=detailsIndicateurs(conf,inputs,cur,inputs["i_id"]["value"],"table",prefix)
+    inputs1={"id":{"value":inputs["i_id"]["value"]},"tuple":inputs["tuple"]}
+    return saveIndexDisplaySettings(conf,inputs1,outputs)
 
 def saveIndexDisplaySettings(conf,inputs,outputs):
     import json
     con=auth.getCon(conf)
     cur=con.conn.cursor()
+    prefix=auth.getPrefix(conf)
 
     if not(inputs["tuple"]["value"].__class__.__name__ in ('list', 'tuple')):
         inputs["tuple"]["value"]=[inputs["tuple"]["value"]]
@@ -638,7 +659,7 @@ def saveIndexDisplaySettings(conf,inputs,outputs):
     reqSuffix=" and (not(agregation) or agregation is null)"
     if inputs.has_key("tid"):
         reqSuffix=" and t_id="+inputs["tid"]["value"]+" and agregation"
-    req="delete from dtable where it_id=(select id from indicateurs_territoires where i_id="+inputs["id"]["value"]+reqSuffix+")"+oSuffix
+    req="delete from "+prefix+"dtable where it_id=(select id from "+prefix+"indicators_territories where i_id="+inputs["id"]["value"]+reqSuffix+")"+oSuffix
     cur.execute(req)
     con.conn.commit()
 
@@ -658,9 +679,9 @@ def saveIndexDisplaySettings(conf,inputs,outputs):
             tmp0 = "%s" % adapt(tmp["var"])
             tmp["var"]=str(tmp0)
             if tmp["pos"]=="":
-                tmp["pos"]="(select count(*) from dtable where it_id=(select id from indicateurs_territoires where i_id="+inputs["id"]["value"]+reqSuffix+"))"+oSuffix
+                tmp["pos"]="(select count(*) from "+prefix+"dtable where it_id=(select id from "+prefix+"indicators_territories where i_id="+inputs["id"]["value"]+reqSuffix+"))"+oSuffix
             print >> sys.stderr,tmp["value"]
-            req="INSERT INTO dtable (it_id,display,search,pos,var,label,value,width"+ofields+") VALUES ((select id from indicateurs_territoires where i_id="+inputs["id"]["value"]+reqSuffix+"),"+tmp["display"]+","+tmp["search"]+","+tmp["pos"]+","+tmp["var"]+","+tmp["label"]+","+tmp["value"]+","+tmp["width"]+""+ovals+")"
+            req="INSERT INTO "+prefix+"dtable (it_id,display,search,pos,var,label,value,width"+ofields+") VALUES ((select id from "+prefix+"indicators_territories where i_id="+inputs["id"]["value"]+reqSuffix+"),"+tmp["display"]+","+tmp["search"]+","+tmp["pos"]+","+tmp["var"]+","+tmp["label"]+","+tmp["value"]+","+tmp["width"]+""+ovals+")"
             print >> sys.stderr,req
             cur.execute(req)
             con.conn.commit()
@@ -672,21 +693,34 @@ def saveIndexDisplaySettings(conf,inputs,outputs):
     return zoo.SERVICE_SUCCEEDED
 
 def saveRepportFile(conf,inputs,outputs):
-    print >> sys.stderr,conf["senv"]
     import shutil
     tmp=conf["senv"]["last_file"].split("/")
     shutil.copy(conf["senv"]["last_file"],conf["main"]["publicationPath"]+"/idx_templates/"+tmp[len(tmp)-1])
     con=auth.getCon(conf)
     cur=con.conn.cursor()
-    cur.execute("DELETE FROM r_table where i_id="+inputs["id"]["value"]+";INSERT INTO r_table (i_id,doc) VALUES ("+inputs["id"]["value"]+",'"+tmp[len(tmp)-1]+"')")
+    prefix=auth.getPrefix(conf)
+    cur.execute("DELETE FROM "+prefix+"r_table where i_id="+inputs["id"]["value"]+";INSERT INTO "+prefix+"r_table (i_id,doc) VALUES ("+inputs["id"]["value"]+",'"+tmp[len(tmp)-1]+"')")
     con.conn.commit()
     outputs["Result"]["value"]="Repport file succesfully uploaded"
     return zoo.SERVICE_SUCCEEDED
+
+def saveRepportFile0(conf,inputs,outputs):
+    import shutil
+    tmp=conf["senv"]["last_file"].split("/")
+    shutil.copy(conf["senv"]["last_file"],conf["main"]["publicationPath"]+"/idx_templates/"+tmp[len(tmp)-1])
+    con=auth.getCon(conf)
+    cur=con.conn.cursor()
+    prefix=auth.getPrefix(conf)
+    cur.execute("DELETE FROM "+prefix+"r_table where i_id="+inputs["id"]["value"]+";INSERT INTO "+prefix+"r_table (i_id,doc) VALUES ("+inputs["id"]["value"]+",'"+tmp[len(tmp)-1]+"')")
+    con.conn.commit()
+    outputs["Message"]["value"]="Repport file succesfully uploaded"
+    return parseDocAttr(conf,{"template":{"value":tmp[len(tmp)-1]}},outputs)
 
 def saveRepportSettings(conf,inputs,outputs):
     import json
     con=auth.getCon(conf)
     cur=con.conn.cursor()
+    prefix=auth.getPrefix(conf)
 
     if not(inputs["tuple"]["value"].__class__.__name__ in ('list', 'tuple')):
         inputs["tuple"]["value"]=[inputs["tuple"]["value"]]
@@ -702,7 +736,7 @@ def saveRepportSettings(conf,inputs,outputs):
         reqSuffix0=" and step="+inputs["step"]["value"]
         fields0=",step"
         values0=","+inputs["step"]["value"]
-    req="delete from rtable where it_id=(select id from indicateurs_territoires where i_id="+inputs["id"]["value"]+reqSuffix+")"+reqSuffix0
+    req="delete from "+prefix+"rtable where it_id=(select id from "+prefix+"indicators_territories where i_id="+inputs["id"]["value"]+reqSuffix+")"+reqSuffix0
     cur.execute(req)
     con.conn.commit()
 
@@ -717,8 +751,8 @@ def saveRepportSettings(conf,inputs,outputs):
             tmp0 = "%s" % adapt(tmp["var"])
             tmp["var"]=str(tmp0)
             if not(tmp.has_key("pos")):
-                tmp["pos"]="(select id from indicateurs_territoires where i_id="+inputs["id"]["value"]+reqSuffix+")"
-            req="INSERT INTO rtable (it_id,display,var,typ,value"+fields0+") VALUES ("+tmp["pos"]+","+tmp["display"]+","+tmp["var"]+","+str(tmp["type"])+","+tmp["value"]+""+values0+")"
+                tmp["pos"]="(select id from "+prefix+"indicators_territories where i_id="+inputs["id"]["value"]+reqSuffix+")"
+            req="INSERT INTO "+prefix+"rtable (it_id,display,var,typ,value"+fields0+") VALUES ("+tmp["pos"]+","+tmp["display"]+","+tmp["var"]+","+str(tmp["type"])+","+tmp["value"]+""+values0+")"
             cur.execute(req)
             con.conn.commit()
         except Exception,e:
@@ -733,7 +767,7 @@ def createAgregate(conf,inputs,outputs):
     con=auth.getCon(conf)
     cur=con.conn.cursor()
     # Extract datasource from territories
-    req="SELECT datasource from territoires where id="+inputs["tid"]["value"]
+    req="SELECT datasource from territories where id="+inputs["tid"]["value"]
     cur.execute(req)
     vals=cur.fetchall()
     for i in range(0,len(vals)):
@@ -796,7 +830,7 @@ def createAgregate(conf,inputs,outputs):
         return zoo.SERVICE_FAILED
 
 
-    req="DELETE FROM indicateurs_territoires WHERE i_id="+inputs["id"]["value"]+" and t_id="+inputs["tid"]["value"]+reqSuffix0+";INSERT INTO indicateurs_territoires (i_id,t_id,agregation) VALUES ("+inputs["id"]["value"]+","+inputs["tid"]["value"]+",true)";
+    req="DELETE FROM "+tprefix+"indicators_territories WHERE i_id="+inputs["id"]["value"]+" and t_id="+inputs["tid"]["value"]+reqSuffix0+";INSERT INTO "+tprefix+"indicators_territories (i_id,t_id,agregation) VALUES ("+inputs["id"]["value"]+","+inputs["tid"]["value"]+",true)";
     try:
         print >> sys.stderr,req
         cur.execute(req)
@@ -807,7 +841,7 @@ def createAgregate(conf,inputs,outputs):
         conf["lenv"]["message"]=zoo._("Issue occurs: "+str(e))
         return zoo.SERVICE_FAILED
 
-    subreq="(SELECT id from indicateurs_territoires where i_id="+inputs["id"]["value"]+" and (not(agregation) or agregation is null))"
+    subreq="(SELECT id from "+tprefix+"indicators_territories where i_id="+inputs["id"]["value"]+" and (not(agregation) or agregation is null))"
     req="DELETE FROM agregation where it_id="+subreq+";INSERT INTO agregation (it_id,t_id,formula) VALUES ("+subreq+","+inputs["tid"]["value"]+","+str(adapt(inputs["formula"]["value"]))+")"
     cur.execute(req)
     con.conn.commit()
@@ -867,27 +901,35 @@ def createAgregate(conf,inputs,outputs):
 def joinIndexTable(conf,inputs,outputs):
     con=auth.getCon(conf)
     cur=con.conn.cursor()
+    prefix=auth.getPrefix(conf)
     tblName="indexes.idx_table_"+inputs["id"]["value"]
     print >> sys.stderr,inputs
-    req="select datasource from territoires where id='"+inputs["territoire"]["value"]+"'"
+    req="select datasource from "+prefix+"territories where id='"+inputs["territory"]["value"]+"'"
     print >> sys.stderr,req
     cur.execute(req)
     vals=cur.fetchall()
     print >> sys.stderr,vals
 
     fields=""
-    if not(inputs["rcol"]["value"].__class__.__name__ in ('list', 'tuple')):
-        fields=inputs["rcol"]["value"]
-    else:
-        cnt=0
-        for i in inputs["rcol"]["value"]:
-            if fields!="":
-                fields+=","
-            if cnt>0:
-                fields+=tblName+"."+i
-            cnt+=1
+    print >> sys.stderr,inputs["rcol"].keys()
+    print >> sys.stderr,inputs["rcol"]["value"][0]
+    for i in ["rcol","field"]:
+        if inputs[i].keys().count("length")==0:
+            inputs[i]["value"]=inputs[i]["value"].split(",")
+
+    for i in inputs["rcol"]["value"]:
+        if fields!="":
+            fields+=","
+        fields+=tblName+"."+i+" AS o"+i
+        
     print >> sys.stderr,inputs["field"]["value"]
-    
+
+    try:
+        import os
+        os.unlink(conf["main"]["dataPath"]+"/indexes_maps/project_Index"+inputs["id"]["value"]+".map")
+    except Exception as e:
+        print >> sys.stderr,str(e)
+        pass
     req="CREATE view indexes.view_idx"+inputs["id"]["value"]+" AS (SELECT foo.*,"+fields+" FROM "\
         +tblName+","\
         +"("\
@@ -897,7 +939,7 @@ def joinIndexTable(conf,inputs,outputs):
     cur.execute(req)
     con.conn.commit()
 
-    req="delete from dtable where it_id=(select id from indicateurs_territoires where i_id='"+inputs["id"]["value"]+"');delete from d_table where i_id="+inputs["id"]["value"]+";delete from graphs where it_id=(select id from indicateurs_territoires where i_id='"+inputs["id"]["value"]+"');delete from indicateurs_territoires where i_id='"+inputs["id"]["value"]+"'"
+    req="delete from "+prefix+"dtable where it_id=(select id from "+prefix+"indicators_territories where i_id='"+inputs["id"]["value"]+"');delete from "+prefix+"d_table where i_id="+inputs["id"]["value"]+";delete from "+prefix+"graphs where it_id=(select id from "+prefix+"indicators_territories where i_id='"+inputs["id"]["value"]+"');delete from "+prefix+"indicators_territories where i_id='"+inputs["id"]["value"]+"'"
     cur.execute(req)
     con.conn.commit()
 
@@ -910,11 +952,10 @@ def joinIndexTable(conf,inputs,outputs):
     ds="NULL"
     if inputs.has_key("dbname") and inputs["dbname"]["value"]!="-1":
         ds = "%s" % adapt(inputs["dbname"]["value"]).getquoted()
-    req="insert into indicateurs_territoires (i_id,o_key_link,t_id,filename,tbl_link,tbl_key_link,fields,query,ds) VALUES ("+inputs["id"]["value"]+",'"+inputs["field"]["value"][1]+"',"+inputs["territoire"]["value"]+","+filename+",'"+inputs["layer"]["value"]+"','"+inputs["field"]["value"][0]+"','"+"indexes.idx_table_"+inputs["id"]["value"]+"."+inputs["field"]["value"][0]+","+fields+"',"+query+","+ds+")"
+    req="insert into "+prefix+"indicators_territories (i_id,o_key_link,t_id,filename,tbl_link,tbl_key_link,fields,query,ds) VALUES ("+inputs["id"]["value"]+",'"+inputs["field"]["value"][1]+"',"+inputs["territory"]["value"]+","+filename+",'"+inputs["layer"]["value"]+"','"+inputs["field"]["value"][0]+"','"+"indexes.idx_table_"+inputs["id"]["value"]+"."+inputs["field"]["value"][0]+","+fields+"',"+query+","+ds+")"
     print >> sys.stderr,req
     cur.execute(req)
     con.conn.commit()
-
 
     outputs["Result"]["value"]=zoo._("View was successfully created, index is ready to use.")
     return zoo.SERVICE_SUCCEEDED
@@ -1030,7 +1071,7 @@ def getMapRequest(conf,inputs,outputs):
     con.connect()
     cur=con.conn.cursor()
     prefix=auth.getPrefix(conf)
-    req0="SELECT datasource from "+prefix+"territoires where id="+inputs["t_id"]["value"]
+    req0="SELECT datasource from "+prefix+"territories where id="+inputs["t_id"]["value"]
     cur.execute(req0)
     vals=cur.fetchall()
     dsn=""
@@ -1065,6 +1106,13 @@ def getMapRequest(conf,inputs,outputs):
             break
     return zoo.SERVICE_SUCCEEDED
 
+def getMapRequest0(conf,inputs,outputs):
+    getMapRequest(conf,inputs,outputs)
+    import urllib2
+    u = urllib2.urlopen(outputs["Result"]["value"])
+    outputs["Result"]["value"]=u.read()
+    return zoo.SERVICE_SUCCEEDED
+    
 def listDefault(tbl,cur,clause=None):
     if clause is None:
         cur.execute("SELECT * from "+tbl+" order by id desc")
@@ -1120,7 +1168,7 @@ def flatTerritoires(l,res):
             flatTerritoires(l[i]["children"],res)
         
 def listTerritoires(cur,prefix,group='public',clause=None,clause1=None):
-    req0="select * from "+prefix+"territoires where id "
+    req0="select * from "+prefix+"territories where id "
     req1="select o_t_id from "+prefix+"t_hierarchy "
     if clause is not None:
         req0+=""
@@ -1135,7 +1183,7 @@ def listTerritoires(cur,prefix,group='public',clause=None,clause1=None):
             if lclause!="":
                 lclause+=" OR "
             lclause+="name='"+groups[i]+"'"        
-        req0+=" and id in (SELECT t_id from "+prefix+"territoires_groups where g_id=(SELECT id from "+prefix+"groups where "+lclause+" or name='public'))"
+        req0+=" and id in (SELECT t_id from "+prefix+"territories_groups where g_id=(SELECT id from "+prefix+"groups where "+lclause+" or name='public'))"
     req2=req0
     if clause1 is not None:
 	req0+=" AND "+clause1
@@ -1171,7 +1219,7 @@ def list(conf,inputs,outputs):
     if not(auth.is_ftable(inputs["table"]["value"])):
 	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
 	return zoo.SERVICE_FAILED
-    if inputs["table"]["value"]=="territoires":
+    if inputs["table"]["value"]=="territories":
         res=listTerritoires(cur,prefix,conf["senv"]["group"])
     else:
         if inputs["table"]["value"]=="themes":
@@ -1224,7 +1272,8 @@ def insertElement(conf,inputs,outputs):
     return zoo.SERVICE_SUCCEEDED
 
 def createGraphView(conf,inputs,con,cur):
-    req="SELECT i_id from indicateurs_territoires where id="+inputs["it_id"]["value"]
+    prefix=auth.getPrefix(conf)    
+    req="SELECT i_id from "+prefix+"indicators_territories where id="+inputs["it_id"]["value"]
     cur.execute(req)
     vals=cur.fetchone()
     id=str(vals[0])
@@ -1287,12 +1336,13 @@ def createGraphView(conf,inputs,con,cur):
             m.save(conf["main"]["dataPath"]+"/indexes_maps/project_GIndex"+id+".map")
     
 def insertElem(conf,inputs,outputs):
+    prefix=auth.getPrefix(conf)
     con=auth.getCon(conf)
     con.connect()
     cur=con.conn.cursor()
     if not(auth.is_ftable(inputs["table"]["value"])):
-	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
-	return zoo.SERVICE_FAILED
+        conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+        return zoo.SERVICE_FAILED
     try:
         fields=""
         values=""
@@ -1312,7 +1362,7 @@ def insertElem(conf,inputs,outputs):
                     tmp = adapt(inputs[i]["value"])
                     values += str(tmp)
 
-        req="INSERT INTO "+inputs["table"]["value"]+" ("+fields+") VALUES ("+values+")"
+        req="INSERT INTO "+prefix+inputs["table"]["value"]+" ("+fields+") VALUES ("+values+")"
         print >> sys.stderr,req
         cur.execute(req)
         con.conn.commit()
@@ -1328,6 +1378,7 @@ def insertElem(conf,inputs,outputs):
     return zoo.SERVICE_SUCCEEDED
 
 def updateElem(conf,inputs,outputs):
+    prefix=auth.getPrefix(conf)
     con=auth.getCon(conf)
     con.connect()
     cur=con.conn.cursor()
@@ -1351,7 +1402,7 @@ def updateElem(conf,inputs,outputs):
 	clause=""
 	if inputs.has_key('tid'):
 		print >> sys.stderr,""
-        req="UPDATE "+inputs["table"]["value"]+" set "+fields+" where id="+inputs["id"]["value"]
+        req="UPDATE "+prefix+inputs["table"]["value"]+" set "+fields+" where id="+inputs["id"]["value"]
         print >> sys.stderr,req
         cur.execute(req)
         con.conn.commit()
@@ -1366,9 +1417,10 @@ def updateElem(conf,inputs,outputs):
     con.conn.close()
     return zoo.SERVICE_SUCCEEDED
 
-def updateKeywords(cur,nom,i_id,k):
+def updateKeywords(conf,cur,nom,i_id,k):
+    prefix=auth.getPrefix(conf)
     tmp = adapt(nom)
-    req0="SELECT id from keywords where "
+    req0="SELECT id from "+prefix+"keywords where "
     req0+= " nom = ".encode("utf-8")+str(tmp)
     cur.execute(req0)
     vals=cur.fetchone()
@@ -1376,15 +1428,15 @@ def updateKeywords(cur,nom,i_id,k):
     tmp0= str(tmp)
     if vals is not None and len(vals)>0:
         clause= " id = " + str(vals[0])
-        req="UPDATE keywords set nom = "+tmp0+" where "+clause
+        req="UPDATE "+prefix+"keywords set nom = "+tmp0+" where "+clause
     else:
-        req="INSERT INTO keywords (nom) VALUES ("+tmp0+")"
+        req="INSERT INTO "+prefix+"keywords (nom) VALUES ("+tmp0+")"
     cur.execute(req)
     if k==0:
-        req="DELETE FROM indicateurs_keywords where i_id="+i_id+";"
+        req="DELETE FROM "+prefix+"indicators_keywords where i_id="+i_id+";"
     else:
         req=""
-    req+="INSERT INTO indicateurs_keywords(i_id,k_id) VALUES ("+i_id+",("+req0+"))"
+    req+="INSERT INTO "+prefix+"indicators_keywords(i_id,k_id) VALUES ("+i_id+",("+req0+"))"
     cur.execute(req)
     
 def updateElement(conf,inputs,outputs):
@@ -1413,7 +1465,7 @@ def updateElement(conf,inputs,outputs):
             tmp0=inputs["keywords"]["value"].split(';')
         for k in range(0,len(tmp0)):
             print >> sys.stderr,"li_d"
-            updateKeywords(cur,tmp0[k],li_id,k)
+            updateKeywords(conf,cur,tmp0[k],li_id,k)
             print >> sys.stderr,"li_d"
             con.conn.commit()
             print >> sys.stderr,"li_d"
@@ -1490,7 +1542,7 @@ def updateElement(conf,inputs,outputs):
         return zoo.SERVICE_FAILED
 
     try:
-        if ["documents","indicateurs"].count(inputs["table"]["value"])>0 :
+        if ["documents","indicators"].count(inputs["table"]["value"])>0 :
             import shutil
             shutil.copy(conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["senv"]["MMID"]+"/"+obj['filename'],conf["main"]["publicationPath"]+"/"+inputs["table"]["value"]+"/"+obj['filename'])
     except Exception,e:
@@ -1528,7 +1580,7 @@ def deleteElement(conf,inputs,outputs):
             con.pexecute_req(["DELETE FROM "+prefix+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
         else:
             con.pexecute_req(["DELETE FROM "+prefix+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
-            if inputs["table"]["value"]=="indicateurs":
+            if inputs["table"]["value"]=="indicators":
                 import glob,os,shutil
                 rpath=conf["main"]["dataPath"]+"/indexes_maps/"
                 try:
@@ -1587,16 +1639,17 @@ def detailsThemes(con,val,prefix):
         res["color"]=vals[0][3]
         res["pid"]=vals[0][4]
     
-    req1="select id from indicateurs where id in (select i_id from indicateurs_themes where t_id=[_t_id_]"
+    req1="select id from "+prefix+"indicators where id in (select i_id from "+prefix+"indicators_themes where t_id=[_t_id_])"
     try:
     	con.pexecute_req([req1,{"t_id":{"value":str(val),"format":"s"}}])
-    	vals=cur.fetchall()
-    	res["indicateurs_themes"]=[]
+    	vals=con.cur.fetchall()
+    	res["indicators_themes"]=[]
     	if len(vals)>0:
         	for i in range(0,len(vals)):
-            		res["indicateurs_themes"]+=[vals[i][0]]
-    except:
+            		res["indicators_themes"]+=[vals[i][0]]
+    except Exception as e:
 	print >> sys.stderr,dir(con.cur)
+	print >> sys.stderr,e
 	con.cur.connection.commit()
     	pass
     req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"themes_groups where t_id=[_t_id_])"
@@ -1609,7 +1662,7 @@ def detailsThemes(con,val,prefix):
     return res
 
 def detailsTerritoires(cur,val,prefix):
-    req0="select * from "+prefix+"territoires where id="+str(val)
+    req0="select * from "+prefix+"territories where id="+str(val)
     cur.execute(req0)
     vals=cur.fetchall()
     res={}
@@ -1618,7 +1671,7 @@ def detailsTerritoires(cur,val,prefix):
         res["name"]=vals[0][1]
         res["dataSource"]=vals[0][2]
     
-    req1="select * from "+prefix+"territoires where id in (select p_t_id from "+prefix+"t_hierarchy where o_t_id="+str(val)+")"
+    req1="select * from "+prefix+"territories where id in (select p_t_id from "+prefix+"t_hierarchy where o_t_id="+str(val)+")"
     cur.execute(req1)
     vals=cur.fetchall()
     res["t_hierarchy"]=[]
@@ -1626,19 +1679,19 @@ def detailsTerritoires(cur,val,prefix):
         for i in range(0,len(vals)):
             res["t_hierarchy"]+=[vals[i][0]]
 
-    req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"territoires_groups where t_id="+str(val)+")"
+    req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"territories_groups where t_id="+str(val)+")"
     cur.execute(req2)
     vals=cur.fetchall()
-    res["territoires_groups"]=[]
+    res["territories_groups"]=[]
     if len(vals)>0:
         for i in range(0,len(vals)):
-            res["territoires_groups"]+=[vals[i][0]]
+            res["territories_groups"]+=[vals[i][0]]
     return res
 
-def detailsIndicateurs(inputs,cur,val,tab,prefix):
+def detailsIndicateurs(conf,inputs,cur,val,tab,prefix):
     res={}
     if tab=="metadata":
-        req0="SELECT id, name, description, sources, filename, url from "+prefix+"indicateurs where id="+val
+        req0="SELECT id, name, description, sources, filename, url from "+prefix+"indicators where id="+val
         cur.execute(req0)
         vals=cur.fetchall()
         if len(vals)>0:
@@ -1650,51 +1703,55 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
             res["url"]=vals[0][5]
 
         suffix=" and (not(agregation) or agregation is null)"
-        req1="select count(*) from "+prefix+"indicateurs_territoires where i_id="+val+suffix
+        req1="select count(*) from "+prefix+"indicators_territories where i_id="+val+suffix
         print >> sys.stderr,req1
         cur.execute(req1)
         vals=cur.fetchall()
         if len(vals)>0 and vals[0][0]>0:
-            req2="SELECT t_id, o_key_link, filename, tbl_link, tbl_key_link, query, ds from "+prefix+"indicateurs_territoires where i_id="+val+suffix
+            req2="SELECT t_id, o_key_link, filename, tbl_link, tbl_key_link, query, ds, id from "+prefix+"indicators_territories where i_id="+val+suffix
             print >> sys.stderr,req2
             cur.execute(req2)
             vals=cur.fetchall()
             if len(vals)>0:
-                res["indicateurs_territoires"]=vals[0][0]
-                res["indicateurs_territoires_key"]=vals[0][1]
+                lval=str(vals[0][2]).split('/')
+                res["indicators_territories"]=vals[0][0]
+                res["indicators_territories_key"]=vals[0][1]
                 res["file_link"]=str(vals[0][2])
+                res["file_name"]=lval[len(lval)-1]
+                res["file_url"]=str(vals[0][2]).replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])
                 res["tbl_link"]=vals[0][3]
                 res["tbl_key_link"]=vals[0][4]
                 res["query"]=vals[0][5]
                 res["ds"]=vals[0][6]
+                res["it_id"]=vals[0][7]
 
-        req0="select count(*) from "+prefix+"indicateurs_keywords where i_id="+val
+        req0="select count(*) from "+prefix+"indicators_keywords where i_id="+val
         print >> sys.stderr,req0
         cur.execute(req0)
         vals=cur.fetchall()
         if len(vals)>0 and vals[0][0]>0:
-            req2="SELECT nom from keywords where id in (SELECT k_id from "+prefix+"indicateurs_keywords where i_id="+val+")"
+            req2="SELECT nom from "+prefix+"keywords where id in (SELECT k_id from "+prefix+"indicators_keywords where i_id="+val+")"
             print >> sys.stderr,req2
             cur.execute(req2)
             vals=cur.fetchall()
             if len(vals)>0:
                 for k in range(0,len(vals)):
-                    if res.has_key("indicateurs_keywords"):
-                        res["indicateurs_keywords"]+=","+str(vals[k][0].encode("utf-8")).decode('utf-8')
+                    if res.has_key("indicators_keywords"):
+                        res["indicators_keywords"]+=","+str(vals[k][0].encode("utf-8")).decode('utf-8')
                     else:
-                        res["indicateurs_keywords"]=str(vals[k][0].encode("utf-8")).decode('utf-8')
+                        res["indicators_keywords"]=str(vals[k][0].encode("utf-8")).decode('utf-8')
 
-        req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"indicateurs_groups where i_id="+str(val)+")"
+        req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"indicators_groups where i_id="+str(val)+")"
         cur.execute(req2)
         vals=cur.fetchall()
-        res["indicateurs_groups"]=[]
+        res["indicators_groups"]=[]
         if len(vals)>0:
             for i in range(0,len(vals)):
-                res["indicateurs_groups"]+=[vals[i][0]]
+                res["indicators_groups"]+=[vals[i][0]]
 
         print >> sys.stderr,inputs
         if inputs.has_key("public"):
-            req22='select t_id from '+prefix+'indicateurs_territoires,'+prefix+'territoires where indicateurs_territoires.t_id=territoires.id and indicateurs_territoires.i_id='+str(res["id"])+' and agregation;'
+            req22='select t_id from '+prefix+'indicators_territories,'+prefix+'territories where "+tprefix+"indicators_territories.t_id=territories.id and "+tprefix+"indicators_territories.i_id='+str(res["id"])+' and agregation;'
             print >> sys.stderr,req22
             cur.execute(req22)
             vals=cur.fetchall()
@@ -1703,7 +1760,7 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
             if len(vals)>0:
                 for i in range(0,len(vals)):
                     res["agregation"]+=[vals[i][0]]
-                    req23="select var from dtable where it_id in (select indicateurs_territoires.id from indicateurs_territoires, indicateurs where indicateurs_territoires.i_id=indicateurs.id and indicateurs.id="+str(res["id"])+" and t_id="+str(vals[i][0])+"and agregation) and pos=0"
+                    req23="select var from dtable where it_id in (select "+tprefix+"indicators_territories.id from "+tprefix+"indicators_territories, "+tprefix+"indicators where "+tprefix+"indicators_territories.i_id=indicateurs.id and "+tprefix+"indicators.id="+str(res["id"])+" and t_id="+str(vals[i][0])+"and agregation) and pos=0"
                     cur.execute(req23)
                     vals23=cur.fetchall()
                     if len(vals23)>0:
@@ -1712,18 +1769,18 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
 
 
             
-            req2="select name from "+prefix+"themes where id in (select t_id from "+prefix+"indicateurs_themes where i_id="+str(val)+")"
+            req2="select name from "+prefix+"themes where id in (select t_id from "+prefix+"indicators_themes where i_id="+str(val)+")"
         else:
-            req2="select id from "+prefix+"themes where id in (select t_id from "+prefix+"indicateurs_themes where i_id="+str(val)+")"
+            req2="select id from "+prefix+"themes where id in (select t_id from "+prefix+"indicators_themes where i_id="+str(val)+")"
         cur.execute(req2)
         vals=cur.fetchall()
-        res["indicateurs_themes"]=[]
+        res["indicators_themes"]=[]
         if len(vals)>0:
             for i in range(0,len(vals)):
                 try:
-                    res["indicateurs_themes"]+=[str(vals[i][0].encode('utf-8')).decode('utf-8')]
+                    res["indicators_themes"]+=[str(vals[i][0].encode('utf-8')).decode('utf-8')]
                 except:
-                    res["indicateurs_themes"]+=[str(vals[i][0])]
+                    res["indicators_themes"]+=[str(vals[i][0])]
     else:
         tab0=tab.split("_")
         suffix=" and (not(agregation) or agregation is null)"
@@ -1734,12 +1791,12 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
             reqSuffix1=" and step="+inputs["step"]["value"]
         if tab=="graph":
             print >> sys.stderr,"Load graph !!"
-            req0="SELECT name, type, lx, vx, ly, vy, tooltip, id, formula,step from graphs where it_id=(SELECT id from indicateurs_territoires where i_id="+val+" "+suffix+")"+reqSuffix1
+            req0="SELECT name, type, lx, vx, ly, vy, tooltip, id, formula,step from "+prefix+"graphs where it_id=(SELECT id from "+prefix+"indicators_territories where i_id="+val+" "+suffix+")"+reqSuffix1
             cur.execute(req0)
             vals=cur.fetchall()
             if len(vals)>0:
                 res["title"]=vals[0][0]
-                res["f_type"]=vals[0][1]
+                res["type"]=vals[0][1]
                 res["lx"]=vals[0][2]
                 res["vx"]=vals[0][3]
                 res["ly"]=vals[0][4]
@@ -1750,7 +1807,7 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
                 res["step"]=vals[0][9]
         elif tab=="table":
             print >> sys.stderr,"Load table !!"
-            req0="SELECT name, id, order_by, step from d_table where i_id="+val+reqSuffix1
+            req0="SELECT name, id, order_by, step,(select t_id from "+prefix+"indicators_territories where i_id="+val+" "+suffix+") from "+prefix+"d_table where i_id="+val+reqSuffix1
             print >> sys.stderr,req0+" !!"
             
             cur.execute(req0)
@@ -1760,9 +1817,25 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
                 res["id"]=vals[0][1]
                 res["order_by"]=vals[0][2]
                 res["step"]=vals[0][3]
+                res["t_id"]=vals[0][4]
+
+                fields=["id","pos","var","label","value","display","search","width","step"]
+                myStr=",".join(fields)
+                req1="SELECT "+myStr+" from "+prefix+"dtable where it_id=(select id from "+prefix+"indicators_territories where i_id="+val+" "+suffix+")"
+                cur.execute(req1)
+                print >> sys.stderr,req1
+                vals1=cur.fetchall()
+                if len(vals1)>0:
+                    res["fields"]=[]
+                    for i in range(0,len(vals1)):
+                        cobj={}
+                        for j in range(0,len(fields)):
+                            cobj[fields[j]]=vals1[i][j]
+                        res["fields"]+=[cobj]
+
         elif tab0[0]=="agregation":
             print >> sys.stderr,"Load agregate !!"
-            req0="SELECT formula FROM agregation where it_id=(SELECT id from indicateurs_territoires where i_id="+val+suffix+" order by id limit 1) and t_id="+tab0[1]
+            req0="SELECT formula FROM "+prefix+"agregation where it_id=(SELECT id from "+prefix+"indicators_territories where i_id="+val+suffix+" order by id limit 1) and t_id="+tab0[1]
             print >> sys.stderr,req0+" !!"
             
             cur.execute(req0)
@@ -1771,13 +1844,31 @@ def detailsIndicateurs(inputs,cur,val,tab,prefix):
                 res["formula"]=vals[0][0]
         elif tab0[0]=="repport":
             print >> sys.stderr,"Load repport !!"
-            req0="SELECT doc FROM r_table where i_id="+val+reqSuffix1
+            req0="SELECT doc FROM "+prefix+"r_table where i_id="+val+reqSuffix1
             print >> sys.stderr,req0+" !!"
             
             cur.execute(req0)
             vals=cur.fetchall()
             if len(vals)>0:
                 res["doc"]=vals[0][0]
+                res["docUrl"]=conf["main"]["publicationUrl"]+"/idx_templates/"+vals[0][0]
+                outputs1={"Result":{"value":""}}
+                res0=parseDocAttr(conf,{"template":{"value":res["doc"]}},outputs1)
+                import json
+                res["docFields"]=json.loads(outputs1["Result"]["value"])
+                fields=["id","var","typ","value","display","step"]
+                myStr=",".join(fields)
+                req1="SELECT "+myStr+" from "+prefix+"rtable where it_id=(select id from "+prefix+"indicators_territories where i_id="+val+" "+suffix+")"
+                cur.execute(req1)
+                print >> sys.stderr,req1
+                vals1=cur.fetchall()
+                if len(vals1)>0:
+                    res["fields"]=[]
+                    for i in range(0,len(vals1)):
+                        cobj={}
+                        for j in range(0,len(fields)):
+                            cobj[fields[j]]=vals1[i][j]
+                        res["fields"]+=[cobj]
 
     return res
 
@@ -1791,18 +1882,40 @@ def details(conf,inputs,outputs):
     if not(auth.is_ftable(inputs["table"]["value"])):
 	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
 	return zoo.SERVICE_FAILED
-    if inputs["table"]["value"]=="territoires":
+    if inputs["table"]["value"]=="territories":
         res=detailsTerritoires(cur,inputs["id"]["value"],prefix)
     else:
         if inputs["table"]["value"]=="themes":
             res=detailsThemes(con,inputs["id"]["value"],prefix)
-        if inputs["table"]["value"]=="indicateurs":
+        if inputs["table"]["value"]=="indicators":
             if inputs.has_key("tab"):
-                res=detailsIndicateurs(inputs,cur,inputs["id"]["value"],inputs["tab"]["value"],prefix)
+                res=detailsIndicateurs(conf,inputs,cur,inputs["id"]["value"],inputs["tab"]["value"],prefix)
                 if res.has_key("doc"):
                     res["doc_url"]=conf["main"]["publicationUrl"]+"/idx_templates/"+res["doc"]        
             else:
-                res=detailsIndicateurs(inputs,cur,inputs["id"]["value"],"metadata",prefix)
+                res=detailsIndicateurs(conf,inputs,cur,inputs["id"]["value"],"metadata",prefix)
+                res["_graph"]=detailsIndicateurs(conf,inputs,cur,inputs["id"]["value"],"graph",prefix)
+                res["_table"]=detailsIndicateurs(conf,inputs,cur,inputs["id"]["value"],"table",prefix)
+                res["_repport"]=detailsIndicateurs(conf,inputs,cur,inputs["id"]["value"],"repport",prefix)
+                try:
+                    inputs0={
+                        "prefix": {"value":"indexes"},
+                        "name": {"value":"Index"+inputs["id"]["value"]},
+                        "orig": {"value":conf["main"]["dbuserName"]},
+                        "id": {"value":inputs["id"]["value"]}#,
+                        #"layer": {"value":"indexes.view_idx"+inputs["id"]["value"]}*/
+                        }
+                    outputs0={
+                        "Result": {"value":""}
+                        }
+                    import mapfile.service as mapfile
+                    mapfile.createLegend0(conf,inputs0,outputs0)
+                    res["_style"]=json.loads(outputs0["Result"]["value"])
+                except Exception as e:
+                    print >> sys.stderr," ********************************** "
+                    print >> sys.stderr,str(e)
+                    print >> sys.stderr," ********************************** "
+                    res["_style"]={}
                 try:
                     mpath=conf["main"]["dataPath"]+'/indexes_maps/project_PIndex'+str(res["id"])+".map"
                     open(mpath)
@@ -1817,7 +1930,6 @@ def details(conf,inputs,outputs):
                     res["cache_file"]=m.web.metadata.get('cache_file')
                 except IOError:
                     res["published"]="false"
-
             conf["senv"]["last_index"]=inputs["id"]["value"]
         if inputs["table"]["value"]=="documents":
             res=detailsDocuments(con,inputs["id"]["value"],prefix)
@@ -1977,7 +2089,7 @@ def previewDoc(conf,inputs,outputs):
             reqSuffix1+=" and step="+inputs["step"]["value"]
         else:
             reqSuffix1+=" and step is null"
-        req="select var,value from rtable where it_id=(SELECT id from indicateurs_territoires where i_id="+inputs["id"]["value"]+reqSuffix+") "+reqSuffix1+" and typ=0"
+        req="select var,value from rtable where it_id=(SELECT id from "+tprefix+"indicators_territories where i_id="+inputs["id"]["value"]+reqSuffix+") "+reqSuffix1+" and typ=0"
 
         res=cur.execute(req)
         vals1=cur.fetchall()
@@ -1991,12 +2103,12 @@ def previewDoc(conf,inputs,outputs):
             script+="pm.searchAndReplace('[_"+vals1[i][0]+"_]',"+json.dumps(vals2[0])+")\n"
 
             
-        req1="select var,value from rtable where it_id=(SELECT id from indicateurs_territoires where i_id="+inputs["id"]["value"]+reqSuffix+") "+reqSuffix1+" and typ=6"
+        req1="select var,value from rtable where it_id=(SELECT id from "+tprefix+"indicators_territories where i_id="+inputs["id"]["value"]+reqSuffix+") "+reqSuffix1+" and typ=6"
         res1=cur.execute(req1)
         vals2=cur.fetchall()
         #print >> sys.stderr,vals1
         for i in range(0,len(vals2)):
-            req0="SELECT sources FROM indicateurs WHERE id="+inputs["id"]["value"]
+            req0="SELECT sources FROM "+tprefix+"indicators WHERE id="+inputs["id"]["value"]
             print >> sys.stderr,req0.encode('utf-8')
             cur.execute(req0)
             vals3=cur.fetchone()
@@ -2048,7 +2160,7 @@ def addLayerForIndex(conf,inputs,outputs):
     prefix=auth.getPrefix(conf)
     con.connect()
     cur=con.conn.cursor()
-    cur.execute("select datasource from territoires where id in (select t_id from indicateurs_territoires where i_id="+inputs["id"]["value"]+reqSuffix+")")
+    cur.execute("select datasource from "+prefix+"territories where id in (select t_id from "+prefix+"indicators_territories where i_id="+inputs["id"]["value"]+reqSuffix+")")
     vals=cur.fetchone()
     l=m.getLayerByName(vals[0].replace("public.",""))
     print >> sys.stderr,dir(l)
@@ -2147,7 +2259,7 @@ def printOdt(conf,script,process,idx,id,cid,f_out,typ=None,tid=None,step=None):
         reqSuffix+=" and (not(agregation) or agregation is null)"
 
 
-    lreq0="SELECT value from rtable where var='classes' and it_id=(SELECT id from indicateurs_territoires where i_id="+idx+reqSuffix+")"
+    lreq0="SELECT value from rtable where var='classes' and it_id=(SELECT id from "+tprefix+"indicators_territories where i_id="+idx+reqSuffix+")"
     print >> sys.stderr,lreq0+"\n\n*******"
     cur.execute(lreq0)
     lvals0=cur.fetchone()
@@ -2205,13 +2317,13 @@ def printOdt(conf,script,process,idx,id,cid,f_out,typ=None,tid=None,step=None):
 
     if conf.has_key("oo") and conf["oo"].has_key("external") and conf["oo"]["external"]=="true":
         #script+="pm.loadDoc('"+conf["main"]["publicationPath"]+"/idx_templates/"+inputs["oDoc"]["value"]+"')\n"
-        rreq="select doc from r_table where i_id="+idx
+        rreq="select doc from "+prefix+"r_table where i_id="+idx
         cur.execute(rreq)
         rvals0=cur.fetchone()
         if rvals0 is not None:
             docPath=conf["main"]["publicationPath"]+"/idx_templates/"+rvals0[0]
         else:
-            rreq="select count(*) from graphs where type='hist' and it_id=(SELECT id from indicateurs_territoires where i_id="+idx+reqSuffix+")"
+            rreq="select count(*) from graphs where type='hist' and it_id=(SELECT id from "+tprefix+"indicators_territories where i_id="+idx+reqSuffix+")"
             cur.execute(rreq)
             rvals0=cur.fetchone()
             if rvals0[0]>0:
@@ -2240,7 +2352,7 @@ def printOdt(conf,script,process,idx,id,cid,f_out,typ=None,tid=None,step=None):
                     script+="pm.statThis(\"[_classes_]\","+json.dumps(mmClasses)+")\n"
                 else:
                     if i not in ["table","diag","map"]:
-                        req="select value,typ from rtable where it_id=(SELECT id from indicateurs_territoires where i_id="+idx+reqSuffix+") and step is null and var='"+i+"'"
+                        req="select value,typ from rtable where it_id=(SELECT id from "+tprefix+"indicators_territories where i_id="+idx+reqSuffix+") and step is null and var='"+i+"'"
                         cur.execute(req)
                         lvals=cur.fetchone()
                         if lvals is not None:
@@ -2274,7 +2386,7 @@ def printOdt(conf,script,process,idx,id,cid,f_out,typ=None,tid=None,step=None):
                                 if lvals1 is not None:
                                     script+="pm.statThis(\"[_"+i+"_]\","+json.dumps(lvals1).replace("null",zoo._("None"))+")\n"
                             if lvals[1]==5:
-                                req0="SELECT description FROM indicateurs WHERE id="+idx
+                                req0="SELECT description FROM "+tprefix+"indicators WHERE id="+idx
                                 cur.execute(req0)
                                 lvals1=cur.fetchone()
                                 if lvals1 is not None and lvals1[0] is not None:
@@ -2288,7 +2400,7 @@ def printOdt(conf,script,process,idx,id,cid,f_out,typ=None,tid=None,step=None):
                                 else:
                                     script+="pm.searchAndReplace('[_"+i+"_]',\"\")\n"
                             if lvals[1]==6:
-                                req0="SELECT sources FROM indicateurs WHERE id="+idx
+                                req0="SELECT sources FROM "+tprefix+"indicators WHERE id="+idx
                                 print >> sys.stderr,req0
                                 cur.execute(req0)
                                 lvals1=cur.fetchone()
@@ -2306,7 +2418,7 @@ def printOdt(conf,script,process,idx,id,cid,f_out,typ=None,tid=None,step=None):
                                 l0.getClass(0).updateFromString("CLASS STYLE OPACITY 25 COLOR 255 0 0 OUTLINECOLOR 255 255 255 WIDTH 1.2 END END")
                                 l0.getClass(0).setExpression(None)
                                 l1=l0.clone()
-                                req="SELECT datasource FROM territoires where id = (SELECT t_id from indicateurs_territoires where i_id="+idx+reqSuffix+")"
+                                req="SELECT datasource FROM territories where id = (SELECT t_id from "+tprefix+"indicators_territories where i_id="+idx+reqSuffix+")"
                                 print >> sys.stderr,req
                                 cur.execute(req)
                                 vals=cur.fetchone()
@@ -2351,9 +2463,9 @@ def printOdt(conf,script,process,idx,id,cid,f_out,typ=None,tid=None,step=None):
         print >> sys.stderr,tmp
         print >> sys.stderr,"\n\n--------------"
 
-        req="select var,value from rtable where it_id=(SELECT id from indicateurs_territoires where i_id="+idx+reqSuffix+") and step is null and typ=0"
+        req="select var,value from rtable where it_id=(SELECT id from "+tprefix+"indicators_territories where i_id="+idx+reqSuffix+") and step is null and typ=0"
         #if inputs.has_key("step"):
-        #    req="select var,value from rtable where it_id=(SELECT id from indicateurs_territoires where i_id="+idx+reqSuffix+") and step = "+inputs["step"]["value"]+" and typ=0"
+        #    req="select var,value from rtable where it_id=(SELECT id from "+tprefix+"indicators_territories where i_id="+idx+reqSuffix+") and step = "+inputs["step"]["value"]+" and typ=0"
         #print >> sys.stderr,req
         res=cur.execute(req)
         saveReq=req
@@ -2434,7 +2546,7 @@ def viewRepport(conf,inputs,outputs):
             tmp0 = "%s" % adapt(inputs["out_val"]["value"]).getquoted()
             clause_out+=field+"="+tmp0
 
-    req="SELECT datasource FROM territoires where id = "+inputs["tid"]["value"]
+    req="SELECT datasource FROM territories where id = "+inputs["tid"]["value"]
     cur.execute(req)
     vals=cur.fetchone()
     req="SELECT ogc_fid FROM "+vals[0]+" WHERE "+clause
@@ -2462,7 +2574,7 @@ def viewRepport(conf,inputs,outputs):
 	clause+=")"
     else:
 	clause="i_id="+inputs["idx"]["value"]
-    nreq0="select CASE WHEN agregation is NULL THEN false ELSE agregation END from indicateurs_territoires where "+clause+" and t_id="+inputs["tid"]["value"]
+    nreq0="select CASE WHEN agregation is NULL THEN false ELSE agregation END from "+tprefix+"indicators_territories where "+clause+" and t_id="+inputs["tid"]["value"]
     cur.execute(nreq0)
     lres=cur.fetchone()
     agregation=lres[0]
@@ -2471,7 +2583,7 @@ def viewRepport(conf,inputs,outputs):
     print >> sys.stderr,"AGREGATION: "+str(agregation)
 
     # Treate Context Indexes
-    nreq="select indicateurs_territoires.i_id from indicateurs_groups, indicateurs_territoires, velo.groups where indicateurs_groups.i_id=indicateurs_territoires.i_id and indicateurs_groups.g_id=velo.groups.id and name='context' and t_id="+inputs["tid"]["value"]
+    nreq="select "+tprefix+"indicators_territories.i_id from "+tprefix+"indicators_groups, "+tprefix+"indicators_territories, velo.groups where "+tprefix+"indicators_groups.i_id="+tprefix+"indicators_territories.i_id and "+tprefix+"indicators_groups.g_id=velo.groups.id and name='context' and t_id="+inputs["tid"]["value"]
     cur.execute(nreq)
     idxs=cur.fetchall()
     if len(idxs)>0:
@@ -2605,7 +2717,7 @@ def viewStatOnly(conf,inputs,outputs):
     else:
         reqSuffix+=" and (not(agregation) or agregation is null)"
 
-    clause="SELECT id FROM indicateurs_territoires where i_id = "+inputs["id"]["value"]+reqSuffix
+    clause="SELECT id FROM "+tprefix+"indicators_territories where i_id = "+inputs["id"]["value"]+reqSuffix
 
     req="select vx,vy,name from graphs where it_id in ("+clause+")"
     cur.execute(req)
@@ -2625,7 +2737,7 @@ def viewStatOnly(conf,inputs,outputs):
         rvals[2]+=[[float(elem["properties"][vals[1]])]]
 
     idx=inputs["id"]["value"]
-    req="select doc from r_table where i_id="+idx
+    req="select doc from "+prefix+"r_table where i_id="+idx
     print >> sys.stderr,req
     cur.execute(req)
     vals=cur.fetchone()
@@ -2635,7 +2747,7 @@ def viewStatOnly(conf,inputs,outputs):
     if vals is not None:
         docPath=conf["main"]["publicationPath"]+"/idx_templates/"+vals[0]
     else:
-        rreq="select count(*) from graphs where type='hist' and it_id=(SELECT id from indicateurs_territoires where i_id="+idx+reqSuffix+")"
+        rreq="select count(*) from graphs where type='hist' and it_id=(SELECT id from "+tprefix+"indicators_territories where i_id="+idx+reqSuffix+")"
         cur.execute(rreq)
         rvals0=cur.fetchone()
         if rvals0[0]>0:

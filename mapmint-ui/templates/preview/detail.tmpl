@@ -2,4 +2,12 @@
 #set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$inputs["map"]["value"]+".map")
 #set l=$m.getLayer(int($inputs["layer"]["value"]))
 #set tmp=$l.metadata.get("mmEFields")
-["$l.connection","SELECT #if tmp is not None#$l.metadata.get("mmEFields")#else#*#end if# from $l.data"];
+#set mmfields=[]
+#if $tmp is not None
+#for i in $l.metadata.get("mmEFields").split(',')
+#if i!=""
+#set $mmfields+=[i]
+#end if
+#end for
+#end if
+["$l.connection","SELECT #if tmp is not None#$(','.join($mmfields))#else#*#end if# from $l.data"];

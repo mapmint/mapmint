@@ -2,7 +2,7 @@ System.initialIndexCnt=0
 
 $(document).ready(function(){
 
-    searchTable("indicateurs");
+    searchTable("indicators");
     searchTable1("documents");
 
     var items = $('\#stage li'),

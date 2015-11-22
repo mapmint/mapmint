@@ -1,4 +1,11 @@
+#encoding UTF-8
 #import zoo
+
+#try
+#set isBasic=$basic
+#except
+#set isBasic=False
+#end try
 
 #def printCheckbox(obj)
 <div class="form-group #if $obj.keys().count("classe")>0#$obj["classe"]#end if#">
@@ -56,11 +63,14 @@
 </li>
 #end def
 
+#if not(isBasic)
 <ul class="nav nav-tabs" role="tablist">
   $printTabHeader("mm_layer_property_property_display",$zoo._("General"),"fa-info",None)
   $printTabHeader("mm_layer_property_table_display",$zoo._("Table"),"fa-th","no-raster no-grid")
 </ul>
+#end if
 
+#if not(isBasic)
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="mm_layer_property_property_display">
 
@@ -99,17 +109,29 @@ $printText($i)
 </form>
 
   </div>
+#end if  
   <div role="tabpanel" class="tab-pane" id="mm_layer_property_table_display">
   </div>
+#if not(isBasic)
 </div>
-
+#end if
  <script type="template/text" id="layer_property_table_line_template">
       <tr>
-	<td><i class="fa fa-arrows-v"> </i>[order]</td>
+	<td>
+	  <i class="fa fa-arrows-v"> </i>[order]
+	  <input type="hidden" name="field_id" value="[id]" />
+	</td>
 	<td><input name="display" type="checkbox" [display] /></td>
+#if not(isBasic)
 	<td><input name="export" type="checkbox" [export] /></td>
+#else
+	<td><input name="search" type="checkbox" [export] /></td>
+#end if
 	<td>[name] <input name="oname" type="hidden" value="[name]" /></td>
 	<td><input name="label" type="text" value="[label]" /></td>
+#if isBasic
+	<td><input name="value" type="text" value="[value]" /></td>
+#end if
 	<td><input name="width" type="text" value="[width]" /></td>
       </tr>
  </script>
@@ -121,9 +143,16 @@ $printText($i)
       <tr>
 	<th style="width:25px"></th>
 	<th style="width:25px">$zoo._("D.")</th>
+#if not(isBasic)
 	<th style="width:25px">$zoo._("E.")</th>
+#else
+	<th style="width:25px">$zoo._("S.")</th>
+#end if
 	<th style="width:25px">$zoo._("Name")</th>
 	<th style="width:25px">$zoo._("Label")</th>
+#if isBasic
+	<th style="width:25px">$zoo._("Value")</th>
+#end if
 	<th style="width:25px">$zoo._("Width")</th>
       </tr>
     </thead>
@@ -133,6 +162,9 @@ $printText($i)
   </table>
   <button class="btn btn-default">
     $zoo._("Save")
+  </button>
+  <button class="btn btn-default">
+    $zoo._("Preview")
   </button>
  </script>
 

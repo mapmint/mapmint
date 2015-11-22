@@ -21,6 +21,7 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 ################################################################################
+import zoo
 import sys
 
 def getForm(conf,inputs,outputs):
@@ -67,6 +68,28 @@ def saveOnServer(conf,inputs,outputs):
     print >> sys.stderr,"ok5 "+str(outFileName)
     outputs["Result"]["value"]="Your "+tmp[len(tmp)-1]+" file was uploaded on the server"
     print >> sys.stderr,"ok6 "+str(inputs)
+    return 3
+
+def saveOnServer0(conf,inputs,outputs):
+    import shutil,json
+    dir=conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["senv"]["MMID"]
+    try:
+        shutil.os.mkdir(dir)
+    except Exception,e:
+        print >> sys.stderr,str(e)
+        pass
+    field="file"
+    if inputs.has_key("filename"):
+        field=inputs["filename"]["value"]
+    tmp=inputs[field]["lref"].split("/")
+    outFileName=dir+"/"+tmp[len(tmp)-1]
+    shutil.move(inputs[field]["lref"],outFileName);
+    conf["senv"]["last_file"]=outFileName
+    conf["senv"]["last_ufile"]=outFileName
+    import mmsession
+    mmsession.save(conf)
+    res={"message":zoo._("Your [file] file was uploaded on the server").replace("\[file\]",tmp[len(tmp)-1])}
+    outputs["Result"]["value"]=json.dumps(res)
     return 3
 
 
@@ -143,6 +166,6 @@ def checkFile(conf,inputs,outputs):
         shutil.os.rmdir(dir)
     except:
         pass
-    
-    outputs["Result"]["value"]=str({"accepted": acceptedList,"refused": deletedList})
+    import json
+    outputs["Result"]["value"]=json.dumps({"accepted": anames,"refused": dnames})
     return 3

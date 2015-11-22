@@ -348,6 +348,7 @@ define([
 		.always(
                     function() {
 			//console.log("ALWAYS");
+			console.log("ALWAYS");
                     }
 		)
 		.fail(
@@ -355,6 +356,7 @@ define([
 			if(closure.debug){
 			    console.log("======== ERROR ========");
 			}
+			    console.log("======== ERROR ========");
 			var robj=_x2js.xml2json( jqXHR.responseXML );
 			if(closure.debug){
 			    console.log(robj);
@@ -369,12 +371,18 @@ define([
 			    console.log("======== SUCCESS ========2");
 			    console.log(data);
 			}
+			console.log("======== SUCCESS ========2");
+			console.log(data);
 			var ctype=jqXHR.getResponseHeader("Content-Type").split(";")[0];
 			if( ctype=="text/xml" )
 			{
 			    var tmpD=data;
-			    data = _x2js.xml2json( data );
-			    data._origin=tmpD;
+			    try{
+				data = _x2js.xml2json( data );
+				data._origin=tmpD;
+			    }catch(e){
+				console.log("error "+e);
+			    }
 			}
 			var launched;
 			var version=(params.version?params.version:closure.version);

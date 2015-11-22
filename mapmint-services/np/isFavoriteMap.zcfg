@@ -23,7 +23,7 @@
    Abstract = The resulting message
    <ComplexData>
     <Default>
-     mimeType = application/json
+     mimeType = text/plain
      encoding = utf-8
     </Default>
    </ComplexData>

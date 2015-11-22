@@ -22,6 +22,7 @@ requirejs.config({
 	validator: 'js/lib/validator.min',
 	metisMenu: 'js/lib/metisMenu.min',
 	adminBasic: 'js/admin-basic',
+	managerTools: 'js/manager-tools',
 	datasources: 'js/datasources',
 	mmDataTables: 'js/lib/mapmint/mapmint.datatables',
 	dataTables: 'js/lib/jquery/jquery.dataTables.min',
@@ -39,6 +40,7 @@ requirejs.config({
 
 	// Unable to load datatables from one file
 	//datatables: 'js/lib/datatables.min',
+	fileinput: 'js/lib/fileinput',
 	sortable: 'js/lib/jquery-sortable',
 	treeview: 'js/lib/treeview',
 	cmenu: 'js/lib/bootstrap-contextmenu',
@@ -149,6 +151,9 @@ requirejs.config({
         app: {
             url: '$conf["main"]["serverAddress"]',
             db: '$conf["main"]["dbuserName"]',
+#if $conf.keys().count($conf["main"]["dbuser"])
+            dbschema: '$conf[$conf["main"]["dbuser"]]["schema"]',
+#end if
             delay: 2000,
             language: '$conf["main"]["language"]',
 	    tmpUrl: '$conf["main"]["tmpUrl"]',

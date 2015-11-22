@@ -1,0 +1,8 @@
+#set toto=$outputs
+#set $toto["Result"]["mimeType"]="image/svg+xml"
+#if $inputs.keys().count("svg")>0
+#set f=open($conf["main"]["publicationPath"]+"/assets/fonts/"+$inputs["svg"]["value"]+".svg")
+#else
+#set f=open($conf["main"]["publicationPath"]+"/assets/fonts/f024.svg")
+#end if
+$f.read().replace("<svg","<svg fill='#"+$inputs['color']["value"]+"' stroke='#000' stroke-linecap='round' width='100' height='100' ")

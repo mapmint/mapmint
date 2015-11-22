@@ -21,11 +21,10 @@
   [Result]
    Title = The welcome message
    Abstract = The welcome message created by service.
-   <MetaData lang="en">
-    title = My test
-   </MetaData>
-   <LiteralData>
-    DataType = string
-    <Default />
-   </LiteralData>
+   <ComplexData>
+    <Default>
+      mimeType = application/json
+      encoding = utf-8
+    </Default>
+   </ComplexData>
  </DataOutputs>

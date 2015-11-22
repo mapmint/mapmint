@@ -857,9 +857,11 @@ def createLegend0(conf,inputs,outputs):
     import json
     import math
     import mapscript
+    print >> sys.stderr,"Create new style for symbol fill"
     mapPath=conf["main"]["dataPath"]+"/maps/"
     if inputs.has_key("prefix"):
         if inputs["prefix"]["value"]=="indexes":
+            inputs["layer"]={"value":"indexes.view_idx"+inputs["id"]["value"]}
             try:
                 open(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
             except:
@@ -1211,7 +1213,7 @@ def createLegend0(conf,inputs,outputs):
 
     res={}
 
-    m2=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["name"]["value"]+".map")
+    m2=mapscript.mapObj(mapPath+"/project_"+inputs["name"]["value"]+".map")
     layer=m2.getLayerByName(inputs["layer"]["value"])
 
     for i in ["default","click"]:
@@ -1245,7 +1247,6 @@ def createLegend0(conf,inputs,outputs):
         "scaleMax": "mmMaxScale",
         "labelMin": "mmLabelMinScale",
         "labelMax": "mmLabelMaxScale",
-        "bands": "ows_bandnames",
         "tiled": "mmTiled",
         }
     for i in metadataKeys.keys():
@@ -1261,6 +1262,13 @@ def createLegend0(conf,inputs,outputs):
             nameSpace[i]=layer.metadata.get(metadataKeys[i]).split(",")
 
     metadataKeys={
+        "bands": "ows_bandnames",
+        }
+    for i in metadataKeys.keys():
+        if layer.metadata.get(metadataKeys[i]) is not None:
+            nameSpace[i]=layer.metadata.get(metadataKeys[i]).split(" ")
+            
+    metadataKeys={
         "mm_interval": "interval",
         "Band1_interval": "band1",
         "Band2_interval": "band2",
@@ -1272,6 +1280,7 @@ def createLegend0(conf,inputs,outputs):
             tmpv=layer.metadata.get(i).split(" ")
             nameSpace[metadataKeys[i]]=[float(tmpv[0]),float(tmpv[1])]
     nameSpace["type"]=layer.type
+    nameSpace["formula"]=layer.metadata.get("mmFormula")
     nameSpace["connection"]=layer.connection
     nameSpace["data"]=layer.data
     nameSpace["mmSteps"]=mySteps
@@ -2342,9 +2351,12 @@ def classifyMap0(conf,inputs,outputs):
             inputs0["mmType"]["value"]="greyScale"
             if inputs.keys().count("nodata"):
                 inputs0["mmOffsite"]={"value": inputs["nodata"]["value"]}
+            inputs0["mmFill"]={"value": "000000"}
+            inputs0["mmStroke"]={"value": "000000"}
+        else:
+            inputs0["mmFill"]={"value": "7d7dff"}
+            inputs0["mmStroke"]={"value": "505050"}
         inputs0["force"]={"value": "true"}
-        inputs0["mmFill"]={"value": "000000"}
-        inputs0["mmStroke"]={"value": "000000"}
         outputs1={"Result":{"value":""}}
         try:
             res=saveLayerStyle(conf,inputs0,outputs1)
@@ -2360,6 +2372,11 @@ def classifyMap0(conf,inputs,outputs):
         m=mapscript.mapObj(mapfile)
         layer=m.getLayerByName(inputs["layer"]["value"])
         outputs["Result"]["value"]=json.dumps(getLayerStylesArray(conf,inputs,layer))
+        inputs1=inputs
+        inputs1["name"]=inputs["map"]
+        outputs1={"Result": {"value": ""}}
+        createLegend0(conf,inputs1,outputs)
+
         return res
     
 
@@ -2542,7 +2559,7 @@ def classifyMap0(conf,inputs,outputs):
                 (1.0, (sr, sg, sb), (er, eg, eb)),
                 ]))
 	#cs._discretise()
-    #print >> sys.stderr, lOutputs
+    print >> sys.stderr, lOutputs
     #print >> sys.stderr, lOutputs["Result1"]["value"]
 
     tmpColor=lOutputs["Result1"]["value"]

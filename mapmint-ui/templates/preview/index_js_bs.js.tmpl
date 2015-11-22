@@ -140,7 +140,7 @@ var oLayers={
 #else
      	"map": "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($m.getLayer($l).metadata.get('mmFilterField') or $m.getLayer($l).metadata.get('mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map",
 #end if
-	"search": "$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map",
+	"searchMap": "$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map",
 	"dataType": #if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER or $m.getLayer($l).type==$mapscript.MS_LAYER_TILEINDEX#"raster"#else##if $m.getLayer($l).type==$mapscript.MS_LAYER_POINT#"point"#else##if $m.getLayer($l).type==$mapscript.MS_LAYER_LINE#"line"#else#"polygon"#end if##end if##end if#,
 	"display": #if vl.count($m.getLayer($l).name)>0#"vector"#else#"raster"#end if#,
 	"opacity": 1,

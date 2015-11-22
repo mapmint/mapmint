@@ -174,6 +174,7 @@ def display(conf,inputs,outputs):
 			try:
 				t = Template(file=conf["main"]["templatesPath"]+"/"+inputs["tmpl"]["value"]+".tmpl",searchList=nameSpace)
 			except Exception,e:
+				print >> sys.stderr,"ERROR => "+str(e)
 				page="/error.tmpl"
 				nameSpace["errorMsg"]=e
 				t = Template(file=conf["main"]["templatesPath"]+page,searchList=nameSpace)

@@ -2,8 +2,8 @@
 
 
 define([
-    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic',"datepicker"
-], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,datepicker) {
+    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic',"datepicker","fileinput"
+], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,datepicker,fileinput) {
     
 
     (function(){
@@ -1532,6 +1532,73 @@ define([
 		    });		    
 		});
 		return;
+	    });
+	},
+	"upload": function(data,param,dsid,dataType,obj){
+	    var ldata=data;
+	    $(obj).off("click");
+	    $(obj).click(function(e){
+		if($("#DS_"+dsid).find(".panel-body").first().find("#uploader-form").length){
+		    $("#DS_"+dsid).find(".panel-body").first().find("#uploader-form").remove();
+		    return false;
+		}
+		var reg=new RegExp("\\[datastore\\]","g");
+		$("#DS_"+dsid).find(".panel-body").first().prepend($("#uploader_form_template")[0].innerHTML.replace(reg,dsid));
+
+		$("#input-"+dsid).fileinput({
+		    uploadUrl: module.config().url+"?service=WPS&version=1.0.0&request=Execute&RawDataOutput=Result&Identifier=upload.saveOnServer0&dataInputs=file=upload;dest="+dsid, // server upload action
+		    uploadAsync: true,
+		    maxFileCount: 5
+		});
+		$('#input-'+dsid).on('filebatchuploadcomplete', function(event, files, extra) {
+		    console.log('File batch upload complete'); 
+		    zoo.execute({
+			identifier: "upload.checkFile",
+			type: "POST",
+			dataInputs: [
+			    {
+				"identifier": "dest",
+				"value": dsid,
+				"dataType": "string"
+			    }
+			],
+			dataOutputs: [
+			    {"identifier":"Result","type":"raw"},
+			],
+			success: function(data){
+			    console.log("SUCCESS");
+			    console.log(data);
+			    console.log($("#DS_"+dsid).find(".file-input"));
+			    var accepted="";
+			    var refused="";
+			    var lreg=[
+				new RegExp("\\[accepted\\]","g"),
+				new RegExp("\\[refused\\]","g"),
+				new RegExp("\\[content\\]","g"),
+				new RegExp("\\[filename\\]","g"),
+			    ];
+			    for(i in data.accepted)
+				accepted+=$("#uploader_result_row_template")[0].innerHTML.replace(lreg[3],data.accepted[i]);
+			    console.log(accepted);
+			    for(i in data.refused)
+				refused+=$("#uploader_result_row_template")[0].innerHTML.replace(lreg[3],data.refused[i]);
+			    console.log(refused);
+			    var acceptedl=$("#uploader_result_list_template")[0].innerHTML.replace(lreg[2],accepted);
+			    var refusedl=$("#uploader_result_list_template")[0].innerHTML.replace(lreg[2],refused);
+			    var acceptedl1=(data.accepted.length>0?$("#uploader_resulta_template")[0].innerHTML.replace(lreg[0],acceptedl):"");
+			    var refusedl1=(data.refused.length>0?$("#uploader_resultr_template")[0].innerHTML.replace(lreg[1],refusedl):"");
+			    var tmpl=$("#uploader_result_template")[0].innerHTML.replace(lreg[0],acceptedl1).replace(lreg[1],refusedl1);
+			    $("#DS_"+dsid).find(".file-input").first().html(tmpl);
+			},
+			error: function(data){
+			    $(".notifications").notify({
+				message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				type: 'danger',
+			    }).show();
+			}
+		    });
+		});
+
 	    });
 	},
 	"tileindex": function(data,param,dsid,dataType,obj){

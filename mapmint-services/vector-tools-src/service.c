@@ -1007,7 +1007,20 @@ __declspec(dllexport)
     /* -------------------------------------------------------------------- */
     if( poDS == NULL )
       {
+	OGRSFDriverRegistrar    *poR = OGRSFDriverRegistrar::GetRegistrar();
 	fprintf(stderr,"ERROR OCCURS %s\n",pszDataSource);
+	char tmp[1024];
+        sprintf( tmp, "FAILURE:\n"
+		 "Unable to open datasource `%s' with the following drivers.\n",
+		 pszDataSource );
+
+        for( int iDriver = 0; iDriver < poR->GetDriverCount(); iDriver++ )
+        {
+	  fprintf(stderr,"  -> %s\n", poR->GetDriver(iDriver)->GetName());
+	  sprintf( tmp+strlen(tmp), "  -> %s\n", poR->GetDriver(iDriver)->GetName() );
+        }
+	
+	setMapInMaps(conf,"lenv","message",tmp);
 	goto TRYGDAL;
       }
 

@@ -15,7 +15,8 @@ function getSymbolChooser4TTF(conf,inputs,outputs){
 	    inputs["charcodes"]={"value": myExecuteResult};
     }
   inputs["map"]={"value": conf["senv"]["last_map"]};
-  inputs["tmpl"]={"value":"Manager/Styler/Symbols.sym.tmpl"};
+    if(!inputs["tmpl"])
+	inputs["tmpl"]={"value":"/Manager/Styler/SymbolChooser.tmpl"};
   
   var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'symbol-tools.getAllSymbolsForTTF');
   var myExecuteResult1=myProcess1.Execute(inputs,myOutputs);

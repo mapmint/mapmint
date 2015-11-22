@@ -280,8 +280,10 @@ function exportTo(conf,inputs,outputs){
     inputs["map"]={"value": inputs["map"]["value"]};
     inputs["layer"]={"value": inputs["layer"]["value"]};
     var myExecuteResult=myProcess.Execute(inputs,myOutputs);
+    alert("JS",myExecuteResult);
     var tmp=eval(myExecuteResult);
-    
+    alert("JS",myExecuteResult);
+
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
     inputs["InputDSTN"]={"value": tmp[0]};
     inputs["sql"]={"value": tmp[1]};

@@ -14,8 +14,8 @@ $(document).ready(function () {
 
 	//Enables collapsing of the children
 	$('.tree-toggle').click(function () {
-		$(this).parent().children('ul.tree').slideToggle(200);
-$('.ud').toggleClass('fa-caret-down fa-caret-up');
+	    $(this).parent().children('ul.tree').slideToggle(200);
+	    $(this).find(".ud").toggleClass('fa-caret-square-o-down fa-caret-square-o-right');
 	});
 
 	//Adds the bagdes with the number of children to parent items
@@ -30,7 +30,6 @@ $('.ud').toggleClass('fa-caret-down fa-caret-up');
 
 	//When a checkbox is changed, its parents and children need to be updated.
 	$('.tree input[type="checkbox"]').click(function () {
-	
 		var el = $(this);
 		checkboxChangeDown(el);
 		checkboxChangeUp(el);

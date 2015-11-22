@@ -32,7 +32,7 @@
    Abstract = The welcome message created by service.
    <ComplexData>
     <Default>
-     mimeType = application/json
+     mimeType = text/plain
      encoding = utf-8
     </Default>
    </ComplexData>

@@ -36,7 +36,8 @@ then
 	AC_MSG_ERROR([the user-specified zoo-kernel compiled source tree  $ZOO_SRC_PATH does not exist])
 else
         ZOO_DIR=$ZOO_SRC_PATH
-	ZOO_FILE="$ZOO_SRC_PATH/ulinet.o $ZOO_SRC_PATH/service_internal_ms.o $ZOO_SRC_PATH/service_internal.o"
+	#ZOO_FILE="$ZOO_SRC_PATH/ulinet.o $ZOO_SRC_PATH/service_internal_ms.o $ZOO_SRC_PATH/service_internal.o"
+	ZOO_FILE="$ZOO_SRC_PATH/service_internal_ms.o"
 fi
 
 AC_SUBST([ZOO_FILE])

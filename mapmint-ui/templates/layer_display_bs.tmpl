@@ -1,6 +1,7 @@
 #import mapscript
 #import zoo
 #import mapfile.service as mmap
+
 #if $layer.metadata.get("ows_title") is not None and $layer.metadata.get("ows_title")!=""
 #set title=$layer.metadata.get("ows_title")
 #else
@@ -14,9 +15,12 @@
 #end def
 #try
 #set p=$prefix
+#set isOverlays=True
 #except
+#set isOverlays=False
 #set p=""
 #end try
+#if p!=""
 #if $layer.metadata.get("cstep") is not None
 #set prefix="_step"+$layer.metadata.get("cstep")
 #set hasStep=True
@@ -24,28 +28,32 @@
 #set prefix=""
 #set hasStep=False
 #end if
+#else
+#set hasStep=False
+#end if
+
 #if $layer.metadata.get('mm_group')!="Layers"
 #if $layer.numclasses > 1 and $layer.metadata.get('mmClass')!="tl"
-    <li id="layer_$(layer.index)$prefix" iconCls="tree$(p)_layer$(layer.index)$prefix" #if not(hasStep)#state="closed"#end if# class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$title </label>
+    <li id="layer_$(layer.index)$(p)" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$(p)" #if not(hasStep)#state="closed"#end if# class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers") is not None and $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$title </label>
 	$bmenu
     	<ul class="list-group tree">
 #for j in range(0,$layer.numclasses)
-     	<li iconCls="tree_layer_class tree$(p)_layer$(layer.index)$(prefix)_class$j" class="list-group-item"><label><i class="fa layer_$(layer.index)_class$j"></i> $layer.getClass($j).name</label></li>
+     	<li iconCls="tree_layer_class tree$(p)_layer$(layer.index)$(p)_class$j" class="list-group-item"><label><i class="fa layer_$(layer.index)_class$j$(p)"></i> $layer.getClass($j).name</label></li>
 #end for
 	    </ul>
 	  </li>
 #else
-	<li id="layer_$(layer.index)" iconCls="tree$(p)_layer$(layer.index)$prefix" class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label><i class="fa fa-circle"></i> $title</label><!--</li>-->
+	<li id="layer_$(layer.index)$p" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$p" class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers") is not None and $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label><i class="fa fa-circle"></i> $title</label><!--</li>-->
 	$bmenu
 #if $layer.metadata.get('mmClass')=="tl"
 #set steps=$layer.metadata.get('mmSteps').split(',')
 <!--<li class="list-group-item">-->
 <div class="bs-example" data-example-id="carousel-with-captions">
-    <div id="layer_$(layer.index)_carousel" class="carousel slide" data-ride="carousel">
+    <div id="layer_$(layer.index)$(p)_carousel" class="carousel slide" data-ride="carousel">
       <ol class="carousel-indicators">
 #set cnt=0
 #for i in steps
-    <li data-target="#layer_$(layer.index)_carousel" data-slide-to="$cnt" #if $cnt==0#class="active"#end if#></li>
+    <li data-target="#layer_$(layer.index)$(p)_carousel" data-slide-to="$cnt" #if $cnt==0#class="active"#end if#></li>
 #set $cnt+=1
 #end for
       </ol>
@@ -79,27 +87,7 @@
       </a>
     </div>
   </div>
-<!--	</li>-->
-#*
-#set cnt=0
-#for i in steps
-<li class="list-group-item layer_$layer.index step$cnt #if $cnt>0#hide    display: block;
-    content: " ";
-    height: 16px;
-    width: 16px;
-#end if#">
-	    <ul class="list-group tree">
-#set m0=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/timeline_"+$conf["senv"]["last_map"]+"_"+$layer.name+"_step"+str($cnt)+".map")
-#set layer0=m0.getLayerByName($layer.name)
-#set $prefix="_step"+str($cnt)
-#for j in range(0,$layer0.numclasses)
-     	<li iconCls="tree_layer_class tree$(p)_layer$(layer.index)$(prefix)_class$j" class="list-group-item"><label><i class="fa layer_$(layer.index)$(prefix)_class$j"></i> $layer0.getClass($j).name</label></li>
-#end for
-	    </ul>
-</li>
-#set $cnt+=1
-#end for
-*#
+
 #end if
 	</li>
 #end if

@@ -42,6 +42,8 @@ define([
     var mymodal = $('#myModal');
     var mynotify = $('.top-right');
     var wgs84Sphere = new ol.Sphere(6378137);
+    var flagStyles;
+    var addedLayers=[];
 
     function notify(text, type) {
         mynotify.notify({
@@ -92,6 +94,32 @@ define([
 	startSearchEngine();
     }
 
+    function displayFeatureInfo(evt,layer,localFunction){
+	var wmsSource = new ol.source.TileWMS({
+	    url: msUrl+"?map="+oLayers[layer]["searchMap"].replace(/_click/g,""),
+	    params: {'LAYERS': layer},
+	    serverType: 'mapserver',
+	    crossOrigin: ''
+	});
+	var url = wmsSource.getGetFeatureInfoUrl(
+	    evt.coordinate, map.getView().getResolution(), 'EPSG:3857',
+	    {'INFO_FORMAT': 'text/html'});
+	$.ajax({
+	    type: "GET",
+	    url: url
+	}).done(function(res){
+	    localFunction(res);
+	    //console.log(res);
+	    //var coords = ol.coordinate.toStringXY(ol.proj.transform(coord, 'EPSG:3857', 'EPSG:4326'),2);
+	    /*if(res.length>1)
+		popup.show(evt.coordinate, '<div>' + res
+			   +'</div>');
+	    else
+		popup.hide();*/
+	});
+
+    }
+    
     var searchValues,searchExtents;
     function startSearchEngine(){
 	$("nav").find(".search-panel").find(".dropdown-menu").find("a").each(function(){
@@ -468,10 +496,147 @@ define([
 	});
 	
 	
-	$(".cm").contextmenu({
+	$("#mm_layers_display").find(".cm").contextmenu({
 	    target: "#context-menu"
 	});
 
+
+	try{
+	$("#addLayer-ui").find('button').first().click(function(){
+	    console.log("Add a layer!");
+	    var cvalue=-1;
+	    var clayers=[];
+	    var cselection="";
+	    var listHTML="";
+	    $(this).parent().next().find(".active").each(function(){
+		console.log($(this));
+		cselection=$(this).attr("id");
+		$(this).find('.layer').find('input[type=checkbox]').each(function(){
+		    if($(this).is(":checked")){
+			if($(this).parent().attr("data-layer"))
+			    clayers.push($(this).parent().attr("data-layer"));
+			else
+			    clayers.push($(this).attr("id"));
+			if(cvalue==-1)
+			    cvalue=$(this).val();
+			else
+			    if(cvalue!=$(this).val())
+				cvalue=null;
+			listHTML+=$(this).parent()[0].outerHTML;
+			console.log($(this));
+			$(this).trigger("click");
+		    }
+		});
+	    });
+	    
+	    console.log(cvalue);
+	    console.log(clayers);
+
+	    myStr=clayers.join(",");
+	    var cmapfile="";
+	    if(cselection=="mm_overlays_wms_display")
+		cmapfile=mapPath.replace(/public_maps/,"WMS")+cvalue+"ds_ows.map";
+	    else
+		cmapfile=mapPath.replace(/public_maps/,"maps")+"/project_Overlays.map";	
+	    addedLayers.push(new ol.layer.Tile({
+		visible: true,
+		source: new ol.source.TileWMS({
+		    url: msUrl+"?map="+cmapfile,
+		    params: {'LAYERS': myStr, 'TILED': true},
+		    serverType: 'mapserver'
+		})
+	    }));
+	    map.addLayer(addedLayers[addedLayers.length-1]);
+	    
+	    var reg=[
+		new RegExp("\\[nn\\]","g"),
+		new RegExp("\\[n\\]","g"),
+		new RegExp("\\[list\\]","g")
+	    ];
+
+	    var myStr=$("#addedLayer_item_template")[0].innerHTML.replace(reg[0],(addedLayers.length-1)+"").replace(reg[1],addedLayers.length+"").replace(reg[2],listHTML);
+	    $("#mm_layers_display").find(".tree").first().append(myStr);
+	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find('button').first().each(function(){
+		$(this).click(function(){
+		    var myRoot=$(this).parent().parent().parent();
+		    var cid=parseInt(myRoot.attr('id').replace(/overlays_/g,""));
+		    map.removeLayer(addedLayers[cid]);
+		    myRoot.remove();
+		});
+	    });
+	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find('input[type=checkbox]').first().each(function(){
+		$(this).click(function(){
+		    var myRoot=$(this).parent().parent().parent();
+		    var cid=parseInt(myRoot.attr('id').replace(/overlays_/g,""));			
+		    addedLayers[cid].setVisible($(this).is(':checked'));
+		});
+	    });
+	    clayer="overlays_"+(addedLayers.length-1);
+	    if(!oLayers[clayer])
+		oLayers[clayer]={'opacity':1};
+
+	    console.log( $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)));
+	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find("li.layer").each(function(){
+		console.log($(this));
+		if(cselection=="mm_overlays_wms_display")
+		    $(this).find("input[type=checkbox]").parent().prepend('<i class="fa fa-server"> </i>  ');
+		$(this).find("input[type=checkbox]").remove();
+	    });
+	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find('.tree-toggle').click(function () {
+		$(this).parent().children('ul.tree').slideToggle(200);
+		$(this).find('.ud').toggleClass('fa-caret-square-o-down fa-caret-square-o-right');
+	    });
+	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).contextmenu({
+		target: "#context-menu"
+	    });
+	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).bind("contextmenu",function(e){
+		console.log(e);
+		console.log($(this).attr("id").indexOf("overlays_"));
+		if($(this).attr("id").indexOf("overlays_")==0){
+		    cid=parseInt($(this).attr("id").replace(/overlays_/,""));
+		    clayer="overlays_"+cid;
+		}
+		else{
+		    cid=eval($(this).attr("id").replace(/layer_/,""));
+		    clayer=getLayerById(cid);
+		}
+		console.log(clayer);
+		if(!oLayers[clayer])
+		    oLayers[clayer]={'opacity':1};
+
+		$("#mm_layers_display").find(".tree").find(".layer-active").toggleClass("layer-active");
+		$(e.currentTarget).toggleClass("layer-active");
+		var myRootLocation=$("#context-menu");
+		for(i in {"export":0,"query":0,"zoomTo":0}){
+		    myRootLocation.find("#mmm_"+i).parent().addClass("hidden");
+		}
+		console.log(clayer);
+		myRootLocation.find("#mmm_opacity").off("input");
+		myRootLocation.find("#mmm_opacity").on("input",function(){
+		    myRootLocation.find("#mmm_range").val($(this).val()+"%");
+		    var cLayer=$("#mm_layers_display").find(".tree").find("li.layer-active").first();
+		    if(cLayer.attr("id").indexOf("overlays_")==0){
+			var cid=parseInt(cLayer.attr("id").replace(/overlays_/,""));
+			addedLayers[cid].setOpacity($(this).val()/100);
+			clayer="overlays_"+cid;
+		    }
+		    else{
+			var cid=eval("myBaseLayers.length+"+(cLayer.attr("id").replace(/layer_/,"").split("_")[0]));
+			var clayer=getLayerById(eval(cLayer.attr("id").replace(/layer_/,"")));
+			map.getLayers().item(cid).setOpacity($(this).val()/100);
+			clayer=getLayerById(cid);
+		    }
+		    oLayers[clayer]["opacity"]=$(this).val()/100;
+		});
+		myRootLocation.find("#mmm_opacity").val(oLayers[clayer]["opacity"]*100);
+		myRootLocation.find("#mmm_range").val(Math.round(oLayers[clayer]["opacity"]*100).toFixed(0)+"%");
+		$('body, #context-menu > ul > li > a').on('click', function (e) {console.log("CLICK !! ");$(".tree").find(".layer-active").removeClass('layer-active');});
+		return;
+	    });
+	});
+	}catch(e){
+	    console.log(e);
+	}
 	authenticateSetup();
 	//$("[rel='dropdown']").dropdown("toggle");
 
@@ -519,45 +684,6 @@ define([
 	    }
 	});
 
-	$('.layer-cmenu').click(function(e){
-	    //e.preventDefault();
-	    //e.stopPropagation();
-	    $(".tree li.layer").find(".layer-active").toggleClass("layer-active");
-	    $(e.currentTarget).toggleClass("layer-active");
-	    console.log($(this).parent().parent().attr("id").replace(/layer_/,""));
-	    var cid=eval($(this).parent().parent().attr("id").replace(/layer_/,""));
-	    $(this).append($("#context-menu")[0].innerHTML);
-	    clayer=getLayerById(cid);
-	    console.log(oLayers[clayer]["query"]);
-	    console.log(oLayers[clayer]["export"]);
-	    
-	    var myRootLocation=$(this).parent().parent();
-	    for(var j in {"export":0,"query":0}){
-		console.log("****** I "+j+" "+oLayers[clayer][j]);
-		if(!oLayers[clayer][j])
-		    myRootLocation.find("#mmm_"+j).parent().addClass("hide");
-		else
-		    myRootLocation.find("#mmm_"+j).parent().removeClass("hide");
-	    }
-
-	    myRootLocation.find("#mmm_opacity").on("input",function(){
-		myRootLocation.find("#mmm_range").val($(this).val()+"%");
-		var cLayer=$(".tree li").find(".active");
-		if(!cLayer.attr("id"))
-		    cLayer=$(this).parent().parent().parent().parent().parent();
-		console.log(cLayer);
-		var cid=eval("myBaseLayers.length+"+(cLayer.attr("id").replace(/layer_/,"").split("_")[0]));
-		var clayer=getLayerById(eval(cLayer.attr("id").replace(/layer_/,"")));
-		oLayers[clayer]["opacity"]=$(this).val()/100;
-		map.getLayers().item(cid).setOpacity($(this).val()/100);
-	    });
-
-	    myRootLocation.find("#mmm_opacity").val(oLayers[clayer]["opacity"]*100);
-	    myRootLocation.find("#mmm_range").val(Math.round(oLayers[clayer]["opacity"]*100).toFixed(0)+"%");
-
-	    return true;
-	});
-
 	$("#context-menu").bind("removeClass",function(){
 	    console.log("context-menu removed");
 	    //$(".tree li.layer").removeClass("layer-active");
@@ -575,31 +701,46 @@ define([
 	    console.log($(e.currentTarget).attr("id"));
 	    console.log(e.currentTarget);
 	    console.log("************* ID : "+$(this).attr("id"));
-	    var cid=eval($(this).attr("id").replace(/layer_/,""));
+	    var cid;
+	    if($(this).attr("id").indexOf("overlays_")==0){
+		cid=eval($(this).attr("id").replace(/overlays_/,""));
+		clayer="overlays_"+cid;
+	    }
+	    else{
+		cid=eval($(this).attr("id").replace(/layer_/,""));
+		clayer=getLayerById(cid);
+	    }
 	    $(this).addClass("layer-active");
 	    console.log($(this));
-	    clayer=getLayerById(cid);
 	    console.log(oLayers[clayer]);
 	    console.log(oLayers[clayer]["query"]);
 	    
 	    var myRootLocation=$("#context-menu");
-	    for(i in {"export":0,"query":0}){	    
+	    for(i in {"export":0,"query":0,"zoomTo":0}){
 		if(!oLayers[clayer][i])
 		    myRootLocation.find("#mmm_"+i).parent().addClass("hidden");
 		else
+		    myRootLocation.find("#mmm_"+i).parent().removeClass("hidden");
+		if(i=="zoomTo")
 		    myRootLocation.find("#mmm_"+i).parent().removeClass("hidden");
 	    }
 
 	    myRootLocation.find("#mmm_opacity").off("input");
 	    myRootLocation.find("#mmm_opacity").on("input",function(){
 		myRootLocation.find("#mmm_range").val($(this).val()+"%");
-		var cLayer=$(".tree li").find(".layer-active");
+		var cLayer=$(".tree").find(".layer-active");
 		if(!cLayer.attr("id"))
 		    cLayer=$(this).parent().parent().parent().parent().parent();
-		var cid=eval("myBaseLayers.length+"+(cLayer.attr("id").replace(/layer_/,"").split("_")[0]));
-		var clayer=getLayerById(eval(cLayer.attr("id").replace(/layer_/,"")));
-		oLayers[clayer]["opacity"]=$(this).val()/100;
-		map.getLayers().item(cid).setOpacity($(this).val()/100);
+		if(cLayer.attr("id").indexOf("overlays_")==0){
+		    var cid=parseInt(cLayer.attr("id").replace(/overlays_/,""));
+		    addedLayers[cid].setOpacity($(this).val()/100);
+		}
+		else{
+		    var cid=eval("myBaseLayers.length+"+(cLayer.attr("id").replace(/layer_/,"").split("_")[0]));
+		    var clayer=getLayerById(eval(cLayer.attr("id").replace(/layer_/,"")));
+		    oLayers[clayer]["opacity"]=$(this).val()/100;
+		    map.getLayers().item(cid).setOpacity($(this).val()/100);
+		}
 	    });
 
 
@@ -983,7 +1124,7 @@ define([
 	myToolsLayers.push(featuresOverlay);
 
 
-	$('input[type="checkbox"]').each(function(){
+	$("#mm_layers_display").find('input[type="checkbox"]').each(function(){
 	    console.log($(this).parent());
 	    $(this).change(function(){
 		//console.log($(this));
@@ -991,9 +1132,11 @@ define([
 		    console.log($(this).parent()[0]["id"].replace(/layer_/g,""));
 		    //console.log(map.getLayers());
 		    console.log($(this).is(":checked"));
-		    var tmp=eval($(this).parent()[0]["id"].replace(/layer_/g,"")+"+myBaseLayers.length");
+		    var cid=parseInt($(this).parent()[0]["id"].replace(/layer_/g,""));
+		    var tmp=eval(cid+"+myBaseLayers.length");
 		    console.log(tmp);
 		    map.getLayers().item(eval($(this).parent()[0]["id"].replace(/layer_/g,"")+'+myBaseLayers.length')).setVisible($(this).is(":checked"));
+		    oLayers[getLayerById(cid)]["activated"]=$(this).is(":checked");
 		    if($(this).parent().find(".carousel").length){
 			if($(this).is(":checked"))
 			    $(this).parent().find(".carousel").carousel("cycle");
@@ -1009,6 +1152,7 @@ define([
 			console.log(tmp);
 			console.log($(this).find("input").is(":checked"));
 			map.getLayers().item(tmp).setVisible(($(this).find("input").is(":checked")));
+			
 			console.log($(this)[0]["id"]);
 		    });
 		}
@@ -1060,11 +1204,14 @@ define([
 	    map.addOverlay(popup[i]);
         
 	map.on('singleclick', function (evt) {
+	    var selectedLayers=[];
 	    console.log("CLICK !");
 	    var feature = map.forEachFeatureAtPixel(evt.pixel,function (feature, layer) {
 		if(layer){
-		    if(layer.get("name") && oLayers[layer.get("name")].click)
+		    if(layer.get("name") && oLayers[layer.get("name")].click){
 			feature.set("layerName",layer.get("name"));
+			selectedLayers.push(layer.get("name"));
+		    }
 		}
 		return feature;
 	    });
@@ -1087,6 +1234,17 @@ define([
 			tryRun(feature,true);
 		    })();
 		}else{
+		    displayFeatureInfo(evt,feature.get("layerName"),function(res){
+			$(".window.active").remove();
+			if(res.length>1)
+			    wm.createWindow({
+				title: oLayers[feature.get("layerName")].alias,
+				bodyContent: "<p>"+res+"</p>",
+				footerContent: '',
+				top: "79px"
+			    });
+		    });
+		    /*
 		    var wmsSource = new ol.source.TileWMS({
 			url: msUrl+"?map="+oLayers[feature.get("layerName")]["search"],
 			params: {'LAYERS': feature.get("layerName")},
@@ -1102,8 +1260,6 @@ define([
 		    }).done(function(res){
 			//console.log(res);
 			//var coords = ol.coordinate.toStringXY(ol.proj.transform(coord, 'EPSG:3857', 'EPSG:4326'),2);
-			/*popup[0].show(evt.coordinate, '<div>' + res
-				   +'</div>');*/
 			wm.createWindow({
 			    title: oLayers[feature.get("layerName")].alias,
 			    bodyContent: "<p>"+res+"</p>",
@@ -1113,16 +1269,39 @@ define([
 
 		    });
 		    console.log(url);
+		    */
 		}
 	    } else {
 		popup[1].hide();
 	    }
+	    var gfLayer="";
+	    for(var i in oLayers){
+		if(selectedLayers.indexOf(i)==-1 && oLayers[i]["click"] && oLayers[i]["activated"]){
+		    console.log(oLayers[i]["searchMap"]);
+		    gfLayer=i;
+		}
+	    }
+	    if(gfLayer!=""){
+		displayFeatureInfo(evt,gfLayer,function(res){
+		    $(".window.active").remove();
+		    if(res.length>1)
+			wm.createWindow({
+			    title: oLayers[gfLayer].alias,
+			    bodyContent: "<p>"+res+"</p>",
+			    footerContent: '',
+			    top: "79px"
+			});
+		});
+	    }
 	});
 	map.on('pointermove', function(evt) {
+	    var selectedLayers=[];
 	    var feature = map.forEachFeatureAtPixel(evt.pixel,function (feature, layer) {
 		if(layer){
-		    if(layer.get("name") && oLayers[layer.get("name")].over)
+		    if(layer.get("name") && oLayers[layer.get("name")].over){
 			feature.set("layerName",layer.get("name"));
+			selectedLayers.push(layer.get("name"));
+		    }
 		}
 		return feature;
 	    });
@@ -1141,8 +1320,8 @@ define([
 			tryRun(feature);
 		    })();
 		}else{
-		    var wmsSource = new ol.source.TileWMS({
-			url: msUrl+"?map="+oLayers[feature.get("layerName")]["search"].replace(/_click/g,""),
+		    /*var wmsSource = new ol.source.TileWMS({
+			url: msUrl+"?map="+oLayers[feature.get("layerName")]["searchMap"].replace(/_click/g,""),
 			params: {'LAYERS': feature.get("layerName")},
 			serverType: 'mapserver',
 			crossOrigin: ''
@@ -1154,16 +1333,37 @@ define([
 			type: "GET",
 			url: url
 		    }).done(function(res){
-			//console.log(res);
-			//var coords = ol.coordinate.toStringXY(ol.proj.transform(coord, 'EPSG:3857', 'EPSG:4326'),2);
-			popup[1].show(evt.coordinate, '<div>' + res
-				   +'</div>');
+			    popup[1].show(evt.coordinate, '<div>' + res
+					  +'</div>');
+		    });*/
+		    displayFeatureInfo(evt,feature.get("layerName"),function(res){
+			if(res.length>1)
+			    popup[1].show(evt.coordinate, '<div>' + res
+				       +'</div>');
+			else
+			    popup[1].hide();
 		    });
 		    console.log(url);
 		}
 	    } else {
 		popup[1].hide();
 	    }
+	    var gfLayer="";
+	    for(var i in oLayers)
+		if(selectedLayers.indexOf(i)==-1 && oLayers[i]["over"] && oLayers[i]["activated"]){
+		    console.log(oLayers[i]["search"]);
+		    gfLayer=i;
+		}
+	    if(gfLayer!=""){
+		displayFeatureInfo(evt,gfLayer,function(res){
+		    if(res.length>1)
+			popup[1].show(evt.coordinate, '<div>' + res
+				      +'</div>');
+		    else
+			popup[1].hide();
+		});
+	    }
+
 	});
 
 	mapInteractions["default"]=new ol.interaction.Select({
@@ -1227,18 +1427,67 @@ define([
 	map.addLayer(selectLayer);
 	myToolsLayers.push(selectLayer);
 
-	/*vstyles=[new ol.style.Style({
-	    image: new ol.style.Icon({
-		anchor: [12, 0.5],
-		size: [24, 24],
-		scale: 0.7,
-		anchorXUnits: 'pixel',
-		anchorYUnits: 'fraction',
-		src: 
-            })
-	})];*/
-
 	vstyles=[new ol.style.Style({
+	    image: new ol.style.Icon({
+		anchorOrigin: 'top-left',
+		anchor: [0.25, 0.95],
+		//anchor: [0, 0],
+		//size: [24, 24],
+		scale: 1/5,
+		opacity: 1,
+		anchorXUnits: 'fraction',
+		anchorYUnits: 'fraction',
+		src: "assets/fonts/f024.svg"
+            })
+	})];
+
+	flagStyles=[];
+	var colors=["000","ab0e0e","e09b6c"];
+	var svgs={"f024":0,"f11e":0};
+	for(a in svgs)
+	    for(var i=0;i<colors.length;i++)
+		flagStyles.push(new ol.style.Style({
+		    image: new ol.style.Icon({
+			anchorOrigin: 'top-left',
+			anchor: [0.25, 0.95],
+			//anchor: [0, 0],
+			//size: [24, 24],
+			scale: 1/5,
+			opacity: 1,
+			anchorXUnits: 'fraction',
+			anchorYUnits: 'fraction',
+			src: "modules/routing/flag.svg;color="+colors[i]+";svg="+a
+		    })
+		}));
+	vstyles=[new ol.style.Style({
+	    image: new ol.style.Icon({
+		anchorOrigin: 'top-left',
+		anchor: [0.25, 0.95],
+		//anchor: [0, 0],
+		//size: [24, 24],
+		scale: 1/5,
+		opacity: 1,
+		anchorXUnits: 'fraction',
+		anchorYUnits: 'fraction',
+		src: "modules/routing/flag.svg;color=000"
+            })
+	})];
+
+	vstylesSelected=[new ol.style.Style({
+	    image: new ol.style.Icon({
+		anchorOrigin: 'top-left',
+		anchor: [0.25, 0.95],
+		//anchor: [0, 0],
+		//size: [24, 24],
+		scale: 1/5,
+		opacity: 1,
+		anchorXUnits: 'fraction',
+		anchorYUnits: 'fraction',
+		src: "modules/routing/flag.svg;color=ab0e0e"
+            })
+	})];
+
+	/*vstyles=[new ol.style.Style({
 	    image: new ol.style.RegularShape({
 		fill: new ol.style.Fill({color: "#FF0000"}),
 		stroke: new ol.style.Stroke({color: "#FF0000",width: 2}),
@@ -1258,7 +1507,7 @@ define([
 		radius2: 0,
 		angle: 0
 	    })
-	})];
+	})];*/
 
 	features0 = new ol.Collection();
 	featureOverlay0 = new ol.layer.Vector({
@@ -1267,6 +1516,27 @@ define([
 	});
 	featureOverlay0.setMap(map);
 	myToolsLayers.push(featureOverlay0);
+
+	featureOverlay0.getSource().on("addfeature",function(e){
+	    var len=featureOverlay0.getSource().getFeatures().length;
+	    var index=-1;
+	    var cindex=0;
+	    for(var i=0;i<len;i++){
+		if(!featureOverlay0.getSource().getFeatures()[i].get("fid")){
+		    console.log(vectorLayerId);
+		    featureOverlay0.getSource().getFeatures()[i].set("fid","vectorLayer_"+vectorLayerId)
+		    console.log(featureOverlay0.getSource().getFeatures()[i].get("fid"));
+		    index=vectorLayerId+1;
+		}else{
+		    var index=parseInt(featureOverlay0.getSource().getFeatures()[i].get("fid").replace(/vectorLayer_/g,""))+1;
+		}
+		//if(index
+		if(index>0 && index<3)
+		    featureOverlay0.getSource().getFeatures()[i].setStyle([flagStyles[(index-1)*3]]);
+		else
+		    featureOverlay0.getSource().getFeatures()[i].setStyle([flagStyles[2]]);
+	    }
+	});
 
 	myMMDataTableObject = new MMDataTable({"selectLayer": selectLayer, "zook": zoo});
 
@@ -2714,15 +2984,34 @@ define([
 
     var features0,featureOverlay0;
     var draw0;
+    var vectorLayerId=0;
 
     function addInteraction() {
 	var closure=arguments[0];
+
+	console.log('addInteraction');
 	var hasDraw0=true;
+	var len=featureOverlay0.getSource().getFeatures().length;
+
+	var cid=closure.parent().prev().attr("id");
+	vectorLayerId=(cid=="end"?1:(cid=="start"?0:-1));
+	console.log(closure.parent().prev().attr("id"));
+	if(len>=2){
+	    for(var i=0;i<len;i++){
+		if(featureOverlay0.getSource().getFeatures()[i] &&
+		   ((featureOverlay0.getSource().getFeatures()[i].get('fid')=="vectorLayer_0" && cid=="start") || 
+		    (featureOverlay0.getSource().getFeatures()[i].get('fid')=="vectorLayer_1" && cid=="end"))){
+		    features0.removeAt(i);
+		    len=i;
+		}
+	    }
+	}
+	console.log(1+((len-1)*3));
 	//if(!draw0){
 	    draw0 = new ol.interaction.Draw({
 		features: features0,
 		type: /** @type {ol.geom.GeometryType} */ ('Point'),
-		style: vstyles
+		style: (len==1?[flagStyles[1+((len)*3)]]:[flagStyles[1]])
 	    });
 	    hasDraw0=false;
 	//}

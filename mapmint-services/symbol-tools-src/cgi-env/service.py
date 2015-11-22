@@ -52,24 +52,20 @@ def getAllSymbolsForTTF(conf,inputs,outputs):
     else:
         mapfile=conf["main"]["dataPath"]+"/maps/map4symbols_default.map"
     images=[]
-    print >> sys.stderr,mapfile
-    print >> sys.stderr,m.getNumSymbols()
     i=0
+    cnt=0
     while i < m.getNumSymbols():
         m.symbolset.getSymbol(i)
-        print >> sys.stderr,mapfile
         symb=m.symbolset.getSymbol(i)
-        print >> sys.stderr,symb.name
         if symb.name is not None and symb.name.count('polygon_')==0:
             l=m.getLayerByName("Symbol_"+symb.name)
-            print >> sys.stderr,l
             if l is None:
                 layer=mapscript.layerObj(m)
                 layer.type=mapscript.MS_LAYER_POINT
                 feature=mapscript.shapeObj(mapscript.MS_SHAPE_POINT)
-                layer.addFeature(feature.fromWKT("POINT(0.001 0.001)"))
+                layer.addFeature(feature.fromWKT("POINT("+str(cnt)+".001 0.001)"))
+                #layer.addFeature(feature.fromWKT("POINT(0.001 0.001)"))
                 layer.connection=None
-                print >> sys.stderr, symb.name
                 layer.name="Symbol_"+symb.name
                 layer.data=None
                 layer.tileitem=None
@@ -85,14 +81,15 @@ def getAllSymbolsForTTF(conf,inputs,outputs):
                 #m.setSize(24,24)
                 #m.setExtent(0,0,0.002,0.002)
                 #tmpImage=m.draw()#
-                images+=[{"id": layer.name,"value": conf["main"]["mapserverAddress"]+"?map="+mapfile+"&LAYERS="+layer.name+"&SRS=EPSG%3A4326&amp;FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&BBOX=0,0,0.002,0.002&WIDTH=32&HEIGHT=32&format=png"}]
+                images+=[{"id": layer.name,"value": conf["main"]["mapserverAddress"]+"?map="+mapfile+"&LAYERS="+layer.name+"&SRS=EPSG%3A4326&amp;FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&BBOX="+str(cnt)+",0,"+str(cnt)+".002,0.002&WIDTH=32&HEIGHT=32&format=png"}]
+                cnt+=1
                 #tmpImage=tmpClass.createLegendIcon(m,layer,32,32)
                 #tmpImage.write(conf["main"]["dataPath"]+"/maps/"+img_name)
                 #print >> sys.stderr,conf["main"]["dataPath"]+"/maps/"+img_name
         i+=1
     m.save(mapfile)
 
-    t=Template(file=conf["main"]["templatesPath"]+"/Manager/Styler/SymbolChooser.tmpl",searchList={"images": images,"inputs":inputs})
+    t=Template(file=conf["main"]["templatesPath"]+inputs["tmpl"]["value"],searchList={"images": images,"inputs":inputs,"mapfile": mapfile,"conf":conf})
     outputs["Result"]["value"]=t.__str__()
 
     return 3
@@ -114,7 +111,7 @@ def addSymbolToOrig(conf,inputs,outputs):
                 else:
                     newContent+=a
             else:
-                print >> sys.stderr,a[:len(a)-4]
+                print >> sys.stderr,a[:len(a)-5]
                 newContent+='SYMBOL\n'+a[:len(a)-5]
             i+=1
     t=Template(file=conf["main"]["templatesPath"]+"/Manager/Styler/Symbols.sym.tmpl",searchList={"conf": conf,"inputs": inputs,"outputs": outputs})
@@ -123,4 +120,37 @@ def addSymbolToOrig(conf,inputs,outputs):
     f.write(newContent)
     f.close()
     outputs["Result"]["value"]=zoo._("Symbol added.")
+    return 3
+
+def deleteSymbolFromOrig(conf,inputs,outputs):
+    import sys
+    import json
+    from Cheetah.Template import Template
+    f=open(conf["main"]["dataPath"]+"/symbols.sym","r")
+    newContent=""
+    str=f.read()
+    f.close()
+    i=0
+    if inputs["name"].keys().count("length")==0:
+        inputs["name"]["value"]=[inputs["name"]["value"]]
+    b=str.split('SYMBOL\n')
+    for a in b:
+        hasValue=False
+        if a!="" and a!='\n':
+            for j in range(len(inputs["name"]["value"])):
+                if a.count(inputs["name"]["value"][j])>0:
+                    hasValue=True
+            if not(hasValue):
+                if newContent!="":
+                    newContent+='SYMBOL\n'+a
+                else:
+                    newContent+=a
+            else:
+                if i+1==len(b):
+                    newContent+="\nEND\n"
+            i+=1
+    f=open(conf["main"]["dataPath"]+"/symbols.sym","w")
+    f.write(newContent)
+    f.close()
+    outputs["Result"]["value"]=zoo._("Symbol removed.")
     return 3

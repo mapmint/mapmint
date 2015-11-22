@@ -376,7 +376,8 @@ define([
 		    "bServerSide": true,
 		    fixedHeader: true,
 		    //searching: true,
-		    responsive: true,
+		    responsive: false,
+		    autoWidth: false,
 		    deferRender: true,
 		    rowId: 'fid',
 		    select: {

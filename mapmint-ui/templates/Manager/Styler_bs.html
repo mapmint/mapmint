@@ -1,6 +1,12 @@
 #encoding UTF-8
 #import zoo
 
+#try
+#set isBasic=$basic
+#except
+#set isBasic=False
+#end try
+
 #def printTabHeader(id,title,font,classe)
 <li role="presentation" #if $classe is not None#class="$classe"#end if#>
   <a id="$(id)_Toggler" href="#$id" aria-controls="home" role="tab" data-toggle="tab">
@@ -15,13 +21,16 @@
 <ul class="nav nav-tabs" role="tablist">
   $printTabHeader("mm_layer_property_style_display",$zoo._("Symbology"),"fa-paint-brush",None)
   $printTabHeader("mm_layer_property_label_display",$zoo._("Labels"),"fa-file-text-o","no-raster")
+#if not(isBasic)
   $printTabHeader("mm_layer_property_grid_display",$zoo._("Grid"),"fa-th","require-grid")
+#end if
 </ul>
 
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active"
   id="mm_layer_property_style_display">
     <form class="form-horizontal mtpp" method="get" >
+#if not(isBasic)
       <div class="form-group require-raster">
 	<label class="col-sm-3 control-label">$zoo._(" Resampling method: ")</label>
         <div class="col-sm-9 ">
@@ -34,6 +43,7 @@
 	  </select>
 	</div>
       </div>
+#end if
       <div class="form-group">
 	<label class="col-sm-3 control-label">$zoo._("Opacity")</label>
 	<div class="col-sm-9 ">
@@ -56,13 +66,26 @@
 	</div>
       </div>
 #end def
-#set choices={
-	"us": [$zoo._("Unique Symbol"),False,False],
-	"gs": [$zoo._("Graduated Symbol"),False,False],
-	"cc": [$zoo._("Continuous Color"),True,False],
-	"uv": [$zoo._("Unique Value"),False,False],
-	"tl": [$zoo._("Time line"),True,False]
-	}
+
+#from collections import OrderedDict      
+#if not(isBasic)
+#set choices=OrderedDict([
+      ("us", [$zoo._("Unique Symbol"),False,False]),
+      ("gs", [$zoo._("Graduated Symbol"),False,False]),
+      ("cc", [$zoo._("Continuous Color"),True,False]),
+      ("uv", [$zoo._("Unique Value"),False,False]),
+      ("tl", [$zoo._("Time line"),True,False])
+      ])
+#else
+#set choices=OrderedDict([
+      ("us", [$zoo._("Choose"),False,False]),
+      ("gs", [$zoo._("Graduated Symbol"),False,False]),
+      ("cc", [$zoo._("Continuous Color"),True,False]),
+      ("uv", [$zoo._("Unique Value"),False,False]),
+      ("tl", [$zoo._("Time line"),True,False])
+      ])
+#end if
+
       $printSelect("",$zoo._("Legend Type: "),"classification",$choices)
       <div class="form-group require-tl no-grid no-us no-gs no-cc no-uv col-sm-12">
 	<label class="col-sm-3 control-label">$zoo._("Steps")</label>
@@ -85,14 +108,26 @@
         <button class="btn btn-default col-sm-4 mmstep-add">
 	  $zoo._("Add")
 	</button>
-      </div>      
+      </div>
+
+#if not(isBasic)      
 #set choices={
 	"us": [$zoo._("Unique Symbol"),False,False],
 	"gs": [$zoo._("Graduated Symbol"),False,False],
 	"cc": [$zoo._("Continuous Color"),True,False],
 	"uv": [$zoo._("Unique Value"),False,False]
 	}
+#else
+#set choices={
+	"gs": [$zoo._("Graduated Symbol"),False,False],
+	"cc": [$zoo._("Continuous Color"),True,False],
+	"uv": [$zoo._("Unique Value"),False,False],
+	}
+#end if
+
+      
       $printSelect("require-tl no-us no-gs no-cc no-uv",$zoo._("Legend Type for this step"),"step_classification",$choices)
+#if not(isBasic)
       <div class="form-group require-raster no-us">
 	<label class="col-sm-3 control-label">$zoo._("Tiled version")</label>
         <div class="col-sm-9">
@@ -127,6 +162,7 @@
 	  </div>
 	</div>
       </div>
+#end if
       <div class="form-group no-us">
 	<label class="col-sm-3 control-label">$zoo._("Min / Max color")</label>
         <div class="col-sm-9 ">
@@ -162,6 +198,14 @@
 	  </select>
 	</div>
       </div>
+#if isBasic      
+      <div class="form-group">
+	<label class="col-sm-3 control-label">$zoo._("Formula")</label>
+        <div class="col-sm-9 ">
+	  <textarea class="form-control"name="formula"></textarea>
+	</div>
+      </div>
+#end if      
       <div class="form-group no-us require-point">
 	<label class="col-sm-3 control-label">$zoo._("Size field")</label>
         <div class="col-sm-9 ">
@@ -195,6 +239,9 @@
       </div>
       <div class="col-sm-12 no-grid">
 	<button href="#" class="btn btn-default mmClassifier">$zoo._("Classify")</button>
+#if isBasic      
+	<button href="#" class="btn btn-default mmPreviewer">$zoo._("Preview")</button>
+#end if
       </div>
       <div class="col-sm-12 classesTable">
 	<table id="classes"></table>

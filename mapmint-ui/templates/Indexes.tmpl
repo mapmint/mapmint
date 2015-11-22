@@ -120,7 +120,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Indexes/displayThemes.html",sea
 	    	  <td>
 	    	    <select id="indicateurs_indicateurs_territoires" class="gselect rounded" onchange="updateSelectWithFields(['indicateurs_indicateurs_territoires_key']);">
 		      <option value="-1">$zoo._("Select a territory")</option>
-#set res=cur.execute("SELECT id,name as val from "+$prefix+"territoires order by name")
+#set res=cur.execute("SELECT id,name as val from "+$prefix+"territories order by name")
 #set vals=cur.fetchall()
 #for i in range(0,len(vals))
 		      <option value="$vals[i][0]">$vals[i][1]</option>

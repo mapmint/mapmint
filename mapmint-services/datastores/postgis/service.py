@@ -79,7 +79,7 @@ def details(conf,inputs,outputs):
 				res[j]=""
 				pass
 	except Exception,e:
-		conf["lenv"]["message"]=zoo._("Unable to parse the file: ")+e
+		conf["lenv"]["message"]=zoo._("Unable to parse the file: ")+str(e)
 		return zoo.SERVICE_FAILED
 	import json
 	outputs["Result"]["value"]=json.dumps(res)

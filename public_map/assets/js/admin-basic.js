@@ -2,8 +2,8 @@
 
 
 define([
-    'jquery', 'metisMenu',
-], function($, metisMenu) {
+    'module', 'jquery', 'metisMenu', 'xml2json'
+], function(module, $, metisMenu, X2JS) {
 
     var initMenu=function(){
 	$('#side-menu').metisMenu({ toggle: false });
@@ -266,6 +266,7 @@ define([
 	    }
 	});	
     }
+
     /** 
      * 
      */
@@ -437,11 +438,91 @@ define([
 	});
     }
 
+
+    function loadTablesList(dbname,schema,target){
+	zoo.execute({
+	    identifier: "datastores.postgis.listTables",
+	    type: "POST",
+	    dataInputs: [
+		{"identifier":"dataStore","value":dbname,"dataType":"string"},
+		{"identifier":"schema","value":schema,"dataType":"string"}
+	    ],
+	    dataOutputs: [
+		{"identifier":"Result","type":"raw"},
+	    ],
+	    success: function(data){
+		if($.isArray(target))
+		    for(var i=0;i<target.length;i++)
+			target[i].html("");
+		else
+		    target.html("");
+
+		target.html("");
+		console.log($.isArray(data));
+		if($.isArray(data))
+		    for(var i=0;i<data.length;i++){
+			if($.isArray(target))
+			    for(var i=0;i<target.length;i++)
+				target[i].append('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
+			else
+			    target.append('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
+			console.log('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
+		    }
+	    },
+	    error: function(data){
+		$(".notifications").notify({
+		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+		    type: 'danger',
+		}).show();
+	    }
+	});	
+    }
+
+    function loadTablesList(dbname,schema,target){
+	zoo.execute({
+	    identifier: "datastores.postgis.listTables",
+	    type: "POST",
+	    dataInputs: [
+		{"identifier":"dataStore","value":dbname,"dataType":"string"},
+		{"identifier":"schema","value":schema,"dataType":"string"}
+	    ],
+	    dataOutputs: [
+		{"identifier":"Result","type":"raw"},
+	    ],
+	    success: function(data){
+		if($.isArray(target))
+		    for(var i=0;i<target.length;i++)
+			target[i].html("");
+		else
+		    target.html("");
+
+		target.html("");
+		console.log($.isArray(data));
+		if($.isArray(data))
+		    for(var i=0;i<data.length;i++){
+			if($.isArray(target))
+			    for(var i=0;i<target.length;i++)
+				target[i].append('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
+			else
+			    target.append('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
+			console.log('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
+		    }
+	    },
+	    error: function(data){
+		$(".notifications").notify({
+		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+		    type: 'danger',
+		}).show();
+	    }
+	});	
+    }
+
     // Return public methods
     return {
         initialize: initialize,
 	loadMap: loadMap,
-	typeaheadMap: typeaheadMap
+	typeaheadMap: typeaheadMap,
+	loadTablesList: loadTablesList
     };
 
 
