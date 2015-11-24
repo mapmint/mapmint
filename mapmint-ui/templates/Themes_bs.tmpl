@@ -80,7 +80,8 @@ MapMint: $zoo._("Themes")
    <div class="form-group">
      <label class="col-sm-3 control-label">$zoo._("Indicator")</label>
      <div class="col-sm-9 ">
-       <select multiple="multiple" class="rounded mltp" id="themes_indicateurs_themes">
+       <select multiple="multiple" class="form-control" id="themes_indicators_themes">
+#set res=cur.execute("SELECT id,name as val from "+$prefix+"indicators order by name")
 #set vals=cur.fetchall()
 #for i in range(0,len(vals))
 	 <option value="$vals[i][0]">$vals[i][1]</option>

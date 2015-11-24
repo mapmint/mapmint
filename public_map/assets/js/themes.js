@@ -211,8 +211,12 @@ define([
 		$(this).find("option:selected").each(function(){
 		    params[oid].push($(this).val());
 		});
-	    }else
-		params[$(this).attr('id').replace(reg0,"")]=$(this).val();
+	    }else{
+		if($(this).prop('multiple'))
+		    params[$(this).attr('id').replace(reg0,"")]=[];
+		else
+		    params[$(this).attr('id').replace(reg0,"")]=$(this).val();
+	    }
 	});
 	return params;
     }
@@ -229,8 +233,8 @@ define([
 		{"identifier": "table","value": "themes","dataType":"string"},
 		{"identifier": "themes_groups_in","value": "t_id","dataType":"string"},
 		{"identifier": "themes_groups_out","value": "g_id","dataType":"string"},
-		{"identifier": "indicateurs_themes_in","value": "t_id","dataType":"string"},
-		{"identifier": "indicateurs_themes_out","value": "i_id","dataType":"string"},
+		{"identifier": "indicators_themes_in","value": "t_id","dataType":"string"},
+		{"identifier": "indicators_themes_out","value": "i_id","dataType":"string"},
 		{"identifier": "tuple","value": JSON.stringify(obj, null, ' '),"mimeType":"application/json"}
 	    ],
 	    dataOutputs: [

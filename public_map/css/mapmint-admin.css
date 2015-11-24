@@ -4,8 +4,25 @@
  * For details, see http://www.apache.org/licenses/LICENSE-2.0.
  */
 
+html {
+    font-family: sans-serif;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+         background-color: #f9f9f9;
+}
 body {
-    background-color: #f8f8f8;
+   font-family: "Arial", Helvetica, sans-serif;
+   margin: 0;
+       font-size: 14px;
+    color: #788288;
+    background-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.53846154;
+}
+
+.panel-default>.panel-heading {
+    color: #333;
 }
 
 #wrapper {
@@ -216,9 +233,9 @@ body {
     overflow-y: scroll;
 }
 
-.login-panel {
+/*.login-panel {
     margin-top: 25%;
-}
+}*/
 
 .flot-chart {
     display: block;

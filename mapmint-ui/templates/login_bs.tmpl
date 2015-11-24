@@ -1,20 +1,34 @@
 #from Skeleton_bs import Skeleton_bs
 #extends Skeleton_bs
 #import zoo
-#attr $ocss = ['main.css','login.css']
+#attr $ocss = ['main.css','login_bs.css']
 #attr $js = ['jquery.notifyBar.js','jquery.cookie.js','login.js','Meta.js','roundies.js']
 #attr $js1 = ['minimal_js']
+
+#attr $mmodule="login"
 
 #def page_title
 MapMint: $zoo._("Login")
 #end def
 
+#def istyles
+    <link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/login.css"/>
+    <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+#end def
+
 #def body
 <div class='notifications top-right'></div>
 
-<div class="container">
- <div class="row">
+<div class="login-container">
+ <div class="row intro-body">
   <div class="col-md-4 col-md-offset-4">
+  <h1><i class="icon-mm-logo"></i>
+    M<span class="hidden-xs">ap</span><span class="green">M<span class="hidden-xs">int</span></span></h1>
    <div class="login-panel panel panel-default">
     <div class="panel-heading">
       <h3 class="panel-title">$zoo._("Please Sign In")</h3>
@@ -44,7 +58,7 @@ MapMint: $zoo._("Login")
 	  </label>
 	</div>
 	<!-- Change this to a button or input when using this as a form -->
-	<input type="submit" href="#" class="btn btn-lg btn-success btn-block" value="$zoo._("Login")" />
+	<input type="submit" href="#" class="btn btn-lg btn-success btn-block btn-mm" value="$zoo._("Login")" />
 	</fieldset>
 	</form>
     </div>
