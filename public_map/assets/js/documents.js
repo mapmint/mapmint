@@ -341,6 +341,9 @@ define([
 	var lid="listElements";
 
 	$('#listElements').DataTable( {
+	    language: {
+                url: module.config().translationUrl
+            },
 	    data: [],
 	    "dom": 'Zlfrtip',
             "colResize": true,
@@ -452,8 +455,9 @@ define([
 		    var existing=$('#'+lid+'_info').children('span.select-info');
 		    if(existing.length)
 			existing.remove();
+		    var lreg=new RegExp("\\[dd\\]","g");
 		    $('#'+lid+'_info').append($('<span class="select-info"/>').append(
-			$('<span class="select-item"/>').append('dd rows selected'.replace(/dd/g,CRowSelected.length))
+			$('<span class="select-item"/>').append((CRowSelected.length>1?module.config().localizationStrings.dataTables.selection:module.config().localizationStrings.dataTables.selection0).replace(lreg,CRowSelected.length).replace(lreg,CRowSelected.length))
 		    ));
 		    
 		    loadElements("documents",localInit);
@@ -506,8 +510,13 @@ define([
 	    var existing=$('#'+lid+'_info').children('span.select-info');
 	    if(existing.length)
 		existing.remove();
+	    var lreg=[
+		new RegExp("\\[dd\\]","g"),
+		new RegExp("\\[ee\\]","g")
+	    ];
+	    var currentLoc=(CFeaturesSelected.length!=CRowSelected.length?(CRowSelected.length>1?module.config().localizationStrings.dataTables.selectionm:module.config().localizationStrings.dataTables.selectionm0):(CRowSelected.length>1?module.config().localizationStrings.dataTables.selection:module.config().localizationStrings.dataTables.selection0));
 	    $('#'+lid+'_info').append($('<span class="select-info"/>').append(
-		$('<span class="select-item"/>').append((CFeaturesSelected.length!=CRowSelected.length?'dd rows selected (ee total selected)'.replace(/dd/g,CRowSelected.length).replace(/ee/g,CFeaturesSelected.length):'dd rows selected'.replace(/dd/g,CRowSelected.length)))
+		$('<span class="select-item"/>').append(currentLoc.replace(lreg[0],CRowSelected.length).replace(lreg[1],CFeaturesSelected.length))
 	    ));
 	});
     }

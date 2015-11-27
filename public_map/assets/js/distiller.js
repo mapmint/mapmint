@@ -2,8 +2,8 @@
 
 
 define([
-    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic',"datepicker","fileinput"
-], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,datepicker,fileinput) {
+    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic',"datepicker","fileinput","fileinput_local"
+], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,datepicker,fileinput,fileinput_local) {
     
 
     (function(){
@@ -199,6 +199,9 @@ define([
 	});
 
 	$('#'+lid).DataTable( {
+	    language: {
+                url: module.config().translationUrl
+            },
 	    data: [],
 	    "dom": 'Zlfrtip',
             "colResize": true,
@@ -332,8 +335,9 @@ define([
 		    var existing=$('#'+lid+'_info').children('span.select-info');
 		    if(existing.length)
 			existing.remove();
+		    var lreg=new RegExp("\\[dd\\]","g");
 		    $('#'+lid+'_info').append($('<span class="select-info"/>').append(
-			$('<span class="select-item"/>').append('dd rows selected'.replace(/dd/g,CRowSelected.length))
+			$('<span class="select-item"/>').append((CRowSelected.length>1?module.config().localizationStrings.dataTables.selection:module.config().localizationStrings.dataTables.selection0).replace(lreg,CRowSelected.length))
 		    ));
 		    console.log('finish');
 		    
@@ -447,6 +451,9 @@ define([
 	var cnt=0;
 	var ldata=data;
 	$('#DS_table_'+dsid+'_'+ldatasource).DataTable( {
+	    language: {
+                url: module.config().translationUrl
+            },
 	    data: [],
 	    "dom": 'Zlfrtip',
             "colResize": true,
@@ -667,7 +674,7 @@ define([
 
 	inputs.push({
 	    "identifier": "OutputDSN",
-	    "value": myLocation.find("#ofdst").val()+myLocation.find("#raster_oname").val()+".tif",
+	    "value": myLocation.find("#ofdst").val()+myLocation.find("#raster_oname").val()+(op=="contour"?".shp":".tif"),
 	    "dataType": "string"
 	});
 	
@@ -1546,6 +1553,7 @@ define([
 		$("#DS_"+dsid).find(".panel-body").first().prepend($("#uploader_form_template")[0].innerHTML.replace(reg,dsid));
 
 		$("#input-"+dsid).fileinput({
+		    language: module.config().lang,
 		    uploadUrl: module.config().url+"?service=WPS&version=1.0.0&request=Execute&RawDataOutput=Result&Identifier=upload.saveOnServer0&dataInputs=file=upload;dest="+dsid, // server upload action
 		    uploadAsync: true,
 		    maxFileCount: 5

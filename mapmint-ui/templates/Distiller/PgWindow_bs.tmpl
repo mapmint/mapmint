@@ -21,10 +21,16 @@
 #end for
   </select>
   #if $inputs.keys().count("no-header")==0#<label for="pg_table">#end if#$zoo._("Tables:")#if $inputs.keys().count("no-header")==0#</label>#end if#
+#set tmpO=$outputs
+#set $tmpO["Result"]={"value": ""}
+#set demo=$pgConnection.listTables($conf,$tmp,$tmpO)
+#if $tmpO["Result"]["value"]!=""
+#set rest=eval($tmpO["Result"]["value"])
+#else
+#set rest=[]
+#end if
   <select id="pg_table" class="input-form">
    <option value="-1">Choose</option>
-#set demo=pgConnection.listTables($conf,$inputs,$outputs)
-#set rest=eval($outputs["Result"]["value"])
 #for i in rest
    <option value="$i[0]">$i[1]</option>
 #end for

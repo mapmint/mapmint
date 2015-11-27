@@ -95,7 +95,7 @@ define([
 		    datasources.displayRaster(data,map,map,layer,$("#manaTableDisplay"),($(window).height()-$("nav").height())/2.2);
 		else{
 		    $("#manaTableDisplay").html("");
-		    myMMDataTableObject = new MMDataTable({"selectLayer": selectLayer, "zook": zoo, oLayers: oLayers,msUrl: module.config().msUrl,pmapfile: module.config().dataPath+"/maps/search_"+$("save-map").val()+"_"+layer+".map",container:$("#manaTableDisplay")});
+		    myMMDataTableObject = new MMDataTable({"selectLayer": selectLayer, "zook": zoo, oLayers: oLayers,msUrl: module.config().msUrl,pmapfile: module.config().dataPath+"/maps/search_"+$("save-map").val()+"_"+layer+".map",container:$("#manaTableDisplay"),config: module.config()});
 
 		    myMMDataTableObject.display(layer,{
 			url: module.config().msUrl,
@@ -667,9 +667,9 @@ define([
 	    "bAutoWidth": false,
 	    "aoColumns": [
 		//{ "sTitle": "","sWidth": "10px", "sClass": "details-control", "data": null },
-		{ "sTitle": "Id","sWidth": "10px" },
-		{ "sTitle": "Legend","sWidth": "40px" },
-		{ "sTitle": "Name", "sClass": "center", "bSortable": false },
+		{ "sTitle": module.config().localizationStrings.manager.id,"sWidth": "10px" },
+		{ "sTitle": module.config().localizationStrings.manager.legend,"sWidth": "40px" },
+		{ "sTitle": module.config().localizationStrings.manager.name, "sClass": "center", "bSortable": false },
 	    ],
 	    rowId: 3
 	});
@@ -1226,6 +1226,9 @@ define([
             $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
 	} );
 	var table = $('#layer_property_table_table_display').DataTable( {
+	    language: {
+                url: module.config().translationUrl
+            },
             rowReorder:       true,
 	    "scrollX":        true,
 	    "scrollY":        (($("#map").height())-($(".navbar").height()*4))+"px",

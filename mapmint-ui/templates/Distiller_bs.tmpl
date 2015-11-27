@@ -258,7 +258,7 @@ MapMint: $mmodule
 	    </button>
 	    <ul class="dropdown-menu pull-right" role="menu">
 #for i in $objs
-	      <li>
+	      <li class="#if $i.keys().count('optional')>0#hide require-select#end if#">
 	        <a href="#" data-mmaction="$i.name" ><i class="fa $i.font fa-fw"></i> $i.title</a>
 	      </li>
 #end for
@@ -304,7 +304,7 @@ MapMint: $mmodule
 	    </button>
 	    <ul class="dropdown-menu pull-right" role="menu">
 #for i in $objs
-	      <li><a  data-mmaction="$i.name" href="#"><i class="fa $i.font fa-fw"></i> $i.title</a></li>
+	      <li class="#if $i.name=="georeference"#hide#end if# #if $i.font=="fa-toggle-down"#collapser#end if#"><a  data-mmaction="$i.name" href="#"><i class="fa $i.font fa-fw"></i> $i.title</a></li>
 #end for
 	    </ul>
 	  </div>
@@ -396,7 +396,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection_bs.html",s
 </script>
 
 <script type="template/text" id="uploader_form_template">
-<form id="uploader-form">
+<form id="uploader-form" class="myWell">
 <input id="input-[datastore]" name="file" type="file" multiple class="file-loading" />
 </form>
 </script>

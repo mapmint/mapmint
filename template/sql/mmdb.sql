@@ -139,8 +139,8 @@ CREATE TABLE users (
 
 CREATE TABLE user_group (
     id serial PRIMARY KEY,
-    id_user integer REFERENCES mm.users(id),
-    id_group integer REFERENCES mm.groups(id)
+    id_user integer REFERENCES mm.users(id) ON DELETE CASCADE,
+    id_group integer REFERENCES mm.groups(id) ON DELETE CASCADE
 );
 
 

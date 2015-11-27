@@ -356,7 +356,6 @@ define([
 			if(closure.debug){
 			    console.log("======== ERROR ========");
 			}
-			    console.log("======== ERROR ========");
 			var robj=_x2js.xml2json( jqXHR.responseXML );
 			if(closure.debug){
 			    console.log(robj);
@@ -371,8 +370,6 @@ define([
 			    console.log("======== SUCCESS ========2");
 			    console.log(data);
 			}
-			console.log("======== SUCCESS ========2");
-			console.log(data);
 			var ctype=jqXHR.getResponseHeader("Content-Type").split(";")[0];
 			if( ctype=="text/xml" )
 			{

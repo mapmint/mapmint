@@ -572,6 +572,9 @@ define([
 	var lid="listElements";
 
 	$('#listElements').DataTable( {
+	    language: {
+                url: module.config().translationUrl
+            },
 	    data: [],
 	    "dom": 'Zlfrtip',
             "colResize": true,

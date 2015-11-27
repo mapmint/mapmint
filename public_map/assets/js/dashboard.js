@@ -65,6 +65,9 @@ define([
 	var myRootLocation=$('#'+lid).parent().parent();
 
 	$('#'+lid).DataTable( {
+	    language: {
+                url: module.config().translationUrl
+            },
 	    data: [],
 	    "dom": 'Zlfrtip',
             "colResize": true,
@@ -198,8 +201,9 @@ define([
 		    var existing=$('#'+lid+'_info').children('span.select-info');
 		    if(existing.length)
 			existing.remove();
+		    var lreg=new RegExp("\\[dd\\]","g");
 		    $('#'+lid+'_info').append($('<span class="select-info"/>').append(
-			$('<span class="select-item"/>').append('dd rows selected'.replace(/dd/g,CRowSelected.length))
+			$('<span class="select-item"/>').append((CRowSelected.length>1?module.config().localizationStrings.dataTables.selection:module.config().localizationStrings.dataTables.selection0).replace(lreg,CRowSelected.length))
 		    ));
 		    console.log('finish');
 		    
@@ -306,16 +310,16 @@ define([
 	    var existing=$('#'+lid+'_info').children('span.select-info');
 	    if(existing.length)
 		existing.remove();
+	    var lreg=[
+		new RegExp("\\[dd\\]","g"),
+		new RegExp("\\[ee\\]","g")
+	    ];
+	    var currentLoc=(CFeaturesSelected.length!=CRowSelected.length?(CRowSelected.length>1?module.config().localizationStrings.dataTables.selectionm:module.config().localizationStrings.dataTables.selectionm0):(CRowSelected.length>1?module.config().localizationStrings.dataTables.selection:module.config().localizationStrings.dataTables.selection0));
 	    $('#'+lid+'_info').append($('<span class="select-info"/>').append(
-		$('<span class="select-item"/>').append((CFeaturesSelected.length!=CRowSelected.length?'dd rows selected (ee total selected)'.replace(/dd/g,CRowSelected.length).replace(/ee/g,CFeaturesSelected.length):'dd rows selected'.replace(/dd/g,CRowSelected.length)))
+		$('<span class="select-item"/>').append(currentLoc.replace(lreg[0],CRowSelected.length).replace(lreg[1],CFeaturesSelected.length))
 	    ));
 	} );
 
-	console.log("***************************************");
-	console.log("."+ltype+"SubmitForm");
-	console.log(myRootLocation);
-	console.log(myRootLocation.find("."+ltype+"SubmitForm"));
-	console.log($('#'+lid).parent().find("."+ltype+"SubmitForm"));
 	myRootLocation.find("."+ltype+"SubmitForm").click(function(e){
 	    var params=[];
 	    var set={};
@@ -698,238 +702,14 @@ define([
 	var cnt=0;
 
 	window.setTimeout(function () { 
-	var CRowSelected=[];
-	var CFeaturesSelected=[];
-	var CFeatures=[];
+	    var CRowSelected=[];
+	    var CFeaturesSelected=[];
+	    var CFeatures=[];
+	    
+	    $('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
+		$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+	    } );
 
-	$('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
-            $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-	} );
-
-	    /*
-	$('#dashUsersTable').DataTable( {
-	    data: [],
-	    "dom": 'Zlfrtip',
-            "colResize": true,
-	    autoWidth: false,
-	    "scrollY":  ($(window).height()/2)+"px",
-	    "scrollCollapse": true,
-	    "scrollX": true,
-	    //"sScrollX": "100%",
-	    //"sScrollXInner": "100%",
-	    "bAutoWidth": false,
-	    "bProcessing": true,
-	    "bServerSide": true,
-	    fixedHeader: true,
-	    //searching: true,
-	    responsive: true,
-	    deferRender: true,
-	    crollCollapse:    true,
-	    rowId: 'fid',
-	    "sAjaxSource": "users",
-	    select: {
-		info: false,
-	    },
-	    "lengthMenu": [[5, 10, 25, 50, 1000], [5, 10, 25, 50, "All"]],
-	    columns: [
-		{"data":"login","name":"login","title":"login","width":"10%"},
-		{"data":"lastname","name":"lastname","title":"lastname","width":"15%"},
-		{"data":"firstname","name":"firstname","title":"firstname","width":"15%"},
-		{"data":"mail","name":"mail","title":"email","width":"30%"},
-		{"data":"phone","name":"phone","title":"phone","width":"20%"}
-	    ],
-	    "rowCallback": function( row, data ) {
-		console.log(CRowSelected);
-		console.log(data.DT_RowId);
-		$(row).removeClass('selected');
-		console.log($(row));
-		console.log($.inArray(data.DT_RowId, CRowSelected) !== -1 );
-		if ( $.inArray(data.DT_RowId, CRowSelected) !== -1 ) {
-		    console.log(data.DT_RowId);
-		    console.log($('#dashUsersTable').DataTable());
-		    $('#dashUsersTable').DataTable().row($(row)).select();
-		    //$(row).addClass('selected');
-		}else{
-		    $('#dashUsersTable').DataTable().row($(row)).deselect();
-		    //$(row).removeClass('selected');
-		}
-	    },
-	    "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
-		console.log("Starting datatable download");
-		console.log(aoData);
-
-
-		var llimit=[];
-		for(j in {"iDisplayStart":0,"iDisplayLength":0,"iSortCol_0":0,"sSortDir_0":0,"sSearch":0})
-		    for(i in aoData)
-			if(aoData[i].name==j){
-			    if(llimit.length==4 && aoData[i].value!="")
-				llimit.push(aoData[i].value);
-			    if(llimit.length<4)
-				llimit.push(aoData[i].value);
-			}
-		console.log(llimit);
-
-		var closestproperties="login,lastname,firstname,mail,phone";
-		var opts=zoo.getRequest({
-		    identifier: "manage-users.getTableFeatures",
-		    dataInputs: [
-			{"identifier":"table","value":"users","dataType":"string"},
-			{"identifier":"offset","value":llimit[0],"dataType":"int"},
-			{"identifier":"limit","value":llimit[1],"dataType":"int"},
-			{"identifier":"sortorder","value":llimit[3],"dataType":"string"},
-			{"identifier":"search","value":llimit[llimit.length-1],"dataType":"string"},
-			{"identifier":"sortname","value":(closestproperties.split(",")[llimit[2]]),"dataType":"string"},
-			{"identifier":"fields","value":closestproperties.replace(/,msGeometry/g,""),"dataType":"string"}
-		    ],
-		    dataOutputs: [
-			{"identifier":"Result","mimeType":"application/json"},
-			{"identifier":"Count","dataType":"string"}
-		    ],
-		    type: 'POST',
-		    storeExecuteResponse: false
-		});
-		
-		console.log(opts);
-		opts["success"]=function() {
-		    console.log(arguments);
-		    var obj=_x2js.xml_str2json( arguments[2].responseText );
-		    console.log(obj);
-		    var outputs=obj["ExecuteResponse"]["ProcessOutputs"]["Output"];
-		    for(var i in outputs){
-			if(outputs[i]["Identifier"].toString()=="Count")
-			    featureCount=eval(outputs[i]["Data"]["LiteralData"].toString());
-			if(outputs[i]["Identifier"].toString()=="Result")
-			    features=JSON.parse(outputs[i]["Data"]["ComplexData"].toString());
-		    }
-		    var data=[];
-		    CFeatures=[];
-		    console.log(features);
-		    for(var i in features.rows){
-			console.log(features.rows[i]);
-			data.push({
-			    "groups": features.rows[i].group,
-			    "fid": "users_"+features.rows[i].id,
-			    "login": features.rows[i].cell[0],
-			    "lastname": features.rows[i].cell[1],
-			    "firstname": features.rows[i].cell[2],
-			    "mail": features.rows[i].cell[3],
-			    "phone": features.rows[i].cell[4]			    
-			});
-			CFeatures.push(data[data.length-1]);
-		    }
-
-		    var opts={
-			"sEcho": cnt++, 
-			"iDraw": cnt++, 
-			"iTotalRecords": featureCount, 
-			"iTotalDisplayRecords": featureCount, 
-			"aaData": (featureCount>0?data:[])
-		    };
-		    console.log(opts);
-		    fnCallback(opts);
-
-		    for(d in data){
-			if ( $.inArray(data[d].fid+"", CRowSelected) !== -1 ) {
-			    console.log(data[d].fid);
-			    $('#dashUsersTable').DataTable().row($("#"+data[d].fid)).select();
-			}else{
-			    $('#dashUsersTable').DataTable().row($("#"+data[d].fid)).deselect();
-			}
-		    }
-
-		    
-		    if(featureCount==0){
-			$('#dashUsersTable').DataTable().clear();
-			console.log("clear table");
-		    }
-		    
-		    console.log(CRowSelected);
-		    var existing=$('#dashUsersTable_info').children('span.select-info');
-		    if(existing.length)
-			existing.remove();
-		    $('#dashUsersTable_info').append($('<span class="select-info"/>').append(
-			$('<span class="select-item"/>').append('dd rows selected'.replace(/dd/g,CRowSelected.length))
-		    ));
-		    console.log('finish');
-		    
-
-		};
-		opts["error"]=function(){
-		    notify('Execute failed:' +data.ExceptionReport.Exception.ExceptionText, 'danger');
-		};
-		oSettings.jqXHR = $.ajax( opts );
-	    }
-	});
-
-	$('#dashUsersTable tbody').on('click', 'tr', function () {
-	    var id = this.id+"";
-	    console.log("CURRENT ID: "+id);
-	    var index = $.inArray(id, CRowSelected);
-	    if ( index == -1 ) {
-		if(CFeaturesSelected.length==0)
-		    $(".require-select").removeClass("disabled");
-		
-		CRowSelected.push( id );
-
-		$('#dashUsersTable').DataTable().row("#"+id).select();
-
-		console.log(CFeatures.length);
-		for(var i=0;i<CFeatures.length;i++){
-		    console.log(CFeatures[i]["fid"]);
-		    if(CFeatures[i]["fid"]==id)
-		       CFeaturesSelected.push( CFeatures[i] );
-		}
-		$(".userEditForm").find("input").each(function(){
-		    if($(this).attr("name") && CFeaturesSelected[0][$(this).attr("name").replace(/user_/g,'')]){
-			$(this).val(CFeaturesSelected[0][$(this).attr("name").replace(/user_/g,'')].replace(/users_/g,""));
-		    }
-		});
-
-		var cnt=0;
-		$(".um_groups_f").find("select").each(function(){
-		    if(cnt>0)
-			$(this).remove();
-		    cnt+=1;
-		});
-		var myNewElement=null;
-		$(".um_groups_f").find("select").each(function(){
-		    myNewElement=$(this).clone();
-		});
-
-		console.log(CFeaturesSelected[0]);
-		for(var i=0;i<CFeaturesSelected[0].groups.length;i++)
-		    $("#update-user").find(".um_groups_f").each(function(){
-			$(this).append($(myNewElement).attr("id","um_group_"+i)[0].outerHTML);
-			$(this).find("select").last().val(CFeaturesSelected[0].groups[i][1]);
-			console.log($(this).parent().parent().find("select").length);
-			if($(this).find("select").length>1)
-			    $(this).find(".gselectDel").show();
-			else
-			    $(this).find(".gselectDel").hide();
-		    });
-		
-
-
-	    } else {
-		$(".userBaseEditForm").removeClass("in");
-		console.log("REMOVE "+index);
-		CRowSelected.pop(index);
-		console.log(CFeaturesSelected);
-		CFeaturesSelected.pop(index);
-		console.log(CFeaturesSelected);
-		$('#dashUsersTable').DataTable().row("#"+id).deselect();
-		if(CFeaturesSelected==0)
-		    $(".require-select").addClass("disabled");
-	    }
-	    var existing=$('#dashUsersTable_info').children('span.select-info');
-	    if(existing.length)
-		existing.remove();
-	    $('#dashUsersTable_info').append($('<span class="select-info"/>').append(
-		$('<span class="select-item"/>').append((CFeaturesSelected.length!=CRowSelected.length?'dd rows selected (ee total selected)'.replace(/dd/g,CRowSelected.length).replace(/ee/g,CFeaturesSelected.length):'dd rows selected'.replace(/dd/g,CRowSelected.length)))
-	    ));
-	} );
-*/
 	},100);
 	console.log("Start Dashboard");
 	$(".btn-lg").on("click",function(){

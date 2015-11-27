@@ -1,3 +1,4 @@
+#import zoo
 // Filename: admin.js
 
 requirejs.config({
@@ -41,6 +42,8 @@ requirejs.config({
 	// Unable to load datatables from one file
 	//datatables: 'js/lib/datatables.min',
 	fileinput: 'js/lib/fileinput',
+#set lang=$conf["main"]["language"].split("-")[0]
+	fileinput_local: 'js/lib/fileinput/fileinput_locale_$lang',
 	sortable: 'js/lib/jquery-sortable',
 	treeview: 'js/lib/treeview',
 	cmenu: 'js/lib/bootstrap-contextmenu',
@@ -76,6 +79,14 @@ requirejs.config({
             	   return require.s.contexts._.registry['typeahead.js'].factory( $ );
        	    }
 	},
+	fileinput: {
+	      deps: ['bootstrap']
+	},
+#*if $lang!="en"*#
+	fileinput_local: {
+	    deps: ['fileinput'],
+	},
+#*end if*#
 	cmenu: {
 	    deps: ['jquery'],
 	},
@@ -160,6 +171,22 @@ requirejs.config({
 	    publicationUrl: '$conf["main"]["publicationUrl"]',
 	    dataPath: '$conf["main"]["dataPath"]',
 	    msUrl: '$conf["main"]["mapserverAddress"]',
+	    lang: "$lang",
+#set myCorrespondances={"fr-FR":"French.json","en-US":"English.json"}
+            translationUrl: "http://cdn.datatables.net/plug-ins/1.10.10/i18n/#if myCorrespondances.keys().count($conf["main"]["language"])>0#$myCorrespondances[$conf["main"]["language"]]#else#$myCorrespondances["en-US"]#end if#",
+	    localizationStrings:{
+		dataTables: {
+			    selection: "$zoo._("[dd] rows selected")",
+	    		    selection0: "$zoo._("[dd] row selected")",
+			    selectionm: "$zoo._("[dd] rows shown on [ee] rows selected")",
+			    selectionm0: "$zoo._("[dd] row shown on [ee] row selected")",
+		},
+		manager: {
+			 id: "$zoo._("Id")",
+			 legend: "$zoo._("Legend")",
+			 name: "$zoo._("Name")",
+		}
+            },		    
 #if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false")
 	    pmapfile: '$conf["senv"]["last_map"]',
 #end if

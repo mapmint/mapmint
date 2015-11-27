@@ -452,7 +452,7 @@ def UpdateUser(conf,inputs,outputs):
                     print >> sys.stderr,e
                     pass
                 c.conn.commit()
-                tmpStr=zoo._('Group succcessfully %s')
+                tmpStr=zoo._('User succcessfully %s')
                 tmpStr=tmpStr % (inputs["type"]["value"]+'d')
                 outputs["Result"]["value"]=tmpStr
 

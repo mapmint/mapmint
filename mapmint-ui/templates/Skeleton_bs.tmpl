@@ -38,6 +38,7 @@
 <link href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-notify.css" rel="stylesheet">
 <link href="$conf["main"]["publicationUrl"]/assets/css/summernote.css" rel="stylesheet">
 
+
 #if $istyles is not None
 $istyles
 #end if
@@ -82,10 +83,10 @@ $istyles
          <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
        </a>
        <ul class="dropdown-menu dropdown-user">
-	 <li><a href="#" id="mmmUserPreferences"><i class="fa fa-user fa-fw"></i> User Profile</a>
+	 <li><a href="#" id="mmmUserPreferences"><i class="fa fa-user fa-fw"></i> $zoo._("User Profile")</a>
 	 </li>
 	 <li class="divider"></li>
-	 <li><a href="#" id="mmmUserLogOut"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+	 <li><a href="#" id="mmmUserLogOut"><i class="fa fa-sign-out fa-fw"></i> $zoo._("Logout")</a>
 	 </li>
        </ul>
        <!-- /.dropdown-user -->
@@ -101,7 +102,7 @@ $istyles
 #set menu=['Dashboard','Distiller','Manager','Themes','Publisher']
 #end if
 #end if
-	    
+
 	  <div class="navbar-default sidebar" role="navigation">
 	  <div class="sidebar-nav navbar-collapse">
 	    <ul class="nav" id="side-menu">

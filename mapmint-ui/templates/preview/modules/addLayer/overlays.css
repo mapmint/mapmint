@@ -1,0 +1,76 @@
+#import mapscript
+
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_Overlays.map")
+
+#for i in range(0,$m.numlayers)
+#set l=$m.getLayer($i)
+
+#if $l.numclasses == 1
+#layer_$(i)_overlays label .fa-circle:before{
+    background:url('#if $l.metadata.get('mmIcon') is not None#$l.metadata.get('mmIcon')#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_Overlays_$(l.name).map&LAYERS=$(l.name)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat scroll 0 0 transparent !important;
+    content: " ";
+    display: block;
+    height: 16px;
+    width: 16px;
+}
+#else
+#for j in range(0,$l.numclasses)
+#if j>0
+,
+#end if
+.layer_$(i)_class$(j)_overlays
+#end for
+{
+    height: 16px;
+    width: 16px;
+}
+
+#for j in range(0,$l.numclasses)
+.layer_$(i)_class$(j)_overlays{
+    background:url('$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_Overlays_$(l.name).map&LAYERS=$(l.name)_$(j+1)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=20&HEIGHT=20&r=1315253453.18') no-repeat;
+    width: 26px;
+}
+#end for
+
+#if $l.metadata.get("mmClass")=="tl"
+
+#set steps=$l.metadata.get("mmSteps").split(',')
+
+#if $inputs.has_key('limit')
+#set ll=int($inputs["limit"]["value"])
+#else
+#set ll=0
+#end if 
+#set cid=$i+$ll
+
+.tree-node .timeline{
+    background:url('$conf["main"]["publicationUrl"]/img/timeline.png') no-repeat;
+    width: 26px;
+}
+
+#set $cnt=0
+#for kk in steps
+
+#try
+#set m0=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/timeline_Overlays_step"+str($cnt)+".map")
+#set layer=m0.getLayer($i)
+#set res=$m0.web.metadata.set("cstep",str($cnt))
+#for j in range(0,$l.numclasses)
+.tree_overlays_layer$(i)_step$(cnt)_class$(j){
+    background:url('$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_Overlays_step$($cnt).map&LAYERS=$(l.name)_$(j+1)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=20&HEIGHT=20&r=1315253453.18') no-repeat;
+    width: 26px;
+}
+#end for
+#except
+$kk {}
+#pass
+#end try
+
+#set $cnt=$cnt+1
+#end for
+
+#end if
+#end if
+
+#end for
+     

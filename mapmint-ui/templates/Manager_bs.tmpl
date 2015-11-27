@@ -107,7 +107,7 @@ MapMint: $mmodule
 #set inputs1={}
 #set toto=$ds.list($conf,$inputs1,$outputs1)	 
 #set res=json.loads($outputs1["Result"]["value"])
-	   <select id="select-datastore" name="selectDatastore" class="select-window" onchange="app.refreshDatasources()">
+	   <select id="select-datastore" name="selectDatastore" class="select-window form-control" onchange="app.refreshDatasources()">
 	     <option value="-1">$zoo._("Choose a Data Store")</option>
 #for i in ('WMS','WFS','Directories','MySQL','PostGIS')
 #if $res and $res.keys().count($i) > 0
@@ -123,13 +123,13 @@ MapMint: $mmodule
 	 </div>
          <div class="form-group">
 	   <label>$zoo._("Data Store")</label>
-	   <select id="select-datasource" name="selectDatasource" class="select-window" multiple="true">
+	   <select id="select-datasource" name="selectDatasource" class="select-window form-control" multiple="true">
 	     <option value="-1">$zoo._("First Choose a Data Store")</option>
 	   </select>
 	 </div>
          <div class="form-group">
 	   <label>$zoo._("Target Group")</label>
-	   <select id="select-target-group" name="targetGroup" class="select-window">
+	   <select id="select-target-group" name="targetGroup" class="select-window form-control">
 
 	   </select>
 	 </div>

@@ -88,6 +88,14 @@ define([
          */         
         this.zoo = (params.zook?params.zook:null);
 
+        /**
+         * @access public
+	 * @memberof MMDataTable#
+	 * @var selectLayer {ol.layer.Vector} 
+	 * @default null
+         */         
+        this.config = (params.config?params.config:null);
+
 	this.parseFidToHtml = function(fid){
 	    var closure=this;
 	    return fid.replace(/\./g,closure.sep);
@@ -206,6 +214,9 @@ define([
 		
 		var lheight=$(window).height();
 		$('#mmm_table-content_'+key).DataTable( {
+		    language: {
+			url: closure.config.translationUrl
+		    },
 		    data: [],
 		    "dom": 'Zlfrtip',
 		    "colReorder": true,
