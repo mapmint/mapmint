@@ -217,7 +217,7 @@ MapMint: Dashboard
 #end for
 #end if
 #set a=$mm.getLayer(0).getExtent()
-#set tmp=$a.project(mapscript.projectionObj(mm.getLayer(0).getProjection()),mapscript.projectionObj("+init=EPSG:4326"))
+#set tmp=$a.project(mapscript.projectionObj(mm.getLayer(0).getProjection()),mapscript.projectionObj("+init=epsg:4326"))
 #set x=(($a.maxx-$a.minx)/2)+$a.minx
 #set y=(($a.maxy-$a.miny)/2)+$a.miny
 #set purl=$conf["main"]["mapserverAddress"]+"?map="+$mpath+"&LAYERS="+$ll+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX="+str($a.minx)+","+str($a.miny)+","+str($a.maxx)+","+str($a.maxy)+"&SRS=EPSG:4326&WIDTH=230&HEIGHT=170"

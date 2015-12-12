@@ -939,6 +939,10 @@ def joinIndexTable(conf,inputs,outputs):
     cur.execute(req)
     con.conn.commit()
 
+    req="SELECT populate_geometry_columns('indexes.view_idx"+inputs["id"]["value"]+"'::regclass);"
+    cur.execute(req)
+    con.conn.commit()
+    
     req="delete from "+prefix+"dtable where it_id=(select id from "+prefix+"indicators_territories where i_id='"+inputs["id"]["value"]+"');delete from "+prefix+"d_table where i_id="+inputs["id"]["value"]+";delete from "+prefix+"graphs where it_id=(select id from "+prefix+"indicators_territories where i_id='"+inputs["id"]["value"]+"');delete from "+prefix+"indicators_territories where i_id='"+inputs["id"]["value"]+"'"
     cur.execute(req)
     con.conn.commit()

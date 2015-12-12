@@ -4,7 +4,7 @@
 #ifdef WIN32
 #endif
 #include <ft2build.h>
-#include <freetype/freetype.h>
+#include <freetype.h>
 #include FT_FREETYPE_H
 #include "service.h"
 
