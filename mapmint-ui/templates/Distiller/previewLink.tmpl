@@ -65,7 +65,11 @@
 #*set f="image/tiff"*#
 #end if
 #if $tmp1[0]==-1.0 and $tmp1[1]==-1.0 and $tmp1[2]==-1.0 and $tmp1[3]==-1.0
+#if $l.connection is not None
 $l.connection
+#else
+$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=datastores.directories.image&DataInputs=file=$l.data&RawDataOutput=Result
+#end if
 #else
 $conf["main"]["mapserverAddress"]?map=$(mapfile)&service=WMS&version=1.0.0&request=GetMap&srs=epsg:4326&bbox=$p1.x,$p1.y,$p2.x,$p2.y&layers=$inputs["dso"]["value"]&width=$width&height=$height&format=$f
 #end if

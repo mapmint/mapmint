@@ -223,7 +223,7 @@ MapMint: Dashboard
 #set purl=$conf["main"]["mapserverAddress"]+"?map="+$mpath+"&LAYERS="+$ll+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX="+str($a.minx)+","+str($a.miny)+","+str($a.maxx)+","+str($a.maxy)+"&SRS=EPSG:4326&WIDTH=230&HEIGHT=170"
 #end if
 #except Exception,e
-$e
+<!-- $e -->
 #set purl="http://placehold.it/50/55C1E7/fff"
 #end try
 

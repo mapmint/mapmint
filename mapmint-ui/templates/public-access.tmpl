@@ -204,7 +204,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
                 <div class="caption">
 			 <h4>$mm.web.metadata.get('mmTitle')</h4>
 
-              <p class="date"> $(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($mpath)))) </p>
+              <p class="date"> $(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($mpath)))) $(time.strftime("%H:%M",time.localtime(os.path.getmtime($mpath)))) </p>
                <p class="meta">$(mms.getShortDescription($conf,$mm))</p>
 	<ul class="dtls">
               <li><a href="#" id="$i[1]" class="map-btn minfo">Information</a></li>
@@ -275,7 +275,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #set dte=""
 #end try
 #try*#
-	      <li>Publié le: <span id="idx_pdate">$dte</span></li>
+	      <li>Publié le: <span id="idx_pdate">$dte  $(time.strftime("%H:%M",time.localtime(os.path.getmtime($mpath))))</span></li>
 	     <li>Description: <span id="idx_desc" class="desc">$val[0][2]</span></li>
 	 </ul>
 	</div>
@@ -391,10 +391,10 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 
                 <div class="caption">
               <h4>$mm.web.metadata.get('mmTitle')</h4>
-<p class="date"> $(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($mpath)))) </p>
+<p class="date"> $(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($mpath))))  $(time.strftime("%H:%M",time.localtime(os.path.getmtime($mpath))))  </p>
                <p class="meta">$(mms.getShortDescription($conf,$mm))</p>
                 <a href="#" id="$i[1]" class="map-btn minfo">Information</a>
-                <a href="$conf["main"]["rootUrl"]#if $conf["main"]["rootUrl"][len($conf["main"]["rootUrl"])-1]!="/"#/#end if#$i[1]" class="map-btn">View</a>
+                <a href="$conf["main"]["rootUrl"]#if $conf["main"]["rootUrl"][len($conf["main"]["rootUrl"])-1]!="/"#/#end if#$i[1]" class="map-btn">$zoo._("View")</a>
 </div>
 
 #if mm.web.metadata.get("previewUrl")

@@ -188,6 +188,10 @@ requirejs.config({
 		}
             },		    
 #if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false")
+#if $conf["senv"].keys().count("last_map")==0
+#set t=$conf
+#set $t["senv"]["last_map"]="Georeferencer"
+#end if
 	    pmapfile: '$conf["senv"]["last_map"]',
 #end if
 #if $inputs["module"]["value"].lower()=="georeferencer"

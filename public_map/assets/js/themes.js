@@ -153,7 +153,7 @@ define([
 		    if(data[$(this).attr("id").replace(reg,"")].length==0)
 			$(this).find('option[value="1"]').prop("selected",true);
 		    for(var i=0;i<data[$(this).attr("id").replace(reg,"")].length;i++){
-			$(this).find('option[value="'+data[$(this).attr("id").replace(reg,"")]+'"]').prop("selected",true);
+			$(this).find('option[value="'+data[$(this).attr("id").replace(reg,"")][i]+'"]').prop("selected",true);
 		    }
 		}else{
 		    $(this).val((data[$(this).attr("id").replace(reg,"")]!=null?data[$(this).attr("id").replace(reg,"")]:-1));
