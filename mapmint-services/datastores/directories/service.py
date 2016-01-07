@@ -5,6 +5,7 @@ import os
 import shutil
 import json
 import mm_access
+import zoo
 
 if sys.platform == 'win32':
 	import ntfslink
@@ -278,8 +279,13 @@ def load(conf,inputs,outputs):
 	outputs["Result"]["value"]=json.dumps({"name": b[len(b)-1], "link":os.readlink(a[0:len(a)-1])})
 	return 3
 
+def image(conf,inputs,outputs):
+	outputs["Result"]["value"]=open(inputs["file"]["value"],mode="rb").read()
+	return zoo.SERVICE_SUCCEEDED
+
 
 def details(conf,inputs,outputs):
+	import time
 	a=inputs["name"]["value"]
 	a=a.replace("__","/")
 	b=a[1:len(a)].split("/")
@@ -288,7 +294,8 @@ def details(conf,inputs,outputs):
 	link=os.readlink(a).replace("//","/")
 	if link[len(link)-1]=="/":
 		link=link[0:len(link)-1]
-	outputs["Result"]["value"]=json.dumps({"name": b[len(b)-1], "link":link})
+	date=time.strftime(conf["mm"]["dateFormat"],time.localtime(os.path.getmtime(a)))
+	outputs["Result"]["value"]=json.dumps({"name": b[len(b)-1], "link":link, "date": date})
     
 	return 3
     

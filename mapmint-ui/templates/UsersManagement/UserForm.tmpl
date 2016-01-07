@@ -45,10 +45,14 @@
 <fieldset>
 <legend>$zoo._("Password:") <input type="checkbox" id="up_cp" #if $inputs.keys().count("pref")==0#data-toggle="collapse"#end if# data-target="#userPassword$inputs["type"]["value"].title()" /></legend>
 <div id="userPassword$inputs["type"]["value"].title()" class="myWell collapse">
-<label class="control-label" for="up_$i">$zoo._($i): </label>
-<input id="up_$(inputs["type"]["value"].title())_$i" name="user_$(fields.split(',')[$cnt])" data-minlength="6" class="form-control" type="password" value=""/>
-<label class="control-label" for="up_confirm_$i">$zoo._("Confirm") $zoo._($i): </label>
-<input id="up_confirm_$i" class="form-control" data-match="\#up_$(inputs["type"]["value"].title())_$i" type="password" value=""/>
+<div class="col-sm-12">
+<label class="control-label col-sm-5" for="up_$i">$zoo._($i): </label>
+<input id="up_$(inputs["type"]["value"].title())_$i" name="user_$(fields.split(',')[$cnt])" data-minlength="6" class="form-control col-sm-7" type="password" value=""/>
+</div>
+<div class="col-sm-12">
+<label class="control-label col-sm-5" for="up_confirm_$i">$zoo._("Confirm") $zoo._($i): </label>
+<input id="up_confirm_$i" class="form-control col-sm-7" data-match="\#up_$(inputs["type"]["value"].title())_$i" type="password" value=""/>
+</div>
 </div>
 </fieldset>
 </div>

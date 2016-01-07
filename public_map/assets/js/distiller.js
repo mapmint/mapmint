@@ -1044,12 +1044,12 @@ define([
 	});
 	params.push({
 	    "identifier": "type",
-	    "value": $("#add-directory").find('#Distiller.form.type').val(),
+	    "value": $("#add-directory").find('#Distiller_form_type:checked').val(),
 	    "dataType": "string"
 	});
 	params.push({
 	    "identifier": "path",
-	    "value": ($("#add-directory").find('#Distiller.form.type').val()=="new"?$("#add-directory").find('input[name="path"]').val():$("#add-directory").find('input[name="browse"]:checked').val()),
+	    "value": ($("#add-directory").find('#Distiller_form_type:checked').val()=="new"?$("#add-directory").find('input[name="path"]').val():$("#add-directory").find('input[name="browse"]:checked').val()),
 	    "dataType": "string"
 	});
 	zoo.execute({

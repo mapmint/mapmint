@@ -95,6 +95,8 @@ def display(conf,inputs,outputs):
 				conf["senv"]["group"]="public"
 			if lastMap is not None:
 				conf["senv"]["last_map"]=lastMap
+			else:
+				conf["senv"]["last_map"]="Georeferencer"
 			conf["senv"]["isTrial"]="true"
 			if toLoad is not None:
 				conf["senv"]["toLoad"]=toLoad
@@ -108,6 +110,8 @@ def display(conf,inputs,outputs):
 				lastMap=conf['senv']['last_map']
 				if toLoad is not None:
 					conf["senv"]["toLoad"]=toLoad
+			else:
+				conf['senv']['last_map']="Georeferencer"
 			pass
 		t=None
 		try:
@@ -132,6 +136,8 @@ def display(conf,inputs,outputs):
 				conf["senv"]["group"]="public"
 			if lastMap is not None:
 				conf["senv"]["last_map"]=lastMap
+			else:
+				conf["senv"]["last_map"]="Georeferencer"
 			conf["senv"]["isTrial"]="true"
 			if toLoad is not None:
 				conf["senv"]["toLoad"]=toLoad

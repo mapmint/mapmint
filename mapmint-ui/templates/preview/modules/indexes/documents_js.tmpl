@@ -5,7 +5,7 @@
 #set cur=con.conn.cursor()
 #set prefix=$auth.getPrefix($conf)
 #set fres=[]
-#set sql="select documents.id,documents.name from "+$prefix+"documents, "+$prefix+"documents_groups where d_id=documents.id and g_id in (SELECT id from "+$prefix+"groups where name=[_name_]  or name='public') and documents.name like [_val_]"
+#set sql="select DISTINCT ON ("+$prefix+"documents.id) documents.id,documents.name from "+$prefix+"documents, "+$prefix+"documents_groups where d_id=documents.id and g_id in (SELECT id from "+$prefix+"groups where name=[_name_] or name='public') and documents.name like [_val_]"
 #set res=con.pexecute_req([sql,{"name":{"value":$conf["senv"]["group"],"format":"s"},"val":{"value":"%"+$inputs["val"]["value"]+"%","format":"s"}}])
 #set vals0=$con.cur.fetchall()
 #if $vals0 is not None

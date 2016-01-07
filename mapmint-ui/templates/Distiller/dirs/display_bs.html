@@ -7,6 +7,9 @@
 #include $tmpl
 #set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
 
+#from datastores.directories.service import *
+
+
 #def listDir($conf,$dir,$level)
 #if $mm_access.checkDataStorePriv($conf,$dir,"rx")
 #set res=ds.mmListDir($dir)
@@ -23,7 +26,7 @@
 #end if
 #end for
 	<i class="fa fa-folder#if len(res2)>0#-open#end if# fa-fw"> </i>
-	$i
+	$i ($(getFormatedSize($getDirSize(os.path.join($dir,$i)))))
 #if len(res2)>0
 	<a href="#">
 	<span class="fa arrow"></span>
@@ -45,9 +48,9 @@
     <div class="form-group">
       <label class="col-sm-3 control-label">$zoo._("Directory")</label>
       <div class="col-sm-9 ">
-	<input type="radio" name="Distiller.form.type" id="Distiller.form.type" onclick="\$(this).parent().parent().next().hide();\$(this).parent().parent().next().next().show();" value="use" checked="checked"/>$zoo._("Browse")
-	<input type="radio" name="Distiller.form.type"
-  id="Distiller.form.type" value="new"
+	<input type="radio" name="Distiller_form_type" id="Distiller_form_type" onclick="\$(this).parent().parent().next().hide();\$(this).parent().parent().next().next().show();" value="use" checked="checked"/>$zoo._("Browse")
+	<input type="radio" name="Distiller_form_type"
+  id="Distiller_form_type" value="new"
   onclick="\$(this).parent().parent().next().show();\$(this).parent().parent().next().next().hide();"
   />$zoo._("New")
       </div>

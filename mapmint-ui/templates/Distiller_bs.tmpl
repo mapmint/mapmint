@@ -76,7 +76,7 @@ MapMint: $mmodule
 #set cnt=0
 #for i in ["Directories"]
   <li class="active">
-    <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $i 
+    <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $zoo._($i)
 #if $dirStr.keys().count($i)>0
     <span class="fa arrow"></span></a>
       <ul class="nav nav-forth-level">

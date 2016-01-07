@@ -77,7 +77,7 @@ var counter=0;
 $ftmpl.printLine({"rid":"documents_name","id":"dname","name":$zoo._("Name")})
 
 #set options=[]
-#set res=cur.execute("SELECT id,name as val from "+$prefix+"themes order by name")
+#set res=cur.execute("SELECT DISTINCT ON (id) * from ( select themes.id as id,name as val from "+$prefix+"themes, "+$prefix+"themes_groups where t_id=themes.id and g_id in (select id from "+$prefix+"groups where name='"+$conf["senv"]["group"]+"' or name='public') order by name) as foo")
 #set vals=cur.fetchall()
 #for i in range(0,len(vals))
 #set $options+=[[$vals[i][0],$vals[i][1]]]
@@ -147,11 +147,15 @@ $ftmpl.printLine({"rid":"documents_description","id":"dname","type":"textarea","
             <td valign="middle" style="width:200px;">$zoo._("Themes:")</td>
             <td>
               <select multiple="multiple" class="rounded mltp" id="documents_documents_themes">
-#set res=cur.execute("SELECT id,name as val from "+$prefix+"themes order by name")
+#set sql="SELECT * FROM (SELECT DISTINCT ON (themes.id) themes.id,themes.name as val from "+$prefix+"themes, "+$prefix+"themes_groups where t_id=themes.id and g_id in (SELECT id from "+$prefix+"groups where name='"+$conf["senv"]["group"]+"' or name='public') ) as foo order by name"
+
+#*
+#set res=cur.execute("SELECT * FROM (SELECT DISTINCT ON (themes.id) themes.id,themes.name as val from "+$prefix+"themes, "+$prefix+"themes_groups where t_id=themes.id and g_id in (SELECT id from "+$prefix+"groups where name='"+$conf["senv"]["group"]+"' or name='public') ) as foo order by name")
 #set vals=cur.fetchall()
 #for i in range(0,len(vals))
 		<option value="$vals[i][0]">$vals[i][1]</option>
 #end for
+*#
               </select>
             </td>
           </tr>
