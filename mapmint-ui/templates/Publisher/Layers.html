@@ -122,7 +122,7 @@
 #set sel=[]
 #end try
 #import os
-#for i in os.listdir($conf["main"]["dataPath"]+"/public_maps/")
+#for i in sorted(os.listdir($conf["main"]["dataPath"]+"/public_maps/"))
 #if $i.count(".map")==0
 #try 
 #set t=os.readlink($conf["main"]["dataPath"]+"/public_maps/"+$i)

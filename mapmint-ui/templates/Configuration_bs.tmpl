@@ -90,7 +90,7 @@ $conf[$a]["abstract"].replace("[BR]","</p><p>")
 		  <input class="form-control" name="$cfields[$kk]" value="$conf[$a][$cfields[$kk]]" />
 #end if
 #if $hasHelp
-		  <p class="help-block">$conf[$a+"_help"][$cfields[$kk]].</p>
+		  <p class="help-block">$zoo._($conf[$a+"_help"][$cfields[$kk]]).</p>
 #end if
 		</div>
 	      #end for
