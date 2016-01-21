@@ -266,7 +266,7 @@ define([
 			    $(this).val(CFeaturesSelected[0][attribute].replace(reg0,""));
 			else{
 			    console.log(CFeaturesSelected[0][attribute].replace(reg0,""));
-			    $(this).prop("checked",CFeaturesSelected[0][attribute].replace(reg0,"")=="1");
+			    $(this).prop("checked",(CFeaturesSelected[0][attribute].replace(reg0,"")=="1" || CFeaturesSelected[0][attribute].replace(reg0,"")=="True"));
 			}
 		    }
 		});
@@ -447,12 +447,26 @@ define([
 	    return false;
 	});
 
-	$("#dashOverview,#dashUsers").on("addClass",function(){
-	    $(".sidebar").find(".nav-third-level").each(function(){
-		$(this).removeClass("in");
-		$(this).find(".active").removeClass("active");
-	    });
+	$(".sidebar").find(".nav-second-level").find("li").each(function(){
+		$(this).click(function(){
+			$(".sidebar").find(".nav-second-level").find("li.active").removeClass("active");
+			$(this).addClass("mactive");
+		});
+		
+	    
 	});
+        
+	/*$("#dashOverview,#dashUsers").on("removeClass",function(){
+	    console.log("DEBUG");
+	    $(".sidebar").find(".nav-third-level").each(function(){
+		console.log("DEBUG" );
+		console.log($(this).find(".active"));
+		$(this).removeClass("in");
+		$(this).find(".active").each(function(){
+			$(this).removeClass("active");
+		});
+	    });
+	});*/
 	
 	console.log($(".userBaseEditForm").find("form").length);
 	$(".userBaseEditForm").find("form").each(function(){
@@ -768,7 +782,7 @@ define([
 		{"data":"name","name":"name","title":"name","width":"10%"},
 		{"data":"description","name":"description","title":"description","width":"15%"}
 	    ],
-	    "name,description,adm"
+	    "name,description,adm,sadm"
 	);
 
     };

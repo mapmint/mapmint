@@ -104,6 +104,7 @@ p.dc a:hover{background:#E31224;color:#FFFFFF;}
 width:100% !important;
 margin:0 !important;
 display:block;
+height: 185px;
 }
  
 .caption {
@@ -117,6 +118,8 @@ display:block;
     display: none;
     text-align:center;
     color:#fff !important;
+    max-height: 180px;
+    overflow:auto;
 }
 
 .caption h4{font-size:1.6em;margin:0 0 10px 0;padding:0;text-shadow:0 1px 0 #000000;}
@@ -784,7 +787,7 @@ display:inline;
 }
 
 
-#auth_validate{margin:20px 0 0 10px;}
+#auth_validate,#auth_register{margin:20px 0 0 10px;}
 #auth_register{margin:20px 0 0 0 !important;}
 
 #searchContainer{

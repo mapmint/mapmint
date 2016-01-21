@@ -357,6 +357,9 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #try
 #set mm=mapscript.mapObj($mpath)
 #set ll=mm.web.metadata.get('mmActivatedLayers')
+#if $ll==""
+#set ll=$mm.getLayer(0).name
+#end if
 #set a=$mm.getLayer(0).getExtent()
 <!-- BaseLayer $a.project(mapscript.projectionObj(mm.getLayer(0).getProjection()),mapscript.projectionObj(mm.getProjection())) -->
 #set x=(($a.maxx-$a.minx)/2)+$a.minx

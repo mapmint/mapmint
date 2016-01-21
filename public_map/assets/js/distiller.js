@@ -1300,6 +1300,7 @@ define([
 			$("#DS_"+dsid).find(".panel-body").first().prepend(data);
 			$("#DS_"+dsid).find(".panel-body").first().find("#pg_schema").change(function(){
 			    console.log("Schema changed to "+$(this).val());
+			    adminBasic.loadTablesList(param,$(this).val(),$("#DS_"+dsid).find(".panel-body").first().find("#pg_table"),true);
 			});
 			$("#DS_"+dsid).find(".panel-body").first().find("#pg_table").change(function(){
 			    console.log("Table changed to "+$(this).val());
