@@ -33,7 +33,7 @@
 #if $inputs["type"]["value"]!="insert"
 <label for="up_$ii" class="control-label">$zoo._(i.title()): </label>
 #end if
-<input id="up_$ii" #if $ii=="email"#type="email"#else#type="text"#end if# name="user_$(fields.split(',')[$cnt])" class="form-control" value="$q[0][$j]" placeholder="$zoo._(i.title())" required/>
+<input id="up_$ii" #if $ii=="email"#type="email"#else#type="text"#end if# name="user_$(fields.split(',')[$cnt])" class="form-control" value="$q[0][$j]" placeholder="$zoo._(i.title())" #if $ii!="phone"#required#end if#/>
 #set $cnt+=1
 #if i=="login"
 #set login=$q[0][$j]

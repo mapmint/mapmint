@@ -328,7 +328,7 @@ def AddUser(conf,inputs,outputs):
                 conf["lenv"]["message"] = zoo._("invalid user parameter: ")+inputs["user"]["value"]
                 return 4
             for (i,j) in user.items():
-                if not manage_users.check_user_params(i,j):
+                if i!="phone" and not manage_users.check_user_params(i,j):
                     conf["lenv"]["message"] = 'Parametre %s incorrect'%(i)
                     return 4
             if c.add_user(user):
