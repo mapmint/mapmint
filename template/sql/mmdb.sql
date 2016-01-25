@@ -108,7 +108,8 @@ CREATE TABLE groups (
     name character varying(25) NOT NULL,
     description text,
     pid integer,
-    adm integer
+    adm integer,
+    sadm boolean DEFAULT true
 );
 
 
