@@ -23,14 +23,18 @@
 MapMint: Dashboard
 #end def
 
+#import authenticate.service as auth
+
 #def mmenu
 	      <ul class="nav nav-second-level collapse in">
 		<li>
-		<a id="dashOverviewAction" href="#dashOverview" role="tab" data-toggle="tab"><i class="fa fa-eye fa-fw"></i> $zoo._("Overview")</a>
+		<a id="dashOverviewAction" class="maction" href="#dashOverview" role="tab" data-toggle="tab"><i class="fa fa-eye fa-fw"></i> $zoo._("Overview")</a>
 		</li>
+#if $auth.isSadm($conf)
 		<li>
 		<a href="#dashUsers" role="tab" data-toggle="tab"><i class="fa fa-users fa-fw"></i> $zoo._("Users")</a>
 		</li>
+#end if
 		<li>
 		<a href="#settings"><i class="fa fa-wrench fa-fw"></i> $zoo._("Settings") <span class="fa arrow"></span></a>
 		<ul class="nav nav-third-level">
@@ -121,7 +125,7 @@ MapMint: Dashboard
 
 <div class="tab-content">  
 
-	<div id="dashOverview" role="tabpanel" class="tab-pane active">
+	<div id="dashOverview" role="tabpanel" class="tab-pane mmform active">
 	    <div class="row">
                 <div class="col-lg-12">
                     <h1 class="page-header"><i class="fa fa-eye fa-fw"></i> $zoo._("Overview")</h1>

@@ -4,8 +4,8 @@
 #set titles=['id','name']
 #set names=['id','name']
 #else
-#set titles=['id','name','description','admin access']
-#set names=['id','name','description','adm']
+#set titles=['id','name','description','admin access','super admin']
+#set names=['id','name','description','adm','sadm']
 #end if
 <div id="$inputs["type"]["value"]-group" class="collapse groupBaseEditForm #if $inputs["type"]["value"]!="insert"#groupEditForm#end if#">
   <form class="form-inline mt myWell" data-toggle="validator" role="form">
@@ -16,10 +16,10 @@
 #set j=$names[$cnt]
   <div class="form-group">
   #set ii=$i.replace(' ','_')
-#if $cnt>0 and ($inputs["type"]["value"]=="update" or $cnt+1==len(titles))
+#if $cnt>0 and ($inputs["type"]["value"]=="update" or $cnt+1==len(titles) or $cnt+2==len(titles))
     <label for="up_$ii" class="control-label">$zoo._(i.title()): </label>
 #end if
-    <input name="$j" id="up_$ii" class="form-control" #if $cnt==0#type="hidden"#else##if $cnt+1==len(titles) and $inputs["type"]["value"]!="delete"#type="checkbox"#end if##end if# #if $inputs["type"]["value"]=="insert"#placeholder="$zoo._(i.title())"#end if# />
+    <input name="$j" id="up_$ii" class="form-control" #if $cnt==0#type="hidden"#else##if ($cnt+2==len(titles) or $cnt+1==len(titles)) and $inputs["type"]["value"]!="delete"#type="checkbox"#end if##end if# #if $inputs["type"]["value"]=="insert"#placeholder="$zoo._(i.title())"#end if# />
 
 #set $cnt+=1
   </div>

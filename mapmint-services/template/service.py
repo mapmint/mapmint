@@ -84,8 +84,8 @@ def display(conf,inputs,outputs):
 			os.stat(mapfile)
 			if os.path.islink(mapfile):
 				mapfile=os.readlink(mapfile)
-			lastMap=mapfile.replace(conf["main"]["publicationPath"],"").replace("/public_maps/project_","").replace(".map","").replace("\\??\\","")
-			verif=not(con.has_key("senv"))
+			lastMap=mapfile.replace(conf["main"]["dataPath"],"").replace("/public_maps/project_","").replace(".map","").replace("\\??\\","")
+			verif=not(conf.has_key("senv"))
 			print >> sys.stderr,verif
 			if verif:
 				conf["senv"]={}
@@ -104,14 +104,18 @@ def display(conf,inputs,outputs):
 			conf["senv"]["tmpl"]=inputs["tmpl"]["value"]
 			if verif:
 				conf["lenv"]["cookie"]="MMID="+conf["senv"]["MMID"]+"; path=/"
+			print >> sys.stderr,"+++++++++++++++++++++++"
+			print >> sys.stderr,conf["senv"]["last_map"]
 
-		except:
+		except Exception, e:
+			print >> sys.stderr,"+++++++++++++++++++++++"
+			print >> sys.stderr,e
 			if conf.keys().count('senv')>0:
 				lastMap=conf['senv']['last_map']
 				if toLoad is not None:
 					conf["senv"]["toLoad"]=toLoad
-			else:
-				conf['senv']['last_map']="Georeferencer"
+			#else:
+			#	conf['senv']['last_map']="Georeferencer"
 			pass
 		t=None
 		try:

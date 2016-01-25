@@ -328,7 +328,7 @@ def AddUser(conf,inputs,outputs):
                 conf["lenv"]["message"] = zoo._("invalid user parameter: ")+inputs["user"]["value"]
                 return 4
             for (i,j) in user.items():
-                if not manage_users.check_user_params(i,j):
+                if i!="phone" and not manage_users.check_user_params(i,j):
                     conf["lenv"]["message"] = 'Parametre %s incorrect'%(i)
                     return 4
             if c.add_user(user):
@@ -396,10 +396,17 @@ def UpdateGroup(conf,inputs,outputs):
             req="DELETE from "+prefix+"groups WHERE "+clause
         else:
             if inputs["type"]["value"]=="update":
+                csadm="false"
+                if group["sadm"]:
+                    csadm="true"
+                cadm="0"
                 if group["adm"]:
-                    req='UPDATE '+prefix+'groups set name=%s, description=%s, adm=1 WHERE '+clause
-                else:
-                    req='UPDATE '+prefix+'groups set name=%s, description=%s, adm=0 WHERE '+clause
+                    cadm="1"
+                req='UPDATE '+prefix+'groups set name=%s, description=%s, adm='+cadm+', sadm='+csadm+' WHERE '+clause
+                #if group["adm"]:
+                #    req='UPDATE '+prefix+'groups set name=%s, description=%s, adm=1 WHERE '+clause
+                #else:
+                #    req='UPDATE '+prefix+'groups set name=%s, description=%s, adm=0 WHERE '+clause
                 req = req % (adapt(group["name"].encode('utf-8')).getquoted(), adapt(group["description"].encode('utf-8')).getquoted() )
             else:
                 inputs["type"]["value"]+="e"

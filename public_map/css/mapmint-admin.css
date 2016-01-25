@@ -73,6 +73,7 @@ body {
 .navbar-top-links .dropdown-menu li a {
     padding: 3px 20px;
     min-height: 0;
+    min-width: 190px;
 }
 
 .navbar-top-links .dropdown-menu li a div {
@@ -116,7 +117,7 @@ body {
     border-bottom: 1px solid #e7e7e7;
 }
 
-.sidebar ul li a.active {
+.sidebar ul li a.active, .sidebar ul li a.mactive {
     background-color: #eee;
 }
 

@@ -31,7 +31,16 @@
 #if $i[2]=="bool"
 <input type="checkbox" name="$i[1]" id="pg_tuple_$i[1]" #if len($tmp1.rows)>0 and $tmp1.rows[0].cell[$j]!="None" and $tmp1.rows[0].cell[$j]=="t"#checked="true"#end if# />
 #else
-#if $i[2]=="text" or ($i[2].count("varchar")>0 and int($i[2][8:len($i[2])-1])>55)
+#if $i[2].count("varchar")>0
+#try
+#set test=int($i[2][8:len($i[2])-1])>55
+#except
+#set test=False
+#end try
+#else
+#set test=False
+#end if
+#if $i[2]=="text" or ($i[2].count("varchar")>0 and $test)
 <textarea class="form-control" name="$i[1]" id="pg_tuple_$i[1]">#if len($tmp1.rows)>0 and $tmp1.rows[0].cell[$j]!="None"##if $i[1]=="content"#$tmp1.rows[0].cell[$j].replace("<div>","",1).replace("</div>","",1)#else#$tmp1.rows[0].cell[$j].replace("\\n","\n")#end if##end if#</textarea>
 #else
 #if $i[3]=="FOR"
@@ -71,7 +80,16 @@
 </select>
 #end try
 #else
-#if $i[2].count("varchar")>0 and int($i[2][8:len($i[2])-1])==40
+#if $i[2].count("varchar")>0
+#try
+#set test=int($i[2][8:len($i[2])-1])==40
+#except
+#set test=False
+#end try
+#else
+#set test=False
+#end if
+#if $i[2].count("varchar")>0 and $test
 <input class="form-control" name="$i[1]" id="pg_tuple_$i[1]" type="password" value="" />
 #else
 <input class="form-control" name="$i[1]" id="pg_tuple_$i[1]" value="#if len($tmp1.rows)>0 and $tmp1.rows[0].cell[$j]!="None"#$tmp1.rows[0].cell[$j]#end if#" #if $i[2]=="date"#data-date-format="dd/mm/yyyy"#end if#/>

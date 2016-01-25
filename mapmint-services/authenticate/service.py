@@ -272,7 +272,7 @@ def logOut(conf,inputs,outputs):
 	if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
 		outputs["Result"]["value"]=zoo._("User disconnected")
 		conf["senv"]["loggedin"]="false"
-		conf["lenv"]["cookie"]="MMID=deleted; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
+		#conf["lenv"]["cookie"]="MMID=deleted; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
 		return zoo.SERVICE_SUCCEEDED
 	else:
 		conf["lenv"]["message"]=zoo._("User not authenticated")
@@ -298,6 +298,17 @@ def getGroup(conf,con,login):
 		print >> sys.stderr,zoo._("Error when processing SQL query: ")+str(e)
 		return None
 
+def isSadm(conf):
+	con=getCon(conf)
+	con.conf=conf
+	prefix=getPrefix(conf)
+	req="select sadm from "+prefix+"groups where id in (select id_group from "+prefix+"user_group where id_user=[_uid_])"
+	con.pexecute_req([req,{"uid":{"value":conf["senv"]["id"],"format":"s"}}])
+	print >> sys.stderr,"************"+req
+	a=con.cur.fetchall()
+	print >> sys.stderr,a
+	return a[0][0]
+	
 def logIn(conf,inputs,outputs):
 	if conf.keys().count("senv") > 0 and conf["senv"] and conf["senv"]["loggedin"]=="true":
 		conf["lenv"]["message"]=zoo._("No need to authenticate")

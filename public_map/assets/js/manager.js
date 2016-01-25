@@ -1638,6 +1638,7 @@ define([
 			//console.log($("#manaLayerProperties").find('select[name="'+(bindings[i]?bindings[i]:i)+'"]').length);
 			if(!$("#manaLayerProperties").find('select[name="'+(bindings[i]?bindings[i]:i)+'"]').length){
 			    console.log(i+" text");
+			    console.log($("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]'));
 			    $("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
 			    if($("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').parent().find('input[type="checkbox"]').first().length){
 				if(!ldata[i] || ldata[i]=="#-1-1-1" || ldata[i]=="")
@@ -1673,7 +1674,7 @@ define([
 	}
 	$("#mm_layer_template_display").find("select[name=case]").change(function(e){
 	    e.stopPropagation();
-	    $(".mm-editor").code(ldata[($(this).val()=="On Click"?"click_tmpl":"default_tmpl")]);
+	    $(".mm-editor").code(ldata[($(this).val()=="click"?"click_tmpl":"default_tmpl")]);
 	});
 	
     }
@@ -2514,6 +2515,14 @@ define([
 		zoom: 2
 	    })
 	});
+
+
+	var transformer = ol.proj.getTransform('EPSG:4326', 'EPSG:3857');
+	var ext=module.config().default_ext.split(',');
+	for(var i=0;i<ext.length;i++)
+		ext[i]=parseFloat(ext[i]);
+	var extent=ol.extent.applyTransform(ext, transformer);
+	map.getView().fit(extent,map.getSize());
 
 	console.log("Start Manager");
 

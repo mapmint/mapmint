@@ -415,7 +415,7 @@ define([
 		    visible: false,
 		    source: new ol.source.TileWMS({
 			url: cacheUrl,
-			params: {'LAYERS': baseLayers["myBaseLayers"][j], 'TILED': true},
+			params: {'LAYERS': baseLayers["myBaseLayers"][j]+"Tile", 'TILED': true},
 			serverType: 'mapserver'
 		    })
 		});
