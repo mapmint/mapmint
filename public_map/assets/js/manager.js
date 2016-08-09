@@ -1904,7 +1904,8 @@ define([
 		"type": "type",
 		"resample": "resm",
 		"step": "mmStep",
-		"tileSize": "tiled"
+		"tileSize": "tiled",
+		"expression0": "mmMExpr"
 	    };
 	    var hasStep=$("#mm_layer_property_style_display").find("select[name=step_classification]").is(":visible");
 	    var cfield=(hasStep?"step_classification":"classification");

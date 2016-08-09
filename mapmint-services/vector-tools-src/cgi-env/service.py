@@ -350,7 +350,7 @@ def ConvexHullPy(conf,inputs,outputs):
         geometry[i].Destroy()
         i+=1
     outputResult(conf,outputs["Result"],rgeometries)
-    return zoo.SUCCEEDED
+    return zoo.SERVICE_SUCCEEDED
 
 
 

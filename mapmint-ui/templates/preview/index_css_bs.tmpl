@@ -89,7 +89,7 @@ body{
 #set fs=open($layer.metadata.get('mmSprite').replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
 #set fc=base64.b64encode(fs.read())
 #for j0 in range(0,$layer.numclasses)##if $cn>0#,#end if#.layer_$(i)_step$(cnt)_class$(j0)#set $cn+=1##end for#{
-    background:	url(data:image/png;base64,$fc) no-repeat !important;
+    background:	url(data:image/png;base64,$fc) ;
 }
 #end if
 #for j in range(0,$layer.numclasses)

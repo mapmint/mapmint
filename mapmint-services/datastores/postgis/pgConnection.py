@@ -40,8 +40,8 @@ class pgConnection:
             else:
                 return True
         except Exception,e:
-            self.conf["lenv"]["message"]="Unable to execute "+req+" due to: "+str(e)
-            print >> sys.stderr,"Unable to execute "+req+str(e)
+            self.conf["lenv"]["message"]="Unable to execute "+req.encode('utf-8')+" due to: "+str(e)
+            #print >> sys.stderr,"Unable to execute "+req+str(e)
             return False
 
 def listSchemas(conf,inputs,outputs):
@@ -96,7 +96,6 @@ def listTablesAndViews(conf,inputs,outputs):
 
 def getDesc(cur,table):
     tmp=table.split('.')
-    print >> sys.stderr,tmp
     req="SELECT b.relname as t FROM pg_inherits, pg_class a, pg_class b WHERE inhrelid=a.oid AND inhparent=b.oid AND a.relname = '"+tmp[0]+"' AND a.relnamespace=(select oid from pg_namespace where nspname='"+tmp[1]+"')"
     res0=cur.execute(req)
     res=cur.fetchall()
@@ -116,7 +115,6 @@ def getTableDescription(conf,inputs,outputs):
 	if db.connect():
             tmp=inputs["table"]["value"].split('.')
             req=getDesc(db.cur,inputs["table"]["value"])
-            print >> sys.stderr,req
             res=db.execute(req)
             if res!=False and len(res)>0:
                 outputs["Result"]["value"]=json.dumps(res)
@@ -139,12 +137,15 @@ def getTableContent(conf,inputs,outputs):
         tmp=eval(outputs["Result"]["value"].replace("null","None"))
         pkey=0
         geom=[]
+        files=[]
         fields=""
         for i in range(0,len(tmp)):
             if tmp[i][3]=="PRI":
                 pkey=tmp[i][0]
             if tmp[i][2]=="geometry":
                 geom+=[i]
+            if tmp[i][2]=="bytea":
+                files+=[i]
             if tmp[i][3]=="FOR" and not(inputs.has_key("force")):
                 input1=inputs
                 otbl=inputs["table"]["value"]
@@ -202,10 +203,19 @@ def getTableContent(conf,inputs,outputs):
                 for i in range(0,len(res)):
                     res0=[]
                     for k in range(0,len(res[i])):
-                        res0+=[str(res[i][k])]
+                        try:
+                            tmp=res[i][k].encode('utf-8')
+                            print >> sys.stderr,dir(tmp)
+                        except Exception,e:
+                            print >> sys.stderr,e
+                            tmp=str(res[i][k])
+                        res0+=[str(tmp)]
                     if len(geom)>0:
                         for j in range(0,len(geom)):
                             res0[geom[j]]="GEOMETRY"
+                    if len(files)>0:
+                        for j in range(0,len(files)):
+                            res0[files[j]]="BINARY FILE"
                     rows+=[{"id": res[i][pkey],"cell": res0}]
                 outputs["Result"]["value"]=json.dumps({"page": page, "total": total,"rows": rows},ensure_ascii=False)
 		return zoo.SERVICE_SUCCEEDED
@@ -232,12 +242,12 @@ def deleteTuple(conf,inputs,outputs):
         conf=db.conf
         return zoo.SERVICE_FAILED
 
-import psycopg2
+import psycopg2,json
 from psycopg2.extensions import *
 def editTuple(conf,inputs,outputs):
     getTableDescription(conf,inputs,outputs)
     desc=eval(outputs["Result"]["value"].replace("null","None"))
-    tmp=eval(inputs["obj"]["value"])
+    tmp=json.loads(inputs["obj"]["value"])
     if inputs.has_key("clause") and inputs["clause"]["value"]!="NULL":
         req="UPDATE "+inputs["table"]["value"]+" set "
         fields=""

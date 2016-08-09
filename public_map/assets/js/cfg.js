@@ -1,7 +1,7 @@
 // Filename: main.js
 
 requirejs.config({
-    baseUrl: '/pm/assets',
+    baseUrl: '/~djay/progede2/public_map/assets',
     paths: {
         text: 'js/lib/require-text-2.0.12',
         hgn: 'js/lib/require-hgn-0.3.0',
@@ -18,6 +18,9 @@ requirejs.config({
 
 	mmDataTables: 'js/lib/mapmint/mapmint.datatables',
 	dataTables: 'js/lib/jquery/jquery.dataTables.min',
+	dataTablesB: [
+		'https://cdn.datatables.net/1.10.9/js/dataTables.bootstrap.min'
+	],
 	buttons: 'js/lib/datatables/dataTables.buttons.min',
 	buttonsCol: 'js/lib/datatables/buttons.colVis.min',
 	colReorder: 'js/lib/datatables/dataTables.colReorder.min',

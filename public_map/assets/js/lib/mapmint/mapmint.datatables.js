@@ -23,8 +23,8 @@
  */
 
 define([
-    'xml2json', 'queryString', 'ol', 'notify'
-], function(X2JS, qs, ol, notify) {
+    'xml2json', 'queryString', 'ol', 'notify', 'dataTablesB'
+], function(X2JS, qs, ol, notify, DataTable) {
 
     /** 
      * The MMDataTable Class
@@ -98,8 +98,15 @@ define([
 
 	this.parseFidToHtml = function(fid){
 	    var closure=this;
-	    return fid.replace(/\./g,closure.sep);
+	    try{
+		return fid.replace(/\./g,closure.sep);
+	    }catch(e){
+		console.log(e);
+		console.log(fid);
+		return fid;
+	    }
 	};
+
 	this.parseFidFromHtml = function(fid){
 	    var closure=this;
 	    var reg=new RegEx(closure.sep,"g");

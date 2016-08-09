@@ -35,7 +35,10 @@ define([
 	$('#side-menu').metisMenu({ toggle: false });
     };
 
+    var datasources={};
     var zoo=null;
+    var sort={"type":"none","field":"none"};
+
     var initialize=function(){
 	if(arguments[0]){
 	    zoo=arguments[0];
@@ -45,6 +48,8 @@ define([
     function displayVector(data,param,dsid,datasource,rdatasource,sfunc,efunc){
 	console.log(data);
 	var ldatasource=datasource.replace(/\./g,"_");
+	if(datasources[param])
+	    datasources[param].destroy();
 	var regs=[
 	    new RegExp("\\[srs\\]","g"),
 	    new RegExp("\\[encoding\\]","g")
@@ -66,7 +71,7 @@ define([
 
 	var cnt=0;
 	var ldata=data;
-	$('#DS_table_'+dsid+'_'+ldatasource).DataTable( {
+	datasources[param]=$('#DS_table_'+dsid+'_'+ldatasource).DataTable( {
 	    data: [],
 	    "dom": 'Zlfrtip',
 	    "colReorder": true,
@@ -107,6 +112,11 @@ define([
 		console.log(llimit);
 
 		console.log(lcolumns);
+
+		sort["type"]=llimit[3];
+		sort["field"]=(lcolumns[llimit[2]].data);
+		console.log(lcolumns[llimit[2]].data);
+		console.log(llimit[3]);
 
 		var opts=zoo.getRequest({
 		    identifier: "vector-tools.mmExtractVectorInfo",
@@ -163,6 +173,7 @@ define([
 		oSettings.jqXHR = $.ajax( opts );
 	    }
 	});
+
     }
 
     function callCreateLegend(map,layer,step,opts,lfunction){
@@ -621,9 +632,21 @@ define([
 	});
     }
 
-    function generateLineTemplate(values){
+    function generateFromTemplate(template,oregs,values){
+	var reg=[];
+	for(var i=0;i<values.length;i++)
+	    reg.push({
+		"reg": new RegExp("\\["+oregs[i]+"\\]","g"),
+		"value": values[i]
+	    });
+	for(var j=0;j<reg.length;j++)
+	    template=template.replace(reg[j]["reg"],reg[j]["value"]);
+	return template;
+    }
+
+    function generateLineTemplate(oregs,values){
 	var template=$("#layer_property_table_line_template")[0].innerHTML;
-	var oregs=["id","order","display","export","name","label","width","value"];
+	//var oregs=;
 	var reg=[];
 	for(var i=0;i<values.length;i++)
 	    reg.push({
@@ -652,7 +675,7 @@ define([
 	if(data["gfi_aliases"] && data["gfi_aliases"].length>0){
 	    for(var i=0;i<data["gfi_aliases"].length;i++){
 		if(data["gfi_fields"][i]){
-		    tbody+=generateLineTemplate([
+		    tbody+=generateLineTemplate(["id","order","display","export","name","label","width","value"],[
 			getTableIndex(ldata,data["gfi_fields"][i]),
 			i+1,
 			'checked="checked"',
@@ -670,7 +693,7 @@ define([
 	if(cnt<ldata.length-1)
 	    for(var i in ldata){
 		if(ldata[i]["_name"]!="msGeometry" && $.inArray(ldata[i]["_name"], alreadyDisplayed) == -1){
-		    tbody+=generateLineTemplate([
+		    tbody+=generateLineTemplate(["id","order","display","export","name","label","width","value"],[
 			i,
 			cnt+1,
 			"",
@@ -859,15 +882,21 @@ define([
 	});	
     }
 
+
     // Return public methods
     return {
         initialize: initialize,
+	sort: sort,
+	displayVector: displayVector,
 	displayVector: displayVector,
 	callCreateLegend: callCreateLegend,
 	loadStyleDisplay: loadStyleDisplay,
 	getTableDesc: getTableDesc,
 	loadTableDefinition: loadTableDefinition,
-	classifyMap: classifyMap
+	classifyMap: classifyMap,
+	generateLineTemplate: generateLineTemplate,
+	generateFromTemplate: generateFromTemplate,
+	datasources: datasources
     };
 
 

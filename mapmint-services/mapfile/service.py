@@ -1660,8 +1660,11 @@ def saveLayerStyle0(conf,inputs,outputs):
 	    m=mapscript.mapObj(mapPath+"/timeline_"+inputs["map"]["value"]+"_"+inputs["layer"]["value"].replace(".","_")+"_step"+inputs["mmStep"]["value"]+".map")
     else:
 	    m=mapscript.mapObj(mapPath+"/project_"+inputs["map"]["value"]+".map")
+    print >> sys.stderr,m
+    print >> sys.stderr,inputs["layer"]["value"]
     layer=m.getLayerByName(inputs["layer"]["value"])
-
+    print >> sys.stderr,layer
+    
     try:
         noColor=False
         fillColor=None
@@ -1692,7 +1695,7 @@ def saveLayerStyle0(conf,inputs,outputs):
             layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
             layer.getClass(nClass).getStyle(2).angle=0
 
-    if layer.type==mapscript.MS_LAYER_POLYGON:
+    if layer is not None and layer.type==mapscript.MS_LAYER_POLYGON:
         if inputs.keys().count('mmSymbolFill')==0 and \
             inputs.keys().count("mmStyle")==0 and \
             inputs.keys().count('mmHatchWidth')==0:
@@ -1709,7 +1712,7 @@ def saveLayerStyle0(conf,inputs,outputs):
             layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
             layer.getClass(nClass).getStyle(layer.getClass(nClass).numstyles-1).angle=0
     else:
-        if layer.type==mapscript.MS_LAYER_POLYGON:
+        if layer is not None and layer.type==mapscript.MS_LAYER_POLYGON:
             if inputs.keys().count("mmStyle")==0:
                 if layer.getClass(nClass).numstyles>2:
                     layer.getClass(nClass).removeStyle(layer.getClass(nClass).numstyles-1)
@@ -1775,7 +1778,10 @@ def saveLayerStyle0(conf,inputs,outputs):
             layer.getClass(nClass).getStyle(1).angle=0
             layer.getClass(nClass).getStyle(1).symbolname=None
             layer.getClass(nClass).getStyle(1).size=-1
-            layer.getClass(nClass).getStyle(1).patternlength=0
+            try:
+                layer.getClass(nClass).getStyle(1).patternlength=0
+            except:
+                pass
             print >> sys.stderr,"layer.getClass(nClass).numstyles 3 - "+str(layer.getClass(nClass).numstyles)
             style=layer.getClass(nClass).getStyle(1)
             setRGB(style.outlinecolor,strokeColor)
@@ -1798,32 +1804,57 @@ def saveLayerStyle0(conf,inputs,outputs):
         if inputs.keys().count("mmStyle")==0:
             if inputs.keys().count("pattern") > 0:
                 print >> sys.stderr,"PATTERN (" +inputs["pattern"]["value"]+")"
-                layer.getClass(nClass).getStyle(0).patternlength=0
+                try:
+                    layer.getClass(nClass).getStyle(0).patternlength=0
+                except:
+                    pass
                 layer.getClass(nClass).getStyle(0).linecap=mapscript.MS_CJC_BUTT
                 layer.setMetaData("mmPattern_"+str(nClass),inputs["pattern"]["value"])
-                layer.getClass(nClass).getStyle(0).updateFromString("STYLE PATTERN "+inputs["pattern"]["value"]+" END END")
+                if layer.type!=mapscript.MS_LAYER_POLYGON:
+                    layer.getClass(nClass).getStyle(0).updateFromString("STYLE PATTERN "+inputs["pattern"]["value"]+" END END")
                 if layer.type==mapscript.MS_LAYER_POLYGON:
                     print >> sys.stderr,"NUMSTYLES "+str(layer.getClass(nClass).numstyles)
                     if layer.getClass(nClass).numstyles==1:
                         layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
                     myStyle=layer.getClass(nClass).getStyle(1)
                     layer.getClass(nClass).getStyle(0).outlinecolor.setRGB(-1,-1,-1)
-                    layer.getClass(nClass).getStyle(0).patternlength=0
+                    try:
+                        layer.getClass(nClass).getStyle(0).patternlength=0
+                    except:
+                        layer.getClass(nClass).getStyle(0).pattern=(1,0)
+                        pass
                     layer.getClass(nClass).getStyle(1).color.setRGB(-1,-1,-1)
                     layer.getClass(nClass).getStyle(1).symbol=0
                     layer.getClass(nClass).getStyle(1).angle=0
                     layer.getClass(nClass).getStyle(1).symbolname=None
                     layer.getClass(nClass).getStyle(1).size=-1
-                    layer.getClass(nClass).getStyle(1).patternlength=0
-                    layer.getClass(nClass).getStyle(1).updateFromString("STYLE PATTERN "+inputs["pattern"]["value"]+" END END")
+                    print >> sys.stderr,dir(layer.getClass(nClass).getStyle(1))
+                    try:
+                        layer.getClass(nClass).getStyle(1).patternlength=0
+                        layer.getClass(nClass).getStyle(1).updateFromString("STYLE PATTERN "+inputs["pattern"]["value"]+" END END")
+                    except:
+                        lp=inputs["pattern"]["value"].split(' ')
+                        for k in range(len(lp)):
+                            lp[k]=float(lp[k])
+                        layer.getClass(nClass).getStyle(1).pattern=lp
+                        pass
+                    print >> sys.stderr,"STYLE PATTERN "+inputs["pattern"]["value"]+" END END"
             else:
-                layer.getClass(nClass).getStyle(mmStyle).patternlength=0
+                try:
+                    layer.getClass(nClass).getStyle(mmStyle).patternlength=0
+                except:
+                    layer.getClass(nClass).getStyle(mmStyle).pattern=(1,0)
+                    pass
                 layer.getClass(nClass).getStyle(mmStyle).linecap=mapscript.MS_CJC_ROUND
                 if layer.type==mapscript.MS_LAYER_POLYGON and layer.getClass(nClass).numstyles>1:
                     if noColor:
                         layer.getClass(nClass).removeStyle(1)
                     else:
-                        layer.getClass(nClass).getStyle(1).patternlength=0
+                        try:
+                            layer.getClass(nClass).getStyle(1).patternlength=0
+                        except:
+                            layer.getClass(nClass).getStyle(1).pattern=(1,0)
+                            pass
                         layer.getClass(nClass).getStyle(1).linecap=mapscript.MS_CJC_ROUND
     else:
         if inputs.has_key("resm"):
@@ -2057,7 +2088,10 @@ def saveLayerStyle(conf,inputs,outputs):
                     layer.getClass(nClass).getStyle(1).patternlength=0
                     layer.getClass(nClass).getStyle(1).updateFromString("STYLE PATTERN "+inputs["pattern"]["value"]+" END END")
             else:
-                layer.getClass(nClass).getStyle(mmStyle).patternlength=0
+                try:
+                    layer.getClass(nClass).getStyle(mmStyle).patternlength=0
+                except:
+                    pass
                 layer.getClass(nClass).getStyle(mmStyle).linecap=mapscript.MS_CJC_ROUND
                 if layer.type==mapscript.MS_LAYER_POLYGON and layer.getClass(nClass).numstyles>1:
                     if noColor:
@@ -2445,11 +2479,11 @@ def classifyMap0(conf,inputs,outputs):
     output1={"Result": {"value":""}}
     isRaster=-1
     try:
-	if not(rClass):
-		print >> sys.stderr,"OK"
-                print >> sys.stderr,lInputs
-		vt.vectInfo(conf,lInputs,outputs)
-		print >> sys.stderr,"OK"
+        if not(rClass):
+            print >> sys.stderr,"OK"
+            print >> sys.stderr,lInputs
+            vt.vectInfo(conf,lInputs,outputs)
+            print >> sys.stderr,"OK"
 		#print >> sys.stderr,outputs["Result"]["value"]
 	tmp=eval(outputs["Result"]["value"])
     except Exception,e:
@@ -3132,7 +3166,7 @@ def saveLabel(conf,inputs,outputs):
             # Set color, font and size
             setRGB(l.color,[int(n, 16) for n in (inputs["mmFill"]["value"][:2],inputs["mmFill"]["value"][2:4],inputs["mmFill"]["value"][4:6])])
             l.font=inputs["f"]["value"]
-            l.size=float(inputs["fs"]["value"])
+            l.size=int(inputs["fs"]["value"])
         
             # Never force display when no space available
             l.force=False

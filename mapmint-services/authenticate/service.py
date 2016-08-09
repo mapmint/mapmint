@@ -63,11 +63,9 @@ def is_ftable(value):
 
 def getCon(conf):
 	if conf["main"].has_key(conf["main"]["dbuser"]) and conf["main"]["dbuser"]=="dblink":
-		print >> sys.stderr,"DB IS SQLITE"
 		con=manage_users(conf["main"][conf["main"]["dbuser"]])
 	else:
 		if conf.has_key(conf["main"]["dbuser"]):
-			print >> sys.stderr,"DB IS POSTGRESQL"
 			con=manage_users(parseDb(conf[conf["main"]["dbuser"]]))
 	con.connect(conf)
 	return con
@@ -212,55 +210,58 @@ def registerUser(conf,inputs,outputs):
 	return zoo.SERVICE_SUCCEEDED
 
 def clogIn(conf,inputs,outputs):
-	if conf.keys().count("senv") > 0 and conf["senv"].has_key("loggedin") and conf["senv"]["loggedin"]=="true":
-		conf["lenv"]["message"]=zoo._("No need to authenticate")
-		return zoo.SERVICE_FAILED
-	con=getCon(conf)
-	prefix=getPrefix(conf)
-	#con.connect()
-	conn = con.conn
-	h = hashlib.new('ripemd160')
-	h.update(inputs['password']['value'])
-	c = conn.cursor()
-	try:
-		con.pexecute_req([" SELECT login FROM "+prefix+"users WHERE login=[_login_] AND passwd=[_password_]",{"login":{"value":inputs['login']['value'],"format":"s"},"password": {"value":h.hexdigest(),"format":"s"}}])
-		
-	except Exception as e:
-		conf["lenv"]["message"]=zoo._("Error when processing SQL query: ")+str(e)
-		return zoo.SERVICE_FAILED
-	a=con.cur.fetchall()
+    if conf.keys().count("senv") > 0 and conf["senv"].has_key("loggedin") and conf["senv"]["loggedin"]=="true":
+        conf["lenv"]["message"]=zoo._("No need to authenticate")
+        return zoo.SERVICE_FAILED
+    con=getCon(conf)
+    prefix=getPrefix(conf)
+    conn = con.conn
+    h = hashlib.new('ripemd160')
+    h.update(inputs['password']['value'])
+    c = conn.cursor()
+    try:
+        con.pexecute_req([" SELECT login,(select adm from "+prefix+"groups,"+prefix+"user_group where "+prefix+"groups.id=id_group and id_user="+prefix+"users.id) FROM "+prefix+"users WHERE login=[_login_] AND passwd=[_password_]",{"login":{"value":inputs['login']['value'],"format":"s"},"password": {"value":h.hexdigest(),"format":"s"}}])
+    except Exception as e:
+        conf["lenv"]["message"]=zoo._("Error when processing SQL query: ")+str(e)
+        return zoo.SERVICE_FAILED
+    a=con.cur.fetchall()
 
-	if len(a)>0:
-		# Set all the Session environment variables using the users 
-		# table content.
-		print >> sys.stderr,a
-		conf["senv"]["login"]=a[0][0].encode('utf-8')
-		conf["senv"]["loggedin"]="true"
-		if conf["main"].has_key("isTrial") and conf["main"]["isTrial"]=="true":
-			conf["senv"]["isTrial"]="true"
-		else:
-			conf["senv"]["isTrial"]="false"
-		conf["senv"]["group"]=getGroup(conf,con,inputs['login']['value'])
-		conf["senv"]["isAdmin"]="false"
+    if len(a)>0:
+        # Set all the Session environment variables using the users 
+        # table content.
+        print >> sys.stderr,a
+        conf["senv"]["login"]=a[0][0].encode('utf-8')
+        conf["senv"]["loggedin"]="true"
+        if conf["main"].has_key("isTrial") and conf["main"]["isTrial"]=="true":
+            conf["senv"]["isTrial"]="true"
+        else:
+            conf["senv"]["isTrial"]="false"
+        conf["senv"]["group"]=getGroup(conf,con,inputs['login']['value'])
+        if a[0][1]==1:
+            conf["senv"]["isAdmin"]="true"
+        else:
+            conf["senv"]["isAdmin"]="false"
+        conf["lenv"]["cookie"]="MMID=MM"+conf["lenv"]["usid"]+"; path=/"
+        outputs["Result"]["value"]=zoo._("User ")+conf["senv"]["login"]+zoo._(" authenticated")
+        sql=" UPDATE "+prefix+"users set last_con="+con.now+" WHERE login=[_login_]"
+        con.pexecute_req([sql,{"login":{"value":inputs['login']['value'],"format":"s"}}])
+        conn.commit()
+        #print >> sys.stderr, str(conf["senv"])
+        return zoo.SERVICE_SUCCEEDED
+    else:
+        conf["lenv"]["message"]=zoo._("Unable to connect with the provided login and password")
+        return zoo.SERVICE_FAILED
 
-		outputs["Result"]["value"]=zoo._("User ")+conf["senv"]["login"]+zoo._(" authenticated")
-		sql=" UPDATE "+prefix+"users set last_con="+con.now+" WHERE login=[_login_]"
-		con.pexecute_req([sql,{"login":{"value":inputs['login']['value'],"format":"s"}}])
-		conn.commit()
-		return zoo.SERVICE_SUCCEEDED
-	else:
-		conf["lenv"]["message"]=zoo._("Unable to connect with the provided login and password")
-		return zoo.SERVICE_FAILED
-
-	sys.path+=[conf["main"]["templatesPath"]]
-	conf["lenv"]["message"]=zoo._("Should never occur")
-	return zoo.SERVICE_FAILED
+    sys.path+=[conf["main"]["templatesPath"]]
+    conf["lenv"]["message"]=zoo._("Should never occur")
+    return zoo.SERVICE_FAILED
 
 def clogOut(conf,inputs,outputs):
 	if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
 		outputs["Result"]["value"]=zoo._("User disconnected")
 		conf["senv"]["loggedin"]="false"
 		conf["senv"]["login"]="anonymous"
+		conf["senv"]["group"]="public"
 		return zoo.SERVICE_SUCCEEDED
 	else:
 		conf["lenv"]["message"]=zoo._("User not authenticated")
@@ -310,76 +311,77 @@ def isSadm(conf):
 	return a[0][0]
 	
 def logIn(conf,inputs,outputs):
-	if conf.keys().count("senv") > 0 and conf["senv"] and conf["senv"]["loggedin"]=="true":
-		conf["lenv"]["message"]=zoo._("No need to authenticate")
-		return zoo.SERVICE_FAILED
-	con=getCon(conf)
-	con.conf=conf
-	prefix=getPrefix(conf)
-	#con.connect(conf)
-	try:
-		conn = con.conn
-	except:
-		conf["lenv"]["message"]=zoo._("Unable to connect to the User Database.")
-		return zoo.SERVICE_FAILED
-	h = hashlib.new('ripemd160')
-	h.update(inputs['password']['value'])
-	h.hexdigest()
-	c = conn.cursor()
-	try:
-		req=" SELECT users.*,(select name from "+prefix+"groups where id=id_group) as gname FROM "+prefix+"users,"+prefix+"user_group,"+prefix+"groups WHERE "+prefix+"users.id=id_user AND "+prefix+"groups.id=id_group AND adm=1 AND login=[_login_] AND passwd=[_password_]"
-		con.pexecute_req([req,{"login":{"value":inputs["login"]["value"],"format":"s"},"password":{"value":h.hexdigest(),"format":"s"}}])
+    if conf.keys().count("senv") > 0 and conf["senv"] and conf["senv"]["loggedin"]=="true":
+        conf["lenv"]["message"]=zoo._("No need to authenticate")
+        return zoo.SERVICE_FAILED
+    con=getCon(conf)
+    con.conf=conf
+    prefix=getPrefix(conf)
+    #con.connect(conf)
+    try:
+        conn = con.conn
+    except:
+        conf["lenv"]["message"]=zoo._("Unable to connect to the User Database.")
+        return zoo.SERVICE_FAILED
+    h = hashlib.new('ripemd160')
+    h.update(inputs['password']['value'])
+    h.hexdigest()
+    c = conn.cursor()
+    try:
+        req=" SELECT users.*,Array((select "+prefix+"groups.name from "+prefix+"groups, "+prefix+"user_group where "+prefix+"groups.id=id_group and "+prefix+"users.id=id_user)) as gname FROM "+prefix+"users,"+prefix+"user_group,"+prefix+"groups WHERE "+prefix+"users.id=id_user AND "+prefix+"groups.id=id_group AND adm=1 AND login=[_login_] AND passwd=[_password_]"
+        con.pexecute_req([req,{"login":{"value":inputs["login"]["value"],"format":"s"},"password":{"value":h.hexdigest(),"format":"s"}}])
 		
-	except Exception as e:
-		conf["lenv"]["message"]=zoo._("Error when processing SQL query: ")+str(e)
-		return zoo.SERVICE_FAILED
-	a=con.cur.fetchall()
+    except Exception as e:
+        conf["lenv"]["message"]=zoo._("Error when processing SQL query: ")+str(e)
+        return zoo.SERVICE_FAILED
+    try:
+        a=con.cur.fetchall()
+    except Exception as e:
+        conf["lenv"]["message"]=zoo._("Error when retrieving data for the SQL query: ")+str(e)
+        return zoo.SERVICE_FAILED
 
-	if len(a)>0:
-		conf["lenv"]["cookie"]="MMID=MM"+str(time.time()).split(".")[0]+"; path=/"
+    if len(a)>0:
+        conf["lenv"]["cookie"]="MMID=MM"+str(time.time()).split(".")[0]+"; path=/"
 
-		
-		conf["senv"]={}
-		conf["senv"]["MMID"]="MM"+str(time.time()).split(".")[0]
-		
-		# Set all the Session environment variables using the users 
-		# table content.
-		#print >> sys.stderr,con.desc
-		c.execute(con.desc)
-		desc=c.fetchall()
-		for i in desc:
-			if isinstance(a[0][i[0]],int):
-				conf["senv"][i[1]]=str(a[0][i[0]])
-			else:
-				if a[0][i[0]] is not None:
-					try:
-						conf["senv"][i[1]]=a[0][i[0]].encode('utf-8')
-					except:
-						conf["senv"][i[1]]=a[0][i[0]]
-				else:
-					conf["senv"][i[1]]=str(a[0][i[0]])
+        conf["senv"]={}
+        conf["senv"]["MMID"]="MM"+str(time.time()).split(".")[0]
+        # Set all the Session environment variables using the users 
+        # table content.
+        #print >> sys.stderr,con.desc
+        c.execute(con.desc)
+        desc=c.fetchall()
+        for i in desc:
+            if isinstance(a[0][i[0]],int):
+                conf["senv"][i[1]]=str(a[0][i[0]])
+            else:
+                if a[0][i[0]] is not None:
+                    try:
+                        conf["senv"][i[1]]=a[0][i[0]].encode('utf-8')
+                    except:
+                        conf["senv"][i[1]]=a[0][i[0]]
+                else:
+                    conf["senv"][i[1]]=str(a[0][i[0]])
 
-		conf["senv"]["group"]=getGroup(conf,con,inputs['login']['value'])
-		conf["senv"]["loggedin"]="true"
-		conf["senv"]["isAdmin"]="true"
-		print >> sys.stderr,conf["senv"]
+        conf["senv"]["group"]=getGroup(conf,con,inputs['login']['value'])
+        conf["senv"]["loggedin"]="true"
+        conf["senv"]["isAdmin"]="true"
 
-		if conf["main"].has_key("isTrial") and conf["main"]["isTrial"]=="true":
-			conf["senv"]["isTrial"]="true"
-		else:
-			conf["senv"]["isTrial"]="false"
+        if conf["main"].has_key("isTrial") and conf["main"]["isTrial"]=="true":
+            conf["senv"]["isTrial"]="true"
+        else:
+            conf["senv"]["isTrial"]="false"
 
+        outputs["Result"]["value"]=zoo._("User ")+conf["senv"]["login"]+zoo._(" authenticated")
+        sql=" UPDATE "+prefix+"users set last_con="+con.now+" WHERE login=[_login_]"
+        con.pexecute_req([req,{"login":{"value":inputs["login"]["value"],"format":"s"}}])
+        conn.commit()
+        #print >> sys.stderr, str(conf["senv"])
+        return zoo.SERVICE_SUCCEEDED
+    else:
+        conf["lenv"]["message"]=zoo._("Unable to connect with the provided login and password")
+        return zoo.SERVICE_FAILED
 
-		outputs["Result"]["value"]=zoo._("User ")+conf["senv"]["login"]+zoo._(" authenticated")
-		sql=" UPDATE "+prefix+"users set last_con="+con.now+" WHERE login=[_login_]"
-		con.pexecute_req([req,{"login":{"value":inputs["login"]["value"],"format":"s"}}])
-		conn.commit()
-		return zoo.SERVICE_SUCCEEDED
-	else:
-		conf["lenv"]["message"]=zoo._("Unable to connect with the provided login and password")
-		return zoo.SERVICE_FAILED
-
-	sys.path+=[conf["main"]["templatesPath"]]
-	conf["lenv"]["message"]=zoo._("Should never occur")
-	return zoo.SERVICE_FAILED
+    sys.path+=[conf["main"]["templatesPath"]]
+    conf["lenv"]["message"]=zoo._("Should never occur")
+    return zoo.SERVICE_FAILED
 

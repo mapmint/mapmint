@@ -1,0 +1,358 @@
+#encoding UTF-8
+
+#from Skeleton_bs import Skeleton_bs
+#extends Skeleton_bs
+
+#attr $mmodule = "Importers"
+
+#attr $ocss = ['colorpicker.css']
+
+#def istyles
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/font-mfizz.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.2.0/css/colReorder.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/1.0.7/css/responsive.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.0.0/css/select.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.3.0/css/colReorder.dataTables.min.css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/dataTables.bootstrap.min.css"/>
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-colorpicker.min.css"/>
+#end def
+
+
+#def page_title
+MapMint: $zoo._("Importers")
+#end def
+
+#def body
+#import zoo
+#import mm_access
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set prefix=auth.getPrefix($conf)
+#set cur=con.connect()
+#set cur=con.conn.cursor()
+
+#set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
+#include $tmpl
+#set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
+<script>
+var counter=0;
+</script>
+<div class="row">
+  <div class="col-sm-9">
+  <h2>
+   <i class="fa fa-upload"></i>
+   $zoo._("Importer:")
+   <span class="project-title" id="name_title">
+    $zoo._("Name of the selected importer")
+   </span>
+   <i class="fa fa-spinner fa-spin"></i>
+  </h2>
+  </div>
+</div>
+<div class="row">
+<div class="col-sm-5 col-lg-4">
+ $ftmpl.printButtonGroupA([
+  {"target":"adder","title":$zoo._("Add a document"),"classes": "fa fa-plus"},
+  {"target":"deleter","title":$zoo._("Dele a document"),"classes": "fa fa-trash"}
+])
+    <div id="adder" class="myWell collapse">
+      $ftmpl.printAdder({"id":"add-document","name": "dname","Name":$zoo._("Indicator Name"),"title":$zoo._("Add")})
+    </div>
+    <div id="deleter" class="myWell collapse">
+      <p>$zoo._("Do you really want to delete the document ?")</p>
+      <button class="btn btn-default pull-right" id="delete-document" type="button">$zoo._("Delete")</button>
+    </div>
+    <table id="listElements">
+      <thead>
+	<tr>
+	  <th>$zoo._("Id")</th>
+	  <th>$zoo._("Name")</th>
+	</tr>
+	</thead>
+      <tbody>
+      </tbody>
+    </table>
+</div>
+<div id="indicatorForm" class="col-sm-7 col-lg-8">
+#def printTab($obj)
+  <li role="presentation" #if $obj.keys().count("active")#class="active"#end if#><a role="tab" data-toggle="tab" href="#indicators_form_$obj["font"]"><i class="fa fa-$obj["font"]"> </i><span class="hidden-sm"> $obj["title"]</span></a></li>
+#end def
+
+#def label
+  <span>
+  $zoo._("File")
+  <input type="radio" name="doct" value="file"  selected="true" onclick="\$('#documents_url').hide();\$('#file').show();" />
+  $zoo._("URL")
+  <input type="radio" name="doct" value="url" onclick="\$('#documents_url').show();\$('#file').hide();" />
+  </span>
+#end def
+
+#def content($conf)
+  <textarea id="documents_url" class="form-control" style="display:none;"></textarea>
+  <form id="fileUpload" action="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=upload.saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="uploader">
+    <input type="file" name="file" id="file" class="form-control file" />
+    <a id="documents_file_link" href="" target="_blank"></a>
+  </form>
+  <input type="hidden" id="documents_filename" class="form-control" />
+  <iframe onload="if(counter>0){app.saveAnElement();counter=1;}else counter+=1;" name="uploader" id="uploader" style="display:none"></iframe>
+#end def
+
+#def label1
+  <span>
+  $zoo._("File")
+  <input type="radio" name="indicator_data_type" value="file"  selected="true" onclick="\$('.documents_itable').hide();\$('.ifile').show();\$('.documents_iquery').hide();" />
+  $zoo._("Table")
+  <input type="radio" name="indicator_data_type" value="db" onclick="\$('.documents_itable').show();\$('.ifile').hide();\$('.documents_iquery').hide();" />
+  $zoo._("Query")
+  <input type="radio" name="indicator_data_type" value="query" onclick="\$('.documents_iquery').show();\$('.documents_itable').hide();\$('.ifile').hide();" />
+  </span>
+#end def
+
+#def content1($conf)
+    <div class="row">
+    </div>
+#*    <div class="form-group documents_itable">
+      <label class="col-sm-3 control-label">
+        $zoo._("Table")
+      </label>
+      <div class="col-sm-9 ">
+#from Cheetah.Template import Template
+#set inputs0={"dataStore":{"value":$conf["main"]["dbuserName"]},"no-header":{"value":"true"}}
+#set outputs0={"Result":{"value":""}}
+$(Template(file=$conf["main"]["templatesPath"]+"/Distiller/PgWindow_bs.tmpl",searchList={"conf": $conf,"inputs": $inputs0,"outputs":$outputs0}))
+	<input type="hidden" name="data_table_dbname" value="$conf["main"]["dbuserName"]" />
+      </div>
+    </div>
+
+#set options=[[-1,$zoo._("Select a database")]]
+#import datastores.postgis.service as pg
+#import json
+#set ii={}
+#set ii["type"]={"value": "PostGIS"}
+#set outputs={"Result":{"value":""}}
+#set res=$pg.displayJson($conf,$ii,$outputs)
+#set t=json.loads($outputs["Result"]["value"])
+#try
+#set t=json.loads($outputs["Result"]["value"])
+#for i in range(0,len($t["sub_elements"]))
+#set $options+=[["PostGIS:"+$t["sub_elements"][i]["name"],$t["sub_elements"][i]["name"]]]
+#end for
+#except
+#pass
+#end try
+#set ii={}
+#set ii["type"]={"value": "MySQL"}
+#set res=$pg.displayJson($conf,$ii,$outputs)
+#try
+#set t=json.loads($outputs["Result"]["value"])
+#for i in range(0,len($t["sub_elements"]))
+#set $options+=[["MySQL:"+$t["sub_elements"][i]["name"],$t["sub_elements"][i]["name"]]]
+#end for
+#except
+#pass
+#end try
+
+     $ftmpl.printLine({"rid":"documents_indicators_database","id":"documents_database","name":$zoo._("Database"),"type":"select","options":$options,"classes":"documents_iquery"})
+
+
+    <div class="form-group documents_iquery">
+      <label class="col-sm-3 control-label">
+        $zoo._("SQL Query")
+      </label>
+      <div class="col-sm-9 ">
+      <div class="col-sm-9 ">
+        <textarea id="documents_data_query" class="form-control"></textarea>
+      </div>
+      $ftmpl.printButton({"id":"testSql","name":$zoo._("Test"),"classes":"btn-small col-sm-3" })
+      $ftmpl.printButton({"id":"runSql","name":$zoo._("Run"),"classes":"btn-small col-sm-3" })
+      </div>
+    </div>
+*#
+
+<script type="text/javascript">
+var icounter=0;
+</script>
+  <div class="ifile form-group">
+
+    $ftmpl.printLine({"rid":"documents_template_name","id":"template_name","name":$zoo._("Current template"),"classes":"disabled"})
+
+      <label class="col-sm-3 control-label">
+        $zoo._("Upload your file")
+      </label>
+      <div class="col-sm-9 ">
+      <div class="col-sm-9 ">
+  <form id="ifileUpload" action="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=upload.saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="iuploader">
+    <input type="file" name="file" id="ifile" class="form-control file" />
+    <a id="documents_ifile_link" href="" target="_blank"></a>
+  <input type="hidden" id="documents_ifilename" class="form-control" />
+  </form>
+  <iframe onload="if(icounter>0){/*app.saveAnElement();*/icounter=0;}else icounter+=1;" name="iuploader" id="iuploader" style="display:none"></iframe>
+      </div>
+      	   $ftmpl.printButton({"id":"import","name":$zoo._("Import"),"classes":"col-sm-3" })
+      </div>
+  </div>
+
+#set options=[[-1,$zoo._("First upload a file")]]
+  $ftmpl.printLine({"rid":"documents_ifile_page","id":"ifile_page","name":$zoo._("Choose a page"),"type":"select","options":$options,"classes":"ifile"})
+
+#set req="SELECT id,name from mm_tables.page_types order by name"
+#set res=$cur.execute($req)
+#set opts=$cur.fetchall()
+  $ftmpl.printLine({"rid":"documents_page_type","id":"page_type","name":$zoo._("Choose a type"),"type":"select","options":$opts})
+
+#end def
+
+
+
+<ul class="nav nav-tabs">
+$printTab({"font":"info","title":$zoo._("Metadata")})
+$printTab({"font":"link","title":$zoo._("Data")})
+$printTab({"font":"table","title":$zoo._("Table")})
+</ul>
+<div class="tab-content">
+  <div id="indicators_form_info" role="tabpanel" class="tab-pane" >
+<div  class="form-horizontal mtpp theForm ">
+
+      <input type="hidden" id="documents_id" value="-1" />
+
+$ftmpl.printLine({"rid":"documents_name","id":"dname","name":$zoo._("Name")})
+
+$ftmpl.printLine({"rid":"documents_description","id":"dname","type":"textarea","name":$zoo._("Description")})
+
+
+#set options=[]
+#set res=$cur.execute("SELECT id,name as val from "+$prefix+"groups order by name")
+#set vals=$cur.fetchall()
+#for i in range(0,len(vals))
+#set $options+=[[$vals[i][0],$vals[i][1]]]
+#end for
+    $ftmpl.printLine({"rid":"documents_groups","id":"groups","name":$zoo._("Groups"),"type":"multiple","options":$options})  
+#set options=[]
+#set res=cur.execute("SELECT id,name as val from "+$prefix+"themes order by name")
+#set vals=cur.fetchall()
+#for i in range(0,len(vals))
+#set $options+=[[$vals[i][0],$vals[i][1]]]
+#end for
+
+     $ftmpl.printLine({"rid":"documents_themes","id":"documents_themes","name":$zoo._("Theme"),"type":"multiple","options":$options})
+    $ftmpl.printButton({"id":"save","name":$zoo._("Save")})
+  </div>
+</div>
+
+  <div id="indicators_form_link" role="tabpanel" class="tab-pane form-horizontal" >
+    <input type="hidden" id="pages_id" value="-1"/>
+    $content1($conf)
+    $ftmpl.printButton({"id":"join","name":$zoo._("Save"),"classes":"disabled"})
+    $ftmpl.printButton({"id":"setAttribute","name":$zoo._("Set Attribute")})
+    $ftmpl.printButton({"id":"setValue","name":$zoo._("Set Value")})
+  </div>
+
+  <div id="indicators_form_table" role="tabpanel" class="tab-pane form-horizontal" >
+  <input type="hidden" id="documents_page_id" value="-1" />
+  <div id="page_table_init">
+  </div>
+ <script type="template/text" id="page_fields_table_template">
+  <h3>$zoo._("Table configuration")   <button class="btn btn-default savePageSettings">
+    $zoo._("Save")
+  </button>
+  </h3>
+  <table id="pages_fields_table_display">
+    <thead>
+      <tr>
+	<th style="width:25px"></th>
+	<th style="width:25px">$zoo._("Label")</th>
+	<th style="width:25px">$zoo._("Name")</th>
+	<th style="width:25px">$zoo._("Type")</th>
+	<th style="width:25px">$zoo._("Clause")</th>
+	<th style="width:25px">$zoo._("Value")</th>
+      </tr>
+    </thead>
+    <tbody>
+      [tbody]
+    </tbody>
+  </table>
+ </script>
+
+ <script type="template/text" id="page_fields_line_template">
+  <tr>
+    <td>
+      <i class="fa fa-arrows-v"> </i>[id]
+      <a href="#" onclick="\$(this).parent().parent().remove();return true;"><i class="fa fa-trash"> </i></a>
+      <input type="checkbox" onchange="try{app.editLine(\$(this));}catch(e){console.log(e)}"/>
+      <input type="hidden" name="field_id" value="[id]" />
+    </td>
+    <td>
+      <input type="text" class="form-control" disabled="disabled" name="field_label" value="[label]" />
+      <input type="hidden" name="field_label_index" value="[label_index]" />
+    </td>
+    <td><input type="text" class="form-control" name="field_name" value="[name]" /></td>
+    <td><select class="form-control" name="field_type">
+
+#set req="SELECT id,name from mm_tables.ftypes where ftype='e' and basic order by name"
+#set res=$cur.execute($req)
+#set svals=$cur.fetchall()
+#for i in range(len(svals))
+     <option value="$svals[i][0]">$svals[i][1]</option>
+#end for
+    
+    </select>
+    </td>
+    <td><input class="form-control" name="clause" type="text" value="[clause]" /></td>
+    <td><textarea class="form-control" name="value">[value]</textarea></td>
+  </tr>
+ </script>
+
+</div>
+
+
+</div>
+
+
+</div>
+
+<script type="template/text" id="dataSource_srs_template">
+</script>
+
+<script type="template/text" id="dataSource_template">
+#set objs=[
+{"name": "toggle","title": $zoo._('Toggle table'),"font":"fa-toggle-down"},
+]
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+	<span><i class="[font] fa-fw" ></i> [datasource]
+        <div class="pull-right">
+	  <div class="btn-group">
+#for i in $objs
+	    <button data-mmaction="$i.name" data-toggle="tooltip" title="$i.title" type="button" class="btn btn-default btn-xs #if $i.name=="georeference"#hide#end if# hidden-md hidden-xs hidden-sm #if $i.font=="fa-toggle-down"#collapser#end if#">
+	    <i class="fa $i.font fa-fw"></i>
+	    </button>
+#end for	    
+	    <button type="button" class="btn btn-default btn-xs dropdown-toggle hidden-lg" data-toggle="dropdown">
+	    <span class="caret"></span>
+	    </button>
+	    <ul class="dropdown-menu pull-right" role="menu">
+#for i in $objs
+	      <li><a  data-mmaction="$i.name" href="#"><i class="fa $i.font fa-fw"></i> $i.title</a></li>
+#end for
+	    </ul>
+	  </div>
+	</div>
+	</span>
+      </div>
+      <div class="panel-body collapse in">
+	<i class="fa fa-spinner fa-spin"></i> $zoo._("Loading datasource ...")
+      </div>	
+    </div>
+      </div>
+</div>
+</script>
+
+ <script type="template/text" id="class_styler_template">
+   #include $conf['main']['templatesPath']+"/Manager/Styler/UniqSymb_bs.html"
+ </script>
+
+#end def

@@ -72,6 +72,8 @@ def saveOnServer(conf,inputs,outputs):
 
 def saveOnServer0(conf,inputs,outputs):
     import shutil,json
+    print >> sys.stderr,"ok1 "+str(inputs)
+    print >> sys.stderr,"ok1 "+str(conf)
     dir=conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["senv"]["MMID"]
     try:
         shutil.os.mkdir(dir)
@@ -79,6 +81,7 @@ def saveOnServer0(conf,inputs,outputs):
         print >> sys.stderr,str(e)
         pass
     field="file"
+    print >> sys.stderr,inputs
     if inputs.has_key("filename"):
         field=inputs["filename"]["value"]
     tmp=inputs[field]["lref"].split("/")
@@ -88,7 +91,7 @@ def saveOnServer0(conf,inputs,outputs):
     conf["senv"]["last_ufile"]=outFileName
     import mmsession
     mmsession.save(conf)
-    res={"message":zoo._("Your [file] file was uploaded on the server").replace("\[file\]",tmp[len(tmp)-1])}
+    res={"files": [{"message":zoo._("Your [file] file was uploaded on the server").replace("\[file\]",tmp[len(tmp)-1]),"fileName":outFileName}]}
     outputs["Result"]["value"]=json.dumps(res)
     return 3
 

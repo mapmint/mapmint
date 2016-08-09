@@ -217,8 +217,12 @@ def parseDocAttr(conf,inputs,outputs):
     import json
     res=[]
     import zipfile
-    if inputs.has_key("fullpath") and inputs["fullpath"]["value"]=="true":
-        fh = open(inputs["template"]["value"],"rb")
+    if inputs.has_key("fullpath"):
+        if inputs["fullpath"]["value"]=="true":
+            fh = open(inputs["template"]["value"],"rb")
+        else:
+            if inputs["fullpath"]["value"]=="tmp":
+                fh = open(conf["main"]["tmpPath"]+"data_tmp_1111"+conf["senv"]["MMID"]+"/"+inputs["template"]["value"],"rb")
     else:
         fh = open(conf["main"]["publicationPath"]+"/idx_templates/"+inputs["template"]["value"],"rb")
     z = zipfile.ZipFile(fh)
@@ -762,6 +766,21 @@ def saveRepportSettings(conf,inputs,outputs):
     outputs["Result"]["value"]=zoo._("Repport settings saved")
     return zoo.SERVICE_SUCCEEDED
 
+def fetchPrimaryKey(cur,tblName):
+    # Extract informations about Primary key or fallback to default "ogc_fid"
+    import datastores.postgis.pgConnection as pg
+    cur.execute(pg.getDesc(cur,tblName))
+    vals=cur.fetchall()
+    cfield=None
+    geomc=None
+    for i in range(0,len(vals)):
+        if i==0:
+            cfield=vals[i][1]
+        if vals[i][3]=="PRI":
+            cfield=vals[i][1]
+            return cfield
+    return cfield
+        
 def createAgregate(conf,inputs,outputs):
     import mapscript
     con=auth.getCon(conf)
@@ -1232,7 +1251,10 @@ def list(conf,inputs,outputs):
             if inputs["table"]["value"]=="idicateurs":
                 res=listDefault(prefix+inputs["table"]["value"],cur," order by ord")
             else:
-                res=listDefault(prefix+inputs["table"]["value"],cur)
+                if inputs["table"]["value"].count('.')>0:
+                    res=listDefault(inputs["table"]["value"],cur)
+                else:
+                    res=listDefault(prefix+inputs["table"]["value"],cur)
     if res is not None:
         for i in res:
             i["selected"]=True
@@ -1265,8 +1287,16 @@ def insertElement(conf,inputs,outputs):
 	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
 	return zoo.SERVICE_FAILED
     try:
-        prefix=auth.getPrefix(conf)
-        cur.execute("INSERT INTO "+prefix+inputs["table"]["value"]+" (name) VALUES ("+str(adapt(inputs["name"]["value"]))+")")
+        col_sufix=""
+        val_sufix=""
+        if inputs["table"]["value"].count(".")>0:
+            prefix=""
+            if inputs.keys().count('title'):
+                col_sufix=",title"
+                val_sufix=","+str(adapt(inputs["title"]["value"]))
+        else:
+            prefix=auth.getPrefix(conf)
+        cur.execute("INSERT INTO "+prefix+inputs["table"]["value"]+" (name"+col_sufix+") VALUES ("+str(adapt(inputs["name"]["value"]))+""+val_sufix+")")
         outputs["Result"]["value"]=zoo._("Done")
     except Exception,e:
         conf["lenv"]["message"]=zoo._("An error occured when processing your request: ")+str(e)
@@ -1406,7 +1436,10 @@ def updateElem(conf,inputs,outputs):
 	clause=""
 	if inputs.has_key('tid'):
 		print >> sys.stderr,""
-        req="UPDATE "+prefix+inputs["table"]["value"]+" set "+fields+" where id="+inputs["id"]["value"]
+        tableName=prefix+inputs["table"]["value"]
+        if inputs["table"]["value"].count('.')>0:
+            tableName=inputs["table"]["value"]
+        req="UPDATE "+tableName+" set "+fields+" where id="+inputs["id"]["value"]
         print >> sys.stderr,req
         cur.execute(req)
         con.conn.commit()
@@ -1475,7 +1508,10 @@ def updateElement(conf,inputs,outputs):
             print >> sys.stderr,"li_d"
         
     prefix=auth.getPrefix(conf)
-    req0="UPDATE "+prefix+inputs["table"]["value"]+" set "
+    tableName=prefix+inputs["table"]["value"]
+    if inputs["table"]["value"].count('.')>0:
+        tableName=prefix+inputs["table"]["value"]
+    req0="UPDATE "+tableName+" set "
     clause="id=[_id_]"
     #clause="id="+str(obj["id"])
     keys=obj.keys()
@@ -1583,7 +1619,13 @@ def deleteElement(conf,inputs,outputs):
         if inputs["table"]["value"]=="themes":
             con.pexecute_req(["DELETE FROM "+prefix+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
         else:
-            con.pexecute_req(["DELETE FROM "+prefix+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
+            if inputs["table"]["value"].count('.')==0 and inputs["table"]["value"]!="p_tables":
+                con.pexecute_req(["DELETE FROM "+prefix+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
+            else:
+                if inputs["table"]["value"]=="p_tables":
+                    con.pexecute_req(["DELETE FROM mm_tables."+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
+                else:
+                    con.pexecute_req(["DELETE FROM "+inputs["table"]["value"]+" where id=[_id_]",{"id":{"value":inputs["id"]["value"],"format":"s"}}])
             if inputs["table"]["value"]=="indicators":
                 import glob,os,shutil
                 rpath=conf["main"]["dataPath"]+"/indexes_maps/"
@@ -1876,6 +1918,66 @@ def detailsIndicateurs(conf,inputs,cur,val,tab,prefix):
 
     return res
 
+def getTableElements(conf,con,cur,res,att,tbl,col):
+    import datastores.postgis.pgConnection as pg
+    import json
+    hasTheme=False
+    try:
+        req="select *,array[(select tid from mm_tables.p_"+tbl+"_themes where mm_tables.p_"+tbl+"s.id=mm_tables.p_"+tbl+"_themes."+col+")],array[(select gid from mm_tables.p_"+tbl+"_groups where mm_tables.p_"+tbl+"s.id=mm_tables.p_"+tbl+"_groups."+col+")] from mm_tables.p_"+tbl+"s where ptid="+res["id"]+";"
+        cur.execute(req)
+        con.conn.commit()
+        hasTheme=True
+    except:
+        con.conn.commit()
+        req="select *,array((select gid from mm_tables.p_"+tbl+"_groups where mm_tables.p_"+tbl+"s.id=mm_tables.p_"+tbl+"_groups."+col+")) from mm_tables.p_"+tbl+"s where ptid="+res["id"]+";"
+        cur.execute(req)
+        con.conn.commit()
+    res1=cur.fetchall()
+    res[att]=[]
+    for j in range(len(res1)):
+        tmp=res1[j]
+        outputs1={"Result":{}}
+        tres1=pg.getTableDescription(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":{"value": "mm_tables.p_"+tbl+"_fields"}},outputs1)
+        tres1=json.loads(outputs1["Result"]["value"])
+        tres2=pg.getTableDescription(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":{"value": "mm_tables.p_"+tbl+"s"}},outputs1)
+        tres2=json.loads(outputs1["Result"]["value"])
+        req="select * from mm_tables.p_"+tbl+"_fields where "+col+"="+str(tmp[0])+";"
+        cur.execute(req)
+        values=[]
+        vals=cur.fetchall()
+        values1={}
+        print >> sys.stderr,tres1
+        for k in range(len(tres2)):
+            print >> sys.stderr,tres2[k][2]
+            if tres2[k][2]=="bytea":
+                try:
+                    obj=unpackFile(conf,tmp[k])
+                    values1[tres2[k][1]]=obj["name"]
+                except:
+                    try:
+                        values1[tres2[k][1]]=str(tmp[k].encode('utf-8'))
+                    except:
+                        values1[tres2[k][1]]=str(tmp[k])
+            else:
+                try:
+                    values1[tres2[k][1]]=str(tmp[k].encode('utf-8'))
+                except:
+                    values1[tres2[k][1]]=str(tmp[k])
+        if hasTheme:
+            values1["themes"]=str(tmp[len(tres2)])
+            values1["groups"]=str(tmp[len(tres2)+1])
+        else:
+            values1["groups"]=str(tmp[len(tres2)])
+        for l in range(len(vals)):
+            lfields={}
+            for k in range(len(tres1)):
+                try:
+                    lfields[tres1[k][1]]=str(vals[l][k].encode('utf-8')).decode('utf-8')
+                except:
+                    lfields[tres1[k][1]]=str(vals[l][k])
+            values+=[lfields]
+        res[att]+=[{"fields":values,"view":values1}]
+
 def details(conf,inputs,outputs):
     import json,time,os
     con=auth.getCon(conf)
@@ -1937,12 +2039,108 @@ def details(conf,inputs,outputs):
             conf["senv"]["last_index"]=inputs["id"]["value"]
         if inputs["table"]["value"]=="documents":
             res=detailsDocuments(con,inputs["id"]["value"],prefix)
+        if inputs["table"]["value"].count("."):
+            import datastores.postgis.pgConnection as pg
+            outputs0=[{"Result":{"value":""}},{"Result":{"value":""}},{"Result":{"value":""}},{"Result":{"value":""}}]
+            tres=pg.getTableDescription(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":inputs["table"],"clause":{"value":"id='"+inputs["id"]["value"]+"'"}},outputs0[0])
+            tres=pg.getTableContent(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":inputs["table"],"clause":{"value":"id='"+inputs["id"]["value"]+"'"}},outputs0[1])
+            desc=json.loads(outputs0[0]["Result"]["value"])
+            content=json.loads(outputs0[1]["Result"]["value"])
+            res={}
+            for i in range(0,len(desc)):
+                res[str(desc[i][1]).encode("utf-8")]=content["rows"][0]["cell"][i]
+                print >> sys.stderr,desc[i][1]
+            if inputs["table"]["value"]=="mm_tables.importers":
+                req="select template,ARRAY((select tid from mm_tables.importer_themes where mm_tables.importers.id=mm_tables.importer_themes.iid)),ARRAY((select gid from mm_tables.importer_groups where mm_tables.importers.id=mm_tables.importer_groups.iid)) from mm_tables.importers where id="+res["id"]+";"
+                print >> sys.stderr," --------- "+str(req)+" --------- "
+                cur.execute(req)
+                res1=cur.fetchall()
+                for j in range(len(res1)):
+                    try:
+                        lfile=unpackFile(conf,res1[j][0])
+                        tmp=lfile["name"].split("/")
+                        res["template_name"]=tmp[len(tmp)-1]
+                        res["otemplate"]=lfile["name"]
+                        conf["senv"]["last_file"]=lfile["name"]
+                        res["template"]=lfile["name"].replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])
+                    except:
+                        continue
+                    res["themes"]=res1[j][1]
+                    res["groups"]=res1[j][2]
+                tres=pg.getTableDescription(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":{"value":"mm_tables.pages"},"clause":{"value":"iid='"+res["id"]+"'"}},outputs0[2])
+                ldesc=json.loads(outputs0[2]["Result"]["value"])
+                
+                req="select * from mm_tables.pages where iid="+res["id"]+";"
+                cur.execute(req)
+                res1=cur.fetchall()
+                res["pages"]={}
+                lres=[]
+                for j in range(len(res1)):
+                    lobj={}
+                    for l in range(0,len(ldesc)):
+                        lobj[str(ldesc[l][1]).encode("utf-8")]=res1[j][l]
+                    
+                    tres=pg.getTableDescription(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":{"value":"mm_tables.page_fields"},"clause":{"value":"pid='"+str(res1[j][0])+"'"}},outputs0[3])
+                    print >> sys.stderr,"******** -- "+str(outputs0[3])+" -- **************"
+                    ldesc1=json.loads(outputs0[3]["Result"]["value"])
+                    req="select * from mm_tables.page_fields where pid="+str(res1[j][0])+";"
+                    cur.execute(req)
+                    res2=cur.fetchall()
+                    lfields=[]
+                    for k in range(len(res2)):
+                        lobj1={}
+                        for l in range(0,len(ldesc1)):
+                            lobj1[str(ldesc1[l][1]).encode("utf-8")]=res2[k][l]
+                        lfields+=[lobj1]
+
+                    lobj["fields"]=lfields
+                    res["pages"][lobj["name"]]=lobj
+
+            if inputs["table"]["value"]=="mm_tables.p_tables":
+                #print >> sys.stderr,res['name']
+                getTableElements(conf,con,cur,res,"mmEdits","edition","eid")
+                getTableElements(conf,con,cur,res,"mmReports","report","rid")
+                tres=pg.getTableDescription(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":{"value": res["name"]}},outputs0[2])
+                req="select *,ARRAY(select tid from mm_tables.p_view_themes where mm_tables.p_views.id=mm_tables.p_view_themes.vid),ARRAY(select gid from mm_tables.p_view_groups where mm_tables.p_views.id=mm_tables.p_view_groups.vid) from mm_tables.p_views where ptid="+res["id"]+";"
+                cur.execute(req)
+                res1=cur.fetchall()
+                res["mmViews"]=[]
+                for j in range(len(res1)):
+                    tmp=res1[j]
+                    outputs1={"Result":{}}
+                    tres1=pg.getTableDescription(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":{"value": "mm_tables.p_view_fields"}},outputs1)
+                    tres1=json.loads(outputs1["Result"]["value"])
+                    tres2=pg.getTableDescription(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":{"value": "mm_tables.p_views"}},outputs1)
+                    tres2=json.loads(outputs1["Result"]["value"])
+                    req="select * from mm_tables.p_view_fields where vid="+str(tmp[0])+";"
+                    cur.execute(req)
+                    values=[]
+                    vals=cur.fetchall()
+                    values1={}
+                    print >> sys.stderr,tres1
+                    for k in range(len(tres2)):
+                        try:
+                            values1[tres2[k][1]]=str(tmp[k].encode('utf-8'))
+                        except:
+                            values1[tres2[k][1]]=str(tmp[k])
+                    values1["themes"]=str(tmp[len(tres2)])
+                    values1["groups"]=str(tmp[len(tres2)+1])
+                    for l in range(len(vals)):
+                        lfields={}
+                        for k in range(len(tres1)):
+                            try:
+                                lfields[tres1[k][1]]=str(vals[l][k].encode('utf-8'))
+                            except:
+                                lfields[tres1[k][1]]=str(vals[l][k])
+                        values+=[lfields]
+                    res["mmViews"]+=[{"fields":values,"view":values1}]
+                res["mmDesc"]=json.loads(outputs0[2]["Result"]["value"])
     if res.has_key("file_link"):
         conf["senv"]["last_file"]=res["file_link"]
     if res is not None:
         print >> sys.stderr,res
-        outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False).encode('utf-8')
-        #outputs["Result"]["value"]=json.dumps(res)
+        #outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False).encode('utf-8')
+        outputs["Result"]["value"]=json.dumps(res)
     else:
         conf["lenv"]["message"]="Unable to access table"
         return zoo.SERVICE_FAILED
@@ -2805,4 +3003,690 @@ def viewStatOnly(conf,inputs,outputs):
         conf["lenv"]["message"]=str(e)
         return zoo.SERVICE_FAILED
 
+
+def insert(conf,inputs,outputs):
+    import json
+    con=auth.getCon(conf)
+    con.connect()
+    cur=con.conn.cursor()
+    if not(auth.is_ftable(inputs["table"]["value"])):
+        conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+        return zoo.SERVICE_FAILED
+    try:
+        if inputs["table"]["value"]=="mm_tables.p_editions":
+            req="SELECT name from mm_tables.p_tables where id="+inputs["ptid"]["value"]
+            res=cur.execute(req)
+            vals=cur.fetchone()
+            tbl=vals[0]
+            try:
+                res=cur.execute("ALTER TABLE "+tbl+" ADD COLUMN uid int4 references mm.users(id);")
+            except Exception,e:
+                print >> sys.stderr,e
+                pass
+            con.conn.commit()
+            if tbl.count("mm_ghosts.")==0:
+                req="SELECT generate_create_ghost_table_statement('"+vals[0]+"')"
+                res=cur.execute(req)
+                vals=cur.fetchone()
+                try:
+                    res=cur.execute("BEGIN;"+vals[0]+";COMMIT;")
+                except:
+                    pass
+                con.conn.commit()
+                try:
+                    req="DROP TRIGGER mm_tables_"+tbl.replace(".","_")+"_update_history on "+tbl+";"
+                    res=cur.execute(req)
+                except Exception,e:
+                    print >> sys.stderr,e
+                    pass
+                con.conn.commit()
+                try:
+                    req="CREATE TRIGGER mm_tables_"+tbl.replace(".","_")+"_update_history BEFORE UPDATE OR DELETE OR INSERT ON "+tbl+" FOR EACH ROW EXECUTE PROCEDURE update_ghosts()"
+                    res=cur.execute(req)
+                except Exception,e:
+                    print >> sys.stderr,e
+                    pass
+                con.conn.commit()
+        col_sufix=""
+        val_sufix=""
+        columns=json.loads(inputs["columns"]["value"])
+        for i in range(len(columns)):
+            content=None
+            print >> sys.stderr,"COLUMN i: "+columns[i]
+            if i>0:
+                col_sufix+=","
+                val_sufix+=","
+            if inputs.keys().count("id")==0:
+                print >> sys.stderr,"OK "
+                col_sufix+=columns[i]
+                print >> sys.stderr,"OK "
+                print >> sys.stderr,str(inputs[columns[i]]["value"])
+                if columns[i]=="file":
+                    content=packFile(conf,conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["senv"]["MMID"]+"/"+inputs[columns[i]]["value"],columns[i])
+                    val_sufix+="%s"
+                else:
+                    val_sufix+=str(adapt(str(inputs[columns[i]]["value"]))).decode('utf-8')
+            else:
+                if columns[i]=="file":
+                    content=packFile(conf,conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["senv"]["MMID"]+"/"+inputs[columns[i]]["value"],columns[i])
+                    #print >> sys.stderr,content
+                    col_sufix+=columns[i]+"=%s"
+                else:
+                    try:
+                        col_sufix+=columns[i]+"="+str(adapt(str(inputs[columns[i]]["value"]))).decode('utf-8')
+                    except:
+                        col_sufix+=columns[i]+"="+str(adapt(str(inputs[columns[i]]["value"])))
+            print >> sys.stderr,val_sufix.encode('utf-8')
+        if len(columns)>0:
+            if inputs.keys().count("id")==0:
+                req="INSERT INTO "+inputs["table"]["value"]+" ("+col_sufix+") VALUES ("+(val_sufix)+") RETURNING id"
+                print >> sys.stderr,req.encode('utf-8')
+                if content is not None:
+                    cur.execute(req,(psycopg2.Binary(content),))
+                else:
+                    cur.execute(req)
+                cid=str(cur.fetchone()[0])
+            else:
+                val_sufix="id="+inputs["id"]["value"]
+                req="UPDATE "+inputs["table"]["value"]+" set "+col_sufix+" WHERE "+val_sufix
+                print >> sys.stderr,req.encode('utf-8')
+                if content is not None:
+                    cur.execute(req,(psycopg2.Binary(content),))
+                else:
+                    cur.execute(req)
+                cid=inputs["id"]["value"]
+            outputs["id"]["value"]=json.dumps(cid)
+        else:
+            if inputs.keys().count("id")>0:
+                outputs["id"]["value"]=inputs["id"]["value"]
+            else:
+                outputs["id"]["value"]="-1"
+            cid=outputs["id"]["value"]
+        if inputs.keys().count("links")>0:
+            links=json.loads(inputs["links"]["value"])
+            lkeys=links.keys()
+            for j in range(len(lkeys)):
+                obj=json.loads(inputs[lkeys[j]]["value"])
+                req="DELETE FROM "+links[lkeys[j]]["table"]+" where "+links[lkeys[j]]["ocol"]+"="+cid+";"
+                try:
+                    cur.execute(req)
+                    print >> sys.stderr,req
+                    con.conn.commit()
+                    req=""
+                except:
+                    con.conn.commit()
+                    req=""
+                print >> sys.stderr,req
+                for k in range(len(obj)):
+                    if links[lkeys[j]]["ocol"]!=links[lkeys[j]]["tid"]:
+                        req="INSERT INTO "+links[lkeys[j]]["table"]+" ("+links[lkeys[j]]["ocol"]+","+links[lkeys[j]]["tid"]+") VALUES ("+cid+","+obj[k]+");"
+                    else:
+                        lcols=obj[k].keys()
+                        col_sufix=links[lkeys[j]]["ocol"]
+                        val_sufix=cid
+                        for i in range(len(lcols)):
+                            print >> sys.stderr,obj[k][lcols[i]].encode('utf-8')
+                            col_sufix+=","+lcols[i]
+                            val_sufix+=","+str(adapt(str(obj[k][lcols[i]].encode('utf-8')))).decode('utf-8')
+                        req="INSERT INTO "+links[lkeys[j]]["table"]+" ("+col_sufix+") VALUES ("+val_sufix+");"
+                    print >> sys.stderr,req.encode('utf-8')
+                    cur.execute(req)
+                    con.conn.commit()
+        outputs["Result"]["value"]=zoo._("Done")
+    except Exception,e:
+        import traceback
+        print >> sys.stderr, traceback.format_exc()
+        conf["lenv"]["message"]=zoo._("An error occured when processing your request: ")+str(e)+" \n"+str(traceback.format_exc())
+        return zoo.SERVICE_FAILED
+    con.conn.commit()
+    con.conn.close()
+    return zoo.SERVICE_SUCCEEDED
+
+def packFile(conf,fileName,field):
+    binary_file=open(fileName, "rb")
+    prefix=bytearray(fileName.encode('utf-8')) # bytearray from the original file name
+    res=prefix+bytearray(512-len(prefix))+binary_file.read()
+    return res
+
+def unpackFile(conf,content):
+    fileName=conf["main"]["tmpPath"]+"/tmp_data"+conf["lenv"]["usid"]+".bin"
+    binary_file=open(fileName, "wb")
+    binary_file.write(content)
+    binary_file.close()
+    binary_file=open(fileName, "rb")
+    head=binary_file.read(512)
+    return {"name": head.decode('utf-8').split("\x00")[0],"content": binary_file.read()}
+
+def clientDelete(conf,inputs,outputs):
+    import json
+    from datastores.postgis import pgConnection as pg
+    con=auth.getCon(conf)
+    con.connect()
+    cur=con.conn.cursor()
+    try:
+        req="SELECT name FROM mm_tables.p_tables WHERE id="+inputs["tableId"]["value"]
+        cur.execute(req)
+        val=cur.fetchone()
+        req=pg.getDesc(cur,val[0])
+        cur.execute(req)
+        vals=cur.fetchall()
+        cId=None
+        for i in range(len(vals)):
+            if vals[i][3]=='PRI':
+                cid=vals[i][1]
+                break
+        if cid is not None:
+            req="DELETE FROM "+val[0]+" WHERE "+cid+"="+inputs["tupleId"]["value"]
+            try:
+                cur.execute(req)
+            except Exception,e:
+                conf["lenv"]["message"]=zoo._("Unable to delete element: "+str(e))
+                return zoo.SERVICE_FAILED
+            con.conn.commit()
+    except Exception,e:
+        conf["lenv"]["message"]=zoo._("Unable to delete element: "+str(e))
+        return zoo.SERVICE_FAILED
+    outputs["Result"]["value"]=zoo._('Done')
+    return zoo.SERVICE_SUCCEEDED
+
+def saveUploadedFile(conf,inputs,outputs):
+    import json
+    con=auth.getCon(conf)
+    con.connect()
+    cur=con.conn.cursor()
+    content=packFile(conf,inputs["file"]["value"],inputs["field"]["value"])
+    cur.execute("UPDATE "+inputs["table"]["value"]+" set "+inputs["field"]["value"]+"=%s WHERE id="+inputs["id"]["value"],(psycopg2.Binary(content),))
+    con.conn.commit()
+    outputs["Result"]["value"]=zoo._('Done')
+    return zoo.SERVICE_SUCCEEDED
+            
+def clientInsert(conf,inputs,outputs):
+    import json
+    con=auth.getCon(conf)
+    con.connect()
+    cur=con.conn.cursor()
+    try:
+        req="SELECT name from mm_tables.p_tables where id="+inputs["tableId"]["value"]
+        res=cur.execute(req)
+        vals=cur.fetchone()
+    except Exception,e:
+        conf["lenv"]["message"]=zoo._("Unable to identify your parameter as a tableId: ")+req+str(e)
+        return zoo.SERVICE_FAILED
+    tableName=vals[0]
+    if not(auth.is_ftable(tableName)):
+        conf["lenv"]["message"]=zoo._("Unable to identify your parameter as a table")
+        return zoo.SERVICE_FAILED
+    try:
+        req="SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.ftypes,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_edition_fields.ftype=mm_tables.ftypes.id and not(mm_tables.ftypes.basic) and mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+inputs["editId"]["value"]+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where name='"+conf["senv"]["group"]+"')) as a ORDER BY a.id"
+        res=cur.execute(req)
+        originalColumns=cur.fetchall()
+        print >> sys.stderr,originalColumns
+        dcols=[]
+        dvals=[]
+        specialFields=[]
+        for i in range(len(originalColumns)):
+            dcols+=[{"name": originalColumns[i][2], "type": originalColumns[i][3],"value": originalColumns[i][4]}] # name type
+            specialFields+=[originalColumns[i][2]]
+        print >> sys.stderr,"DCOLS"
+        print >> sys.stderr,dcols
+        col_sufix=""
+        val_sufix=""
+        tuple=json.loads(inputs["tuple"]["value"])
+        tupleReal=json.loads(inputs["tupleReal"]["value"])
+        realKeys=tupleReal.keys()
+        keys=tuple.keys()
+        columns=realKeys+keys
+        print >> sys.stderr,columns
+        for i in range(len(columns)):
+            if specialFields.count(columns[i])==0:
+                print >> sys.stderr,columns[i]
+                if i>0:
+                    col_sufix+=","
+                    val_sufix+=","
+                if inputs.keys().count("id")==0:
+                    print >> sys.stderr,"TUPLE "+str(i)
+                    col_sufix+=columns[i]
+                    if i >= len(realKeys):
+                        print >> sys.stderr," * "+str(tuple[columns[i]].encode("utf-8"))
+                        val_sufix+=str(adapt(str(tuple[columns[i]].encode("utf-8"))))
+                    else:
+                        print >> sys.stderr," * "+str(tupleReal[columns[i]])
+                        val_sufix+=str(tupleReal[columns[i]])
+                else:
+                    print >> sys.stderr,"TUPLE "+str(i)
+                    if i >= len(realKeys):
+                        print >> sys.stderr,"TUPLE "
+                        print >> sys.stderr," * "+str(tuple[columns[i]].encode("utf-8"))
+                        print >> sys.stderr," * "+str(adapt(str(tuple[columns[i]].encode("utf-8"))))
+                        col_sufix+=columns[i]+"="+str(adapt(str(tuple[columns[i]].encode("utf-8")))).decode('utf-8')
+                        print >> sys.stderr," * "+str(adapt(str(tuple[columns[i]].encode("utf-8"))))
+                    else:
+                        print >> sys.stderr,"TUPLE "
+                        print >> sys.stderr,tupleReal[columns[i]].decode("utf-8")
+                        col_sufix+=columns[i]+"="+str(tupleReal[columns[i]])
+            else:
+                hasElement=False
+                if dcols[specialFields.index(columns[i])]["type"]=="tbl_list":
+                    if i>0:
+                        col_sufix+=","
+                        val_sufix+=","
+                    if inputs.keys().count("id")==0:
+                        col_sufix+=columns[i]
+                        val_sufix+=str(adapt(str(tuple[columns[i]])))
+                    else:
+                        col_sufix+=columns[i]+"="+str(adapt(str(tuple[columns[i]])))
+                else:
+                    if i >= len(realKeys):
+                        dvals+=[tuple[columns[i]]]
+                    else:
+                        dvals+=[tupleReal[columns[i]]]
+                
+        if inputs.keys().count("id")==0:
+            print >> sys.stderr,"COLS"
+            print >> sys.stderr,col_sufix
+            print >> sys.stderr,"VALS"
+            print >> sys.stderr,val_sufix
+            req="INSERT INTO "+tableName+" ("+col_sufix+") VALUES ("+val_sufix.decode("'utf-8")+") RETURNING id"
+            print >> sys.stderr,"VALS"
+            print >> sys.stderr,req.encode("utf-8")
+            cur.execute(req)
+            print >> sys.stderr,"VALS"
+            cid=str(cur.fetchone()[0])
+            print >> sys.stderr,"VALS"
+        else:
+            f=fetchPrimaryKey(cur,tableName)
+            val_sufix=f+"="+inputs["id"]["value"]
+            print >> sys.stderr,tableName
+            print >> sys.stderr,col_sufix.encode("utf-8")
+            print >> sys.stderr,val_sufix
+            req="UPDATE "+tableName+" set "+col_sufix+" WHERE "+val_sufix
+            #print >> sys.stderr,str(req.encode("utf-8"))
+            cur.execute(req)
+            cid=inputs["id"]["value"]
+        for i in range(len(dcols)):
+            print >> sys.stderr,dcols[i]
+            if dcols[i]["type"]=="bytea":
+                print >> sys.stderr,dcols[i]
+                if inputs.keys().count("id"):
+                    cid=inputs["id"]["value"]
+                #try:
+                content=packFile(conf,tuple[dcols[i]["name"]],dcols[i]["name"])
+                print >> sys.stderr,content
+                cur.execute("UPDATE "+tableName+" set "+dcols[i]["name"]+"=%s WHERE id="+cid,(psycopg2.Binary(content),))
+                #except Exception,e:
+                #    print >> sys.stderr,e
+                
+            if dcols[i]["type"]=="tbl_linked":
+                lcomponents=dcols[i]["value"].split(';')
+                if inputs.keys().count("id"):
+                    cid=inputs["id"]["value"]
+                # Remove possible previous tuple refering this element
+                try:
+                    req="DELETE FROM "+lcomponents[2]+" where "+lcomponents[0]+" = "+cid
+                    print >> sys.stderr,req
+                    cur.execute(req)
+                except:
+                    con.conn.commit()
+                for j in range(len(dvals[i])):
+                    try:
+                        req="INSERT INTO "+lcomponents[2]+" ("+lcomponents[0]+","+lcomponents[1]+") VALUES ("+cid+","+str(dvals[i][j])+")"
+                        print >> sys.stderr,req
+                        cur.execute(req)
+                    except:
+                        con.conn.commit()
+            con.conn.commit()
+                
+        outputs["Result"]["value"]=zoo._("Done")
+    except Exception,e:
+        import traceback
+        conf["lenv"]["message"]=zoo._("An error occured when processing your request: ")+str(e)+"\n"+str(traceback.format_exc())
+        return zoo.SERVICE_FAILED
+    con.conn.commit()
+    con.conn.close()
+    return zoo.SERVICE_SUCCEEDED
+
+def _clientPrint(conf,cur,tableId,cid,rName=None):
+    import json
+    try:
+        req="SELECT name from mm_tables.p_tables where id="+tableId
+        res=cur.execute(req)
+        vals=cur.fetchone()
+    except Exception,e:
+        conf["lenv"]["message"]=zoo._("Unable to identify your parameter as a tableId: ")+req+str(e)
+        return None
+    tableName=vals[0]
+    if rName is None:
+        req="SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid="+tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='"+conf["senv"]["id"]+"') order by mm_tables.p_reports.id asc"
+    else:
+        req="SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid="+tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='"+conf["senv"]["id"]+"') and mm_tables.p_reports.name="+str(adapt(str(rName)))+" order by mm_tables.p_reports.id asc"
+    print >> sys.stderr,req
+    res=cur.execute(req)
+    ovals0=cur.fetchall()
+    print >> sys.stderr,ovals0
+    if len(ovals0)==0:
+        conf["lenv"]["message"]=zoo._("Unable to find any report for the current element")
+        return None
+    req="SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_report_fields.name) mm_tables.p_report_fields.rid as rid,mm_tables.p_report_fields.id,mm_tables.p_report_fields.name,(select code from mm_tables.ftypes where mm_tables.ftypes.id=mm_tables.p_report_fields.ftype),mm_tables.p_report_fields.value FROM mm_tables.p_reports,mm_tables.p_report_fields,mm.groups,mm_tables.p_report_groups where mm_tables.p_reports.id=mm_tables.p_report_fields.rid and mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid="+tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='"+conf["senv"]["id"]+"') and mm_tables.p_reports.id="+str(ovals0[0][0])+") as a ORDER BY a.id"
+    print >> sys.stderr,req
+    res=cur.execute(req)
+    vals0=cur.fetchall()
+    rcolumns=[]
+    postDocuments=[]
+    for i in range(len(vals0)):
+        print >> sys.stderr,vals0[i][3]
+        print >> sys.stderr,str(vals0[i])
+        if vals0[i][3]!="multiple_doc":
+            rcolumns+=[vals0[i][4]]
+        else:
+            postDocuments+=[vals0[i][4]]
+    rfields=(",".join(rcolumns))
+    print >> sys.stderr,rfields
+    print >> sys.stderr,"*********** ["+str(postDocuments)+"] ***********"
+    
+    rreq="SELECT "+rfields+" from "+tableName+" where id="+cid+" AND "+ovals0[0][3]
+    print >> sys.stderr,vals0
+    res=cur.execute(rreq)
+    rvals=cur.fetchone()
+    print >> sys.stderr,"*********** ["+str(rvals)+"] ***********"
+
+    lfile=unpackFile(conf,ovals0[0][2])
+    #fres[ovals[i][0]][cvals[j][1]]={"type":"bytes","filename":file["name"],"fileurl":file["name"].replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])}
+
+    docPath=conf["main"]["tmpPath"]+"/report_"+tableName.replace(".","_")+"_"+cid+"_"+conf["senv"]["MMID"]+"_init.odt"
+    docPath1=conf["main"]["tmpPath"]+"/report_"+tableName.replace(".","_")+"_"+cid+"_"+conf["lenv"]["usid"]+"_final.odt"
+    tDocPath=[]
+    lexts=["html","pdf","doc"]
+    for i in range(len(lexts)):
+        tDocPath+=[conf["main"]["tmpPath"]+"/report_"+tableName.replace(".","_")+"_"+cid+"_"+conf["lenv"]["usid"]+"_final."+lexts[i]]
+    myFile=open(docPath,"wb")
+    myFile.write(lfile["content"])
+    myFile.close()
+    
+    conf["lenv"]["message"]="Start PaperMint client"
+    from subprocess import Popen, PIPE
+    import os
+    #zoo.update_status(conf,10)
+    #sys.stderr.flush()
+    script="import sys\nimport shutil\n"
+    script+="import print.PaperMint as PaperMint\n"
+    script+="pm=PaperMint.LOClient()\n"
+    script+="pm.loadDoc('"+docPath+"')\n"
+    rcnt=0
+    pcnt=0
+    for i in range(len(vals0)):
+        if vals0[i][3]=="default":
+            script+="pm.searchAndReplace('[_"+vals0[i][2]+"_]',"+json.dumps(rvals[rcnt])+")\n"
+            rcnt+=1
+        else:
+            if vals0[i][3]=="html":
+                 script+="pm.goToWord('[_"+vals0[i][2]+"_]');"
+                 fname=conf["main"]["tmpPath"]+"/report_tmp_"+conf["senv"]["MMID"]+".html"
+                 hfile=open(fname,"w")
+                 hfile.write(rvals[rcnt].encode('utf-8'))
+                 hfile.close()
+                 script+="pm.insertDoc(\""+fname+"\")\n"
+                 script+="pm.searchAndReplace('[_"+vals0[i][2]+"_]',\"\")\n"
+                 rcnt+=1
+            else:
+                if vals0[i][3]=="paragraph_sql_array":
+                    print >> sys.stderr,str(rvals[i]).replace("'{","[").replace("}'","]")
+                    script+="pm.addParagraph('[_"+vals0[i][2]+"_]',"+json.dumps(rvals[rcnt])+")\n"
+                    rcnt+=1
+                else:
+                    if vals0[i][3]=="sql_array":
+                        script+="pm.addTable('[_"+vals0[i][2]+"_]',"+json.dumps(eval(unicode(str(rvals[rcnt]),"utf-8").replace("'{","[").replace("}'","]")))+")\n"
+                        rcnt+=1
+                    else:
+                        if vals0[i][3]=="diagram":
+                            script+="pm.statThis('[_"+vals0[i][2]+"_]',"+json.dumps(eval(unicode(str(rvals[rcnt]),"utf-8").replace("'{","[").replace("}'","]")))+")\n"
+                            rcnt+=1
+                        else:
+                            if vals0[i][3]=="multiple_doc":
+                                tmp=postDocuments[pcnt].split(';')
+                                print >> sys.stderr,tmp
+                                f=fetchPrimaryKey(cur,tableName)
+                                f1=fetchPrimaryKey(cur,tmp[1])
+                                req1="(SELECT id from mm_tables.p_tables where name="+str(adapt(tmp[1]))+")"
+                                req="SELECT "+f1+"::text from "+tmp[1]+" WHERE "+tmp[0]+"=(select "+f+" from "+tableName+" where "+f+"="+cid+" AND "+ovals0[0][3]+")"
+                                if len(tmp)==4:
+                                    req+=" ORDER BY "+tmp[3]
+                                cur.execute(req)
+                                lvals=cur.fetchall()
+                                for j in range(len(lvals)):
+                                    ldocs=_clientPrint(conf,cur,req1,lvals[j][0],tmp[2])
+                                    print >> sys.stderr,ldocs
+                                    print >> sys.stderr,conf["lenv"]["message"]
+                                    #if j==0:
+                                    script+="pm.goToWord('[_"+vals0[i][2]+"_]')\n"
+                                    script+="from com.sun.star.text.ControlCharacter import PARAGRAPH_BREAK, LINE_BREAK\n"
+                                    script+="pm.doc.Text.insertControlCharacter( pm.cursor, PARAGRAPH_BREAK , 0 )\n"
+                                    script+='pm.doc.Text.insertString( pm.cursor, "[_'+vals0[i][2]+'_]" , 0 )\n'
+                                    script+="pm.doc.Text.insertControlCharacter( pm.cursor, PARAGRAPH_BREAK , 0 )\n"
+                                    script+="pm.insertDoc(\""+ldocs[0]+"\")\n"
+                                    if j+1==len(lvals):
+                                        script+="pm.searchAndReplace('[_"+vals0[i][2]+"_]',\"\")\n"
+                                pcnt+=1
+        
+    script+="pm.saveDoc('"+docPath1+"')\n"
+    if rName is None:
+        for i in range(len(lexts)):
+            script+="pm.saveDoc('"+tDocPath[i]+"')\n"
+    print >> sys.stderr,script
+    err_log = file(conf["main"]["tmpPath"]+'/tmp_err_log_file_'+conf["senv"]["MMID"], 'w', 0)
+    os.dup2(err_log.fileno(), sys.stderr.fileno())
+    process = Popen([conf["oo"]["path"]],stdin=PIPE,stdout=PIPE)
+    process.stdin.write(script)
+    process.stdin.close()
+    conf["lenv"]["message"]=str(process.stdout.readline())
+    sys.stderr.flush()
+    process.wait()
+    if rName is None:
+        return [docPath1]+tDocPath
+    else:
+        return [docPath1]
+    
+def clientPrint(conf,inputs,outputs):
+    import json
+    con=auth.getCon(conf)
+    con.connect()
+    cur=con.conn.cursor()
+    fres={}
+    docs=_clientPrint(conf,cur,inputs["tableId"]["value"],inputs["id"]["value"])
+    for i in range(len(docs)):
+        docs[i]=docs[i].replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])
+    outputs["Result"]["value"]=json.dumps(docs)
+    return zoo.SERVICE_SUCCEEDED
+    
+def clientView(conf,inputs,outputs):
+    import json
+    con=auth.getCon(conf)
+    con.connect()
+    cur=con.conn.cursor()
+    fres={}
+    try:
+        req="SELECT name from mm_tables.p_tables where id="+inputs["tableId"]["value"]
+        res=cur.execute(req)
+        vals=cur.fetchone()
+    except Exception,e:
+        conf["lenv"]["message"]=zoo._("Unable to identify your parameter as a tableId: ")+req+str(e)
+        return zoo.SERVICE_FAILED
+    tableName=vals[0]
+    #clientPrint(conf,inputs,outputs)
+    req="SELECT mm_tables.p_editions.id,mm_tables.p_editions.name FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where name='"+conf["senv"]["group"]+"') and (mm_tables.p_editions.step=-2 or mm_tables.p_editions.step=-10 or mm_tables.p_editions.step>=0 ) order by mm_tables.p_editions.step asc"
+    print >> sys.stderr,req
+    res=cur.execute(req)
+    ovals=cur.fetchall()
+    tableId=ovals[0][0]
+    print >> sys.stderr,ovals
+    req="SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where mm_tables.ftypes.id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.value,mm_tables.p_edition_fields.edition FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='"+conf["senv"]["id"]+"') and (mm_tables.p_editions.step=-2 or mm_tables.p_editions.step>=0 )) as a ORDER BY a.id"
+    print >> sys.stderr,req
+    res=cur.execute(req)
+    vals=cur.fetchall()
+    print >> sys.stderr,vals
+    columns=[]
+    rcolumns=[]
+    files={}
+    for i in range(len(vals)):
+        print >> sys.stderr,vals[i][3]
+        columns+=[vals[i][2]]
+        if vals[i][3]=="tbl_linked":
+            components=vals[i][4].split(';')
+            print >> sys.stderr,components
+            rcolumns+=["(SELECT ARRAY(SELECT "+components[1]+" FROM "+components[2]+" WHERE "+components[0]+"="+tableName+".id)) as "+vals[i][2]]
+        else:
+            if vals[i][3]=="bytea":
+                files[vals[i][2]]=1
+            if vals[i][3]!="link" and vals[i][3]!="tbl_link":
+                if vals[i][5]:
+                    if vals[i][3].count("date")>0:
+                        if vals[i][3]=="date":
+                            rcolumns+=[vals[i][2]+"::text"]
+                        else:
+                            rcolumns+=["split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',1)||'T'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',1)||':'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',2)"]
+                    else:
+                        rcolumns+=[vals[i][2]]
+                else:
+                    if vals[i][3].count("date")>0:
+                        if vals[i][3]=="date":
+                            rcolumns+=[vals[i][2]+"::text"]
+                        else:
+                            rcolumns+=["split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',1)||'T'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',1)||':'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',2)"]
+                    else:
+                        rcolumns+=[vals[i][2]]
+    rfields=(",".join(rcolumns))
+    print >> sys.stderr,rfields
+    f=fetchPrimaryKey(cur,tableName)
+    rreq="SELECT "+rfields+" from "+tableName+" where "+f+"="+inputs["id"]["value"] 
+    print >> sys.stderr,rreq
+    res=cur.execute(rreq)
+    rvals=cur.fetchone()
+    for i in range(len(ovals)):
+        fres[ovals[i][0]]={}
+        req="SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+str(ovals[i][0])+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where name='"+conf["senv"]["group"]+"')) as a ORDER BY a.id"
+        res=cur.execute(req)
+        cvals=cur.fetchall()
+        for j in range(len(cvals)):
+            print >> sys.stderr,cvals[j]
+            if files.keys().count(cvals[j][2])>0:
+                file=unpackFile(conf,rvals[j])
+                fres[ovals[i][0]][cvals[j][1]]={"type":"bytes","filename":file["name"],"fileurl":file["name"].replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])}
+            else:
+                if rvals is not None and columns.count(cvals[j][2])>0 and columns.index(cvals[j][2])<len(rvals):
+                    fres[ovals[i][0]][cvals[j][1]]=rvals[columns.index(cvals[j][2])]
+            print >> sys.stderr,cvals[j]
+    #fres["ref"]=inputs["id"]["value"] 
+
+    print >> sys.stderr,rvals
+    outputs["Result"]["value"]=json.dumps(fres)
+    con.conn.commit()
+    con.conn.close()
+    return zoo.SERVICE_SUCCEEDED
+
+def buildClause(filters):
+    res=""
+    for i in range(len(filters)):
+        lkeys=filters[i].keys()
+        print >> sys.stderr,lkeys
+        for k in range(len(lkeys)):
+            print >> sys.stderr,lkeys[k]
+            if lkeys[k]!="linkClause":
+                if res!="":
+                    res+=" "+filters[i]["linkClause"]+" "
+                try:
+                    tmp=int(filters[i][lkeys[k]])
+                    res+="( "+lkeys[k]+" = "+str(int(filters[i][lkeys[k]]))+" ) "
+                except:
+                    res+="( "+lkeys[k]+"::varchar LIKE "+str(adapt(str(filters[i][lkeys[k]].replace("*","%").encode('utf-8'))))+" ) "
+            print >> sys.stderr,res
+    print >> sys.stderr,res
+    if res!="":
+        res=" ( "+res+" ) "
+    res
+    return res
+
+def clientViewTable(conf,inputs,outputs):
+    import json
+    con=auth.getCon(conf)
+    con.connect()
+    cur=con.conn.cursor()
+    fres={}
+    try:
+        req="SELECT (select name from mm_tables.p_tables where id=ptid),name,clause from mm_tables.p_views where id="+inputs["table"]["value"]
+        res=cur.execute(req)
+        vals=cur.fetchone()
+        table=vals[0]
+        name=vals[1]
+        clause=vals[2]
+        import datastores.postgis.pgConnection as pg
+        cur.execute(pg.getDesc(cur,table))
+        defs=cur.fetchall()
+        
+    except Exception,e:
+        conf["lenv"]["message"]=zoo._("Unable to identify your parameter as a View Id: ")+req+str(e)
+        return zoo.SERVICE_FAILED
+    req="SELECT mm_tables.p_view_fields.id,mm_tables.p_view_fields.alias,mm_tables.p_view_fields.value,mm_tables.p_view_fields.view,mm_tables.p_view_fields.search,mm_tables.p_view_fields.class,mm_tables.p_view_fields.name FROM mm_tables.p_views,mm_tables.p_view_fields where mm_tables.p_views.id=mm_tables.p_view_fields.vid and mm_tables.p_view_fields.view and mm_tables.p_views.id="+inputs["table"]["value"]
+    classifiers=["asc","desc"]
+    values=[]
+    classifier=""
+    res=cur.execute(req)
+    vals=cur.fetchall()
+    for i in range(len(vals)):
+        values+=[vals[i][2]]
+        if vals[i][5] is not None:
+            classifier=vals[i][6]+" "+classifiers[(vals[i][5]-1)]
+    if inputs.keys().count("sortname")>0 and inputs.keys().count("sortname")!="":
+        for i in range(len(vals)):
+            if vals[i][6] == inputs["sortname"]["value"]:
+                classifier=inputs["sortname"]["value"]+" "+inputs["sortorder"]["value"]
+    if inputs.keys().count("filters")>0:
+        filters=json.loads(inputs["filters"]["value"])
+        if len(filters)>0:
+            if clause!="":
+                clause+=" AND "+buildClause(filters)
+            else:
+                clause=buildClause(json.loads(inputs["filters"]["value"]))
+    req1="SELECT count(*) FROM "+table+" WHERE "+clause
+    print >> sys.stderr,req1
+    res=cur.execute(req1)
+    fres["total"]=cur.fetchone()[0]
+    if inputs.keys().count("page")>0:
+        fres["page"]=inputs["page"]["value"]
+    else:
+        fres["page"]="1"
+    con.conn.commit()
+    cid=fetchPrimaryKey(cur,table)
+    print >> sys.stderr,"***** "+str(values)
+    print >> sys.stderr,"****** "+str(cid)
+    print >> sys.stderr,"******* "+str(clause)
+    req1="SELECT "+(",".join(values+[cid]))+" FROM "+table+" WHERE "+clause+" ORDER BY "+classifier+" LIMIT "+inputs["limit"]["value"]+" OFFSET "+inputs["offset"]["value"]
+    res=cur.execute(req1)
+    vals=cur.fetchall()
+    fres["rows"]=[]
+    print >> sys.stderr,defs
+    for i in range(len(vals)):
+        lobj={"cell":[],"id":vals[i][len(vals[i])-1]}
+        for j in range(len(vals[i])):
+            if j==0:
+                if defs[j][2]!="bytea":
+                    lobj["cell"]+=['<input type="hidden" name="id" value ="'+str(vals[i][len(vals[i])-1])+'" />'+str(vals[i][j])]
+                else:
+                    lobj["cell"]+=['<input type="hidden" name="id" value ="'+str(vals[i][len(vals[i])-1])+'" />'+"file"]
+            else:
+                if j+1<len(vals[i]):
+                    if defs[j][2]!="bytea":
+                        lobj["cell"]+=[vals[i][j]]
+                    else:
+                        try:
+                            file=unpackFile(conf,vals[i][j])
+                            displayName=file["name"].split("/")
+                            lobj["cell"]+=[displayName[len(displayName)-1]]
+                        except Exception,e:
+                            lobj["cell"]+=[zoo._("No file found")]
+        fres["rows"]+=[lobj]
+    con.conn.commit()
+    
+    outputs["Result"]["value"]=json.dumps(fres)
+    con.conn.commit()
+    con.conn.close()
+    return zoo.SERVICE_SUCCEEDED
 

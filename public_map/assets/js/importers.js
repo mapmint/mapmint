@@ -43,8 +43,13 @@ define([
     var llevelInit=false;
     var reg0=new RegExp("documents_","");
     var reloadElement=true;
-    var tableName="indicators";
+    var tableName="mm_tables.importers";
     var fileName="";
+
+    var isAttributes=true;
+    var attributes=[];
+    var attributes_index=[];
+    var values=[];
 
     function loadElements(table,init){
 	zoo.execute({
@@ -109,10 +114,257 @@ define([
 	}
     }
 
+    var hasBeenDone=false;
     function fillForm(data){
 	$(".project-title").html(data["name"]+' <i class="fa fa-'+(data["published"]=="false"?"exclamation":"check")+'"> </i>');
 	var myRootLocation=$(".theForm");
 	var reg=new RegExp("documents_","");
+
+	$("#indicators_form_link").find("#documents_template_name").val(data["template_name"]);
+
+	//var cData=data;
+	(function(cData){
+	    getLastFile(function(data){
+		fetchInfoAndDisplay(data,function(){
+		    if(!hasBeenDone){
+			$("#pages_fields_table_display").prev().remove();
+			$("#pages_fields_table_display").remove();
+			if(cData["pages"][$("#documents_ifile_page").val()]["ofield"]){
+			    $("#pages_id").val(cData["pages"][$("#documents_ifile_page").val()]["id"]);
+			    $("#documents_page_type").val(cData["pages"][$("#documents_ifile_page").val()]["type"]);
+			    var closure={
+				"field": eval((cData["pages"][$("#documents_ifile_page").val()]["ofield"].replace(/Field/g,"")+"-1")),
+				"type": cData["pages"][$("#documents_ifile_page").val()]["otype"]
+			    };
+			    console.log("Now fix the order to "+closure["type"]+" "+closure["type"]+"!");
+			    managerTools.datasources[data].order([closure["field"],closure["type"]]).draw();
+			    var tbody="";
+			    $("#page_table_init").html(managerTools.generateFromTemplate($("#page_fields_table_template").html(),["tbody"],[tbody]));
+			    $("#pages_fields_table_display").DataTable({
+				rowReorder:       true,
+				"scrollX":        true,
+				"scrollY":        (($("#indicators_form_eye").height())-($(".navbar").height()*6))+"px",
+				"scrollCollapse": true,
+				autoWidth:        false,
+				"paging":         false,
+				//"info":           false,
+				//"responsive":     true,
+				//deferRender:      true,
+				bFilter:          false
+			    });
+
+			    $(".savePageSettings").off('click');
+			    $(".savePageSettings").click(function(){
+				console.log('savePageSettings !');
+				var mapping={
+				    "name": "field_name",
+				    "type": "field_type",
+				    "rlabel": "field_label",
+				    "label": "field_label_index",
+				    "value": "value",
+				    "clause": "clause",
+				};
+				var objs=[];
+				$("#pages_fields_table_display").find("tbody").find('tr').each(function(){
+				    var obj={};
+				    for(var i in mapping){
+					obj[i]=$(this).find("input[name="+mapping[i]+"],select[name="+mapping[i]+"],textarea[name="+mapping[i]+"]").val();
+				    }
+				    objs.push(obj);
+				});
+				var params=[
+				    {"identifier": "table","value": "mm_tables.pages","dataType":"string"},
+				    {"identifier": "columns","value": JSON.stringify([], null, ' '),"mimeType":"application/json"},
+				    {"identifier": "links","value": JSON.stringify({"fields":{"table":"mm_tables.page_fields","ocol":"pid","tid":"pid"}}, null, ' '),"mimeType":"application/json"},
+				    {"identifier": "fields","value": JSON.stringify(objs, null, ' '),"mimeType":"application/json"},
+				    {"identifier": "id","value": $("#pages_id").val(),"dataType":"string"}
+				];
+
+				insert(params,($("#pages_id").val()!=-1),function(data){
+				    console.log(data);
+				    $(".notifications").notify({
+					message: { text: data },
+					type: 'success',
+				    }).show();
+				    //loadAnElement($("#tables_id").val(),false);
+				});
+
+				console.log(params);
+			    });
+
+			    try{
+				$("#DS_table_indicatorTable_indicator").dataTable().fnSettings().aoDrawCallback.push( {
+				    "fn": function () {
+					console.log("****** TABLE REFRESH !");
+					if(cData["pages"][$("#documents_ifile_page").val()]["fields"].length>0){
+					    console.log("****** TABLE REFRESH WITH VALUES !");
+					    var tbody="";
+					    for(var i=0;i<cData["pages"][$("#documents_ifile_page").val()]["fields"].length;i++){
+						var celem=cData["pages"][$("#documents_ifile_page").val()]["fields"][i];
+						tbody+=managerTools.generateFromTemplate($("#page_fields_line_template").html(),
+											 ["id","name","label","label_index","value","clause"],
+											 [i+1,celem["name"],celem["rlabel"],celem["label"],celem["value"],celem["clause"]]);
+					
+						try{
+						    var tmp=celem["label"].split('||');
+						    for(var j=0;j<tmp.length;j++){
+							var tmp1=tmp[j].split(',');
+							var coords=[];
+							for(var k=0;k<tmp1.length;k++){
+							    coords.push(parseInt(tmp1[k].replace(/\(|\)/g,"")));
+							}
+							console.log(coords);
+							console.log($("#DS_table_indicatorTable_indicator").DataTable());
+							console.log($("#DS_table_indicatorTable_indicator").DataTable().cells(coords[1],coords[0]));
+							console.log($("#DS_table_indicatorTable_indicator").DataTable().cell(coords[1],coords[0]));
+							var element=$($("#DS_table_indicatorTable_indicator").DataTable().cells(coords[1],coords[0]).nodes());
+							console.log($(element));
+							element.addClass("alert alert-success");
+							element.append(' <span class="badge progress-bar-info">'+(i+1)+'</span>');
+							
+						    }
+						    tmp=celem["value"].split('||');
+						    for(var j=0;j<tmp.length;j++){
+							var tmp1=tmp[j].split(',');
+							var coords=[];
+							for(var k=0;k<tmp1.length;k++){
+							    coords.push(parseInt(tmp1[k].replace(/\(|\)/g,"")));
+							}
+							var element=$($("#DS_table_indicatorTable_indicator").DataTable().cell(coords[1],coords[0]).node());
+							console.log(element);
+							element.addClass("alert alert-danger");
+							element.append(' <span class="badge progress-bar-info">'+(i+1)+'</span>');
+							
+						    }
+						}catch(e){
+						    console.log("******************"+e+"_____");
+						};
+					    }
+					    $("#pages_fields_table_display").find("tbody").html(tbody);
+					    var cnt=0;
+					    $("#pages_fields_table_display").find('tbody').find('tr').each(function(){
+						$(this).find('select[name=field_type]').first().val(cData["pages"][$("#documents_ifile_page").val()]["fields"][cnt]["type"]);
+						cnt+=1;
+					    });
+					}
+				    },
+				    "sName": "user"
+				} );
+			    }catch(e){
+				alert(e);
+			    }
+			    /*$("#DS_table_indicatorTable_indicator").DataTable().fnDrawCallback=function(){
+				console.log("****** TABLE REFRESH !");
+			    };*/
+
+
+			    if(cData["pages"][$("#documents_ifile_page").val()]["length"]!=null)
+				$("#DS_table_indicatorTable_indicator").DataTable().page.len(cData["pages"][$("#documents_ifile_page").val()]["length"]).draw();
+
+
+
+			}else{
+			    $("#pages_id").val(-1);
+			}
+			hasBeenDone=true;
+
+			console.log($('#DS_table_indicatorTable_indicator tbody'));
+
+
+			$('#DS_table_indicatorTable_indicator tbody').on( 'click', 'td', function () {
+			    console.log('Clicked');
+			    console.log($("#DS_table_indicatorTable_indicator").DataTable().cell( this ));
+			    if($(this).hasClass("alert")){
+				if(!$(this).find('span').first().hasClass("progress-bar-info")){
+				    $(this).removeClass("alert "+(isAttributes?"alert-success":"alert-danger"));
+				    $(this).find('span').first().remove();
+				    if(isAttributes){
+					attributes_index.pop(attributes.indexOf($(this).text()));
+					attributes.pop(attributes.indexOf($(this).text()));
+				    }else
+					values.pop(values.indexOf('('+$("#DS_table_indicatorTable_indicator").DataTable().cell( this ).index().column+','+$("#DS_table_indicatorTable_indicator").DataTable().cell( this ).index().row+')'));
+				}
+			    }
+			    else{
+				if(!$(this).find('span').first().hasClass("progress-bar-info")){
+				    $(this).addClass("alert "+(isAttributes?"alert-success":"alert-danger"));
+				    if(isAttributes){
+					attributes.push($(this).text());
+					attributes_index.push('('+$("#DS_table_indicatorTable_indicator").DataTable().cell( this ).index().column+','+$("#DS_table_indicatorTable_indicator").DataTable().cell( this ).index().row+')');
+					if($("#pages_fields_table_display").find("tbody").find('tr').find('td').first().attr('colspan')==6)
+					    $(this).append(' <span class="badge">'+(1)+'</span>');
+					else
+					    $(this).append(' <span class="badge">'+($("#pages_fields_table_display").find("tbody").find('tr').length+1)+'</span>');
+				    }
+				    else{
+					values.push('('+$("#DS_table_indicatorTable_indicator").DataTable().cell( this ).index().column+','+$("#DS_table_indicatorTable_indicator").DataTable().cell( this ).index().row+')');
+					console.log($("#DS_table_indicatorTable_indicator").DataTable().cell( this ).index());
+					$(this).append(' <span class="badge">'+($("#pages_fields_table_display").find("tbody").find('tr').length)+'</span>');
+				    }
+				}
+			    }
+			    console.log($("#DS_table_indicatorTable_indicator").DataTable().cell( this ).index());
+			} );
+
+			$(".addRow").first().click(function(){
+			    alert("add row to table");
+			    console.log($("#page_fields_line_template").html());
+			    $("#pages_fields_table_display").find("tbody").append(managerTools.generateFromTemplate($("#page_fields_line_template").html(),["id","name","label","true","ignore","value"],[$("#pages_fields_table_display").find("tbody").find('tr').length,"true",0,""]));
+			});
+
+			$("[data-mmaction=setAttribute]").off('click');
+			$("[data-mmaction=setAttribute]").click(function(){
+			    isAttributes=false;	
+			    $("#pages_fields_table_display").find("tbody").find("td").first().each(function(){
+				if($(this).attr("colspan")==6)
+				    $(this).parent().remove();
+			    });
+	    		    $("#pages_fields_table_display").find("tbody").append(managerTools.generateFromTemplate($("#page_fields_line_template").html(),["id","name","label","ignore","value","clause","label_index"],[$("#pages_fields_table_display").find("tbody").find('tr').length+1,attributes.join("_"),attributes.join("_"),0,"","true",attributes_index.join(' || ')]));
+			});
+
+			$("[data-mmaction=setValue]").off('click');
+			$("[data-mmaction=setValue]").click(function(){
+			    isAttributes=true;
+			    var tmp=$("#pages_fields_table_display").find("tbody").find('tr').last().find("textarea").last().val(values.join(' || '));
+
+			    for(var i=0;i<attributes.length;i++){
+				var tmp=attributes_index[i].split('||');
+				var aCoords=[];
+				for(var j=0;j<tmp.length;j++){
+				    var tmp1=tmp[j].split(',');
+				    aCoords.push([]);
+				    for(var k=0;k<tmp1.length;k++){
+					aCoords[aCoords.length-1][k]=tmp1[k].replace(/\(|\)/g, "");
+				    }
+				    console.log($($("#DS_table_indicatorTable_indicator").DataTable().cell( aCoords[aCoords.length-1][1],aCoords[aCoords.length-1][0] ).node()).find(".badge").addClass("progress-bar-info"));
+				}
+				console.log(aCoords);
+			    }
+			    for(var i=0;i<values.length;i++){
+				var tmp=values[i].split('||');
+				var aCoords=[];
+				for(var j=0;j<tmp.length;j++){
+				    var tmp1=tmp[j].split(',');
+				    aCoords.push([]);
+				    for(var k=0;k<tmp1.length;k++){
+					aCoords[aCoords.length-1][k]=tmp1[k].replace(/\(|\)/g, "");
+				    }
+				    console.log($($("#DS_table_indicatorTable_indicator").DataTable().cell( aCoords[aCoords.length-1][1],aCoords[aCoords.length-1][0] ).node()).find(".badge").addClass("progress-bar-info"));
+				}
+				console.log(aCoords);
+			    }
+
+			    attributes_index=[];
+			    attributes=[];
+			    values=[];
+			    
+	    		    //$("#pages_fields_table_display").find("tbody").append(managerTools.generateFromTemplate($("#page_fields_line_template").html(),["id","name","label","ignore","value"],[$("#pages_fields_table_display").find("tbody").find('tr').length,attributes.join("_"),attributes.join("_"),"true",0,""]));
+			});
+
+		    }
+		});
+	    });
+	})(data);
 
 	myRootLocation.find("textarea").each(function(){
 	    if(!$(this).attr("id"))
@@ -124,7 +376,11 @@ define([
 		$(this).val(data[$(this).attr("id").replace(reg,"")]).change();
 	});
 
-	myRootLocation.find("input[type=text],select").each(function(){
+	myRootLocation.find("select").each(function(){
+	    $(this).find('option').prop('selected', false);
+	});
+	
+	myRootLocation.find("input[type=text],input[type=hidden],select").each(function(){
 	    
 	    if(!$(this).attr("id"))
 		return;
@@ -136,15 +392,17 @@ define([
 			$(this).val("#000").change();
 		}
 		else
-		    $(this).val(data[$(this).attr("id").replace(reg,"")])
+		    $(this).val(data[$(this).attr("id").replace(reg,"")]);
 	    }else{
-		$(this).find('option').prop('selected', false);
+		console.log($(this));
+		$(this).find('option').each(function(){$(this).prop('selected', false);});
 		if($.isArray(data[$(this).attr("id").replace(reg,"")])){
 		    var obj=data[$(this).attr("id").replace(reg,"")];
 		    var oid=$(this).attr("id").replace(reg,"");
 		    if(obj.length==0)
 			$(this).find('option[value="-1"]').prop("selected",true);
 		    for(var i=0;i<obj.length;i++){
+			//(this).find('option').each(function(){if($(this).val()==obj[j])$(this).prop('selected', true);});
 			$(this).find('option[value="'+obj[i]+'"]').prop("selected",true);
 		    }
 		}else{
@@ -376,20 +634,20 @@ define([
 			}
 		    }
 
-		    var lcnt=0;
+		    /*var lcnt=0;
 		    $("#indicatorForm").find('.nav').first().find('[role=presentation]').each(function(){
 			if(lcnt>1){
 			    $(this).removeClass("disabled");
 			    $(this).prop("disabled",false);
 			}
 			lcnt+=1;
-		    });
+		    });*/
 
 		}else{
 		    console.log($("#DS_indicatorTable_indicator"));
 		    $("#DS_indicatorTable_indicator").remove();
 		    $("#documents_ifile_link").attr('href','#').text('');
-		    var lcnt=0;
+		    /*var lcnt=0;
 		    console.log($("#indicatorForm").find('.nav').first());
 		    console.log($("#indicatorForm").find('.nav').first().find('[role=presentation]'));
 		    $("#indicatorForm").find('.nav').first().find('[role=presentation]').each(function(){
@@ -398,7 +656,7 @@ define([
 			    $(this).addClass("disabled");
 			}
 			lcnt+=1;
-		    });
+		    });*/
 		}
 		$(".fa-spin").addClass("hide");
 	    },
@@ -629,7 +887,7 @@ define([
 		    identifier: "datastores.postgis.getTableContent",
 		    dataInputs: [
 			{"identifier":"dataStore","value":module.config().db,"dataType":"string"},
-			{"identifier":"table","value":"mm.indicators","dataType":"string"},
+			{"identifier":"table","value":"mm_tables.importers","dataType":"string"},
 			{"identifier":"offset","value":llimit[0],"dataType":"int"},
 			{"identifier":"limit","value":llimit[1],"dataType":"int"},
 			{"identifier":"page","value":page,"dataType":"int"},
@@ -775,7 +1033,7 @@ define([
 	});	
     }
 
-    var fetchInfoAndDisplay=function(data){
+    var fetchInfoAndDisplay=function(data,ffunc){
 	fileName=data;
 	var ldata=data;
 	zoo.execute({
@@ -799,8 +1057,11 @@ define([
 			       val=data.datasource.layer[i].name;
 			    $("select[name=ifile_page]").append("<option>"+data.datasource.layer[i].name+"</option>");
 			}
+			$("select[name=ifile_page]").off('change');
 			$("select[name=ifile_page]").change(function(){
+			    $("#pages_id").val(-1);
 			    var lval=$(this).val();
+			    hasBeenDone=false;
 			    getVectorInfo(ldata,$(this).val(),function(data){
 				var reg=new RegExp("\\[datasource\\]","g");
 				var reg1=new RegExp("\\[font\\]","g");
@@ -818,6 +1079,10 @@ define([
 							   function(){
 							       $("#DS_indicatorTable_indicator").find(".panel").removeClass("panel-warning").addClass("panel-default");
 							       $("[data-mmaction=join]").removeClass("disabled");
+							       try{
+								   ffunc();
+							       }catch(e){
+							       }
 							   }); 
 			    });			    
 			});
@@ -843,6 +1108,10 @@ define([
 						function(){
 						    $("#DS_indicatorTable_indicator").find(".panel").removeClass("panel-warning").addClass("panel-default");
 						    $("[data-mmaction=join]").removeClass("disabled");
+						    try{
+							ffunc();
+						    }catch(e){
+						    }
 						}); 
 		    });
 		}
@@ -1216,6 +1485,48 @@ define([
 	});
     }
 
+    function insertElem(params,test,func){
+	zoo.execute({
+	    identifier: "np."+(test?"updateElem":"insertElem"),
+	    type: "POST",
+	    dataInputs: params,
+	    dataOutputs: [
+		{"identifier":"Result","type":"raw"},
+	    ],
+	    success: function(data){
+		console.log(data);
+		func(data);
+	    },
+	    error: function(data){
+		$(".notifications").notify({
+		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+		    type: 'danger',
+		}).show();
+	    }
+	});		
+    }
+
+    function insert(params,test,func){
+	zoo.execute({
+	    identifier: "np.insert",
+	    type: "POST",
+	    dataInputs: params,
+	    dataOutputs: [
+		{"identifier":"Result","type":"raw"},
+	    ],
+	    success: function(data){
+		console.log(data);
+		func(data);
+	    },
+	    error: function(data){
+		$(".notifications").notify({
+		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+		    type: 'danger',
+		}).show();
+	    }
+	});		
+    }
+
     var initialize=function(){
 	
 	adminBasic.initialize(zoo);
@@ -1251,236 +1562,135 @@ define([
 	$(".tab-pane").css({"max-height":($(window).height()-($(".navbar").height()*3.5))+"px","overflow-y":"auto","overflow-x":"hidden"});
 	$("#page-wrapper").find("[role=presentation]").first().children().first().click();
 	
-	$("[data-mmaction=testSql]").click(function(){
-	    runSql();
-	});
-	$("[data-mmaction=runSql]").click(function(){
-	    runSql(true);
-	});
-
-	$("#indicators_form_pie-chart").find("button").last().click(function(){
-	    var prefix="";
-	    /*if(arguments.length>1)
-		prefix="agregate_";	*/
+	$("[data-mmaction=join]").off('click');
+	$("[data-mmaction=join]").click(function(){
+	    console.log($(this));
 	    var params=[
-		{identifier: "table", value: "graphs",dataType: "string"},
-		{identifier: "name", value: $("#documents_graphs_title").val(),dataType: "string"},
-		{identifier: "type", value: $("#documents_graphs_type").val(),dataType: "string"},
-		{identifier: "lx", value: $("#documents_"+prefix+"graphs_lx").val(),dataType: "string"},
-		{identifier: "vx", value: $("#documents_"+prefix+"graphs_vx").val(),dataType: "string"},
-		{identifier: "ly", value: $("#documents_"+prefix+"graphs_ly").val(),dataType: "string"},
-		{identifier: "vy", value: $("#documents_"+prefix+"graphs_vy").val(),dataType: "string"},
-		{identifier: "tooltip", value: $("#documents_graphs_tooltip").val(),dataType: "string"},
-		{identifier: "formula", value: $("#documents_graphs_formula").val(),dataType: "string"},
-		{identifier: "it_id", value: "(SELECT id from "+module.config().dbschema+".indicators_territories where i_id="+localId+($("#agregation").is(":visible")?" and t_id="+$("#p_tname").val():" and (not(agregation) or agregation is null)")+")",dataType: "string"}	
+		{"identifier": "table","value": "mm_tables.pages","dataType":"string"},
+		{"identifier": "columns","value": JSON.stringify(["name","type","ofield","otype","length","iid"], null, ' '),"mimeType":"application/json"},
+		{"identifier": "name","value": $(this).prev().prev().find('select').val(),"dataType":"string"},
+		{"identifier": "type","value": $(this).prev().find('select').val(),"dataType":"string"},
+		{"identifier": "length","value": $("select[name=DS_table_indicatorTable_indicator_length]").val(),"dataType":"string"},
+		{"identifier": "ofield","value": managerTools.sort["field"],"dataType":"string"},
+		{"identifier": "otype","value": managerTools.sort["type"],"dataType":"string"},
+		{"identifier": "iid","value": $("#documents_id").val(),"dataType":"string"},
 	    ];
-	    if($("#agregation").is(":visible")){
-		test=false;
-		params.push({
-		    identifier: "tid",
-		    value: $("#p_tname").val(),
-		    dataType: "string"
-		});
-	    }
-	    test=$("#documents_"+prefix+"graphs_id")[0] && $("#documents_"+prefix+"graphs_id").val()!='-1' && $("#"+prefix+"graphs_id").val()!='';
-	    if(test){
-		params.push({
-		    identifier: "id",
-		    value: $("#documents_"+prefix+"graphs_id").val(),
-		    dataType: "string"
-		});
-	    }
-	    if($("#documents_graphs_steps").is(":visible") && $("#graphs_step").val()>0)
-		params.push({"identifier":"step","value":($("#documents_graphs_step")[0].selectedIndex-1),dataType: "string"});
 
+	    if($("#pages_id").val()!=-1){
+		params.push({"identifier": "id","value": $("#pages_id").val(),"dataType":"string"});
+	    }
 
-	    insertElem(params,function(data){
+	    insert(params,($("#tables_view_id").val()!=-1),function(data){
 		console.log(data);
 		$(".notifications").notify({
 		    message: { text: data },
 		    type: 'success',
 		}).show();
+		loadAnElement($("#documents_id").val(),false);
 	    });
-	});
 
-	$("[data-mmaction=join]").click(function(){
-	    var table=$("#DS_table_indicatorTable_indicator").DataTable();
-	    var params=[];
-	    console.log(table.columns());
-	    console.log(table.columns().name);
-	    var res=[];
-	    var elemChecked=0;
-	    var hasElem=false;
-	    $("input[name=indicator_data_type]").each(function(){
-		if($(this).is(":checked")){
-		    hasElem=true;
-		    return;
-		}
-		if(!hasElem)
-		    elemChecked+=1;
-	    });
-	    console.log(elemChecked);
-	    if(elemChecked==2){
-		params.push({
-		    identifier: "dbname",
-		    value: $("input[name=documents_database]").val(),
-		    dataType: "string"
-		});
-		params.push({
-		    identifier: "query",
-		    value: $("#documents_data_query").val(),
-		    dataType: "string"
-		});		
+	    console.log(managerTools.sort);
+	    var  myLocation=$(this);
+	    for(var i=0;i<2;i++){
+		myLocation=myLocation.prev();
+		console.log(myLocation.find('select').val());
 	    }
-	    if(elemChecked==1){
-		params.push({
-		    identifier: "dbname",
-		    value: module.config().db,
-		    dataType: "string"
-		});
-		params.push({
-		    identifier: "query",
-		    value: "SELECT * FROM "+$("#pg_table").val(),
-		    dataType: "string"
-		});		
-	    }
-	    for(var i=0;i<table.columns()[0].length;i++){
-		res.push($(table.column( i ).header()).html());
-		if(i==0)
-		    params.push({
-			identifier: "field",
-			value: $(table.column( i ).header()).html(),
-			dataType: "string"
-		    });
-		params.push({
-		    identifier: "rcol",
-		    value: $(table.column( i ).header()).html(),
-		    dataType: "string"
-		});
-		var title = table.column( i ).header();
-		console.log( 'Column title clicked on: '+$(title).html() );
-		console.log(table.columns()[0][i]);
-	    }
-	    params.push({
-		identifier: "territory",
-		value: $("#documents_indicators_table").val(),
-		dataType: "string"
-	    });
-	    params.push({
-		identifier: "field",
-		value: $("#documents_indicators_field").val(),
-		dataType: "string"
-	    });
-	    params.push({
-		identifier: "filename",
-		value: fileName,
-		dataType: "string"
-	    });
-	    params.push({
-		identifier: "type",
-		value: (elemChecked==2?"sql":(elemChecked==1?"table":"file")),
-		dataType: "string"
-	    });
-	    params.push({"identifier": "sql","value":"SELECT "+res.join(',')+' FROM "'+$("#documents_ifile_page").val()+'"',dataType:"string"});
-	    params.push({"identifier": "layer","value":$("#documents_ifile_page").val(),dataType:"string"});
-	    params.push({"identifier": "id","value":localId,dataType:"string"});
-	    console.log(res);
-	    console.log(params);
-	    zoo.execute({
-		identifier: "np.createIndex",
-		type: "POST",
-		dataInputs: params,
-		dataOutputs: [
-		    {"identifier":"Result","type":"raw"},
-		],
-		success: function(data){
-		    $(".notifications").notify({
-			message: { text: data },
-			type: 'success',
-		    }).show();
 
-		    /*fetchIndexTableAndDisplay(data,function(data){
-			refreshLayerStyle();
-		    });*/
-		    fetchIndicatorInfo(function(data){
-			refreshLayerStyle();
-			//fetchIndicatorInfo(data);
-		    });
-		},
-		error: function(data){
-		    $(".notifications").notify({
-			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
-			type: 'danger',
-		    }).show();
-		}
-	    });	
-	});
 
-	$("#pg_schema").change(function(){
-	    adminBasic.loadTablesList($("input[name=data_table_dbname]").val(),$(this).val(),$("#pg_table"));
-	});
-	$("#pg_table").change(function(){
-	    runSql(true,$("input[name=data_table_dbname]").val(),"SELECT * FROM "+$(this).val());
-	});
-
-	$("#documents_indicators_table").change(function(){
-	    if($(this).val()!=-1)
-		fetchFields($(this).val());
-	});
-
-	$("[data-mmaction=import-doc]").click(function(){
-	    $("#auploader").off("load");
-	    $("#auploader").on("load",function(){
-		callService("np.saveRepportFile0",[{"identifier":"id","value":localId,"dataType":"integer"}],function(d){
-		    console.log(d);
-		    $(".notifications").notify({
-			message: { text: d["ExecuteResponse"]["ProcessOutputs"]["Output"][0]["Data"]["ComplexData"]["__text"] },
-			type: 'success',
-		    }).show();
-		    var localData=JSON.parse(d["ExecuteResponse"]["ProcessOutputs"]["Output"][1]["Data"]["ComplexData"]["__cdata"]);
-		    fillDefaultRepport(localData);
-		},[
-		    {"identifier": "Message"},
-		    {"identifier": "Result"}
-		]);
-	    });
-	    $("#afileUpload").submit();
+	    console.log($(this).prev());
+	    console.log($(this).prev().prev());
 	});
 
 	$("[data-mmaction=import]").click(function(){
 	    $("#iuploader").off("load");
 	    $("#iuploader").on("load",function(){
 		console.log(arguments);
-		getLastFile(fetchInfoAndDisplay);
+		getLastFile(function(data){
+		    fetchInfoAndDisplay(data);
+		    console.log(data);
+		    alert('Run Save File in DB: '+data);
+		    zoo.execute({
+			identifier: "np.saveUploadedFile",
+			type: "POST",
+			dataInputs: [
+			    {"identifier": "table","value": "mm_tables.importers","dataType":"string"},
+			    {"identifier": "id","value": $("#documents_id").val(),"dataType":"string"},
+			    {"identifier": "field","value": "template","dataType":"string"},
+			    {"identifier": "file","value": data,"dataType":"string"}
+			],
+			dataOutputs: [
+			    {"identifier":"Result","type":"raw"},
+			],
+			success: function(data){
+			    console.log(data);
+			    $(".notifications").notify({
+				message: { text: data },
+				type: 'success',
+			    }).show();
+			},
+			error: function(data){
+			    $(".notifications").notify({
+				message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				type: 'danger',
+			    }).show();
+			}
+		    });		
+
+		});
 	    });
 	    $("#ifileUpload").submit();
 	});
 
-	$("[data-mmaction=publish]").click(function(){
-	    callService("np.publishFullIndex",[
-		{identifier:"id",value:localId,dataType:"string"}
-	    ],function(data){
-	    	$(".notifications").notify({
+	$("#indicators_form_info").find("button").last().click(function(e){
+	    var tmp=["groups","themes"];
+	    var multiples=[[],[]];
+	    for(var i=0;i<tmp.length;i++){
+		$("#documents_"+tmp[i]).find("option:selected").each(function(){
+		    multiples[i].push($(this).val());
+		});
+	    }
+	    var params=[
+		{"identifier": "table","value": "mm_tables.importers","dataType":"string"},
+		{"identifier": "columns","value": JSON.stringify(["name","description"], null, ' '),"mimeType":"application/json"},
+		{"identifier": "links","value": JSON.stringify({"importer_groups":{"table":"mm_tables.importer_groups","ocol":"iid","tid":"gid"},"importer_themes":{"table":"mm_tables.importer_themes","ocol":"iid","tid":"tid"}}, null, ' '),"mimeType":"application/json"},
+		{"identifier": "name","value": $("#documents_name").val(),"dataType":"string"},
+		{"identifier": "description","value": $("#documents_description").val(),"dataType":"string"},
+		{"identifier": "importer_groups","value": JSON.stringify(multiples[0], null, ' '),"mimeType":"application/json"},
+		{"identifier": "importer_themes","value": JSON.stringify(multiples[1], null, ' '),"mimeType":"application/json"},
+	    ];
+	    
+	    if($("#documents_id").val()!=-1)
+		params.push({"identifier": "id","value": $("#documents_id").val(),"dataType":"string"});
+	    insert(params,($("#documents_id").val()!=-1),function(data){
+		console.log(data);
+		$(".notifications").notify({
 		    message: { text: data },
 		    type: 'success',
 		}).show();
-		$("#name_title").removeClass("fa-exclamation").addClass('fa-check');
+		uploadedFile=null;
+		loadAnElement($("#documents_id").val(),false);
 	    });
+
 	});
 
 	console.log($("#page-wrapper").find("[role=presentation]").first());
 	console.log("Start Indicators");
 
-	$("#mm_layer_property_style_display").find(".cpicker").each(function(){
-	    $(this).colorpicker({format: "hex",input: $(this).find("input[type=text]")});
-	});
+	$('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
+            $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+	} );
 
     };
+
+    function editLine(){
+	alert('Activate line editing !');
+    }
 
     // Return public methods
     return {
         initialize: initialize,
-	saveAnElement: saveAnElement
+	saveAnElement: saveAnElement,
+	editLine: editLine
     };
 
 

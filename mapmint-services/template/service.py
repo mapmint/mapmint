@@ -32,6 +32,7 @@ import customize
 
 def display(conf,inputs,outputs):
 	sys.path+=[conf["main"]["templatesPath"]]
+	print >> sys.stderr,"*****************n"+str(inputs)
 	nameSpace = {'conf': conf,'inputs': inputs, 'outputs': outputs}
 	tmpName=inputs["tmpl"]["value"].split('/')
 	toLoad=None
@@ -213,7 +214,8 @@ def display(conf,inputs,outputs):
 	except Exception,e:
 		if conf.keys().count('senv')>0 and conf["senv"].keys().count('lastname')>0:
 			page="/error.tmpl"
-			nameSpace["errorMsg"]=e
+			import traceback
+			nameSpace["errorMsg"]=str(e)+"\n"+str(traceback.format_exc())
 			t1 = Template(file=conf["main"]["templatesPath"]+page,searchList=nameSpace)
 			import time
 			outputs["Result"]["value"]=t1.__str__()

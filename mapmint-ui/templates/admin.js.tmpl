@@ -67,10 +67,11 @@ requirejs.config({
 #end if
             
     },
+    moduleName: "$inputs["module"]["value"]",
     shim: {
 #if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false")
         app: {
-	        deps: ['highcharts','enquire','colResize','responsive','select','validator','typeahead','dataTablesB'#if $inputs["module"]["value"]=="Manager"#,'ol','splitter','colorpicker','cmenu'#end if#],
+	        deps: [#*'highcharts','enquire',*#'colResize','responsive','select','validator',#*'typeahead',*#'dataTablesB'#if $inputs["module"]["value"]=="Manager"#,'ol','splitter','colorpicker','cmenu'#end if#],
 	    },
 #end if
 	typeahead: {

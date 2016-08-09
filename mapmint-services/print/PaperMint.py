@@ -146,9 +146,11 @@ class LOClient:
         @param name Document filename
         """
         tmp=name.split('/')
-        print(tmp,file=sys.stderr)
+        print("********"+str(tmp)+"**********",file=sys.stderr)
         tmp=tmp[len(tmp)-1].split('.')
-        print(tmp,file=sys.stderr)
+        print("********"+tmp[len(tmp)-1]+"**********",file=sys.stderr)
+        print(self.format,file=sys.stderr)
+        print(self.outputFormat[self.format][tmp[len(tmp)-1]],file=sys.stderr)
         prop1Fich = (
             PropertyValue( "FilterName" , 0, self.outputFormat[self.format][tmp[len(tmp)-1]][1] , 0 ),
             PropertyValue( "Overwrite" , 0, True , 0 )
@@ -453,12 +455,19 @@ class LOClient:
         if self.cursor is None:
             self.getCursor()
         self.goToWord(pName)
+        text.insertString( self.cursor, "" , 0 )
+        text.insertControlCharacter( self.cursor, PARAGRAPH_BREAK , 0 )
+        cnt=0
         for i in pData:
             try:
                 text.insertString( self.cursor, unicode(i+"",'utf-8') , 0 )
             except:
                 text.insertString( self.cursor, i , 0 )
-            text.insertControlCharacter( self.cursor, PARAGRAPH_BREAK , 0 )
+            if cnt+1<len(pData):
+                text.insertControlCharacter( self.cursor, PARAGRAPH_BREAK , 0 )
+            else:
+                text.insertString( self.cursor, " " , 0 )
+            cnt+=1
         self.searchAndReplace(pName,"")
 
     def searchTable(self,tName):

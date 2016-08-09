@@ -64,7 +64,6 @@ class manage_users:
 		self.db = db_file
 
 	def connect (self,conf=None):
-		print >> sys.stderr,self.db
 		if conf is not None:
 			self.conf=conf
 		try:
@@ -87,7 +86,6 @@ class manage_users:
 				import authenticate.service as auth
 				import datastores.postgis.pgConnection as pg
 				self.prefix=auth.getPrefix(conf)
-				print >> sys.stderr,self.prefix
 				self.desc=pg.getDesc(self.cur,self.prefix+"users")
 				return True
 			except Exception,e:
@@ -98,17 +96,17 @@ class manage_users:
 	def close (self):
 		try:
 			self.conn.close()
-                except Exception,e:
-                	print >> sys.stderr,e
+		except Exception,e:
+			print >> sys.stderr,e
 			return False
 		return True
 
 	def execute_req(self,req):
 		try:
-                	self.cur.execute(req)
+			self.cur.execute(req)
 			self.conn.commit()
-                except Exception,e:
-                	print >> sys.stderr,e
+		except Exception,e:
+			print >> sys.stderr,e
 			self.conn.commit()
 			return False
 		return True

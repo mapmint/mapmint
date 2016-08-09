@@ -2086,7 +2086,7 @@ __declspec(dllexport)
 	//classObj* myClass=myLayer->class;
 	if(initClass(myClass) == -1)
 	  return;
-	myClass->type = myLayer->type;
+	//myClass->type = myLayer->type;
 	if(msGrowClassStyles(myClass) == NULL)
 	  return ;
 	if(initStyle(myClass->styles[myClass->numstyles]) == -1)

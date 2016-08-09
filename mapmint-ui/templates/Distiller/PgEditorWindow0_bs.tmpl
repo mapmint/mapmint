@@ -1,35 +1,23 @@
 #import zoo
+#set origTbl=$inputs["table"]["value"]
 <div class="tab-content">
   <div class="padder row">
 #set outputs1={"Result":{"value":""}}
 #set inputs1=$inputs
 #set $inputs1["clause"]={"value":"NULL"}
 #set $inputs1["type"]={"value":"insert"}
-#set searchList1=$searchList
     $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/PgEditorWindow_bs.tmpl",searchList=[{"conf":$conf,"inputs":$inputs1,"outputs":$outputs1}]))
   </div>
 
   <div class="padder row">
-#set inputs1=$inputs
-#import authenticate.service as auth
-#set con=auth.getCon($conf)
-#set cur=con.conn.cursor()
-#set prefix=$auth.getPrefix($conf)
-#set $inputs1["clause"]={"value":"NULL"}
-#set $inputs1["type"]={"value":"delete"}
-#set searchList1=$searchList
+#set $inputs1["type"]["value"]="delete"
+#set inputs1["table"]["value"]=$origTbl
     $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/PgEditorWindow_bs.tmpl",searchList=[{"conf":$conf,"inputs":$inputs1,"outputs":$outputs1}]))
   </div>
 	    
   <div class="padder row">
-#set inputs1=$inputs
-#import authenticate.service as auth
-#set con=auth.getCon($conf)
-#set cur=con.conn.cursor()
-#set prefix=$auth.getPrefix($conf)
-#set $inputs1["clause"]={"value":"NULL"}
-#set $inputs1["type"]={"value":"update"}
-#set searchList1=$searchList
+#set $inputs1["type"]["value"]="update"
+#set inputs1["table"]["value"]=$origTbl
     $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/PgEditorWindow_bs.tmpl",searchList=[{"conf":$conf,"inputs":$inputs1,"outputs":$outputs1}]))
   </div>
  

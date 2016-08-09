@@ -438,8 +438,8 @@ define([
 	});
     }
 
-
-    function loadTablesList(dbname,schema,target){
+    function loadTablesList(dbname,schema,target,func){
+	var keepfirst=arguments[3];
 	zoo.execute({
 	    identifier: "datastores.postgis.listTables",
 	    type: "POST",
@@ -451,14 +451,31 @@ define([
 		{"identifier":"Result","type":"raw"},
 	    ],
 	    success: function(data){
+		var kept=null;
 		if($.isArray(target))
-		    for(var i=0;i<target.length;i++)
+		    for(var i=0;i<target.length;i++){
+			if(keepfirst){
+			    if(kept==null)
+				kept=[];
+			    kept.push(target[i].find('option').first()[0].outerHTML);
+			}
 			target[i].html("");
-		else
+		    }
+		else{
+		    if(keepfirst){
+			kept=target.find('option').first()[0].outerHTML;
+		    }
 		    target.html("");
+		}
 
 		target.html("");
-		console.log($.isArray(data));
+		if($.isArray(kept)){
+		    for(var i=0;i<kept.length;i++){
+			target[i].append(kept[i]);
+		    }
+		}else{
+		    target.append(kept);
+		}
 		if($.isArray(data))
 		    for(var i=0;i<data.length;i++){
 			if($.isArray(target))
@@ -466,8 +483,9 @@ define([
 				target[i].append('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
 			else
 			    target.append('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
-			console.log('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
 		    }
+		if(func)
+		    func();
 	    },
 	    error: function(data){
 		$(".notifications").notify({
@@ -478,43 +496,28 @@ define([
 	});	
     }
 
-    function loadTablesList(dbname,schema,target){
+    function callService(service,params,func,onError,outputs){
+	var dataOutputs=[
+	    {"identifier":"Result","type":"raw"},
+	];
+	if(outputs)
+	    dataOutputs=outputs;
 	zoo.execute({
-	    identifier: "datastores.postgis.listTables",
+	    identifier: service,
 	    type: "POST",
-	    dataInputs: [
-		{"identifier":"dataStore","value":dbname,"dataType":"string"},
-		{"identifier":"schema","value":schema,"dataType":"string"}
-	    ],
-	    dataOutputs: [
-		{"identifier":"Result","type":"raw"},
-	    ],
+	    dataInputs: params,
+	    dataOutputs: dataOutputs,
 	    success: function(data){
-		if($.isArray(target))
-		    for(var i=0;i<target.length;i++)
-			target[i].html("");
-		else
-		    target.html("");
-
-		target.html("");
-		console.log($.isArray(data));
-		if($.isArray(data))
-		    for(var i=0;i<data.length;i++){
-			if($.isArray(target))
-			    for(var i=0;i<target.length;i++)
-				target[i].append('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
-			else
-			    target.append('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
-			console.log('<option value="'+data[i][0]+'">'+data[i][1]+'</option>');
-		    }
+		func(data);
 	    },
 	    error: function(data){
-		$(".notifications").notify({
+		onError(data);
+		/*$(".notifications").notify({
 		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
 		    type: 'danger',
-		}).show();
+		}).show();*/
 	    }
-	});	
+	});		
     }
 
     // Return public methods
@@ -522,6 +525,7 @@ define([
         initialize: initialize,
 	loadMap: loadMap,
 	typeaheadMap: typeaheadMap,
+	callService: callService,
 	loadTablesList: loadTablesList
     };
 

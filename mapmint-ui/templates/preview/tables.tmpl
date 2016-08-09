@@ -1,0 +1,236 @@
+#import zoo
+
+#attr mmenu0=[]
+
+#encoding UTF-8
+#from Skeleton_bs import Skeleton_bs
+#extends Skeleton_bs
+
+#attr $mmodule = "tables-public"
+
+#attr $ocss = []
+
+#def istyles
+#if $conf.keys().count("senv")==0 or $conf["senv"]["loggedin"]!="true"
+    <link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/loginc.css"/>
+    <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+#end if
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/font-mfizz.css"/>
+#if $conf["mm"].keys().count("useCdn")>0 and $conf["mm"]["useCdn"]=="true"
+<!-- CDN DEPENDENCIES -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.2.0/css/colReorder.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/1.0.7/css/responsive.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.0.0/css/select.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/dataTables.bootstrap.min.css"/>
+<!-- / CDN DEPENDENCIES -->
+#else
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/buttons.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/colReorder.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/responsive.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/select.dataTables.min.css"/>
+<link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/dataTables.bootstrap.min.css"/>
+#end if
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/ol.css"/>
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/bootstrap-colorpicker.min.css"/>
+<link rel="stylesheet" type="text/css" href="/~djay/progede2/public_map//assets/css/fileinput.min.css"/>
+<link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/mapmint-tables.css"/>
+#end def
+
+#def page_title
+$conf["identification"]["title"]: $zoo._("Tables management")
+#end def
+
+#set lurl=$conf["renv"]["REDIRECT_URL"]
+#if $conf["renv"]["REDIRECT_URL"][len($conf["renv"]["REDIRECT_URL"])-1]!="/"
+#set tmp=$conf["renv"]["REDIRECT_URL"].split("/")
+#set lurl=("/".join(tmp[:len(tmp)-1]))+"/"
+#end if
+
+#def getAbstract()
+#if $conf["identification"]["abstract"].count($conf["main"]["tmpUrl"])>0
+#set f=open($conf["identification"]["abstract"].replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
+              $f.read()
+#else
+              $conf["identification"]["abstract"].replace("[BR]","</p><p>")
+#end if
+#end def
+
+#def mmenu
+
+#import json
+#import np.service as np
+#import mm_access
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=auth.getPrefix($conf)
+
+#set outputs1={"Result":{}}
+#set tmp=np.list($conf,{"table":{"value":"themes"}},$outputs1)
+
+#set lmenu=json.loads($outputs1["Result"]["value"])
+
+#set req="select *,ARRAY(select id from mm.themes where id in (select tid from mm_tables.p_view_themes where vid=mm_tables.p_views.id)) as themes from mm_tables.p_views where id in (select vid from mm_tables.p_view_groups where gid=(select id from mm.groups where name='"+$conf["senv"]["group"]+"')) and visible"
+
+#set res=$cur.execute($req)
+#set res=$cur.fetchall()
+
+#def findTheme(menu,id)
+#for i in range(len(menu))
+#if menu[i].keys().count("id")>0 and menu[i]["id"]==$id
+#if menu[i].keys().count("children")==0
+#set menu1=$menu
+#set $menu1[i]["children"]=[]
+#return $menu1[i]
+#else
+#return $menu[i]
+#end if
+#end if
+#if menu[i].keys().count("children")>0
+#set menu1=$menu[$i]
+#set themeFound=findTheme(menu1["children"],id)
+#if $themeFound is not None
+#return $themeFound
+#end if
+#end if
+#end for
+#return None
+#end def
+
+#def appendMenu(menu,obj)
+#for i in range(len($obj))
+#for j in range(len($obj[i][len($obj[i])-1]))
+#set elem=$findTheme(menu,$obj[i][len($obj[i])-1][j])
+#set elem1=$elem
+#if $elem1
+#set $elem1["children"]+=[{"link":$obj[i][0],"text":$obj[i][2]}]
+#end if
+#end for
+
+#end for
+#end def
+
+
+$appendMenu($lmenu,$res)
+
+#set clevel=0
+
+#set global lurl=$conf["renv"]["REDIRECT_URL"]
+#if $conf["renv"]["REDIRECT_URL"][len($conf["renv"]["REDIRECT_URL"])-1]!="/"
+#set tmp=$conf["renv"]["REDIRECT_URL"].split("/")
+#set global lurl=("/".join(tmp[:len(tmp)-1]))+"/"
+#end if
+
+#def printLine(lurl,level,obj)
+
+#set levels=["first","second","third","forth"]
+ <ul class="nav nav-$(levels[level])-level collapse in">
+  <li>
+   <a id="#if obj.keys().count("id")>0#$(obj["id"])#end if#" href="#if $obj.keys().count("link")>0#$(lurl)/$(obj["link"])#else#\##end if#" role="tab" data-toggle="tab" class="#if $obj.keys().count("link")>0#mmdatastore#end if#"> $obj["text"]</a>
+#if $obj.keys().count("children")
+#for i in range(len($obj["children"]))
+    $printLine(lurl,level+1,$obj["children"][i])
+#end for
+#end if
+  </li>
+ </ul>
+#end def
+
+#for i in range(len($lmenu))
+     $printLine($conf["main"]["rootUrl"]+"tables",0,$lmenu[i])
+#end for
+
+<!--
+ <ul class="nav nav-first-level collapse in">
+  <li>
+    <div class="input-group">
+      <span class="input-group-addon">
+       <i class="fa fa-table br"></i>
+      </span>
+      <input class="form-control" id="save-map" placeholder="$zoo._("Table Name")"
+      type="text" value="$conf["senv"]["last_map"]" />
+      <span class="input-group-btn" title="$zoo._("Load Map")" rel="tooltip">
+       <button class="btn btn-default disabled" type="button">$zoo._("Load")</button>
+      </span>
+    </div>
+  </li>
+ </ul>
+-->
+#end def
+
+#def body
+
+#import zoo
+
+#set lurl=$conf["renv"]["REDIRECT_URL"]
+#if $conf["renv"]["REDIRECT_URL"][len($conf["renv"]["REDIRECT_URL"])-1]!="/"
+#set tmp=$conf["renv"]["REDIRECT_URL"].split("/")
+#set lurl=("/".join(tmp[:len(tmp)-1]))+"/"
+#end if
+
+#if $conf.keys().count("senv")==0 or $conf["senv"]["loggedin"]!="true"
+<div class='notifications top-right'></div>
+$getAbstract()
+
+#if $conf.keys().count("senv")==0 or $conf["senv"]["loggedin"]!="true"
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/login_bs_body.html",searchList={"title":$zoo._("Tables management"),"hasHeader": False}))
+#end if
+#else
+#if $inputs.keys().count('query')>0 and $inputs["query"]["value"]!=""
+
+#from Cheetah.Template import Template
+#import mm_access
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=auth.getPrefix($conf)
+
+#set qComponents=$inputs["query"]["value"].split('/')
+
+#if len($qComponents)==1
+#*
+ In case we want a table list
+*#
+#try
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"con":$con,"qComponents":$qComponents}))
+#except Exception,e
+$getAbstract()
+<div class="alert alert-danger">
+#import traceback
+$zoo._("An error occured: ")<code>$e</code> <span><input type="checkbox" onchange="if(\$(this).is(':checked'))\$(this).next().show();else \$(this).next().hide();" /><div><code>$traceback.format_exc()</code></div></span>
+</div>
+#end try
+#else
+#if $qComponents[1]=="edit"
+#*
+ In case we want to edit / add an element
+*#
+#set inputs0={"dataStore":{"value":$conf["main"]["dbuserName"]},"no-header":{"value":"true"},"table":{"value":"toto"}}	
+#if len($qComponents)>2
+#set $inputs0["id"]={"value":$qComponents[2]}
+#end if
+#set outputs0={"Result":{"value":""}}
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmpl",searchList={"conf": $conf,"inputs": $inputs0,"outputs":$outputs0,"cur":$cur,"con":$con}))
+#end if
+#end if
+#else
+<div class='notifications top-right'></div>
+$getAbstract()
+
+#if $conf.keys().count("senv")==0 or $conf["senv"]["loggedin"]!="true"
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/login_bs_body.html",searchList={"title":$zoo._("Tables management"),"hasHeader": False}))
+#end if
+#end if
+#end if
+#end def
+

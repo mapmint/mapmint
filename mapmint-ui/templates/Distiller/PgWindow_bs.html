@@ -1,15 +1,16 @@
 #encoding "UTF-8"
 #import zoo
-<form method="post">
+<form method="post" class="form-horizontal ">
 #if $inputs.keys().count("no-header")==0
  <h3>$zoo._("Database Access")</h3>
 #end if
  <div class="form-group">
-  <label for="pg_schema">Schemas:</label>
+  <label class="col-sm-2" for="pg_schema">Schemas:</label>
+  <span class="col-sm-4">
 #from datastores.postgis import pgConnection
 #set demo=pgConnection.listSchemas($conf,$inputs,$outputs)
 #set ress=eval($outputs["Result"]["value"])
-  <select id="pg_schema" onchange="MapMintDBManager.refreshTablesList();">
+  <select id="pg_schema" class="form-control">
 #set j=0
 #for i in ress
 #if $j==0
@@ -20,8 +21,10 @@
 #set j=$j+1
 #end for
   </select>
-  <span>Tables:</span>
-  <select id="pg_table" onchange="MapMintDBManager.loadTable();">
+  </span>
+  <span class="col-sm-2">Tables:</span>
+  <span class="col-sm-4">
+  <select id="pg_table" class="form-control">
    <option value="-1">Choose</option>
 #set demo=pgConnection.listTables($conf,$inputs,$outputs)
 #set rest=eval($outputs["Result"]["value"])
@@ -29,5 +32,6 @@
    <option value="$i[0]">$i[1]</option>
 #end for
   </select>
+  </span>
  </div>
 </form>
