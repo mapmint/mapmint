@@ -1,0 +1,104 @@
+#import zoo
+ <script type="template/text" id="view_table_line_c0_template">
+      <i class="fa fa-arrows-v"> </i>[id]
+      <input type="hidden" name="field_id" value="[id]" />
+ </script>
+
+ <script type="template/text" id="view_table_line_c01_template">
+ </script>
+
+ <script type="template/text" id="view_table_line_c1_template">
+      <input name="order" type="checkbox" [order] />
+      <select class="form-control" name="orderType" [orderType]>
+	<option value="1" [asc]>asc</option>
+	<option value="2" [desc]>desc</option>
+      </select>
+ </script>
+
+ <script type="template/text" id="view_table_line_c2_template">
+      <input name="view" type="checkbox" [display] />
+ </script>
+
+ <script type="template/text" id="view_table_line_c3_template">
+      <input name="search" type="checkbox" [search] />
+ </script>
+
+ <script type="template/text" id="view_table_line_c4_template">
+      <a href="#"><i class="fa fa-trash"> </i></a>
+      [name]
+      <input name="oname" type="hidden" value="[name]" />
+ </script>
+
+ <script type="template/text" id="view_table_line_c5_template">
+      <input class="form-control" name="alias" type="text" value="[label]" />
+ </script>
+
+ <script type="template/text" id="view_table_line_c6_template">
+      <textarea class="form-control" name="value">[value]</textarea>
+ </script>
+
+ <script type="template/text" id="view_table_line_c7_template">
+      <input type="text" class="form-control" name="width" value="[width]" />
+ </script>
+
+ <script type="template/text" id="layer_property_table_line_template">
+  <tr>
+    <td>
+      <i class="fa fa-arrows-v"> </i>[id]
+      <input type="hidden" name="field_id" value="[id]" />
+    </td>
+    <td>
+      <input name="order" type="checkbox" [order] />
+      <select class="form-control" name="orderType" [orderType]>
+	<option value="1" [asc]>asc</option>
+	<option value="2" [desc]>desc</option>
+      </select>
+    </td>
+    <td><input name="view" type="checkbox" [display] /></td>
+    <td><input name="search" type="checkbox" [search] /></td>
+    <td>
+      <a href="#mm_layer_property_table_display"><i class="fa fa-trash"> </i></a>
+      [name]
+      <input name="oname" type="hidden" value="[name]" /></td>
+    <td><input class="form-control" name="alias" type="text" value="[label]" /></td>
+    <td><textarea class="form-control" name="value">[value]</textarea></td>
+    <td><input type="text" class="form-control" name="width" value="[width]" /></td>
+  </tr>
+ </script>
+
+ <script type="template/text" id="layer_property_table_template">
+  <h3>$zoo._("Table configuration")   <button class="btn btn-default addRow">
+    $zoo._("Add a row")
+  </button>
+  </h3>
+  <table id="layer_property_table_table_display">
+    <thead>
+      <tr>
+	<th style="width:25px"></th>
+	<th style="width:25px">$zoo._("O.")</th>
+	<th style="width:25px">$zoo._("D.")</th>
+	<th style="width:25px">$zoo._("S.")</th>
+	<th style="width:25px">$zoo._("Name")</th>
+	<th style="width:25px">$zoo._("Label")</th>
+	<th style="width:25px">$zoo._("Value")</th>
+	<th style="width:25px">$zoo._("Width")</th>
+      </tr>
+    </thead>
+    <tbody>
+      [tbody]
+    </tbody>
+  </table>
+ </script>
+
+ <script type="template/text" id="layer_property_export_template">
+   <li class="list-group-item" data-id="[id]">
+    [id]
+   </li>
+ </script>
+
+ <div role="tabpanel" class="tab-pane" id="mm_layer_property_table_display">
+ </div>
+
+ <script type="template/text" id="view_selector_template">
+	<option value="-1">$zoo._("Add")</option>
+ </script>

@@ -1,0 +1,69 @@
+#import zoo
+#encoding UTF-8
+#import zoo
+#import mm_access
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=auth.getPrefix($conf)
+ <script type="template/text" id="report_template">
+  <h3>$zoo._("Table configuration")</h3>
+  <table id="report_table_display">
+    <thead>
+      <tr>
+	<th style="width:25px"></th>
+	<th style="width:25px">$zoo._("Name")</th>
+	<th style="width:25px">$zoo._("Type")</th>
+	<th style="width:25px">$zoo._("Value")</th>
+      </tr>
+    </thead>
+    <tbody>
+      [tbody]
+    </tbody>
+  </table>
+ </script>
+
+ <script type="template/text" id="report_line_template">
+  <tr>
+    <td>
+      <i class="fa fa-arrows-v"> </i> [id]
+      <input type="hidden" name="field_id" value="[id]" />
+    </td>
+    <td>
+      [name]
+      <input name="oname" type="hidden" value="[name]" />
+    </td>
+    <td>
+      <select class="form-control" name="ftype">
+	#set res=$cur.execute("select id,name from mm_tables.ftypes where ftype='r' order by id")
+	#set res=$cur.fetchall()
+	#for i in range(len(res))
+	<option value="$res[$i][0]">$zoo._($res[$i][1])</option>
+	#end for
+      </select>
+    </td>
+    <td><textarea class="form-control" name="value">[value]</textarea></td>
+  </tr>
+ </script>
+
+#set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
+#include $tmpl
+#set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]  
+  <div class="form-group">
+    <label class="col-sm-3 control-label">
+      $zoo._("Document model")
+    </label>
+    <div class="col-sm-9">
+      <form id="afileUpload" class="col-sm-9" action="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=upload.saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="auploader">
+        <input type="file" name="file" id="file" class="form-control file" />
+        <a id="documents_afile_link" href="" target="_blank"></a>
+        <input type="hidden" id="documents_afilename" class="form-control" />
+      </form>
+      $ftmpl.printButton({"id":"import-doc","name":$zoo._("Import"),"classes":"btn-small col-sm-3" })
+      <iframe name="auploader" id="auploader" style="display:none"></iframe>
+    </div>
+  </div>
+  
+  
+ <div role="tabpanel" class="tab-pane" id="mm_report_table_display">
+ </div>

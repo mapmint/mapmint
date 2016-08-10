@@ -1,0 +1,98 @@
+#import zoo
+#encoding UTF-8
+#import zoo
+#import mm_access
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=auth.getPrefix($conf)
+ <script type="template/text" id="edition_template">
+  <h3>$zoo._("Table configuration")   <button class="btn btn-default addRow">
+    $zoo._("Add a row")
+  </button>
+</h3>
+  <table id="edition_table_display">
+    <thead>
+      <tr>
+	<th style="width:25px"></th>
+	<th style="width:25px">$zoo._("E.")</th>
+	<th style="width:25px">$zoo._("Name")</th>
+	<th style="width:25px">$zoo._("Type")</th>
+	<th style="width:25px">$zoo._("Label")</th>
+	<th style="width:25px">$zoo._("Value")</th>
+      </tr>
+    </thead>
+    <tbody>
+      [tbody]
+    </tbody>
+  </table>
+ </script>
+
+ <script type="template/text" id="edition_c0_template">
+  <i class="fa fa-arrows-v"> </i> [id]
+  <input type="hidden" name="field_id" value="[id]" />  
+ </script>
+
+ <script type="template/text" id="edition_c1_template">
+  <input name="edition" type="checkbox" [display] />
+ </script>
+  
+ <script type="template/text" id="edition_c2_template">
+  <a href="#"><i class="fa fa-trash"> </i></a>
+  [name]
+  <input name="oname" type="hidden" value="[name]" />
+ </script>
+  
+ <script type="template/text" id="edition_c3_template">
+  <select class="form-control" name="ftype">
+    #set res=$cur.execute("select id,name from mm_tables.ftypes where ftype='e' order by id")
+    #set res=$cur.fetchall()
+    #for i in range(len(res))
+    <option value="$res[$i][0]">$zoo._($res[$i][1])</option>
+      #end for
+  </select>
+  <br/>
+  <textarea name="dependencies" style="display:none"></textarea>
+ </script>
+
+ <script type="template/text" id="edition_c4_template">
+  <input class="form-control" name="alias" type="text" value="[label]" />  
+ </script>
+
+ <script type="template/text" id="edition_c5_template">
+  <textarea class="form-control" name="value">[value]</textarea>
+ </script>
+
+ <script type="template/text" id="edition_line_template">
+  <tr>
+    <td>
+      <i class="fa fa-arrows-v"> </i> [id]
+      <input type="hidden" name="field_id" value="[id]" />
+    </td>
+    <td><input name="edition" type="checkbox" [display] /></td>
+    <td>
+      <a href="#"><i class="fa fa-trash"> </i></a>
+      [name]
+      <input name="oname" type="hidden" value="[name]" />
+    </td>
+    <td>
+      <select class="form-control" name="ftype">
+	#for i in range(len(res))
+	<option value="$res[$i][0]">$zoo._($res[$i][1])</option>
+	#end for
+      </select>
+      <br/>
+      <textarea name="dependencies" style="display:none"></textarea>
+    </td>
+    <td><input class="form-control" name="alias" type="text" value="[label]" /></td>
+    <td><textarea class="form-control" name="value">[value]</textarea></td>
+  </tr>
+ </script>
+
+ <div role="tabpanel" class="tab-pane" id="mm_edition_table_display">
+ </div>
+
+ <script type="template/text" id="edition_selector_template">
+	<option value="-1">$zoo._("Add")</option>
+ </script>
+ 
