@@ -409,8 +409,9 @@ define([
 			    console.log($(this).attr("value"));
 			    console.log(obj[j]);
 			    console.log($(this).attr("value")==obj[j]);
-			    if($(this).attr("value")==obj[j])
+			    if($(this).attr("value")==obj[j]){
 				$(this).prop("selected",true);
+			    }
 			});
 		}
 		console.log($("#tables_edition_"+i));
@@ -444,6 +445,19 @@ define([
 	    $("#mm_edition_table_display").find("select[name=ftype]").each(function(){
 		$(this).val(data.mmEdits[id].fields[i].ftype);
 		i+=1;
+		$(this).find("option:selected").each(function(){
+		    if($(this).text()=="Reference"){
+			$(this).parent().parent().find("textarea").show();
+		    }else
+			$(this).parent().parent().find("textarea").hide();
+		});
+		$(this).off('change');
+		$(this).change(function(){
+		    if($(this).find('option:selected').text()=="Reference"){
+			$(this).parent().find("textarea").show();
+		    }else
+			$(this).parent().find("textarea").hide();
+		});
 	    });
 
 	    $('#edition_table_display').DataTable({
