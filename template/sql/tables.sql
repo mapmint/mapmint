@@ -62,9 +62,9 @@ INSERT INTO mm_tables.ftypes (name,code,ftype,basic) VALUES ('Date and Time', 'd
 --
 CREATE TABLE mm_tables.p_tables(
        id serial PRIMARY KEY,
-       schema text,
        name text,
-       title text
+       title text,
+       description text
 );
 
 --

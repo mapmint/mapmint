@@ -2,8 +2,8 @@
 
 
 define([
-    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic',"datepicker","fileinput","fileinput_local"
-], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,datepicker,fileinput,fileinput_local) {
+    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic',"datepicker","fileinput","fileinput_local",'highcharts'
+], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,datepicker,fileinput,fileinput_local,Highcharts) {
     
 
     (function(){
