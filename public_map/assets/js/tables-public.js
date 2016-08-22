@@ -442,6 +442,8 @@ define([
 	    params=[];
 	    var tupleReal={};
 	    myRoot.find("script").each(function(){
+		if($(this).attr('id').indexOf('runFirst')>=0)
+		    return;
 		console.log($(this));
 		try{
 		    console.log("**********- "+(myRoot1.attr('id').indexOf('embedded')<0));
@@ -772,6 +774,7 @@ define([
 	}
     }
 
+    var changingFields=[];
     var initialize=function(){
 	var closure=this;
 	$('#side-menu').metisMenu({ toggle: false });
@@ -786,6 +789,77 @@ define([
 
 	displayTable("mainListing_display",$("input[name=mainTableViewId]").val(),mainTableFields,mainTableRFields.join(","),mainTableFilter);
 
+	$(".tab-pane").find("script").each(function(){
+	    try{
+		changingFields.push(JSON.parse("{\""+$(this).attr('name')+"\":"+$(this).html()+"}"));
+		
+		console.log(changingFields);
+		var lname=$(this).attr('name');
+		/*
+		 * Create the options array containing initial values
+		 */
+		$(this).parent().find('select[name='+$(this).attr('name')+']').first().find('option').each(function(){
+		    console.log(changingFields[changingFields.length-1][lname])
+		    for(var i in changingFields[changingFields.length-1][lname]){
+			for(var j in changingFields[changingFields.length-1][lname][i]){
+			    changingFields[changingFields.length-1][lname][i][j]["options"].push($(this).val());
+			}
+		    }
+		});
+		/*
+		 * Load all the corresponding values
+		 */
+		for(var i=0;i<changingFields[changingFields.length-1][lname].length;i++){
+		    changingFields[changingFields.length-1][lname][i]["myEditId"]=$(this).parent().parent().attr('id').replace(/edit_/g,"").replace(/edit0_/g,"");
+		    var closure=$(this);
+		    for(var j in changingFields[changingFields.length-1][lname][i])
+			if(j!="myEditId"){
+			    console.log(lname);
+			    
+			    (function(closure,ref){
+				zoo.execute({
+				    "identifier": "template.display",
+				    "type": "POST",
+				    dataInputs: [
+					{"identifier":"tmpl","value":"public/modules/tables/fetchDependencies_js","dataType":"string"},
+					{"identifier":"elements","value":JSON.stringify(changingFields[changingFields.length-1]),"mimeType":"applicaiton/json"}
+				    ],
+				    dataOutputs: [
+					{"identifier":"Result","type":"raw"},
+				    ],
+				    success: function(data){
+					closure.parent().find('select[name='+closure.attr('name')+']').first().off('change');
+					(function(data){
+					    closure.parent().find('select[name='+closure.attr('name')+']').first().change(function(){
+						console.log(ref)
+						console.log($(this).val());
+						console.log(data[$(this).val()])
+						$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").html("");
+						if(data[$(this).val()]['value'].length>0)
+						    for(var j=0;j<data[$(this).val()]['value'].length;j++)
+							$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="'+data[$(this).val()]['value'][j][0]+'">'+data[$(this).val()]['value'][j][1]+'</option>');
+						else
+						    $(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="NULL">'+module.config().localizationStrings.tables.none+'</option>');
+						    
+
+					    });
+					})(data);
+					closure.parent().find('select[name='+closure.attr('name')+']').first().change();
+					console.log("SUCCESS");
+				    },
+				    error: function(data){
+					console.log("ERROR");
+					console.log(data);
+				    }
+				});
+			    })(closure,j);
+			}
+		}
+		//console.log($(this).attr('name'));
+	    }catch(e){
+		console.log(e);
+	    }
+	});
 	console.log(embedded);
 
 	try{
