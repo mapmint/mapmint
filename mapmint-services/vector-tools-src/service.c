@@ -133,15 +133,23 @@ __declspec(dllexport)
 	/* -------------------------------------------------------------------- */
 	/*      Open data source.                                               */
 	/* -------------------------------------------------------------------- */
-	OGRDataSource       *poDS = NULL;
-	OGRSFDriver         *poDriver = NULL;
 	
 	pszDataSource=(char*) malloc((strlen(dp->d_name)+strlen(pszDataDir)+1)*sizeof(char));
 	sprintf(pszDataSource,"%s%s",pszDataDir,dp->d_name);
-	poDS = OGRSFDriverRegistrar::Open( pszDataSource, !bReadOnly, &poDriver );
-	if( poDS == NULL && !bReadOnly ){
-	  poDS = OGRSFDriverRegistrar::Open( pszDataSource, FALSE, &poDriver );
-	}
+#if GDAL_VERSION_MAJOR >= 2
+      GDALDataset *poDS =
+	(GDALDataset*) GDALOpenEx( pszDataSource,
+				   GDAL_OF_READONLY | GDAL_OF_VECTOR,
+				   NULL, NULL, NULL );
+      GDALDriverManager* poR=GetGDALDriverManager();
+      GDALDriver          *poDriver = NULL;
+#else
+      OGRDataSource poDS = OGRSFDriverRegistrar::Open( pszDataSource, !bReadOnly, &poDriver );
+      if( poDS == NULL && !bReadOnly ){
+	poDS = OGRSFDriverRegistrar::Open( pszDataSource, FALSE, &poDriver );
+      }
+	OGRSFDriver         *poDriver = NULL;
+#endif
 
 	if( poDS != NULL ){
 	  if(res!=NULL){
@@ -158,7 +166,9 @@ __declspec(dllexport)
 	    res=(char*)malloc((strlen(dp->d_name)+strlen(pszDataSource)+4)*sizeof(char));
 	    sprintf(res,"[\"%s\"",pszDataSource);
 	  }
+#if GDAL_VERSION_MAJOR < 2
 	  OGRDataSource::DestroyDataSource( poDS );
+#endif
 	}
 	
 	free(pszDataSource);
@@ -457,21 +467,28 @@ __declspec(dllexport)
     /* -------------------------------------------------------------------- */
     /*      Open data source.                                               */
     /* -------------------------------------------------------------------- */
+#if GDAL_VERSION_MAJOR >= 2
+    GDALDataset *poDS =
+      (GDALDataset*) GDALOpenEx( pszDataSource,
+				 GDAL_OF_READONLY | GDAL_OF_VECTOR,
+				 NULL, NULL, NULL );
+    GDALDriverManager* poR=GetGDALDriverManager();
+    GDALDriver          *poDriver = NULL;
+#else
     OGRDataSource       *poDS = NULL;
     OGRSFDriver         *poDriver = NULL;
-    
+    OGRSFDriverRegistrar    *poR = OGRSFDriverRegistrar::GetRegistrar();
     poDS = OGRSFDriverRegistrar::Open( pszDataSource, !bReadOnly, &poDriver );
     if( poDS == NULL && !bReadOnly )
       {
 	poDS = OGRSFDriverRegistrar::Open( pszDataSource, FALSE, &poDriver );
       }
-    
+#endif    
     /* -------------------------------------------------------------------- */
     /*      Report failure                                                  */
     /* -------------------------------------------------------------------- */
     if( poDS == NULL )
       {
-	OGRSFDriverRegistrar    *poR = OGRSFDriverRegistrar::GetRegistrar();
 	char tmp2[2048];
 	sprintf(tmp2,
 		_ss("FAILURE:\n"
@@ -481,7 +498,11 @@ __declspec(dllexport)
 	for( int iDriver = 0; iDriver < poR->GetDriverCount(); iDriver++ )
 	  {
 	    char *tmp3=strdup(tmp2);
-	    sprintf(tmp2,"%s  - %s\n", tmp3, poR->GetDriver(iDriver)->GetName() );
+#if GDAL_VERSION_MAJOR >=2
+	    sprintf( tmp2,  "%s  -> `%s'\n", tmp3, poR->GetDriver(iDriver)->GetDescription() );
+#else
+	    sprintf( tmp2,  "%s  -> `%s'\n", tmp3, poR->GetDriver(iDriver)->GetName() );
+#endif
 	    free(tmp3);
 	  }
 	setMapInMaps(conf,"lenv","message",tmp2);
@@ -491,8 +512,12 @@ __declspec(dllexport)
     xmlNodePtr n1;
     if(dataSource){
       n1=xmlNewNode(NULL,BAD_CAST "dataType");
-      OGRSFDriver* tmp=poDS->GetDriver();
-      xmlAddChild(n1,xmlNewText(BAD_CAST tmp->GetName()));
+      poDriver=poDS->GetDriver();
+#if GDAL_VERSION_MAJOR >=2
+      xmlAddChild(n1,xmlNewText(BAD_CAST poDriver->GetDescription()));
+#else
+      xmlAddChild(n1,xmlNewText(BAD_CAST poDriver->GetName()));
+#endif
       xmlAddChild(n,n1);
       
       //if(strcasecmp(tmp->GetName(),"ESRI Shapefile")==0){
@@ -595,7 +620,9 @@ __declspec(dllexport)
     /* -------------------------------------------------------------------- */
     CSLDestroy( papszLayers );
     CSLDestroy( papszOptions );
+#if GDAL_VERSION_MAJOR <2
     OGRDataSource::DestroyDataSource( poDS );
+#endif
     if (poSpatialFilter)
       OGRGeometryFactory::destroyGeometry( poSpatialFilter );
     
@@ -993,21 +1020,29 @@ __declspec(dllexport)
     /* -------------------------------------------------------------------- */
     /*      Open data source.                                               */
     /* -------------------------------------------------------------------- */
+#if GDAL_VERSION_MAJOR >= 2
+      GDALDataset *poDS =
+	(GDALDataset*) GDALOpenEx( pszDataSource,
+				   GDAL_OF_VECTOR,
+				   NULL, NULL, NULL );
+      GDALDriverManager* poR=GetGDALDriverManager();
+      GDALDriver          *poDriver = NULL;
+#else
     OGRDataSource       *poDS = NULL;
     OGRSFDriver         *poDriver = NULL;
-
+    OGRSFDriverRegistrar    *poR = OGRSFDriverRegistrar::GetRegistrar();
     poDS = OGRSFDriverRegistrar::Open( pszDataSource, !bReadOnly, &poDriver );
     if( poDS == NULL && !bReadOnly )
       {
         poDS = OGRSFDriverRegistrar::Open( pszDataSource, FALSE, &poDriver );
       }
+#endif
 
     /* -------------------------------------------------------------------- */
     /*      Report failure                                                  */
     /* -------------------------------------------------------------------- */
     if( poDS == NULL )
       {
-	OGRSFDriverRegistrar    *poR = OGRSFDriverRegistrar::GetRegistrar();
 	fprintf(stderr,"ERROR OCCURS %s\n",pszDataSource);
 	char tmp[1024];
         sprintf( tmp, "FAILURE:\n"
@@ -1016,8 +1051,13 @@ __declspec(dllexport)
 
         for( int iDriver = 0; iDriver < poR->GetDriverCount(); iDriver++ )
         {
-	  fprintf(stderr,"  -> %s\n", poR->GetDriver(iDriver)->GetName());
-	  sprintf( tmp+strlen(tmp), "  -> %s\n", poR->GetDriver(iDriver)->GetName() );
+#if GDAL_VERSION_MAJOR >= 2
+	    fprintf( stderr, "  -> %s\n", poR->GetDriver(iDriver)->GetDescription() );
+	    sprintf( tmp+strlen(tmp), "  -> %s\n", poR->GetDriver(iDriver)->GetDescription() );
+#else
+	    fprintf( stderr, "  -> %s\n", poR->GetDriver(iDriver)->GetName() );
+	    sprintf( tmp+strlen(tmp), "  -> %s\n", poR->GetDriver(iDriver)->GetName() );
+#endif
         }
 	
 	setMapInMaps(conf,"lenv","message",tmp);
@@ -1026,9 +1066,19 @@ __declspec(dllexport)
 
     if(dataSource){
       xmlNodePtr n1=xmlNewNode(NULL,BAD_CAST "dataType");
-      OGRSFDriver* tmp=poDS->GetDriver();
+#if GDAL_VERSION_MAJOR >= 2
+      GDALDriver*
+#else
+      OGRSFDriver*
+#endif
+	tmp=poDS->GetDriver();
+#if GDAL_VERSION_MAJOR >= 2
+      xmlAddChild(n1,xmlNewText(BAD_CAST tmp->GetDescription()));
+      fprintf(stderr,"Driver Name: %s\n",BAD_CAST tmp->GetDescription());      
+#else
       xmlAddChild(n1,xmlNewText(BAD_CAST tmp->GetName()));
       fprintf(stderr,"Driver Name: %s\n",BAD_CAST tmp->GetName());
+#endif
       xmlAddChild(n,n1);
     }
 
@@ -1086,15 +1136,24 @@ __declspec(dllexport)
 		  {
                     if( iRepeat != 0 )
 		      poLayer->ResetReading();
+		    fprintf(stderr,"MSG: %s",tmp);
+		    /*
+#if GDAL_VERSION_MAJOR >= 2
+		    if(strcasecmp(poDriver->GetDescription(),"ESRI Shapefile")==0)
+#else
+		    if(strcasecmp(poDriver->GetName(),"ESRI Shapefile")==0)
+#endif
+		      {
+			fprintf(stderr,"MSG: %s",tmp);
+			char tmpSQL[1024];
+			sprintf(tmpSQL,"CREATE SPATIAL INDEX ON %s",poLayer->GetName());
+			poDS->ExecuteSQL( tmpSQL, poSpatialFilter, 
+					  pszDialect );
+					  }*/
 
-		    if(strcasecmp(poDriver->GetName(),"ESRI Shapefile")==0){
-		      char tmpSQL[1024];
-		      sprintf(tmpSQL,"CREATE SPATIAL INDEX ON %s",poLayer->GetName());
-		      poDS->ExecuteSQL( tmpSQL, poSpatialFilter, 
-					pszDialect );
-		    }
-
+		fprintf(stderr,"MSG: %s",tmp);
                     ReportOnLayer4Map( pszDataSource, poLayer, pszWHERE, poSpatialFilter, myMap, conf , NULL);
+		fprintf(stderr,"MSG: %s",tmp);
 
 		    xmlNodePtr n0=xmlNewNode(NULL,BAD_CAST "layer");
 		    xmlNodePtr n1=xmlNewNode(NULL,BAD_CAST "name");
@@ -1151,7 +1210,9 @@ __declspec(dllexport)
     /* -------------------------------------------------------------------- */
     CSLDestroy( papszLayers );
     CSLDestroy( papszOptions );
+#if GDAL_VERSION_MAJOR < 2
     OGRDataSource::DestroyDataSource( poDS );
+#endif
     if (poSpatialFilter)
       OGRGeometryFactory::destroyGeometry( poSpatialFilter );
 
@@ -1299,10 +1360,17 @@ __declspec(dllexport)
 		strcasecmp(strstr(dp->d_name,"."),".QIX")!=0 &&
 		strcasecmp(strstr(dp->d_name,"."),".PRJ")!=0)){
 	      //res=tryOgr(conf,tmp,myMap);
+#if GDAL_VERSION_MAJOR >= 2
+	      poDS =
+		(GDALDataset*) GDALOpenEx( fname,
+					   GDAL_OF_VECTOR,
+					   NULL, NULL, NULL );
+#else
 	      poDS = OGRSFDriverRegistrar::Open( fname, !bReadOnly, &poDriver );
 	      if( poDS == NULL && !bReadOnly ){
 		poDS = OGRSFDriverRegistrar::Open( fname, FALSE, &poDriver );
 	      }
+#endif
 	      if( poDS != NULL){
 		fprintf(stderr,"Successfully tried to open OGR DataSource %s => %d\n",tmp->content->value,res);
 		
@@ -1394,8 +1462,9 @@ __declspec(dllexport)
 		/* -------------------------------------------------------------------- */
 		CSLDestroy( papszLayers );
 		CSLDestroy( papszOptions );
+#if GDAL_VERSION_MAJOR < 2
 		OGRDataSource::DestroyDataSource( poDS );
-		
+#endif		
 		hasValue=1;
 	      }
 	      else{
