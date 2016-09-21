@@ -1,0 +1,283 @@
+#import zoo
+#from Cheetah.Template import Template
+#set embeddedNb=0
+
+#set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
+#include $tmpl
+#set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
+
+#if $inputs.keys().count("isHistory") and $inputs["isHistory"]["value"]=="true"
+#set isH=True
+#else
+#set isH=False
+#end if
+
+#set req="SELECT mm_tables.p_editions.name,mm_tables.p_editions.step,mm_tables.p_editions.ptid,mm_tables.p_editions.id FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm.groups.id in (SELECT mm.groups.id from mm.groups,mm.user_group where mm.groups.id=mm.user_group.id_group and mm.user_group.id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.id="+$inputs["id"]["value"]
+#set res=$cur.execute($req)
+#set vals=$cur.fetchone()
+#set tblId=vals[2]
+#set editId=vals[3]
+#set step=vals[1]
+
+#import json
+#set dependents=[]
+#set dependentFields=[]
+
+<div id="mm_table_editor_form">
+#if not($isH)
+
+#if $step==-1
+#set isOptional=True
+#else
+#set isOptional=False
+#end if
+
+#if $inputs.keys().count("header")>0
+<h2>$vals[0]</h2>
+#if $conf["renv"].keys().count("HTTP_REFERER")>0
+<a href="$conf["renv"]["HTTP_REFERER"]">$zoo._("Back")</a>
+#end if
+#end if
+#set step=$vals[1]
+
+#set req="SELECT mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,mm_tables.p_edition_fields.alias,mm_tables.p_edition_fields.value,mm_tables.p_edition_fields.edition,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.dependencies FROM mm_tables.p_editions,mm_tables.p_edition_fields where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm_tables.p_editions.id="+$inputs["id"]["value"]
+#set res=$cur.execute($req)
+#set vals=$cur.fetchall()
+
+#set req="select code from mm_tables.ftypes where ftype='e' order by id asc;"
+#set res=$cur.execute($req)
+#set codes=$cur.fetchall()
+
+#for i in range(len($vals))
+
+#try
+
+#set ctype=$vals[i][5]
+
+#*
+  In case mm_tables.p_edition_fields.edition is true
+*#
+#if $vals[i][4]
+
+#if $vals[i][6] is not None and $vals[i][6]!=''
+$ftmpl.printHiddenContent({"rid":"runFirst_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][6],"optional":$isOptional})
+#end if
+
+#if $ctype=="text" or $ctype=="varchar(255)" or $ctype=="html"
+#*
+ In case it is a long text content
+*#
+#if $ctype=="html"
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+#else
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":"textarea","optional":$isOptional})
+#end if
+#else
+#if ctype=="bytea"
+$ftmpl.printBasicLine({"label":$vals[i][2].title(),"content":$ftmpl.printUploadInputNew({"id":"edit_"+str($vals[i][0]),"name":"edition_"+str($vals[i][1])})})
+#else
+#if ctype=="tbl_linked" 
+#*
+ In case it is a multiple select list
+*#
+#set components=str($vals[i][3]).split(";")
+#set req=$components[len(components)-1]
+#set res1=$cur.execute($req)
+#try
+#set vals1=$cur.fetchall()
+#set options=[]
+#for j in range(len(vals1))
+#set $options+=[vals1[j]]
+#end for
+#except Exception,e
+#set options=[["-1",$zoo._("No element")]]
+#end try
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"type":"multiple","options":$options,"optional":$isOptional})
+#else
+#if ctype=="ref" 
+#*
+ In case it is a select list
+*#
+#set req0=str($vals[i][3])
+#set res1=$cur.execute($vals[i][3])
+#try
+#set vals1=$cur.fetchall()
+#set options=[]
+#for j in range(len(vals1))
+#set $options+=[vals1[j]]
+#end for
+#except Exception,e
+#set options=[["-1",$zoo._("No element")]]
+#end try
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"type":"select","options":$options,"optional":$isOptional})
+#else
+#if ctype=="date" or ctype=="datetime" or ctype=="float"
+#*
+ In case it is a date
+*#
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+#else
+#if ctype=="link"
+#*
+ In case it is a linked table (link)
+*#
+#set components=$vals[i][3].split(";")
+#import psycopg2
+#from psycopg2.extensions import *
+#set req="SELECT mm_tables.p_views.id from mm_tables.p_views,mm_tables.p_tables where mm_tables.p_views.ptid=mm_tables.p_tables.id AND mm_tables.p_tables.name="+str(adapt($components[1]))
+#set res=$cur.execute($req)
+#set lvals=$cur.fetchone()
+#try
+#set content=Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"qComponents":[str(lvals[0])],"embedded":$embeddedNb,"con":$con})
+#set $embeddedNb+=1
+#except Exception,e
+<div class="alert alert-danger">$e</div>
+#end try
+#set preTitle='<input type="hidden" name="embedded_'+str($embeddedNb-1)+'_link_col" value="'+$components[0]+'"/>'
+$ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content})
+#else
+#if ctype=="tbl_link"
+#set components=$vals[i][3].split(";")
+#import psycopg2
+#from psycopg2.extensions import *
+#set req="SELECT mm_tables.p_views.id from mm_tables.p_views,mm_tables.p_tables where mm_tables.p_views.ptid=mm_tables.p_tables.id AND mm_tables.p_tables.name="+str(adapt($components[2]))
+#set res=$cur.execute($req)
+#set lvals=$cur.fetchone()
+#try
+#set content=Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"qComponents":[str(lvals[0])],"embedded":$embeddedNb,"isPreInput": True,"con":$con})
+#set $embeddedNb+=1
+#except Exception,e
+<div class="alert alert-danger">$e</div>
+#end try
+#set preTitle='<input type="hidden" name="embedded_'+str($embeddedNb-1)+'_link_col" value="'+$components[0]+'"/>'
+$ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content})
+#else
+#if ctype=="tbl_list"
+#import psycopg2
+#from psycopg2.extensions import *
+#set req="SELECT mm_tables.p_views.id from mm_tables.p_views,mm_tables.p_tables where mm_tables.p_views.ptid=mm_tables.p_tables.id AND mm_tables.p_tables.name="+str(adapt($vals[i][3]))
+#set res=$cur.execute($req)
+#set lvals=$cur.fetchone()
+#try
+#set content=Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"qComponents":[str(lvals[0])],"embedded":$embeddedNb,"isInput":True,"con":$con})
+#set $embeddedNb+=1
+#except Exception,e
+<div class="alert alert-danger">$e</div>
+#end try
+#set preTitle='<input type="hidden" name="input_'+str($embeddedNb-1)+'_embedded_'+str($embeddedNb-1)+'_link_col" value="'+$vals[i][1]+'"/><input type="hidden" name="input_'+str($embeddedNb-1)+'_embedded_'+str($embeddedNb-1)+'_link_val" value="-1"/>'
+$ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content})
+#else
+#*
+ In other cases
+*#
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"optional":$isOptional})
+#end if
+#end if
+#end if
+#end if
+#end if
+#end if
+#end if
+#end if
+#else
+#*
+  In case mm_tables.p_edition_fields.edition is false
+*#
+#set lvalue=$vals[i][3]
+
+#if $lvalue.count("[_")
+
+#*
+  Create an array containing the values
+*#
+#set allValues=$lvalue.split("[_")
+#set fvalues=[]
+#for a in range(len($allValues))
+#if $allValues[a].count("_]")>0
+#try
+#set t=$Template($allValues[a].replace("_]",""),searchList=$searchList())
+#set $fvalues+=[unicode($t)]
+#except Exception,e
+<div class="alert alert-danger">$zoo._("Unable to handle your SQL query: ")$e</div>
+#end try
+#else
+#set $fvalues+=[$allValues[a]]
+#end if
+#end for
+#set lvalue="".join($fvalues)
+#end if
+$ftmpl.printHiddenContent({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$lvalue,"optional":$isOptional})
+
+#end if
+
+#except Exception,e
+#try
+#set res=$con.conn.commit()
+#except
+continue
+#end try
+<div class="alert alert-danger">
+$zoo._("Unable to display your form. Please, check your configuration.")
+<code>
+$e
+</code>
+#import traceback
+<span><input type="checkbox" onchange="if(\$(this).is(':checked'))\$(this).next().show();else \$(this).next().hide();" /><div><code>$traceback.format_exc()</code></div></span>
+</div>
+#end try
+
+#end for
+
+#end if
+
+#try
+
+$ftmpl.printHidden({"rid":"edition_uid","id":"edit_uid","name":"edit_uidName","value":$conf["senv"]["id"]})
+
+#if $step<0
+#if $step==-2
+$ftmpl.printButton({"id":"delete","name":$zoo._("Delete")})
+#else
+#if $step!=-10
+
+#set opts=[$zoo._("OR"),$zoo._("AND")]
+$ftmpl.printLine({"rid":"edition_linkClause","id":"edit_linkClause","name":$zoo._("Link clauses with"),"value":$vals[i][3],"optional":False,"type":"select","options":opts})
+
+$ftmpl.printButton({"id":"search","name":$zoo._("Search")})
+
+<script type="template/text" id="filter_complete_template">
+<div id="filter_[id]" class="alert alert-[type]">
+       <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+       <strong><i class="fa fa-filter" aria-hidden="true"></i> $zoo._("Filter ")[cid]</strong>  [body]
+</div>
+</script>
+
+<script type="template/text" id="filter_line_template">
+  <span class="label label-info">[line]</span>
+</script>
+
+#end if
+#end if
+#else
+$ftmpl.printButton({"id":"save","name":$zoo._("Save")})
+#end if
+
+</div>
+$ftmpl.printHidden({"rid":"edition_table_id","id":"edit_table_id","name":"table_id","value":$tblId})
+$ftmpl.printHidden({"rid":"edition_edition_id","id":"edit_edition_id","name":"edition_id","value":$editId})
+
+#if $inputs.keys().count("isReference")>0 and $inputs["isReference"]["value"]=="true"
+$ftmpl.printHidden({"rid":"edition_tuple_id","id":"edit_tuple_id","name":"table_id","value":"-1"})
+#end if
+
+#except Exception,e
+<div class="alert alert-danger">
+$zoo._("Unable to display your form. Please, check your configuration.")
+<code>
+$e
+</code>
+#import traceback
+<span><input type="checkbox" onchange="if(\$(this).is(':checked'))\$(this).next().show();else \$(this).next().hide();" /><div><code>$traceback.format_exc()</code></div></span>
+</div>
+#end try
+

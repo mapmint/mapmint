@@ -132,6 +132,7 @@ define([
 			if(cData["pages"][$("#documents_ifile_page").val()]["ofield"]){
 			    $("#pages_id").val(cData["pages"][$("#documents_ifile_page").val()]["id"]);
 			    $("#documents_page_type").val(cData["pages"][$("#documents_ifile_page").val()]["type"]);
+			    $("#documents_page_tablename").val(cData["pages"][$("#documents_ifile_page").val()]["tablename"]);
 			    var closure={
 				"field": eval((cData["pages"][$("#documents_ifile_page").val()]["ofield"].replace(/Field/g,"")+"-1")),
 				"type": cData["pages"][$("#documents_ifile_page").val()]["otype"]
@@ -1567,9 +1568,10 @@ define([
 	    console.log($(this));
 	    var params=[
 		{"identifier": "table","value": "mm_tables.pages","dataType":"string"},
-		{"identifier": "columns","value": JSON.stringify(["name","type","ofield","otype","length","iid"], null, ' '),"mimeType":"application/json"},
-		{"identifier": "name","value": $(this).prev().prev().find('select').val(),"dataType":"string"},
-		{"identifier": "type","value": $(this).prev().find('select').val(),"dataType":"string"},
+		{"identifier": "columns","value": JSON.stringify(["name","tablename","type","ofield","otype","length","iid"], null, ' '),"mimeType":"application/json"},
+		{"identifier": "name","value": $(this).prev().prev().prev().find('select').val(),"dataType":"string"},
+		{"identifier": "type","value": $(this).prev().prev().find('select').val(),"dataType":"string"},
+		{"identifier": "tablename","value": $(this).prev().find('input').val(),"dataType":"string"},
 		{"identifier": "length","value": $("select[name=DS_table_indicatorTable_indicator_length]").val(),"dataType":"string"},
 		{"identifier": "ofield","value": managerTools.sort["field"],"dataType":"string"},
 		{"identifier": "otype","value": managerTools.sort["type"],"dataType":"string"},

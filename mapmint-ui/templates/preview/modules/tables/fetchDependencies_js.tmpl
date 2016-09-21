@@ -1,0 +1,43 @@
+#import zoo,json
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=auth.getPrefix($conf)
+#set fres={}
+#*$inputs["elements"]["value"]*#
+#set obj=$json.loads($inputs["elements"]["value"])
+#set objKeys=obj.keys()
+#set lid=None
+#for k in range(len(objKeys))
+#for j in range(len($obj[$objKeys[k]]))
+#set req="SELECT id, name,value from mm_tables.p_edition_fields WHERE eid=[_id_] AND name=[_name_]"
+#set val=$obj[$objKeys[k]][j]["myEditId"]
+#*$obj[$objKeys[k]][j].keys()*#
+#set lkeys=$obj[$objKeys[k]][j].keys()
+#for i in range(len($lkeys))
+#if $lkeys[i]!="myEditId"
+#set name=lkeys[i]
+#end if
+#end for
+#*[$name]*#
+#set res=$con.pexecute_req([req,{"id":{"value":$val,"format":"s"},"name":{"value":$name,"format":"s"}}])
+#set vals=$con.cur.fetchall()
+#*$obj[$objKeys[k]][j].keys()
+$vals*#
+#for i in range(len($vals))
+#*$vals[i][0]*#
+#if $obj[$objKeys[k]][j].keys().count($vals[i][1])>0
+#*$obj[$objKeys[k]][j][$name]["options"]*#
+#for ii in range(len($obj[$objKeys[k]][j][$name]["options"]))
+#set clause=""
+#set $clause+=" "+$obj[$objKeys[k]][j][$name]["tfield"]+" "+$obj[$objKeys[k]][j][$name]["operator"]+" "+str($obj[$objKeys[k]][j][$name]["options"][ii])
+#if $vals[i][2].upper().count("WHERE")==0
+$con.cur.execute($vals[i][2].replace(" order by"," WHERE " + $clause + " order by"))
+#end if
+#set $fres[$obj[$objKeys[k]][j][$name]["options"][ii]]={"value":$con.cur.fetchall(),"id":$vals[i][0]}
+#end for
+#end if
+#end for
+#end for
+#end for
+$json.dumps($fres)

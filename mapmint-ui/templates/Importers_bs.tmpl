@@ -113,63 +113,6 @@ var counter=0;
 #def content1($conf)
     <div class="row">
     </div>
-#*    <div class="form-group documents_itable">
-      <label class="col-sm-3 control-label">
-        $zoo._("Table")
-      </label>
-      <div class="col-sm-9 ">
-#from Cheetah.Template import Template
-#set inputs0={"dataStore":{"value":$conf["main"]["dbuserName"]},"no-header":{"value":"true"}}
-#set outputs0={"Result":{"value":""}}
-$(Template(file=$conf["main"]["templatesPath"]+"/Distiller/PgWindow_bs.tmpl",searchList={"conf": $conf,"inputs": $inputs0,"outputs":$outputs0}))
-	<input type="hidden" name="data_table_dbname" value="$conf["main"]["dbuserName"]" />
-      </div>
-    </div>
-
-#set options=[[-1,$zoo._("Select a database")]]
-#import datastores.postgis.service as pg
-#import json
-#set ii={}
-#set ii["type"]={"value": "PostGIS"}
-#set outputs={"Result":{"value":""}}
-#set res=$pg.displayJson($conf,$ii,$outputs)
-#set t=json.loads($outputs["Result"]["value"])
-#try
-#set t=json.loads($outputs["Result"]["value"])
-#for i in range(0,len($t["sub_elements"]))
-#set $options+=[["PostGIS:"+$t["sub_elements"][i]["name"],$t["sub_elements"][i]["name"]]]
-#end for
-#except
-#pass
-#end try
-#set ii={}
-#set ii["type"]={"value": "MySQL"}
-#set res=$pg.displayJson($conf,$ii,$outputs)
-#try
-#set t=json.loads($outputs["Result"]["value"])
-#for i in range(0,len($t["sub_elements"]))
-#set $options+=[["MySQL:"+$t["sub_elements"][i]["name"],$t["sub_elements"][i]["name"]]]
-#end for
-#except
-#pass
-#end try
-
-     $ftmpl.printLine({"rid":"documents_indicators_database","id":"documents_database","name":$zoo._("Database"),"type":"select","options":$options,"classes":"documents_iquery"})
-
-
-    <div class="form-group documents_iquery">
-      <label class="col-sm-3 control-label">
-        $zoo._("SQL Query")
-      </label>
-      <div class="col-sm-9 ">
-      <div class="col-sm-9 ">
-        <textarea id="documents_data_query" class="form-control"></textarea>
-      </div>
-      $ftmpl.printButton({"id":"testSql","name":$zoo._("Test"),"classes":"btn-small col-sm-3" })
-      $ftmpl.printButton({"id":"runSql","name":$zoo._("Run"),"classes":"btn-small col-sm-3" })
-      </div>
-    </div>
-*#
 
 <script type="text/javascript">
 var icounter=0;
@@ -201,6 +144,8 @@ var icounter=0;
 #set res=$cur.execute($req)
 #set opts=$cur.fetchall()
   $ftmpl.printLine({"rid":"documents_page_type","id":"page_type","name":$zoo._("Choose a type"),"type":"select","options":$opts})
+
+  $ftmpl.printLine({"rid":"documents_page_tablename","id":"page_tablename","name":$zoo._("Table name")})
 
 #end def
 
