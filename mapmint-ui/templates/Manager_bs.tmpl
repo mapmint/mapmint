@@ -264,11 +264,15 @@ $printAdder({"id":"mm_addGrid","title":$zoo._("Add Grid"),"placeholder":$zoo._("
    </li>
  </script>
 
+ <script type="template/text" id="layerswitcher_item_template_short">
+   [short] <span data-placement="right" data-toggle="tooltip" title="[id]">[...]</span>
+ </script>
+
  <script type="template/text" id="layerswitcher_item_template">
    <li class="li-layer">
      <div class="input-group col-sm-12">
        <input class="form" value="[id]" type="checkbox" />
-       <span> [id]</span>
+       <span> [idl]</span>
        <span data-placement="right" data-toggle="tooltip" class="dropdown pull-right hidden-lg">
         <button data-toggle="dropdown" id="[id]Toggle" class="dropdown-toggle layer-cmenu btn btn-default btn-xs " href="#"><b class="caret"></b></button>
 	  <ul class="dropdown-menu">

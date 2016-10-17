@@ -65,7 +65,7 @@ define([
 	});
 	inputs.push({
 	    "identifier": "mmBAK",
-	    "value": $("#mmBAK").val(),
+	    "value": $("input[name=mmBAK]").val(),
 	    "dataType": "string"
 	});
 
@@ -146,7 +146,7 @@ define([
 	    });	    
 	});
 
-	var tools=["mmNav","mmOT","mmVT"];
+	var tools=["mmNav","mmOT","mmVT","mmRT"];
 	for(var i=0;i<tools.length;i++){
 	    inputs.push({
 		"identifier": tools[i],

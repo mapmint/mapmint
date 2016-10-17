@@ -112,10 +112,13 @@ var baseLayers={
 #set windows=[]
 #end if
 
+
+#set alreadyInTimeline=[]
+
 var oLayers={
 #set cnt=0
 #for l in range($m.numlayers)
-#if $mm_access.checkLayerPriv($conf,$m,$m.getLayer($l).name,"r")
+#if $mm_access.checkLayerPriv($conf,$m,$m.getLayer($l).name,"r") and $alreadyInTimeline.count($m.getLayer($l).name)==0
 #if $cnt >0
     ,
 #end if
@@ -139,6 +142,26 @@ var oLayers={
      	"map": "$conf["main"]["dataPath"]/public_maps/timeline_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)_step0.map",
 #else
      	"map": "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($m.getLayer($l).metadata.get('mmFilterField') or $m.getLayer($l).metadata.get('mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map",
+#if $m.web.metadata.get("mmRT") and $m.web.metadata.get("mmRT").count("timeline")>0 and $m.getLayer($l).type==mapscript.MS_LAYER_RASTER
+    	"maps":[
+#set cg=$m.getLayer($l).metadata.get("mm_group")
+#for n in range($m.numlayers)
+#if $m.getLayer($n).metadata.get("mm_group")==$cg
+	  "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($n).type==mapscript.MS_LAYER_RASTER and $m.getLayer($n).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($n).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($n).name)#if ($m.getLayer($n).metadata.get('mmFilterField') or $m.getLayer($n).metadata.get('mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map",
+#set $alreadyInTimeline+=[$m.getLayer($n).name]
+#end if
+#end for
+	],
+    	"layers":[
+#set cg=$m.getLayer($l).metadata.get("mm_group")
+#for n in range($m.numlayers)
+#if $m.getLayer($n).type==mapscript.MS_LAYER_RASTER and $m.getLayer($n).metadata.get("mm_group")==$cg
+	  "$m.getLayer($n).name",
+#set $alreadyInTimeline+=[$m.getLayer($n).name]
+#end if
+#end for
+	],
+#end if
 #end if
 	"searchMap": "$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map",
 	"dataType": #if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER or $m.getLayer($l).type==$mapscript.MS_LAYER_TILEINDEX#"raster"#else##if $m.getLayer($l).type==$mapscript.MS_LAYER_POINT#"point"#else##if $m.getLayer($l).type==$mapscript.MS_LAYER_LINE#"line"#else#"polygon"#end if##end if##end if#,

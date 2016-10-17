@@ -624,9 +624,9 @@ def getLayersList(conf,mapfile):
     res+="]"
     return res
 
-def getGroupList(conf,mapfile):
+def getGroupList(conf,mapfile,raster=None):
     import mapscript,sys
-    print >> sys.stderr,"DEBUG: "+str(mapfile)
+    print >> sys.stderr,"************** DEBUG: "+str(mapfile)
     try:
         m = mapscript.mapObj(mapfile)
         #print >> sys.stderr,m
@@ -635,10 +635,10 @@ def getGroupList(conf,mapfile):
         if conf is not None:
             conf["lenv"]["message"]=zoo._("Unable to open the mapfile")
         return 4
-    print >> sys.stderr,"DEBUG"
     res="["
     allGroups=[]
     resGroups={}
+    allreadyInTimeline=[]
     for i in range(0,3):
         #try:
         groups=m.web.metadata.get("mm_group_"+str(i))
@@ -675,20 +675,30 @@ def getGroupList(conf,mapfile):
                     for k in inheritance[0].split(","):
                         if k!="":
                             elem+=[{k: []}]
-        for i in range(0,m.numlayers):
-            j=m.getLayer(i)
-            if j is not None:
-                g=j.metadata.get("mm_group")
-                if g is None:
-                    break
-                d=getThemArray(resGroups,g)
-                dict={"layer": j.name}
-                if j.metadata.get('mmSteps') is not None and j.metadata.get('mmSteps')!="":
-                    dict["steps"]=j.metadata.get('mmSteps').split(',')
-                if j.metadata.get('mmTiled') is not None and j.metadata.get('mmTiled')!="":
-                    dict["tiled"]=j.metadata.get('mmTiled')
-                if j.metadata.get('mmLabelsMap') is not None and j.metadata.get('mmLabelsMap')!="":
-                    dict["labels"]=j.metadata.get('mmLabelsMap')
+    for i in range(0,m.numlayers):
+        j=m.getLayer(i)
+        if j is not None:
+            g=j.metadata.get("mm_group")
+            if g is None:
+                break
+            dict={"layer": j.name}
+            if raster is None and m.web.metadata.get('mmRT') and m.web.metadata.get('mmRT').count("timeline")>0 and j.type==mapscript.MS_LAYER_RASTER and allreadyInTimeline.count(j.name)==0:
+                dict["steps"]=[j.name]
+                allreadyInTimeline=[j.name]
+                for n in range(m.numlayers):
+                    ll=m.getLayer(n)
+                    if j.metadata.get("mm_group")==ll.metadata.get("mm_group") and ll.type==mapscript.MS_LAYER_RASTER and allreadyInTimeline.count(ll.name)==0:
+                        allreadyInTimeline+=[ll.name]
+                        dict["steps"]+=[ll.name]
+                    #if allreadyInTimeline.count(ll.name)==0:
+                addLayerToThem(resGroups,g,dict)
+            if j.metadata.get('mmSteps') is not None and j.metadata.get('mmSteps')!="":
+                dict["steps"]=j.metadata.get('mmSteps').split(',')
+            if j.metadata.get('mmTiled') is not None and j.metadata.get('mmTiled')!="":
+                dict["tiled"]=j.metadata.get('mmTiled')
+            if j.metadata.get('mmLabelsMap') is not None and j.metadata.get('mmLabelsMap')!="":
+                dict["labels"]=j.metadata.get('mmLabelsMap')
+            if allreadyInTimeline.count(j.name)==0:
                 addLayerToThem(resGroups,g,dict);
 
     return resGroups
@@ -730,11 +740,12 @@ def addLayerToThem(obj,search,value):
             pass
     return None
 
-def recursMapList(conf,group):
+def recursMapList(conf,group,allreadyInTimeline):
     res=[]
     print >> sys.stderr,str(group)
+    print >> sys.stderr,str(allreadyInTimeline)
     for i in group:
-        print >> sys.stderr,"GROUP I "
+        print >> sys.stderr,"****** GROUP III "
         print >> sys.stderr,str(group[i])
         if type(group[i]).__name__=="str":
             import mapscript
@@ -742,10 +753,17 @@ def recursMapList(conf,group):
             l=m.getLayerByName(group[i])
             if l is not None and l.name and l.name.count("grid_")>0:
                 return [{"id": group[i],"text": group[i],"mmType": 0}]
-            if l is not None:
+            if l is not None and allreadyInTimeline.count(l.name)==0:
                 obj={"id": group[i],"text": group[i],"mmType": l.type, "nclasses":l.numclasses}
                 if l.metadata.get("mmSteps") is not None:
                     obj["steps"]=l.metadata.get("mmSteps").split(',')
+                if m.web.metadata.get('mmRT') and m.web.metadata.get('mmRT').count("timeline")>0 and l.type==mapscript.MS_LAYER_RASTER:
+                    obj["steps"]=[]
+                    for j in range(m.numlayers):
+                        ll=m.getLayer(j)
+                        if l.metadata.get("mm_group")==ll.metadata.get("mm_group") and ll.type==mapscript.MS_LAYER_RASTER:
+                            allreadyInTimeline+=[ll.name]
+                            obj["steps"]+=[ll.name]
                 return [obj]
             else:
                 return [{"id": group[i],"text": group[i]}]
@@ -754,7 +772,7 @@ def recursMapList(conf,group):
                 res1=[]
                 for j in range(0,len(group[i])):
                     #print >> sys.stderr,"recursMap "+str(group[i][j])
-                    res1+=recursMapList(conf,group[i][j])
+                    res1+=recursMapList(conf,group[i][j],allreadyInTimeline)
                 res+=[{"id": i,"text": i, "children": res1}]
             else:
                 if conf is not None:
@@ -797,7 +815,7 @@ def getMapList(conf,inputs,outputs):
     import json
     #outputs["Result"]["value"]=json.dumps([res])
     print >> sys.stderr,"GROUPS "+str(d)
-    outputs["Result"]["value"]=json.dumps(recursMapList(conf,d))
+    outputs["Result"]["value"]=json.dumps(recursMapList(conf,d,[]))
     return 3
 
 def recursGroupList1(group,pref):
@@ -815,7 +833,7 @@ def recursGroupList1(group,pref):
 
 def getGroupList1(conf,inputs,outputs):
     import json
-    d=getGroupList(conf,conf["main"]["dataPath"]+"/maps/project_"+inputs["name"]["value"]+".map")
+    d=getGroupList(conf,conf["main"]["dataPath"]+"/maps/project_"+inputs["name"]["value"]+".map",True)
     #print >> sys.stderr, recursGroupList1(d,"")
     outputs["Result"]["value"]=json.dumps(d)
     return zoo.SERVICE_SUCCEEDED
@@ -1583,7 +1601,7 @@ def saveMap(conf,inputs,outputs):
         m.web.metadata.set("mmProjectName",inputs["map"]["value"])
         if m.web.metadata.get("mmTitle")=="" or m.web.metadata.get("mmTitle") is None :
             m.web.metadata.set("mmTitle",inputs["map"]["value"])
-            saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+        saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
         import authenticate.service as auth
         con = auth.getCon(conf)
         prefix = auth.getPrefix(conf)
@@ -2444,7 +2462,7 @@ def classifyMap0(conf,inputs,outputs):
         con.conn.commit()
 
     cond=""
-    if inputs.keys().count("mmMExpr")>0 and inputs["mmMExpr"]["value"]!="":
+    if layer.type!=mapscript.MS_LAYER_RASTER and inputs.keys().count("mmMExpr")>0 and inputs["mmMExpr"]["value"]!="":
 	    cond=" WHERE "+inputs["mmMExpr"]["value"].replace("\"[","").replace("]\"","")
 	    cond=cond.replace("[","").replace("]","")
     lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layer.data+" "+cond+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
@@ -2453,7 +2471,7 @@ def classifyMap0(conf,inputs,outputs):
     if layer.metadata.get("mmMethod"):
 	    layer.metadata.remove("mmMethod")
     #if inputs.keys().count("mmType") and inputs["mmType"]["value"]=="gradSymb":
-    if inputs.keys().count("method")>0 and conf["main"].has_key("Rpy2") and conf["main"]["Rpy2"]=="true":
+    if layer.type!=mapscript.MS_LAYER_RASTER and inputs.keys().count("method")>0 and conf["main"].has_key("Rpy2") and conf["main"]["Rpy2"]=="true":
         lInputs1={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT "+inputs["field"]["value"]+" as val FROM "+layerName}}
         vt.vectInfo(conf,lInputs,outputs)
         ll=json.loads(outputs["Result"]["value"])
@@ -2720,6 +2738,13 @@ def classifyMap0(conf,inputs,outputs):
     inputs1["name"]=inputs["map"]
     outputs1={"Result": {"value": ""}}
     createLegend0(conf,inputs1,outputs)
+    if inputs.keys().count("noRecurs")==0 and l.type==mapscript.MS_LAYER_RASTER and nbClasses>1 and m.web.metadata.get('mmRT') and m.web.metadata.get('mmRT').count('timeline')>0:
+        for i in range(m.numlayers):
+            ll=m.getLayer(i)
+            if l.name!=ll.name and ll is not None and ll.type==mapscript.MS_LAYER_RASTER and ll.metadata.get('mm_group')==l.metadata.get('mm_group'):
+                inputs["noRecurs"]={"value":"true"}
+                inputs["layer"]["value"]=ll.name
+                classifyMap0(conf,inputs,outputs)
     return zoo.SERVICE_SUCCEEDED
 
     
@@ -3686,12 +3711,12 @@ def updateMapOrder0(conf,inputs,outputs):
     i=0
     order=0
     while i < 3:
-        m.web.metadata.set("mm_group_"+str(i),mmGroups[i])
+        m.web.metadata.set("mm_group_"+str(i),mmGroups[i].encode('utf-8'))
         i+=1
     for a in layers:
         l=m.getLayerByName(a["name"])
         if l is not None:
-            l.setMetaData("mm_group",a["group"])
+            l.setMetaData("mm_group",a["group"].encode('utf-8'))
             l.setMetaData("mm_order",str(order))
         order+=1
     saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
@@ -4010,7 +4035,7 @@ def savePublishMap(conf,inputs,outputs):
     mapfile=conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map"
     destMapfile=mapfile.replace("maps","public_maps")
     m = mapscript.mapObj(mapfile)
-    args=["mmPopupList","mmWindowList","mmProjectName","mmTitle","mmKeywords","mmAuthor","mmCopyright","mmRestricted","mmMBaseLayers","mmPBaseLayers","mmProprietaryBaseLayers","mmOSMBaseLayers","mmActivatedBaseLayers","mmBAK","mmOT","mmVT","mmNav","mmBProject","mmRenderer","default_minx","default_maxx","default_miny","default_maxy","max_minx","max_miny","max_maxx","max_maxy","mmActivatedLayers","layout_t","mmProjectName","vectorLayers","rasterLayers","mmLayoutColor","base_osm","tuom","tprj","fsize","ffamily","font-colorpicker","mmLSPos","mmLSAct"]
+    args=["mmPopupList","mmWindowList","mmProjectName","mmTitle","mmKeywords","mmAuthor","mmCopyright","mmRestricted","mmMBaseLayers","mmPBaseLayers","mmProprietaryBaseLayers","mmOSMBaseLayers","mmActivatedBaseLayers","mmBAK","mmOT","mmVT","mmRT","mmNav","mmBProject","mmRenderer","default_minx","default_maxx","default_miny","default_maxy","max_minx","max_miny","max_maxx","max_maxy","mmActivatedLayers","layout_t","mmProjectName","vectorLayers","rasterLayers","mmLayoutColor","base_osm","tuom","tprj","fsize","ffamily","font-colorpicker","mmLSPos","mmLSAct"]
     isPassed=-1
     for i in args:
         if inputs.keys().count(i)>0:

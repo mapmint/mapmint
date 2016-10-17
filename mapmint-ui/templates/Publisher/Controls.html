@@ -42,22 +42,29 @@
     </div>
   </div>
 #if $m.web.metadata.get('mmVT')
-#set mmVT=$m.web.metadata.get('mmVT').split(',')
+#set mmT={"V":$m.web.metadata.get('mmVT').split(',')}
 #else
-#set mmVT=[]
+#set mmT={"V":[]}
+#end if
+#if $m.web.metadata.get('mmRT')
+#set $mmT["R"]=$m.web.metadata.get('mmRT').split(',')
+#else
+#set $mmT["R"]=[]
 #end if
 
-#set toolbars=$conf["mm"]["toolbars"].split(',')
+#set keys=$mmT.keys()
+  $keys
+#set toolbars=$conf["mm"]["toolbars1"].split(',')
 #for i in range(0,len($toolbars))
   <div class="row">
-    <label class="col-sm-3 control-label">$zoo._($toolbars[$i])</label>
+    <label class="col-sm-3 control-label">$zoo._($conf[$toolbars[$i]]["title"])</label>
     <div class="col-sm-9 range">
-      <select id="mmVT" multiple class="form-control">
-#set items=$conf["mm"][$toolbars[$i].lower()+"Toolbar"].split(',')
-#set items_alias=$conf["mm"][$toolbars[$i].lower()+"ToolbarAlias"].split(',')
-	    <option value="-1" #if len(mmVT)==0 or $mmVT.count("-1")#selected="true"#end if#>None</option>
+      <select id="mm$(keys[$i])T" multiple class="form-control">
+#set items=$conf[$toolbars[$i]]["name"].split(',')
+#set items_alias=$conf[$toolbars[$i]]["alias"].split(',')
+	    <option value="-1" #if len(mmT[keys[$i]])==0 or $mmT[mmT.keys()[$i]].count("-1")#selected="true"#end if#>None</option>
 #for j in range(0,len($items))
-	    <option value="$items[$j]" #if $mmVT.count($items[$j])>0#selected="true"#end if#>$items_alias[$j]</option>
+	    <option value="$items[$j]" #if $mmT[keys[$i]].count($items[$j])>0#selected="true"#end if#>$items_alias[$j]</option>
 #end for
       </select>
     </div>

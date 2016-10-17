@@ -68,6 +68,8 @@ define([
 
     var initialize=function(){
 	console.log("Start application");
+	$(".bg_load").fadeOut("slow");
+	$(".bg_load_wrapper").fadeOut("slow");
 	$("form").on("submit",function(){
 	    var closure=$(".btn-lg");
 	    return react(closure);

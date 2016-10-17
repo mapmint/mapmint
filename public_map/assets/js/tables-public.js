@@ -175,6 +175,18 @@ define([
 		    }
 		    
 
+		    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+		    $('.inner_displayer').off('click');
+		    $('.inner_displayer').on('click',function(){
+			var closure=$(this);
+			console.log($(this).parent().next());
+			if($(this).is(':checked')){
+			    $(this).parent().next().show();
+			}else {
+			    $(this).parent().next().hide();
+			};
+		    });
+
 		    console.log('finish');
 		    
 
@@ -234,7 +246,7 @@ define([
 			    console.log(data[i][j]);
 			    if(data[i][j]){
 			    if(!data[i][j].type){
-				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]);
+				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
 				    if($(this).hasClass("htmlEditor")){
 					$(this).code(data[i][j]);
@@ -833,7 +845,9 @@ define([
 					    closure.parent().find('select[name='+closure.attr('name')+']').first().change(function(){
 						console.log(ref)
 						console.log($(this).val());
+						console.log(data)
 						console.log(data[$(this).val()])
+						console.log($(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]"));
 						$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").html("");
 						if(data[$(this).val()]['value'].length>0)
 						    for(var j=0;j<data[$(this).val()]['value'].length;j++)
@@ -843,8 +857,8 @@ define([
 						    
 
 					    });
+					    closure.parent().find('select[name='+closure.attr('name')+']').first().change();
 					})(data);
-					closure.parent().find('select[name='+closure.attr('name')+']').first().change();
 					console.log("SUCCESS");
 				    },
 				    error: function(data){

@@ -289,6 +289,36 @@ $BODY$
   LANGUAGE 'plpgsql' COST 100.0 SECURITY INVOKER;
 
 
+CREATE OR REPLACE FUNCTION automatically_update_geom_property() RETURNS trigger AS 
+$BODY$
+DECLARE
+	newX float8;
+	newY float8;
+	oldX float8;
+	oldY float8;
+	lgeom geometry;
+	xfield varchar;
+	yfield varchar;
+	srs varchar;
+BEGIN
+	xfield:=TG_ARGV[0];
+	yfield:=TG_ARGV[1];
+	srs:=TG_ARGV[2];
+	EXECUTE 'SELECT ($1).' || xfield || '::float as a' INTO newX USING NEW;
+	EXECUTE 'SELECT ($1).' || yfield || '::float as a' INTO newY USING NEW;
+
+	EXECUTE 'SELECT ($1).' || xfield || '::float as a' INTO oldX USING OLD;
+	EXECUTE 'SELECT ($1).' || yfield || '::float as a' INTO oldY USING OLD;
+
+	IF newX!=oldX or newY!=oldY or (NEW.wkb_geometry is null and newY is not null and newX is not null) THEN
+	   EXECUTE $q$SELECT ST_SetSRID(ST_MakePoint($q$||newX||$q$,$q$||newY||$q$),(select srid from spatial_ref_sys where auth_name||':'||auth_srid='$q$||srs||$q$'))$q$ INTO NEW.wkb_geometry;
+	END IF;
+
+	return NEW;	
+END;
+$BODY$
+  LANGUAGE 'plpgsql' COST 100.0 SECURITY INVOKER;
+
 
 CREATE OR REPLACE FUNCTION update_ghosts() RETURNS trigger AS 
 $$

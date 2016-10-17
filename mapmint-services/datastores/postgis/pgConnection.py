@@ -1,3 +1,4 @@
+
 import psycopg2
 import libxml2
 import libxslt
@@ -65,14 +66,14 @@ def listTables(conf,inputs,outputs):
 	db=pgConnection(conf,inputs["dataStore"]["value"])
 	db.parseConf()
 	if db.connect():
-            req="select schemaname||'.'||tablename as tablename, tablename as display from pg_tables WHERE schemaname NOT LIKE 'information_schema' AND schemaname NOT LIKE 'pg_%' AND tablename NOT LIKE 'tmp%' AND tablename NOT LIKE 'spatial_ref_sys' AND  tablename NOT LIKE 'geometry_columns' "
+            req="select schemaname||'.'||tablename as tablename, tablename as display from pg_tables WHERE schemaname NOT LIKE 'information_schema' AND schemaname NOT LIKE 'pg_%' AND tablename NOT LIKE 'spatial_ref_sys' AND  tablename NOT LIKE 'geometry_columns' "
             if inputs.has_key("schema"):
                 req+="AND schemaname='"+inputs["schema"]["value"]+"'"
             req+=" ORDER BY schemaname||'.'||tablename"
             res=db.execute(req)
-            if res:
-                outputs["Result"]["value"]=json.dumps(res)
-		return zoo.SERVICE_SUCCEEDED
+            outputs["Result"]["value"]=json.dumps(res)
+            return zoo.SERVICE_SUCCEEDED
+		#return zoo.SERVICE_SUCCEEDED
         else:
             print >> sys.stderr,"Unable to connect"
             return zoo.SERVICE_FAILED
@@ -107,14 +108,15 @@ def getDesc(cur,table):
 
 def getTableDescription(conf,inputs,outputs):
 	import authenticate.service as auth
-	if not(auth.is_ftable(inputs["table"]["value"])):
-		conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
-		return zoo.SERVICE_FAILED
+	#if not(auth.is_ftable(inputs["table"]["value"])):
+	#	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+	#	return zoo.SERVICE_FAILED
 	db=pgConnection(conf,inputs["dataStore"]["value"])
 	db.parseConf()
 	if db.connect():
             tmp=inputs["table"]["value"].split('.')
             req=getDesc(db.cur,inputs["table"]["value"])
+            print >> sys.stderr,req
             res=db.execute(req)
             if res!=False and len(res)>0:
                 outputs["Result"]["value"]=json.dumps(res)
@@ -128,9 +130,9 @@ def getTableDescription(conf,inputs,outputs):
 
 def getTableContent(conf,inputs,outputs):
 	import authenticate.service as auth
-	if not(auth.is_ftable(inputs["table"]["value"])):
-		conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
-		return zoo.SERVICE_FAILED
+	#if not(auth.is_ftable(inputs["table"]["value"])):
+	#	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+	#	return zoo.SERVICE_FAILED
         db=pgConnection(conf,inputs["dataStore"]["value"])
 	db.parseConf()
         getTableDescription(conf,inputs,outputs)
@@ -174,6 +176,10 @@ def getTableContent(conf,inputs,outputs):
                     fields+=","
                 fields+=tmp[i][1]
 	if db.connect():
+            tmp=inputs["table"]["value"].split(".")
+            tmp[0]='"'+tmp[0]+'"'
+            tmp[1]='"'+tmp[1]+'"'
+            inputs["table"]["value"]=(".").join(tmp)
             req="select count(*) from "+inputs["table"]["value"]
             res=db.execute(req)
             if res!=False:
@@ -333,8 +339,8 @@ def testDesc(val,desc):
                 return None
         else:
             if val!='NULL':
-                tmp = adapt(val)
-                return str(tmp)
+                tmp = adapt(val.encode('utf-8'))
+                return str(tmp).decode('utf-8')
             else:
                 return "NULL"
     else:
@@ -350,3 +356,41 @@ def testDesc(val,desc):
             else:
                 return val
 
+def fetchType(conf,ftype):
+    db=pgConnection(conf,conf["main"]["dbuserName"])
+    db.parseConf()
+    if db.connect():
+        res=db.execute("SELECT code from mm_tables.ftypes where id="+ftype)
+        if res:
+            return str(res[0][0])
+    return None
+
+def addColumn(conf,inputs,outputs):
+    print >> sys.stderr,inputs["dataStore"]["value"]
+    db=pgConnection(conf,inputs["dataStore"]["value"])
+    db.parseConf()
+    req=[]
+    if db.connect():
+        if inputs["field_type"]["value"]!="18":
+            req+=["ALTER TABLE quote_ident("+inputs["table"]["value"]+") ADD COLUMN "+inputs["field_name"]["value"]+" "+fetchType(conf,inputs["field_type"]["value"])]
+            outputs["Result"]["value"]=zoo._("Column added")
+        else:
+            tblInfo=inputs["table"]["value"].split(".")
+            if len(tblInfo)==1:
+                tmp=tblInfo[0]
+                tblInfo[0]="public"
+                tblInfo[1]=tmpl
+            req+=["SELECT AddGeometryColumn('"+tblInfo[0]+"','"+tblInfo[1]+"','wkb_geometry',(select srid from spatial_ref_sys where auth_name||':'||auth_srid = '"+inputs["proj"]["value"]+"'),'"+inputs["geo_type"]["value"]+"',2)"]
+            outputs["Result"]["value"]=zoo._("Geometry column added.")
+            if inputs.keys().count("geo_x")>0 and inputs.keys().count("geo_y")>0:
+                req+=["CREATE TRIGGER mm_tables_"+inputs["table"]["value"].replace(".","_")+"_update_geom BEFORE UPDATE OR INSERT ON "+inputs["table"]["value"]+" FOR EACH ROW EXECUTE PROCEDURE automatically_update_geom_property('"+inputs["geo_x"]["value"]+"','"+inputs["geo_y"]["value"]+"','"+inputs["proj"]["value"]+"')"]
+                outputs["Result"]["value"]+=" "+zoo._("Trigger in place")
+            print >> sys.stderr,req
+        for i in range(0,len(req)):
+            if not(db.execute(req[i])):
+                return zoo.SERVICE_FAILED
+        db.conn.commit()
+        return zoo.SERVICE_SUCCEEDED
+    else:
+        conf["lenv"]["message"]=zoo._("Unable to connect")
+    return zoo.SERVICE_FAILED

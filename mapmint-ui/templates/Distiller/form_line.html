@@ -1,3 +1,5 @@
+#import zoo
+
 #def printAdder($obj)
 <div class="input-group">
   <input class="form-control" name="$obj["name"]" placeholder="$obj["Name"]" type="text" />
@@ -40,7 +42,7 @@
 #end def
 
 #def printBasicLine(obj)
-<div class="form-group #if $obj.keys().count("classes")>0#$obj["classes"]#end if#">
+<div class="form-group row #if $obj.keys().count("classes")>0#$obj["classes"]#end if#">
   <label class="col-sm-3 control-label">
   $obj["label"]
   </label>
@@ -64,8 +66,8 @@
 #end def
 
 #def printLine(obj)
-#set ltypes=["select","multiple","textarea","date","datetime","float","html"]
-<div class="form-group #if $obj.keys().count("classes")>0#$obj["classes"]#end if#">
+#set ltypes=["select","multiple","textarea","date","datetime","float","html","checkbox"]
+<div class="form-group row #if $obj.keys().count("classes")>0#$obj["classes"]#end if#">
   <label class="col-sm-3 control-label">$obj["name"]</label>
   <div class="col-sm-9 ">
 
@@ -74,16 +76,15 @@
       <span class="input-group-addon">
         <input type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" name="filter" value=""/>
       </span>
-#end if    
+#end if
 #if $obj.keys().count("type")==0
     <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="text" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
 #else
 #if $ltypes.count($obj["type"])==0
     <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="password" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
 #else
-#if $obj["type"]=="date" or $obj["type"]=="datetime"
-    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="$obj["type"]#if $obj["type"]!="date"#-local#end if#" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
-
+#if $obj["type"]=="date" or $obj["type"]=="datetime" or $obj["type"]=="checkbox"
+    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control#if $obj["type"]=="checkbox"#-checkbox#end if#" type="$obj["type"]#if $obj["type"]!="date" and $obj["type"]!="checkbox"#-local#end if#" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
 #else
 #if $obj["type"]=="float"
     <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="number" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
@@ -133,7 +134,15 @@
 #if obj.keys().count("font")
     <i class="fa $(obj.font) fa-fw"></i>
 #end if
+#if obj.keys().count("cnt")>0
+    <span class="hidden-lg">$(obj.cnt)</span>
+#end if
     <span class="hidden-xs hidden-sm hidden-md">$(obj.title)</span>
   </a>
 </li>
+#end def
+
+#def printBasicCheckbox()
+<input class="inner_displayer pull-right" type="checkbox"
+  checked="checked" data-toggle="tooltip" title="$zoo._("Display")"/>
 #end def

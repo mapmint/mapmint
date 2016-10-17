@@ -4,6 +4,7 @@
 #except
 #set pprefix=""
 #end try
+
 #if $elem[$i].keys().count("children") > 0 
     <li class="list-group-item"><input type="checkbox" /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$elem[$i]["text"].decode('raw_unicode_escape').replace("-_-"," ") </label>
     	<ul class="list-group tree">

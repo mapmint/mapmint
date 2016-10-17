@@ -1660,16 +1660,16 @@ def detailsDocuments(con,val,prefix):
     if len(vals)>0:
         for i in range(0,len(vals)):
             res["documents_themes"]+=[vals[i][0]]
-            req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"documents_groups where d_id=[_id_])"
-            con.pexecute_req([req2,{"id":{"value":str(val),"format":"s"}}])
-            try:
-            	vals0=con.cur.fetchall()
-            	res["documents_groups"]=[]
-            	if len(vals0)>0:
-                	for j in range(0,len(vals0)):
-                    		res["documents_groups"]+=[vals0[j][0]]
-            except:
-		res["documents_groups"]+=[]
+    req2="select * from "+prefix+"groups where id in (select g_id from "+prefix+"documents_groups where d_id=[_id_])"
+    con.pexecute_req([req2,{"id":{"value":str(val),"format":"s"}}])
+    try:
+        vals0=con.cur.fetchall()
+        res["documents_groups"]=[]
+        if len(vals0)>0:
+            for j in range(0,len(vals0)):
+                res["documents_groups"]+=[vals0[j][0]]
+    except:
+        res["documents_groups"]+=[]
 
     return res
 
@@ -1985,9 +1985,6 @@ def details(conf,inputs,outputs):
     con.connect()
     cur=con.conn.cursor()
     res=None
-    if not(auth.is_ftable(inputs["table"]["value"])):
-	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
-	return zoo.SERVICE_FAILED
     if inputs["table"]["value"]=="territories":
         res=detailsTerritoires(cur,inputs["id"]["value"],prefix)
     else:
@@ -2038,6 +2035,7 @@ def details(conf,inputs,outputs):
                     res["published"]="false"
             conf["senv"]["last_index"]=inputs["id"]["value"]
         if inputs["table"]["value"]=="documents":
+            print >> sys.stderr,"*** OK TREAT DOCUMENTS !!"
             res=detailsDocuments(con,inputs["id"]["value"],prefix)
         if inputs["table"]["value"].count("."):
             import datastores.postgis.pgConnection as pg
@@ -2050,7 +2048,7 @@ def details(conf,inputs,outputs):
             for i in range(0,len(desc)):
                 res[str(desc[i][1]).encode("utf-8")]=content["rows"][0]["cell"][i]
                 print >> sys.stderr,desc[i][1]
-            if inputs["table"]["value"]=="mm_tables.importers":
+            if inputs["table"]["value"]=='"mm_tables"."importers"':
                 req="select template,ARRAY((select tid from mm_tables.importer_themes where mm_tables.importers.id=mm_tables.importer_themes.iid)),ARRAY((select gid from mm_tables.importer_groups where mm_tables.importers.id=mm_tables.importer_groups.iid)) from mm_tables.importers where id="+res["id"]+";"
                 print >> sys.stderr," --------- "+str(req)+" --------- "
                 cur.execute(req)
@@ -2096,7 +2094,7 @@ def details(conf,inputs,outputs):
                     lobj["fields"]=lfields
                     res["pages"][lobj["name"]]=lobj
 
-            if inputs["table"]["value"]=="mm_tables.p_tables":
+            if inputs["table"]["value"]=='"mm_tables"."p_tables"':
                 #print >> sys.stderr,res['name']
                 getTableElements(conf,con,cur,res,"mmEdits","edition","eid")
                 getTableElements(conf,con,cur,res,"mmReports","report","rid")
@@ -3197,6 +3195,24 @@ def saveUploadedFile(conf,inputs,outputs):
     content=packFile(conf,inputs["file"]["value"],inputs["field"]["value"])
     cur.execute("UPDATE "+inputs["table"]["value"]+" set "+inputs["field"]["value"]+"=%s WHERE id="+inputs["id"]["value"],(psycopg2.Binary(content),))
     con.conn.commit()
+    if inputs["file"]["value"].count('mdb'):
+        import os,subprocess
+        try:
+            os.mkdir(inputs["file"]["value"]+"_dir")
+        except:
+            pass
+        table_names = subprocess.Popen(["/usr/local/bin/mdb-tables", inputs["file"]["value"]],
+            stdout=subprocess.PIPE).communicate()[0]
+        tables = table_names.split(" ")
+        sys.stdout.flush()
+        for table in tables:
+            print >> sys.stderr,table
+            if table != '':
+                csv_content=subprocess.Popen(["/usr/local/bin/mdb-export", inputs["file"]["value"], table],
+                    stdout=subprocess.PIPE).communicate()[0]
+                cfile=open(inputs["file"]["value"]+"_dir/"+table+".csv","w")
+                cfile.write(csv_content)
+                cfile.close()
     outputs["Result"]["value"]=zoo._('Done')
     return zoo.SERVICE_SUCCEEDED
             
@@ -3285,6 +3301,7 @@ def clientInsert(conf,inputs,outputs):
             print >> sys.stderr,"COLS"
             print >> sys.stderr,col_sufix
             print >> sys.stderr,"VALS"
+            val_sufix=val_sufix.replace("'NULL'","NULL")
             print >> sys.stderr,val_sufix
             req="INSERT INTO "+tableName+" ("+col_sufix+") VALUES ("+val_sufix.decode("'utf-8")+") RETURNING id"
             print >> sys.stderr,"VALS"
@@ -3299,6 +3316,7 @@ def clientInsert(conf,inputs,outputs):
             print >> sys.stderr,tableName
             print >> sys.stderr,col_sufix.encode("utf-8")
             print >> sys.stderr,val_sufix
+            col_sufix=col_sufix.replace("'NULL'","NULL")
             req="UPDATE "+tableName+" set "+col_sufix+" WHERE "+val_sufix
             #print >> sys.stderr,str(req.encode("utf-8"))
             cur.execute(req)
@@ -3636,8 +3654,8 @@ def clientViewTable(conf,inputs,outputs):
             classifier=vals[i][6]+" "+classifiers[(vals[i][5]-1)]
     if inputs.keys().count("sortname")>0 and inputs.keys().count("sortname")!="":
         for i in range(len(vals)):
-            if vals[i][6] == inputs["sortname"]["value"]:
-                classifier=inputs["sortname"]["value"]+" "+inputs["sortorder"]["value"]
+            if vals[i][1].encode('utf-8') == inputs["sortname"]["value"]:
+                classifier=vals[i][6]+" "+inputs["sortorder"]["value"]
     if inputs.keys().count("filters")>0:
         filters=json.loads(inputs["filters"]["value"])
         if len(filters)>0:
@@ -3646,7 +3664,6 @@ def clientViewTable(conf,inputs,outputs):
             else:
                 clause=buildClause(json.loads(inputs["filters"]["value"]))
     req1="SELECT count(*) FROM "+table+" WHERE "+clause
-    print >> sys.stderr,req1
     res=cur.execute(req1)
     fres["total"]=cur.fetchone()[0]
     if inputs.keys().count("page")>0:
@@ -3659,6 +3676,7 @@ def clientViewTable(conf,inputs,outputs):
     print >> sys.stderr,"****** "+str(cid)
     print >> sys.stderr,"******* "+str(clause)
     req1="SELECT "+(",".join(values+[cid]))+" FROM "+table+" WHERE "+clause+" ORDER BY "+classifier+" LIMIT "+inputs["limit"]["value"]+" OFFSET "+inputs["offset"]["value"]
+    print >> sys.stderr,req1
     res=cur.execute(req1)
     vals=cur.fetchall()
     fres["rows"]=[]
@@ -3690,3 +3708,149 @@ def clientViewTable(conf,inputs,outputs):
     con.conn.close()
     return zoo.SERVICE_SUCCEEDED
 
+def massiveImport(conf,inputs,outputs):
+    import json
+    cid=-1
+    con=auth.getCon(conf)
+    con.connect()
+    cur=con.conn.cursor()
+    req="SELECT name,type,ofield,otype,tablename,id,isreference,(select count(*)>0 from mm_tables.pages where iid="+inputs["id"]["value"]+" and isreference) from mm_tables.pages where iid="+inputs["id"]["value"]+" ORDER BY isreference desc"
+    res=cur.execute(req)
+    vals=cur.fetchall()
+    import vector_tools.vectSql as vectSql
+    for i in range(len(vals)):
+        try:
+            print >> sys.stderr,str(('SELECT * FROM "'+vals[i][0]+'" order by '+vals[i][2]+' '+vals[i][3]+'').encode('utf-8'))
+        except:
+            print >> sys.stderr,('SELECT * FROM "'+vals[i][0]+'" order by '+vals[i][2]+' '+vals[i][3]+'')
+        res=vectSql.vectInfo(conf,{"q":{"value":str(('SELECT * FROM "'+vals[i][0]+'" order by '+vals[i][2]+' '+vals[i][3]+'').encode('utf-8'))},"dstName":{"value":inputs["dstName"]["value"]}},outputs)
+        res=json.loads(outputs["Result"]["value"])
+        req1="select name,value,(select code from mm_tables.ftypes where id=type),rlabel from mm_tables.page_fields where pid="+str(vals[i][5])
+        res1=cur.execute(req1)
+        vals1=cur.fetchall()
+        tname="imports.\"tmp_"+vals[i][4].replace(".","___")+"_"+conf["lenv"]["usid"]+"\""
+        tname_1=vals[i][4]
+        #reqTemp0="CREATE TEMPORARY TABLE "+tname+" ("
+        reqTemp0="CREATE TABLE "+tname+" ("
+        reqTemp0_1="CREATE TABLE "+tname_1+" (id serial PRIMARY KEY, "
+        reqTemp=reqTemp0
+        reqTemp_1=reqTemp0_1
+        cattr=""
+        reqInsertTemp="INSERT INTO "+tname+" VALUES ("
+        reqs=[]
+        if vals[i][1]==2:
+            for j in vals1:
+                if cattr!="":
+                    cattr+=", "
+                if reqTemp_1!=reqTemp0_1:
+                    reqTemp_1+=", "
+                if reqTemp!=reqTemp0:
+                    reqTemp+=", "
+                    reqInsertTemp+=", "
+                cattr+=j[0]
+                reqTemp+=j[0]+" "+j[2]
+                reqTemp_1+=j[0]+" "+j[2]
+                refs=j[1].split('||')
+                value=""
+                for k in range(len(refs)):
+                    ref=eval(refs[k])
+                    fieldName="Field"+str(ref[0]+1)
+                    value+=res[ref[1]][fieldName]
+                try:
+                    cur.execute("SELECT "+str(adapt(value)).replace(",",".")+"::"+j[2])
+                    reqInsertTemp+=str(adapt(value)).replace(",",".")+"::"+j[2]
+                except:
+                    con.conn.commit()
+                    reqInsertTemp+="NULL"
+            reqTemp+=")"
+            reqTemp_1+=")"
+            reqInsertTemp+=")"
+            referenceTable=vals[i][4]
+        else:
+            for j in vals1:
+                if cattr!="":
+                    cattr+=", "
+                if reqTemp_1!=reqTemp0_1:
+                    reqTemp_1+=", "
+                if reqTemp!=reqTemp0:
+                    reqTemp+=", "
+                cattr+=j[0]
+                reqTemp_1+=j[0]+" "+j[2]
+                reqTemp+=j[0]+" "+j[2]
+            reqTemp+=")"
+            if vals[i][6]:
+                cattr+=", fkey"
+            if vals[i][7]:
+                reqTemp_1+=", fkey int4 references "+referenceTable+"(id) ON DELETE CASCADE"
+            reqTemp_1+=")"
+            refs=vals1[0][1].split('||')
+            ref=eval(refs[0])
+            for k in range(ref[1],len(res)):
+                reqIS0=""
+                reqIS=reqIS0
+                reqIS1=reqIS0
+                for j in vals1:
+                    if reqIS!=reqIS0:
+                        reqIS+=", "
+                        reqIS1+=", "
+                    refs=j[1].split('||')
+                    value=""
+                    valueX=""
+                    for l in range(len(refs)):
+                        ref=eval(refs[l])
+                        if ref[1]>=0 and ref[0]>=0:
+                            fieldName="Field"+str(ref[0]+1)
+                        else:
+                            fieldName=str(j[3].encode("utf-8"))
+                        print >> sys.stderr,res[k]
+                        value+=res[k][fieldName.decode('utf-8')]
+                        valueX+="(null)"
+                    try:
+                        cur.execute("SELECT "+str(adapt(value)).replace(",",".")+"::"+j[2])
+                        reqIS+=str(adapt(value)).replace(",",".")+"::"+j[2]
+                    except:
+                        con.conn.commit()
+                        reqIS+="NULL"
+                    try:
+                        cur.execute("SELECT "+str(adapt(valueX)).replace(",",".")+"::"+j[2])
+                        reqIS1+=str(adapt(valueX)).replace(",",".")+"::"+j[2]
+                    except:
+                        con.conn.commit()
+                        reqIS1+="NULL"
+                if reqIS1!=reqIS:
+                    reqs+=[reqIS]
+            #reqInsertTemp+=",".join(reqs)+")"
+        # isReference ?
+        reqInsertTemp_1="INSERT INTO "+tname_1+" ("+cattr
+        if vals[i][7] and not(vals[i][6]):
+            reqInsertTemp_1+=", fkey) (SELECT *,"+str(cid)+" from "+tname+")"
+        else:
+            reqInsertTemp_1+=") (SELECT * from "+tname+")"
+        if vals[i][6]:
+            reqInsertTemp_1+=" RETURNING id"
+        print >> sys.stderr,"******* 0 *********"
+        print >> sys.stderr,reqTemp
+        print >> sys.stderr,"******* 1 *********"
+        print >> sys.stderr,reqTemp_1
+        print >> sys.stderr,"******* 2 *********"
+        print >> sys.stderr,reqInsertTemp
+        print >> sys.stderr,"******* 3 *********"
+        print >> sys.stderr,reqInsertTemp_1
+        print >> sys.stderr,"******* 4 *********"
+        con.pexecute_req([reqTemp,{}])
+        con.pexecute_req([reqTemp_1,{}])
+        if len(reqs)==0:
+            print >> sys.stderr,"******* 5 *********"
+            print >> sys.stderr,reqInsertTemp
+            print >> sys.stderr,"****************"
+            con.pexecute_req([reqInsertTemp,{}])
+        for j in range(len(reqs)):
+            reqInsertTemp1=reqInsertTemp+reqs[j]+")"
+            print >> sys.stderr,"******* 6 *********"
+            print >> sys.stderr,reqInsertTemp1
+            print >> sys.stderr,"******* 7 *********"
+            con.pexecute_req([reqInsertTemp1,{}])
+        con.pexecute_req([reqInsertTemp_1,{}])
+        if vals[i][6]:
+            cid=con.cur.fetchone()[0]
+    return zoo.SERVICE_SUCCEEDED

@@ -42,10 +42,14 @@ define([
     var zoo=null;
     var initialize=function(){
 
-	$('[data-toggle="tooltip"]').tooltip();
+	$(".bg_load").fadeOut("slow");
+	$(".bg_load_wrapper").fadeOut("slow");
 
 	//if(arguments.length==0 || arguments[0])
 	initMenu();
+
+	$('[data-toggle="tooltip"]').tooltip();
+	
 
 	var isMoved=false;
 	isMoved=setupMenu(isMoved);

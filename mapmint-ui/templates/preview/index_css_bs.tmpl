@@ -69,8 +69,7 @@ body{
 #end for
 #end if
 #end if
-#if $l.metadata.get("mmClass")=="tl" or $l.metadata.get("mmSteps") is not None
-#set steps=$l.metadata.get("mmSteps").split(',')
+#if $l.type==mapscript.MS_LAYER_RASTER and $l.map.web.metadata.get("mmRT") and $l.map.web.metadata.get("mmRT").count('timeline')>0
 #layer_$(i) label .fa-circle:before{
     /*background:url('$conf["main"]["publicationUrl"]/img/timeline.png') no-repeat scroll 0 0 transparent !important;*/
     display: block;
@@ -78,6 +77,17 @@ body{
     height: 16px;
     width: 16px;
 }
+#end if
+
+#if $l.metadata.get("mmClass")=="tl" or $l.metadata.get("mmSteps") is not None 
+#layer_$(i) label .fa-circle:before{
+    /*background:url('$conf["main"]["publicationUrl"]/img/timeline.png') no-repeat scroll 0 0 transparent !important;*/
+    display: block;
+    content: "\f017";
+    height: 16px;
+    width: 16px;
+}
+#set steps=$l.metadata.get("mmSteps").split(',')
 #set $cnt=0
 #for kk in steps
 #set m0=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/timeline_"+$conf["senv"]["last_map"]+"_"+$l.name+"_step"+str($cnt)+".map")

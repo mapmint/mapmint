@@ -32,8 +32,10 @@
 #set hasStep=False
 #end if
 
+
+
 #if $layer.metadata.get('mm_group')!="Layers"
-#if $layer.numclasses > 1 and $layer.metadata.get('mmClass')!="tl"
+#if ($layer.numclasses > 1 and $layer.metadata.get('mmClass')!="tl") and (not($layer.map.web.metadata.get("mmRT")) or ($layer.type==$mapscript.MS_LAYER_RASTER and $layer.map.web.metadata.get("mmRT") and $layer.map.web.metadata.get("mmRT").count("timeline")==0))
     <li id="layer_$(layer.index)$(p)" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$(p)" #if not(hasStep)#state="closed"#end if# class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers") is not None and $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$title </label>
 	$bmenu
     	<ul class="list-group tree">
@@ -43,8 +45,63 @@
 	    </ul>
 	  </li>
 #else
+#if not($layer.type==$mapscript.MS_LAYER_RASTER and $layer.map.web.metadata.get("mmRT") and $layer.map.web.metadata.get("mmRT").count("timeline")!=0)
 	<li id="layer_$(layer.index)$p" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$p" class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers") is not None and $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label><i class="fa fa-circle"></i> $title</label><!--</li>-->
 	$bmenu
+#else
+	<li id="layer_$(layer.index)$p" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$p" class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers") is not None and $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label><i class="fa fa-circle"></i> $zoo._("Raster Timeline")</label><!--</li>-->
+	$bmenu
+#set steps=[]
+#set cg=$layer.metadata.get("mm_group")
+#set steps=[]
+#for k in range($layer.map.numlayers)
+#set l=$layer.map.getLayer(k)
+#if l.type==mapscript.MS_LAYER_RASTER and $l.metadata.get("mm_group")==$cg
+#set $steps+=[l.name]
+#end if
+#end for
+<!--<li class="list-group-item">-->
+<div class="bs-example" data-example-id="carousel-with-captions">
+	    <ul class="list-group tree">
+#for j in range(0,$layer.numclasses)
+     	<li iconCls="tree_layer_class tree$(p)_layer$(layer.index)$(p)_class$j" class="list-group-item"><label><i class="fa layer_$(layer.index)_class$j$(p)"></i> $layer.getClass($j).name</label></li>
+#end for
+	    </ul>
+    <div id="layer_$(layer.index)$(p)_carousel" class="carousel slide" data-ride="carousel">
+<!--
+      <ol class="carousel-indicators">
+#set cnt=0
+#for i in steps
+    <li data-target="#layer_$(layer.index)$(p)_carousel" data-slide-to="$cnt" #if $cnt==0#class="active"#end if#></li>
+#set $cnt+=1
+#end for
+      </ol>
+-->
+      <div class="carousel-inner" role="listbox">
+#set cnt=0
+#for i in steps
+        <div class="item#if $cnt==0# active#end if#" id="layer_$(layer.index)_step$(cnt)">
+          <img height="100" alt="900x500" src="$conf["main"]["publicationUrl"]/img/timeline.png" style="min-height: 100px;visibility:hidden" data-holder-rendered="false">
+#set layer0=$layer.map.getLayerByName($i)
+          <div class="carousel-caption">
+            <h4>$layer0.metadata.get("ows_title")</h4>
+#set $cnt+=1
+          </div>
+        </div>
+
+#end for
+      </div>
+      <a class="left carousel-control" href="#layer_$(layer.index)_carousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="right carousel-control" href="#layer_$(layer.index)_carousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+  </div>
+#end if
 #if $layer.metadata.get('mmClass')=="tl"
 #set steps=$layer.metadata.get('mmSteps').split(',')
 <!--<li class="list-group-item">-->

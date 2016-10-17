@@ -191,7 +191,7 @@ $ftmpl.printHidden({"rid":"edition_tuple_id","id":"edit_tuple_id","name":"editio
 #if i+1==len($vals1)
 #set $classes+=" toActivate"
 #end if
-$ftmpl.printTabHeaderNew({"id":$prefix+"edit0_"+str($vals1[i][0]),"title":$vals1[i][1],"classe":$classes})
+$ftmpl.printTabHeaderNew({"id":$prefix+"edit0_"+str($vals1[i][0]),"title":$vals1[i][1],"classe":$classes,"cnt":($i+1)})
 #end for
 </ul>
 

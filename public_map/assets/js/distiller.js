@@ -54,7 +54,7 @@ define([
 	var CFeatures=[];
 
 	console.log(lid);
-	var myRootElement=$('#'+lid).parent().find(".btn-group").first().parent();
+	var myRootElement=$('#'+lid).parent().find(".btn-group").last().parent();
 
 	zoo.execute({
 	    identifier: "template.display",
@@ -81,7 +81,7 @@ define([
 	    ],
 	    success: function(data){
 		console.log("SUCCESS");
-		console.log(data);
+		//console.log(data);
 		console.log(lid);
 		myRootElement.append(data);
 
@@ -1189,6 +1189,51 @@ define([
 
     }
 
+    function bindAddColumnToTable(myRoot,ds){
+	console.log(" bindAddColumnToTable !");
+	myRoot.find("button").last().off("click");
+	myRoot.find("button").last().click(function(){
+	    var params=[];
+	    if($(".field-require-geometry").is(":visible")){
+		if($(".field-require-geometry-point-active").is(":visible")){
+		    params.push({identifier:"geo_x", "value": myRoot.find("select[name=field_geometry_x]").val(),dataType:"string"});
+		    params.push({identifier:"geo_y", "value": myRoot.find("select[name=field_geometry_y]").val(),dataType:"string"});
+		}
+		params.push({identifier:"proj", "value": myRoot.find("#field_geometry_tprj").val(),dataType:"string"});
+		params.push({identifier:"geo_type", "value": myRoot.find("select[name=field_geometry_type]").val(),dataType:"string"});
+	    }
+	    params.push({identifier:"field_name", "value": myRoot.find("input[name=field_name]").val(),dataType:"string"});
+	    params.push({identifier:"field_type", "value": myRoot.find("select[name=field_type]").val(),dataType:"string"});
+	    params.push({identifier:"table", "value": $("#pg_table").val(),dataType:"string"});
+	    params.push({identifier:"dataStore", "value": ds,dataType:"string"});
+
+	    zoo.execute({
+		identifier: "datastores.postgis.addColumn",
+		type: "POST",
+		dataInputs: params,
+		dataOutputs: [
+		    {"identifier":"Result","type":"raw"},
+		],
+		success: function(data){
+		    console.log("SUCCESS");
+		    $(".notifications").notify({
+			message: { text: data },
+			type: 'success',
+		    }).show();
+		    $("#pg_table").change();
+		},
+		error: function(data){
+		    $(".notifications").notify({
+			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			type: 'danger',
+		    }).show();
+		}
+	    });
+
+	});
+
+    }
+
     var DSTSetupCallBacks={
 	"delete": function(data,param,dsid,dataType,obj){
 	    $(obj).off("click");
@@ -1334,6 +1379,7 @@ define([
 				    $("#DS_"+dsid).find(".panel-body").first().find("#db_access").append(
 					$("#dataSource_db_access_template")[0].innerHTML.replace(reg0,cval).replace(reg1,cvalid)
 				    );
+				    var ifields=[];
 				    fields=[];
 				    rfields="";
 				    for(var i=0;i<data.length;i++){
@@ -1341,6 +1387,8 @@ define([
 					rfields+=data[i][1];
 					if(i+1<data.length)
 					    rfields+=",";
+					if(data[i][2]=="int4" || data[i][2]=="float8" )
+					    ifields.push(data[i][1]);
 					fields.push({
 					    "data":data[i][1],
 					    "name":data[i][1],
@@ -1350,8 +1398,49 @@ define([
 				    }
 				    console.log(fields);
 				    console.log(rfields);
-				    console.log($("#DS_"+dsid).find(".panel-body").first().find(".db_access_display"));
-
+				    //console.log($("#DS_"+dsid).find(".panel-body").first().find(".db_access_display"));
+				    $(".field-require-geometry").hide();
+				    $(".field-require-geometry-point").hide();
+				    $(".field-require-geometry-point-active").hide();
+				    $("#DB_table_field_type").off('change');
+				    $("#DB_table_field_type").change(function(){
+					$("#DB_table_field_geometry_type").off('change');
+					$("#DB_table_field_geometry_type").change(function(){
+					    if($(this).val()=="POINT")
+						$(".field-require-geometry-point").show();
+					    else{
+						$(".field-require-geometry-point").hide();
+						$(".field-require-geometry-point-active").hide();
+					    }
+					});
+					$("#DB_table_field_geometry_type_active").off("click");
+					$("#DB_table_field_geometry_type_active").click(function(){
+					    if($(this).is(':checked')){
+						$(".field-require-geometry-point-active").show();
+					    }
+					    else
+						$(".field-require-geometry-point-active").hide();
+					   
+					});
+					// GEOMETRY TYPE (18)
+					if($(this).val()==18){
+					    $(this).parent().parent().parent().find("input[name=field_name]").val("wkb_geometry");
+					    $(this).parent().parent().parent().find("input[name=field_name]").prop("disabled",true);
+					    $(".field-require-geometry").show();
+					    $("#DB_table_field_geometry_type").change();
+					}
+					else{
+					    $(".field-require-geometry").hide();
+					    $(".field-require-geometry-point").hide();
+					    $(".field-require-geometry-point-active").hide();
+					}
+				    });
+				    for(var i=0;i<ifields.length;i++){
+					$("#DB_table_field_geometry_x").append("<option>"+ifields[i]+"</option>");
+					$("#DB_table_field_geometry_y").append("<option>"+ifields[i]+"</option>");
+				    }
+				    console.log("***** bindAddColumnToTable \n\n");
+				    bindAddColumnToTable($("#DS_"+dsid).find("#insert-table"),param);
 				    displayTable(param,cval,cvalid,fields,rfields);
 				},
 				error: function(data){
@@ -1731,11 +1820,11 @@ define([
 		else{
 		    if(panelRoot1.find(".panel-success").length){
 			panelRoot1.find(".panel-heading").first().find(".btn-group").find("button,a").first().find('i').removeClass("fa-square-o").addClass("fa-minus-square-o ");
-			panelRoot1.find(".panel-heading").first().find(".btn-group").find(".require-select").removeClass("hide");
+			panelRoot1.find(".panel-heading").first().find(".btn-group").last().find(".require-select").removeClass("hide");
 		    }
 		    else{
 			panelRoot1.find(".panel-heading").first().find(".btn-group").find("button,a").first().find('i').removeClass("fa-minus-square-o").addClass("fa-square-o ");
-			panelRoot1.find(".panel-heading").first().find(".btn-group").find(".require-select").addClass("hide");
+			panelRoot1.find(".panel-heading").first().find(".btn-group").last().find(".require-select").addClass("hide");
 		    }
 		}
 

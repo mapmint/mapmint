@@ -44,6 +44,8 @@ define([
     var wgs84Sphere = new ol.Sphere(6378137);
     var flagStyles;
     var addedLayers=[];
+    var previousLayers=[];
+    var tiletoload={};
 
     function notify(text, type) {
         mynotify.notify({
@@ -232,6 +234,7 @@ define([
     }
 
     function loadBaseLayerIcon(key,layer){
+	console.log(layer.getSource().getTileGrid());
 	var obj=layer.getSource().getTileGrid().getTileCoordForCoordAndZ(ol.proj.transform(mmCenter,"EPSG:4326","EPSG:3857"),mmZoom);
 	var tmp=layer.getSource().getTileUrlFunction()(obj,1.325,ol.proj.get("EPSG:3857"));
 	var res=tmp.split('\n')[0];
@@ -373,9 +376,13 @@ define([
 		    });
 		}
 
+		try{
 		url=loadBaseLayerIcon(baseLayers["proprietary"]["layers"][i].replace(/\./g,"_"),layer);
 		console.log("OK 0");
 		console.log(url);
+		}catch(e){
+		    console.log(e);
+		}
 
 		myBaseLayers.push(layer);
 		//url=loadBaseLayerIcon(baseLayers["mq"][i],osm.getLayers().item(1));
@@ -1582,20 +1589,84 @@ define([
 		    $('.carousel').carousel({
 			interval: 5000
 		    });
+		    /*map.getLayers().item(myBaseLayers.length+myLayer.index).on("loadend",function(){
+			console.log(arguments);
+		    });*/
 		    $('#layer_'+myLayer.index+'_carousel').on('slid.bs.carousel', function () {
 			if(map.getLayers().item(myBaseLayers.length+myLayer.index).getVisible()){
 			    console.log($(this));
 			    var reg0=new RegExp("layer_"+myLayer.index+"_step","g");
+			    console.log($(this).find('.active'));
 			    var cid=parseInt($(this).find('.active').attr("id").replace(reg0,""));
 			    console.log(cid);
 			    //$(this).carousel('pause');
 			    console.log(myLayer.maps[cid]);
-			    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
-			    console.log(myBaseLayers.length)
-			    console.log(myLayer.index);
+			    if(myLayer.layers && myLayer.layers[cid]){
+				if(cid-1>=0 && previousLayers.length==0){
+				    previousLayers.push(new ol.layer.Tile({
+					visible: true,
+					source: new ol.source.TileWMS({
+					    url: msUrl+"?map="+myLayer.maps[cid],
+					    params: {'LAYERS': myLayer.layers[cid], 'TILED': true},
+					    serverType: 'mapserver'
+					})
+				    }));
+				    map.addLayer(previousLayers[0]);
+				}else{
+				    if(cid-1>=0){
+					//previousLayers[previousLayers.length-1].setVisible(true);
+					/*previousLayers[0].getSource().updateParams({"LAYERS":myLayer.layers[cid-1]});
+					previousLayers[0].getSource().setUrl(msUrl+"?map="+myLayer.maps[cid-1]);
+					previousLayers[0].getSource().changed();
+					//map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+					$("#mm_layers_display").find(".layer_"+myLayer.index).addClass("hide");
+					$("#mm_layers_display").find(".layer_"+myLayer.index+".step"+cid).removeClass("hide");
+					map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid-1]);*/
+				    }/*else{*/
+				map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+					/*map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+					$("#mm_layers_display").find(".layer_"+myLayer.index).addClass("hide");
+					$("#mm_layers_display").find(".layer_"+myLayer.index+".step"+cid).removeClass("hide");
+					map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);*/
+				    //}
+				    tiletoload["l"+cid]=0;
+				    if(cid>0){
+					map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().unByKey(tiletoload["key0"+(cid-1)]);
+					map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().unByKey(tiletoload["key1"+(cid-1)]);
+				    }
+				    tiletoload["key0"+cid]=map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().on("tileloadstart", function() {
+					if(!tiletoload["l"+cid])
+					    tiletoload["l"+cid]=0;
+					tiletoload["l"+cid]+=1;
+				    });
+				    tiletoload["key1"+cid]=map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().on("tileloadend", function() {
+					tiletoload["l"+cid]-=1;
+					//previousLayers.pop(0);
+					console.log("Still to load "+tiletoload["l"+cid]);
+					if(tiletoload["l"+cid]==0){
+					    if(cid-1>=0){
+						previousLayers[0].getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+						previousLayers[0].getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
+						previousLayers[0].getSource().changed();
+					    }
+					    /*else
+					      previousLayers[previousLayers.length-1].setVisible(false);*/
+					}
+				    },map.getLayers().item(myBaseLayers.length+myLayer.index).getSource());
+				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().changed();
+				}
+				var lreg=new RegExp($(this).find('.active').prev().find('.carousel-caption').find('h4').html(),"g");
+				$(this).parent().parent().find('label').first().html($(this).parent().parent().find('label').html().replace(/Raster Timeline/g,$(this).find('.active').find('.carousel-caption').find('h4').html()).replace(lreg,$(this).find('.active').find('.carousel-caption').find('h4').html()));
+				//$(this).find(".carousel-inner").hide();
+			    }
+			    //else{
+				//console.log(myBaseLayers.length)
+				//console.log(myLayer.index);
 			    $("#mm_layers_display").find(".layer_"+myLayer.index).addClass("hide");
 			    $("#mm_layers_display").find(".layer_"+myLayer.index+".step"+cid).removeClass("hide");
+			    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
 			    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().changed();
+			    //}
 			    map.updateSize();
 			}
 		    });

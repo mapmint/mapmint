@@ -125,19 +125,40 @@ define([
 	//var cData=data;
 	(function(cData){
 	    getLastFile(function(data){
+		console.log(hasBeenDone);
 		fetchInfoAndDisplay(data,function(){
 		    if(!hasBeenDone){
 			$("#pages_fields_table_display").prev().remove();
 			$("#pages_fields_table_display").remove();
-			if(cData["pages"][$("#documents_ifile_page").val()]["ofield"]){
-			    $("#pages_id").val(cData["pages"][$("#documents_ifile_page").val()]["id"]);
-			    $("#documents_page_type").val(cData["pages"][$("#documents_ifile_page").val()]["type"]);
-			    $("#documents_page_tablename").val(cData["pages"][$("#documents_ifile_page").val()]["tablename"]);
+			var cPage=cData["pages"][$("#documents_ifile_page").val()];
+			if(cPage["ofield"]){
+			    $("#pages_id").val(cPage["id"]);
+			    if(cPage["isreference"])
+				$("#documents_page_isreference").prop("checked",true);
+			    else
+				$("#documents_page_isreference").prop("checked",false);
+			    $("#documents_page_type").val(cPage["type"]);
+			    $("#documents_page_tablename").val(cPage["tablename"]);
+			    var cid=0;
+			    try{
+				cid=eval((cPage["ofield"].replace(/Field/g,"")+"-1"));
+			    }catch(e){
+				try{
+				    var columns=$("#DS_table_indicatorTable_indicator").dataTable().fnSettings().aoColumns;
+				    for(var kk=0;kk<columns.length;kk++)
+					if(columns[kk].data==cPage["ofield"]){
+					    cid=kk;
+					    break;
+					}
+				}catch(e){
+				    console.log("!! MM ERROR "+e);
+				}
+			    }
 			    var closure={
-				"field": eval((cData["pages"][$("#documents_ifile_page").val()]["ofield"].replace(/Field/g,"")+"-1")),
-				"type": cData["pages"][$("#documents_ifile_page").val()]["otype"]
+				"field": cid,
+				"type": cPage["otype"]
 			    };
-			    console.log("Now fix the order to "+closure["type"]+" "+closure["type"]+"!");
+			    console.log("Now fix the order to "+closure["field"]+" "+closure["type"]+"!");
 			    managerTools.datasources[data].order([closure["field"],closure["type"]]).draw();
 			    var tbody="";
 			    $("#page_table_init").html(managerTools.generateFromTemplate($("#page_fields_table_template").html(),["tbody"],[tbody]));
@@ -216,9 +237,13 @@ define([
 							}
 							console.log(coords);
 							console.log($("#DS_table_indicatorTable_indicator").DataTable());
-							console.log($("#DS_table_indicatorTable_indicator").DataTable().cells(coords[1],coords[0]));
-							console.log($("#DS_table_indicatorTable_indicator").DataTable().cell(coords[1],coords[0]));
-							var element=$($("#DS_table_indicatorTable_indicator").DataTable().cells(coords[1],coords[0]).nodes());
+							var element=null;
+							if(coords[1]>=0){
+							    console.log($("#DS_table_indicatorTable_indicator").DataTable().cells(coords[1],coords[0]));
+							    console.log($("#DS_table_indicatorTable_indicator").DataTable().cell(coords[1],coords[0]));
+							    element=$($("#DS_table_indicatorTable_indicator").DataTable().cells(coords[1],coords[0]).nodes());
+							}else
+							    element=$($("#DS_table_indicatorTable_indicator").DataTable().column(coords[0]).header());
 							console.log($(element));
 							element.addClass("alert alert-success");
 							element.append(' <span class="badge progress-bar-info">'+(i+1)+'</span>');
@@ -313,6 +338,24 @@ define([
 			    $("#pages_fields_table_display").find("tbody").append(managerTools.generateFromTemplate($("#page_fields_line_template").html(),["id","name","label","true","ignore","value"],[$("#pages_fields_table_display").find("tbody").find('tr').length,"true",0,""]));
 			});
 
+			$("[data-mmaction=useColumnNV]").off('click');
+			$("[data-mmaction=useColumnNV]").click(function(){
+			    var columns=$("#DS_table_indicatorTable_indicator").dataTable().fnSettings().aoColumns;
+			    $("#pages_fields_table_display").find("tbody").html("");
+			    for(var kk=0;kk<columns.length;kk++){
+	    			$("#pages_fields_table_display").find("tbody").append(managerTools.generateFromTemplate($("#page_fields_line_template").html(),["id","name","label","ignore","value","clause","label_index"],[$("#pages_fields_table_display").find("tbody").find('tr').length+1,columns[kk].data,columns[kk].data,0,"","true","("+kk+",-1)"]));
+				$("#pages_fields_table_display").find("tbody").find('tr').last().find("textarea").last().val("("+kk+",0)");
+				var element=$($("#DS_table_indicatorTable_indicator").DataTable().column(kk).header());
+				element.addClass("alert alert-success");
+				element.append(' <span class="badge progress-bar-info">'+(kk+1)+'</span>');
+				var element=$($("#DS_table_indicatorTable_indicator").DataTable().cells(0,kk).nodes());
+				element.addClass("alert alert-danger");
+				element.append(' <span class="badge progress-bar-info">'+(kk+1)+'</span>');
+
+			    }
+
+			});
+
 			$("[data-mmaction=setAttribute]").off('click');
 			$("[data-mmaction=setAttribute]").click(function(){
 			    isAttributes=false;	
@@ -377,8 +420,8 @@ define([
 		$(this).val(data[$(this).attr("id").replace(reg,"")]).change();
 	});
 
-	myRootLocation.find("select").each(function(){
-	    $(this).find('option').prop('selected', false);
+	$(".tab-content").find("select").find("option").each(function(){
+	    $(this).prop('selected', false);
 	});
 	
 	myRootLocation.find("input[type=text],input[type=hidden],select").each(function(){
@@ -1037,6 +1080,9 @@ define([
     var fetchInfoAndDisplay=function(data,ffunc){
 	fileName=data;
 	var ldata=data;
+	console.log("********************** "+ldata.indexOf("mdb"));
+	if(ldata.indexOf("mdb")>0)
+	    ldata+="_dir/";
 	zoo.execute({
 	    identifier: "vector-tools.mmVectorInfo2Map",
 	    type: "POST",
@@ -1568,8 +1614,9 @@ define([
 	    console.log($(this));
 	    var params=[
 		{"identifier": "table","value": "mm_tables.pages","dataType":"string"},
-		{"identifier": "columns","value": JSON.stringify(["name","tablename","type","ofield","otype","length","iid"], null, ' '),"mimeType":"application/json"},
-		{"identifier": "name","value": $(this).prev().prev().prev().find('select').val(),"dataType":"string"},
+		{"identifier": "columns","value": JSON.stringify(["name","tablename","type","ofield","otype","length","iid","isreference"], null, ' '),"mimeType":"application/json"},
+		{"identifier": "name","value": $(this).prev().prev().prev().prev().find('select').val(),"dataType":"string"},
+		{"identifier": "isreference","value": $(this).prev().prev().prev().find('input[type=checkbox]').is(":checked"),"dataType":"string"},
 		{"identifier": "type","value": $(this).prev().prev().find('select').val(),"dataType":"string"},
 		{"identifier": "tablename","value": $(this).prev().find('input').val(),"dataType":"string"},
 		{"identifier": "length","value": $("select[name=DS_table_indicatorTable_indicator_length]").val(),"dataType":"string"},

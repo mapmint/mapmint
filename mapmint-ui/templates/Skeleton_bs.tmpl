@@ -38,6 +38,7 @@
 #end if
 <link href="$conf["main"]["publicationUrl"]/css/mapmint-admin.css" rel="stylesheet">
 <link href="$conf["main"]["publicationUrl"]/assets/css/mm-font.css" rel="stylesheet">
+<link href="$conf["main"]["publicationUrl"]/assets/css/loader.css" rel="stylesheet">
 <link href="$conf["main"]["publicationUrl"]/css/mm_icons.css" rel="stylesheet">
 <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
 <link href="$conf["main"]["publicationUrl"]/css/metisMenu.min.css" rel="stylesheet">
@@ -53,6 +54,8 @@ $istyles
 
 </head>
 <body>
+#include($conf["main"]["templatesPath"]+"/loader_bs.tmpl")
+
 #if $mmodule!="public"
 #if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false") and not($verr)
 <div id="wrapper">
@@ -84,7 +87,7 @@ $istyles
 #set cfont="question"
 #end try
 #if $mmodule=="tables-public"
-     <a class="navbar-brand" href="#"><i class="fa fa-$cfont"></i> <span class="hid">$zoo._("Tables management")</span></a>
+     <a class="navbar-brand" href="#"><i class="fa fa-$cfont"></i> <span class="hid">$zoo._("Data import")</span></a>
 #else
      <a class="navbar-brand" href="#"><i class="fa fa-$cfont"></i> <span class="hid">$zoo._($mmodule)</span></a>
 #end if

@@ -320,16 +320,108 @@ MapMint: $mmodule
 </script>
 
 <script type="template/text" id="dataSource_db_access_template">
-<div class="db_access_display">
-  <h3>$zoo._("Table: ")[table]</h3>
+<div class="db_access_display panel panel-default">
+  <div class="panel-heading">
+  <h4><i class="fa fa-table"></i> $zoo._("Table: ") [table]
+      <span class="dropdown pull-right">
+  <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+    <span class="hidden-xs">$zoo._("options")</span>
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+    <li><a data-toggle="collapse" data-target="#insert-table" href="#db_access"><i class="fa fa-plus"></i> $zoo._("Add Column")</a></li>
+    <li><a data-toggle="collapse" data-target="#update-table" href="#db_access"><i class="fa fa-edit"></i> $zoo._("Edit column")</a></li>
+    <li role="separator" class="divider"></li>
+    <li><a data-toggle="collapse" data-target="#delete-table" href="#db_access"><i class="fa fa-trash"></i> $zoo._("Delete Table")</a></li>
+  </ul>
+  </span></h4>
+  </div>
+  <div class="panel-body">
+  <div class="tab-content">
+    <div class="padder">
+      <div id="insert-table" class="collapse">
+      <div class="padder row">	
+      <div class="col-sm-6">
+      <label for="DB_table_field_type">$zoo._("Name") </label>
+      <input name="field_name" class="form-control" />
+      </div>
+      <div class="col-sm-6">
+      <label for="DB_table_field_type">$zoo._("Type") </label>
+      <select id="DB_table_field_type" name="field_type" class="form-control" >
+#import authenticate.service as auth
+#set con=auth.getCon($conf)
+#set prefix=auth.getPrefix($conf)
+#set cur=con.connect()
+#set cur=con.conn.cursor()
+
+#set req="SELECT id,name from mm_tables.ftypes where ftype='e' and basic order by name"
+#set res=$cur.execute($req)
+#set svals=$cur.fetchall()
+#for i in range(len(svals))
+       <option value="$svals[i][0]">$svals[i][1]</option>
+#end for
+      </select>
+      </div>
+      </div>
+      <div class="padder row field-require-geometry">	
+      <div class="col-sm-6">
+      <label for="DB_table_field_geometry_type">$zoo._("Geometry Type") </label>
+      <select name="field_geometry_type" id="DB_table_field_geometry_type" name="field_geometry_type" class="form-control" >
+#for i in ["POINT","LINE","POLYGON","MULTIPOINT","MULTILINE","MULTIPOLYGON"]
+       <option value="$i">$i</option>
+#end for
+      </select>
+      </div>
+      <div class="col-sm-6">
+	<label for="DB_table_field_geometry_type">$zoo._("Coordinates SRS") </label>
+#from Cheetah.Template import Template
+$(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection_bs.html",searchList={"conf": $conf,"prefix":"field_geometry_","selected": "EPSG:4326"}))
+      </div>
+      </div>
+      <div class="row padder field-require-geometry">
+      <div class="col-sm-6 field-require-geometry-point">
+      <label for="DB_table_field_geometry_type_active">$zoo._("Compute geometry from other fields") </label>
+      <input type="checkbox" id="DB_table_field_geometry_type_active"/>
+      </div>
+      </div>
+      <div class="padder row field-require-geometry-point-active">	
+      <div class="col-sm-6">
+	<label for="DB_table_field_geometry_type">$zoo._("X") </label>
+	<select name="field_geometry_x" id="DB_table_field_geometry_x" class="form-control"></select>
+      </div>
+      <div class="col-sm-6">
+	<label for="DB_table_field_geometry_type">$zoo._("Y") </label>
+	<select name="field_geometry_y" id="DB_table_field_geometry_y" class="form-control"></select>
+      </div>
+      </div>
+      <div class="row padder">
+  <button class="btn btn-default btn-sm dropdown-toggle pull-left" type="button" aria-haspopup="true" aria-expanded="true">
+    <span class="hidden-xs">$zoo._("Add")</span>
+    <span class="hidden-sm"><i class="fa fa-add"></i></span>
+  </button>
+      </div>
+      </div>
+    </div>
+    <div class="padder row">
+      <div id="update-table" class="collapse well">
+       <table id="DB_table_fields_display"></table>
+      </div>
+    </div>
+    <div class="padder row">
+      <div id="delete-table" class="collapse well">
+       DELETE TABLE
+      </div>
+    </div>
+  </div>
   <div class="padder row">
     <div class="btn-group">
-      <a class="btn btn-default btn-sm fa fa-plus" title="$zoo._("Add element")" data-toggle="collapse" data-target="#insert-tuple" href="#insert-tuple"></a>
-      <a class="require-select btn btn-default btn-sm fa fa-trash disabled" title="$zoo._("Delete element")" role="tab"  data-toggle="collapse" data-target="#delete-tuple"></a>
-      <a class="require-select btn btn-default btn-sm fa fa-edit disabled" title="$zoo._("Edit element")" role="tab"  data-toggle="collapse" data-target="#update-tuple"></a>
+      <a class="btn btn-default btn-sm fa fa-plus" title="$zoo._("Add element")" data-toggle="collapse" data-target="#insert-tuple" href="#db_access"></a>
+      <a class="require-select btn btn-default btn-sm fa fa-trash disabled" title="$zoo._("Delete element")" role="tab"  data-toggle="collapse" data-target="#delete-tuple" href="#db_access"></a>
+      <a class="require-select btn btn-default btn-sm fa fa-edit disabled" title="$zoo._("Edit element")" role="tab"  data-toggle="collapse" data-target="#update-tuple" href="#db_access"></a>
     </div>
   </div>
   <table id="[tableid]"></table>
+  </div>
 </div>
 </script>
 
@@ -429,6 +521,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection_bs.html",s
 <script type="template/text" id="uploader_result_row_template">
 <li>[filename]</li>
 </script>
+
 #end def
 
 #def tfooter

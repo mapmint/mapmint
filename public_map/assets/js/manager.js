@@ -161,6 +161,7 @@ define([
 		if(level>0)
 		    console.log(mmenu[level-1]);
 		if($.isArray(data[id])){
+		    console.log(id);
 		    //llevelInit=false;
 		    mmenu[level].push(id);
 		    var lid=id.replace(/ /g,"-_-");
@@ -179,25 +180,46 @@ define([
 			$("#layerswitcher").parent().append(myHTML);
 		    }
 		    else{
-			$("#layerswitcher").parent().find('ul#'+oid).last().append(myHTML);
+			console.log(oid);
+			$("#layerswitcher").parent().find('ul#'+oid.replace(/ /g,"-_-")).last().append(myHTML);
 		    }
 		    for(var index in data[id]){
 			addToLayerSwitcher(id,data[id][index],level+1);
 		    }
 		}else{
+		    console.log(id);
 		    var regs=[
-			new RegExp("\\[id\\]","g")
+			new RegExp("\\[id\\]","g"),
+			new RegExp("\\[idl\\]","g")
 		    ];
-		    var myHTML=$("#layerswitcher_item_template")[0].innerHTML
-			.replace(regs[0],data[id]);
+		    var myHTML="";
+		    console.log(data[id]);
+		    var len=data[id].length;
+		    console.log(len>19);
+		    if(data[id].length>19){
+			var short="";
+			for(var i=0;i<19;i++)
+			    short+=data[id][i];
+			var regs1=[
+			    new RegExp("\\[id\\]","g"),
+			    new RegExp("\\[short\\]","g")
+			];
+			myHTML=$("#layerswitcher_item_template")[0].innerHTML
+			    .replace(regs[0],data[id]).replace(regs[1],$("#layerswitcher_item_template_short")[0].innerHTML.replace(regs1[0],data[id]).replace(regs1[1],short));
+		    }else{
+			myHTML=$("#layerswitcher_item_template")[0].innerHTML
+			    .replace(regs[0],data[id]).replace(regs[1],data[id]);
+		    }
+		    console.log(oid.replace(/ /g,"-_-"));
 		    if(!llevelInit){
 			llevelInit=true;
 			$("#layerswitcher").parent().append(myHTML);
 		    }
 		    else{
-			console.log(data);
-			$("#layerswitcher").parent().find('ul#'+oid).last().append(myHTML);
+			console.log(oid);
+			$("#layerswitcher").parent().find('ul#'+oid.replace(/ /g,"-_-")).last().append(myHTML);
 		    }
+		    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
 		}
 	    }
 	}
@@ -1029,7 +1051,7 @@ define([
 			$("#manaLayerProperties").find('input[type="checkbox"]').each(function(){
 			    $(this).prop("checked",false).change();
 			});
-			if(obj.schema.complexType){
+			if(obj.schema && obj.schema.complexType){
 			    var ldata=obj.schema.complexType.complexContent.extension.sequence.element;
 			    oLayers[layer]["queryParams"]={
 				fields: [],
@@ -1178,7 +1200,7 @@ define([
     function loadTableDefinition(obj,data){
 	var alreadyDisplayed=[];
 	var tbody="";
-	if(!obj.schema.complexType)
+	if(!obj.schema || !obj.schema .complexType)
 	    return;
 	var ldata=obj.schema.complexType.complexContent.extension.sequence.element;
 	if(data["gfi_aliases"] && data["gfi_aliases"].length>0){
@@ -1449,7 +1471,7 @@ define([
 	    $("select[name=resample]").val(ldata.Style["processing"]).change();
 	else
 	    $("select[name=resample]").val("NEAREST").change();
-
+	console.log(ldata.Style["processing"]);
 	//$("input[name=styleOpacity]").next().html(ldata.Style.classes[0]["opacity"]+"%");
 	if(ldata["bands"]!=null){
 	    var myData=ldata["bands"];

@@ -138,6 +138,10 @@ define([
 
 	this.container=(params.container?params.container:$("#mmm_table-wrapper-container"));
 
+	this.regs=[
+	    new RegExp("\\.","g")
+	];
+
 	this.display = function(layer,localUrl,lforce){
 	    var closure = this;
 	    var isForced;
@@ -154,9 +158,9 @@ define([
 	    if(closure.debug)
 		console.log(key);
 	    if(lforce){
-		if($('#mmm_table-content-wrapper_'+key).length){
-		    $('#mmm_table-content-wrapper_'+key).remove();
-		    $('#mmm_table-content-display_'+key).parent().remove();
+		if($('#mmm_table-content-wrapper_'+key.replace(this.regs[0],"_")).length){
+		    $('#mmm_table-content-wrapper_'+key.replace(this.regs[0],"_")).remove();
+		    $('#mmm_table-content-display_'+key.replace(this.regs[0],"_")).parent().remove();
 		    alreadyExist=true;
 		}
 		closure.selectLayer.getSource().clear();
@@ -169,8 +173,8 @@ define([
 	    if($("#table-wrapper").hasClass("collapse") && !$("#table-wrapper").hasClass("in")){
 		$("#table-wrapper").collapse("show");
 	    }
-	    $('#mmm_table-content-display_'+key).tab("show");
-	    if(!$('#mmm_table-content-wrapper_'+key).length){
+	    $('#mmm_table-content-display_'+key.replace(this.regs[0],"_")).tab("show");
+	    if(!$('#mmm_table-content-wrapper_'+key.replace(this.regs[0],"_")).length){
 
 		for(var i in {"container":0,"header":0})
 		    $("#mmm_table-wrapper-"+i).find(".active").each(function(){
@@ -178,7 +182,7 @@ define([
 		    });
 		
 
-		this.container.append($('<div id="mmm_table-content-wrapper_'+key+'" class="tab-pane active"></div>').append('<table id="mmm_table-content_'+key+'" class="display" width="100%"></table>'));
+		this.container.append($('<div id="mmm_table-content-wrapper_'+key.replace(this.regs[0],"_")+'" class="tab-pane active"></div>').append('<table id="mmm_table-content_'+key.replace(this.regs[0],"_")+'" class="display" width="100%"></table>'));
 		$("#mmm_table-wrapper-header").append('<li role="presentation" class="active"><a id="mmm_table-content-display_'+key+'" title="'+oLayers[key]["alias"]+'" data-toggle="tab" data-target="#mmm_table-content-wrapper_'+key+'" href="#mmm_table-content-wrapper_'+key+'"><i class="fa fa-table"></i><b class="ncaret"> </b><span class="hidden-xs hidden-sm">'+oLayers[key]["alias"]+'</span> </a>  </li>');
 		
 		
@@ -220,10 +224,11 @@ define([
 		
 		
 		var lheight=$(window).height();
-		$('#mmm_table-content_'+key).DataTable( {
-		    language: {
-			url: closure.config.translationUrl
-		    },
+		var language={};
+		if(closure.config && closure.config.translationUrl)
+		    language["url"]=closure.config.translationUrl;
+		$('#mmm_table-content_'+key.replace(this.regs[0],"_")).DataTable( {
+		    language: language,
 		    data: [],
 		    "dom": 'Zlfrtip',
 		    "colReorder": true,
@@ -301,7 +306,7 @@ define([
 				firstParam,
 				{"identifier":"offset","value":llimit[0],"dataType":"int"},
 				{"identifier":"limit","value":llimit[1],"dataType":"int"},
-				{"identifier":"sql","value":"SELECT "+(localUrl.lurl?"fid0 as gml_id,fid0 as fid,":"gml_id as id,gml_id as fid,")+closestproperties.replace(/,msGeometry/g,"")+" from "+(localUrl.lurl?'Result':key)+lclause+" order by "+(closestproperties.split(",")[llimit[2]])+" "+llimit[3],"dataType":"string"}
+				{"identifier":"sql","value":"SELECT "+(localUrl.lurl?"fid0 as gml_id,fid0 as fid,":"gml_id as id,gml_id as fid,")+closestproperties.replace(/,msGeometry/g,"")+" from "+(localUrl.lurl?'Result':(key.indexOf("\.")<0?key:'"'+key+'"'))+lclause+" order by "+(closestproperties.split(",")[llimit[2]])+" "+llimit[3],"dataType":"string"}
 			    ],
 			    dataOutputs: [
 				{"identifier":"Result","mimeType":"application/json"},

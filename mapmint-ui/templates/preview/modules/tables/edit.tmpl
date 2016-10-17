@@ -128,12 +128,18 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
 #set res=$cur.execute($req)
 #set lvals=$cur.fetchone()
 #try
+#set toto=$ftmpl.printBasicCheckbox()
 #set content=Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"qComponents":[str(lvals[0])],"embedded":$embeddedNb,"con":$con})
 #set $embeddedNb+=1
 #except Exception,e
 <div class="alert alert-danger">$e</div>
 #end try
 #set preTitle='<input type="hidden" name="embedded_'+str($embeddedNb-1)+'_link_col" value="'+$components[0]+'"/>'
+#try 
+#set $preTitle+=$toto
+#except
+#set noTitle=True
+#end try
 $ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content})
 #else
 #if ctype=="tbl_link"

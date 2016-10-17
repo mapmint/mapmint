@@ -54,14 +54,14 @@ var counter=0;
 <div class="row">
 <div class="col-sm-5 col-lg-4">
  $ftmpl.printButtonGroupA([
-  {"target":"adder","title":$zoo._("Add a document"),"classes": "fa fa-plus"},
-  {"target":"deleter","title":$zoo._("Dele a document"),"classes": "fa fa-trash"}
+  {"target":"adder","title":$zoo._("Add an importer"),"classes": "fa fa-plus"},
+  {"target":"deleter","title":$zoo._("Delete an importer"),"classes": "fa fa-trash"}
 ])
     <div id="adder" class="myWell collapse">
-      $ftmpl.printAdder({"id":"add-document","name": "dname","Name":$zoo._("Indicator Name"),"title":$zoo._("Add")})
+      $ftmpl.printAdder({"id":"add-document","name": "dname","Name":$zoo._("Importer Name"),"title":$zoo._("Add")})
     </div>
     <div id="deleter" class="myWell collapse">
-      <p>$zoo._("Do you really want to delete the document ?")</p>
+      <p>$zoo._("Do you really want to delete the importer ?")</p>
       <button class="btn btn-default pull-right" id="delete-document" type="button">$zoo._("Delete")</button>
     </div>
     <table id="listElements">
@@ -139,12 +139,12 @@ var icounter=0;
 
 #set options=[[-1,$zoo._("First upload a file")]]
   $ftmpl.printLine({"rid":"documents_ifile_page","id":"ifile_page","name":$zoo._("Choose a page"),"type":"select","options":$options,"classes":"ifile"})
+  $ftmpl.printLine({"rid":"documents_page_isreference","id":"page_isreference","name":$zoo._("Is a reference"),"type":"checkbox"})
 
 #set req="SELECT id,name from mm_tables.page_types order by name"
 #set res=$cur.execute($req)
 #set opts=$cur.fetchall()
   $ftmpl.printLine({"rid":"documents_page_type","id":"page_type","name":$zoo._("Choose a type"),"type":"select","options":$opts})
-
   $ftmpl.printLine({"rid":"documents_page_tablename","id":"page_tablename","name":$zoo._("Table name")})
 
 #end def
@@ -191,6 +191,7 @@ $ftmpl.printLine({"rid":"documents_description","id":"dname","type":"textarea","
     $content1($conf)
     $ftmpl.printButton({"id":"join","name":$zoo._("Save"),"classes":"disabled"})
     $ftmpl.printButton({"id":"setAttribute","name":$zoo._("Set Attribute")})
+    $ftmpl.printButton({"id":"useColumnNV","name":$zoo._("Use Column Definitions")})
     $ftmpl.printButton({"id":"setValue","name":$zoo._("Set Value")})
   </div>
 
