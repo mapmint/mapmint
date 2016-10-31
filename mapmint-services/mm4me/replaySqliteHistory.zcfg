@@ -1,0 +1,35 @@
+[replaySqliteHistory]
+ Title = Convert PostgreSQL database and MapMint settings of the Tables module in SQLite DB for using with MapMint4ME. 
+ Abstract = Convert a PostgreSQL database and MapMint settings of the Tables module in SQLite DB for using with MapMint4ME.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceType = JS
+ serviceProvider = service.js
+ <DataInputs>
+  [id]
+   Title = The index identifier
+   Abstract = The index identifier
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    dataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <LiteralData>
+    dataType = string
+    <Default/>	
+   </LiteralData>
+  [Log]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <LiteralData>
+    dataType = string
+    <Default/>	
+   </LiteralData>
+ </DataOutputs>  
