@@ -45,8 +45,11 @@ def getForm(conf,inputs,outputs):
 
 def saveOnServer(conf,inputs,outputs):
     import shutil
-    print >> sys.stderr,"ok1 "+str(inputs)
-    dir=conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["senv"]["MMID"]
+    print >> sys.stderr,"************ ok1 "+str(inputs)
+    if conf.keys().count("senv")>0:
+        dir=conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["senv"]["MMID"]
+    else:
+        dir=conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["lenv"]["usid"]
     try:
         shutil.os.mkdir(dir)
     except Exception,e:
@@ -55,19 +58,22 @@ def saveOnServer(conf,inputs,outputs):
     field="file"
     if inputs.has_key("filename"):
         field=inputs["filename"]["value"]
-    print >> sys.stderr,"ok2 "+str(inputs)
+    print >> sys.stderr,"************ ok2 "+str(inputs)
     tmp=inputs[field]["lref"].split("/")
-    print >> sys.stderr,"ok3 "+str(inputs)
+    print >> sys.stderr,"************ ok3 "+str(inputs)
     outFileName=dir+"/"+tmp[len(tmp)-1]
-    print >> sys.stderr,"ok4 "+str(inputs)
+    print >> sys.stderr,"************ ok4 "+str(inputs)
     shutil.move(inputs[field]["lref"],outFileName);
-    conf["senv"]["last_file"]=outFileName
-    conf["senv"]["last_ufile"]=outFileName
-    import mmsession
-    mmsession.save(conf)
-    print >> sys.stderr,"ok5 "+str(outFileName)
+    if conf.keys().count("senv")>0:
+        conf["senv"]["last_file"]=outFileName
+        conf["senv"]["last_ufile"]=outFileName
+        #import mmsession
+        #mmsession.save(conf)
+        #conf["lenv"]["cookie"]="MMID=MM"+conf["senv"]["MMID"]+"; path=/"
+        print >> sys.stderr,"************ XXX "+str(conf["senv"])
+    print >> sys.stderr,"************ ok5 "+str(outFileName)
     outputs["Result"]["value"]="Your "+tmp[len(tmp)-1]+" file was uploaded on the server"
-    print >> sys.stderr,"ok6 "+str(inputs)
+    print >> sys.stderr,"************ ok6 "+str(inputs)
     return 3
 
 def saveOnServer0(conf,inputs,outputs):

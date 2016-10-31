@@ -1579,15 +1579,16 @@ def listMap(conf,inputs,outputs):
             except:
                 pass
             try:
-                mTime=time.strftime(conf["mm"]["dateFormat"].encode(locale.getlocale()[1]),time.localtime(os.path.getmtime(conf["main"]["dataPath"]+"/"+prefix+"maps/"+i)))
+                mTime=time.strftime(conf["mm"]["dateFormat"].encode(locale.getlocale()[1]),time.localtime(os.path.getmtime(conf["main"]["dataPath"]+"/"+prefix+"maps/"+i))).decode(locale.getlocale()[1],'replace')
             except Exception,e:
                 print >> sys.stderr,e
-                mTime=time.strftime(conf["mm"]["dateFormat"].encode("utf-8"),time.localtime(os.path.getmtime(conf["main"]["dataPath"]+"/"+prefix+"maps/"+i)))
-            res+=[{"id": i.replace("project_","").replace(".map",""),"value": i, "mTime": mTime}]
+                mTime=time.strftime(conf["mm"]["dateFormat"].encode("utf-8"),time.localtime(os.path.getmtime(conf["main"]["dataPath"]+"/"+prefix+"maps/"+i))).decode('utf-8','replace')
             try:
                 locale.setlocale(locale.LC_ALL,oloc)
             except:
                 pass
+            res+=[{"id": i.replace("project_","").replace(".map",""),"value": i, "mTime": mTime}]
+            print >> sys.stderr," +++++++ > "+str(res)
         print >> sys.stderr,str(i)+' '+str(i)
     outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
     return 3

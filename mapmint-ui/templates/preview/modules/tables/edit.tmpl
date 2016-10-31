@@ -1,6 +1,10 @@
 #import zoo
 #from Cheetah.Template import Template
+#try
+#set embeddedNb=0+$cid
+#except
 #set embeddedNb=0
+#end try
 
 #set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
 #include $tmpl

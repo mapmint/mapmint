@@ -259,3 +259,319 @@ function convertTo(conf,inputs,outputs){
     
     return {result: ZOO.SERVICE_SUCCEEDED, outputs: {"Result": {"value": myExecuteResult.replace(conf["main"]["serverAddress"],"")}} };
 }
+
+function getMapLayersInfo(conf){
+    var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.getMapLayersInfo');
+    inputs={
+	"map":{"value": conf["main"]["dbuserName"]+"ds_ows.map"},
+	"layer":{"value": "-1"},
+	"fullPath":{"value": "true"}
+    };
+    var myExecuteResult1=myProcess1.Execute(inputs,myOutputs);
+    var tmp=eval(myExecuteResult1.replace('None','null'));
+    return tmp;
+}
+
+function createSqliteDB4ME(conf,inputs,outputs){
+    var dbFile="mm4medb_"+conf["lenv"]["usid"]+".db";
+    var groups=conf["senv"]["group"].split(',');
+    var dbs={
+	"mm4me_editions": {
+	    "table": "mm_tables.p_editions",
+	    "clause": "where id in (select eid from mm_tables.p_edition_groups where gid in (select id from mm.groups where name in ('"+groups.join("','")+"')))",
+	},
+	"mm4me_edition_fields": {
+	    "table": "mm_tables.p_edition_fields",
+	    "clause": "where eid in (select eid from mm_tables.p_edition_groups where gid in (select id from mm.groups where name in ('"+groups.join("','")+"')))",
+	},
+	"mm4me_views": {
+	    "table": "mm_tables.p_views",
+	    "clause": "where id in (select vid from mm_tables.p_view_groups where gid in (select id from mm.groups where name in ('"+groups.join("','")+"')))",
+	},
+	"mm4me_view_fields": {
+	    "table": "mm_tables.p_view_fields",
+	    "clause": "where vid in (select vid from mm_tables.p_view_groups where gid in (select id from mm.groups where name in ('"+groups.join("','")+"')))",
+	},
+	"mm4me_ftypes": {
+	    "table": "mm_tables.ftypes",
+	    "clause": ""
+	},
+	"mm4me_themes": {
+	    "table": "mm.themes",
+	    "clause": ""
+	},
+	"mm4me_views_themes": {
+	    "table": "mm_tables.p_view_themes",
+	    "clause": ""
+	},
+	"mm4me_tables": {
+	    "table": "mm_tables.p_tables",
+	    "clause": "where id in (select ptid from mm_tables.p_views where id in (select vid from mm_tables.p_view_groups where gid in (select id from mm.groups where name in ('"+groups.join("','")+"')))) or id in (select ptid from mm_tables.p_editions where id in (select eid from mm_tables.p_edition_groups where gid in (select id from mm.groups where name in ('"+groups.join("','")+"'))))",
+	},
+    };
+    var tmpTot=12;
+    var inputDSN=getMapLayersInfo(conf);
+    var cnt=0;
+    for(var i in dbs){
+	conf["lenv"]["message"]="Export table:"+" "+dbs[i]["table"];
+	ZOOUpdateStatus(conf,cnt*2);
+	var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+	var myInputs={
+	    "append": {"value": "true","type":"string"},
+	    "InputDSN": {"value": inputDSN,"type":"string"},
+	    "OutputDSN": {"value": dbFile,"type":"string"},
+	    "F": {"value": "SQLite","type":"string"},
+	    "nln": {"value": i,"type":"string"},
+	    "sql": {"value": "SELECT * FROM "+dbs[i]["table"]+" "+dbs[i]["clause"],"type":"string"},
+	}
+	if(cnt>0)
+	    myInputs["update"]={"value": "true","type":"string"};
+	var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
+	var myExecuteResult=myProcess.Execute(myInputs,{});
+	var myExecuteResult0=myExecuteResult;
+	alert(myExecuteResult);
+	cnt+=1;
+    }
+
+    /**
+     * Dump all table structures that can be edited/viewed first
+     */
+    var req="CREATE TABLE primary_keys (id integer primary key autoincrement, tbl text, col text)";
+    var myOutputs= {};
+    var myInputs={
+	"dsoName": {"value": "","type":"string"},
+	"dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile,"type":"string"},
+	"q": {"value": req,"type":"string"},
+    }
+    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
+    var myExecuteResult2=myProcess2.Execute(myInputs,myOutputs);
+    alert(myExecuteResult2);
+    var req="CREATE TABLE history_log (id integer primary key autoincrement, tbl text, pkey_value var(255), sql text, edition_time integer(4) not null default (strftime('%s','now')))";
+    var myOutputs= {};
+    var myInputs={
+	"dsoName": {"value": "","type":"string"},
+	"dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile,"type":"string"},
+	"q": {"value": req,"type":"string"},
+    }
+    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
+    var myExecuteResult2=myProcess2.Execute(myInputs,myOutputs);
+    alert(myExecuteResult2);
+
+    var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+    var myInputs={
+	"dsoName": {"value": "","type":"string"},
+	"dstName": {"value": inputDSN,"type":"string"},
+	"q": {"value": "SELECT name FROM "+dbs["mm4me_tables"]["table"]+" "+dbs["mm4me_tables"]["clause"],"type":"string"},
+    }
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
+    var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
+    var myExecuteResult0=eval(myExecuteResult);
+    alert(myExecuteResult);
+    alert(myExecuteResult0);
+    for(var i=0;i<myExecuteResult0.length;i++){
+	conf["lenv"]["message"]="Export structure:"+" "+myExecuteResult0[i]["name"];
+	ZOOUpdateStatus(conf,((((50-12)/myExecuteResult0.length)*i)+12));
+	alert("+++++ >"+i+" "+myExecuteResult0[i]);
+	var myInputs={
+	    "append": {"value": "true","type":"string"},
+	    "update": {"value": "true","type":"string"},
+	    "InputDSN": {"value": inputDSN,"type":"string"},
+	    "OutputDSN": {"value": dbFile,"type":"string"},
+	    "F": {"value": "SQLite","type":"string"},
+	    "nln": {"value": myExecuteResult0[i]["name"].replace(/(\w+)(\d*)\.(\d*)(\w+)/g,"$1$2_$3$4"),"type":"string"},
+	    "sql": {"value": "SELECT * FROM "+myExecuteResult0[i]["name"]+" limit 0 ","type":"string"},
+	}
+	var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
+	var myExecuteResult=myProcess.Execute(myInputs,{});
+	alert(myExecuteResult);
+	alert(myExecuteResult0[i]["name"]);
+	/**
+	 * Create description tables
+	 */
+	var myOutputs1= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+	var myInputs1={
+	    "table": {"value": myExecuteResult0[i]["name"],"type":"string"},
+	    "dataStore": {"value": conf["main"]["dbuserName"],"type":"string"}
+	};
+	var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'datastores.postgis.getTableDescription');
+	var myExecuteResult1=myProcess1.Execute(myInputs1,myOutputs1);
+	var myExecuteResult01=eval(myExecuteResult1);
+	alert(myExecuteResult1);
+	var req="INSERT INTO primary_keys (tbl,col) VALUES ('"+myExecuteResult0[i]["name"].replace(/(\w+)(\d*)\.(\d*)(\w+)/g,"$1$2_$3$4")+"',";
+	for(var j=0;j<myExecuteResult01.length;j++){
+	    if(myExecuteResult01[j][3]=="PRI"){
+		req+="'"+myExecuteResult01[j][1]+"')";
+		break;
+	    }
+	}
+	var myOutputs= {};
+	var myInputs={
+	    "dsoName": {"value": "","type":"string"},
+	    "dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile,"type":"string"},
+	    "q": {"value": req,"type":"string"},
+	}
+	var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
+	var myExecuteResult2=myProcess2.Execute(myInputs,myOutputs);
+	alert(myExecuteResult2);
+
+    }
+     
+
+    /**
+     * Extract all Reference tables content from the settings
+     */
+    alert(" +++++++++++-------------------------------+++++++++++ ");
+    alert("Extract all Reference tables content from the settings");
+    alert(" +++++++++++-------------------------------+++++++++++ ");
+    var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+    var myInputs={
+	"dsoName": {"value": "","type":"string"},
+	"dstName": {"value": inputDSN,"type":"string"},
+	"q": {"value": "SELECT value FROM "+dbs["mm4me_edition_fields"]["table"]+" "+dbs["mm4me_edition_fields"]["clause"]+" AND ftype=(select id from mm_tables.ftypes where ftype='e' and code='ref')","type":"string"},
+    }
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
+    var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
+    var myExecuteResult0=eval(myExecuteResult);
+    alert(myExecuteResult);
+    alert(myExecuteResult0);
+    for(var i=0;i<myExecuteResult0.length;i++){
+	var matched=myExecuteResult0[i]["value"].match(/(\w+)(\d*)\.(\d*)(\w+)/);
+	if(matched[0]){
+	    conf["lenv"]["message"]="Export reference tables:"+" "+matched[0];
+	    ZOOUpdateStatus(conf,(((20/myExecuteResult0.length)*i)+50));
+	    alert("+++++ >"+i+" "+matched[0]);
+	    var currentTable=matched[0];
+	    var currentTableName=matched[0].replace(/(\w+)(\d*)\.(\d*)(\w+)/g,"$1$2_$3$4");
+	    var myOutputs= {};
+	    var myInputs={
+		"dsoName": {"value": "","type":"string"},
+		"dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile,"type":"string"},
+		"q": {"value": "DROP TABLE "+currentTableName,"type":"string"},
+	    }
+	    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
+	    var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
+	    alert(myExecuteResult);
+	    var myInputs={
+		"overwrite": {"value": "true","type":"string"},
+		"update": {"value": "true","type":"string"},
+		"InputDSN": {"value": inputDSN,"type":"string"},
+		"OutputDSN": {"value": dbFile,"type":"string"},
+		"F": {"value": "SQLite","type":"string"},
+		"nln": {"value": currentTableName,"type":"string"},
+		"sql": {"value": "SELECT * FROM "+currentTable+"  ","type":"string"},
+	    }
+	    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
+	    var myExecuteResult=myProcess.Execute(myInputs,{});
+	    alert(myExecuteResult);
+	    alert(myExecuteResult0[i]["name"]);
+	}
+    } 
+
+    /**
+     * Extract all Link Table tables content from the settings
+     */
+    alert(" +++++++++++-------------------------------+++++++++++ ");
+    alert("Extract all Link Table tables content from the settings");
+    alert(" +++++++++++-------------------------------+++++++++++ ");
+    var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+    var myInputs={
+	"dsoName": {"value": "","type":"string"},
+	"dstName": {"value": inputDSN,"type":"string"},
+	"q": {"value": "SELECT value FROM "+dbs["mm4me_edition_fields"]["table"]+" "+dbs["mm4me_edition_fields"]["clause"]+" AND ftype=(select id from mm_tables.ftypes where ftype='e' and code='tbl_link')","type":"string"},
+    }
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
+    var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
+    var myExecuteResult0=eval(myExecuteResult);
+    alert(myExecuteResult);
+    alert(myExecuteResult0);
+    for(var i=0;i<myExecuteResult0.length;i++){
+	var matched=myExecuteResult0[i]["value"].split(';');
+	if(matched[matched.length-1]){
+	    conf["lenv"]["message"]="Export link structure:"+" "+matched[matched.length-2];
+	    ZOOUpdateStatus(conf,((10/myExecuteResult0.length)*i)+70);
+	    alert("+++++ >"+i+" "+matched[matched.length-2]);
+	    var currentTable=matched[matched.length-2];
+	    var currentTableName=matched[matched.length-2].replace(/(\w+)(\d*)\.(\d*)(\w+)/g,"$1$2_$3$4");
+	    var myInputs={
+		"append": {"value": "true","type":"string"},
+		"update": {"value": "true","type":"string"},
+		"InputDSN": {"value": inputDSN,"type":"string"},
+		"OutputDSN": {"value": dbFile,"type":"string"},
+		"F": {"value": "SQLite","type":"string"},
+		"nln": {"value": currentTableName,"type":"string"},
+		"sql": {"value": "SELECT * FROM "+currentTable+" limit 0 ","type":"string"},
+	    }
+	    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
+	    var myExecuteResult=myProcess.Execute(myInputs,{});
+	    alert(myExecuteResult);
+	    alert(myExecuteResult0[i]["name"]);
+	}
+    }  
+  
+    /**
+     * Extract all Link Table tables content from the settings
+     */
+    alert(" +++++++++++-------------------------------+++++++++++ ");
+    alert("Extract all Link Table tables content from the settings");
+    alert(" +++++++++++-------------------------------+++++++++++ ");
+    var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+    var myInputs={
+	"dsoName": {"value": "","type":"string"},
+	"dstName": {"value": inputDSN,"type":"string"},
+	"q": {"value": "SELECT value FROM "+dbs["mm4me_edition_fields"]["table"]+" "+dbs["mm4me_edition_fields"]["clause"]+" AND ftype=(select id from mm_tables.ftypes where ftype='e' and code='tbl_linked')","type":"string"},
+    }
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
+    var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
+    var myExecuteResult0=eval(myExecuteResult);
+    alert(myExecuteResult);
+    alert(myExecuteResult0);
+    for(var i=0;i<myExecuteResult0.length;i++){
+	var matched=myExecuteResult0[i]["value"].split(';');
+	if(matched[matched.length-1]){
+	    conf["lenv"]["message"]="Export link structure:"+" "+matched[matched.length-2];
+	    ZOOUpdateStatus(conf,((20/myExecuteResult0.length)*i)+80);
+	    alert("+++++ >"+i+" "+matched[matched.length-1]);
+	    var currentTable=matched[matched.length-2];
+	    var currentTableName=matched[matched.length-2].replace(/(\w+)(\d*)\.(\d*)(\w+)/g,"$1$2_$3$4");
+	    var myInputs={
+		"append": {"value": "true","type":"string"},
+		"update": {"value": "true","type":"string"},
+		"InputDSN": {"value": inputDSN,"type":"string"},
+		"OutputDSN": {"value": dbFile,"type":"string"},
+		"F": {"value": "SQLite","type":"string"},
+		"nln": {"value": currentTableName,"type":"string"},
+		"sql": {"value": "SELECT * FROM "+currentTable+" limit 0 ","type":"string"},
+	    }
+	    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
+	    var myExecuteResult=myProcess.Execute(myInputs,{});
+	    alert(myExecuteResult);
+	    alert(myExecuteResult0[i]["name"]);
+	    var lmatched=matched[matched.length-1].match(/(\w+)(\d*)\.(\d*)(\w+)/);
+	    /**
+	     * UpdateStatus
+	     */
+	    conf["lenv"]["message"]="Export link table:"+" "+lmatched[0];
+	    ZOOUpdateStatus(conf,((20/myExecuteResult0.length)*i)+80);
+	    var currentTable=lmatched[0];
+	    var currentTableName=lmatched[0].replace(/(\w+)(\d*)\.(\d*)(\w+)/g,"$1$2_$3$4");
+	    var myInputs={
+		"append": {"value": "true","type":"string"},
+		"update": {"value": "true","type":"string"},
+		"InputDSN": {"value": inputDSN,"type":"string"},
+		"OutputDSN": {"value": dbFile,"type":"string"},
+		"F": {"value": "SQLite","type":"string"},
+		"nln": {"value": currentTableName,"type":"string"},
+		"sql": {"value": "SELECT * FROM "+currentTable+" ","type":"string"},
+	    }
+	    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
+	    var myExecuteResult=myProcess.Execute(myInputs,{});
+	    alert(myExecuteResult);
+	    alert(myExecuteResult0[i]["name"]);
+	}
+    }    
+
+    outputs["Result"]["generated_file"]=conf["main"]["tmpPath"]+"/"+dbFile;
+    return {result: ZOO.SERVICE_SUCCEEDED, conf: conf, outputs: outputs };
+    
+}

@@ -285,19 +285,34 @@ def image(conf,inputs,outputs):
 
 
 def details(conf,inputs,outputs):
-	import time
-	a=inputs["name"]["value"]
-	a=a.replace("__","/")
-	b=a[1:len(a)].split("/")
+    import time
+    a=inputs["name"]["value"]
+    a=a.replace("__","/")
+    b=a[1:len(a)].split("/")
 	#print >> sys.stderr, a[0:len(a)-1]
-	#print >> sys.stderr, b[len(b)-1]
-	link=os.readlink(a).replace("//","/")
-	if link[len(link)-1]=="/":
+    #print >> sys.stderr, b[len(b)-1]
+    link=os.readlink(a).replace("//","/")
+    if link[len(link)-1]=="/":
 		link=link[0:len(link)-1]
-	date=time.strftime(conf["mm"]["dateFormat"],time.localtime(os.path.getmtime(a)))
-	outputs["Result"]["value"]=json.dumps({"name": b[len(b)-1], "link":link, "date": date})
+    try:
+        oloc=locale.getlocale(locale.LC_ALL)
+        locale.setlocale(locale.LC_ALL,'')
+    except:
+        pass
+    try:
+        mTime=time.strftime(conf["mm"]["dateFormat"].encode(locale.getlocale()[1]),time.localtime(os.path.getmtime(a))).decode(locale.getlocale()[1],"replace")
+    except Exception,e:
+        pass
+        mTime=time.strftime(conf["mm"]["dateFormat"].encode("utf-8"),time.localtime(os.path.getmtime(a))).decode("utf-8","replace")
+    try:
+        locale.setlocale(locale.LC_ALL,oloc)
+    except:
+        pass
     
-	return 3
+    res={"name": b[len(b)-1], "link":link, "date": mTime}
+    outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
+    
+    return 3
     
 def delete(conf,inputs,outputs):
     a=conf["main"]["dataPath"]+"/dirs/"+inputs["name"]["value"]

@@ -3654,7 +3654,7 @@ def clientViewTable(conf,inputs,outputs):
             classifier=vals[i][6]+" "+classifiers[(vals[i][5]-1)]
     if inputs.keys().count("sortname")>0 and inputs.keys().count("sortname")!="":
         for i in range(len(vals)):
-            if vals[i][1].encode('utf-8') == inputs["sortname"]["value"]:
+            if vals[i][6] == inputs["sortname"]["value"]:
                 classifier=vals[i][6]+" "+inputs["sortorder"]["value"]
     if inputs.keys().count("filters")>0:
         filters=json.loads(inputs["filters"]["value"])

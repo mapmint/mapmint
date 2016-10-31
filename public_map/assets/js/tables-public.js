@@ -223,7 +223,7 @@ define([
 		CRowSelected.push(  lid+"_"+$(this).find("input[name=id]").val() );
 		$(this).addClass("selected");
 		$('#'+lid).DataTable().row($(this)).select();
-		if(prefix.indexOf("input_")<0)
+		if(prefix.indexOf("input_")<0 && prefix.indexOf('embedded')<0)
 		    $(".toActivate").each(function(){
 			$(this).children().first().click();
 			console.log($(this));
@@ -843,11 +843,11 @@ define([
 					closure.parent().find('select[name='+closure.attr('name')+']').first().off('change');
 					(function(data){
 					    closure.parent().find('select[name='+closure.attr('name')+']').first().change(function(){
-						console.log(ref)
+						/*console.log(ref)
 						console.log($(this).val());
 						console.log(data)
 						console.log(data[$(this).val()])
-						console.log($(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]"));
+						console.log($(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]"));*/
 						$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").html("");
 						if(data[$(this).val()]['value'].length>0)
 						    for(var j=0;j<data[$(this).val()]['value'].length;j++)

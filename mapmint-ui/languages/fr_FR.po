@@ -2473,6 +2473,9 @@ msgstr "Diagramme"
 msgid "Repport"
 msgstr "Rapport"
 
+msgid "Report"
+msgstr "Rapport"
+
 #: /mapmint-ui/templates/Indicators_bs.tmpl:210
 msgid "Aggregate"
 msgstr "Agréger"
@@ -4513,3 +4516,6 @@ msgstr "Auteur"
 #: /mapmint-ui/templates/Publisher/Properties.html:38
 msgid "Copyright"
 msgstr ""
+
+msgid "Loading"
+msgstr "Chargement"

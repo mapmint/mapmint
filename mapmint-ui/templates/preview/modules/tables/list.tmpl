@@ -3,11 +3,20 @@
 #include $tmpl
 #set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
 
+#set firstListElement=0
 #try
 #set toto=$isPreInput
 #except
 #set isPreInput=False
 #end try
+
+#try 
+#set currentLoadIndex=int($conf["lenv"]["mylevel"])+1
+#except
+#set currentLoadIndex=0
+#end try
+#set tmp=$conf["lenv"]
+#set $tmp["mylevel"]=$currentLoadIndex
 
 #try
 #if $embedded>=0
@@ -200,7 +209,7 @@ $ftmpl.printTabHeaderNew({"id":$prefix+"edit0_"+str($vals1[i][0]),"title":$vals1
 #for i in range(len($vals1))
      <div id="$(prefix)edit0_$vals1[i][0]" role="tabpanel" class="tab-pane" >
 #set inputs0={"id":{"value":str($vals1[i][0])},"isReference":{"value":"true"}}
-$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmpl",searchList={"conf": $conf,"inputs": $inputs0,"cur":$cur,"con":$con}))
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmpl",searchList={"conf": $conf,"inputs": $inputs0,"cur":$cur,"con":$con,"cid":i}))
      </div>
 #end for
 </div>
@@ -212,7 +221,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 <input type="hidden" name="$(prefix)mainTableViewId" value="$qComponents[0]" />
 
 
-#set req="SELECT mm_tables.p_view_fields.id,mm_tables.p_view_fields.alias,mm_tables.p_view_fields.value,mm_tables.p_view_fields.view,mm_tables.p_view_fields.search,mm_tables.p_view_fields.class,mm_tables.p_view_fields.width FROM mm_tables.p_views,mm_tables.p_view_fields where mm_tables.p_views.id=mm_tables.p_view_fields.vid and mm_tables.p_views.id="+$qComponents[0]
+#set req="SELECT mm_tables.p_view_fields.id,mm_tables.p_view_fields.alias,mm_tables.p_view_fields.value,mm_tables.p_view_fields.view,mm_tables.p_view_fields.search,mm_tables.p_view_fields.class,mm_tables.p_view_fields.width,mm_tables.p_view_fields.name FROM mm_tables.p_views,mm_tables.p_view_fields where mm_tables.p_views.id=mm_tables.p_view_fields.vid and mm_tables.p_views.id="+$qComponents[0]
 #set res=$cur.execute($req)
 #set vals=$cur.fetchall()
 #set values=[]
@@ -279,7 +288,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
     obj["id"]="$prefix";
     obj["mainTableRFields"]=
 #end if
-        [#for i in range(len($contents))#"$vals[i][1]",#end for#];
+        [#for i in range(len($contents))#"$vals[i][7]",#end for#];
 #if $prefix==""
     var $(prefix)mainTableFields=
 #else
@@ -288,15 +297,15 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 	[
 #for i in range(len($contents))
        	  {
-		"mData": "$vals[i][1]",
-	  	"sNname": "$vals[i][1]",
+		"mData": "$vals[i][7]",
+	  	"sNname": "$vals[i][7]",
 	  	"sTitle": "$(vals[i][1].title())",
 	  	"sWidth": "$vals[i][6]"
 	  },
 #end for
         ];
 #if $prefix!=""
-#if $embedded==0 or $embedded==1024
+#if $currentLoadIndex==1 or $embedded==1024
 #if not($isInput)
     var embeddeds=[];
 #else

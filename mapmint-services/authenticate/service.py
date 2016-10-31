@@ -230,6 +230,12 @@ def clogIn(conf,inputs,outputs):
         # Set all the Session environment variables using the users 
         # table content.
         print >> sys.stderr,a
+        if conf.keys().count("senv")==0:
+            cid="MM"+conf["lenv"]["usid"]
+            conf["lenv"]["cookie"]="MMID="+cid+"; path=/"
+            conf["senv"]={}
+            conf["senv"]["MMID"]=cid
+
         conf["senv"]["login"]=a[0][0].encode('utf-8')
         conf["senv"]["loggedin"]="true"
         if conf["main"].has_key("isTrial") and conf["main"]["isTrial"]=="true":
@@ -257,29 +263,30 @@ def clogIn(conf,inputs,outputs):
     return zoo.SERVICE_FAILED
 
 def clogOut(conf,inputs,outputs):
-	if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
-		outputs["Result"]["value"]=zoo._("User disconnected")
-		conf["senv"]["loggedin"]="false"
-		conf["senv"]["login"]="anonymous"
-		conf["senv"]["group"]="public"
-		return zoo.SERVICE_SUCCEEDED
-	else:
-		conf["lenv"]["message"]=zoo._("User not authenticated")
-		return zoo.SERVICE_FAILED
-	conf["lenv"]["message"]=zoo._("User not authenticated")
-	return zoo.SERVICE_FAILED
+    if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
+        outputs["Result"]["value"]=zoo._("User disconnected")
+        conf["senv"]["loggedin"]="false"
+        conf["senv"]["login"]="anonymous"
+        conf["senv"]["group"]="public"
+        conf["lenv"]["cookie"]="MMID="+conf["lenv"]["usid"]+"; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
+        return zoo.SERVICE_SUCCEEDED
+    else:
+        conf["lenv"]["message"]=zoo._("User not authenticated")
+        return zoo.SERVICE_FAILED
+    conf["lenv"]["message"]=zoo._("User not authenticated")
+    return zoo.SERVICE_FAILED
 
 def logOut(conf,inputs,outputs):
-	if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
-		outputs["Result"]["value"]=zoo._("User disconnected")
-		conf["senv"]["loggedin"]="false"
-		#conf["lenv"]["cookie"]="MMID=deleted; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
-		return zoo.SERVICE_SUCCEEDED
-	else:
-		conf["lenv"]["message"]=zoo._("User not authenticated")
-		return zoo.SERVICE_FAILED
-	conf["lenv"]["message"]=zoo._("User not authenticated")
-	return zoo.SERVICE_FAILED
+    if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
+        outputs["Result"]["value"]=zoo._("User disconnected")
+        conf["senv"]["loggedin"]="false"
+        conf["lenv"]["cookie"]="MMID="+conf["senv"]["MMID"]+"; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
+        return zoo.SERVICE_SUCCEEDED
+    else:
+        conf["lenv"]["message"]=zoo._("User not authenticated")
+        return zoo.SERVICE_FAILED
+    conf["lenv"]["message"]=zoo._("User not authenticated")
+    return zoo.SERVICE_FAILED
 
 def getGroup(conf,con,login):
 	try:
