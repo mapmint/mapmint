@@ -3187,6 +3187,34 @@ def clientDelete(conf,inputs,outputs):
     outputs["Result"]["value"]=zoo._('Done')
     return zoo.SERVICE_SUCCEEDED
 
+def recoverFileFromHex(conf,inputs,outputs):
+    #dec_string = int(inputs["binaryString"]["value"], 16)
+    #print >> sys.stderr,inputs["binaryString"]["value"]
+    bin_ostring=inputs["binaryString"]["value"]
+    bin_string=bin_ostring[2:len(bin_ostring)-1].decode('hex')#bin(int(bin_ostring[2:len(bin_ostring)-1],16))
+    try:
+        lfile=unpackFile(conf,bin_string)
+        fileName=conf["main"]["tmpPath"]+"/"+lfile["name"].replace("/","_")
+        binary_file=open(fileName, "wb")
+        binary_file.write(lfile["content"])
+        binary_file.close()
+        inputs["file"]={"value": fileName}
+        return saveUploadedFile(conf,inputs,outputs)
+    except Exception,e:
+        #print >> sys.stderr,e
+        con=auth.getCon(conf)
+        con.connect()
+        try:
+            #print >> sys.stderr,bin_string.encode('utf-8')
+            cur=con.conn.cursor()
+            cur.execute("UPDATE "+inputs["table"]["value"]+" set "+inputs["field"]["value"]+"=ST_SetSRID(ST_GeometryFromText('"+bin_string.encode('utf-8')+"'),4326) WHERE id="+inputs["id"]["value"])
+            con.conn.commit()
+            return zoo.SERVICE_SUCCEEDED
+        except Exception,e:
+            print >> sys.stderr,e
+            con.conn.commit()
+            return zoo.SERVICE_FAILED
+
 def saveUploadedFile(conf,inputs,outputs):
     import json
     con=auth.getCon(conf)
@@ -3447,8 +3475,8 @@ def _clientPrint(conf,cur,tableId,cid,rName=None):
                  rcnt+=1
             else:
                 if vals0[i][3]=="paragraph_sql_array":
-                    print >> sys.stderr,str(rvals[i]).replace("'{","[").replace("}'","]")
-                    script+="pm.addParagraph('[_"+vals0[i][2]+"_]',"+json.dumps(rvals[rcnt])+")\n"
+                    #print >> sys.stderr,str(rvals[i]).replace("'{","[").replace("}'","]")
+                    script+="pm.addParagraph('[_"+vals0[i][2]+"_]',"+json.dumps(eval(unicode(str(rvals[rcnt]),"utf-8").replace("'{","[").replace("}'","]")))+")\n"
                     rcnt+=1
                 else:
                     if vals0[i][3]=="sql_array":
@@ -3542,11 +3570,15 @@ def clientView(conf,inputs,outputs):
     vals=cur.fetchall()
     print >> sys.stderr,vals
     columns=[]
+    fcolumns=[]
     rcolumns=[]
     files={}
     for i in range(len(vals)):
         print >> sys.stderr,vals[i][3]
-        columns+=[vals[i][2]]
+        if vals[i][2].count("unamed")==0:
+            columns+=[vals[i][2]]
+        else:
+            fcolumns+=[vals[i][2]]
         if vals[i][3]=="tbl_linked":
             components=vals[i][4].split(';')
             print >> sys.stderr,components
@@ -3572,6 +3604,7 @@ def clientView(conf,inputs,outputs):
                     else:
                         rcolumns+=[vals[i][2]]
     rfields=(",".join(rcolumns))
+    columns+=fcolumns
     print >> sys.stderr,rfields
     f=fetchPrimaryKey(cur,tableName)
     rreq="SELECT "+rfields+" from "+tableName+" where "+f+"="+inputs["id"]["value"] 
@@ -3580,17 +3613,19 @@ def clientView(conf,inputs,outputs):
     rvals=cur.fetchone()
     for i in range(len(ovals)):
         fres[ovals[i][0]]={}
-        req="SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+str(ovals[i][0])+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where name='"+conf["senv"]["group"]+"')) as a ORDER BY a.id"
+        req="SELECT * FROM (SELECT mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+str(ovals[i][0])+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where name='"+conf["senv"]["group"]+"')) as a ORDER BY a.id"
         res=cur.execute(req)
         cvals=cur.fetchall()
         for j in range(len(cvals)):
             print >> sys.stderr,cvals[j]
             if files.keys().count(cvals[j][2])>0:
-                file=unpackFile(conf,rvals[j])
+                file=unpackFile(conf,rvals[rcolumns.index(cvals[j][2])])
                 fres[ovals[i][0]][cvals[j][1]]={"type":"bytes","filename":file["name"],"fileurl":file["name"].replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])}
             else:
                 if rvals is not None and columns.count(cvals[j][2])>0 and columns.index(cvals[j][2])<len(rvals):
                     fres[ovals[i][0]][cvals[j][1]]=rvals[columns.index(cvals[j][2])]
+                else:
+                    fres[ovals[i][0]][cvals[j][1]]="Not found"
             print >> sys.stderr,cvals[j]
     #fres["ref"]=inputs["id"]["value"] 
 

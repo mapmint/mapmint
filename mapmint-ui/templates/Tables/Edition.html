@@ -39,8 +39,8 @@
   
  <script type="template/text" id="edition_c2_template">
   <a href="#"><i class="fa fa-trash"> </i></a>
-  [name]
-  <input name="oname" type="hidden" value="[name]" />
+  <span id="oname_txt">[name]</span>
+  <input name="oname" type="text" value="[name]" onkeyup="\$(this).prev().html(\$(this).val())" />
  </script>
   
  <script type="template/text" id="edition_c3_template">

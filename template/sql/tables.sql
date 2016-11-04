@@ -307,13 +307,16 @@ BEGIN
 	EXECUTE 'SELECT ($1).' || xfield || '::float as a' INTO newX USING NEW;
 	EXECUTE 'SELECT ($1).' || yfield || '::float as a' INTO newY USING NEW;
 
-	EXECUTE 'SELECT ($1).' || xfield || '::float as a' INTO oldX USING OLD;
-	EXECUTE 'SELECT ($1).' || yfield || '::float as a' INTO oldY USING OLD;
+	IF (TG_OP = 'UPDATE') THEN
+	   EXECUTE 'SELECT ($1).' || xfield || '::float as a' INTO oldX USING OLD;
+	   EXECUTE 'SELECT ($1).' || yfield || '::float as a' INTO oldY USING OLD;
 
-	IF newX!=oldX or newY!=oldY or (NEW.wkb_geometry is null and newY is not null and newX is not null) THEN
-	   EXECUTE $q$SELECT ST_SetSRID(ST_MakePoint($q$||newX||$q$,$q$||newY||$q$),(select srid from spatial_ref_sys where auth_name||':'||auth_srid='$q$||srs||$q$'))$q$ INTO NEW.wkb_geometry;
+	   IF newX!=oldX or newY!=oldY or (NEW.wkb_geometry is null and newY is not null and newX is not null) THEN
+	      EXECUTE $q$SELECT ST_SetSRID(ST_MakePoint($q$||newX||$q$,$q$||newY||$q$),(select srid from spatial_ref_sys where auth_name||':'||auth_srid='$q$||srs||$q$'))$q$ INTO NEW.wkb_geometry;
+	   END IF;
+	ELSE
+	   EXECUTE $q$SELECT ST_SetSRID(ST_MakePoint($q$||newX||$q$,$q$||newY||$q$),(select srid from spatial_ref_sys where auth_name||':'||auth_srid='$q$||srs||$q$'))$q$ INTO NEW.wkb_geometry;		
 	END IF;
-
 	return NEW;	
 END;
 $BODY$

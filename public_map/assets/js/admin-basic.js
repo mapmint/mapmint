@@ -515,7 +515,10 @@ define([
 		func(data);
 	    },
 	    error: function(data){
-		onError(data);
+		try{
+		    onError(data);
+		}catch(e){
+		}
 		/*$(".notifications").notify({
 		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
 		    type: 'danger',

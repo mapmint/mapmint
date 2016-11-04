@@ -322,6 +322,7 @@ define([
 				//$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
 				console.log("____ EmbeddedTables loaded"+i);
 				displayTable(embeddeds[i].id+"mainListing_display",$("input[name="+embeddeds[i].id+"mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),embeddedTableFilter[i]);
+				$(".require-"+embeddeds[i].id+"select").hide();
 			    });
 			    console.log("____ loadEmbeddedTables");
 			}
@@ -333,6 +334,7 @@ define([
 			message: { text: "Tuple loaded." },
 			type: 'success',
 		    }).show();
+
 		},function(data){
 		    myRoot.append(data["ExceptionReport"]["Exception"]["ExceptionText"].toString());
 		    $(".notifications").notify({
@@ -443,6 +445,11 @@ define([
 		    );
 		}
 		closure.parent().parent().find(".report_display").html(ul);
+	    },function(data){
+		closure.removeClass("disabled");
+		closure.children().first().show();
+		closure.children().first().next().hide();
+		closure.parent().parent().find(".report_display").html('<div class="alert alert-danger">'+data["ExceptionReport"]["Exception"]["ExceptionText"].toString()+'</div>');
 	    });
 	});
 	$("[data-mmaction=save]").click(function(){
@@ -516,9 +523,10 @@ define([
 		    console.log($(this));
 		}
 	    });
+	    console.log(myRoot1.attr('id'));
 	    var parts=myRoot1.attr('id').split("_");
 	    if(parts[0]=="embedded"){
-		var ei=parseInt(parts[1]);
+		var ei=parseInt(parts[1])-1;
 		var obj=embeddedTableFilter[ei][0];
 		console.log(obj);
 		for(var key in obj)
@@ -778,12 +786,14 @@ define([
 		embeddedTableFilter[i].push(obj);
 	    });
 	    console.log(lRoot);
+	    console.log(embeddedTableFilter);
 	    try{
 		func(i);
 	    }catch(e){
-		console.log('!!!!! ERROR: '+e);
+		console.log('-----!!!!! ERROR: '+e);
 	    }
 	}
+	console.log(embeddedTableFilter);
     }
 
     var changingFields=[];
@@ -811,7 +821,7 @@ define([
 		 * Create the options array containing initial values
 		 */
 		$(this).parent().find('select[name='+$(this).attr('name')+']').first().find('option').each(function(){
-		    console.log(changingFields[changingFields.length-1][lname])
+		    //console.log(changingFields[changingFields.length-1][lname])
 		    for(var i in changingFields[changingFields.length-1][lname]){
 			for(var j in changingFields[changingFields.length-1][lname][i]){
 			    changingFields[changingFields.length-1][lname][i][j]["options"].push($(this).val());
@@ -878,7 +888,7 @@ define([
 
 	try{
 	    for(var i=0;i<embeddeds.length;i++){
-		$(".require-embedded_"+i+"_select").hide();
+		$(".require-"+embeddeds[i].id+"_select").hide();
 	    }
 	}catch(e){
 	    console.log("----- DEBUG :"+e);

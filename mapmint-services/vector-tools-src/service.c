@@ -144,7 +144,7 @@ __declspec(dllexport)
       GDALDriverManager* poR=GetGDALDriverManager();
       GDALDriver          *poDriver = NULL;
 #else
-      OGRDataSource poDS = OGRSFDriverRegistrar::Open( pszDataSource, !bReadOnly, &poDriver );
+      OGRDataSource* poDS = OGRSFDriverRegistrar::Open( pszDataSource, !bReadOnly, &poDriver );
       if( poDS == NULL && !bReadOnly ){
 	poDS = OGRSFDriverRegistrar::Open( pszDataSource, FALSE, &poDriver );
       }

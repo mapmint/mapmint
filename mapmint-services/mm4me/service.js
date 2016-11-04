@@ -54,7 +54,7 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     /**
      * Fetch editable columns
      */
-    var req="select distinct (name) as name, ftype, value from mm4me_edition_fields where eid in (SELECT id from mm4me_editions where step >=0 and ptid = (select id from mm4me_tables where name='"+obj["tbl"].replace(/_/,".")+"') ) and edition > 0 ";
+    var req="select distinct (name) as name, ftype, value from mm4me_edition_fields where eid in (SELECT id from mm4me_editions where step >=0 and ptid = (select id from mm4me_tables where name='"+obj["tbl"].replace(/_/,".")+"') ) and edition > 0 group by name";
     var myOutputs1= {"Result":{  type: 'RawDataOutput', "mimeType": "application/json" }};
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
@@ -68,15 +68,17 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     var initContent=sqlPartContent;
     var protect="$q$";
     var currentValues="";
+    var lcnt=0;
     for(var j=0;j<efields.length;j++){
 	var ctype=getType(conf,efields[j]["ftype"]);
 	//sqlContent+="[__"+ctype+"__]";
 	if(ctype!="tbl_linked" && ctype!="tbl_link" && ctype!="link"){
-	    if(j>0){
+	    if(lcnt>0){
 		sqlPartContent+=", ";
 		//currentValues+=", ";
 	    }
 	    sqlPartContent+=efields[j]["name"];
+	    lcnt+=1;
 	    //currentValues+=protect+currentTuple[0][efields[j]["name"]]+protect;
 	}
     }
@@ -90,10 +92,10 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     var reqCurrent="";
     for(var j=0;j<efields.length;j++){
 	var ctype=getType(conf,efields[j]["ftype"]);
-	if(ctype=="bytea"){
+	if(ctype=="bytea" || ctype=="geometry"){
 	    if(reqCurrent!="")
 		reqCurrent+=", ";
-	    reqCurrent+='quote('+efields[j]["name"]+') as '+efields[j]["name"];//+', writefile("'+conf["main"]["tmpPath"]+'/import_'+conf["lenv"]["usid"]+'_'+fileCounter+'.bin",'+efields[j]["name"]+') as wfile';
+	    reqCurrent+='quote('+efields[j]["name"].replace("wkb_geometry","geometry")+') as '+efields[j]["name"];//+', writefile("'+conf["main"]["tmpPath"]+'/import_'+conf["lenv"]["usid"]+'_'+fileCounter+'.bin",'+efields[j]["name"]+') as wfile';
 	    fileCounter+=1;
 	}
 	else{
@@ -115,17 +117,31 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
     var currentTuple=eval(myExecuteResult);
-    
+    alert("**** > "+myExecuteResult);
+    var binaryValues=[];
+    var geometryValues=[];
+    alert("**** > "+req);
+    lcnt=0;
     for(var j=0;j<efields.length;j++){
 	var ctype=getType(conf,efields[j]["ftype"]);
 	//sqlContent.push("[__"+ctype+"__]");
 	if(efields[j]["ftype"]!=11){
-	    if(j>0){
+	    if(lcnt>0){
 		//sqlPartContent+=", ";
 		currentValues+=", ";
 	    }
 	    //sqlPartContent+=efields[j]["name"];
-	    currentValues+=protect+currentTuple[0][efields[j]["name"]]+protect;
+	    var ctype=getType(conf,efields[j]["ftype"]);
+	    if(ctype!="bytea" && ctype!="geometry" )
+		currentValues+=protect+currentTuple[0][efields[j]["name"]]+protect;
+	    else{
+		if(ctype=="geometry")
+		    geometryValues.push({"name": efields[j]["name"], "value":currentTuple[0][efields[j]["name"]]});
+		else
+		    binaryValues.push({"name": efields[j]["name"], "value":currentTuple[0][efields[j]["name"]]});
+		currentValues+="NULL";
+	    }
+	    lcnt+=1;
 	}
     }
 
@@ -139,9 +155,10 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     var hasReturnedId=false;
     for(var j=0;j<efields.length;j++){
 	var ctype=getType(conf,efields[j]["ftype"]);
-	if(ctype=="tbl_linked" || ctype=="tbl_link" || ctype=="link"){
+	if((ctype=="bytea" || ctype=="geometry" || ctype=="tbl_linked" || ctype=="tbl_link" || ctype=="link") && !hasReturnedId){
 	    sqlPartContent+=" RETURNING id";
 	    hasReturnedId=true;
+	    break;
 	}
     }
     var referenceId=null;
@@ -154,13 +171,58 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     }
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
+    alert(sqlPartContent);
+    alert(myExecuteResult);
     //sqlContent.push("[__"+myExecuteResult+"__]");
     if(hasReturnedId){
 	var currentTuple=eval(myExecuteResult);
 	referenceId=currentTuple[0]["id"];
+	for(var j=0;j<efields.length;j++){
+	    var ctype=getType(conf,efields[j]["ftype"]);
+	    if(ctype=="bytea"){
+		for(var kk=0;kk<binaryValues.length;kk++){
+		    alert("BINARY VALUES ! "+kk);
+		    for(var k=0;k<currentTuple.length;k++){
+			var myOutputs= {"Result":{  type: 'RawDataOutput', "mimeType": "application/json" }};
+			var myInputs={
+			    "table": {"value": obj["tbl"].replace(/_/,"."),"type":"string"},
+			    "field": {"value": binaryValues[kk]["name"],"type":"string"},
+			    "binaryString": {"value": binaryValues[kk]["value"],"type":"string"},
+			    "id": {"value": currentTuple[k]["id"],"type":"string"}
+			};
+			var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'np.recoverFileFromHex');
+			var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
+			alert(myExecuteResult);
+		    }
+		}
+		binaryValues=[];
+	    }else{
+		if(ctype=="geometry"){
+		    for(var kk=0;kk<geometryValues.length;kk++){
+			alert("GEOMETRY VALUES ! "+kk);
+			for(var k=0;k<currentTuple.length;k++){
+			    alert("GEOMETRY VALUES found in tuple ! "+k);
+			    var myOutputs= {"Result":{  type: 'RawDataOutput', "mimeType": "application/json" }};
+			    var myInputs={
+				"table": {"value": obj["tbl"].replace(/_/,"."),"type":"string"},
+				"field": {"value": geometryValues[kk]["name"],"type":"string"},
+				"binaryString": {"value":  geometryValues[kk]["value"],"type":"string"},
+				"id": {"value": currentTuple[k]["id"],"type":"string"},
+				"type": {"value": "geometry","type":"string"}
+			    };
+			    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'np.recoverFileFromHex');
+			    var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
+			    alert(myExecuteResult);
+			}
+		    }
+		    geometryValues=[];
+		}
+	    }
+	}
     }
     sqlContent.push(sqlPartContent);
     sqlResult.push("DELETE FROM "+obj["tbl"]+" WHERE "+pkey+"="+obj["pkey_value"]+";");
+
 
     for(var j=0;j<efields.length;j++){
 	var ctype=getType(conf,efields[j]["ftype"]);
@@ -250,6 +312,7 @@ function replaySqliteHistory(conf,inputs,outputs){
 
     }
 
+    sqlResult.push("DELETE FROM history_log");
     var json=new ZOO.Format.JSON();
     outputs["Result"]["value"]=json.write(sqlResult);
     outputs["Log"]["value"]=json.write(sqlContent);
@@ -258,6 +321,7 @@ function replaySqliteHistory(conf,inputs,outputs){
 }
 
 function createSqliteDB4ME(conf,inputs,outputs){
+    var indexesToCreate=[];
     var dbFile="mm4medb_"+conf["lenv"]["usid"]+".db";
     var groups=conf["senv"]["group"].split(',');
     var dbs={
@@ -311,6 +375,8 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	}
 	if(cnt>0)
 	    myInputs["update"]={"value": "true","type":"string"};
+
+	indexesToCreate.push("CREATE INDEX "+i+"_idx ON "+i+" (id) ");
 	var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
 	var myExecuteResult=myProcess.Execute(myInputs,{});
 	var myExecuteResult0=myExecuteResult;
@@ -355,7 +421,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
     alert(myExecuteResult0);
     for(var i=0;i<myExecuteResult0.length;i++){
 	conf["lenv"]["message"]="Export structure:"+" "+myExecuteResult0[i]["name"];
-	ZOOUpdateStatus(conf,((((50-12)/myExecuteResult0.length)*i)+12));
+	ZOOUpdateStatus(conf,((((50-16)/myExecuteResult0.length)*i)+16));
 	alert("+++++ >"+i+" "+myExecuteResult0[i]);
 	var myInputs={
 	    "append": {"value": "true","type":"string"},
@@ -386,6 +452,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	for(var j=0;j<myExecuteResult01.length;j++){
 	    if(myExecuteResult01[j][3]=="PRI"){
 		req+="'"+myExecuteResult01[j][1]+"')";
+		indexesToCreate.push("CREATE INDEX "+myExecuteResult0[i]["name"].replace(/(\w+)(\d*)\.(\d*)(\w+)/g,"$1$2_$3$4")+"_"+myExecuteResult01[j][1]+"_idx ON "+myExecuteResult0[i]["name"].replace(/(\w+)(\d*)\.(\d*)(\w+)/g,"$1$2_$3$4")+" ("+myExecuteResult01[j][1]+")");
 		break;
 	    }
 	}
@@ -396,7 +463,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	    "q": {"value": req,"type":"string"},
 	}
 	var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
-	var myExecuteResult2=myProcess2.Execute(myInputs,myOutputs);
+	var myExecuteResult2=myProcess2.Execute(myInputs,myOutputs1);
 	alert(myExecuteResult2);
 
     }
@@ -419,10 +486,12 @@ function createSqliteDB4ME(conf,inputs,outputs){
     var myExecuteResult0=eval(myExecuteResult);
     alert(myExecuteResult);
     alert(myExecuteResult0);
+    var tablesImported=[];
     for(var i=0;i<myExecuteResult0.length;i++){
 	var matched=myExecuteResult0[i]["value"].match(/(\w+)(\d*)\.(\d*)(\w+)/);
-	if(matched[0]){
-	    conf["lenv"]["message"]="Export reference tables:"+" "+matched[0];
+	if(matched[0] && tablesImported.indexOf(matched[0])<0){
+	    tablesImported.push(matched[0]);
+	    conf["lenv"]["message"]="Export reference tables: "+matched[0];
 	    ZOOUpdateStatus(conf,(((20/myExecuteResult0.length)*i)+50));
 	    alert("+++++ >"+i+" "+matched[0]);
 	    var currentTable=matched[0];
@@ -449,6 +518,28 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	    var myExecuteResult=myProcess.Execute(myInputs,{});
 	    alert(myExecuteResult);
 	    alert(myExecuteResult0[i]["name"]);
+
+	    var myOutputs1= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+	    var myInputs1={
+		"table": {"value": currentTable,"type":"string"},
+		"dataStore": {"value": conf["main"]["dbuserName"],"type":"string"}
+	    };
+	    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'datastores.postgis.getTableDescription');
+	    var myExecuteResult01=myProcess1.Execute(myInputs1,myOutputs1);
+	    alert(" **** ---- "+myExecuteResult01);
+	    try{
+		var myExecuteResult01=eval(myExecuteResult1);
+		//alert(myExecuteResult1);
+		for(var j=0;j<myExecuteResult01.length;j++){
+		    if(myExecuteResult01[j][3]=="PRI"){
+			indexesToCreate.push("CREATE INDEX "+currentTableName+"_"+myExecuteResult01[j][1]+"_idx ON "+currentTableName+" ("+myExecuteResult01[j][1]+")");
+			break;
+		    }
+		}
+	    }catch(e){
+		alert(e);
+	    }
+
 	}
     } 
 
@@ -471,12 +562,14 @@ function createSqliteDB4ME(conf,inputs,outputs){
     alert(myExecuteResult0);
     for(var i=0;i<myExecuteResult0.length;i++){
 	var matched=myExecuteResult0[i]["value"].split(';');
-	if(matched[matched.length-1]){
+	if(matched[matched.length-1] && tablesImported.indexOf(matched[matched.length-1])<0){
+	    tablesImported.push(matched[matched.length-1]);
 	    conf["lenv"]["message"]="Export link structure:"+" "+matched[matched.length-2];
 	    ZOOUpdateStatus(conf,((10/myExecuteResult0.length)*i)+70);
 	    alert("+++++ >"+i+" "+matched[matched.length-2]);
 	    var currentTable=matched[matched.length-2];
 	    var currentTableName=matched[matched.length-2].replace(/(\w+)(\d*)\.(\d*)(\w+)/g,"$1$2_$3$4");
+	    indexesToCreate.push("CREATE INDEX "+currentTableName+"_"+matched[matched.length-2]+"_idx ON "+currentTableName+" ("+matched[matched.length-2]+");");
 	    var myInputs={
 		"append": {"value": "true","type":"string"},
 		"update": {"value": "true","type":"string"},
@@ -512,12 +605,14 @@ function createSqliteDB4ME(conf,inputs,outputs){
     alert(myExecuteResult0);
     for(var i=0;i<myExecuteResult0.length;i++){
 	var matched=myExecuteResult0[i]["value"].split(';');
-	if(matched[matched.length-1]){
+
+	var currentTable=matched[matched.length-2];
+	var currentTableName=matched[matched.length-2].replace(/(\w+)(\d*)\.(\d*)(\w+)/g,"$1$2_$3$4");
+
+	if(matched[matched.length-2] && tablesImported.indexOf(matched[matched.length-2])<0){
 	    conf["lenv"]["message"]="Export link structure:"+" "+matched[matched.length-2];
-	    ZOOUpdateStatus(conf,((20/myExecuteResult0.length)*i)+80);
+	    ZOOUpdateStatus(conf,((10/myExecuteResult0.length)*i)+80);
 	    alert("+++++ >"+i+" "+matched[matched.length-1]);
-	    var currentTable=matched[matched.length-2];
-	    var currentTableName=matched[matched.length-2].replace(/(\w+)(\d*)\.(\d*)(\w+)/g,"$1$2_$3$4");
 	    var myInputs={
 		"append": {"value": "true","type":"string"},
 		"update": {"value": "true","type":"string"},
@@ -555,6 +650,18 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	}
     }    
 
+    for(var i=0;i<indexesToCreate.length;i++){
+	conf["lenv"]["message"]="Create indexes ...";
+	ZOOUpdateStatus(conf,((10/indexesToCreate.length)*i)+90);
+	var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+	var myInputs={
+	    "dsoName": {"value": "","type":"string"},
+	    "dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile,"type":"string"},
+	    "q": {"value": indexesToCreate[i],"type":"string"},
+	}
+	var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
+	var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
+    }
     outputs["Result"]["generated_file"]=conf["main"]["tmpPath"]+"/"+dbFile;
     return {result: ZOO.SERVICE_SUCCEEDED, conf: conf, outputs: outputs };
     
