@@ -268,7 +268,8 @@ def clogOut(conf,inputs,outputs):
         conf["senv"]["loggedin"]="false"
         conf["senv"]["login"]="anonymous"
         conf["senv"]["group"]="public"
-        conf["lenv"]["cookie"]="MMID="+conf["lenv"]["usid"]+"; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
+        conf["lenv"]["cookie"]="MMID="+conf["senv"]["MMID"]+"; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
+        print >> sys.stderr,conf["senv"]
         return zoo.SERVICE_SUCCEEDED
     else:
         conf["lenv"]["message"]=zoo._("User not authenticated")

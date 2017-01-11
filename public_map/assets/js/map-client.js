@@ -16,9 +16,9 @@ define([
 	    var originalMethod = $.fn[method];
 	    
 	    $.fn[method] = function () {
-		var oldClass = this.className;
+		var oldClass = this.attr("class");
 		var result = originalMethod.apply(this, arguments);
-		var newClass = this.className;
+		var newClass = this.attr("class");
 		this.trigger(method, [oldClass, newClass]);	    
 		return result;
 	    };
@@ -1031,22 +1031,26 @@ define([
 					var tmp0=obj["StyledLayerDescriptor"]["NamedLayer"]["UserStyle"]["FeatureTypeStyle"]["Rule"]["PointSymbolizer"];
 					console.log(tmp0["Graphic"]["Mark"]["WellKnownName"]);
 				    
-					if(tmp0["Graphic"]["Mark"]["WellKnownName"]=="square"){
+					if(tmp0["Graphic"]["Mark"]["WellKnownName"]!=""){
 
 					    console.log(tmp0["Graphic"]["Mark"]["WellKnownName"]);
 
+					    var lobj={};
+					    if(tmp0["Graphic"]["Size"])
+						lobj["radius"]=eval(tmp0["Graphic"]["Size"].toString());
+					    if(tmp0["Graphic"]["Mark"]["Fill"])
+						lobj["fill"]=new ol.style.Fill({
+						    color: tmp0["Graphic"]["Mark"]["Fill"]["CssParameter"].toString(),
+						    opacity: 0.6
+						});
+					    if(tmp0["Graphic"]["Mark"]["Stroke"])
+						lobj["stroke"]=new ol.style.Stroke({
+						    color: tmp0["Graphic"]["Mark"]["Stroke"]["CssParameter"].toString(),
+						    opacity: 0.4
+						});
 					    style=new ol.style.Style({
-						image: new ol.style.Circle({
-						    radius: eval(tmp0["Graphic"]["Size"].toString()+"*10"),
-						    fill: new ol.style.Fill({
-							color: tmp0["Graphic"]["Mark"]["Fill"]["CssParameter"].toString(),
-							opacity: 0.6
-						    }),
-						    stroke: new ol.style.Stroke({
-							color: tmp0["Graphic"]["Mark"]["Stroke"]["CssParameter"].toString(),
-							opacity: 0.4
-						    })
-						})});
+						image: new ol.style.Circle(lobj)
+					    });
 					    
 					}
 				    }
@@ -1069,21 +1073,41 @@ define([
 			sourceVector = new ol.source.Vector({
 			});
 
-			if(styles[cnt]!=null)
-			    layerVector = new ol.layer.Vector({
-				visible: true,
-				style: style,
+			if(oLayers[this.localID].dataType=="point"){
+			    var clusterSource = new ol.source.Cluster({
+				distance: 40,
 				source: sourceVector
 			    });
-			else
-			    layerVector = new ol.layer.Vector({
-				visible: true,
-				source: sourceVector
-			    });
+			    
+			    if(styles[cnt]!=null)
+				layerVector = new ol.layer.Vector({
+				    visible: true,
+				    style: style,
+				    source: clusterSource
+				});
+			    else
+				layerVector = new ol.layer.Vector({
+				    visible: true,
+				    source: clusterSource
+				});
+			}else{
+			    if(styles[cnt]!=null)
+				layerVector = new ol.layer.Vector({
+				    visible: true,
+				    style: style,
+				    source: sourceVector
+				});
+			    else
+				layerVector = new ol.layer.Vector({
+				    visible: true,
+				    source: sourceVector
+				});
+			}
 			
 			cnt++;
 			console.log(this.localID);
-			$.ajax(msUrl+"?map="+pmapfile,{
+			
+			$.ajax(msUrl+"?map="+oLayers[this.localID].map,{
 			    type: 'GET',
 			    data: {
 				service: 'WFS',
@@ -1214,15 +1238,22 @@ define([
 	    var selectedLayers=[];
 	    console.log("CLICK !");
 	    var feature = map.forEachFeatureAtPixel(evt.pixel,function (feature, layer) {
+		console.log("CLICK !"+layer.get("name"));
 		if(layer){
+		    console.log("CLICK !"+layer.get("name"));
+		    console.log(oLayers[layer.get("name")]);
 		    if(layer.get("name") && oLayers[layer.get("name")].click){
+			console.log("CLICK !"+layer.get("name"));
 			feature.set("layerName",layer.get("name"));
 			selectedLayers.push(layer.get("name"));
 		    }
 		}
 		return feature;
 	    });
+	    if(feature)
+		console.log(feature.get("layerName"));
 	    if (feature && feature.get("layerName")) {
+		console.log("CLICK ! "+oLayers[feature.get("layerName")]["dataType"]);
 		var geometry = feature.getGeometry();
 		var coord = geometry.getCoordinates();
 		if($(".window.active").length)
@@ -1236,20 +1267,23 @@ define([
 				bodyContent: "<p>"+html+"</p>",
 				footerContent: ''
 			    });
-			    $(".window.active").css({"top":"79px"});
+			    $(".window.active").css({"width":"90%","top":"79px","left":"5%"});
 			}
 			tryRun(feature,true);
 		    })();
+		    return;
 		}else{
 		    displayFeatureInfo(evt,feature.get("layerName"),function(res){
 			$(".window.active").remove();
-			if(res.length>1)
+			if(res.length>1){
 			    wm.createWindow({
 				title: oLayers[feature.get("layerName")].alias,
 				bodyContent: "<p>"+res+"</p>",
 				footerContent: '',
 				top: "79px"
 			    });
+			    $(".window.active").css({"width":"90%","top":"79px","left":"5%"});
+			}
 		    });
 		    /*
 		    var wmsSource = new ol.source.TileWMS({
@@ -1286,19 +1320,21 @@ define([
 		if(selectedLayers.indexOf(i)==-1 && oLayers[i]["click"] && oLayers[i]["activated"]){
 		    console.log(oLayers[i]["searchMap"]);
 		    gfLayer=i;
+		    if(gfLayer!=""){
+			var closure=gfLayer;
+			displayFeatureInfo(evt,gfLayer,(function(gfLayer){return function(res){
+			    $(".window.active").remove();
+			    if(res.length>1)
+				wm.createWindow({
+				    title: oLayers[gfLayer].alias,
+				    bodyContent: "<p>"+res+"</p>",
+				    footerContent: '',
+				    top: "79px"
+				});
+			    $(".window.active").css({"width":"90%","top":"79px","left":"5%"});
+			}})(closure));
+		    }
 		}
-	    }
-	    if(gfLayer!=""){
-		displayFeatureInfo(evt,gfLayer,function(res){
-		    $(".window.active").remove();
-		    if(res.length>1)
-			wm.createWindow({
-			    title: oLayers[gfLayer].alias,
-			    bodyContent: "<p>"+res+"</p>",
-			    footerContent: '',
-			    top: "79px"
-			});
-		});
 	    }
 	});
 	map.on('pointermove', function(evt) {
@@ -1387,7 +1423,7 @@ define([
 				width: 5
 			    }),
 			    text: new ol.style.Text({
-				//text: feature.get('name'),
+				text: "Selected Feature",
 				font: '15px Verdana,sans-serif',
 				fill: '#FFFFFFF',
 				stroke:'#333333',
@@ -1558,8 +1594,11 @@ define([
 	    $("#mmm_table-wrapper-header").find(".active").remove();
 	    if($("#mmm_table-wrapper-header").find("li a").length>1)
 		$($("#mmm_table-wrapper-header").find("li a")[1]).tab('show');
-	    else
+	    else{
 		$("#table-wrapper").collapse("hide");
+		setMapHeight();
+		map.updateSize();
+	    }
 	    e.preventDefault();
 	});
 
@@ -1880,12 +1919,13 @@ define([
 	    var j=0;
 	    for(var i in pmapfiles){
 		var ext=myWMSLayers["Capability"]["Layer"]["Layer"][j]["BoundingBox"][0]["extent"];
-		oLayers[i]["extent"]=[
-		    ext[1],
-		    ext[0],
-		    ext[3],
-		    ext[2]
-		];
+		if(oLayers[i])
+		    oLayers[i]["extent"]=[
+			ext[1],
+			ext[0],
+			ext[3],
+			ext[2]
+		    ];
 		j++;
 	    }
 	});
@@ -2451,8 +2491,19 @@ define([
 					$("#mmm_table-wrapper-container").append('<div class="output-profile tab-pane active" id="output-profile-'+layer+'" style="height: '+($(window).height()/3)+'px;"></div>');
 
 					$('#mmm_table-content-display_'+layer).tab("show");
-					if(!$("#table-wrapper").hasClass("in"))
+					if(!$("#table-wrapper").hasClass("in")){
 					    $("#table-wrapper").collapse("show");
+					    var mpheight= ($(window).height() - $('.navbar-header').height())/2;
+					    $('#map').height(mpheight);
+					    map.updateSize();
+					}
+					$("#table-wrapper").on("removeClass",function(){
+					    if(arguments[1].indexOf(" in ")>=0 && arguments[2].indexOf(" in ")<=0){
+						setMapHeight();
+						map.updateSize();
+					    }
+					});
+
 					var chart = new Highcharts.Chart({
 					    chart: {
 						zoomType: 'x',
@@ -2940,7 +2991,7 @@ define([
 	});
     }
 
-    function printlTemplate(feature,click){
+    function printlTemplate(feature,click,multiple){
 	if(!feature){
 	    return;
 	}
@@ -2954,14 +3005,47 @@ define([
 	var tmp="";
 	var data=feature.getProperties();
 	for(j in data){
+	    console.log(j);
 	    if(j!="msGeometry"){
 		var reg=new RegExp("\\[=&quot;"+j+"&quot;\\]","g");	
 		res1=res1.replace(reg,feature.get(j));
 		var reg=new RegExp("\\[="+j+"\\]","g");
 		res1=res1.replace(reg,feature.get(j));
 	    }
+	    if(j=="features"){
+		var tmp=feature.get(j);
+		var content='<div class="tab-content">';
+		var header='<ul class="nav nav-tabs" role="tablist">';
+		for(k in tmp){
+		    header+='<li role="presentation" '+(k==0?'class="active"':'')+'><a href="#feature_'+k+'" aria-controls="feature_'+k+'" role="tab" data-toggle="tab">Feature '+eval(k+'+1')+'</a></li>';
+		    console.log(k);
+		    console.log(tmp[k]);
+		    tmp[k].set("layerName",layer);
+		    content+='<div role="tabpanel" class="tab-pane '+(k==0?'active':'')+'" id="feature_'+k+'">'+
+			printlTemplate(tmp[k],click,true)+
+			'</div>';
+		    //content+="<hr />";
+		    //break;
+		}
+		header+='</ul>';
+		if(tmp.length>1){
+		    System.onPrintlTemplate(feature,'<div>'+header+content+'</div>');
+		    $('.window.active').find('a').each(function(){
+			console.log($(this));
+			$(this).click(function (e) {
+			    e.preventDefault()
+			    $(this).tab('show');
+			});
+		    });
+		}else
+		    System.onPrintlTemplate(feature,content);
+		return;
+	    }
 	}
-	System.onPrintlTemplate(feature,res1);
+	if(!multiple)
+	    System.onPrintlTemplate(feature,res1);
+	else
+	   return res1;
     }
     
     function tryRun(feature,click){

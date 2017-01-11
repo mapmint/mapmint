@@ -52,6 +52,33 @@
 </div>
 #end def
 
+#def printCoordInput(obj0)
+<div class="form-group row #if $obj0.keys().count("classes")>0#$obj0["classes"]#end if#">
+  <label class="col-sm-3 control-label">
+  $obj0["name"]
+  </label>
+  <div class="col-sm-9 ">
+    <div class="col-xs-6">
+      <div class="input-group">
+	<span class="input-group-addon" id="basic-addon1">X</span>
+	<input class="form-control" name="$(obj0["id"])_x"
+            onchange="\$(this).parent().parent().next().next().val('POINT('+\$(this).val()+' '+\$(this).parent().parent().next().find('input').val()+')');"
+	    value="" />
+      </div>
+    </div>
+    <div class="col-xs-6">
+      <div class="input-group">
+	<span class="input-group-addon" id="basic-addon1">Y</span>
+	<input class="form-control" name="$(obj0["id"])_y"
+            onchange="\$(this).parent().parent().next().val('POINT('+\$(this).parent().parent().prev().find('input').val()+' '+\$(this).val()+')');"
+	    value="" />
+      </div>
+    </div>
+    <input id="$obj0["rid"]" type="hidden" name="$obj0["id"]" />
+  </div>
+</div>
+#end def
+
 #def printUploadInput(obj)
   <form id="fileUpload" action="$obj["url"]" method="post" enctype="multipart/form-data" target="uploader">
     <input type="file" name="$obj["name"]" id="$(obj["id"])_file" class="form-control mmFile" />

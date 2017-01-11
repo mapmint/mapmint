@@ -3187,6 +3187,16 @@ def clientDelete(conf,inputs,outputs):
     outputs["Result"]["value"]=zoo._('Done')
     return zoo.SERVICE_SUCCEEDED
 
+def recoverFileFromHexInDb(conf,inputs,outputs):
+    from vector_tools import vectSql
+    res=vectSql.vectInfo(conf,inputs,outputs)
+    import json
+    jsObj=json.loads(outputs["Result"]["value"])
+    print >> sys.stderr,jsObj[0][inputs["field"]["value"]]
+    lInputs={"table":inputs["tableName"],"field":inputs["field"],"binaryString": {"value":jsObj[0][inputs["field"]["value"]]},"id":inputs["id"]}
+    return recoverFileFromHex(conf,lInputs,outputs)
+    #return zoo.SERVICE_SUCCEEDED
+
 def recoverFileFromHex(conf,inputs,outputs):
     #dec_string = int(inputs["binaryString"]["value"], 16)
     #print >> sys.stderr,inputs["binaryString"]["value"]
@@ -3201,7 +3211,7 @@ def recoverFileFromHex(conf,inputs,outputs):
         inputs["file"]={"value": fileName}
         return saveUploadedFile(conf,inputs,outputs)
     except Exception,e:
-        #print >> sys.stderr,e
+        print >> sys.stderr,"ERROR 1 "+str(e)
         con=auth.getCon(conf)
         con.connect()
         try:
@@ -3211,6 +3221,7 @@ def recoverFileFromHex(conf,inputs,outputs):
             con.conn.commit()
             return zoo.SERVICE_SUCCEEDED
         except Exception,e:
+            print >> sys.stderr,"ERROR 2 "+str(e)
             print >> sys.stderr,e
             con.conn.commit()
             return zoo.SERVICE_FAILED
@@ -3234,7 +3245,7 @@ def saveUploadedFile(conf,inputs,outputs):
         tables = table_names.split(" ")
         sys.stdout.flush()
         for table in tables:
-            print >> sys.stderr,table
+            print >> sys.stderr," <-> ----> "+str(table)
             if table != '':
                 csv_content=subprocess.Popen(["/usr/local/bin/mdb-export", inputs["file"]["value"], table],
                     stdout=subprocess.PIPE).communicate()[0]
@@ -3262,8 +3273,10 @@ def clientInsert(conf,inputs,outputs):
         return zoo.SERVICE_FAILED
     try:
         req="SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.ftypes,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_edition_fields.ftype=mm_tables.ftypes.id and not(mm_tables.ftypes.basic) and mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+inputs["editId"]["value"]+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where name='"+conf["senv"]["group"]+"')) as a ORDER BY a.id"
+        print >> sys.stderr,req
         res=cur.execute(req)
         originalColumns=cur.fetchall()
+        print >> sys.stderr,"originalColumns"
         print >> sys.stderr,originalColumns
         dcols=[]
         dvals=[]
@@ -3320,10 +3333,21 @@ def clientInsert(conf,inputs,outputs):
                     else:
                         col_sufix+=columns[i]+"="+str(adapt(str(tuple[columns[i]])))
                 else:
-                    if i >= len(realKeys):
-                        dvals+=[tuple[columns[i]]]
+                    if dcols[specialFields.index(columns[i])]["type"]=="geometry":
+                        tmp=tableName.split(".")
+                        req="select srid from geometry_columns WHERE f_table_schema='"+tmp[0]+"' AND f_table_name='"+tmp[1]+"'"
+                        res=cur.execute(req)
+                        vals0=cur.fetchone()
+                        if i>0:
+                            col_sufix+=","
+                            val_sufix+=","
+                        col_sufix+=columns[i]
+                        val_sufix+="ST_SetSRID(ST_GeometryFromText("+str(adapt(str(tuple[columns[i]])))+"),"+str(vals0[0])+")"
                     else:
-                        dvals+=[tupleReal[columns[i]]]
+                        if i >= len(realKeys):
+                            dvals+=[tuple[columns[i]]]
+                        else:
+                            dvals+=[tupleReal[columns[i]]]
                 
         if inputs.keys().count("id")==0:
             print >> sys.stderr,"COLS"
@@ -3586,23 +3610,26 @@ def clientView(conf,inputs,outputs):
         else:
             if vals[i][3]=="bytea":
                 files[vals[i][2]]=1
-            if vals[i][3]!="link" and vals[i][3]!="tbl_link":
-                if vals[i][5]:
-                    if vals[i][3].count("date")>0:
-                        if vals[i][3]=="date":
-                            rcolumns+=[vals[i][2]+"::text"]
+            if vals[i][3]=="geometry":
+                rcolumns+=["ST_AsText("+vals[i][2]+") as "+vals[i][2]]
+            else:
+                if vals[i][3]!="link" and vals[i][3]!="tbl_link":
+                    if vals[i][5]:
+                        if vals[i][3].count("date")>0:
+                            if vals[i][3]=="date":
+                                rcolumns+=[vals[i][2]+"::text"]
+                            else:
+                                rcolumns+=["split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',1)||'T'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',1)||':'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',2)"]
                         else:
-                            rcolumns+=["split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',1)||'T'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',1)||':'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',2)"]
+                            rcolumns+=[vals[i][2]]
                     else:
-                        rcolumns+=[vals[i][2]]
-                else:
-                    if vals[i][3].count("date")>0:
-                        if vals[i][3]=="date":
-                            rcolumns+=[vals[i][2]+"::text"]
+                        if vals[i][3].count("date")>0:
+                            if vals[i][3]=="date":
+                                rcolumns+=[vals[i][2]+"::text"]
+                            else:
+                                rcolumns+=["split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',1)||'T'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',1)||':'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',2)"]
                         else:
-                            rcolumns+=["split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',1)||'T'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',1)||':'||split_part(split_part(("+vals[i][2]+"::timestamp AT TIME ZONE 'Z')::text,' ',2),':',2)"]
-                    else:
-                        rcolumns+=[vals[i][2]]
+                            rcolumns+=[vals[i][2]]
     rfields=(",".join(rcolumns))
     columns+=fcolumns
     print >> sys.stderr,rfields
@@ -3619,8 +3646,9 @@ def clientView(conf,inputs,outputs):
         for j in range(len(cvals)):
             print >> sys.stderr,cvals[j]
             if files.keys().count(cvals[j][2])>0:
-                file=unpackFile(conf,rvals[rcolumns.index(cvals[j][2])])
-                fres[ovals[i][0]][cvals[j][1]]={"type":"bytes","filename":file["name"],"fileurl":file["name"].replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])}
+                if rvals[rcolumns.index(cvals[j][2])] is not None:
+                    file=unpackFile(conf,rvals[rcolumns.index(cvals[j][2])])
+                    fres[ovals[i][0]][cvals[j][1]]={"type":"bytes","filename":file["name"],"fileurl":file["name"].replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])}
             else:
                 if rvals is not None and columns.count(cvals[j][2])>0 and columns.index(cvals[j][2])<len(rvals):
                     fres[ovals[i][0]][cvals[j][1]]=rvals[columns.index(cvals[j][2])]

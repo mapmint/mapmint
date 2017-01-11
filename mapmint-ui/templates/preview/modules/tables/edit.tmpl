@@ -67,7 +67,10 @@
 $ftmpl.printHiddenContent({"rid":"runFirst_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][6],"optional":$isOptional})
 #end if
 
-#if $ctype=="text" or $ctype=="varchar(255)" or $ctype=="html"
+#if $ctype=="text" or $ctype=="varchar(255)" or $ctype=="html" or $ctype=="geometry" 
+#if $ctype=="geometry"
+$ftmpl.printCoordInput({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+#else
 #*
  In case it is a long text content
 *#
@@ -75,6 +78,7 @@ $ftmpl.printHiddenContent({"rid":"runFirst_"+str($vals[i][1]),"id":"edit_"+str($
 $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
 #else
 $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":"textarea","optional":$isOptional})
+#end if
 #end if
 #else
 #if ctype=="bytea"

@@ -69,21 +69,20 @@ def save(conf,inputs,outputs):
 	return 3
 
 def test(conf,inputs,outputs):
-	try:
-		if inputs["type"]["value"].upper()=="WMS":
-			import osgeo.gdal
-			ds=osgeo.gdal.Open(inputs["type"]["value"]+":"+inputs["url"]["value"])
-			ds.GetDriver()
-		else:
-			import osgeo.ogr
-			ds=osgeo.ogr.Open(inputs["type"]["value"]+":"+inputs["url"]["value"])
-			
-		ds.GetDriver()
-		outputs["Result"]["value"]=zoo._("Test connecting the Data Store ")+inputs["name"]["value"]+zoo._(" run successfully")
-		return zoo.SERVICE_SUCCEEDED
-	except Exception,e:
-		conf["lenv"]["message"]=zoo._("Unable to access the Data Store:")+str(e)
-		return zoo.SERVICE_FAILED
+    try:
+        if inputs["type"]["value"].upper()=="WMS":
+            import osgeo.gdal
+            ds=osgeo.gdal.Open(inputs["type"]["value"]+":"+inputs["url"]["value"])
+            ds.GetDriver()
+        else:
+            import osgeo.ogr
+            ds=osgeo.ogr.Open(inputs["type"]["value"]+":"+inputs["url"]["value"])
+            ds.GetDriver()
+        outputs["Result"]["value"]=zoo._("Test connecting the Data Store ")+inputs["name"]["value"]+zoo._(" run successfully")
+        return zoo.SERVICE_SUCCEEDED
+    except Exception,e:
+        conf["lenv"]["message"]=zoo._("Unable to access the Data Store:")+str(e)
+        return zoo.SERVICE_FAILED
 
 def display(conf,inputs,outputs):
 	default_dir=conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"

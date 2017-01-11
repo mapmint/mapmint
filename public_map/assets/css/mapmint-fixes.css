@@ -206,3 +206,8 @@ input[type="file"] {
     -webkit-transform:rotate(225deg); /* Chrome, Safari, Opera */
     transform:rotate(225deg);         /* Standard syntax */
 }
+
+.ol-zoomslider-thumb{
+    left: -1px;
+    width: 100% !important;
+}

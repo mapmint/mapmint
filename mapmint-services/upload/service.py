@@ -78,7 +78,7 @@ def saveOnServer(conf,inputs,outputs):
 
 def saveOnServer0(conf,inputs,outputs):
     import shutil,json
-    print >> sys.stderr,"ok1 "+str(inputs)
+    print >> sys.stderr,"ok1 INPUTS "+str(inputs)
     print >> sys.stderr,"ok1 "+str(conf)
     dir=conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["senv"]["MMID"]
     try:

@@ -26,4 +26,20 @@
       mimeType = application/x-sqlite3
     </Default>	
    </ComplexData>
+  [Result1]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <ComplexData>
+    <Default>
+      mimeType = application/x-sqlite3
+    </Default>	
+   </ComplexData>
+  [Result2]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <ComplexData>
+    <Default>
+      mimeType = application/x-sqlite3
+    </Default>	
+   </ComplexData>
  </DataOutputs>  

@@ -323,7 +323,7 @@ class LOClient:
             except:
                 pass
 
-    def insertImage(self,image_name,width=None,height=None):
+    def insertImage(self,image_name,width=None,height=None,vposition=None):
         """ Add image to a document
         Image is added to the active cursor position
         @param image_name Image filename
@@ -335,6 +335,10 @@ class LOClient:
             oShape.Width=width
         if height is not None:
             oShape.Height=height
+        if vposition is not None:
+            oShape.VertOrient=uno.getConstantByName( "com.sun.star.text.VertOrientation.CHAR_CENTER")
+            oShape.VertOrientRelation=uno.getConstantByName( "com.sun.star.text.RelOrientation.TEXT_LINE" )
+            oShape.VertOrientPosition=vposition
         self.cursor.Text.insertTextContent(self.cursor,oShape,uno.Bool(0))
 
     def loadImage(self,image_name,image_file):
@@ -386,7 +390,7 @@ class LOClient:
             print("++++++++++++++++++",file=sys.stderr)
             #self.cursor.gotoRange(self.vcursor,False)
             #self.vcursor.setString("")
-            self.insertImage(image_url)
+            self.insertImage(image_url,vposition="43")
             self.nbc+=1
             return 1
         while self.goToWord(image_name):

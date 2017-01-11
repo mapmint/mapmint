@@ -42,20 +42,22 @@ function getInitialInfo(conf,inputs,outputs){
   var myExecuteResult=myProcess.Execute(inputs,myOutputs);
   alert(myExecuteResult);
   try{
-    var tmp=eval(myExecuteResult.replace(/None/g,"null"));
-    var myInputs;
-  alert(tmp[0]);
-  if(tmp[0][0]=='P' && tmp[0][1]=='G' && tmp[0][2]==':')
-    myInputs = {"dataSource": { type: 'string', "value": tmp[0] }, "layer": { type: 'string', "value": tmp[1] }};
-  else
-    myInputs = {"dataSource": { type: 'string', "value": tmp[0] }, "layer": { type: 'string', "value": tmp[1] }};
-  alert(myInputs["dataSource"]["value"]);
-  var myOutputs1= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-  var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.mmExtractVectorInfo');
-  var myExecuteResult1=myProcess1.Execute(myInputs,myOutputs);
-  alert(myExecuteResult1);
-
-  return {result: ZOO.SERVICE_SUCCEEDED, outputs: [{name:"Result","mimeType": "text/xml",encoding: "utf-8", value: myExecuteResult1}]}
+      var tmp=eval(myExecuteResult.replace(/None/g,"null"));
+      var myInputs;
+      alert(tmp[0]);
+      if((tmp[0][0]=='P' && tmp[0][1]=='G' && tmp[0][2]==':') || (tmp[0][0]=='M' && tmp[0][1]=='y' && tmp[0][5]==':')){
+	  alert("OK");
+	  myInputs = {"dataSource": { type: 'string', "value": tmp[0] }, "layer": { type: 'string', "value": tmp[1] }};
+      }
+      else
+	  myInputs = {"dataSource": { type: 'string', "value": tmp[0] }, "layer": { type: 'string', "value": tmp[1] }};
+      alert(myInputs["dataSource"]["value"]);
+      var myOutputs1= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+      var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.mmExtractVectorInfo');
+      var myExecuteResult1=myProcess1.Execute(myInputs,myOutputs);
+      alert(myExecuteResult1);
+      
+      return {result: ZOO.SERVICE_SUCCEEDED, outputs: [{name:"Result","mimeType": "text/xml",encoding: "utf-8", value: myExecuteResult1}]}
 
   }catch(e){
       conf["lenv"]["message"]=e;

@@ -294,6 +294,7 @@ def getPath(conf,ds):
         else:
             return ds+"/"
     else:
+        print >> sys.stderr,ds
         if conf["mm"].has_key("supportedDbs"):
             for i in conf["mm"]["supportedDbs"].split(','):
                 if os.path.exists(conf["main"]["dataPath"]+"/"+i+"/"+ds+".xml"):

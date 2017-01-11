@@ -4519,3 +4519,18 @@ msgstr ""
 
 msgid "Loading"
 msgstr "Chargement"
+
+msgid "User Profile"
+msgstr "Paramètres utilisateur"
+
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+msgid "Distiller"
+msgstr "Données"
+
+msgid "Manager"
+msgstr "Cartes"
+
+msgid "Publisher"
+msgstr "Publication"

@@ -1,0 +1,91 @@
+[addColumn]
+ Title = List all tablles from PgDatabase.
+ Abstract = List all the key value pairs from the main configuration file.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = pgConnection
+ serviceType = Python
+ <DataInputs>
+  [dataStore]
+   Title = Input string
+   Abstract = The name of the map to extract values from.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [table]
+   Title = Input string
+   Abstract = The name of the map to extract values from.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [field_name]
+   Title = name of column
+   Abstract = The name of the column to add.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [field_type]
+   Title = column's type
+   Abstract = The type of the column to add.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [proj]
+   Title = column's type
+   Abstract = The type of the column to add.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [geo_x]
+   Title = column's type
+   Abstract = The type of the column to add.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [geo_y]
+   Title = column's type
+   Abstract = The type of the column to add.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [geo_type]
+   Title = column's type
+   Abstract = The type of the column to add.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The execution message
+   Abstract = The execution message created by service.
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>

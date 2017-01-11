@@ -367,13 +367,13 @@ def cleanup(conf,inputs,outputs):
 	try:
 		tmp=nms.keys()
 		tmp0=inputs["dsName"]["value"].split(":")
-		if tmp.count(inputs["dsType"]["value"])==0:
+		if tmp.count(inputs["dsType"]["value"].lower())==0:
 			os.unlink(inputs["dsName"]["value"]+"/ds_ows.map")
 		else:
 			if len(tmp0)>=2:
 				os.unlink(conf["main"]["dataPath"]+"/"+nms[inputs["dsType"]["value"]]+"/"+tmp0[1]+"ds_ows.map")
 			else:
-				os.unlink(conf["main"]["dataPath"]+"/"+nms[inputs["dsType"]["value"]]+"/"+inputs["dsName"]["value"]+"ds_ows.map")
+				os.unlink(conf["main"]["dataPath"]+"/"+inputs["dsType"]["value"]+"/"+inputs["dsName"]["value"]+"ds_ows.map")
 	except Exception,e:
 		conf["lenv"]["message"]="Dir cleaned up failed: "+str(e)
 		return 4

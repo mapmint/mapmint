@@ -46,6 +46,9 @@
 #endif
 
 #include "service_internal.h"
+#include <libxml/parser.h>
+#include <libxml/xpath.h>
+
 extern "C" {
 #include <libxml/tree.h>
 #include <libxml/parser.h>
@@ -196,9 +199,12 @@ __declspec(dllexport)
     int isJson=-1;
     int isRaster=-1;
 
+
     map *tmpP=getMapFromMaps(conf,"main","dataPath");
     map *tmp=getMapFromMaps(inputs,"dataSource","value");
     if(tmp!=NULL){
+      fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+      fflush(stderr);
       char *tmpDataSource=strdup(tmp->value);
       char *pszDataDir;
       char *pszDataDirMY;
@@ -207,14 +213,35 @@ __declspec(dllexport)
       sprintf(type,"PostGIS");
       int dirp = open( pszDataDir , O_RDONLY );
       if(dirp<0){
+	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	fflush(stderr);
+	//pszDataDir=NULL;
 	//free(pszDataDir);
+	pszDataDir=(char*)malloc((strlen(tmpDataSource)+strlen(tmpP->value)+12)*sizeof(char));
 	sprintf(pszDataDir,"%s/MySQL/%s.xml",tmpP->value,tmpDataSource);
+	//pszDataDir[(strlen(tmpDataSource)+strlen(tmpP->value)+12)]=0;
+	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	fflush(stderr);
+	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	fflush(stderr);
+	fprintf(stderr,"MAP : %s %d %s \n",__FILE__,__LINE__,pszDataDir);
+	fflush(stderr);
+	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	fflush(stderr);
 	sprintf(type,"MySQL");
+	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	fflush(stderr);
 	dirp = open( pszDataDir , O_RDONLY );
+	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	fflush(stderr);
       }
+      //fprintf(stderr,"MAP : %s %s %d %d \n",__FILE__,__LINE__,pszDataDir,dirp);
+      //fflush(stderr);
       char *res=NULL;
       struct dirent *dp;
       if(dirp>=0){
+	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	fflush(stderr);
 	close(dirp);
 	fprintf(stderr,"XML FOUND \n");
 	xsltStylesheetPtr cur = NULL;
@@ -530,8 +557,11 @@ __declspec(dllexport)
     /*      Special case for -sql clause.  No source layers required.       */
     /* -------------------------------------------------------------------- */
     map* tmpSql=getMapFromMaps(inputs,"sql","value");
-    if(tmpSql!=NULL)
+    if(tmpSql!=NULL){
+      if(pszSQLStatement!=NULL)
+	free(pszSQLStatement);
       pszSQLStatement=strdup(tmpSql->value);
+    }
     
     if( pszSQLStatement != NULL )
       {
@@ -622,11 +652,14 @@ __declspec(dllexport)
     CSLDestroy( papszOptions );
 #if GDAL_VERSION_MAJOR <2
     OGRDataSource::DestroyDataSource( poDS );
+#else
+    //GDALClose(poDS);
 #endif
+
     if (poSpatialFilter)
       OGRGeometryFactory::destroyGeometry( poSpatialFilter );
     
-    OGRCleanupAll();
+    //OGRCleanupAll();
     
     xmlChar *xmlb;
     int bsize;
@@ -974,7 +1007,7 @@ __declspec(dllexport)
 	}
       }
     }
-    fprintf(stderr,"DATASOURCE : %s\n",pszDataSource);
+    fprintf(stderr,"DATASOURCE %s %d : %s\n",__FILE__,__LINE__,pszDataSource);
 
     tmp1=getMapFromMaps(inputs,"getFeatures","value");
     if(tmp1!=NULL){
@@ -1044,23 +1077,6 @@ __declspec(dllexport)
     if( poDS == NULL )
       {
 	fprintf(stderr,"ERROR OCCURS %s\n",pszDataSource);
-	char tmp[1024];
-        sprintf( tmp, "FAILURE:\n"
-		 "Unable to open datasource `%s' with the following drivers.\n",
-		 pszDataSource );
-
-        for( int iDriver = 0; iDriver < poR->GetDriverCount(); iDriver++ )
-        {
-#if GDAL_VERSION_MAJOR >= 2
-	    fprintf( stderr, "  -> %s\n", poR->GetDriver(iDriver)->GetDescription() );
-	    sprintf( tmp+strlen(tmp), "  -> %s\n", poR->GetDriver(iDriver)->GetDescription() );
-#else
-	    fprintf( stderr, "  -> %s\n", poR->GetDriver(iDriver)->GetName() );
-	    sprintf( tmp+strlen(tmp), "  -> %s\n", poR->GetDriver(iDriver)->GetName() );
-#endif
-        }
-	
-	setMapInMaps(conf,"lenv","message",tmp);
 	goto TRYGDAL;
       }
 
@@ -1229,6 +1245,7 @@ __declspec(dllexport)
 	msInsertHashTable(&(l->metadata), "wfs_version", "1.0.0");
 	free(tmp);
       }
+      GDALAllRegister();
       goto CONCLUDE;
     }
 
@@ -1247,11 +1264,8 @@ __declspec(dllexport)
       int res=0;
       if(dirp==NULL){
 	if(isWxs>0){
-	  maps* tmp=(maps*)malloc(MAPS_SIZE);
-	  tmp->name=strdup("RasterDS");
+	  maps* tmp=createMaps("RasterDS");
 	  tmp->content=createMap("storage",pszDataSource);
-	  tmp->next=NULL;
-	  dumpMaps(tmp);
 	  if(res!=1){
 	    char **papszMetadata;
 	    char **papszMetadataInit;
@@ -1295,8 +1309,8 @@ __declspec(dllexport)
 		msInsertHashTable(&(myLayer->metadata), "ows_label", dname);
 		msInsertHashTable(&(myLayer->metadata), "ows_title", dname);
 		msInsertHashTable(&(myLayer->metadata), "ows_abstract", dname);
-		msInsertHashTable(&(myMap->web.metadata), "ows_srs", "EPSG:4326 EPSG:900913");
-		msInsertHashTable(&(myLayer->metadata), "ows_srs", "EPSG:4326 EPSG:900913");
+		msInsertHashTable(&(myMap->web.metadata), "ows_srs", "EPSG:4326 EPSG:900913 EPSG:3857");
+		msInsertHashTable(&(myLayer->metadata), "ows_srs", "EPSG:4326 EPSG:900913 EPSG:3857");
 
 		myMap->layerorder[myMap->numlayers] = myMap->numlayers;
 		myMap->numlayers++;
@@ -1342,17 +1356,14 @@ __declspec(dllexport)
 		sprintf(fname,"%s%s",mapfilePath->value,dp->d_name);
 #endif
 	    char* rname=strdup(dp->d_name);
-	    maps* tmp=(maps*)malloc(MAPS_SIZE);
-	    tmp->name=strdup(dp->d_name);
+	    maps* tmp=createMaps(dp->d_name);
 	    char* sext=strstr(rname,".");
 	    tmp->name[strlen(rname)-strlen(sext)]=0;
 	    tmp->content=createMap("storage",fname);
-	    tmp->next=NULL;
 	    // Make sure the file is not vector
 	    int res=0;
 	    int hasValue=0;
 	    {
-	      fprintf(stderr,"OK %s %s %d \n\n",dp->d_name,strstr(dp->d_name,"."),strcasecmp(strstr(dp->d_name,"."),".DBF"));
 	    if(strstr(dp->d_name,".")!=NULL && 
 	       (strcasecmp(strstr(dp->d_name,"."),".SHP")!=0 &&
 		strcasecmp(strstr(dp->d_name,"."),".DBF")!=0 &&
@@ -1502,7 +1513,6 @@ __declspec(dllexport)
 
   CONCLUDE:
 
-    OGRCleanupAll();
     xmlChar *xmlb;
     int bsize;
 
@@ -1514,7 +1524,7 @@ __declspec(dllexport)
     else
       xmlDocDumpFormatMemory(resDoc, &xmlb, &bsize, 1);
     setMapInMaps(outputs,"Result","value",(char*)xmlb);
-
+    xmlFreeDoc(resDoc);
 
     fprintf(stderr,"MAPFILE TO SAVE !\n");    
     if(isPg>0 || isWxs>0){
@@ -1532,10 +1542,16 @@ __declspec(dllexport)
     struct stat mstat;
     int s=stat(mapPath,&mstat);
     if(s<0){
+      myMap->mappath=zStrdup(mapPath);
+      fprintf(stderr,"END! %s %d \n",__FILE__,__LINE__);
       msSaveMap(myMap,mapPath);
-      msFreeMap(myMap);
+      fprintf(stderr,"END! %s %d \n",__FILE__,__LINE__);
+      //msFreeMap(myMap);
     }
 
+    fprintf(stderr,"END! %s %d \n",__FILE__,__LINE__);
+    //OGRCleanupAll();
+    fprintf(stderr,"END! %s %d \n",__FILE__,__LINE__);
     return SERVICE_SUCCEEDED;
   }
 
@@ -1795,7 +1811,7 @@ __declspec(dllexport)
 	  xmlAddChild(n1,xmlNewText(BAD_CAST tmp));
 	  xmlAddChild(n,n1);
 
-	  char tmpStr[2048];
+	  char *tmpStr;
 	  map* tmpMapPath=getMapFromMaps(conf,"main","mapserverAddress");
 	  char* mapPath=(char*)malloc((strlen(tmpMapPath->value)+strlen(pszDataSource)+11)*sizeof(char));
 	  sprintf(mapPath,"%sds_ows.map",pszDataSource);
@@ -1817,14 +1833,16 @@ __declspec(dllexport)
 	  
 	  map* tmpMap=getMapFromMaps(conf,"main","mapfile");
 
+	  tmpStr=(char*)malloc((strlen(tmpMapPath->value)+strlen(tmpMap->value)+strlen(layerName)+2048)*sizeof(char));
 	  /*if(pszWKT!=NULL && strncasecmp(pszWKT,"EPSG:4326",9)==0)
 	  sprintf(tmpStr,"%s?map=%s&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=%f,%f,%f,%f&SRS=EPSG:4326&WIDTH=%f&HEIGHT=%f&LAYERS=%s\n",tmpMapPath->value,tmpMap->value,oExt.MinY,oExt.MinX,oExt.MaxY,oExt.MaxX,width,height,poDefn->GetName());
 	  else*/
-	    sprintf(tmpStr,"%s?map=%s&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=%f,%f,%f,%f&SRS=EPSG:4326&WIDTH=%f&HEIGHT=%f&LAYERS=%s\n",tmpMapPath->value,tmpMap->value,oExt.MinX,oExt.MinY,oExt.MaxX,oExt.MaxY,width,height,layerName);
+	    sprintf(tmpStr,"%s?map=%s&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=%f,%f,%f,%f&SRS=EPSG:4326&WIDTH=%f&HEIGHT=%f&LAYERS=%s",tmpMapPath->value,tmpMap->value,oExt.MinX,oExt.MinY,oExt.MaxX,oExt.MaxY,width,height,layerName);
 	  fprintf(stderr,"previewLink *%s* %d\n",tmpStr,(pszWKT!=NULL && strncasecmp(pszWKT,"EPSG:4326",9)!=0));	  
 	  n2=xmlNewNode(NULL,BAD_CAST "previewLink");
 	  xmlAddChild(n2,xmlNewText(BAD_CAST tmpStr));
 	  xmlAddChild(n,n2);
+	  free(tmpStr);
 	}
       
       n1=xmlNewNode(NULL,BAD_CAST "fields");
@@ -2089,12 +2107,12 @@ __declspec(dllexport)
 
 	msLoadProjectionStringEPSG(&m->projection,"EPSG:4326");
 	msLoadProjectionStringEPSG(&myLayer->projection,"EPSG:4326");
-	msInsertHashTable(&(m->web.metadata), "ows_srs", "EPSG:4326 EPSG:900913");
-	msInsertHashTable(&(myLayer->metadata), "ows_srs", "EPSG:4326 EPSG:900913");
+	msInsertHashTable(&(m->web.metadata), "ows_srs", "EPSG:4326 EPSG:900913 EPSG:3857");
+	msInsertHashTable(&(myLayer->metadata), "ows_srs", "EPSG:4326 EPSG:900913 EPSG:3857");
       }
 
-      msInsertHashTable(&(m->web.metadata), "ows_srs", "EPSG:4326 EPSG:900913");
-      msInsertHashTable(&(myLayer->metadata), "ows_srs", "EPSG:4326 EPSG:900913");
+      msInsertHashTable(&(m->web.metadata), "ows_srs", "EPSG:4326 EPSG:900913 EPSG:3857");
+      msInsertHashTable(&(myLayer->metadata), "ows_srs", "EPSG:4326 EPSG:900913 EPSG:3857");
 
       OGREnvelope ogExt;
       if (OGR_L_GetExtent(poLayer,&ogExt, TRUE) == OGRERR_NONE){

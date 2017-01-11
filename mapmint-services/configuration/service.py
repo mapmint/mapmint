@@ -52,7 +52,7 @@ def SaveConf(conf,inputs,outputs):
 	try:
 		f=open(conf["lenv"]["cwd"].replace("\\","/")+'/main.cfg', 'w')
 		for a in conf:
-			if a != "lenv" and a != "senv":
+			if a != "lenv" and a != "senv" and a != "renv":
 				if i>0:
 					f.write("\n");
 				f.write("["+a+"]\n");

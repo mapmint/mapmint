@@ -386,8 +386,11 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
         m.save(mapfile)
     except Exception,e:
         print >> sys.stderr,e
+        m00=None
         for i in ["PostGIS","MySQL","WFS","WMS"]:
             try:
+                wmsGetCapDocument=None
+                layersList=None
                 mapfile=conf["main"]["dataPath"]+"/"+i+"/"+inputs["dataStore"]["value"].replace("WFS:","").replace("WMS:","")+"ds_ows.map"
                 print >> sys.stderr,"MAPFILE 0 "+mapfile
                 m = mapscript.mapObj(mapfile)
@@ -396,47 +399,130 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
                 print >> sys.stderr,mapscript.MS_WMS
                 print >> sys.stderr,m.getLayer(0).connectiontype
                 if m.getLayer(0).connectiontype==mapscript.MS_WMS:
-			
                     print >> sys.stderr,m.web.metadata.get("ows_srs")
-                    print >> sys.stderr,m.web.metadata.get("ows_srs")
-                    print >> sys.stderr,dir(m)
-                    
+                    #print >> sys.stderr,dir(m)
+                    srs=m.web.metadata.get("ows_srs")
+                    m.web.metadata.set("ows_srs",srs+" EPSG:3857")
                     for i in range(0,m.numlayers):
                         l=m.getLayer(i)
                         con=l.connection
+                        import osgeo.gdal
+                        ds=osgeo.gdal.Open(con)
+                        ds.GetDriver()
+                        from urlparse import urlparse
+                        o=urlparse(con)
+                        import cgi
+                        params=cgi.parse_qs(o.query)
+                        if params['BBOX']:
+                            tmp=str(params['BBOX'][0]).split(',')
                         tmp0=con.split("BBOX=")
                         print >> sys.stderr,tmp0[1]
-                        tmp1=tmp0[1].split("&")
-                        if len(tmp1)>0:
-                            tmp=tmp1[0].split(",")
-                        else:
-                            tmp=tmp0[1].split(",")
                         try:
-                            for i in range(0,len(tmp)):
-                                tmp[i]=eval(tmp[i])
-                                try:
-                                    tmp1=con.split("SRS=")
-                                    if tmp1 is None:
-                                        tmp1=con.split("CRS=")
-                                    if tmp1 is not None:
-                                        tmp1=tmp1[1].split("&")
-                                    l.setProjection(tmp1[0])
-                                except:
-                                    pass
+                            print >> sys.stderr,"OK"
+
+                            for ij in range(0,len(tmp)):
+                                tmp[ij]=eval(tmp[ij])
+                            print >> sys.stderr,"OK"
+                            try:
+                                tmp1=con.split("SRS=")
+                                if tmp1 is None:
+                                    tmp1=con.split("CRS=")
+                                if tmp1 is not None:
+                                    tmp1=tmp1[1].split("&")
+                                l.setProjection(tmp1[0])
+                            except:
+                                pass
+                            print >> sys.stderr,"OK"
                             if tmp0[0].count("format")==0 and tmp0[0].count("FORMAT")==0:
                                 tmp0[0]+="format=image/png"
                             if tmp0[0].count("width")==0 and tmp0[0].count("height")==0:
-                                tmp0[0]+="&width=500&height=400"
-						
-                            l.connection=tmp0[0]+"&BBOX="+str(tmp[0])+","+str(tmp[1])+","+str(tmp[2])+","+str(tmp[3])
-                            if not(l.processing):
-                                updateProcessing(layer,"RESAMPLE=NEAREST")
-                            l.setExtent(tmp[0],tmp[1],tmp[2],tmp[3])
+                                tmp0[0]+="&width=1024&height=1024"
+                            print >> sys.stderr,"OK"
+                            l.connection=tmp0[0]+"&TRANSPARENT=TRUE&BBOX="+str(tmp[0])+","+str(tmp[1])+","+str(tmp[2])+","+str(tmp[3])
+                            print >> sys.stderr,"OK"
+                            try:
+                                if not(l.processing):
+                                    updateProcessing(l,"RESAMPLE=NEAREST")
+                            except:
+                                try:
+                                    updateProcessing(l,"RESAMPLE=NEAREST")
+                                except:
+                                    pass
+                            print >> sys.stderr,"OK"
+                            try:
+                                if params['BBOXORDER'][0]=='yxYX':
+                                    l.setExtent(tmp[1],tmp[0],tmp[3],tmp[2])
+                                else:
+                                    l.setExtent(tmp[0],tmp[1],tmp[2],tmp[3])
+                            except:
+                                pass
+                            print >> sys.stderr,"OK"
+                            print >> sys.stderr,params['VERSION'][0]
+                            print >> sys.stderr,params['VERSION'][0]=="1.3.0"
+                            if params['VERSION'][0]=='1.3.0' or true:
+                                print >> sys.stderr,conf["main"]["tmpPath"]+'/'+inputs["dataStore"]["value"].replace("WMS:","")+"_layer_"+str(i)+".vrt"
+                                try:
+                                    if layersList is None:
+                                        import urllib2
+                                        response = urllib2.urlopen(con.replace("GetMap","GetCapabilities"))
+                                        html = response.read()
+                                        from xml.dom import minidom
+                                        wmsGetCapDocument=minidom.parseString(html)
+                                        layersList = wmsGetCapDocument.getElementsByTagName('Layer')
+                                    v=layersList[i].getElementsByTagName('Dimension')
+                                    lcnt=0
+                                    if len(v)>0:
+                                        for tt in v:
+                                            dimension=tt.childNodes[0].data.split(',')
+                                            name=tt.getAttribute('name')
+                                            print >> sys.stderr,name
+                                            if name=='time':
+                                                for j in range(0,len(dimension)):
+                                                    fName=conf["main"]["tmpPath"]+'/'+inputs["dataStore"]["value"].replace("WMS:","")+"_layer_"+str(i)+"_"+str(j)+".vrt"
+                                                    f=open(fName,"w")
+                                                    content='<GDAL_WMS><Service name="WMS"><Version>1.3.0</Version><ServerUrl>'+o.scheme+'://'+o.netloc+'/'+o.path+'?time='+dimension[j]+'&reference_time='+dimension[j]+'</ServerUrl><ImageFormat>image/png</ImageFormat><Layers>'+str(params['LAYERS'][0])+'</Layers>'
+                                                    if params.keys().count("BBOXORDER")>0:
+                                                        content+='<BBoxOrder>'+str(params['BBOXORDER'][0])+'</BBoxOrder>'
+                                                    content+='<CRS>'+str(params['CRS'][0])+'</CRS><Transparent>TRUE</Transparent></Service><DataWindow><SizeX>'+str(ds.RasterXSize)+'</SizeX><SizeY>'+str(ds.RasterYSize)+'</SizeY></DataWindow><ClampRequests>false</ClampRequests><Timeout>600</Timeout><BandsCount>4</BandsCount><MaxConnections>10</MaxConnections></GDAL_WMS>'
+                                                    f.write(content)
+                                                    f.close()
+                                                    l0=l.clone()
+                                                    l0.name=l0.name.encode('utf-8')+"_"+str(lcnt)
+                                                    l0.metadata.set("ows_title",str(l0.metadata.get("ows_title"))+" "+dimension[j])
+                                                    #l0.metadata.set("ows_title",l.metadata.get("ows_title").encode('utf-8')+" "+dimension[j].encode('utf-8'))
+                                                    l0.connection=None
+                                                    l0.connectiontype=-1
+                                                    l0.data=fName
+                                                    if m00 is None:
+                                                        m00=m.clone()
+                                                        for k in range(m00.numlayer):
+                                                            removeAllLayers(m00)
+                                                    m00.insertLayer(l0)
+                                                    lcnt+=1
+                                    mapfile1=conf["main"]["tmpPath"]+'/'+inputs["dataStore"]["value"].replace("WMS:","")+"_layer_"+str(i)+".map"
+                                    m00.save(mapfile1)
+                                    fName=conf["main"]["tmpPath"]+'/'+inputs["dataStore"]["value"].replace("WMS:","")+"_layer_"+str(i)+".vrt"
+                                    f=open(fName,"w")
+                                    content='<GDAL_WMS><Service name="WMS"><Version>1.3.0</Version><ServerUrl>'+o.scheme+'://'+o.netloc+'/'+o.path+'</ServerUrl><ImageFormat>image/png</ImageFormat><Layers>'+str(params['LAYERS'][0])+'</Layers>'
+                                    if params.keys().count("BBOXORDER"):
+                                        content+='<BBoxOrder>'+str(params['BBOXORDER'][0])+'</BBoxOrder>'
+                                    content+='<CRS>'+str(params['CRS'][0])+'</CRS><Transparent>TRUE</Transparent></Service><DataWindow><SizeX>'+str(ds.RasterXSize)+'</SizeX><SizeY>'+str(ds.RasterYSize)+'</SizeY></DataWindow><ClampRequests>false</ClampRequests><Timeout>600</Timeout><BandsCount>4</BandsCount><MaxConnections>100</MaxConnections></GDAL_WMS>'
+                                    print >> sys.stderr,content
+                                    f.write(content)
+                                    f.close()
+                                    l.connection=None
+                                    l.connectiontype=-1
+                                    l.metadata.set("mmWMS","true")
+                                    #l.setConnectionType(mapscript.MS_RASTER,"")
+                                    l.data=fName
+                                except Exception,e:
+                                    print >> sys.stderr,e
                         except Exception, e:
                             print >> sys.stderr,e
-                            m.save(mapfile)
-                            print >> sys.stderr,mapfile
-                
+                        print >> sys.stderr,str(2)+str(tmp0[1])
+                    m.save(mapfile)
+                    m = mapscript.mapObj(mapfile)
+                    print >> sys.stderr,mapfile
             except Exception,e:
                 print >> sys.stderr,e
                 pass
@@ -452,6 +538,7 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
         j=m.getLayer(i)
 	print >> sys.stderr,j
 	print >> sys.stderr,j.name
+	print >> sys.stderr,j.metadata.get("mmWMS")
 	if mm_access.checkDataSourcePriv(conf,m,inputs["dataStore"]["value"].replace("WFS:","").replace("WMS:",""),j.name,"r"):
 		node = libxml2.newNode('layer')
 		node1 = libxml2.newNode('name')
@@ -471,7 +558,7 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
 		node1.addChild(libxml2.newText(val))
 		node.addChild(node1)
 
-		if j.connectiontype==mapscript.MS_WMS:
+		if j.connectiontype==mapscript.MS_WMS or j.metadata.get("mmWMS")=="true":
 			node1 = libxml2.newNode('label')
 			node1.addChild(libxml2.newText(j.metadata.get('ows_title')))
 			node.addChild(node1)
@@ -1113,7 +1200,10 @@ def createLegend0(conf,inputs,outputs):
     myLayer=m.getLayerByName(inputs["layer"]["value"])
     processingDirective=""
     if myLayer.type==mapscript.MS_LAYER_RASTER:
-        processingDirective=myLayer.getProcessing(0)
+        try:
+            processingDirective=myLayer.getProcessing(0)
+        except:
+            processingDirective=None
         if processingDirective is not None:
             processingDirective=processingDirective.replace("RESAMPLE=","")
     label=None
@@ -1571,7 +1661,6 @@ def listMap(conf,inputs,outputs):
                 
     for i in files:
         i=i.replace(conf["main"]["dataPath"]+"/"+prefix+"maps/","").replace(conf["main"]["dataPath"]+"/"+prefix+"maps\\","")
-        print >> sys.stderr,str(i)+' '+conf["main"]["dataPath"]+"/"+prefix+"maps/"+i
         if i!="project_Untitled_0.map":
             try:
                 oloc=locale.getlocale(locale.LC_ALL)
@@ -1579,7 +1668,7 @@ def listMap(conf,inputs,outputs):
             except:
                 pass
             try:
-                mTime=time.strftime(conf["mm"]["dateFormat"].encode(locale.getlocale()[1]),time.localtime(os.path.getmtime(conf["main"]["dataPath"]+"/"+prefix+"maps/"+i))).decode(locale.getlocale()[1],'replace')
+                mTime=time.strftime(conf["mm"]["dateFormat"].encode('utf-8'),time.localtime(os.path.getmtime(conf["main"]["dataPath"]+"/"+prefix+"maps/"+i))).decode('utf-8','replace')
             except Exception,e:
                 print >> sys.stderr,e
                 mTime=time.strftime(conf["mm"]["dateFormat"].encode("utf-8"),time.localtime(os.path.getmtime(conf["main"]["dataPath"]+"/"+prefix+"maps/"+i))).decode('utf-8','replace')
@@ -1587,9 +1676,7 @@ def listMap(conf,inputs,outputs):
                 locale.setlocale(locale.LC_ALL,oloc)
             except:
                 pass
-            res+=[{"id": i.replace("project_","").replace(".map",""),"value": i, "mTime": mTime}]
-            print >> sys.stderr," +++++++ > "+str(res)
-        print >> sys.stderr,str(i)+' '+str(i)
+            res+=[{"id": i.replace("project_","").replace(".map",""),"value": i, "mTime": mTime.encode('utf-8')}]
     outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
     return 3
 
@@ -3357,7 +3444,7 @@ def getMapLayersInfo(conf,inputs,outputs):
     print >> sys.stderr,"LAYER: "+inputs["layer"]["value"]+" "+str(l)
     if l.type!=mapscript.MS_LAYER_RASTER:
         if not(inputs.has_key("fullPath")):
-		if l.connection[0:3]!="PG:":
+		if l.connection[0:3]!="PG:" and l.connection[0:3]!="MySQL:":
 			outputs["Result"]["value"]=str([l.connection,l.data])
 		else:
 			outputs["Result"]["value"]=str([l.metadata.get("mmDSTN"),l.data])

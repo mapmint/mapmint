@@ -252,6 +252,12 @@ define([
 					$(this).code(data[i][j]);
 				    }
 				});
+				if(data[i][j].indexOf && data[i][j].indexOf("POINT(")>=0){
+				    var coordinates=data[i][j].replace(/POINT\(/,"").replace(/\)/,"").split(" ");
+				    myRoot.find("input[name=edit_"+j+"_x]").val(coordinates[0]).change();
+				    myRoot.find("input[name=edit_"+j+"_y]").val(coordinates[1]).change();
+				    //console.log(pStr);
+				}
 			    }else{
 				myRoot.find("input[name=edit_"+j+"]").each(function(){
 				    var closure=$(this);

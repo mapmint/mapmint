@@ -429,7 +429,7 @@ define([
 
     function displayVector(data,param,dsid,datasource){
 	console.log(data);
-	var ldatasource=datasource.replace(/\./g,"_");
+	var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
 	var regs=[
 	    new RegExp("\\[srs\\]","g"),
 	    new RegExp("\\[encoding\\]","g")
@@ -523,7 +523,7 @@ define([
 			obj.FeatureCollection.featureMember=[obj.FeatureCollection.featureMember];
 		    for(var i in obj.FeatureCollection.featureMember){
 			data.push(obj.FeatureCollection.featureMember[i]);
-			data[data.length-1]["fid"]=dsid+"_"+datasource+"_"+(obj.FeatureCollection.featureMember[i][lcolumns[0].name].replace(/\./g,"__"));
+			data[data.length-1]["fid"]=dsid+"_"+datasource+"_"+(obj.FeatureCollection.featureMember[i][lcolumns[0].name].replace(/\./g,"__").replace(/:/g,"__"));
 		    }
 
 		    var opts={
@@ -1350,7 +1350,7 @@ define([
 			$("#DS_"+dsid).find(".panel-body").first().find("#pg_table").change(function(){
 			    console.log("Table changed to "+$(this).val());
 			    var cval=$(this).val();
-			    var cvalid=$(this).val().replace(/\./g,"_");
+			    var cvalid=$(this).val().replace(/\./g,"_").replace(/:/g,"_");
 			    zoo.execute({
 				identifier: "datastores.postgis.getTableDescription",
 				type: "POST",
@@ -1782,7 +1782,7 @@ define([
 	"select": function(data,param,dsid,datasource,geometryType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
-		var ldatasource=datasource.replace(/\./g,"_");
+		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
 		e.preventDefault();
 		if(!Datastores["DS_"+dsid+"_"+ldatasource])
 		    Datastores["DS_"+dsid+"_"+ldatasource]=(geometryType=="raster"?"raster":"vector");
@@ -1833,13 +1833,13 @@ define([
 	"privileges": function(data,param,dsid,datasource,geometryType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
-		bindPrivileges(dsid+"_"+datasource.replace(/\./g,"_"),"datasourcePrivileges",param,geometryType,datasource);
+		bindPrivileges(dsid+"_"+datasource.replace(/\./g,"_").replace(/:/g,"_"),"datasourcePrivileges",param,geometryType,datasource);
 	    });
 	},
 	"preview": function(data,param,dsid,datasource,geometryType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
-		var ldatasource=datasource.replace(/\./g,"_");
+		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
 		if($(obj).is("a")){
 		    e.preventDefault();
 		    e.stopPropagation();
@@ -1901,7 +1901,7 @@ define([
 	    $(obj).click(function(e){
 		e.preventDefault();
 		console.log(geometryType);
-		var ldatasource=datasource.replace(/\./g,"_");
+		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
 
 		var initial=!$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().find('#vectorProcessing').length;
 
@@ -1974,7 +1974,7 @@ define([
 	    $(obj).off("click");
 	    $(obj).click(function(e){
 		e.preventDefault();
-		var ldatasource=datasource.replace(/\./g,"_");
+		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
 		var initial=$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().hasClass("in");
 		if( $(obj).children().first().hasClass("fa-toggle-down") && initial){
 		    initial=!initial;
@@ -2117,7 +2117,7 @@ define([
     }
 
     function doOnLoadDataSource(param,dsid,datasource,geometryType,ldata,originType,data){
-        var ldatasource=datasource.replace(/\./g,"_");
+        var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
 	$("#DS_"+dsid+"_"+ldatasource).find(".panel").first().removeClass("panel-warning").addClass("panel-default");
 	$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().html("").collapse();
 	$("#DS_"+dsid+"_"+ldatasource).find(".panel-heading").first().find("button,a").each(function(){
@@ -2148,7 +2148,7 @@ define([
     
     function loadDataSource(param,dsid,datasource,geometryType,ldata,originType){
 	console.log(originType);
-	var ldatasource=datasource.replace(/\./g,"_");
+	var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
 	zoo.execute({
 	    identifier: "vector-tools.mmExtractVectorInfo",
 	    type: "POST",
@@ -2224,7 +2224,8 @@ define([
 			    font="fa fa-question";
 			}
 			console.log("FONT !! "+font);
-			$("#DS_"+localDSId).find(".panel-body").first().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg,(localDataType=="WMS"?data.datasource.layer[i].label:data.datasource.layer[i].name))).attr("id","DS_"+localDSId+"_"+data.datasource.layer[i].name.replace(/\./g,"_")));
+			console.log(data.datasource.layer[i].name.replace(/\./g,"_").replace(/\:/g,"_"));
+			$("#DS_"+localDSId).find(".panel-body").first().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg,(localDataType=="WMS"?data.datasource.layer[i].label:data.datasource.layer[i].name))).attr("id","DS_"+localDSId+"_"+data.datasource.layer[i].name.replace(/\./g,"_").replace(/:/g,"_")));
 			console.log(localDataType);
 			if(localDataType!="WMS")
 			    loadDataSource(param,localDSId,data.datasource.layer[i].name,data.datasource.layer[i].geometry,data,localDataType);
