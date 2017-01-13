@@ -834,6 +834,7 @@ def recursMapList(conf,group,allreadyInTimeline):
     for i in group:
         print >> sys.stderr,"****** GROUP III "
         print >> sys.stderr,str(group[i])
+        print >> sys.stderr,type(group[i]).__name__
         if type(group[i]).__name__=="str":
             import mapscript
             m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
@@ -865,14 +866,14 @@ def recursMapList(conf,group,allreadyInTimeline):
                 if conf is not None:
                     import mapscript
                     m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
-                    if type(group[i]).__name__=="str":
-                        l=m.getLayerByName(group[i])
-                        #if l.name.count("grid_")>0:
-                        #    return [{"id": group[i],"text": group[i],"mmType": 0}]
-                        if l is not None:
-				res+=[{"id": group[i],"text": group[i],"mmType": l.type, "nclasses":l.numclasses}]
-                        else:
-                            res+=[{"id": i,"text": str(group[i])}]
+                    #if type(group[i]).__name__=="str":
+                    l=m.getLayerByName(group[i])
+                    #if l.name.count("grid_")>0:
+                    #    return [{"id": group[i],"text": group[i],"mmType": 0}]
+                    if l is not None:
+                        res+=[{"id": group[i],"text": group[i],"mmType": l.type, "nclasses":l.numclasses}]
+                    else:
+                        res+=[{"id": i,"text": str(group[i])}]
                 else:
                     res+=[{"id": i,"text": i}]
     return res

@@ -375,6 +375,10 @@ $(printWrapper())
   </div>
  </script>
 
+#if $inputs.keys().count("filter")>0
+<input type="hidden" name="mmIniFilter" value="$inputs["filter"]["value"]" />
+#end if
+
 </body>
 </html>
 #end if

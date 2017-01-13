@@ -456,6 +456,8 @@ define([
 
     var initialize = function() {
 
+	window.ol=ol;
+
 	console.log('START !');
 
 	wm = new WindowManager({
@@ -1278,12 +1280,18 @@ define([
 			if(res.length>1){
 			    wm.createWindow({
 				title: oLayers[feature.get("layerName")].alias,
-				bodyContent: "<p>"+res+"</p>",
+				bodyContent: "<p>"+res.replace(/script1/g,"script")+"</p>",
 				footerContent: '',
 				top: "79px"
 			    });
 			    $(".window.active").css({"width":"90%","top":"79px","left":"5%"});
+			}else{
+			    if(hasAddedFeature){
+				selectLayer.getSource().clear();
+				hasAddedFeature=false;
+			    }
 			}
+			    
 		    });
 		    /*
 		    var wmsSource = new ol.source.TileWMS({
@@ -1324,14 +1332,20 @@ define([
 			var closure=gfLayer;
 			displayFeatureInfo(evt,gfLayer,(function(gfLayer){return function(res){
 			    $(".window.active").remove();
-			    if(res.length>1)
+			    if(res.length>1){
 				wm.createWindow({
 				    title: oLayers[gfLayer].alias,
-				    bodyContent: "<p>"+res+"</p>",
+				    bodyContent: "<p>"+res.replace(/script1/g,"script")+"</p>",
 				    footerContent: '',
 				    top: "79px"
 				});
-			    $(".window.active").css({"width":"90%","top":"79px","left":"5%"});
+				$(".window.active").css({"width":"90%","top":"79px","left":"5%"});
+			    }else{
+				if(hasAddedFeature){
+				    selectLayer.getSource().clear();
+				    hasAddedFeature=false;
+				}
+			    }
 			}})(closure));
 		    }
 		}
@@ -2194,6 +2208,7 @@ define([
 			var transformer = ol.proj.getTransform('EPSG:3857','EPSG:4326');
 			var ext=ol.extent.applyTransform(extent, transformer);
 			for(var i in oLayers){
+			    console.log(oLayers[i]);
 			    if(oLayers[i]["queryParams"] && oLayers[i]["queryParams"]["fields"]){
 				var key=i;
 				myMMDataTableObject.display(key,{
@@ -2207,6 +2222,8 @@ define([
 					bbox: ext
 				    }
 				},true);
+			    }else{
+				
 			    }
 			}
 			console.log(extent);
@@ -3293,6 +3310,13 @@ define([
 	});
     }
 
+    var hasAddedFeature=false;
+    function addASelectedFeature(feature){
+	selectLayer.getSource().clear();
+	selectLayer.getSource().addFeatures(feature);
+	hasAddedFeature=true;
+    }
+
     function printPreview(){
 	var reg=new RegExp(tmpUrl,"g");
 	zoo.execute({
@@ -3321,7 +3345,8 @@ define([
     return {
         initialize: initialize,
 	printDocument: printDocument,
-	addInteraction: addInteraction
+	addInteraction: addInteraction,
+	addASelectedFeature: addASelectedFeature
     };
 
 
