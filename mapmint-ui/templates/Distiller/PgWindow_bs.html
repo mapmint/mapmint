@@ -1,4 +1,4 @@
-#encoding "UTF-8"
+#encoding "utf8"
 #import zoo
 <form method="post" class="form-horizontal ">
 #if $inputs.keys().count("no-header")==0
@@ -26,7 +26,8 @@
   <span class="col-sm-4">
   <select id="pg_table" class="form-control">
    <option value="-1">Choose</option>
-#set demo=pgConnection.listTables($conf,$inputs,$outputs)
+     #set demo=pgConnection.listTables($conf,$inputs,$outputs)
+     $outputs
 #set rest=eval($outputs["Result"]["value"])
 #for i in rest
    <option value="$i[0]">$i[1]</option>

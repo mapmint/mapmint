@@ -418,6 +418,7 @@ function symbolAddToRSelection(){
                 </div>
 
 
+
 #import sqlite_module as sql
 #set t=$sql.request($conf,"SELECT count(*) as nb from spatial_ref_sys where fav")
 #set prjNumber=0
@@ -481,6 +482,7 @@ function symbolAddToRSelection(){
   </div>
 </div> 
 
+
 <script type="template/text" id="selected_row_string_template">
 
 </script>
@@ -490,6 +492,5 @@ function symbolAddToRSelection(){
 <img style="width:500px" class="img-responsive" src="[datasource]" />
 </div>
 </script>
-
 
 #end def

@@ -1400,6 +1400,8 @@ define([
 	    //$(".no-us").show();
 	    myRootLocation.find("select[name=classField]").val(ldata[i].class_field);
 	    myRootLocation.find("select[name=classification]").val(ldata[i].class).change();
+	    myRootLocation.find("select[name=step_field]").val(ldata[i].classes_field);
+	    myRootLocation.find("select[name=step_classification]").val(ldata[i].sclasses).change();
 	}
 	if(ldata[i].class=="gs"){
 	    $(".require-gs").show();
@@ -1427,7 +1429,7 @@ define([
 	myRootLocation.find("input[name=minColorValue]").first().val(ldata["colors"][3]).change();
 	myRootLocation.find("input[name=maxColorValue]").first().val(ldata["colors"][4]).change();
 	if(ldata[i].expr!=null){
-	    myRootLocation.find("input[name=expression]").val(ldata[i].expr);
+	    myRootLocation.find("textarea[name=expression0]").val(ldata[i].expr);
 	    myRootLocation.find("input[name=expressionc]").prop("checked",true).change();
 	}else{
 	    myRootLocation.find("input[name=expressionc]").prop("checked",false).change();
@@ -1508,15 +1510,33 @@ define([
 		    if(hasElement)
 			index+=1;
 	    });
+	    var scnt=0;
 	    $(this).find('option').each(function(){
 		if(!$(this).is(':selected'))
 		    myRootLocation.find('.no-'+$(this).attr('value')).show();
+		scnt+=1;
 	    });
 	    $(this).find('option:selected').each(function(){
 		myRootLocation.find('.no-'+$(this).attr('value')).hide();
 	    });
-	    if(index>0)
+	    console.log(index);
+	    if(index>0){
+		console.log(" INDEX "+index+" SCNT "+scnt);
 		myRootLocation.find(".require-tl").show();
+	    }
+	    if($(this).val()!="tc")
+		myRootLocation.find('.require-tc').hide();
+	    if($(this).val()!="tl")
+		myRootLocation.find('.require-tl').hide();
+	    if(scnt==4){
+		console.log($('select[name="classification"]').val());
+		if($("select[name=classification]").val()=="tc"){
+		    myRootLocation.find('.require-tc').show();
+		}else{
+		    myRootLocation.find(".require-tl").show();
+		}
+	    }else{
+	    }
 	    if(ldata.type!=3)
 		myRootLocation.find(".require-raster").hide();
 	    myRootLocation.find(".require-add-step").hide();
@@ -1698,7 +1718,16 @@ define([
 	    e.stopPropagation();
 	    $(".mm-editor").code(ldata[($(this).val()=="click"?"click_tmpl":"default_tmpl")]);
 	});
-	
+
+	if($('select[name="classification"]').val()!="tl")
+	    myRootLocation.find('.require-tl').hide();
+	else
+	    myRootLocation.find('.require-tl').show();
+	if($('select[name="classification"]').val()!="tc")
+	    myRootLocation.find('.require-tc').hide();
+	else
+	    myRootLocation.find('.require-tc').show();
+
     }
     
     var selectedLayer=null;
@@ -1915,6 +1944,7 @@ define([
 	    var classifierBindings={
 		"minBandValue": "min",
 		"maxBandValue": "max",
+		"step_field": "stepField",
 		"classField": "field",
 		"nodataColorValue": "nodata",
 		"minColorValue": "from",
@@ -2016,6 +2046,9 @@ define([
 		    }
 		    else
 			redrawLayer(ldata.name);
+		    if($('select[name="classification"]').val()=="tc"){
+			document.location.reload(false);
+		    }
 		},
 		error: function(data){
 		    console.log("ERROR");

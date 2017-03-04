@@ -74,7 +74,8 @@
       ("gs", [$zoo._("Graduated Symbol"),False,False]),
       ("cc", [$zoo._("Continuous Color"),True,False]),
       ("uv", [$zoo._("Unique Value"),False,False]),
-      ("tl", [$zoo._("Time line"),True,False])
+      ("tl", [$zoo._("Time line"),True,False]) ,
+      ("tc", [$zoo._("Time line classes"),True,False])
       ])
 #else
 #set choices=OrderedDict([
@@ -82,12 +83,21 @@
       ("gs", [$zoo._("Graduated Symbol"),False,False]),
       ("cc", [$zoo._("Continuous Color"),True,False]),
       ("uv", [$zoo._("Unique Value"),False,False]),
-      ("tl", [$zoo._("Time line"),True,False])
+      ("tl", [$zoo._("Time line"),True,False]),
+      ("tc", [$zoo._("Time line classes"),True,False])
       ])
 #end if
 
       $printSelect("",$zoo._("Legend Type: "),"classification",$choices)
-      <div class="form-group require-tl no-grid no-us no-gs no-cc no-uv col-sm-12">
+      <div class="form-group require-tc no-tl no-grid no-us no-gs no-cc no-uv col-sm-12">
+	<label class="col-sm-3 control-label">$zoo._("Field defining steps")</label>
+	<div class="col-sm-9">
+	  <select name="step_field" class="form-control mmField" onchange="if(\$(this).val()=='-1') \$(this).parent().parent().next().show();else \$(this).parent().parent().next().hide();">
+	    <option value="-2">$zoo._("Choose a field")</option>
+	  </select>
+	</div>
+      </div>
+      <div class="form-group require-tl no-tc no-grid no-us no-gs no-cc no-uv col-sm-12">
 	<label class="col-sm-3 control-label">$zoo._("Steps")</label>
 	<div class="col-sm-5 ">
 	  <select name="step" class="form-control mmstep-list" onchange="if(\$(this).val()=='-1') \$(this).parent().parent().next().show();else \$(this).parent().parent().next().hide();">
@@ -99,7 +109,7 @@
 	  $zoo._("Delete")
 	</button>
       </div>
-      <div class="form-group require-add-step no-us no-gs no-cc no-uv col-sm-12">
+      <div class="form-group require-add-step no-tc no-us no-gs no-cc no-uv col-sm-12">
 	<label class="col-sm-3 control-label">$zoo._("Step name")</label>
         <div class="col-sm-5">
 	  <input type="text" class="form-control" name="stepName" placeholder="$zoo._("1789")" value="" />
@@ -126,7 +136,7 @@
 #end if
 
       
-      $printSelect("require-tl no-us no-gs no-cc no-uv",$zoo._("Legend Type for this step"),"step_classification",$choices)
+      $printSelect("require-tl require-tc no-us no-gs no-cc no-uv",$zoo._("Legend Type for this step"),"step_classification",$choices)
 #if not(isBasic)
       <div class="form-group require-raster no-us">
 	<label class="col-sm-3 control-label">$zoo._("Tiled version")</label>
@@ -238,7 +248,9 @@
 	</div>
       </div>
       <div class="col-sm-12 no-grid">
-	<button href="#" class="btn btn-default mmClassifier">$zoo._("Classify")</button>
+	<button href="#" class="btn btn-default mmClassifier no-tc">$zoo._("Classify")</button>
+	<button href="#" class="btn btn-default mmClassifier
+	require-tc no-tl no-us no-uv no-gs no-raster">$zoo._("Generate")</button>
 #if isBasic      
 	<button href="#" class="btn btn-default mmPreviewer">$zoo._("Preview")</button>
 #end if

@@ -208,7 +208,7 @@ def printMap(conf,inputs,outputs):
             #print >> sys.stderr,inputs["zoom"]["value"]
         print >> sys.stderr,"+++++++++++++++++++++++++++++++++++++"
     else:
-        zl=int(inputs["zoom"]["value"])
+        zl=int(float(inputs["zoom"]["value"]))
     
     delta=(100*(2**(18-zl)))
     m.setExtent(float(ext[0])+delta,float(ext[1])+delta,float(ext[2])-delta,float(ext[3])-delta)

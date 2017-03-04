@@ -238,7 +238,8 @@ $(printWrapper())
  </div>
 
  <div id="context-menu" style="display:none"> 
-  <ul class="dropdown-menu">
+#include($conf["main"]["templatesPath"]+"/contextmenu_bs.html")
+#*  <ul class="dropdown-menu">
     <li><a tabindex="-1" class="mm-menu" id="mmm_zoomTo"><i class="i i-search"></i> $zoo._("Zoom to")</a></li>
     <li><a tabindex="-1" class="mm-menu" id="mmm_query"><i class="fa fa-table"></i> $zoo._("View table")</a></li>
     <li>
@@ -261,6 +262,7 @@ $(printWrapper())
      </div>
      </li>
   </ul>
+*#
  </div>
 
 <script data-main="$conf["main"]["publicationUrl"]/assets/js/cfg" src="$conf["main"]["publicationUrl"]/assets/js/lib/require.js"></script>

@@ -459,7 +459,7 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
                             print >> sys.stderr,"OK"
                             print >> sys.stderr,params['VERSION'][0]
                             print >> sys.stderr,params['VERSION'][0]=="1.3.0"
-                            if params['VERSION'][0]=='1.3.0' or true:
+                            if params['VERSION'][0]=='1.3.0' or True:
                                 print >> sys.stderr,conf["main"]["tmpPath"]+'/'+inputs["dataStore"]["value"].replace("WMS:","")+"_layer_"+str(i)+".vrt"
                                 try:
                                     if layersList is None:
@@ -469,6 +469,10 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
                                         from xml.dom import minidom
                                         wmsGetCapDocument=minidom.parseString(html)
                                         layersList = wmsGetCapDocument.getElementsByTagName('Layer')
+                                    print >> sys.stderr,"************************"
+                                    v0=layersList[i].getElementsByTagName('LegendURL')[0].getElementsByTagName('OnlineResource')[0]
+                                    l.metadata.set("mmIcon",v0.getAttribute("xlink:href"))
+                                    l.metadata.set("mmWMS","true")
                                     v=layersList[i].getElementsByTagName('Dimension')
                                     lcnt=0
                                     if len(v)>0:
@@ -500,7 +504,8 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
                                                     m00.insertLayer(l0)
                                                     lcnt+=1
                                     mapfile1=conf["main"]["tmpPath"]+'/'+inputs["dataStore"]["value"].replace("WMS:","")+"_layer_"+str(i)+".map"
-                                    m00.save(mapfile1)
+                                    if m00 is not None:
+                                        m00.save(mapfile1)
                                     fName=conf["main"]["tmpPath"]+'/'+inputs["dataStore"]["value"].replace("WMS:","")+"_layer_"+str(i)+".vrt"
                                     f=open(fName,"w")
                                     content='<GDAL_WMS><Service name="WMS"><Version>1.3.0</Version><ServerUrl>'+o.scheme+'://'+o.netloc+'/'+o.path+'</ServerUrl><ImageFormat>image/png</ImageFormat><Layers>'+str(params['LAYERS'][0])+'</Layers>'
@@ -1250,11 +1255,17 @@ def createLegend0(conf,inputs,outputs):
         for i in range(0,len(msValues)):
             if label.position==msValues[i]:
                 labelInfo["position"]=values[i]
+    try:
+        mmClasses=myLayer.metadata.get("mmClasses").replace("uniqVal","uv")
+    except:
+        mmClasses=""
     nameSpace["Style"]={
         "numclasses": myLayer.numclasses,
         "expr": myLayer.metadata.get("mmMExpr"),
         "class": myLayer.metadata.get("mmClass"),
         "class_field": myLayer.metadata.get("mmField"),
+        "sclasses": mmClasses,
+        "classes_field": myLayer.metadata.get("mmSField"),
         "discretisation": myLayer.metadata.get("mmMethod"),
         "processing": processingDirective,
         "label": labelInfo,
@@ -2445,6 +2456,8 @@ def getLayerStylesArray(conf,inputs,myLayer):
         "expr": myLayer.metadata.get("mmMExpr"),
         "class": myLayer.metadata.get("mmClass"),
         "class_field": myLayer.metadata.get("mmField"),
+        "sclasses": myLayer.metadata.get("mmClasses"),
+        "classes_field": myLayer.metadata.get("mmSField"),
         "discretisation": myLayer.metadata.get("mmMethod"),
         "processing": processingDirective,
         "classes": []
@@ -2455,6 +2468,7 @@ def getLayerStylesArray(conf,inputs,myLayer):
         if myLayer.metadata.get("mmClass")=="us":
             break
     return res
+
 
 def classifyMap0(conf,inputs,outputs):
     import mapscript
@@ -2469,7 +2483,7 @@ def classifyMap0(conf,inputs,outputs):
     mapfile=mapPath+"/project_"+inputs["map"]["value"]+".map"
     
     isStep=False
-    if inputs .has_key("mmStep"):
+    if inputs.has_key("mmStep"):
         m=mapscript.mapObj(mapfile)
         l=m.getLayerByName(inputs["layer"]["value"])
         if l.metadata.get("mmClass")!="tl":
@@ -2485,6 +2499,47 @@ def classifyMap0(conf,inputs,outputs):
     import vector_tools.vectSql as vt
     layer=m.getLayerByName(inputs["layer"]["value"])
     #print >> sys.stderr,layer
+    print >> sys.stderr,inputs
+    if inputs.keys().count("stepField")>0:
+        #layer=m.getLayerByName(inputs["layer"]["value"])
+        lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["stepField"]["value"]+" as c FROM "+layer.data+" ORDER BY "+inputs["stepField"]["value"]+" ASC"}}
+        vt.vectInfo(conf,lInputs,outputs)
+        ll=json.loads(outputs["Result"]["value"])
+        print >> sys.stderr,ll
+        linputs=inputs.copy()
+        linputs.pop("stepField",None)
+        for i in range(0,len(ll)):
+            llayer=layer.clone()
+            llayer.name=layer.name+"_"+ll[i]["c"]
+            linputs["layer"]["value"]=llayer.name
+            linputs["mmType"]["value"]=linputs["type"]["value"]
+            linputs["mmMExpr"]={"value":"\"["+inputs["stepField"]["value"]+"]\" = '"+str(ll[i]["c"])+"'"}
+            sr=eval('0x'+inputs["from"]["value"][:2])
+            sg=eval('0x'+inputs["from"]["value"][2:4])
+            sb=eval('0x'+inputs["from"]["value"][4:6])
+            er=eval('0x'+inputs["to"]["value"][:2])
+            eg=eval('0x'+inputs["to"]["value"][2:4])
+            eb=eval('0x'+inputs["to"]["value"][4:6])
+            layer.metadata.set("mmColor",str(sr)+" "+str(sg)+" "+str(sb)+" ")
+            layer.metadata.set("mmOutColor",str(er)+" "+str(eg)+" "+str(eb)+" ")
+            if m.getLayerByName(llayer.name) is not None:
+                m.removeLayer(m.getLayerByName(llayer.name).index)                
+            m.insertLayer(llayer)
+            if i==0:
+                layer.metadata.set("mmClass","tc")
+                layer.metadata.set("mmClasses",inputs["type"]["value"])
+                layer.metadata.set("mmSField",inputs["stepField"]["value"])
+                layer.metadata.set("mmField",inputs["field"]["value"])
+            m.save(mapfile)
+            print >> sys.stderr,linputs
+            print >> sys.stderr,"**********\n\nclassifyMap0\n\n********\n\n"
+            classifyMap0(conf,linputs,outputs)
+            print >> sys.stderr,"**********\n\n/classifyMap0\n\n********\n\n"
+            m=mapscript.mapObj(mapfile)
+
+        outputs["Message"]["value"]=zoo._("Layer classified")
+        return zoo.SERVICE_SUCCEEDED
+
 
     if inputs.keys().count("field")==0:
         inputs0=inputs
@@ -2769,6 +2824,13 @@ def classifyMap0(conf,inputs,outputs):
 					if j=="pixel":
 						tmpClass.setExpression('( ['+j+'] = '+str(tmp[i][j])+' '+precond+' )')
 					else:
+						if str(tmp[i][j])[0]=='#':
+							style.color.red=eval("0x"+str(tmp[i][j])[1:3])
+							style.color.green=eval("0x"+str(tmp[i][j])[3:5])
+							style.color.blue=eval("0x"+str(tmp[i][j])[5:7])
+							style.outlinecolor.red=eval("0x"+str(er))
+							style.outlinecolor.green=eval("0x"+str(eg))
+							style.outlinecolor.blue=eval("0x"+str(eb))
 						try:
 							tmpClass.setExpression('( ['+j+'] = '+str(int(tmp[i][j]))+' '+precond+' )')
 						except:

@@ -243,6 +243,7 @@ BEGIN
             b.relname as table_name,
             a.attname as column_name,
             pg_catalog.format_type(a.atttypid, a.atttypmod) as column_type,
+	    ''::text as column_default_value,
 	    ''::text as column_not_null,
             a.attnum as attnum,
             e.max_attnum as max_attnum

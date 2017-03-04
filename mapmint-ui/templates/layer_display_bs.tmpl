@@ -71,6 +71,31 @@ $Template(file=$conf['main']['templatesPath']+"layer_basic_display_bs.tmpl",sear
      	<li iconCls="tree_layer_class tree$(p)_layer$(layer.index)$(p)_class$j" class="list-group-item"><label><i class="fa layer_$(layer.index)_class$j$(p)"></i> $layer.getClass($j).name</label></li>
 #end for
 	    </ul>
+    <div>
+#set ticks=[]
+#set labels=[]
+
+#set cnt=0
+#for i in steps
+#set layer0=$layer.map.getLayerByName($i)
+#set $ticks+=[$cnt]
+#set $labels+=[$layer0.metadata.get("ows_title")]
+#set $cnt+=1
+#end for
+
+#import json
+
+<input
+    id="mmmmmINPUTS"
+    type="text"
+    name="somename"
+    data-provide="slider"
+    data-slider-ticks="$ticks"
+    data-slider-ticks-labelss='$(json.dumps(labels))'
+    data-slider-tooltip="hide"
+>
+	<div style="text-align: center;float: right;margin-right: 20px;">Value</div>
+    </div>
     <div id="layer_$(layer.index)$(p)_carousel" class="carousel slide" data-ride="carousel">
 <!--
       <ol class="carousel-indicators">

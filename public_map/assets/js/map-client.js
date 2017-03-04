@@ -695,6 +695,7 @@ define([
 
 	$("#context-menu").bind("removeClass",function(){
 	    console.log("context-menu removed");
+	    //$("[data-toggle=popover]").popover("hide");
 	    //$(".tree li.layer").removeClass("layer-active");
 	});
 	$("#context-menu").bind("addClass",function(){
@@ -723,8 +724,12 @@ define([
 	    console.log($(this));
 	    console.log(oLayers[clayer]);
 	    console.log(oLayers[clayer]["query"]);
-	    
 	    var myRootLocation=$("#context-menu");
+	    myRootLocation.find("#mmm_legend").parent().addClass("hidden");
+	    $(this).find("i").each(function(){
+		if($(this).data("href"))
+		    myRootLocation.find("#mmm_legend").parent().removeClass("hidden");
+	    });
 	    for(i in {"export":0,"query":0,"zoomTo":0}){
 		if(!oLayers[clayer][i])
 		    myRootLocation.find("#mmm_"+i).parent().addClass("hidden");
@@ -1434,7 +1439,7 @@ define([
 			    }),
 			    stroke: new ol.style.Stroke({
 				color: '#fff',
-				width: 5
+				width: 2
 			    }),
 			    text: new ol.style.Text({
 				text: "Selected Feature",
@@ -1733,6 +1738,30 @@ define([
     var myMMDataTableObject;
     var tableDisplay=0;
     var contextualMenu={
+	"legend": {
+	    "run": function(layer,element,event){
+		var key=getLayerById(layer);
+		console.log("OK "+key+" - "+layer);
+		console.log(oLayers[key]);
+		console.log($(this));
+		$("#layer_"+layer).find('i').each(function(){
+		    if($(this).data("href")){
+			element.data("content",'<a href="'+$(this).data("href")+'" target="_blank"><div style="height:25px;width: 100px;overflow: none;background: url(\''+$(this).data("href")+'\') ;"></div></a>');
+			if(!oLayers[key]["popover"]){
+			    element.popover();
+			    element.popover("show");
+			    oLayers[key]["popover"]=true;
+			}
+			console.log(element.data("content"));
+			console.log($(this).data("href"));
+			event.stopPropagation();
+		    }	
+		});
+		/*var transformer = ol.proj.getTransform('EPSG:4326', 'EPSG:3857');
+		var extent=ol.extent.applyTransform(oLayers[key]["extent"], transformer);
+		map.getView().fit(extent,map.getSize());*/
+	    }
+	},
 	"zoomTo": {
 	    "run": function(layer){
 		var key=getLayerById(layer);
@@ -1945,13 +1974,24 @@ define([
 	});
 	$(".mm-menu").each(function(){
 	    console.log($(this));
-	    $(this).on('click',function(){
-		var cLayer=$(".tree li").find(".layer-active");
-		if(!cLayer.attr("id"))
-		    cLayer=$(this).parent().parent().parent().parent();
-		console.log(cLayer);
-		contextualMenu[$(this).attr("id").replace(/mmm_/,"")]["run"](cLayer.attr("id").replace(/layer_/,""));
-	    });
+	    var closure=$(this);
+	    (function(closure){
+		closure.on('click',function(e){
+		    var cLayer=$(".tree li").find(".layer-active");
+		    if(!cLayer.attr("id"))
+			cLayer=closure.parent().parent().parent().parent();
+		    console.log(cLayer);
+		    console.log(e);
+		    console.log(closure);
+		    console.log(cLayer);
+		    try{
+			contextualMenu[closure.attr("id").replace(/mmm_/,"")]["run"](cLayer.attr("id").replace(/layer_/,""),closure,e);
+		    }catch(e){
+			closure.popover("hide");
+			oLayers[getLayerById(cLayer.attr("id").replace(/layer_/,""))]["popover"]=false;
+		    }
+		});
+	    })(closure);
 	});
     }
 

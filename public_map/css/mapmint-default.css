@@ -250,7 +250,7 @@ a.list-group-item:hover,a.list-group-item:focus {background-color:#f9fafc}
 .panel-heading .list-group {background:transparent}
 .panel-footer {border-color:#eaeef1;border-radius:0 0 2px 2px;background-color:#f9fafc}
 .panel-group .panel-heading+.panel-collapse .panel-body {border-top:1px solid #eaedef}
-.open {z-index:1050;position:relative}
+.open {z-index:999 !important;position:relative}
 .dropdown-menu {font-size:13px;border-radius:2px;-webkit-box-shadow:0 2px 6px rgba(0,0,0,0.1);box-shadow:0 2px 6px rgba(0,0,0,0.1);border:1px solid #ddd;border:1px solid rgba(0,0,0,0.1)}
 .dropdown-menu.pull-left {left:100%}
 .dropdown-menu>.panel {border:none;margin:-5px 0}

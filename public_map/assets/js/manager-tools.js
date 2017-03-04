@@ -298,7 +298,7 @@ define([
 	myRootLocation.find("input[name=minColorValue]").first().val(ldata["colors"][3]).change();
 	myRootLocation.find("input[name=maxColorValue]").first().val(ldata["colors"][4]).change();
 	if(ldata[i].expr!=null){
-	    myRootLocation.find("input[name=expression]").val(ldata[i].expr);
+	    myRootLocation.find("input[name=expression0]").val(ldata[i].expr);
 	    myRootLocation.find("input[name=expressionc]").prop("checked",true).change();
 	}else{
 	    myRootLocation.find("input[name=expressionc]").prop("checked",false).change();

@@ -6,7 +6,7 @@ XSLT_LDFLAGS=@XSLT_LDFLAGS@
 ZOO_FILE=@ZOO_FILE@
 ZOO_DIR=@ZOO_DIR@
 ZRPATH=@ZOO_DIR@/../
-include ${ZRPATH}/zoo-kernel/ZOOMakefile.opts
+include ${ZOO_DIR}/ZOOMakefile.opts
 
 
 
@@ -18,7 +18,7 @@ BIN_LIST = cgi-env/service.zo
 default : $(BIN_LIST)
 
 cgi-env/service.zo: service.c
-	g++ -I${INST_INCLUDE} ${GDAL_CFLAGS} ${MS_CFLAGS} ${CPPFLAGS} $(CFLAGS) $(CPPFLAGS) -shared -fpic $< ${GDAL_LIBS} ${MACOS_LD_NET_FLAGS} ${MS_LDFLAGS} ${MACOS_CFLAGS} ${MACOS_LD_FLAGS} -L${INST_LIB} -lzoo_service -o $@
+	g++ -I${INST_INCLUDE} ${GDAL_CFLAGS} ${MS_CFLAGS} ${CPPFLAGS} $(CFLAGS) $(CPPFLAGS) -shared -fpic $< ${ZOO_LDFLAGS} ${GDAL_LIBS} ${MACOS_LD_NET_FLAGS} ${MS_LDFLAGS} ${MACOS_CFLAGS} ${MACOS_LD_FLAGS} -L${INST_LIB} -lzoo_service -o $@
 
 
 install: 
