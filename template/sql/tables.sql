@@ -202,7 +202,7 @@ INSERT INTO mm_tables.page_types (name,code) VALUES ('Complex', 'complex');
 CREATE TABLE mm_tables.pages (
     id serial PRIMARY KEY,
     name text,
-    table text,
+    tablename text,
     type integer REFERENCES mm_tables.page_types(id) ON DELETE CASCADE,
     ofield text,
     otype text,
