@@ -119,4 +119,31 @@ function SpatialQuery(conf,inputs,outputs){
 
 }
 
-
+function createGrid(conf,inputs,outputs){
+    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.convert');
+    var ext=inputs["extent"]["value"].split(",");
+    alert("SELECT * from (SELECT geom AS geomWKT FROM ST_RegularGrid(ST_Transform(ST_SetSRID(ST_GeomFromText('LINESTRING("+ext[0]+" "+ext[1]+", "+ext[2]+" "+ext[3]+")',0),3857),32628),1,100,100,false)) as foo WHERE ST_Intersects(foo.geomWKT,(SELECT ST_Transform(wkb_geometry,32628) FROM forets where auto_id='"+inputs["id"]["value"]+"'))");
+    var layerData="produced_polygones_"+inputs["id"]["value"]+"_"+(conf["lenv"]["usid"].replace(/-/g,"_"));
+    alert(layerData);
+    var myInputs1 = {
+	"sql": { type: 'string',  value: "SELECT * from (SELECT geom AS geomWKT FROM ST_RegularGrid(ST_Transform(ST_SetSRID(ST_GeomFromText('LINESTRING("+ext[0]+" "+ext[1]+", "+ext[2]+" "+ext[3]+")',0),3857),32628),1,100,100,false)) as foo WHERE ST_Intersects(foo.geomWKT,(SELECT ST_Transform(wkb_geometry,32628) FROM forets where ogc_fid='"+inputs["id"]["value"]+"'))"},
+	"dst_in": { type: "string", value: conf["main"]["dbuserName"] },
+	"dso_in": { type: "string", value: "forets" },
+	"dso_f": { type: "string", value: "PostgreSQL" },
+	"dst_out": { type: "string", value: conf["main"]["dbuserName"] },
+	"dso_out": { type: "string", value: layerData },
+    };
+    var myOutputs1= {Result: { type: 'RawDataOutput', "mimeType": "application/json" } };
+    var myExecuteResult1=myProcess1.Execute(myInputs1,myOutputs1);
+    alert(myExecuteResult1);
+    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.updateGridStyle');
+    var myInputs2 = {
+	"extent": { type: "string", value: inputs["extent"]["value"] },
+	"data": { type: "string", value: layerData }
+    };
+    var myOutputs2= {Result: { type: 'RawDataOutput', "mimeType": "text/plain" } };
+    var myExecuteResult2=myProcess2.Execute(myInputs2,myOutputs2);
+    alert(myExecuteResult2);
+    outputs["Result"]["value"]=conf["main"]["dataPath"]+"/grids/project_gridStyle_"+layerData+".map";
+    return {result: ZOO.SERVICE_SUCCEEDED, outputs: outputs };
+}

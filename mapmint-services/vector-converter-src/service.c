@@ -1432,6 +1432,8 @@ int main( int nArgc, char ** papszArgv )
         }
     }
 
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
+
 /* -------------------------------------------------------------------- */
 /*      Open data source.                                               */
 /* -------------------------------------------------------------------- */
@@ -1479,6 +1481,8 @@ int main( int nArgc, char ** papszArgv )
 #endif
     }
 
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
+    
 /* -------------------------------------------------------------------- */
 /*      Try opening the output datasource as an existing, writable      */
 /* -------------------------------------------------------------------- */
@@ -1490,6 +1494,7 @@ int main( int nArgc, char ** papszArgv )
     OGRSFDriver          *poDriver = NULL;
 #endif
     int                  bCloseODS = TRUE;
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 
     if( bUpdate )
     {
@@ -1595,6 +1600,8 @@ int main( int nArgc, char ** papszArgv )
 #endif
         }
     }
+
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 
 /* -------------------------------------------------------------------- */
 /*      Find the output driver.                                         */
@@ -2072,35 +2079,54 @@ int main( int nArgc, char ** papszArgv )
 /* -------------------------------------------------------------------- */
 
     poODS->SetStyleTable( poDS->GetStyleTable () );
-    
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
+
 /* -------------------------------------------------------------------- */
 /*      Close down.                                                     */
 /* -------------------------------------------------------------------- */
     OGRSpatialReference::DestroySpatialReference(poOutputSRS);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     OGRSpatialReference::DestroySpatialReference(poSourceSRS);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 #if GDAL_VERSION_MAJOR < 2
     if (bCloseODS)
         OGRDataSource::DestroyDataSource(poODS);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     OGRDataSource::DestroyDataSource(poDS);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 #endif
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     OGRGeometryFactory::destroyGeometry(poSpatialFilter);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     OGRGeometryFactory::destroyGeometry(poClipSrc);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     OGRGeometryFactory::destroyGeometry(poClipDst);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 
     CSLDestroy(papszSelFields);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 #ifndef ZOO_SERVICE
     CSLDestroy( papszArgv );
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 #endif
     CSLDestroy( papszLayers );
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     CSLDestroy( papszDSCO );
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     CSLDestroy( papszLCO );
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     CSLDestroy( papszFieldTypesToString );
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     CPLFree( pszNewLayerName );
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     
     free(pszDataSource);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     free(pszDestDataSource);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 
     OGRCleanupAll();
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 
 #ifdef DBMALLOC
     malloc_dump(1);
@@ -2108,7 +2134,9 @@ int main( int nArgc, char ** papszArgv )
     
 #ifdef ZOO_SERVICE
     setMapInMaps(outputs,"Result","value",(char*)pszwebDestData);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     free(pszwebDestData);
+    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     return SERVICE_SUCCEEDED;
 #else
     return 0;

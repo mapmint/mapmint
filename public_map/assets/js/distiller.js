@@ -724,12 +724,17 @@ define([
 		"id": "t_srs",
 		"value": "tdso_srs",
 		"isSrs": true
-	    },	    
+	    },
 	    "sql_chk": {
 		"id": "sql",
 		"value": "sql",
 		"isSrs": false
-	    },	    
+	    },
+	    "chkType": {
+		"id": "nlt",
+		"value": "force_geometry_type",
+		"isSrs": false
+	    },
 	};
 	for(var i in checkboxes){
 	    if(myLocation.find("input#"+i).is(":checked")){

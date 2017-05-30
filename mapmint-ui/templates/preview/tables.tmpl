@@ -196,6 +196,12 @@ $(Template(file=$conf["main"]["templatesPath"]+"/login_bs_body.html",searchList=
 
 #set qComponents=$inputs["query"]["value"].split('/')
 
+#set c=$conf["lenv"]
+#try
+#set $c["cid"]=str(1+int($c["cid"]))
+#except
+#set $c["cid"]="0"
+#end try
 #if len($qComponents)==1
 #*
  In case we want a table list

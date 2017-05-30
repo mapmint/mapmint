@@ -97,7 +97,10 @@ def listTablesAndViews(conf,inputs,outputs):
 
 def getDesc(cur,table):
     tmp=table.split('.')
-    req="SELECT b.relname as t FROM pg_inherits, pg_class a, pg_class b WHERE inhrelid=a.oid AND inhparent=b.oid AND a.relname = '"+tmp[0]+"' AND a.relnamespace=(select oid from pg_namespace where nspname='"+tmp[1]+"')"
+    if len(tmp)==1 :
+        tmp1=tmp[0]
+        tmp=["public",tmp1];
+    req="SELECT b.relname as t FROM pg_inherits, pg_class a, pg_class b WHERE inhrelid=a.oid AND inhparent=b.oid AND a.relname = '"+tmp[1]+"' AND a.relnamespace=(select oid from pg_namespace where nspname='"+tmp[0]+"')"
     res0=cur.execute(req)
     res=cur.fetchall()
     if res!=False and len(res)>0:
@@ -265,6 +268,7 @@ def editTuple(conf,inputs,outputs):
                     fd=k[2]
             if fd is not None:
                 print >> sys.stderr,tmp
+                print >> sys.stderr,fd
                 td=testDesc(tmp[i],fd)
                 if td is not None:
                     if fields!="":
@@ -309,7 +313,7 @@ def editTuple(conf,inputs,outputs):
         values+=")"
         req+=fields+" VALUES "+values
         outputs["Result"]["value"]="Tuple inserted"
-        #print >> sys.stderr,req.decode("utf-8")
+    print >> sys.stderr,req.encode("utf-8")
     db=pgConnection(conf,inputs["dataStore"]["value"])
     db.parseConf()
     if db.connect():
@@ -327,7 +331,7 @@ def editTuple(conf,inputs,outputs):
 
 def testDesc(val,desc):
     if desc=="bool":
-        if val=="t":
+        if val=="t" or val:
             return "true"
         else:
             return "false"

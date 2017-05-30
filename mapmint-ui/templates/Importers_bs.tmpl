@@ -132,6 +132,7 @@ var icounter=0;
   <input type="hidden" id="documents_ifilename" class="form-control" />
   </form>
   <iframe onload="if(icounter>0){/*app.saveAnElement();*/icounter=0;}else icounter+=1;" name="iuploader" id="iuploader" style="display:none"></iframe>
+  <a id="documents_template_link" href="#">$zoo._("File")</a>
       </div>
       	   $ftmpl.printButton({"id":"import","name":$zoo._("Import"),"classes":"col-sm-3" })
       </div>
@@ -180,8 +181,14 @@ $ftmpl.printLine({"rid":"documents_description","id":"dname","type":"textarea","
 #for i in range(0,len(vals))
 #set $options+=[[$vals[i][0],$vals[i][1]]]
 #end for
-
-     $ftmpl.printLine({"rid":"documents_themes","id":"documents_themes","name":$zoo._("Theme"),"type":"multiple","options":$options})
+    $ftmpl.printLine({"rid":"documents_themes","id":"documents_themes","name":$zoo._("Theme"),"type":"multiple","options":$options})
+#set options=[["None",$zoo._("None")]]
+#set res=cur.execute("SELECT id,title||' ('||name||')' as val from mm_tables.p_tables order by title")
+#set vals=cur.fetchall()
+#for i in range(0,len(vals))
+#set $options+=[[$vals[i][0],$vals[i][1]]]
+#end for
+    $ftmpl.printLine({"rid":"documents_tid","id":"documents_tid","name":$zoo._("Table"),"type":"select","options":$options})
     $ftmpl.printButton({"id":"save","name":$zoo._("Save")})
   </div>
 </div>
@@ -200,8 +207,12 @@ $ftmpl.printLine({"rid":"documents_description","id":"dname","type":"textarea","
   <div id="page_table_init">
   </div>
  <script type="template/text" id="page_fields_table_template">
-  <h3>$zoo._("Table configuration")   <button class="btn btn-default savePageSettings">
+  <h3>$zoo._("Table configuration")
+  <button class="btn btn-default savePageSettings">
     $zoo._("Save")
+  </button>
+  <button class="btn btn-default processImportData">
+    $zoo._("Import")
   </button>
   </h3>
   <table id="pages_fields_table_display">

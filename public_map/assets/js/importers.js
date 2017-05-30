@@ -121,6 +121,8 @@ define([
 	var reg=new RegExp("documents_","");
 
 	$("#indicators_form_link").find("#documents_template_name").val(data["template_name"]);
+	$("#indicators_form_link").find("#documents_ifilename").val(data["otemplate"]);
+	$("#indicators_form_link").find("#documents_template_link").attr("href",data["template"]).text(data["template_name"]);
 
 	//var cData=data;
 	(function(cData){
@@ -131,13 +133,19 @@ define([
 			$("#pages_fields_table_display").prev().remove();
 			$("#pages_fields_table_display").remove();
 			var cPage=cData["pages"][$("#documents_ifile_page").val()];
+			console.log("+++++>");
+			console.log(cPage);
+			console.log("<+++++");
 			if(cPage["ofield"]){
+			    console.log("+++++>");
+			    console.log(cPage);
+			    console.log("<+++++");
 			    $("#pages_id").val(cPage["id"]);
 			    if(cPage["isreference"])
 				$("#documents_page_isreference").prop("checked",true);
 			    else
 				$("#documents_page_isreference").prop("checked",false);
-			    $("#documents_page_type").val(cPage["type"]);
+			    $("#documents_page_type").val(cPage["type"]).change();
 			    $("#documents_page_tablename").val(cPage["tablename"]);
 			    var cid=0;
 			    try{
@@ -159,8 +167,16 @@ define([
 				"type": cPage["otype"]
 			    };
 			    console.log("Now fix the order to "+closure["field"]+" "+closure["type"]+"!");
-			    managerTools.datasources[data].order([closure["field"],closure["type"]]).draw();
+			    try{
+				managerTools.datasources[data].order([closure["field"],closure["type"]]).draw();
+			    }catch(e){
+				console.log("****** ERROR ");
+				console.log(e);
+				console.log("****** ERROR ");
+				
+			    }
 			    var tbody="";
+			    console.log(managerTools.generateFromTemplate($("#page_fields_table_template").html(),["tbody"],[tbody]));
 			    $("#page_table_init").html(managerTools.generateFromTemplate($("#page_fields_table_template").html(),["tbody"],[tbody]));
 			    $("#pages_fields_table_display").DataTable({
 				rowReorder:       true,
@@ -173,6 +189,35 @@ define([
 				//"responsive":     true,
 				//deferRender:      true,
 				bFilter:          false
+			    });
+			    hasBeenDone=true;
+
+			    $(".processImportData").off('click');
+			    $(".processImportData").click(function(){
+				console.log('processImportData !');
+				var dstName=$("#documents_ifilename").val();
+				dstName=dstName+(dstName.indexOf(".mdb")>0?"_dir":'');
+				var lparams=[
+				    {"identifier": "id","value": localId,"dataType":"string"},
+				    {"identifier": "dstName","value": dstName,"dataType":"string"}
+				];
+				zoo.execute({
+				    identifier: "np.massiveImport",
+				    type: "POST",
+				    mode: "async",
+				    storeExecuteResponse: true,
+				    status: true,
+				    dataInputs: lparams,
+				    dataOutputs: [
+					{"identifier":"Result","mimeType":"text/plain"},
+				    ],
+				    success: function(data){
+					console.log(data);
+				    },
+				    error: function(data){
+					console.log(data);
+				    }
+				});
 			    });
 
 			    $(".savePageSettings").off('click');
@@ -292,7 +337,7 @@ define([
 			}else{
 			    $("#pages_id").val(-1);
 			}
-			hasBeenDone=true;
+			
 
 			console.log($('#DS_table_indicatorTable_indicator tbody'));
 
@@ -343,6 +388,8 @@ define([
 			    var columns=$("#DS_table_indicatorTable_indicator").dataTable().fnSettings().aoColumns;
 			    $("#pages_fields_table_display").find("tbody").html("");
 			    for(var kk=0;kk<columns.length;kk++){
+				console.log(columns[kk].data);
+				console.log($("#pages_fields_table_display").find("tbody").find('tr').length);
 	    			$("#pages_fields_table_display").find("tbody").append(managerTools.generateFromTemplate($("#page_fields_line_template").html(),["id","name","label","ignore","value","clause","label_index"],[$("#pages_fields_table_display").find("tbody").find('tr').length+1,columns[kk].data,columns[kk].data,0,"","true","("+kk+",-1)"]));
 				$("#pages_fields_table_display").find("tbody").find('tr').last().find("textarea").last().val("("+kk+",0)");
 				var element=$($("#DS_table_indicatorTable_indicator").DataTable().column(kk).header());
@@ -1007,6 +1054,7 @@ define([
 	$('#'+lid+' tbody').on('click', 'tr', function () {
 	    if(!this.id)
 		return;
+	    hasBeenDone=false;
 	    var id = this.id+"";
 	    var reg0=new RegExp(ltype+'s_',"g");
 	    var index = $.inArray(id, CRowSelected);
@@ -1081,13 +1129,22 @@ define([
 	fileName=data;
 	var ldata=data;
 	console.log("********************** "+ldata.indexOf("mdb"));
-	if(ldata.indexOf("mdb")>0)
+	if(ldata.indexOf(".mdb")>0)
 	    ldata+="_dir/";
+	/*if(ldata.indexOf(".csv")>0){
+	    var tmp=ldata.split('/');
+	    ldata="";
+	    for(var i=0;i<ldata.length-1;i++)
+		ldata+=tmp[i]+"/";
+	    console.log("********************** "+ldata);
+	}*/
 	zoo.execute({
-	    identifier: "vector-tools.mmVectorInfo2Map",
+	    //identifier: "vector-tools.mmVectorInfo2Map",
+	    identifier: "datastores.mmVectorInfo2MapJs",
 	    type: "POST",
 	    dataInputs: [
-		{"identifier":"dataSource","value":ldata,"dataType":"string"},
+		//{"identifier":"dataSource","value":ldata,"dataType":"string"},
+		{"identifier":"dataStore","value":ldata,"dataType":"string"},
 		{"identifier":"force","value":"1","dataType":"integer"}
 	    ],
 	    dataOutputs: [
@@ -1104,6 +1161,10 @@ define([
 			       val=data.datasource.layer[i].name;
 			    $("select[name=ifile_page]").append("<option>"+data.datasource.layer[i].name+"</option>");
 			}
+		    }else{
+			val=data.datasource.layer.name;
+			$("select[name=ifile_page]").append("<option>"+val+"</option>");
+		    }
 			$("select[name=ifile_page]").off('change');
 			$("select[name=ifile_page]").change(function(){
 			    $("#pages_id").val(-1);
@@ -1113,11 +1174,11 @@ define([
 				var reg=new RegExp("\\[datasource\\]","g");
 				var reg1=new RegExp("\\[font\\]","g");
 				font="fa fa-table";
-				console.log("FONT !! "+font);
-				console.log($("#DS_indicatorTable_indicator"));
+				//console.log("FONT !! "+font);
+				//console.log($("#DS_indicatorTable_indicator"));
 				if($("#DS_indicatorTable_indicator").length)
 				    $("#DS_indicatorTable_indicator").remove();
-				$("[data-mmaction=join]").first().parent().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg,val)).attr("id","DS_indicatorTable_indicator"));
+				$("[data-mmaction=join]").first().parent().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg,$("select[name=ifile_page]").val())).attr("id","DS_indicatorTable_indicator"));
 				managerTools.displayVector(data,ldata,"indicatorTable","indicator",lval,
 							   function(){
 							       $("#DS_indicatorTable_indicator").find(".panel").addClass("panel-warning").removeClass("panel-default");
@@ -1130,15 +1191,11 @@ define([
 								   ffunc();
 							       }catch(e){
 							       }
-							   }); 
-			    });			    
+							   });
+			    });
 			});
 			$("select[name=ifile_page]").find('option').first().prop("selected",true).change();
-		    }else{
-			val=data.datasource.layer.name;
-			$("select[name=ifile_page]").append("<option>"+val+"</option>");
-		    }
-		    getVectorInfo(ldata,val,function(data){
+		    /*getVectorInfo(ldata,val,function(data){
 			var reg=new RegExp("\\[datasource\\]","g");
 			var reg1=new RegExp("\\[font\\]","g");
 			font="fa fa-table";
@@ -1146,7 +1203,7 @@ define([
 			console.log($("#DS_indicatorTable_indicator"));
 			if($("#DS_indicatorTable_indicator").length)
 			    $("#DS_indicatorTable_indicator").remove();
-			$("[data-mmaction=join]").first().parent().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg,val)).attr("id","DS_indicatorTable_indicator"));
+			$("[data-mmaction=join]").first().parent().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg,$("select[name=ifile_page]").val())).attr("id","DS_indicatorTable_indicator"));
 			managerTools.displayVector(data,ldata,"indicatorTable","indicator",val,
 						function(){
 						    $("#DS_indicatorTable_indicator").find(".panel").addClass("panel-warning").removeClass("panel-default");
@@ -1160,7 +1217,7 @@ define([
 						    }catch(e){
 						    }
 						}); 
-		    });
+		    });*/
 		}
 	    },
 	    error: function(data){
@@ -1228,7 +1285,7 @@ define([
 		{"identifier":"Result","type":"raw"},
 	    ],
 	    success: function(data){
-		console.log(data);
+		//console.log(data);
 		func(data);
 	    },
 	    error: function(data){
@@ -1597,6 +1654,12 @@ define([
 	]);
 	bindSave();
 
+	$("#documents_page_type").change(function(){
+	    if($(this).val()==1)
+		$(".processImportData").show();
+	    else
+		$(".processImportData").hide();
+	});
 	$("#adder").find("button").click(function(){
 	    addAnElement();
 	    $("#adder").removeClass("in");
@@ -1609,6 +1672,7 @@ define([
 	$(".tab-pane").css({"max-height":($(window).height()-($(".navbar").height()*3.5))+"px","overflow-y":"auto","overflow-x":"hidden"});
 	$("#page-wrapper").find("[role=presentation]").first().children().first().click();
 	
+
 	$("[data-mmaction=join]").off('click');
 	$("[data-mmaction=join]").click(function(){
 	    console.log($(this));
@@ -1700,10 +1764,11 @@ define([
 	    }
 	    var params=[
 		{"identifier": "table","value": "mm_tables.importers","dataType":"string"},
-		{"identifier": "columns","value": JSON.stringify(["name","description"], null, ' '),"mimeType":"application/json"},
+		{"identifier": "columns","value": JSON.stringify(["name","description","tid"], null, ' '),"mimeType":"application/json"},
 		{"identifier": "links","value": JSON.stringify({"importer_groups":{"table":"mm_tables.importer_groups","ocol":"iid","tid":"gid"},"importer_themes":{"table":"mm_tables.importer_themes","ocol":"iid","tid":"tid"}}, null, ' '),"mimeType":"application/json"},
 		{"identifier": "name","value": $("#documents_name").val(),"dataType":"string"},
 		{"identifier": "description","value": $("#documents_description").val(),"dataType":"string"},
+		{"identifier": "tid","value": ($("#documents_tid").val()!="None"?$("#documents_tid").val():"NULL"),"dataType":"string"},
 		{"identifier": "importer_groups","value": JSON.stringify(multiples[0], null, ' '),"mimeType":"application/json"},
 		{"identifier": "importer_themes","value": JSON.stringify(multiples[1], null, ' '),"mimeType":"application/json"},
 	    ];
@@ -1723,7 +1788,7 @@ define([
 	});
 
 	console.log($("#page-wrapper").find("[role=presentation]").first());
-	console.log("Start Indicators");
+	console.log("Start Importer Module");
 
 	$('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
             $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();

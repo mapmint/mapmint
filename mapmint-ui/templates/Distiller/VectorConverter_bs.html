@@ -64,6 +64,15 @@
       $zoo._("Append:") <input type="radio" name="overr" id="ov2" />
     </div>
     <div>
+      <label for="chkType">$zoo._("Geometry Type:")</label>
+      <input type="checkbox" id="chkType" onclick="if(this.checked) this.nextSibling.nextSibling.style.display='inline';else this.nextSibling.nextSibling.style.display='none';"/>
+      <select id="force_geometry_type" class="form-control" style="display:none">
+#for i in ["GeometryCollection","Geometry","Multipolygon","Polygon","Multipoint","Point","MultiLinestring","Linestring"]	
+	<option value="$(i.upper())">$zoo._($i)</option>
+#end for
+      </select>
+    </div>
+    <div>
       <fieldset>
       <legend>$zoo._("Simplify") <input id="simplify_chk" type="checkbox" onclick="\$(this).parent().next().css({'display':(this.checked?'inline':'none')});"/></legend>
       <input type="text" class="form-control" id="simplify" value="" style="display:none" />

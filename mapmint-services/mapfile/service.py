@@ -2511,6 +2511,7 @@ def classifyMap0(conf,inputs,outputs):
         for i in range(0,len(ll)):
             llayer=layer.clone()
             llayer.name=layer.name+"_"+ll[i]["c"]
+            llayer.metadata.set("ows_title",llayer.name)
             linputs["layer"]["value"]=llayer.name
             linputs["mmType"]["value"]=linputs["type"]["value"]
             linputs["mmMExpr"]={"value":"\"["+inputs["stepField"]["value"]+"]\" = '"+str(ll[i]["c"])+"'"}
@@ -2834,7 +2835,7 @@ def classifyMap0(conf,inputs,outputs):
 						try:
 							tmpClass.setExpression('( ['+j+'] = '+str(int(tmp[i][j]))+' '+precond+' )')
 						except:
-							tmpClass.setExpression('( "['+j+']" = '+json.dumps(tmp[i][j])+' '+precond+' )')
+							tmpClass.setExpression('( "['+j+']" = '+json.dumps(tmp[i][j].encode('utf-8'))+' '+precond+' )')
 				except Exception,e:
 					print >> sys.stderr,e
 					iEnc=layer.encoding
@@ -3445,6 +3446,9 @@ def addLabelLayer0(conf,inputs,outputs):
     f1=open(inputs["map"]["value"],"w")
     f1.write(tmpStr)
     f1.close()
+    # Required only by KelQuartier software
+    m1=mapscript.mapObj(inputs["map"]["value"])
+    m1.save(conf["main"]["dataPath"]+"/maps/label_"+inputs["omap"]["value"]+"_"+inputs["layer"]["value"]+".map")
     l=m.getLayerByName(inputs["layer"]["value"])
     l.metadata.set("mmLabelsMap",inputs["map"]["value"])
     m.save(conf["main"]["dataPath"]+"/maps/project_"+inputs["omap"]["value"]+".map")
@@ -3606,59 +3610,74 @@ def setMapLayerProperties(conf,inputs,outputs):
     lname=inputs["layer"]["value"]
     m0=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/search_"+mf+"_"+lname+".map")
     if m0.getLayer(0).metadata.get('mmFilterField') or m0.getLayer(0).metadata.get('mmZFilterField'):
-	import json
-	import vector_tools.vectSql as vt
-	print >> sys.stderr,m0.getLayer(0).data
-	print >> sys.stderr,m0.getLayer(0).connection
-	layer=m0.getLayer(0)
-	if layer.metadata.get('mmFilterField'):
-		sql="SELECT DISTINCT "+layer.metadata.get('mmFilterField')+" FROM "+layer.data+" ORDER BY "+layer.metadata.get('mmFilterField')+" ASC"
-	else:
-		sql="SELECT DISTINCT "+layer.metadata.get('mmZFilterField')+" FROM "+layer.data+" ORDER BY "+layer.metadata.get('mmZFilterField')+" ASC"
+        import json
+        import vector_tools.vectSql as vt
+        print >> sys.stderr,m0.getLayer(0).data
+        print >> sys.stderr,m0.getLayer(0).connection
+        layer=m0.getLayer(0)
+        if layer.metadata.get('mmFilterField'):
+            sql="SELECT DISTINCT "+layer.metadata.get('mmFilterField')+" FROM "+layer.data+" ORDER BY "+layer.metadata.get('mmFilterField')+" ASC"
+        else:
+            sql="SELECT DISTINCT "+layer.metadata.get('mmZFilterField')+" FROM "+layer.data+" ORDER BY "+layer.metadata.get('mmZFilterField')+" ASC"
 
-	lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": sql}}
-	output1={"Result": {"value":""}}
-	vt.vectInfo(conf,lInputs,outputs)
-	print >> sys.stderr,outputs["Result"]["value"]
-	tmp=json.loads(outputs["Result"]["value"].decode("utf-8"))
-	for i in range(0,len(tmp)):
-		filter=""
-		fval=""
-		ffilter=""
-		for k in tmp[i]:
-			filter=' AND "['+k+']" = "'+tmp[i][k]+'" )'
-			fval=tmp[i][k]
-			ffilter="<PropertyIsEqualTo><PropertyName>"+k+"</PropertyName><Literal>"+tmp[i][k]+"</Literal></PropertyIsEqualTo>"
-		for j in range(0,layer.numclasses):
-			if layer.getClass(j).getExpressionString() is not None:
-				if layer.encoding is not None:
-					tmp0=layer.getClass(j).getExpressionString().decode(layer.encoding)
-					tmp0=tmp0.replace(")",filter)
-					layer.getClass(j).setExpression(tmp0.encode(layer.encoding))
-				else:
-					layer.getClass(j).setExpression(layer.getClass(j).getExpressionString().replace(")",filter))
-			else:
-				layer.getClass(j).setExpression(filter.replace("AND ","(",1))
-		
-		layer.connectiontype=mapscript.MS_WFS
-		layer.connection=conf["main"]["mapserverAddress"]+"?map="+conf["main"]["dataPath"]+"/maps/search_"+mf+"_"+lname+".map"
-		layer.metadata.set("wfs_typename",lname)
-		layer.metadata.set("wfs_version","1.0.0")
-		layer.metadata.set("wfs_filter",ffilter)
-		wgs84=mapscript.projectionObj("+init=epsg:4326")
-		ext=layer.getExtent()
-		p0=mapscript.pointObj(ext.minx,ext.miny)
-		p1=mapscript.pointObj(ext.maxx,ext.maxy)
-		p0.project(mapscript.projectionObj(m.getLayer(0).getProjection()),wgs84)
-		p1.project(mapscript.projectionObj(m.getLayer(0).getProjection()),wgs84)	
-		layer.setExtent(p0.x,p0.y,p1.x,p1.y)
-		layer.setProjection("+init=epsg:4326")
-		saveProjectMap(m0,conf["main"]["dataPath"]+"/maps/search_"+mf+"_"+lname+"_"+fval+".map")
-		f = open(conf["main"]["publicationPath"]+'/styles/'+layer.name+'_'+fval+"_"+conf["senv"]["last_map"]+"_sld.xml", 'w')
-		f.write(layer.generateSLD())
-		f.close()		
-		m0=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/search_"+mf+"_"+lname+".map")
-		layer=m0.getLayer(0)
+        lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": sql}}
+        output1={"Result": {"value":""}}
+        vt.vectInfo(conf,lInputs,outputs)
+        print >> sys.stderr,outputs["Result"]["value"]
+        tmp=json.loads(outputs["Result"]["value"].decode("utf-8"))
+        for i in range(0,len(tmp)):
+            _filter=""
+            fval=""
+            ffilter=""
+            for k in tmp[i]:
+                _filter=' AND "['+k+']" = "'+tmp[i][k]+'" )'
+                fval=tmp[i][k]
+                ffilter="<PropertyIsEqualTo><PropertyName>"+k+"</PropertyName><Literal>"+tmp[i][k]+"</Literal></PropertyIsEqualTo>"
+            for j in range(0,layer.numclasses):
+                if layer.getClass(j).getExpressionString() is not None:
+                    if layer.encoding is not None:
+                        tmp0=layer.getClass(j).getExpressionString().decode(layer.encoding)
+                        tmp0=tmp0.replace(")",_filter)
+                        layer.getClass(j).setExpression(tmp0.encode(layer.encoding))
+                    else:
+                        layer.getClass(j).setExpression(layer.getClass(j).getExpressionString().replace(")",_filter))
+                else:
+                    layer.getClass(j).setExpression(_filter.replace("AND ","(",1))
+            # Used only in the KelQuartier software
+            if layer.metadata.get("mmLabelsMap") is not None:
+                labelMapfile=mapscript.mapObj(layer.metadata.get("mmLabelsMap"))
+                labelLayer=labelMapfile.getLayer(0)
+                for j in range(0,labelLayer.numclasses):
+                    if labelLayer.getClass(j).getExpressionString() is not None:
+                        if labelLayer.encoding is not None:
+                            tmpl0=labelLayer.getClass(j).getExpressionString().decode(labelLayer.encoding)
+                            tmpl0=tmpl0.replace(")",_filter)
+                            labelLayer.getClass(j).setExpression(tmpl0.encode(labelLayer.encoding))
+                        else:
+                            labelLayer.getClass(j).setExpression(labelLayer.getClass(j).getExpressionString().replace(")",_filter))
+                    else:
+                        labelLayer.getClass(j).setExpression(_filter.replace("AND ","(",1))
+                saveProjectMap(labelMapfile,conf["main"]["dataPath"]+"/maps/label_"+mf+"_"+lname+"_"+fval+".map")
+            # Don't use WFS to apply filter anymore
+            #layer.connectiontype=mapscript.MS_WFS
+            #layer.connection=conf["main"]["mapserverAddress"]+"?map="+conf["main"]["dataPath"]+"/maps/search_"+mf+"_"+lname+".map"
+            #layer.metadata.set("wfs_typename",lname)
+            #layer.metadata.set("wfs_version","1.0.0")
+            #layer.metadata.set("wfs_filter",ffilter)
+            #wgs84=mapscript.projectionObj("+init=epsg:4326")
+            #ext=layer.getExtent()
+            #p0=mapscript.pointObj(ext.minx,ext.miny)
+            #p1=mapscript.pointObj(ext.maxx,ext.maxy)
+            #p0.project(mapscript.projectionObj(m.getLayer(0).getProjection()),wgs84)
+            #p1.project(mapscript.projectionObj(m.getLayer(0).getProjection()),wgs84)	
+            #layer.setExtent(p0.x,p0.y,p1.x,p1.y)
+            #layer.setProjection("+init=epsg:4326")
+            saveProjectMap(m0,conf["main"]["dataPath"]+"/maps/search_"+mf+"_"+lname+"_"+fval+".map")
+            f = open(conf["main"]["publicationPath"]+'/styles/'+layer.name+'_'+fval+"_"+conf["senv"]["last_map"]+"_sld.xml", 'w')
+            f.write(layer.generateSLD())
+            f.close()		
+            m0=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/search_"+mf+"_"+lname+".map")
+            layer=m0.getLayer(0)
 	print >> sys.stderr,tmp
     outputs["Result"]["value"]="Layer properties saved."
     return 3
@@ -4719,4 +4738,24 @@ def getFullLayerProperties(conf,inputs,outputs):
     res["connection"]=layer.connection
     res["data"]=layer.data
     outputs["Result"]["value"]=json.dumps(res)
+    return zoo.SERVICE_SUCCEEDED
+
+def updateGridStyle(conf,inputs,outputs):
+    import mapscript
+    ext=inputs["extent"]["value"].split(",")
+    m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_gridStyle.map")
+    layer=m.getLayer(0)
+    t=mapscript.projectionObj(layer.getProjection())
+    s=mapscript.projectionObj("epsg:3857")
+    p1=mapscript.pointObj(float(ext[0]),float(ext[1]))
+    r1=p1.project(s,t)
+    p2=mapscript.pointObj(float(ext[2]),float(ext[3]))
+    r2=p2.project(s,t)
+    layer.setExtent(p1.x,p1.y,p2.x,p2.y)
+    m.setExtent(p1.x,p1.y,p2.x,p2.y)
+    layer.data=inputs["data"]["value"]
+    layer.name="currentGrid"
+    layer.metadata.set("ows_name","currentGrid")
+    m.save(conf["main"]["dataPath"]+"/grids/project_gridStyle_"+inputs["data"]["value"]+".map")
+    outputs["Result"]["value"]=zoo._("Grid map has been updated successfully")
     return zoo.SERVICE_SUCCEEDED

@@ -16,7 +16,7 @@
 #set isH=False
 #end if
 
-#set req="SELECT mm_tables.p_editions.name,mm_tables.p_editions.step,mm_tables.p_editions.ptid,mm_tables.p_editions.id FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm.groups.id in (SELECT mm.groups.id from mm.groups,mm.user_group where mm.groups.id=mm.user_group.id_group and mm.user_group.id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.id="+$inputs["id"]["value"]
+#set req="SELECT mm_tables.p_editions.name,mm_tables.p_editions.step,mm_tables.p_editions.ptid,mm_tables.p_editions.id,mm_tables.p_editions.description FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm.groups.id in (SELECT mm.groups.id from mm.groups,mm.user_group where mm.groups.id=mm.user_group.id_group and mm.user_group.id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.id="+$inputs["id"]["value"]
 #set res=$cur.execute($req)
 #set vals=$cur.fetchone()
 #set tblId=vals[2]
@@ -28,6 +28,9 @@
 #set dependentFields=[]
 
 <div id="mm_table_editor_form">
+<div class="table_description">
+$vals[4]
+</div>
 #if not($isH)
 
 #if $step==-1
@@ -260,7 +263,7 @@ $ftmpl.printLine({"rid":"edition_linkClause","id":"edit_linkClause","name":$zoo.
 $ftmpl.printButton({"id":"search","name":$zoo._("Search")})
 
 <script type="template/text" id="filter_complete_template">
-<div id="filter_[id]" class="alert alert-[type]">
+<div id="filter_[id]" class="alert alert-[type] col-sm-3">
        <button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
        <strong><i class="fa fa-filter" aria-hidden="true"></i> $zoo._("Filter ")[cid]</strong>  [body]
 </div>

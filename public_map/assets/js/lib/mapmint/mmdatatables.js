@@ -77,6 +77,7 @@ define([
 	    var key=getLayerById(layer);
 	    var CRowSelected=[];
 	    console.log(key);
+	    console.log("++++++++++++"+oLayers)
 	    //$("#table-wrapper").removeAttr("style");
 	    if($("#table-wrapper").hasClass("collapse") && !$("#table-wrapper").hasClass("in")){
 		console.log("collapse || in");

@@ -481,6 +481,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	conf["lenv"]["message"]="Export structure:"+" "+myExecuteResult0[i]["name"];
 	ZOOUpdateStatus(conf,((((50-16)/myExecuteResult0.length)*i)+16));
 	alert("+++++ >"+i+" "+myExecuteResult0[i]);
+	alert("+++++ >"+"SELECT * FROM "+myExecuteResult0[i]["name"]+" limit 0 ");
 	var myInputs={
 	    "append": {"value": "true","type":"string"},
 	    "update": {"value": "true","type":"string"},
@@ -535,7 +536,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	}
 	var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
 	var myExecuteResult=myProcess.Execute(myInputs,{});
-	alert(myExecuteResult2);
+	alert(myExecuteResult);
 
     }
      
@@ -579,6 +580,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	"dstName": {"value": inputDSN,"type":"string"},
 	"q": {"value": "SELECT name,value,dependencies FROM "+dbs["mm4me_edition_fields"]["table"]+" "+dbs["mm4me_edition_fields"]["clause"]+" AND ftype=(select id from mm_tables.ftypes where ftype='e' and code='ref')","type":"string"},
     }
+    alert("O_o o_O "+"SELECT name,value,dependencies FROM "+dbs["mm4me_edition_fields"]["table"]+" "+dbs["mm4me_edition_fields"]["clause"]+" AND ftype=(select id from mm_tables.ftypes where ftype='e' and code='ref')");
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
     var myExecuteResult0=eval(myExecuteResult);
@@ -606,11 +608,11 @@ function createSqliteDB4ME(conf,inputs,outputs){
 		var myInputs={
 		    "dsoName": {"value": "","type":"string"},
 		    "dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile,"type":"string"},
-		    "q": {"value": "DROP TABLE "+currentTableName,"type":"string"},
+		    "q": {"value": "BEGIN;DELETE FROM geometry_columns where f_table_name='"+currentTableName+"';COMMIT;BEGIN;DROP TABLE "+currentTableName+";COMMIT;","type":"string"},
 		}
 		var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
 		var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
-		alert(myExecuteResult);
+		alert("+++++++++\n\nDROP TABLE "+currentTableName+" "+myExecuteResult+" \n\n++++++++++++++\n" );
 		var myInputs={
 		    "overwrite": {"value": "true","type":"string"},
 		    "InputDSN": {"value": inputDSN,"type":"string"},

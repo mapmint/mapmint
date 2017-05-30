@@ -2049,11 +2049,13 @@ def details(conf,inputs,outputs):
                 res[str(desc[i][1]).encode("utf-8")]=content["rows"][0]["cell"][i]
                 print >> sys.stderr,desc[i][1]
             if inputs["table"]["value"]=='"mm_tables"."importers"':
-                req="select template,ARRAY((select tid from mm_tables.importer_themes where mm_tables.importers.id=mm_tables.importer_themes.iid)),ARRAY((select gid from mm_tables.importer_groups where mm_tables.importers.id=mm_tables.importer_groups.iid)) from mm_tables.importers where id="+res["id"]+";"
+                
+                req="select template,ARRAY((select tid from mm_tables.importer_themes where mm_tables.importers.id=mm_tables.importer_themes.iid)),ARRAY((select gid from mm_tables.importer_groups where mm_tables.importers.id=mm_tables.importer_groups.iid)),tid from mm_tables.importers where id="+res["id"]+";"
                 print >> sys.stderr," --------- "+str(req)+" --------- "
                 cur.execute(req)
                 res1=cur.fetchall()
                 for j in range(len(res1)):
+                    res["tid"]=res1[j][3]
                     try:
                         lfile=unpackFile(conf,res1[j][0])
                         tmp=lfile["name"].split("/")
@@ -3315,7 +3317,10 @@ def clientInsert(conf,inputs,outputs):
                         print >> sys.stderr,"TUPLE "
                         print >> sys.stderr," * "+str(tuple[columns[i]].encode("utf-8"))
                         print >> sys.stderr," * "+str(adapt(str(tuple[columns[i]].encode("utf-8"))))
-                        col_sufix+=columns[i]+"="+str(adapt(str(tuple[columns[i]].encode("utf-8")))).decode('utf-8')
+                        if len(str(adapt(str(tuple[columns[i]].encode("utf-8")))))==2:
+                            col_sufix+=columns[i]+"=NULL"
+                        else:
+                            col_sufix+=columns[i]+"="+str(adapt(str(tuple[columns[i]].encode("utf-8")))).decode('utf-8')
                         print >> sys.stderr," * "+str(adapt(str(tuple[columns[i]].encode("utf-8"))))
                     else:
                         print >> sys.stderr,"TUPLE "
@@ -3415,7 +3420,7 @@ def clientInsert(conf,inputs,outputs):
     con.conn.close()
     return zoo.SERVICE_SUCCEEDED
 
-def _clientPrint(conf,cur,tableId,cid,rName=None):
+def _clientPrint(conf,cur,tableId,cid,filters,rid=None,rName=None):
     import json
     try:
         req="SELECT name from mm_tables.p_tables where id="+tableId
@@ -3426,9 +3431,13 @@ def _clientPrint(conf,cur,tableId,cid,rName=None):
         return None
     tableName=vals[0]
     if rName is None:
-        req="SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid="+tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='"+conf["senv"]["id"]+"') order by mm_tables.p_reports.id asc"
+        if rid is not None:
+            clause=" AND mm_tables.p_reports.id = "+rid
+        else:
+            clause=""
+        req="SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid="+tableId+clause+" and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='"+conf["senv"]["id"]+"') order by mm_tables.p_reports.id asc"
     else:
-        req="SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid="+tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='"+conf["senv"]["id"]+"') and mm_tables.p_reports.name="+str(adapt(str(rName)))+" order by mm_tables.p_reports.id asc"
+        req="SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid="+tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='"+conf["senv"]["id"]+"') and mm_tables.p_reports.name="+str(adapt(str(rName)))+" order by mm_tables.p_reports.id asc"
     print >> sys.stderr,req
     res=cur.execute(req)
     ovals0=cur.fetchall()
@@ -3450,13 +3459,27 @@ def _clientPrint(conf,cur,tableId,cid,rName=None):
         else:
             postDocuments+=[vals0[i][4]]
     rfields=(",".join(rcolumns))
-    print >> sys.stderr,rfields
+    #print >> sys.stderr,rfields
     print >> sys.stderr,"*********** ["+str(postDocuments)+"] ***********"
-    
-    rreq="SELECT "+rfields+" from "+tableName+" where id="+cid+" AND "+ovals0[0][3]
+
+    if ovals0[0][4]:
+        clause=ovals0[0][3]
+        if len(filters)>0:
+            if clause!="":
+                clause+=" AND "+buildClause(filters)
+            else:
+                clause=buildClause(json.loads(inputs["filters"]["value"]))
+
+        rreq=rfields.replace("[_CLAUSE_]",clause)
+    else:
+        rreq="SELECT "+rfields+" from "+tableName+" where id="+cid+" AND "+ovals0[0][3]
+    #print >> sys.stderr,rreq
     print >> sys.stderr,vals0
     res=cur.execute(rreq)
-    rvals=cur.fetchone()
+    if ovals0[0][4]:
+        rvals=cur.fetchall()
+    else:
+        rvals=cur.fetchone()
     print >> sys.stderr,"*********** ["+str(rvals)+"] ***********"
 
     lfile=unpackFile(conf,ovals0[0][2])
@@ -3504,7 +3527,9 @@ def _clientPrint(conf,cur,tableId,cid,rName=None):
                     rcnt+=1
                 else:
                     if vals0[i][3]=="sql_array":
-                        script+="pm.addTable('[_"+vals0[i][2]+"_]',"+json.dumps(eval(unicode(str(rvals[rcnt]),"utf-8").replace("'{","[").replace("}'","]")))+")\n"
+                        print >> sys.stderr,"*** 0 ***"+unicode(str(rvals[rcnt]),"utf-8")
+                        print >> sys.stderr,"*** 1 ***"+unicode(str(rvals[rcnt]),"utf-8").replace("'{","[").replace("}'","]")
+                        script+="pm.addTable('[_"+vals0[i][2]+"_]',"+json.dumps(eval(unicode(str(rvals[rcnt]),"utf-8").replace("'{","[").replace("}'","]"))[0]).replace("null,","")+")\n"
                         rcnt+=1
                     else:
                         if vals0[i][3]=="diagram":
@@ -3523,7 +3548,7 @@ def _clientPrint(conf,cur,tableId,cid,rName=None):
                                 cur.execute(req)
                                 lvals=cur.fetchall()
                                 for j in range(len(lvals)):
-                                    ldocs=_clientPrint(conf,cur,req1,lvals[j][0],tmp[2])
+                                    ldocs=_clientPrint(conf,cur,req1,lvals[j][0],rid,tmp[2])
                                     print >> sys.stderr,ldocs
                                     print >> sys.stderr,conf["lenv"]["message"]
                                     #if j==0:
@@ -3561,7 +3586,10 @@ def clientPrint(conf,inputs,outputs):
     con.connect()
     cur=con.conn.cursor()
     fres={}
-    docs=_clientPrint(conf,cur,inputs["tableId"]["value"],inputs["id"]["value"])
+    if inputs.keys().count("rid")>0:
+        docs=_clientPrint(conf,cur,inputs["tableId"]["value"],inputs["id"]["value"],filters=json.loads(inputs["filters"]["value"]),rid=inputs["rid"]["value"])
+    else:
+        docs=_clientPrint(conf,cur,inputs["tableId"]["value"],inputs["id"]["value"],filters=json.loads(inputs["filters"]["value"]))
     for i in range(len(docs)):
         docs[i]=docs[i].replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])
     outputs["Result"]["value"]=json.dumps(docs)
@@ -3788,6 +3816,10 @@ def massiveImport(conf,inputs,outputs):
             print >> sys.stderr,('SELECT * FROM "'+vals[i][0]+'" order by '+vals[i][2]+' '+vals[i][3]+'')
         res=vectSql.vectInfo(conf,{"q":{"value":str(('SELECT * FROM "'+vals[i][0]+'" order by '+vals[i][2]+' '+vals[i][3]+'').encode('utf-8'))},"dstName":{"value":inputs["dstName"]["value"]}},outputs)
         res=json.loads(outputs["Result"]["value"])
+        try:
+            print >> sys.stderr,str(('SELECT * FROM "'+vals[i][0]+'" order by '+vals[i][2]+' '+vals[i][3]+'').encode('utf-8'))
+        except:
+            print >> sys.stderr,('SELECT * FROM "'+vals[i][0]+'" order by '+vals[i][2]+' '+vals[i][3]+'')
         req1="select name,value,(select code from mm_tables.ftypes where id=type),rlabel from mm_tables.page_fields where pid="+str(vals[i][5])
         res1=cur.execute(req1)
         vals1=cur.fetchall()
@@ -3817,12 +3849,16 @@ def massiveImport(conf,inputs,outputs):
                 value=""
                 for k in range(len(refs)):
                     ref=eval(refs[k])
-                    fieldName="Field"+str(ref[0]+1)
+                    if vals[i][2].count("Field")==0:
+                        fieldName=j[0]
+                    else:
+                        fieldName="Field"+str(ref[0]+1)
                     value+=res[ref[1]][fieldName]
                 try:
                     cur.execute("SELECT "+str(adapt(value)).replace(",",".")+"::"+j[2])
                     reqInsertTemp+=str(adapt(value)).replace(",",".")+"::"+j[2]
-                except:
+                except Exception,e:
+                    print >> sys.stderr,e
                     con.conn.commit()
                     reqInsertTemp+="NULL"
             reqTemp+=")"
@@ -3862,16 +3898,39 @@ def massiveImport(conf,inputs,outputs):
                     for l in range(len(refs)):
                         ref=eval(refs[l])
                         if ref[1]>=0 and ref[0]>=0:
-                            fieldName="Field"+str(ref[0]+1)
+                            if vals[i][2].count("Field")==0:
+                                fieldName=j[0]
+                            else:
+                                fieldName="Field"+str(ref[0]+1)
                         else:
                             fieldName=str(j[3].encode("utf-8"))
+                        print >> sys.stderr,vals[i][2].count("Field")
+                        print >> sys.stderr,fieldName
                         print >> sys.stderr,res[k]
                         value+=res[k][fieldName.decode('utf-8')]
                         valueX+="(null)"
                     try:
-                        cur.execute("SELECT "+str(adapt(value)).replace(",",".")+"::"+j[2])
-                        reqIS+=str(adapt(value)).replace(",",".")+"::"+j[2]
-                    except:
+                        print >> sys.stderr,"+++++++++++----- 0 -------=++++++++++++++++"
+                        print >> sys.stderr,adapt(value)
+                        print >> sys.stderr,"+++++++++++----- 1 -------=++++++++++++++++"
+                        if isinstance(value, unicode):
+                            print >> sys.stderr,"+++++++++++----- 11 -------=++++++++++++++++"
+                            value=value.encode("utf-8")
+                            print >> sys.stderr,value
+                        #toto=adapt(value.encode("utf-8"))
+                        #print >> sys.stderr,unicode(str(adapt(value.encode("utf-8"))),"utf-8")
+                        print >> sys.stderr,"+++++++++++----- 2 -------=++++++++++++++++"
+                        req=("SELECT "+str(adapt(value)).decode("utf-8").replace(",",".")+"::"+j[2])
+                        print >> sys.stderr,"+++++++++++----- 3 -------=++++++++++++++++"
+                        #print >> sys.stderr,req.encode("utf-8")
+                        cur.execute(req.encode("utf-8"))
+                        print >> sys.stderr,"+++++++++++----- 4 -------=++++++++++++++++"
+                        reqIS+=str(adapt(value)).decode("utf-8").replace(",",".")+"::"+j[2]
+                        print >> sys.stderr,"+++++++++++----- 5 -------=++++++++++++++++"
+                    except Exception,e:
+                        print >> sys.stderr,"+++++++++++----- XXXXXXXXXXXXX -------=++++++++++++++++"
+                        print >> sys.stderr,e
+                        print >> sys.stderr,"+++++++++++----- XXXXXXXXXXXXX -------=++++++++++++++++"
                         con.conn.commit()
                         reqIS+="NULL"
                     try:
@@ -3881,6 +3940,7 @@ def massiveImport(conf,inputs,outputs):
                         con.conn.commit()
                         reqIS1+="NULL"
                 if reqIS1!=reqIS:
+                    print >> sys.stderr,reqIS.encode("utf-8")
                     reqs+=[reqIS]
             #reqInsertTemp+=",".join(reqs)+")"
         # isReference ?
@@ -3910,10 +3970,11 @@ def massiveImport(conf,inputs,outputs):
         for j in range(len(reqs)):
             reqInsertTemp1=reqInsertTemp+reqs[j]+")"
             print >> sys.stderr,"******* 6 *********"
-            print >> sys.stderr,reqInsertTemp1
+            print >> sys.stderr,reqInsertTemp1.encode("utf-8")
             print >> sys.stderr,"******* 7 *********"
-            con.pexecute_req([reqInsertTemp1,{}])
+            con.pexecute_req([reqInsertTemp1.encode("utf-8"),{}])
         con.pexecute_req([reqInsertTemp_1,{}])
         if vals[i][6]:
             cid=con.cur.fetchone()[0]
+    outputs["Result"]["value"]=zoo._("File imported successfully")
     return zoo.SERVICE_SUCCEEDED

@@ -129,6 +129,9 @@ function convert(conf,inputs,outputs){
   if(inputs["append"] && inputs["append"]["value"]!="NULL"){
     inputs3["append"]={"value":inputs["append"]["value"],"type":"string"};
   }
+  if(inputs["nlt"] && inputs["nlt"]["value"]!="NULL"){
+    inputs3["nlt"]={"value":inputs["nlt"]["value"],"type":"string"};
+  }
     for(i in inputs){
 	if(inputs3[i]==null){
 	    alert(i);

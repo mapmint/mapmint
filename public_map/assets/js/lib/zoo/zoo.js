@@ -468,9 +468,21 @@ define([
 	    }
 
             function onSuccess(data) {
-		if(closure.debug){
+		//if(closure.debug){
                     console.log("++++ getStatus SUCCESS "+sid);
                     console.log(data);
+		//}
+
+		if(data.ExceptionReport){
+		    if (handlers.onError instanceof Function) {
+                        handlers.onError({
+                            sid: sid,
+                            text: "",
+                            result: data
+			});
+		    }
+		    closure.terminated[sid] = true;
+		    return;
 		}
 
 		if(data.StatusInfo || data.Result){

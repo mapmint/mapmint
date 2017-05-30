@@ -105,13 +105,14 @@ define([
 	$(".project-title").html(data["name"]+' <i class="fa fa-'+(data["published"]=="false"?"exclamation":"check")+'"> </i>');
 	var myRootLocation=$(".theForm");
 	var reg=new RegExp("tables_","");
-
+	var reg0=new RegExp("edition_","");
+	
 	myRootLocation.find("textarea").each(function(){
 	    if(!$(this).attr("id"))
 		return;
 	    console.log($(this).attr("id"));
 	    console.log($(this).attr("id").replace(reg,""));
-	    if($(this).attr("id").replace(reg,"")=="description"){
+	    if($(this).attr("id").replace(reg,"").replace(reg0,"")=="description"){
 		console.log($(this).attr("id"));
 		$(this).code(data[$(this).attr("id").replace(reg,"")]);
 	    }
@@ -354,6 +355,7 @@ define([
 	    $("#tables_edition_id").val("-1");
 	    $("#tables_edition_title").val("");
 	    $("#tables_edition_step").val("");
+	    $("#tables_edition_code").code("");
 	    console.log(data.mmDesc);
 	    for(var i=0;i<data.mmDesc.length;i++){
 		ebody+=managerTools.generateFromTemplate(
@@ -397,11 +399,15 @@ define([
 	    bindOrder();
 	    bindAddRow();
 	    bindDeleteRow();
-	    return;
+	    //return;
 	}else{
 	    for(var i in data.mmEdits[id].view){
-		if(data.mmEdits[id].view[i].indexOf("]")<0)
+		if(data.mmEdits[id].view[i].indexOf("]")<0){
 		    $("#tables_edition_"+i.replace(/name/g,"title")).val(data.mmEdits[id].view[i]);
+		    console.log("**************");
+		    if(i.replace(/name/g,"title")=="description")
+			$("#tables_edition_"+i.replace(/name/g,"title")).code(data.mmEdits[id].view[i]);
+		}
 		else{
 		    var obj=JSON.parse(data.mmEdits[id].view[i]);
 		    for(var j=0;j<obj.length;j++)
@@ -1513,6 +1519,7 @@ define([
 
 	window.setTimeout(function () { 
 	    $("textarea#tables_description").summernote();
+	    $("textarea#tables_edition_description").summernote();
 	},10);
 
 	$('[data-toggle="tooltip"]').tooltip({container: 'body'});
@@ -1719,6 +1726,7 @@ define([
 	    var obj1={
 		"name": $("#tables_edition_title").val(),
 		"step": $("#tables_edition_step").val(),
+		"description": $("#tables_edition_description").val(),
 		"views_groups": JSON.stringify(multiples[0], null, ' '),
 		"views_themes": JSON.stringify(multiples[1], null, ' ')
 	    };
@@ -1728,11 +1736,12 @@ define([
 	    console.log(obj1);
 	    var params=[
 		{"identifier": "table","value": "mm_tables.p_editions","dataType":"string"},
-		{"identifier": "columns","value": JSON.stringify(["ptid","name","step"], null, ' '),"mimeType":"application/json"},
+		{"identifier": "columns","value": JSON.stringify(["ptid","name","step","description"], null, ' '),"mimeType":"application/json"},
 		{"identifier": "links","value": JSON.stringify({"edition_groups":{"table":"mm_tables.p_edition_groups","ocol":"eid","tid":"gid"},"edition_themes":{"table":"mm_tables.p_edition_themes","ocol":"eid","tid":"tid"},"vfields":{"table":"mm_tables.p_edition_fields","ocol":"eid","tid":"eid"}}, null, ' '),"mimeType":"application/json"},
 		{"identifier": "ptid","value": $("#tables_id").val(),"dataType":"string"},
 		{"identifier": "name","value": $("#tables_edition_title").val(),"dataType":"string"},
 		{"identifier": "step","value": $("#tables_edition_step").val(),"dataType":"string"},
+		{"identifier": "description","value": $("#tables_edition_description").val(),"mimeType":"application/json"},
 		{"identifier": "edition_groups","value": JSON.stringify(multiples[0], null, ' '),"mimeType":"application/json"},
 		{"identifier": "edition_themes","value": JSON.stringify(multiples[1], null, ' '),"mimeType":"application/json"},
 		{"identifier": "vfields","value": JSON.stringify(objs, null, ' '),"mimeType":"application/json"}

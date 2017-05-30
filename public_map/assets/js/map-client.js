@@ -46,6 +46,7 @@ define([
     var addedLayers=[];
     var previousLayers=[];
     var tiletoload={};
+    var searchValues,searchExtents;
 
     function notify(text, type) {
         mynotify.notify({
@@ -122,7 +123,6 @@ define([
 
     }
     
-    var searchValues,searchExtents;
     function startSearchEngine(){
 	$("nav").find(".search-panel").find(".dropdown-menu").find("a").each(function(){
 	    if($(this).find("i.fa-check").length){
@@ -3381,12 +3381,39 @@ define([
 	    }		    
 	});
     }
+
+    function getSearchValues(){
+	return [searchValues,searchExtents];
+    }
+
+    function getMap(){
+	return map;
+    }
+
+    function addALayer(obj){
+	var wmsSource = new ol.source.TileWMS({
+	    url: msUrl+"?map="+obj.map,
+	    params: {'LAYERS': obj.layer},
+	    serverType: 'mapserver',
+	    crossOrigin: ''
+	});
+	layer=new ol.layer.Tile({
+	    visible: true,
+	    source: wmsSource
+	});
+
+	map.addLayer(layer);
+    }
+    
     // Return public methods
     return {
         initialize: initialize,
 	printDocument: printDocument,
 	addInteraction: addInteraction,
-	addASelectedFeature: addASelectedFeature
+	addASelectedFeature: addASelectedFeature,
+	getMap: getMap,
+	getSearchValues: getSearchValues,
+	addALayer: addALayer
     };
 
 

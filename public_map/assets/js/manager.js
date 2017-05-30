@@ -1524,10 +1524,16 @@ define([
 		console.log(" INDEX "+index+" SCNT "+scnt);
 		myRootLocation.find(".require-tl").show();
 	    }
-	    if($(this).val()!="tc")
-		myRootLocation.find('.require-tc').hide();
 	    if($(this).val()!="tl")
 		myRootLocation.find('.require-tl').hide();
+	    if($(this).val()!="tc")
+		myRootLocation.find('.require-tc').hide();
+	    if($("select[name=classification]").val()=="tc"){
+		myRootLocation.find('.require-tc').show();
+	    }else{
+		if($("select[name=classification]").val()=="tl")
+		    myRootLocation.find(".require-tl").show();
+	    }
 	    if(scnt==4){
 		console.log($('select[name="classification"]').val());
 		if($("select[name=classification]").val()=="tc"){

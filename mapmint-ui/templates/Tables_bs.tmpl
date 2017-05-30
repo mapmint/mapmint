@@ -225,6 +225,7 @@ $printTab({"font":"print","title":$zoo._("Report")})
   <div id="indicators_form_info" role="tabpanel" class="tab-pane form-horizontal" >
     <table id="infoTable" class="display" width="100%"></table>
   </div>
+  
 #set options=[]
 #set res=$cur.execute("SELECT id,name as val from "+$prefix+"groups order by name")
 #set vals=$cur.fetchall()
@@ -266,8 +267,9 @@ $printTab({"font":"print","title":$zoo._("Report")})
     <input type="hidden" id="tables_edition_id" value="-1" />
     $ftmpl.printLine({"rid":"tables_edition_title","id":"table_title","name":$zoo._("Title"),"classes":"row"})
     $ftmpl.printLine({"rid":"tables_edition_step","id":"table_step","name":$zoo._("Step"),"classes":"row"})
-    $ftmpl.printLine({"rid":"tables_edition_groups","id":"groups","name":$zoo._("Groups"),"type":"multiple","options":$options})  
-     $ftmpl.printLine({"rid":"tables_edition_themes","id":"tables_themes","name":$zoo._("Theme"),"type":"multiple","options":$options1})
+    $ftmpl.printLine({"rid":"tables_edition_groups","id":"groups","name":$zoo._("Groups"),"type":"multiple","options":$options})
+    $ftmpl.printLine({"rid":"tables_edition_description","id":"dname","type":"textarea","name":$zoo._("Description")})
+    $ftmpl.printLine({"rid":"tables_edition_themes","id":"tables_themes","name":$zoo._("Theme"),"type":"multiple","options":$options1})
     $(Template(file=$conf["main"]["templatesPath"]+"/Tables/Edition.html",searchList={"conf": $conf,"inputs": {},"outputs":{},"basic":True}))
     $ftmpl.printButton({"id":"save","name":$zoo._("Save")})
   </div>

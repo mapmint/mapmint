@@ -316,9 +316,11 @@ BEGIN
 	      EXECUTE $q$SELECT ST_SetSRID(ST_MakePoint($q$||newX||$q$,$q$||newY||$q$),(select srid from spatial_ref_sys where auth_name||':'||auth_srid='$q$||srs||$q$'))$q$ INTO NEW.wkb_geometry;
 	   END IF;
 	ELSE
-	   EXECUTE $q$SELECT ST_SetSRID(ST_MakePoint($q$||newX||$q$,$q$||newY||$q$),(select srid from spatial_ref_sys where auth_name||':'||auth_srid='$q$||srs||$q$'))$q$ INTO NEW.wkb_geometry;		
+	   BEGIN
+	   EXECUTE $q$SELECT ST_SetSRID(ST_MakePoint($q$||newX||$q$,$q$||newY||$q$),(select srid from spatial_ref_sys where auth_name||':'||auth_srid='$q$||srs||$q$'))$q$ INTO NEW.wkb_geometry;
+	   END;
 	END IF;
-	return NEW;	
+	return NEW;
 END;
 $BODY$
   LANGUAGE 'plpgsql' COST 100.0 SECURITY INVOKER;
