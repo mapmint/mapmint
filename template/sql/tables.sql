@@ -173,7 +173,8 @@ CREATE TABLE  mm_tables.importers (
     id serial PRIMARY KEY,
     name character varying(255),
     description text,
-    template bytea
+    template bytea,
+    tid int4 REFERENCES mm_tables.p_tables(id)
 );
 
 CREATE TABLE mm_tables.importer_groups (
