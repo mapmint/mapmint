@@ -420,7 +420,7 @@ define([
             "paging":         false,
             "ordering":       false,
             "info":           false,
-	    "responsive":     true,
+	    "responsive":     false,
 	    deferRender:      true,
 	    crollCollapse:    true,
 	    bFilter:          false
@@ -431,7 +431,7 @@ define([
             "paging":         false,
             "ordering":       false,
             "info":           false,
-	    "responsive":     true,
+	    "responsive":     false,
 	    deferRender:      true,
 	    crollCollapse:    true,
 	    bFilter:          false

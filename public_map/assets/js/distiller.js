@@ -2138,10 +2138,10 @@ define([
 	},50);
 	if(data!=null){
 	    var font="";
-	    if(data.datasource.geometry=="Polygon")
+	    if(data.datasource.geometry.indexOf("Polygon")>=0)
 		font="mm mm-polygon";
 	    else{
-		if(data.datasource.geometry=="Line String")
+		if(data.datasource.geometry.indexOf("Line String")>=0)
 		    font="mm mm-line";
 		else{
 		    font="mm mm-point";

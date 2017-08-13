@@ -65,7 +65,7 @@ MAP
     METADATA
       "mm_group"	"Group"
       "ows_name"	"dummy"
-      "ows_srs"	"EPSG:4326 EPSG:900913"
+      "ows_srs"	"EPSG:4326 EPSG:900913 EPSG:3857"
       "gml_include_items"	"all"
       "gml_types"	"auto"
     END # METADATA
