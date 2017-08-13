@@ -36,7 +36,7 @@ then
 	AC_MSG_ERROR([the user-specified zoo-kernel compiled source tree  $ZOO_SRC_PATH does not exist])
 else
         ZOO_DIR=$ZOO_SRC_PATH
-	ZOO_FILE="$ZOO_SRC_PATH/service_internal_ms.o $ZOO_SRC_PATH/response_print.o $ZOO_SRC_PATH/server_internal.o $ZOO_SRC_PATH/lex.sr.o $ZOO_SRC_PATH/lex.cr.o $ZOO_SRC_PATH/main_conf_read.tab.o $ZOO_SRC_PATH/service_conf.tab.o $ZOO_SRC_PATH/service_yaml.o"
+	ZOO_FILE="$ZOO_SRC_PATH/service_internal_ms.o $ZOO_SRC_PATH/response_print.o $ZOO_SRC_PATH/server_internal.o $ZOO_SRC_PATH/lex.sr.o $ZOO_SRC_PATH/lex.cr.o $ZOO_SRC_PATH/main_conf_read.tab.o $ZOO_SRC_PATH/service_conf.tab.o"
 fi
 
 AC_SUBST([ZOO_FILE])
