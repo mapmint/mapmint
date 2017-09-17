@@ -37,7 +37,7 @@
       <span class="input-group-addon">
         <input name="fillColorValuec" type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" />
       </span>
-      <input type="text" name="fillColorValue" value="#ffffff"  class="form-control"/>
+      <input type="text" name="fillColorValue" value="#ffffff" class="form-control" onkeyup="if(\$(this).val().length==7)\$(this).parent().colorpicker('setValue', \$(this).val());"/>
       <span class="input-group-addon"><i></i></span>
     </div>
   </div>
@@ -87,7 +87,7 @@
   <div class="form-group col-sm-12 require-symbolfill hide">
     <label class="col-sm-3 control-label">$zoo._("Fill color")</label>
     <div class="input-group col-sm-9 cpicker">
-      <input type="text" name="symbFillColorValue" value="#ffffff"  class="form-control"/>
+      <input type="text" name="symbFillColorValue" value="#ffffff" class="form-control" onkeyup="if(\$(this).val().length==7)\$(this).parent().colorpicker('setValue', \$(this).val());"/>
       <span class="input-group-addon"><i></i></span>
     </div>
   </div>
@@ -101,7 +101,7 @@
   <div class="form-group col-sm-12 require-symbolfill hide">
     <label class="col-sm-3 control-label">$zoo._("Stroke color")</label>
     <div class="input-group col-sm-9 cpicker">
-      <input type="text" name="symbStrokeColorValue" value="#ffffff"  class="form-control"/>
+      <input type="text" name="symbStrokeColorValue" value="#ffffff" class="form-control" onkeyup="if(\$(this).val().length==7)\$(this).parent().colorpicker('setValue', \$(this).val());"/>
       <span class="input-group-addon"><i></i></span>
     </div>
   </div>
@@ -129,7 +129,7 @@
       <span class="input-group-addon">
         <input name="strokeColorValuec" type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" />
       </span>
-      <input type="text" name="strokeColorValue" value="#ffffff"  class="form-control"/>
+      <input type="text" name="strokeColorValue" value="#ffffff" class="form-control" onkeyup="if(\$(this).val().length==7)\$(this).parent().colorpicker('setValue', \$(this).val());"/>
       <span class="input-group-addon"><i></i></span>
     </div>
   </div>

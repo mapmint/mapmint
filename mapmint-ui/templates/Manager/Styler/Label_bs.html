@@ -52,7 +52,7 @@
     </div>
     <div class="col-sm-3 ">
       <div class="input-group cpicker">
-	<input type="text" name="labelFontColor" value="#ffffff"  class="form-control"/>
+	<input type="text" name="labelFontColor" value="#ffffff" class="form-control" onkeyup="if(\$(this).val().length==7)\$(this).parent().colorpicker('setValue', \$(this).val());"/>
 	<span class="input-group-addon"><i></i></span>
       </div>
     </div>
@@ -68,7 +68,7 @@
     </div>
     <div class="col-sm-6 ">
       <div class="input-group cpicker">
-	<input type="text" name="labelBufferColor" value="#ffffff"  class="form-control"/>
+	<input type="text" name="labelBufferColor" value="#ffffff" class="form-control" onkeyup="if(\$(this).val().length==7)\$(this).parent().colorpicker('setValue', \$(this).val());"/>
 	<span class="input-group-addon"><i></i></span>
       </div>
     </div>

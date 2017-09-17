@@ -175,7 +175,7 @@
 	    <span class="input-group-addon">
 	    <input name="expressionc" type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" />
 	    </span>
-	    <input type="text" class="form-control" name="nodataColorValue" value="#000000" />
+	    <input type="text" class="form-control" name="nodataColorValue" value="#000000" onkeyup="if(\$(this).val().length==7)\$(this).parent().colorpicker('setValue', \$(this).val());"/>
 	    <span class="input-group-addon"><i></i></span>
 	  </div>
 	</div>
