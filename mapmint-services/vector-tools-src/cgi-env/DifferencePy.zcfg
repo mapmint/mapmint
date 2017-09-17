@@ -5,7 +5,7 @@
  processVersion = 2
  storeSupported = true
  statusSupported = true
- serviceProvider = service
+ serviceProvider = ogr_sp
  serviceType = Python
  <MetaData>
    title = Demo
@@ -71,5 +71,23 @@
       encoding = UTF-8
       extension = js
      </Supported>
-    </ComplexData>
+     <Supported>
+      mimeType = image/png
+      useMapserver = true
+      asReference = true
+      msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 0.3 OPACITY 65 END
+    </Supported>
+    <Supported>
+      mimeType = image/tif
+      useMapserver = true
+      asReference = true
+      msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 0.3 END
+    </Supported>
+    <Supported>
+      mimeType = application/vnd.google-earth.kmz
+      useMapserver = true
+      asReference = true
+      msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 0.3 END
+    </Supported>
+=+    </ComplexData>
  </DataOutputs>  

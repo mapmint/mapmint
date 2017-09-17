@@ -1204,14 +1204,17 @@ def createLegend0(conf,inputs,outputs):
         
     nameSpace = {'images': images, 'colors': [inColor,outColor,img_url,inColor1,outColor1]}
     myLayer=m.getLayerByName(inputs["layer"]["value"])
-    processingDirective=""
+    processingDirectives=[]
     if myLayer.type==mapscript.MS_LAYER_RASTER:
         try:
-            processingDirective=myLayer.getProcessing(0)
+            for kk in range(0,myLayer.numprocessing):
+                processingDirectives+=[myLayer.getProcessing(kk)]
         except:
-            processingDirective=None
-        if processingDirective is not None:
-            processingDirective=processingDirective.replace("RESAMPLE=","")
+            processingDirectives=None
+        if processingDirectives is not None:
+            for kk in range(0,myLayer.numprocessing):
+                if processingDirectives[kk].count("RESAMPLE=")>0:
+                    processingDirectives[kk]=processingDirectives[kk].replace("RESAMPLE=","")
     label=None
     litem=None
     try:
@@ -1267,7 +1270,7 @@ def createLegend0(conf,inputs,outputs):
         "sclasses": mmClasses,
         "classes_field": myLayer.metadata.get("mmSField"),
         "discretisation": myLayer.metadata.get("mmMethod"),
-        "processing": processingDirective,
+        "processing": processingDirectives,
         "label": labelInfo,
         "grid": gridInfo,
         "classes": []
@@ -1394,6 +1397,9 @@ def createLegend0(conf,inputs,outputs):
         "Band2_interval": "band2",
         "Band3_interval": "band3",
         "Band4_interval": "band4",
+        "Band5_interval": "band5",
+        "Band6_interval": "band6",
+        "Band7_interval": "band7",
         }
     for i in metadataKeys.keys():
         if layer.metadata.get(i) is not None:
@@ -1650,7 +1656,10 @@ def createLegend(conf,inputs,outputs):
 		    t = Template(file=conf["main"]["templatesPath"]+"/Manager/Styler.tmpl",searchList=nameSpace)
 	    else:
 		    t = Template(file=conf["main"]["templatesPath"]+"/Manager/Styler/UniqSymb.tmpl",searchList=nameSpace)
-    outputs["Result"]["value"]=t.__str__()
+    try:
+        outputs["Result"]["value"]=t.__str__()
+    except:
+        outputs["Result"]["value"]="None"
     saveProjectMap(m,mapfile1)
     conf["lenv"]["message"]=zoo._("An error occured (")+str(images)+")"
     #outputs["Result"]["value"]=str(images)
@@ -1834,7 +1843,7 @@ def saveLayerStyle0(conf,inputs,outputs):
             if inputs.keys().count("mmStyle")==0:
                 if layer.getClass(nClass).numstyles>2:
                     layer.getClass(nClass).removeStyle(layer.getClass(nClass).numstyles-1)
-    if inputs.has_key("mmClassName") and layer.getClass(nClass) is not None:
+    if inputs.has_key("mmClassName") and layer is not None and layer is not None and layer.getClass(nClass) is not None:
 	    layer.getClass(nClass).name=inputs["mmClassName"]["value"]
     if inputs.has_key("mmExpr"):
 	    layer.getClass(nClass).setExpression(inputs["mmExpr"]["value"])
@@ -2220,6 +2229,23 @@ def saveLayerStyle(conf,inputs,outputs):
     else:
         if inputs.has_key("resm"):
             updateProcessing(layer,inputs["resm"])
+            if inputs.keys().count("processing")>0:
+                for kk in range(0,len(inputs["processing"]["value"])):            
+                    print >> sys.stderr," *********** OK "+str(inputs["processing"]["value"][kk])
+                    layer.addProcessing(inputs["processing"]["value"][kk])
+                    print >> sys.stderr," *********** OK"
+            try:
+                layer.setOpacity(int(inputs["opacity"]["value"]))
+                #layer.updateFromString("LAYER COMPOSITE OPACITY "+inputs["opacity"]["value"]+" END END")
+            except Exception,e:
+                print >> sys.stderr,e
+                try:
+                    layer.updateFromString("LAYER COMPOSITE OPACITY "+inputs["opacity"]["value"]+" END END")
+                except:
+                    layer.updateFromString("LAYER OPACITY "+inputs["opacity"]["value"]+" END")
+                #m.save(mapfile+"100")
+                #m.save(mapfile)
+
         if layer.numclasses==0:
             layer.opacity=int(inputs["mmOpacity"]["value"])
 	if inputs.keys().count("mmOffsite")>0:
@@ -2280,8 +2306,8 @@ def updateProcessing(layer,resm):
     layer.clearProcessing()
     for i in range(layer.numprocessing):
         if processings[i].count("RESAMPLE=")==0:
-            layer.setProcessing(processings[i])
-    layer.setProcessing("RESAMPLE="+resm["value"])
+            layer.addProcessing(processings[i])
+    layer.addProcessing("RESAMPLE="+resm["value"])
 
 def createColorRamp(conf,m,layer,useTile=0):
     import mapscript,sys
@@ -2440,16 +2466,17 @@ def getClassObject(conf,inputs,myLayer,myClass,index):
 def getLayerStylesArray(conf,inputs,myLayer):
     import mapscript,time
     res={}
-    processingDirective=""
+    processingDirectives=[]
     mapPath=conf["main"]["dataPath"]+"/maps"
     if inputs.has_key('prefix'):
 	    mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps"
     mapfile=mapPath+"/project_"+inputs["map"]["value"]+".map"
     
     if myLayer.type==mapscript.MS_LAYER_RASTER:
-        processingDirective=myLayer.getProcessing(0)
-        if processingDirective is not None:
-            processingDirective=processingDirective.replace("RESAMPLE=","")
+        for kk in range(0,myLayer.numprocessing):
+            processingDirectives+=[myLayer.getProcessing(0)]
+            if processingDirectives[kk] is not None:
+                processingDirectives[kk]=processingDirectives[kk].replace("RESAMPLE=","")
             
     res["Style"]={
         "numclasses": myLayer.numclasses,
@@ -2459,7 +2486,7 @@ def getLayerStylesArray(conf,inputs,myLayer):
         "sclasses": myLayer.metadata.get("mmClasses"),
         "classes_field": myLayer.metadata.get("mmSField"),
         "discretisation": myLayer.metadata.get("mmMethod"),
-        "processing": processingDirective,
+        "processing": processingDirectives,
         "classes": []
         }
     for i in range(0,myLayer.numclasses):
@@ -2503,6 +2530,7 @@ def classifyMap0(conf,inputs,outputs):
     if inputs.keys().count("stepField")>0:
         #layer=m.getLayerByName(inputs["layer"]["value"])
         lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["stepField"]["value"]+" as c FROM "+layer.data+" ORDER BY "+inputs["stepField"]["value"]+" ASC"}}
+        #lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT "+inputs["stepField"]["value"]+" as c, ('||count(*)||' items)' as nb FROM "+layer.data+" GROUP BY inputs["stepField"]["value"] ORDER BY "+inputs["stepField"]["value"]+" ASC"},"dialect":{"value":"sqlite"}}
         vt.vectInfo(conf,lInputs,outputs)
         ll=json.loads(outputs["Result"]["value"])
         print >> sys.stderr,ll
@@ -2545,7 +2573,9 @@ def classifyMap0(conf,inputs,outputs):
     if inputs.keys().count("field")==0:
         inputs0=inputs
         if layer.type==mapscript.MS_LAYER_RASTER:
-            inputs0["mmType"]["value"]="greyScale"
+            tmp=layer.metadata.get("ows_bandnames").split(" ")
+            if len(tmp)==1:
+                inputs0["mmType"]["value"]="greyScale"
             if inputs.keys().count("nodata"):
                 inputs0["mmOffsite"]={"value": inputs["nodata"]["value"]}
             inputs0["mmFill"]={"value": "000000"}
@@ -2553,14 +2583,27 @@ def classifyMap0(conf,inputs,outputs):
         else:
             inputs0["mmFill"]={"value": "7d7dff"}
             inputs0["mmStroke"]={"value": "505050"}
+        inputs0["opacity"]=inputs["mmOpacity"]
         inputs0["force"]={"value": "true"}
         outputs1={"Result":{"value":""}}
+        layer.clearProcessing()
+        if inputs.keys().count("processing")>0:
+            for kk in range(0,len(inputs["processing"]["value"])):            
+                print >> sys.stderr," *********** OK "+str(inputs["processing"]["value"][kk])
+                layer.addProcessing(inputs["processing"]["value"][kk])
+                print >> sys.stderr," *********** OK"
+            m.save(mapfile+"100")
+            m.save(mapfile)
         try:
             res=saveLayerStyle(conf,inputs0,outputs1)
         except:
             inputs0.pop("force")
             inputs0.pop("mmFill")
             inputs0.pop("mmStroke")
+            print >> sys.stderr, "==== -------- ===="
+            print >> sys.stderr,inputs
+            print >> sys.stderr, "==== -------- ===="
+            inputs0["opacity"]=inputs["mmOpacity"]
             res=saveLayerStyle(conf,inputs0,outputs1)
         #inputs0["mmFill"]={"value": "000000"}
         #inputs0["mmStroke"]={"value": "000000"}
@@ -2610,8 +2653,9 @@ def classifyMap0(conf,inputs,outputs):
     if layer.type!=mapscript.MS_LAYER_RASTER and inputs.keys().count("mmMExpr")>0 and inputs["mmMExpr"]["value"]!="":
 	    cond=" WHERE "+inputs["mmMExpr"]["value"].replace("\"[","").replace("]\"","")
 	    cond=cond.replace("[","").replace("]","")
-    lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layer.data+" "+cond+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
-    #lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.data}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layerName+" "+cond+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
+    #lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layer.data+" "+cond+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
+    lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT count(*) as title,"+inputs["field"]["value"]+" FROM "+layer.data+" GROUP BY "+inputs["field"]["value"]+" ORDER BY "+inputs["field"]["value"]+" ASC"},"dialect":{"value":"sqlite"}}
+    
     rClass=False
     if layer.metadata.get("mmMethod"):
 	    layer.metadata.remove("mmMethod")
@@ -2640,27 +2684,42 @@ def classifyMap0(conf,inputs,outputs):
 
     #print >> sys.stderr,lInputs
     output1={"Result": {"value":""}}
+    outputs1={"Result": {"value":""}}
     isRaster=-1
     try:
         if not(rClass):
-            print >> sys.stderr,"OK"
+            print >> sys.stderr,"-- OK"
             print >> sys.stderr,lInputs
-            vt.vectInfo(conf,lInputs,outputs)
-            print >> sys.stderr,"OK"
-		#print >> sys.stderr,outputs["Result"]["value"]
-	tmp=eval(outputs["Result"]["value"])
+            print >> sys.stderr,"OK --"
+            res=vt.vectInfo(conf,lInputs,outputs)
+            print >> sys.stderr,"-- OK"
+            print >> sys.stderr,res
+            print >> sys.stderr,outputs["Result"]
+            print >> sys.stderr,"OK --"
+        try:
+            tmp=eval(outputs["Result"]["value"])
+        except Exception, e:
+            print >> sys.stderr,"** ERROR **"
+            print >> sys.stderr,e
+            conf["lenv"]["message"]=zoo._("Unable to execute the request. ")+str(e)
+            return zoo.SERVICE_FAILED
     except Exception,e:
         try:
 	    k=inputs.keys()
 	    print >> sys.stderr,e.message
 	    print >> sys.stderr,"/ERROR"
 	    
+	    layer.clearProcessing()
+	    if inputs.count("processing")>0:
+		    for kk in range(0,len(inputs["processing"]["value"])):            
+			    print >> sys.stderr," *********** OK"
+			    layer.setProcessing(inputs["processing"]["value"][kk])
+			    print >> sys.stderr," *********** OK"
 	    if inputs["mmType"]["value"]!="uniqVal":
 		    if k.count("min")==0 :
 			    import osgeo.gdal
 			    d=osgeo.gdal.Open(layer.data)
 			    b=d.GetRasterBand(int(inputs["field"]["value"]))
-			    layer.clearProcessing()
 			    layer.setProcessing("BAND="+inputs["field"]["value"])
 			    tmp=[{"min": b.GetMinimum(),"max": b.GetMaximum()}]
 		    else:
@@ -2692,8 +2751,13 @@ def classifyMap0(conf,inputs,outputs):
 					    count[cell_value] = 1
 					    tmp+=[{"pixel": cell_value}]
 		    sorted(tmp, key=lambda x: x["pixel"])
-		    layer.clearProcessing()
-		    layer.setProcessing("BAND="+inputs["field"]["value"])
+		    #layer.clearProcessing()
+            if inputs.keys().count("processing")==0:
+                layer.setProcessing("BAND="+inputs["field"]["value"])
+            else:
+                for kk in range(0,len(inputs["processing"]["value"])):
+                    layer.setProcessing(inputs["processing"]["value"][kk])
+
 		    #tmp=[{"min": b.GetMinimum(),"max": b.GetMaximum()}]
 		    #print >> sys.stderr,tmp
 		    
@@ -2705,6 +2769,12 @@ def classifyMap0(conf,inputs,outputs):
 
     if inputs.has_key("resm"):
         updateProcessing(layer,inputs["resm"])
+        layer.clearProcessing()
+        if inputs.count("processing")>0:
+            for kk in range(0,len(inputs["processing"]["value"])):            
+                print >> sys.stderr," *********** OK"
+                layer.setProcessing(inputs["processing"]["value"][kk])
+                print >> sys.stderr," *********** OK"
 
     i=layer.numclasses-1
     while i >= 0:
@@ -2767,100 +2837,113 @@ def classifyMap0(conf,inputs,outputs):
     #	    color_file=open(conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr","w+")
 
     while i < nbClasses:
-	try:
-		tmpClass=mapscript.classObj(layer)
-		tmpClass.name="Class_"+str(i)
-		
-		style=mapscript.styleObj(tmpClass)
+        try:
+            tmpClass=mapscript.classObj(layer)
+            tmpClass.name="Class_"+str(i)
 
-		style.color.red=tmpColor[i][0]
-		style.color.green=tmpColor[i][1]
-		style.color.blue=tmpColor[i][2]
-		
-		style.outlinecolor.red=tmpColor[i][0]
-		style.outlinecolor.green=tmpColor[i][1]
-		style.outlinecolor.blue=tmpColor[i][2]
+            style=mapscript.styleObj(tmpClass)
 
-		style.opacity=int(inputs["mmOpacity"]["value"])
+            style.color.red=tmpColor[i][0]
+            style.color.green=tmpColor[i][1]
+            style.color.blue=tmpColor[i][2]
 
-		if layer.type==mapscript.MS_LAYER_POINT:
-			style.size=15
-			style.symbolname="circle"
+            style.outlinecolor.red=tmpColor[i][0]
+            style.outlinecolor.green=tmpColor[i][1]
+            style.outlinecolor.blue=tmpColor[i][2]
+
+            style.opacity=int(inputs["mmOpacity"]["value"])
+
+            if layer.type==mapscript.MS_LAYER_POINT:
+                style.size=15
+                style.symbolname="circle"
+                #print >> sys.stderr,"Keys: "+str(inputs.keys().count("nbClasses"))
         
-			#print >> sys.stderr,"Keys: "+str(inputs.keys().count("nbClasses"))
-        
-		layer.metadata.set("mmName",inputs["field"]["value"])
-		try:
-			minVal=int(tmp[0]["min"])
-		except:
-			try:
-				minVal=float(tmp[0]["min"])
-			except:
-				
-				pass
+            layer.metadata.set("mmName",inputs["field"]["value"])
+            try:
+                minVal=int(tmp[0]["min"])
+            except:
+                try:
+                    minVal=float(tmp[0]["min"])
+                except:
+                    pass
 
-		precond=""
-		if inputs.keys().count("mmMExpr") > 0:
-			precond=" AND "+inputs["mmMExpr"]["value"]+" "
-			layer.metadata.set("mmMExpr",inputs["mmMExpr"]["value"])
-		else:
-			try:
-				layer.metadata.remove("mmMExpr")
-			except:
-				pass
-		if inputs.keys().count("nbClasses")>0:
-			if rClass:
-				if i==0:
-					tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) '+precond+' )')
-				else:
-					tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] > '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) '+precond+' )')
-			elif i==0:
-				tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(minVal+(colspan*i))+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(minVal+(colspan*(i+1)))+' ) '+precond+' )')
-			else:
-				tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] > '+str(minVal+(colspan*i))+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(minVal+(colspan*(i+1)))+' ) '+precond+' )')
-                
-		else:
-			for j in tmp[i]:
-				try:
-					if j=="pixel":
-						tmpClass.setExpression('( ['+j+'] = '+str(tmp[i][j])+' '+precond+' )')
-					else:
-						if str(tmp[i][j])[0]=='#':
-							style.color.red=eval("0x"+str(tmp[i][j])[1:3])
-							style.color.green=eval("0x"+str(tmp[i][j])[3:5])
-							style.color.blue=eval("0x"+str(tmp[i][j])[5:7])
-							style.outlinecolor.red=eval("0x"+str(er))
-							style.outlinecolor.green=eval("0x"+str(eg))
-							style.outlinecolor.blue=eval("0x"+str(eb))
-						try:
-							tmpClass.setExpression('( ['+j+'] = '+str(int(tmp[i][j]))+' '+precond+' )')
-						except:
-							tmpClass.setExpression('( "['+j+']" = '+json.dumps(tmp[i][j].encode('utf-8'))+' '+precond+' )')
-				except Exception,e:
-					print >> sys.stderr,e
-					iEnc=layer.encoding
-					oEnc=m.web.metadata.get("ows_encoding")
-					tmpClass.setExpression('( "['+j+']" = "'+tmp[i][j].decode(oEnc).encode(iEnc)+'" '+precond+' )')
-				print >> sys.stderr,tmpClass.getExpressionString()
-				if inputs.has_key("mmFAS") and inputs["mmFAS"]["value"]=="true":
-					try:
-						style.size=eval(inputs["mmFASF"]["value"].replace(j,tmp[i][j]));
-						layer.metadata.set("mmFAS","true")
-						layer.metadata.set("mmFASF",inputs["mmFASF"]["value"])
-					except Exception,e:
-						print >> sys.stderr,e
-				else:
-					try:
-						layer.metadata.remove("mmFAS")
-						layer.metadata.remove("mmFASF")
-					except:
-						pass
-				layer.metadata.set("mmName",tmp[i][j])
-				tmpClass.name=tmp[i][j]
-	except Exception,e:
-		#print >> sys.stderr,e
-		pass
+            precond=""
+            if inputs.keys().count("mmMExpr") > 0:
+                precond=" AND "+inputs["mmMExpr"]["value"]+" "
+                layer.metadata.set("mmMExpr",inputs["mmMExpr"]["value"])
+            else:
+                try:
+                    layer.metadata.remove("mmMExpr")
+                except:
+                    pass
+            
+            if inputs.keys().count("nbClasses")>0:
+                if rClass:
+                    if i==0:
+                        tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) '+precond+' )')
+                    else:
+                        tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] > '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) '+precond+' )')
+                elif i==0:
+                    tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(minVal+(colspan*i))+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(minVal+(colspan*(i+1)))+' ) '+precond+' )')
+                else:
+                    tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] > '+str(minVal+(colspan*i))+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(minVal+(colspan*(i+1)))+' ) '+precond+' )')
+            else:
+                for j in tmp[i]:
+                    try:
+                        print >> sys.stderr,dir(tmp[i])
+                        if j=="pixel":
+                            tmpClass.setExpression('( ['+j+'] = '+str(tmp[i][j])+' '+precond+' )')
+                        else:
+                            if str(tmp[i][j])[0]=='#':
+                                style.color.red=eval("0x"+str(tmp[i][j])[1:3])
+                                style.color.green=eval("0x"+str(tmp[i][j])[3:5])
+                                style.color.blue=eval("0x"+str(tmp[i][j])[5:7])
+                                style.outlinecolor.red=eval("0x"+str(er))
+                                style.outlinecolor.green=eval("0x"+str(eg))
+                                style.outlinecolor.blue=eval("0x"+str(eb))
+                            try:
+                                if j!="title":
+                                    tmpClass.setExpression('( ['+j+'] = '+str(int(tmp[i][j]))+' '+precond+' )')
+                            except:
+                                if j!="title":
+                                    tmpClass.setExpression('( "['+j+']" = '+json.dumps(tmp[i][j].encode('utf-8'))+' '+precond+' )')
+                    except Exception,e:
+                        print >> sys.stderr,e
+                        iEnc=layer.encoding
+                        oEnc=m.web.metadata.get("ows_encoding")
+                        try:
+                            tmpClass.setExpression('( "['+j+']" = "'+tmp[i][j].decode(oEnc).encode(iEnc)+'" '+precond+' )')
+                        except:
+                            tmpClass.setExpression('( "['+j+']" = "'+tmp[i][j]+'" '+precond+' )')
+                    print >> sys.stderr,tmpClass.getExpressionString()
+                    if inputs.has_key("mmFAS") and inputs["mmFAS"]["value"]=="true":
+                        try:
+                            style.size=eval(inputs["mmFASF"]["value"].replace(j,tmp[i][j]));
+                            layer.metadata.set("mmFAS","true")
+                            layer.metadata.set("mmFASF",inputs["mmFASF"]["value"])
+                        except Exception,e:
+                            print >> sys.stderr,e
+                    else:
+                        try:
+                            layer.metadata.remove("mmFAS")
+                            layer.metadata.remove("mmFASF")
+                        except:
+                            pass
+                    if j!="title":
+                        layer.metadata.set("mmName",tmp[i][j])
+                        tmpClass.name=tmp[i][j]
+                    else:
+                        layer.metadata.set("mmName",tmp[i][j])
+                        if tmp[i][j]>1:
+                            tmpClass.name+=" ("+str(tmp[i][j])+" "+zoo._("items")+")"
+                        else:
+                            tmpClass.name+=" ("+str(tmp[i][j])+" "+zoo._("item")+")"
+
+        except Exception,e:
+            #print >> sys.stderr,e
+            pass
         i+=1
+
     if l.type==mapscript.MS_LAYER_RASTER  and nbClasses>1:
 	    if inputs.keys().count("tiled"):
 		    l.metadata.set("mmTiled",inputs["tiled"]["value"])
@@ -2979,7 +3062,10 @@ def classifyMap(conf,inputs,outputs):
 			for j in ll[i]:
 				vals+=[ll[i][j]]
 		try:
-			classif=json.loads(cs._discretise(vals,inputs["nbClasses"]["value"],inputs["method"]["value"]))
+			tmp=cs._discretise(vals,inputs["nbClasses"]["value"],inputs["method"]["value"])
+			print >> sys.stderr,tmp
+			classif=json.loads(tmp)
+			rClass=True
 		except Exception,e:
 			conf["lenv"]["message"]=str(e)
 			return zoo.SERVICE_FAILED
@@ -2992,15 +3078,18 @@ def classifyMap(conf,inputs,outputs):
 
     #print >> sys.stderr,lInputs
     output1={"Result": {"value":""}}
+    outputs1={"Result": {"value":""}}
     isRaster=-1
     try:
-	if not(rClass):
-		print >> sys.stderr,"OK"
-                print >> sys.stderr,lInputs
-		vt.vectInfo(conf,lInputs,outputs)
-		print >> sys.stderr,"OK"
-		#print >> sys.stderr,outputs["Result"]["value"]
-	tmp=eval(outputs["Result"]["value"])
+        if not(rClass):
+            print >> sys.stderr,"-- OK"
+            print >> sys.stderr,lInputs
+            print >> sys.stderr,"OK --"
+            vt.vectInfo(conf,lInputs,outputs1)
+            print >> sys.stderr,"-- OK"
+            print >> sys.stderr,outputs1["Result"]
+            print >> sys.stderr,"OK --"
+            tmp=eval(outputs1["Result"]["value"])
     except Exception,e:
         try:
 	    k=inputs.keys()
@@ -3013,7 +3102,7 @@ def classifyMap(conf,inputs,outputs):
 			    d=osgeo.gdal.Open(layer.data)
 			    b=d.GetRasterBand(int(inputs["field"]["value"]))
 			    layer.clearProcessing()
-			    layer.setProcessing("BAND="+inputs["field"]["value"])
+			    layer.addProcessing("BAND="+inputs["field"]["value"])
 			    tmp=[{"min": b.GetMinimum(),"max": b.GetMaximum()}]
 		    else:
 			    tmp=[{"min": inputs["min"]["value"],"max": inputs["max"]["value"]}]
@@ -3045,7 +3134,7 @@ def classifyMap(conf,inputs,outputs):
 					    tmp+=[{"pixel": cell_value}]
 		    sorted(tmp, key=lambda x: x["pixel"])
 		    layer.clearProcessing()
-		    layer.setProcessing("BAND="+inputs["field"]["value"])
+		    layer.addProcessing("BAND="+inputs["field"]["value"])
 		    #tmp=[{"min": b.GetMinimum(),"max": b.GetMaximum()}]
 		    #print >> sys.stderr,tmp
 		    
@@ -3076,7 +3165,7 @@ def classifyMap(conf,inputs,outputs):
 
     
     lOutputs={"Result": {"value": ""}}
-    #print >> sys.stderr,inputs
+    print >> sys.stderr,inputs
     sr=eval('0x'+inputs["from"]["value"][:2])
     sg=eval('0x'+inputs["from"]["value"][2:4])
     sb=eval('0x'+inputs["from"]["value"][4:6])
@@ -3200,7 +3289,7 @@ def classifyMap(conf,inputs,outputs):
 				layer.metadata.set("mmName",tmp[i][j])
 				tmpClass.name=tmp[i][j]
 	except Exception,e:
-		#print >> sys.stderr,e
+		print >> sys.stderr,e
 		pass
         i+=1
     if l.type==mapscript.MS_LAYER_RASTER  and nbClasses>1:
@@ -3772,6 +3861,7 @@ def _setLayerScale(conf,inputs,outputs):
                 if m.getLayer(i).minscaledenom==int(float(inputs["sv"]["value"])):
                     m.getLayer(i).minscaledenom=-1
                 m.getLayer(i).maxscaledenom=int(float(inputs["sv"]["value"]))
+                
         i+=1
     saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
     outputs["Result"]["value"]=zoo._("Map saved")
@@ -3794,6 +3884,16 @@ def setLayerLabelScale(conf,inputs,outputs):
                 m.getLayer(i).labelminscaledenom=int(float(inputs["sv"]["value"]))
             else:
                 m.getLayer(i).labelmaxscaledenom=int(float(inputs["sv"]["value"]))
+            if m.getLayer(i).metadata.get('mmLabelsMap') is not None:
+                m0=mapscript.mapObj(m.getLayer(i).metadata.get('mmLabelsMap'))
+                if inputs["st"]["value"]=="Min":
+                    m0.getLayer(0).labelminscaledenom=int(float(inputs["sv"]["value"]))
+                else:
+                    m0.getLayer(0).labelmaxscaledenom=int(float(inputs["sv"]["value"]))
+                print >> sys.stderr,m0.getLayer(0).labelminscaledenom
+                print >> sys.stderr,m0.getLayer(0).labelmaxscaledenom
+                saveProjectMap(m0,m.getLayer(i).metadata.get('mmLabelsMap'))
+
         i+=1
     saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
     outputs["Result"]["value"]=zoo._("Map saved")
@@ -4399,8 +4499,8 @@ def setResample(conf,inputs,outputs):
     mapfile=conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map"
     m = mapscript.mapObj(mapfile)
     layer=m.getLayerByName(inputs["layer"]["value"])
-    layer.clearProcessing()
-    layer.setProcessing("RESAMPLE="+inputs["resm"]["value"])
+    #layer.clearProcessing()
+    layer.addProcessing("RESAMPLE="+inputs["resm"]["value"])
     saveProjectMap(m,mapfile)
     outputs["Result"]["value"]=zoo._("Resampling method saved.")
     return 3

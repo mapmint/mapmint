@@ -1,3 +1,4 @@
+#encoding UTF-8
 #import zoo
 #set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
 #include $tmpl
@@ -167,7 +168,111 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
 		<iframe id="associatedMap" src="$conf["main"]["rootUrl"]$associatedMapName" style="border:0;width:100%;"></iframe>
 	  </div>
 	  <div class="col-sm-3">
-	  <button mm-action="createGrid" class="require-select" ><i class="fa fa-gear"></i> $zoo._("Compute grid for extent")</button>
+	  <div>
+	  <label>$zoo._("Layer")</label>
+	  <select id="addedLayers" class="form-control form-control-sm require-select" >
+	  	  <option value="-1">$zoo._("None")</option>
+	  </select>
+	  </div>
+
+      <label>Title</label>
+      <input id="layerTitle" type="text" class="form-control form-control-sm" />
+
+<div>
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="active" role="presentation"><a href="#layerExtract" aria-controls="extract" role="tab" data-toggle="tab">$zoo._("Filter")</a></li>
+    <li role="presentation"><a href="#processing" aria-controls="processing" role="tab" data-toggle="tab">$zoo._("Processing")</a></li>
+    <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="layerExtract">
+    <div class="col-sm-12">
+     <p>$zoo._("Create a new layer by applying filters to the available features")</p>
+     <p>$zoo._("First choose a layer, then choose one or more field and define for every column the operator and value to check for filtering features.")</p>
+     <p>$zoo._('Optionaly, you can also add filter to existing one by pressing the <i class="fa fa-plus"></i> button.')</p>
+    </div>
+    <div class="col-sm-12">
+      <button class="btn btn-default" onclick="return false;"> $zoo._("Filter")</button>
+    </div>
+    <form>
+    <div class="col-sm-12 require-filter" style="display:none">
+      <label>Link clauses</label>
+      <select name="link_clause" class="form-control form-control-sm">
+      	      <option value="AND">$zoo._("AND")</option>
+	      <option value="OR">$zoo._("OR")</option>
+      </select>
+    </div>
+    <div class="col-sm-8">
+     <label for="filterField">$zoo._("Column")</label>
+     <select name="field" class="form-control form-control-sm">
+     	     <option value="-1">$zoo._("First select a layer")</option>
+     </select>
+    </div>
+    <div class="col-sm-4">
+     <label for="filterField">$zoo._("Operator")</label>
+     <select name="operator" class="form-control form-control-sm">
+     	     <option value="PropertyIsEqualTo" class=".require-float">=</option>
+     	     <option value="PropertyIsGreaterThan">></option>
+     	     <option value="PropertyIsGreaterThanOrEqualTo">≥</option>
+     	     <option value="PropertyIsLessThan"> < </option>
+     	     <option value="PropertyIsLessThanOrEqualTo">≤</option>
+     	     <option value="PropertyIsLike" class=".require-string">Like</option>
+     </select>
+    </div>
+    <div class="col-sm-9">
+     <label for="filterField">$zoo._("Value")</label>
+     <select name="values" class="form-control form-control-sm">
+     	     <option value="-1">$zoo._("First select a field")</option>
+     </select>
+    </div>
+    <div class="col-sm-3">
+      <label> Add </label>
+      <div class="btn-group btn-group-sm" role="group" aria-label="Button group">
+      <button class="btn btn-default require-filter"  style="display:none" onclick="var tmp=\$(this).parent().parent().parent().parent().find('form').last().remove();app.bindFilterLayer();return false;"><i class="fa fa-minus"></i></button>
+      <button class="btn btn-default" onclick="var tmp=\$(this).parent().parent().parent().parent().find('form').first().clone();\$(this).parent().parent().parent().parent().append(tmp);\$(this).parent().parent().parent().parent().find('form').last().find('.require-filter').show();app.bindFilterLayer();return false;"><i class="fa fa-plus"></i></button>
+      </div>
+    </div>
+    </form>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="processing">
+    <label>$zoo._("Services")</label>
+    <select name="processing_service" class="form-control form-control-sm" onchange="\$(this).find('option').each(function(){console.log(\$(this).is(':selected'));var closure=\$(this);if(\$(this).is(':selected')){ \$('#'+closure.attr('data-display')).find('select').first().html('');\$('#addedLayers').find('option').each(function(){ if(!\$(this).is(':selected')) \$('#'+closure.attr('data-display')).find('select').first().append(\$(this).clone());});\$('#'+\$(this).attr('data-display')).show();}else \$('#'+\$(this).attr('data-display')).hide();});">
+    	   <option data-display="pbuffer" value="Buffer">$zoo._("Buffer")</option>
+    	   <option data-display="punion" value="Union">$zoo._("Union")</option>
+    	   <option data-display="psymdifference" value="SymDifference">$zoo._("SymDifference")</option>
+    </select>
+    <div id="pbuffer">
+    <label>$zoo._("Length")</label>
+    <input type="hidden" name="param1" value="InputPolygon" />
+    <input type="text" name="BufferDistance1" data-type="noTransmited" onkeypress="\$(this).next().val(eval(\$(this).val())/(11119.487428468118));" class="form-control form-control-sm" />
+    <input type="text" name="BufferDistance" style="display:none" data-type="float" data-transmission="force" class="form-control form-control-sm" />
+    </div>
+    <div id="punion">
+    <label>$zoo._("Layer")</label>
+    <input type="hidden" name="param1" value="InputEntity1" />
+    <select name="InputEntity2" class="form-control form-control-sm">
+    </select>
+    </div>
+    <div id="psymdifference">
+    <label>$zoo._("Layer")</label>
+    <input type="hidden" name="param1" value="InputEntity1" />
+    <select name="InputEntity2" class="form-control form-control-sm">
+    </select>
+    </div>
+    <button mm-action="processLayer" class="btn btn-default require-select" ><i class="fa fa-gear"></i> $zoo._("Run")</button>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="union">
+    </div>
+    <div role="tabpanel" class="tab-pane" id="settings">
+    <button mm-action="createGrid" class="btn btn-default require-select" ><i class="fa fa-gear"></i> $zoo._("Compute grid for extent")</button>
+    </div>
+  </div>
+
+</div>
+
 	  </div>
      </div>
 #end if

@@ -51,13 +51,15 @@ function getInitialInfo(conf,inputs,outputs){
       }
       else
 	  myInputs = {"dataSource": { type: 'string', "value": tmp[0] }, "layer": { type: 'string', "value": tmp[1] }};
+      alert("OK0");
       alert(myInputs["dataSource"]["value"]);
       var myOutputs1= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
       var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.mmExtractVectorInfo');
       var myExecuteResult1=myProcess1.Execute(myInputs,myOutputs);
+      alert("OK1");
       alert(myExecuteResult1);
-      
-      return {result: ZOO.SERVICE_SUCCEEDED, outputs: [{name:"Result","mimeType": "text/xml",encoding: "utf-8", value: myExecuteResult1}]}
+      alert("OK1");
+      return {result: ZOO.SERVICE_SUCCEEDED, outputs: {"Result": {"mimeType": "text/xml",encoding: "utf-8", value: myExecuteResult1}}};
 
   }catch(e){
       conf["lenv"]["message"]=e;

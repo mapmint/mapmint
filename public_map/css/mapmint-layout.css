@@ -151,11 +151,18 @@ padding:6px;
 }
 
 .base_layer{
-    display: table;
+    //display: table;
 }
 
 .base_layer span{
     display: table-cel;
+}
+
+.base_layer_title {
+}
+
+.baselayers .list-group-item{
+    width: 98%;
 }
 
 .qrcodel{

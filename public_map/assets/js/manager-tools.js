@@ -753,11 +753,13 @@ define([
 		    rdata={
 			fields: [],
 			aliases: [],
+			types: [],
 			sizes: []
 		    };
 		    for(i in ldata){
 			rdata.fields.push(ldata[i]["_name"]);
 			rdata.aliases.push(ldata[i]["_name"]);
+			rdata.types.push(ldata[i]["_type"]);
 			rdata.sizes.push(100);
 		    }
 		    func(obj,rdata,idata);

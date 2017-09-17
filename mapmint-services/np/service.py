@@ -3073,9 +3073,15 @@ def insert(conf,inputs,outputs):
                     col_sufix+=columns[i]+"=%s"
                 else:
                     try:
-                        col_sufix+=columns[i]+"="+str(adapt(str(inputs[columns[i]]["value"]))).decode('utf-8')
+                        if len(inputs[columns[i]]["value"])==0 or inputs[columns[i]]["value"]=="NULL":
+                            col_sufix+=columns[i]+"=NULL"
+                        else:
+                            col_sufix+=columns[i]+"="+str(adapt(str(inputs[columns[i]]["value"]))).decode('utf-8')
                     except:
-                        col_sufix+=columns[i]+"="+str(adapt(str(inputs[columns[i]]["value"])))
+                        if len(inputs[columns[i]]["value"])==0 or inputs[columns[i]]["value"]=="NULL":
+                            col_sufix+=columns[i]+"=NULL"
+                        else:
+                            col_sufix+=columns[i]+"="+str(adapt(str(inputs[columns[i]]["value"])))
             print >> sys.stderr,val_sufix.encode('utf-8')
         if len(columns)>0:
             if inputs.keys().count("id")==0:

@@ -47,6 +47,7 @@ define([
     var previousLayers=[];
     var tiletoload={};
     var searchValues,searchExtents;
+    var externalCallbacks={};
 
     function notify(text, type) {
         mynotify.notify({
@@ -234,12 +235,13 @@ define([
     }
 
     function loadBaseLayerIcon(key,layer){
-	console.log(layer.getSource().getTileGrid());
+	var obj;
+	var tmp;
+	if(myBaseLayerNames.indexOf(key)<0)
+	    myBaseLayerNames.push(key);
 	var obj=layer.getSource().getTileGrid().getTileCoordForCoordAndZ(ol.proj.transform(mmCenter,"EPSG:4326","EPSG:3857"),mmZoom);
 	var tmp=layer.getSource().getTileUrlFunction()(obj,1.325,ol.proj.get("EPSG:3857"));
 	var res=tmp.split('\n')[0];
-	if(myBaseLayerNames.indexOf(key)<0)
-	    myBaseLayerNames.push(key);
 	$("#base_layer_"+key+"_img").attr("src",res);
 	return res;
     }
@@ -263,7 +265,11 @@ define([
 		if(baseLayers["mq"][i]!='hyb'){
 		    osm=new ol.layer.Tile({
 			visible: baseLayers["default"]==myBaseLayers.length?true:false,
-			source: new ol.source.MapQuest({layer: baseLayers["mq"][i]})
+			source:
+			new ol.source.OSM({url:
+					   (baseLayers["mq"][i]==osm?"//maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png":
+					   "//{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png")
+					  }),//new ol.source.MapQuest({layer: baseLayers["mq"][i]})
 		    });
 		    url=loadBaseLayerIcon(baseLayers["mq"][i],osm);
 		    console.log("OK 0");
@@ -276,7 +282,7 @@ define([
 			visible: baseLayers["default"]==myBaseLayers.length?true:false,
 			layers: [
 			    new ol.layer.Tile({
-				source: new ol.source.MapQuest({layer: 'sat'})
+				source: new ol.source.OSM({url: "//{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"}),
 			    }),
 			    new ol.layer.Tile({
 				source: new ol.source.MapQuest({layer: 'hyb'})
@@ -342,7 +348,7 @@ define([
 			       })
 			   }):
 			   new ol.layer.Tile({
-			       visible: false,
+			       visible: baseLayers["default"]==myBaseLayers.length?true:false,
 			       preload: Infinity,
 			       source: new ol.source.BingMaps({
 				   key: baseLayers["proprietary"]["key"],
@@ -353,6 +359,7 @@ define([
 			       })
 			   })
 			  );
+		    console.log("OK");
 		}
 		else{
 		    var ign_source = new ol.source.WMTS({
@@ -377,9 +384,11 @@ define([
 		}
 
 		try{
-		url=loadBaseLayerIcon(baseLayers["proprietary"]["layers"][i].replace(/\./g,"_"),layer);
-		console.log("OK 0");
-		console.log(url);
+		    console.log("OK 0");
+		    console.log(baseLayers["proprietary"]["layers"][i].replace(/\./g,"_"));
+		    url=loadBaseLayerIcon(baseLayers["proprietary"]["layers"][i].replace(/\./g,"_"),layer);
+		    console.log("OK 1");
+		    console.log(url);
 		}catch(e){
 		    console.log(e);
 		}
@@ -428,7 +437,9 @@ define([
 		});
 		myBaseLayers.push(layer);
 	    }
-	}	
+	}
+
+	baseLayers["myBaseLayers"]
     };
 
     var finalizeBaseLayers=function(){
@@ -511,10 +522,12 @@ define([
 
 
 	try{
+	    // Add Layer callback
 	$("#addLayer-ui").find('button').first().click(function(){
 	    console.log("Add a layer!");
 	    var cvalue=-1;
 	    var clayers=[];
+	    var clabels=[];
 	    var cselection="";
 	    var listHTML="";
 	    $(this).parent().next().find(".active").each(function(){
@@ -522,8 +535,11 @@ define([
 		cselection=$(this).attr("id");
 		$(this).find('.layer').find('input[type=checkbox]').each(function(){
 		    if($(this).is(":checked")){
-			if($(this).parent().attr("data-layer"))
+			if($(this).parent().attr("data-layer")){
 			    clayers.push($(this).parent().attr("data-layer"));
+			    clabels.push($(this).next().text());
+			    console.log($(this).parent());
+			}
 			else
 			    clayers.push($(this).attr("id"));
 			if(cvalue==-1)
@@ -547,6 +563,12 @@ define([
 		cmapfile=mapPath.replace(/public_maps/,"WMS")+cvalue+"ds_ows.map";
 	    else
 		cmapfile=mapPath.replace(/public_maps/,"maps")+"/project_Overlays.map";	
+
+	    addLayerToMap({"mapfile":cmapfile,"layers":clayers,"labels":clabels,"listHTML":listHTML,"cselection":cselection});
+	    
+	    /*if(externalCallbacks["addLayer"])
+		externalCallbacks["addLayer"]({"mapfile":cmapfile,"layers":clayers,"labels":clabels});
+
 	    addedLayers.push(new ol.layer.Tile({
 		visible: true,
 		source: new ol.source.TileWMS({
@@ -641,7 +663,7 @@ define([
 		myRootLocation.find("#mmm_range").val(Math.round(oLayers[clayer]["opacity"]*100).toFixed(0)+"%");
 		$('body, #context-menu > ul > li > a').on('click', function (e) {console.log("CLICK !! ");$(".tree").find(".layer-active").removeClass('layer-active');});
 		return;
-	    });
+	    });*/
 	});
 	}catch(e){
 	    console.log(e);
@@ -704,6 +726,11 @@ define([
 	    //$(".tree li.layer").removeClass("layer-active");
 	});
 
+	$(".tree li.layer").find(".ud").each(function(){
+	    $(this).click();
+	    console.log($(this));
+	});
+	
 	$('.cm').bind("contextmenu",function(e){
 
 	    console.log(e);
@@ -3390,6 +3417,119 @@ define([
 	return map;
     }
 
+    function addLayerToMap(obj){
+	console.log(obj);
+	var cmapfile=obj.mapfile;
+	var clayers=obj.layers;
+	var clabels=obj.labels;
+	var listHTML=obj.listHTML;
+	var cselection=obj.cselection;
+	console.log(cmapfile);
+	console.log(clayers);
+	console.log(clabels);
+	
+	if(externalCallbacks["addLayer"])
+	    externalCallbacks["addLayer"](obj);
+	
+	var myStr=clayers.join(",");
+	addedLayers.push(new ol.layer.Tile({
+	    visible: true,
+	    source: new ol.source.TileWMS({
+		url: msUrl+"?map="+cmapfile,
+		params: {'LAYERS': myStr, 'TILED': true},
+		serverType: 'mapserver'
+	    })
+	}));
+	map.addLayer(addedLayers[addedLayers.length-1]);
+	
+	var reg=[
+	    new RegExp("\\[nn\\]","g"),
+	    new RegExp("\\[n\\]","g"),
+	    new RegExp("\\[list\\]","g")
+	];
+
+	myStr=$("#addedLayer_item_template")[0].innerHTML.replace(reg[0],(addedLayers.length-1)+"").replace(reg[1],addedLayers.length+"").replace(reg[2],listHTML);
+	$("#mm_layers_display").find(".tree").first().append(myStr);
+	$("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find('button').first().each(function(){
+	    $(this).click(function(){
+		var myRoot=$(this).parent().parent().parent();
+		var cid=parseInt(myRoot.attr('id').replace(/overlays_/g,""));
+		map.removeLayer(addedLayers[cid]);
+		myRoot.remove();
+	    });
+	});
+	$("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find('input[type=checkbox]').first().each(function(){
+	    $(this).click(function(){
+		var myRoot=$(this).parent().parent().parent();
+		var cid=parseInt(myRoot.attr('id').replace(/overlays_/g,""));			
+		addedLayers[cid].setVisible($(this).is(':checked'));
+	    });
+	});
+	clayer="overlays_"+(addedLayers.length-1);
+	if(!oLayers[clayer])
+	    oLayers[clayer]={'opacity':1};
+
+	console.log( $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)));
+	$("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find("li.layer").each(function(){
+	    console.log($(this));
+	    if(cselection=="mm_overlays_wms_display")
+		$(this).find("input[type=checkbox]").parent().prepend('<i class="fa fa-server"> </i>  ');
+	    $(this).find("input[type=checkbox]").remove();
+	});
+	$("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find('.tree-toggle').click(function () {
+	    $(this).parent().children('ul.tree').slideToggle(200);
+	    $(this).find('.ud').toggleClass('fa-caret-square-o-down fa-caret-square-o-right');
+	});
+	$("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).contextmenu({
+	    target: "#context-menu"
+	});
+	$("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).bind("contextmenu",function(e){
+	    console.log(e);
+	    console.log($(this).attr("id").indexOf("overlays_"));
+	    if($(this).attr("id").indexOf("overlays_")==0){
+		cid=parseInt($(this).attr("id").replace(/overlays_/,""));
+		clayer="overlays_"+cid;
+	    }
+	    else{
+		cid=eval($(this).attr("id").replace(/layer_/,""));
+		clayer=getLayerById(cid);
+	    }
+	    console.log(clayer);
+	    if(!oLayers[clayer])
+		oLayers[clayer]={'opacity':1};
+
+	    $("#mm_layers_display").find(".tree").find(".layer-active").toggleClass("layer-active");
+	    $(e.currentTarget).toggleClass("layer-active");
+	    var myRootLocation=$("#context-menu");
+	    for(i in {"export":0,"query":0,"zoomTo":0}){
+		myRootLocation.find("#mmm_"+i).parent().addClass("hidden");
+	    }
+	    console.log(clayer);
+	    myRootLocation.find("#mmm_opacity").off("input");
+	    myRootLocation.find("#mmm_opacity").on("input",function(){
+		myRootLocation.find("#mmm_range").val($(this).val()+"%");
+		var cLayer=$("#mm_layers_display").find(".tree").find("li.layer-active").first();
+		if(cLayer.attr("id").indexOf("overlays_")==0){
+		    var cid=parseInt(cLayer.attr("id").replace(/overlays_/,""));
+		    addedLayers[cid].setOpacity($(this).val()/100);
+		    clayer="overlays_"+cid;
+		}
+		else{
+		    var cid=eval("myBaseLayers.length+"+(cLayer.attr("id").replace(/layer_/,"").split("_")[0]));
+		    var clayer=getLayerById(eval(cLayer.attr("id").replace(/layer_/,"")));
+		    map.getLayers().item(cid).setOpacity($(this).val()/100);
+		    clayer=getLayerById(cid);
+		}
+		oLayers[clayer]["opacity"]=$(this).val()/100;
+	    });
+	    myRootLocation.find("#mmm_opacity").val(oLayers[clayer]["opacity"]*100);
+	    myRootLocation.find("#mmm_range").val(Math.round(oLayers[clayer]["opacity"]*100).toFixed(0)+"%");
+	    $('body, #context-menu > ul > li > a').on('click', function (e) {console.log("CLICK !! ");$(".tree").find(".layer-active").removeClass('layer-active');});
+	    return;
+	});
+
+    }
+    
     function addALayer(obj){
 	var wmsSource = new ol.source.TileWMS({
 	    url: msUrl+"?map="+obj.map,
@@ -3413,7 +3553,9 @@ define([
 	addASelectedFeature: addASelectedFeature,
 	getMap: getMap,
 	getSearchValues: getSearchValues,
-	addALayer: addALayer
+	addALayer: addALayer,
+	addLayerToMap: addLayerToMap,
+	externalCallbacks: externalCallbacks
     };
 
 

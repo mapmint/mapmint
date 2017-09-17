@@ -124,12 +124,20 @@ def _discretise(data,nbc,method):
     print >> sys.stderr,"OK"
     robjects.r('data(jenks71)')
     print >> sys.stderr,"OK"
+    tmp=data
+    for i in range(len(tmp)):
+        try:
+            data[i]=float(tmp[i])
+        except Exception,e:
+            print >> sys.stderr,e
+            data[i]=0.0000066
     jenksData = robjects.FloatVector(data)
     print >> sys.stderr,"OK"
     ci = robjects.r.classIntervals
     print >> sys.stderr,"OK"
     nbClasses=int(nbc)
     print >> sys.stderr,"OK"
+    print >> sys.stderr,str(data)
     classes=ci(jenksData, n = nbClasses, style = method)
     print >> sys.stderr,"OK"
     trobj=classes.rx(-1)

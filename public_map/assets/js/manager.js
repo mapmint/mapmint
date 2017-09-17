@@ -1468,11 +1468,39 @@ define([
 	    "labelMax": "maxLabel",
 	    "default_tmpl": "editor"
 	};
-	
+	$("#style_processings").html("");
 	if(!ldata.Style["processing"])
 	    $("select[name=resample]").val(ldata.Style["processing"]).change();
-	else
-	    $("select[name=resample]").val("NEAREST").change();
+	else{
+	    console.log("*********************************** DEBUG ");
+	    console.log(ldata.Style["processing"]);
+	    console.log("*********************************** DEBUG ");
+	    for(var i=0;i<ldata.Style["processing"].length;i++){
+		if(ldata.Style["processing"][i].indexOf("=")>=0){
+		    var tmp=ldata.Style["processing"][i].split("=");
+		    var regs=[
+			new RegExp("\\[label\\]","g"),
+			new RegExp("\\[name\\]","g"),
+			new RegExp("\\[value\\]","g")
+		    ];
+		    console.log($("#style_processing_line_template")[0]);
+		    var myHTML=$("#style_processing_line_template")[0].innerHTML
+			.replace(regs[0],tmp[0])
+			.replace(regs[1],tmp[0])
+			.replace(regs[2],tmp[1]);
+		    $("#style_processings").append($(myHTML));
+		}else{
+		    console.log("*********************************** DEBUG ");
+		    console.log($("select[name=resample]").val());
+		    console.log("*********************************** DEBUG ");
+		    $("select[name=resample]").val(ldata.Style["processing"][i]).change();
+		    console.log("*********************************** DEBUG ");
+		    console.log($("select[name=resample]").val());
+		    console.log("*********************************** DEBUG ");
+		}
+	    }
+	    //$("select[name=resample]").val("NEAREST").change();
+	}
 	console.log(ldata.Style["processing"]);
 	//$("input[name=styleOpacity]").next().html(ldata.Style.classes[0]["opacity"]+"%");
 	if(ldata["bands"]!=null){
@@ -2010,6 +2038,14 @@ define([
 		"value": ldata.name,
 		"dataType": "string"
 	    });
+
+	    $("#style_processings").each(function(){
+		console.log("********* ok");
+		$(this).find("input").each(function(){
+		    console.log("********* ok");
+		    inputs.push({"identifier":"processing","value": $(this).attr("name").replace(/processing_/g,"")+"="+$(this).val(),"dataType": "string"});
+		});
+	    });
 	    
 	    console.log(inputs);
 	    zoo.execute({
@@ -2540,13 +2576,14 @@ define([
         });
 	myBaseLayers.push(osm);
 	var mq0=new ol.layer.Tile({
-	    source: new ol.source.MapQuest({layer: "osm"}),
+	    source: new ol.source.OSM({url: "//{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"}),
 	    visible: false,
 	    name: 'mapquest-osm'
 	});
 	myBaseLayers.push(mq0);
 	var mq1=new ol.layer.Tile({
-	    source: new ol.source.MapQuest({layer: "sat"}),
+	    //source: new ol.source.OSM({url: "//{a-b}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"}),
+	    source: new ol.source.OSM({url: "//maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png"}),
 	    visible: false,
 	    name: 'mapquest-sat'
 	});

@@ -37,7 +37,7 @@
    minOccurs = 1
    maxOccurs = 1
    <MetaData>
-    title = Mon test  
+    title = Mon test
    </MetaData>   
    <ComplexData>
     <Default>
@@ -57,8 +57,8 @@
    Title = Intersection of the two geometries
    Abstract = A new geometry representing the intersection or NULL if there is no intersection or an error occurs.
    <MetaData>
-    title = Mon test  
-   </MetaData>   
+    title = Mon test
+   </MetaData>
     <ComplexData>
      <Default>
       mimeType = text/xml

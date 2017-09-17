@@ -16,6 +16,15 @@
     DataType = string
     <Default />
    </LiteralData>
+  [processing]
+   Title = Input string
+   Abstract = The name of the map to extract values from.
+   minOccurs = 0
+   maxOccurs = 1024
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
  </DataInputs>
  <DataOutputs>
   [Message]

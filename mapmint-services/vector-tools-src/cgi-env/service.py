@@ -425,6 +425,29 @@ def UnionOne(conf,inputs,outputs):
     #outputResult(conf,outputs["Result"],rgeometries)
     return 3
 
+def UnionOneBis(conf,inputs):
+    import sys
+    #print >> sys.stderr,"DEBG"
+    geometry1=extractInputs(conf,inputs["InputEntity"])
+    #print >> sys.stderr,"DEUBG"
+    i=0
+    geometryRes=None
+    #print >> sys.stderr,"DEUBG"
+    while i < len(geometry1):
+        j=0
+        if i==0:
+            geometryRes=geometry1[i].Clone()
+        else:
+            tres=geometryRes.GetGeometryRef().Union(geometry1[i].GetGeometryRef())
+        geometry1[i].Destroy()
+        i+=1
+    if not(tres.IsEmpty()):
+        geometryRes.SetGeometryDirectly(tres.Clone())
+        tres.Destroy()
+    #outputs["Result"]["value"]=geometryRes.ExportToJson()
+    #outputResult(conf,outputs["Result"],rgeometries)
+    return geometryRes
+
 points=[]
 
 class Classifier:
@@ -760,8 +783,11 @@ def DifferencePy(conf,inputs,outputs):
     return 3
 
 def SymDifferencePy(conf,inputs,outputs):
+    #print >> sys.stderr,inputs
     geometry1=extractInputs(conf,inputs["InputEntity1"])
-    geometry2=extractInputs(conf,inputs["InputEntity2"])
+    #geometry2=extractInputs(conf,inputs["InputEntity2"])
+    outputs1={"Result":{"mimeType":"application/json"}}
+    res=UnionOneGeom(conf,{"InputEntity":inputs["InputEntity2"]})
     rgeometries=[]
     i=0
     while i < len(geometry1):
@@ -782,3 +808,12 @@ def SymDifferencePy(conf,inputs,outputs):
     outputResult(conf,outputs["Result"],rgeometries)
     return 3
 
+def CreateRegularGrid(conf,inputs,outputs):
+    ext=inputs["extent"]["value"].split(",")
+    query="SELECT ST_AsGeoJSON(geom) AS geomWKT FROM ST_RegularGrid(ST_Transform(ST_SetSRID(ST_GeomFromText('LINESTRING("+ext[0]+" "+ext[1]+", -"+ext[2]+" "+ext[3]+")',0),3857),32628),1,100,100,false);"
+    import authenticate.service as auth
+    con=auth.getCon(conf)
+    con.connect()
+    cur=con.conn.cursor()
+    res=cur.execute(query)
+    return zoo.SERVICE_SUCCEEDEED

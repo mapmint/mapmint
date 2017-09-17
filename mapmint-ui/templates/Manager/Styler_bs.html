@@ -43,6 +43,14 @@
 	  </select>
 	</div>
       </div>
+<script type="template/text" id="style_processing_line_template" >
+	<label class="col-sm-3 control-label">[label]</label>
+        <div class="col-sm-9 ">
+	  <input name="processing_[name]" class="form-control" value="[value]" />
+	</div>
+</script>
+      <div class="form-group require-raster" id="style_processings">
+      </div>
 #end if
       <div class="form-group">
 	<label class="col-sm-3 control-label">$zoo._("Opacity")</label>
