@@ -2578,7 +2578,7 @@ def classifyMap0(conf,inputs,outputs):
                 if len(tmp)==1:
                     inputs0["mmType"]["value"]="greyScale"
             except:
-                continue
+                pass
             if inputs.keys().count("nodata"):
                 inputs0["mmOffsite"]={"value": inputs["nodata"]["value"]}
             inputs0["mmFill"]={"value": "000000"}
