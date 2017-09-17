@@ -113,7 +113,7 @@ function saveLabelJS(conf,inputs,outputs){
 		    var myExecuteResult2=myProcess2.Execute(inputs2,myOutputs2,"Cookie: MMID="+conf["senv"]["MMID"]);
 		    alert(myExecuteResult2);
 		    
-		    return {result: ZOO.SERVICE_SUCCEEDED, outputs: [{name:"Result","dataType": "string",value: myExecuteResult2}]}
+		    return {result: ZOO.SERVICE_SUCCEEDED, outputs: {"Result":{"dataType": "string","value": myExecuteResult2}}};
 		}catch(e){
 		    alert(e);
 		    return {result: ZOO.SERVICE_FAILED, conf: conf};
@@ -123,13 +123,13 @@ function saveLabelJS(conf,inputs,outputs){
 		var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.removeLabelLayer');
 		var myExecuteResult2=myProcess2.Execute(inputs,myOutputs2,"Cookie: MMID="+conf["senv"]["MMID"]);
 		alert(myExecuteResult2);
-		return {result: ZOO.SERVICE_SUCCEEDED, outputs: [{name:"Result","dataType": "string",value: myExecuteResult2}]}
+		return {result: ZOO.SERVICE_SUCCEEDED, outputs: {"Result":{"dataType": "string","value": myExecuteResult2}}};
             }
 	}else{
 	    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.saveLabel');
 	    var myOutputs1= {"Result": { type: 'RawDataOutput', "dataType": "string" }};
 	    var myExecuteResult1=myProcess1.Execute(inputs,myOutputs1,"Cookie: MMID="+conf["senv"]["MMID"]);
-	    return {result: ZOO.SERVICE_SUCCEEDED, outputs: [{name:"Result","dataType": "string",value: myExecuteResult1}]}
+	    return {result: ZOO.SERVICE_SUCCEEDED, outputs: {"Result":{"dataType": "string",value: myExecuteResult1}}};
 	    
 	}
 	
