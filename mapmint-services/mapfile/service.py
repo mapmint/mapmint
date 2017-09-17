@@ -2573,9 +2573,12 @@ def classifyMap0(conf,inputs,outputs):
     if inputs.keys().count("field")==0:
         inputs0=inputs
         if layer.type==mapscript.MS_LAYER_RASTER:
-            tmp=layer.metadata.get("ows_bandnames").split(" ")
-            if len(tmp)==1:
-                inputs0["mmType"]["value"]="greyScale"
+            try:
+                tmp=layer.metadata.get("ows_bandnames").split(" ")
+                if len(tmp)==1:
+                    inputs0["mmType"]["value"]="greyScale"
+            except:
+                continue
             if inputs.keys().count("nodata"):
                 inputs0["mmOffsite"]={"value": inputs["nodata"]["value"]}
             inputs0["mmFill"]={"value": "000000"}
