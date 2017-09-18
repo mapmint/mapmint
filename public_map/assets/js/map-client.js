@@ -2601,7 +2601,7 @@ define([
 					    map.updateSize();
 					}
 					$("#table-wrapper").on("removeClass",function(){
-					    if(arguments[1].indexOf(" in ")>=0 && arguments[2].indexOf(" in ")<=0){
+					    if(arguments.length>=2 && arguments[1].indexOf(" in ")>=0 && arguments[2].indexOf(" in ")<=0){
 						setMapHeight();
 						console("== ******* == DEBUG");
 						map.updateSize();
@@ -2609,7 +2609,7 @@ define([
 					    $("#table-wrapper").removeAttr("style");
 					});
 					$("#table-wrapper").on("addClass",function(){
-					    if(arguments[1].indexOf(" in ")>=0 && arguments[2].indexOf(" in ")<=0){
+					    if(arguments.length>=2 && arguments[1].indexOf(" in ")>=0 && arguments[2].indexOf(" in ")<=0){
 						console("== ******* == DEBUG");
 						setMapHeight();
 						map.updateSize();
