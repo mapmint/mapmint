@@ -207,7 +207,7 @@ define([
 			    "CAST("+oLayers[key]["queryParams"]["fields"][i]+" AS character(255)) like 'dd%'"+
 			    " OR "+
 			    "CAST("+oLayers[key]["queryParams"]["fields"][i]+" AS character(255)) like 'dd'"+
-			    (j+1<oLayers[key]["queryParams"]["fields"].length?" OR ":"");
+			    (j+1<oLayers[key]["queryParams"]["fields"].length && oLayers[key]["queryParams"]["fields"][j+1]!=""?" OR ":"");
 			if(i==0)
 			    order=oLayers[key]["queryParams"]["fields"][i];
 			j++;
@@ -306,7 +306,7 @@ define([
 				firstParam,
 				{"identifier":"offset","value":llimit[0],"dataType":"int"},
 				{"identifier":"limit","value":llimit[1],"dataType":"int"},
-				{"identifier":"sql","value":"SELECT "+(localUrl.lurl?"fid0 as gml_id,fid0 as fid,":"gml_id as id,gml_id as fid,")+closestproperties.replace(/,msGeometry/g,"")+" from "+(localUrl.lurl?'Result':(key.indexOf("\.")<0?key:'"'+key+'"'))+lclause+" order by "+(closestproperties.split(",")[llimit[2]])+" "+llimit[3],"dataType":"string"}
+				{"identifier":"sql","value":"SELECT "+(localUrl.lurl?"fid0 as gml_id,fid0 as fid,":"gml_id as id,gml_id as fid,")+closestproperties/*.replace(/,msGeometry/g,"")*/+" from "+(localUrl.lurl?'Result':(key.indexOf("\.")<0?key:'"'+key+'"'))+lclause+" order by "+(closestproperties.split(",")[llimit[2]])+" "+llimit[3],"mimeType":"text/plain"}
 			    ],
 			    dataOutputs: [
 				{"identifier":"Result","mimeType":"application/json"},

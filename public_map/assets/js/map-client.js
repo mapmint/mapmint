@@ -65,7 +65,7 @@ define([
     }
 
     function setMapHeight(){
-	var mpheight= $(window).height() - $('.navbar-header').height();
+	var mpheight= $(window).height() - $('.navbar-header').height() - ($('#table-wrapper').hasClass('in')?$('#table-wrapper').height():0);
 	$('#map').height(mpheight);
     }
 
@@ -173,12 +173,27 @@ define([
 			    searchValues=[];
 			    searchExtents=[];
 			    for(var i=0;i<features.length;i++){
-				searchValues.push(features[i].get(cfield));
-				console.log(features[i].get(cfield));
-				if(features[i].getGeometry())
-				    searchExtents.push(features[i].getGeometry().getExtent());
-				else
-				    console.log(features[i]);
+				if(cfield.indexOf(",")<0){ 
+				    searchValues.push(features[i].get(cfield));
+				    console.log(features[i].get(cfield));
+				    if(features[i].getGeometry()){
+					searchExtents.push(features[i].getGeometry().getExtent());
+				    }
+				    else
+					console.log(features[i]);
+				}else{
+				    var kk=cfield.split(",");
+				    for(var jj=0;jj<kk.length;jj++)
+					if(kk[jj]!=""){
+					    searchValues.push(features[i].get(kk[jj]));
+					    if(features[i].getGeometry()){
+						searchExtents.push(features[i].getGeometry().getExtent());
+					    }
+					    else
+						console.log(features[i]);
+					}
+				}
+				
 			    }
 				
 			    try{
@@ -1923,7 +1938,7 @@ define([
 			}
 		    });
 		}
-		else
+		else{
 		    myMMDataTableObject.display(key,{
 			url: msUrl,
 			data: {
@@ -1934,7 +1949,11 @@ define([
 			    typename: key
 			}
 		    });
-
+		    /*window.setTimeout(function(){
+			setMapHeight();
+			map.updateSize();
+		    },1000);*/
+		}
 	    }
 	},
 	"export": {
@@ -2584,10 +2603,22 @@ define([
 					$("#table-wrapper").on("removeClass",function(){
 					    if(arguments[1].indexOf(" in ")>=0 && arguments[2].indexOf(" in ")<=0){
 						setMapHeight();
+						console("== ******* == DEBUG");
 						map.updateSize();
 					    }
+					    $("#table-wrapper").removeAttr("style");
 					});
-					$("#table-wrapper").removeAttr("style");
+					$("#table-wrapper").on("addClass",function(){
+					    if(arguments[1].indexOf(" in ")>=0 && arguments[2].indexOf(" in ")<=0){
+						console("== ******* == DEBUG");
+						setMapHeight();
+						map.updateSize();
+					    }
+					    $("#table-wrapper").removeAttr("style");
+					});
+					window.setTimeout(function () {
+					    $("#table-wrapper").removeAttr("style");
+					},1200);
 					var chart = new Highcharts.Chart({
 					    chart: {
 						zoomType: 'x',
@@ -2672,7 +2703,9 @@ define([
 						data: values
 					    }]
 					});
-					$("#table-wrapper").removeAttr("style");					
+					window.setTimeout(function () {
+					    $("#table-wrapper").removeAttr("style");
+					},500);
 				    },
 				    error: function(data){
 					console.log("ERROR");

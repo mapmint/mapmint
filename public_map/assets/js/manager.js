@@ -1727,7 +1727,22 @@ define([
 			    //console.log(i);
 			}
 			else{
-			    $("#manaLayerProperties").find('select.mmField[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
+			    if((bindings[i]?bindings[i]:i)!="search_field")
+				$("#manaLayerProperties").find('select.mmField[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
+			    else{
+				if(ldata[i]!=null){
+				    if(ldata[i].indexOf(",")<0)
+					$("#manaLayerProperties").find('select.mmField[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
+				    else{
+					var kk=ldata[i].split(",");
+					for(var jj=0;jj<kk.length;jj++)
+					    if(kk[jj]!=""){
+						$("#manaLayerProperties").find('select.mmField[name="'+(bindings[i]?bindings[i]:i)+'"]').find('option[value='+kk[jj]+']').attr("selected","selected");
+					    }
+				    }
+				}
+				    
+			    }
 			    //console.log($("#manaLayerProperties").find('select[name="'+(bindings[i]?bindings[i]:i)+'"]'));
 			    //console.log(i);
 			}

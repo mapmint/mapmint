@@ -18,7 +18,7 @@
       type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" />
       </span>
       <select class="form-control #if $obj["select"].keys().count("class")>0# $obj["select"]["class"]#end if#" disabled="disabled"
-	name="$obj["select"]["name"]" >
+	name="$obj["select"]["name"]" #if $obj["select"].keys().count("multiple")>0#multiple="multiple"#end if#>
 #if $obj["select"].keys().count("options")
 #for j in $obj["select"]["options"]
 	<option value="$j">$j.title()</option>
@@ -91,7 +91,7 @@ $printText($obj)
 {"type":"select","name":"routing","title":$zoo._("Routing"),"placeholder":$zoo._("Routing"),"classe":"only-pline hide"},
 {"type":"select","name":"filter","title":$zoo._("Filtering"),"placeholder":$zoo._("Layer Filtering"),"select":{"name":"filter_field","class":"mmField"},"classe": "no-grid no-raster"},
 {"type":"select","name":"zfilter","title":$zoo._("Zoom on"),"placeholder":$zoo._("Zoom Filtering"),"select":{"name":"zfilter_field","class":"mmField"},"classe": "no-grid no-raster"},
-{"type":"select","name":"search","title":$zoo._("Search"),"placeholder":$zoo._("Layer Search"),"select":{"name":"search_field","class":"mmField"},"classe": "no-grid no-raster"},
+{"type":"select","name":"search","title":$zoo._("Search"),"placeholder":$zoo._("Layer Search"),"select":{"name":"search_field","class":"mmField","multiple":"multiple"},"classe": "no-grid no-raster"},
 {"type":"select","name":"squery","title":$zoo._("Spatial Query"),"placeholder":$zoo._("Layer Spatial Query"),"select":{"name":"squery_field","options":[$zoo._("none"),$zoo._("contained"),$zoo._("contains"),$zoo._("both")]},"classe": "no-grid no-raster"},
 ]
 #for i in $objs

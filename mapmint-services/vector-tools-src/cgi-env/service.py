@@ -196,25 +196,44 @@ def demo(conf,inputs,outputs):
     return zoo.SERVICE_SUCCEEDED
 
 def access(conf,inputs,outputs):
-    print >> sys.stderr,str(inputs);
+    #print >> sys.stderr,str(inputs);
     osgeo.gdal.FileFromMemBuffer('/vsimem//temp1',inputs["InputData"]["value"])
     ds = osgeo.ogr.Open('/vsimem//temp1')
     print >> sys.stderr,ds
     displayCnt=0
     geometry=[]
+    sqlResults=[]
     if inputs["sql"].keys().count("value")>0:
-        lyr=ds.ExecuteSQL( inputs["sql"]["value"], None, None )
-        cnt=lyr.GetFeatureCount()
+        lyr=ds.ExecuteSQL( inputs["sql"]["value"], None, 'SQLITE' )
+        if lyr is None:
+            conf["lenv"]["message"]=zoo._("Unable to execute your request: "+inputs["sql"]["value"])
+            cnt=0
+            #return zoo.SERVICE_FAILED
+        else:
+            cnt=lyr.GetFeatureCount()
+            for a in range(0,cnt):
+                if int(inputs["offset"]["value"])+int(inputs["limit"]["value"])>a:
+                    tfeat=lyr.GetNextFeature()
+                if int(inputs["offset"]["value"])+int(inputs["limit"]["value"])>a and a>=int(inputs["offset"]["value"]):
+                    #lyr.FindFieldIndex(lyr.GetFIDColumn())
+                    sqlResults+=[tfeat.GetFID()]
         print >> sys.stderr,dir(lyr)
         if cnt>0:
             if cnt==1:
-                feat=lyr.GetNextFeature()
+                #feat=lyr.GetNextFeature()
+                #feat=sqlResults[0]
+                feat=lyr.GetFeature(sqlResults[0])
                 if feat is not None:
                     geometry+=[feat.Clone()]
             else:
+                ci=0
                 for i in range(int(inputs["offset"]["value"]),int(inputs["offset"]["value"])+int(inputs["limit"]["value"])):
                     if i < cnt:
-                        feat=lyr.GetFeature(i)
+                        #feat=lyr.GetNextFeature()
+                        #feat=sqlResults[i]
+                        print >> sys.stderr," ***** DEBUG "+str(i)+" ["+str(sqlResults[ci])+"]"
+                        feat=lyr.GetFeature(sqlResults[ci])
+                        ci+=1
                         if feat is not None:
                             geometry+=[feat.Clone()]
     else:
