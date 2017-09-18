@@ -2603,14 +2603,14 @@ define([
 					$("#table-wrapper").on("removeClass",function(){
 					    if(arguments.length>=2 && arguments[1].indexOf(" in ")>=0 && arguments[2].indexOf(" in ")<=0){
 						setMapHeight();
-						console("== ******* == DEBUG");
+						console.log("== ******* == DEBUG");
 						map.updateSize();
 					    }
 					    $("#table-wrapper").removeAttr("style");
 					});
 					$("#table-wrapper").on("addClass",function(){
 					    if(arguments.length>=2 && arguments[1].indexOf(" in ")>=0 && arguments[2].indexOf(" in ")<=0){
-						console("== ******* == DEBUG");
+						console.log("== ******* == DEBUG");
 						setMapHeight();
 						map.updateSize();
 					    }
