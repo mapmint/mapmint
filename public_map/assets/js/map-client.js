@@ -2587,7 +2587,7 @@ define([
 						map.updateSize();
 					    }
 					});
-
+					$("#table-wrapper").removeAttr("style");
 					var chart = new Highcharts.Chart({
 					    chart: {
 						zoomType: 'x',
@@ -2672,7 +2672,7 @@ define([
 						data: values
 					    }]
 					});
-					
+					$("#table-wrapper").removeAttr("style");					
 				    },
 				    error: function(data){
 					console.log("ERROR");
