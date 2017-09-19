@@ -1357,6 +1357,7 @@ def createLegend0(conf,inputs,outputs):
         "keywords": "ows_keywordlist",
         "fees": "ows_fees",
         "query": "mmQuery",
+        "timeline": "mmRasterTimeline",
         "export": "mmExport",
         "zfilter": "mmZFilter",
         "zfilter_field": "mmZFilterField",
@@ -2339,8 +2340,8 @@ def createColorRamp(conf,m,layer,useTile=0):
     color_file.close()
     import urllib2
     tmp0=layer.data.split("/")
-    print >>sys.stderr,conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result"
-    response = urllib2.urlopen(conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result")
+    print >>sys.stderr,conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";co=COMPRESSION=DEFLATE;utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result"
+    response = urllib2.urlopen(conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";co=COMPRESSION=DEFLATE;utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result")
     value = response.read()
     print >> sys.stderr,useTile
     if useTile>0:
@@ -2713,7 +2714,7 @@ def classifyMap0(conf,inputs,outputs):
 	    print >> sys.stderr,"/ERROR"
 	    
 	    layer.clearProcessing()
-	    if inputs.count("processing")>0:
+	    if k.count("processing")>0:
 		    for kk in range(0,len(inputs["processing"]["value"])):            
 			    print >> sys.stderr," *********** OK"
 			    layer.setProcessing(inputs["processing"]["value"][kk])
@@ -2773,7 +2774,7 @@ def classifyMap0(conf,inputs,outputs):
     if inputs.has_key("resm"):
         updateProcessing(layer,inputs["resm"])
         layer.clearProcessing()
-        if inputs.count("processing")>0:
+        if inputs.keys().count("processing")>0:
             for kk in range(0,len(inputs["processing"]["value"])):            
                 print >> sys.stderr," *********** OK"
                 layer.setProcessing(inputs["processing"]["value"][kk])
@@ -3651,6 +3652,7 @@ def setMapLayerProperties(conf,inputs,outputs):
     l.metadata.set("mmAlias",urllib.unquote(inputs["a"]["value"]))
     l.metadata.set("ows_title",urllib.unquote(inputs["a"]["value"]))
     l.metadata.set("mmQuery",inputs["q"]["value"])
+    l.metadata.set("mmRasterTimeline",inputs["rtl"]["value"])
     l.metadata.set("mmExport",inputs["e"]["value"])
     if inputs.has_key("routing"):
     	l.metadata.set("mmRouting",inputs["routing"]["value"])

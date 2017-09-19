@@ -1693,6 +1693,7 @@ define([
 			console.log(arguments);
 		    });*/
 		    $('#layer_'+myLayer.index+'_carousel').on('slid.bs.carousel', function () {
+			console.log(myBaseLayers.length+myLayer.index);
 			if(map.getLayers().item(myBaseLayers.length+myLayer.index).getVisible()){
 			    console.log($(this));
 			    var reg0=new RegExp("layer_"+myLayer.index+"_step","g");
@@ -1712,7 +1713,12 @@ define([
 					})
 				    }));
 				    map.addLayer(previousLayers[0]);
+				    console.log("Add layer");
 				}else{
+				    if(cid==0 && previousLayers.length>0){
+					map.removeLayer(previousLayers[0]);
+					//previousLayers=[];
+				    }
 				    if(cid-1>=0){
 					//previousLayers[previousLayers.length-1].setVisible(true);
 					/*previousLayers[0].getSource().updateParams({"LAYERS":myLayer.layers[cid-1]});
@@ -1754,9 +1760,13 @@ define([
 					}
 				    },map.getLayers().item(myBaseLayers.length+myLayer.index).getSource());
 				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().changed();
+				    console.log("Reset layer");
 				}
 				var lreg=new RegExp($(this).find('.active').prev().find('.carousel-caption').find('h4').html(),"g");
-				$(this).parent().parent().find('label').first().html($(this).parent().parent().find('label').html().replace(/Raster Timeline/g,$(this).find('.active').find('.carousel-caption').find('h4').html()).replace(lreg,$(this).find('.active').find('.carousel-caption').find('h4').html()));
+				try{
+				    $(this).parent().parent().find('label').first().html($(this).parent().parent().find('label').html().replace(/Raster Timeline/g,$(this).find('.active').find('.carousel-caption').find('h4').html()).replace(lreg,$(this).find('.active').find('.carousel-caption').find('h4').html()));
+				}catch(e){
+				}
 				//$(this).find(".carousel-inner").hide();
 			    }
 			    //else{
@@ -1764,6 +1774,7 @@ define([
 				//console.log(myLayer.index);
 			    $("#mm_layers_display").find(".layer_"+myLayer.index).addClass("hide");
 			    $("#mm_layers_display").find(".layer_"+myLayer.index+".step"+cid).removeClass("hide");
+			    console.log(myBaseLayers.length+myLayer.index);
 			    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
 			    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().changed();
 			    //}
@@ -1816,6 +1827,7 @@ define([
 	    "run": function(layer){
 
 		var key=getLayerById(layer);
+		console.log(oLayers[key]);
 		console.log(oLayers[key]);
 		if(oLayers[key]["dataType"]=="raster"){
 		    zoo.execute({
@@ -2504,7 +2516,7 @@ define([
 			    if(oLayers[layer]["query"] && oLayers[layer]["type"]=="raster"){
 				window["raster_query_"+layer]=function(){
 				    return sVal1;
-				}
+				};
 				window["raster_query_level1_"+layer]=function(){
 				    var tmp=zoo.getRequest({
 					identifier: "template.display",
@@ -2524,7 +2536,7 @@ define([
 					storeExecuteResponse: false
 				    });
 				    return tmp.data;
-				}
+				};
 				window["raster_query_level2_"+layer]=function(){
 				    var tmp=zoo.getRequest({
 					identifier: "raster-tools.GdalExtractProfile",
@@ -2549,7 +2561,8 @@ define([
 					storeExecuteResponse: false
 				    });
 				    return tmp.data;
-				}
+				};
+				(function(layer){
 				zoo.execute({
 				    identifier: "template.display",
 				    dataInputs: [
@@ -2712,7 +2725,7 @@ define([
 					console.log(data);
 				    }
 				});
-
+				})(layer);
 			    }
 			}
 		    }
