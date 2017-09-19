@@ -1207,8 +1207,13 @@ def createLegend0(conf,inputs,outputs):
     processingDirectives=[]
     if myLayer.type==mapscript.MS_LAYER_RASTER:
         try:
+            print >> sys.stderr,myLayer.numprocessing
             for kk in range(0,myLayer.numprocessing):
-                processingDirectives+=[myLayer.getProcessing(kk)]
+                print >> sys.stderr,myLayer.getProcessing(kk)
+                if myLayer.getProcessing(kk) is not None:
+                    processingDirectives+=[str(myLayer.getProcessing(kk))]
+                    print >> sys.stderr,kk
+                    print >> sys.stderr,str(myLayer.getProcessing(kk))
         except:
             processingDirectives=None
         if processingDirectives is not None:
@@ -2230,11 +2235,15 @@ def saveLayerStyle(conf,inputs,outputs):
     else:
         if inputs.has_key("resm"):
             updateProcessing(layer,inputs["resm"])
+            print >> sys.stderr,inputs["processing"]
             if inputs.keys().count("processing")>0:
-                for kk in range(0,len(inputs["processing"]["value"])):            
-                    print >> sys.stderr," *********** OK "+str(inputs["processing"]["value"][kk])
-                    layer.addProcessing(inputs["processing"]["value"][kk])
-                    print >> sys.stderr," *********** OK"
+                if inputs["processing"].keys().count("isArray")>0:
+                    for kk in range(0,len(inputs["processing"]["value"])):            
+                        print >> sys.stderr," *********** OK "+str(inputs["processing"]["value"][kk])
+                        layer.addProcessing(inputs["processing"]["value"][kk])
+                        print >> sys.stderr," *********** OK"
+                else:
+                    layer.addProcessing(inputs["processing"]["value"])
             try:
                 layer.setOpacity(int(inputs["opacity"]["value"]))
                 #layer.updateFromString("LAYER COMPOSITE OPACITY "+inputs["opacity"]["value"]+" END END")
