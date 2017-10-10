@@ -37,7 +37,7 @@
 
 #if $layer.metadata.get('mm_group')!="Layers"
 #if ($layer.numclasses > 1 and $layer.metadata.get('mmClass')!="tl") and (not($layer.map.web.metadata.get("mmRT")) or ($layer.type==$mapscript.MS_LAYER_RASTER and $layer.map.web.metadata.get("mmRT") and $layer.map.web.metadata.get("mmRT").count("timeline")==0 and $layer.metadata.get("mmRasterTimeline") is not None and $layer.metadata.get("mmRasterTimeline")=="true"))
-    <li id="layer_$(layer.index)$(p)" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$(p)" #if not(hasStep)#state="closed"#end if# class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers") is not None and $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$title </label>
+    <li id="layer_$(layer.index)$(p)" data-id="layer_$conf["lenv"]["lindex"]" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$(p)" #if not(hasStep)#state="closed"#end if# class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers") is not None and $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$title </label>
 	$bmenu
     	<ul class="list-group tree">
 #for j in range(0,$layer.numclasses)
@@ -45,6 +45,8 @@
 #end for
 	    </ul>
 	  </li>
+#set cnf=$conf
+#set $cnf["lenv"]["lindex"]=str(int($conf["lenv"]["lindex"])+1)
 #else
 #try
 #set grt=int($layer.map.web.metadata.get("mmRT"))
@@ -53,8 +55,10 @@
 #end try
 #if not($layer.type==$mapscript.MS_LAYER_RASTER and $grt>0 and $layer.map.web.metadata.get("mmRT").count("timeline")!=0 and $layer.metadata.get("mmRasterTimeline") is not None and $layer.metadata.get("mmRasterTimeline")=="true" )
 $Template(file=$conf['main']['templatesPath']+"layer_basic_display_bs.tmpl",searchList={"layer": $layer,"conf": $conf,"p":$p,"isOverlays":$isOverlays,"bmenu":$bmenu,"hasStep":$hasStep,"title":$title})
+#set cnf=$conf
+#set $cnf["lenv"]["lindex"]=str(int($cnf["lenv"]["lindex"])+1)
 #else
-	<li id="layer_$(layer.index)$p" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$p" class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers") is not None and $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label><i class="fa fa-circle"></i> $zoo._("Raster Timeline")</label><!--</li>-->
+	<li id="layer_$(layer.index)$p" data-id="layer_$conf["lenv"]["lindex"]" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$p" class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers") is not None and $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label><i class="fa fa-circle"></i> $zoo._("Raster Timeline")</label><!--</li>-->
 	$bmenu
 #set steps=[]
 #set cg=$layer.metadata.get("mm_group")
@@ -136,6 +140,8 @@ $Template(file=$conf['main']['templatesPath']+"layer_basic_display_bs.tmpl",sear
   </div>
   </li>
   </ul>
+#set cnf=$conf
+#set $cnf["lenv"]["lindex"]=str(int($cnf["lenv"]["lindex"])+1)
 #end if
 
 #if $layer.metadata.get('mmClass')=="tl"
@@ -191,7 +197,8 @@ $Template(file=$conf['main']['templatesPath']+"layer_basic_display_bs.tmpl",sear
   </div>
 </li>
 </ul>
-
+#set cnf=$conf
+#set $cnf["lenv"]["lindex"]=str(int($cnf["lenv"]["lindex"])+1)
 #end if
 #* End layer.metadata.get('mmClass')=="tl" *#
 

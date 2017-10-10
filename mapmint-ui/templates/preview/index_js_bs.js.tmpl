@@ -117,13 +117,15 @@ var baseLayers={
 
 var oLayers={
 #set cnt=0
+#set cnt1=0
 #for l in range($m.numlayers)
 #if $mm_access.checkLayerPriv($conf,$m,$m.getLayer($l).name,"r") and $alreadyInTimeline.count($m.getLayer($l).name)==0
 #if $cnt >0
     ,
 #end if
      "$m.getLayer($l).name":{ 
-        "index": $m.getLayer($l).index,
+        "index": $cnt1,
+	"rindex": $m.getLayer($l).index,
         "ot": $m.getLayer($l).type,
         "type": "#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER#raster#else#vector#end if#",
         "alias": #if $m.getLayer($l).metadata.get('ows_title')!=""#"$m.getLayer($l).metadata.get('ows_title')"#else#"$m.getLayer($l).name"#end if#,
@@ -223,6 +225,7 @@ var oLayers={
 	"rQuery": #if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $m.getLayer($l).metadata.get('mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#
      }
 #set $cnt+=1
+#set $cnt1+=1
 #end if
 #end for
 

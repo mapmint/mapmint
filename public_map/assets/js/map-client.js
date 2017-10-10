@@ -175,7 +175,7 @@ define([
 			    for(var i=0;i<features.length;i++){
 				if(cfield.indexOf(",")<0){ 
 				    searchValues.push(features[i].get(cfield));
-				    console.log(features[i].get(cfield));
+				    //console.log(features[i].get(cfield));
 				    if(features[i].getGeometry()){
 					searchExtents.push(features[i].getGeometry().getExtent());
 				    }
@@ -792,7 +792,7 @@ define([
 		    addedLayers[cid].setOpacity($(this).val()/100);
 		}
 		else{
-		    var cid=eval("myBaseLayers.length+"+(cLayer.attr("id").replace(/layer_/,"").split("_")[0]));
+		    var cid=eval("myBaseLayers.length+"+getLayerIdById(cLayer.attr("id").replace(/layer_/,"").split("_")[0]));
 		    var clayer=getLayerById(eval(cLayer.attr("id").replace(/layer_/,"")));
 		    oLayers[clayer]["opacity"]=$(this).val()/100;
 		    map.getLayers().item(cid).setOpacity($(this).val()/100);
@@ -1223,11 +1223,14 @@ define([
 		    console.log($(this).parent()[0]["id"].replace(/layer_/g,""));
 		    //console.log(map.getLayers());
 		    console.log($(this).is(":checked"));
-		    var cid=parseInt($(this).parent()[0]["id"].replace(/layer_/g,""));
-		    var tmp=eval(cid+"+myBaseLayers.length");
-		    console.log(tmp);
-		    map.getLayers().item(eval($(this).parent()[0]["id"].replace(/layer_/g,"")+'+myBaseLayers.length')).setVisible($(this).is(":checked"));
-		    oLayers[getLayerById(cid)]["activated"]=$(this).is(":checked");
+		    var cid=getLayerIdById(parseInt($(this).parent()[0]["id"].replace(/layer_/g,"")))+myBaseLayers.length;
+		    //var tmp=eval(cid+"+(myBaseLayers.length>0?1:0)");
+		    //console.log(tmp);
+		    console.log(map.getLayers());
+		    map.getLayers().item(cid).setVisible($(this).is(":checked"));
+		    console.log(cid);
+		    console.log(getLayerById(parseInt($(this).parent()[0]["id"].replace(/layer_/g,""))));
+		    oLayers[getLayerById(parseInt($(this).parent()[0]["id"].replace(/layer_/g,"")))]["activated"]=$(this).is(":checked");
 		    if($(this).parent().find(".carousel").length){
 			if($(this).is(":checked"))
 			    $(this).parent().find(".carousel").carousel("cycle");
@@ -1687,7 +1690,7 @@ define([
 	for(var i in oLayers){
 	    if(oLayers[i].maps){
 		timelines.push(i);
-		(function(){
+		(function(i){
 		    var myLayer=oLayers[i];/*
 		    var objs=[
 			$('#layer_'+myLayer.index+'_carousel').find('img'),
@@ -1703,11 +1706,14 @@ define([
 		    /*map.getLayers().item(myBaseLayers.length+myLayer.index).on("loadend",function(){
 			console.log(arguments);
 		    });*/
-		    $('#layer_'+myLayer.index+'_carousel').on('slid.bs.carousel', function () {
+		    $('#layer_'+myLayer.rindex+'_carousel').on('slid.bs.carousel', function () {
 			console.log(myBaseLayers.length+myLayer.index);
+			console.log(myLayer.index);
+			console.log(myLayer.rindex);
+			console.log(map.getLayers().item(myBaseLayers.length+myLayer.index).getVisible())
 			if(map.getLayers().item(myBaseLayers.length+myLayer.index).getVisible()){
 			    console.log($(this));
-			    var reg0=new RegExp("layer_"+myLayer.index+"_step","g");
+			    var reg0=new RegExp("layer_"+myLayer.rindex+"_step","g");
 			    console.log($(this).find('.active'));
 			    var cid=parseInt($(this).find('.active').attr("id").replace(reg0,""));
 			    console.log(cid);
@@ -1724,9 +1730,10 @@ define([
 				      serverType: 'mapserver'
 				      })
 				      }));*/
-				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
-				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
-				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().changed();
+				    console.log(map.getLayers().item(myLayer.index+(myBaseLayers.length)));
+				    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+				    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
+				    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().changed();
 				    console.log(myBaseLayers.length+myLayer.index);
 				    //map.addLayer(previousLayers[0]);
 				    console.log("Add layer");
@@ -1745,7 +1752,7 @@ define([
 					$("#mm_layers_display").find(".layer_"+myLayer.index+".step"+cid).removeClass("hide");
 					map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid-1]);*/
 				    }/*else{*/
-				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+				    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
 					/*map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
 					$("#mm_layers_display").find(".layer_"+myLayer.index).addClass("hide");
 					$("#mm_layers_display").find(".layer_"+myLayer.index+".step"+cid).removeClass("hide");
@@ -1753,10 +1760,10 @@ define([
 				    //}
 				    tiletoload["l"+cid]=0;
 				    if(cid>0){
-					map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().unByKey(tiletoload["key0"+(cid-1)]);
-					map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().unByKey(tiletoload["key1"+(cid-1)]);
+					map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().unByKey(tiletoload["key0"+(cid-1)]);
+					map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().unByKey(tiletoload["key1"+(cid-1)]);
 				    }
-				    tiletoload["key0"+cid]=map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().on("tileloadstart", function() {
+				    /*tiletoload["key0"+cid]=map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().on("tileloadstart", function() {
 					if(!tiletoload["l"+cid])
 					    tiletoload["l"+cid]=0;
 					tiletoload["l"+cid]+=1;
@@ -1772,11 +1779,11 @@ define([
 						previousLayers[0].getSource().changed();
 					    }
 					    /*else
-					      previousLayers[previousLayers.length-1].setVisible(false);*/
+					      previousLayers[previousLayers.length-1].setVisible(false);*
 					}
-				    },map.getLayers().item(myBaseLayers.length+myLayer.index).getSource());
-				    console.log(myBaseLayers.length+myLayer.index);
-				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().changed();
+				    },map.getLayers().item(myBaseLayers.length+myLayer.index).getSource());*/
+				    console.log(myLayer.index);
+				    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().changed();
 				    console.log("Reset layer");
 				}
 				var lreg=new RegExp($(this).find('.active').prev().find('.carousel-caption').find('h4').html(),"g");
@@ -1792,13 +1799,14 @@ define([
 			    $("#mm_layers_display").find(".layer_"+myLayer.index).addClass("hide");
 			    $("#mm_layers_display").find(".layer_"+myLayer.index+".step"+cid).removeClass("hide");
 			    console.log(myBaseLayers.length+myLayer.index);
-			    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
-			    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().changed();
+			    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+			    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
+			    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().changed();
 			    //}
 			    map.updateSize();
 			}
 		    });
-		})();
+		})(i);
 	    }
 	}
 
@@ -3254,16 +3262,22 @@ define([
         }
       }
 
-    function getLayerById(cid){
-	var clayer=null;
-	var j=0;
+    function getLayerIdById(cid){
 	for(i in oLayers){
-	    if(j==cid){
+	    if(oLayers[i]["rindex"]==cid){
+		return oLayers[i]["index"];
+	    }
+	}
+	return -1;
+    }
+    
+    function getLayerById(cid){
+	for(i in oLayers){
+	    if(oLayers[i]["rindex"]==cid){
 		return i;
 	    }
-	    j++;
 	}
-	return clayer;
+	return null;
     }
 
     // @see https://groups.google.com/forum/#!topic/ol3-dev/a7jcO3LPGac
