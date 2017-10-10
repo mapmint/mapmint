@@ -142,11 +142,11 @@ var oLayers={
      	"map": "$conf["main"]["dataPath"]/public_maps/timeline_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)_step0.map",
 #else
      	"map": "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($m.getLayer($l).metadata.get('mmFilterField') or $m.getLayer($l).metadata.get('mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map",
-#if $m.web.metadata.get("mmRT") and $m.web.metadata.get("mmRT").count("timeline")>0 and $m.getLayer($l).type==mapscript.MS_LAYER_RASTER
+#if $m.web.metadata.get("mmRT") and $m.web.metadata.get("mmRT").count("timeline")>0 and $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).metadata.get("mmRasterTimeline") is not None and $m.getLayer($l).metadata.get("mmRasterTimeline")=="true"
     	"maps":[
 #set cg=$m.getLayer($l).metadata.get("mm_group")
 #for n in range($m.numlayers)
-#if $m.getLayer($n).metadata.get("mm_group")==$cg
+#if $m.getLayer($n).metadata.get("mm_group")==$cg and $m.getLayer($n).metadata.get("mmRasterTimeline") is not None and $m.getLayer($n).metadata.get("mmRasterTimeline")=="true"
 	  "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($n).type==mapscript.MS_LAYER_RASTER and $m.getLayer($n).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($n).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($n).name)#if ($m.getLayer($n).metadata.get('mmFilterField') or $m.getLayer($n).metadata.get('mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map",
 #set $alreadyInTimeline+=[$m.getLayer($n).name]
 #end if
@@ -155,7 +155,7 @@ var oLayers={
     	"layers":[
 #set cg=$m.getLayer($l).metadata.get("mm_group")
 #for n in range($m.numlayers)
-#if $m.getLayer($n).type==mapscript.MS_LAYER_RASTER and $m.getLayer($n).metadata.get("mm_group")==$cg
+#if $m.getLayer($n).type==mapscript.MS_LAYER_RASTER and $m.getLayer($n).metadata.get("mm_group")==$cg and $m.getLayer($n).metadata.get("mmRasterTimeline") is not None and $m.getLayer($n).metadata.get("mmRasterTimeline")=="true"
 	  "$m.getLayer($n).name",
 #set $alreadyInTimeline+=[$m.getLayer($n).name]
 #end if

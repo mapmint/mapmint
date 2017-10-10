@@ -227,8 +227,9 @@ define([
 
     var llevelInit0=false;
     function addToLayerLegend(oid,data,level){
-	for(var id in data)
-	    if(id!="steps" && id!="tiled"){
+	console.log(data);
+	for(var id in data){
+	    if(id!="steps" && id!="tiled" && id!="labels"){
 		if($.isArray(data[id])){
 		    var lid=id.replace(/ /g,"-_-");
 		    var cid=id.replace(/-_-/g," ");
@@ -267,6 +268,7 @@ define([
 		    }
 		}
 	    }
+	}
     }
 
     function getLayerIndexByName(layer){
@@ -2141,6 +2143,7 @@ define([
 		"keywords": "kl",
 		"fees": "f",
 		"query": "q",
+		"timeline": "rtl",
 		"export": "e",
 		"filter": "_f",
 		"zfilter": "zf",
@@ -2194,7 +2197,6 @@ define([
 				"dataType": "string"
 			    });
 			}
-			
 			break;
 		    }
 		}
@@ -2451,7 +2453,8 @@ define([
 		break;
 	    }
 	    for(name in oLayers)
-		$("#mm_layer_order_display").children().first().append('<li data-id="'+name+'" class="list-group-item">'+name+'</li>');
+		if(name.indexOf(".map")<0)
+		    $("#mm_layer_order_display").children().first().append('<li data-id="'+name+'" class="list-group-item">'+name+'</li>');
 	    var group0=$("ul.draggable").sortable({
 		group: 'draggable',
 		delay: 100
@@ -2502,7 +2505,7 @@ define([
 		    identifier: "mapfile.updateMapOrder0",
 		    type: "POST",
 		    dataInputs: [
-			{"identifier":"jsonStr","value":jsonString,"dataType":"string"},
+			{"identifier":"jsonStr","value":jsonString,"mimeType":"application/json"},
 			{"identifier":"map","value":$("#save-map").val(),"dataType":"string"}
 		    ],
 		    dataOutputs: [

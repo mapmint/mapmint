@@ -947,20 +947,31 @@ define([
 	    if(oLayers[layerName].maps)
 		timelines.push(layerName);
 	    if(oLayers[layerName].display=="raster"){
+		console.log(oLayers[layerName]);
 		var lmapfile=pmapfile;
 		if(oLayers[layerName].maps)
 		    lmapfile=oLayers[layerName].map;
 		var layer;
 		if(layerName.indexOf("grid_")===-1){
-		    if(!oLayers[layerName].labels)
-			layer=new ol.layer.Tile({
-			    visible: oLayers[layerName]["activated"],
-			    source: new ol.source.TileWMS({
-				url: msUrl+"?map="+lmapfile,
-				params: {'LAYERS': layerName, 'TILED': true},
-				serverType: 'mapserver'
-			    })
-			});
+		    console.log(oLayers[layerName]);
+		    if(!oLayers[layerName].labels){
+			if(oLayers[layerName].dataType=="point")
+			    layer=new ol.layer.Tile({
+				visible: oLayers[layerName]["activated"],
+				source: new ol.source.OSM({
+				    url: msUrl+"?map="+lmapfile+"&layers="+layerName+"&mode=tile&tilemode=gmap&tile={x}+{y}+{z}"
+				})
+			    });
+			else
+			    layer=new ol.layer.Tile({
+				visible: oLayers[layerName]["activated"],
+				source: new ol.source.TileWMS({
+				    url: msUrl+"?map="+lmapfile,
+				    params: {'LAYERS': layerName, 'TILED': true},
+				    serverType: 'mapserver'
+				})
+			    });
+		    }
 		    else{
 			layer=new ol.layer.Group({
 			    visible: oLayers[layerName]["activated"],
@@ -992,7 +1003,7 @@ define([
 		    }
 
 		}
-		else
+		else{
 		    layer=new ol.layer.Image({
 			visible: oLayers[layerName]["activated"],
 			source: new ol.source.ImageWMS({
@@ -1002,7 +1013,7 @@ define([
 			    serverType: ('mapserver')
 			})
 		    });
-
+		}
 		layers.push(layer);
 		map.addLayer(layer);
 	    }else{

@@ -3773,7 +3773,7 @@ def clientViewTable(conf,inputs,outputs):
     print >> sys.stderr,"****** "+str(cid)
     print >> sys.stderr,"******* "+str(clause)
     req1="SELECT "+(",".join(values+[cid]))+" FROM "+table+" WHERE "+clause+" ORDER BY "+classifier+" LIMIT "+inputs["limit"]["value"]+" OFFSET "+inputs["offset"]["value"]
-    print >> sys.stderr,req1
+    #print >> sys.stderr,req1
     res=cur.execute(req1)
     vals=cur.fetchall()
     fres["rows"]=[]

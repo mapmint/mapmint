@@ -314,8 +314,13 @@ $printAdder({"ltype": "div","id":"mm_addDir","title":$zoo._("Add Group"),"placeh
  <script type="template/text" id="layerLegend_group_template">
    <li class="list-group-item0" data-id="[lid]">
       <i class="fa fa-folder"></i>
-      [id]
-     <ul class="nav-[level]-level collapse in" id="[lid]"></ul>
+      <i class="fa fa-edit" onclick='\$(this).next().next().toggle();'></i>
+      <span>[id]</span>
+      <div class="input-group" style="display:none" >
+      <input name="g_value" value="[id]" onchange="console.log('CHANGE');\$(this).parent().parent().data('id',\$(this).val());\$(this).parent().prev().text(\$(this).val());" class="form-control" />
+      <span class="input-group-btn"><button class="btn btn-default" type="button" href="#" onclick="\$(this).parent().parent().toggle();"><i class="fa fa-check"></i></button></span>
+      </div>
+      <ul class="nav-[level]-level collapse in" id="[lid]"></ul>
    </li>
  </script>
 

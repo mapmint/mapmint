@@ -82,7 +82,7 @@ body{
 #end for
 #end if
 #end if
-#if $l.type==mapscript.MS_LAYER_RASTER and $l.map.web.metadata.get("mmRT") and $l.map.web.metadata.get("mmRT").count('timeline')>0
+#if $l.type==mapscript.MS_LAYER_RASTER and $l.map.web.metadata.get("mmRT") and $l.map.web.metadata.get("mmRT").count('timeline')>0  and $l.metadata.get("mmRasterTimeline") is not None and $l.metadata.get("mmRasterTimeline")=="true"
 #layer_$(i) label .fa-circle:before{
     /*background:url('$conf["main"]["publicationUrl"]/img/timeline.png') no-repeat scroll 0 0 transparent !important;*/
     display: block;
