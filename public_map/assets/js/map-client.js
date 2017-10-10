@@ -1715,19 +1715,24 @@ define([
 			    console.log(myLayer.maps[cid]);
 			    if(myLayer.layers && myLayer.layers[cid]){
 				if(cid-1>=0 && previousLayers.length==0){
-				    previousLayers.push(new ol.layer.Tile({
-					visible: true,
-					source: new ol.source.TileWMS({
-					    url: msUrl+"?map="+myLayer.maps[cid],
-					    params: {'LAYERS': myLayer.layers[cid], 'TILED': true},
-					    serverType: 'mapserver'
-					})
-				    }));
-				    map.addLayer(previousLayers[0]);
+				    /*
+				      previousLayers.push(new ol.layer.Tile({
+				      visible: true,
+				      source: new ol.source.TileWMS({
+				      url: msUrl+"?map="+myLayer.maps[cid],
+				      params: {'LAYERS': myLayer.layers[cid], 'TILED': true},
+				      serverType: 'mapserver'
+				      })
+				      }));*/
+				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
+				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().changed();
+				    console.log(myBaseLayers.length+myLayer.index);
+				    //map.addLayer(previousLayers[0]);
 				    console.log("Add layer");
 				}else{
 				    if(cid==0 && previousLayers.length>0){
-					map.removeLayer(previousLayers[0]);
+					//map.removeLayer(previousLayers[0]);
 					//previousLayers=[];
 				    }
 				    if(cid-1>=0){
@@ -1740,7 +1745,7 @@ define([
 					$("#mm_layers_display").find(".layer_"+myLayer.index+".step"+cid).removeClass("hide");
 					map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid-1]);*/
 				    }/*else{*/
-				map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
 					/*map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
 					$("#mm_layers_display").find(".layer_"+myLayer.index).addClass("hide");
 					$("#mm_layers_display").find(".layer_"+myLayer.index+".step"+cid).removeClass("hide");
@@ -1770,6 +1775,7 @@ define([
 					      previousLayers[previousLayers.length-1].setVisible(false);*/
 					}
 				    },map.getLayers().item(myBaseLayers.length+myLayer.index).getSource());
+				    console.log(myBaseLayers.length+myLayer.index);
 				    map.getLayers().item(myBaseLayers.length+myLayer.index).getSource().changed();
 				    console.log("Reset layer");
 				}
