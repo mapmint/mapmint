@@ -33,10 +33,17 @@ body{
 #if $l.numclasses==0
 #layer_$(i) label .fa-circle:before{
 #set cext=$l.getExtent()
+#try
 #set cextf=$cext.project(mapscript.projectionObj(l.getProjection()),mapscript.projectionObj(m.getProjection()))
 #set center=[(cext.maxx-cext.minx)/2,(cext.maxy-cext.miny)/2]
 #set bbox=[(cext.minx+center[0])-0.01,(cext.miny+center[1])-0.01,(cext.minx+center[0])+0.01,(cext.miny+center[1])+0.01]
     background:url('#if $l.metadata.get('mmIcon') is not None#$l.metadata.get('mmIcon')#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/project_$(conf["senv"]["last_map"]).map&LAYERS=$(l.name)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$(bbox[0]),$(str(bbox[1])),$(str(bbox[2])),$(str(bbox[3]))&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat scroll 0 0 transparent !important;
+#except Exception,e
+/**
+ The following error occcured!
+  $e
+ **/ 
+#end try
     content: " ";
     display: block;
     height: 16px;
