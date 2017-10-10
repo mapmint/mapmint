@@ -774,12 +774,12 @@ def getGroupList(conf,mapfile,raster=None):
             if g is None:
                 break
             dict={"layer": j.name}
-            if raster is None and m.web.metadata.get('mmRT') and m.web.metadata.get('mmRT').count("timeline")>0 and j.type==mapscript.MS_LAYER_RASTER and allreadyInTimeline.count(j.name)==0:
+            if raster is None and m.web.metadata.get('mmRT') and m.web.metadata.get('mmRT').count("timeline")>0 and j.type==mapscript.MS_LAYER_RASTER and allreadyInTimeline.count(j.name)==0  and j.metadata.get("mmRasterTimeline") is not None and j.metadata.get("mmRasterTimeline")=="true":
                 dict["steps"]=[j.name]
                 allreadyInTimeline=[j.name]
                 for n in range(m.numlayers):
                     ll=m.getLayer(n)
-                    if j.metadata.get("mm_group")==ll.metadata.get("mm_group") and ll.type==mapscript.MS_LAYER_RASTER and allreadyInTimeline.count(ll.name)==0:
+                    if j.metadata.get("mm_group")==ll.metadata.get("mm_group") and ll.type==mapscript.MS_LAYER_RASTER and allreadyInTimeline.count(ll.name)==0 and ll.metadata.get("mmRasterTimeline") is not None and ll.metadata.get("mmRasterTimeline")=="true":
                         allreadyInTimeline+=[ll.name]
                         dict["steps"]+=[ll.name]
                     #if allreadyInTimeline.count(ll.name)==0:
@@ -834,12 +834,12 @@ def addLayerToThem(obj,search,value):
 
 def recursMapList(conf,group,allreadyInTimeline):
     res=[]
-    print >> sys.stderr,str(group)
-    print >> sys.stderr,str(allreadyInTimeline)
+    #print >> sys.stderr,str(group)
+    #print >> sys.stderr,str(allreadyInTimeline)
     for i in group:
-        print >> sys.stderr,"****** GROUP III "
-        print >> sys.stderr,str(group[i])
-        print >> sys.stderr,type(group[i]).__name__
+        #print >> sys.stderr,"****** GROUP III "
+        #print >> sys.stderr,str(group[i])
+        #print >> sys.stderr,type(group[i]).__name__
         if type(group[i]).__name__=="str":
             import mapscript
             m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
@@ -850,13 +850,16 @@ def recursMapList(conf,group,allreadyInTimeline):
                 obj={"id": group[i],"text": group[i],"mmType": l.type, "nclasses":l.numclasses}
                 if l.metadata.get("mmSteps") is not None:
                     obj["steps"]=l.metadata.get("mmSteps").split(',')
-                if m.web.metadata.get('mmRT') and m.web.metadata.get('mmRT').count("timeline")>0 and l.type==mapscript.MS_LAYER_RASTER:
+                if m.web.metadata.get('mmRT') and m.web.metadata.get('mmRT').count("timeline")>0 and l.type==mapscript.MS_LAYER_RASTER and l.metadata.get("mmRasterTimeline") is not None and l.metadata.get("mmRasterTimeline")=="true":
                     obj["steps"]=[]
                     for j in range(m.numlayers):
                         ll=m.getLayer(j)
-                        if l.metadata.get("mm_group")==ll.metadata.get("mm_group") and ll.type==mapscript.MS_LAYER_RASTER:
+                        if l.metadata.get("mm_group")==ll.metadata.get("mm_group") and ll.type==mapscript.MS_LAYER_RASTER and ll.metadata.get("mmRasterTimeline") is not None and ll.metadata.get("mmRasterTimeline")=="true":
                             allreadyInTimeline+=[ll.name]
                             obj["steps"]+=[ll.name]
+                else:
+                    obj={"id": group[i],"text": group[i],"mmType": l.type, "nclasses":l.numclasses}
+                    return [obj]
                 return [obj]
             else:
                 return [{"id": group[i],"text": group[i]}]
@@ -876,7 +879,7 @@ def recursMapList(conf,group,allreadyInTimeline):
                     #if l.name.count("grid_")>0:
                     #    return [{"id": group[i],"text": group[i],"mmType": 0}]
                     if l is not None:
-                        res+=[{"id": group[i],"text": group[i],"mmType": l.type, "nclasses":l.numclasses}]
+                        res+=[{"id": group[i],"text": group[i],"mmType": l.type, "ptType": mapscript.MS_LAYER_POINT, "nclasses":l.numclasses}]
                     else:
                         res+=[{"id": i,"text": str(group[i])}]
                 else:
@@ -3972,7 +3975,10 @@ def doGroupLists0(mmGroups,layers,groups,i):
             else:
                 mmGroups[i]+=","+groups["id"]
         for j in range(0,len(groups["children"][0])):
-            doGroupLists0(mmGroups,layers,groups["children"][0][j],i+1)
+            try:
+                doGroupLists0(mmGroups,layers,groups["children"][0][j],i+1)
+            except Exception,e:
+                print >> sys.stderr,"*** Error: "+str(e)
         if i == 1 and mmGroups[i+1][len(mmGroups[i+1])-1]!=';':
             mmGroups[i+1]+=',|'+groups["id"]+";"
             print >> sys.stderr,mmGroups[i+1]
