@@ -222,7 +222,9 @@ var oLayers={
 #end try
 	},     
 #end if
-	"rQuery": #if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $m.getLayer($l).metadata.get('mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#
+	"rQuery": #if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $m.getLayer($l).metadata.get('mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#,
+	"rQueryTitle": #if $m.getLayer($l).metadata.get('mmQueryTitle')#"$m.getLayer($l).metadata.get('mmQueryTitle')"#else#null#end if#,
+	"rQueryTooltip": #if $m.getLayer($l).metadata.get('mmQueryTooltip')#"$m.getLayer($l).metadata.get('mmQueryTooltip')"#else#null#end if#
      }
 #set $cnt+=1
 #set $cnt1+=1

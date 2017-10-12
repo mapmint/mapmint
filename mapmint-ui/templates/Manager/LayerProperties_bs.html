@@ -34,7 +34,7 @@
 #end def
 
 #def printText(obj)
-<div class="form-group">
+<div class="form-group #if $obj.keys().count("classe")>0#$obj["classe"]#end if#">
   <label class="col-sm-3 control-label">$obj["title"]</label>
   <div class="col-sm-9">
     <input name="$obj["name"]" class="form-control" placeholder="$obj["placeholder"]" type="text" />
@@ -87,6 +87,8 @@ $printText($obj)
 {"name":"keywords","title":$zoo._("Keywords"),"placeholder":$zoo._("Sample kewords")},
 {"name":"fees","title":$zoo._("Fees"),"placeholder":$zoo._("Sample attribution")},
 {"type":"select","name":"query","title":$zoo._("Query"),"placeholder":$zoo._("Layer Query")},
+{"name":"raster_query_title","title":$zoo._("Title"),"placeholder":$zoo._("Elevation"),"classe": "require-raster require-query"},
+{"name":"raster_query_tooltip","title":$zoo._("Tooltip"),"placeholder":$zoo._("Altitude") ,"classe": "require-raster require-query"},
 {"type":"select","name":"timeline","title":$zoo._("Timeline"),"placeholder":$zoo._("Layer is in timeline"),"classe": "require-raster"},
 {"type":"select","name":"export","title":$zoo._("Export"),"placeholder":$zoo._("Layer Export"),"classe": "no-grid no-raster"},
 {"type":"select","name":"routing","title":$zoo._("Routing"),"placeholder":$zoo._("Routing"),"classe":"only-pline hide"},
@@ -107,6 +109,10 @@ $printText($i)
 #end if
 #end for
 <button class="btn btn-default mm-layer-save" >$zoo._("Save")</button>
+<script type="text/template" id="query_raster_tempalte_src">
+<input name="raster_query_title" class="form-control col-sm-6" placeholder="Sample title" value="Elevation" type="text"/>
+<input name="raster_query_tooltip" class="form-control col-sm-6" placeholder="Sample tooltip" type="text" value="Altitude" />
+</script>
 </form>
 
   </div>

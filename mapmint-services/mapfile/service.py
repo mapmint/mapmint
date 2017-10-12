@@ -1365,6 +1365,8 @@ def createLegend0(conf,inputs,outputs):
         "keywords": "ows_keywordlist",
         "fees": "ows_fees",
         "query": "mmQuery",
+        "raster_query_title": "mmQueryTitle",
+        "raster_query_tooltip": "mmQueryTooltip",
         "timeline": "mmRasterTimeline",
         "export": "mmExport",
         "zfilter": "mmZFilter",
@@ -3664,6 +3666,8 @@ def setMapLayerProperties(conf,inputs,outputs):
     l.metadata.set("mmAlias",urllib.unquote(inputs["a"]["value"]))
     l.metadata.set("ows_title",urllib.unquote(inputs["a"]["value"]))
     l.metadata.set("mmQuery",inputs["q"]["value"])
+    l.metadata.set("mmQueryTitle",inputs["rqt"]["value"])
+    l.metadata.set("mmQueryTooltip",inputs["rqtt"]["value"])
     l.metadata.set("mmRasterTimeline",inputs["rtl"]["value"])
     l.metadata.set("mmExport",inputs["e"]["value"])
     if inputs.has_key("routing"):

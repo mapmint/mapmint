@@ -2536,6 +2536,7 @@ define([
 			console.log(sVal1);
 			var layer;
 			for(layer in oLayers){
+			    //console.log(oLayers[layer]);
 			    console.log(oLayers[layer]["query"]+" "+oLayers[layer]["type"]=="raster");
 			    console.log(oLayers[layer]["query"] && oLayers[layer]["type"]=="raster");
 			    if(oLayers[layer]["query"] && oLayers[layer]["type"]=="raster"){
@@ -2587,6 +2588,7 @@ define([
 				    });
 				    return tmp.data;
 				};
+				//console.log(oLayers[layer]);
 				(function(layer){
 				zoo.execute({
 				    identifier: "template.display",
@@ -2612,6 +2614,7 @@ define([
 				    success: function(data){
 					console.log("SUCCESS");
 					console.log(data);
+					console.log(oLayers[layer]);
 					var values=[];
 					var sspoints=[];
 					for(i in data.coordinates){
@@ -2663,7 +2666,7 @@ define([
 						renderTo: 'output-profile-'+layer
 					    },
 					    title: {
-						text: "Elevation profile"
+						text: oLayers[layer]["rQueryTitle"]
 					    },
 					    xAxis: {
 						labels: {
@@ -2732,7 +2735,7 @@ define([
 						    selectLayer.getSource().addFeature(new ol.Feature({
 							geometry: lgeom
 						    }));
-						    return '<h1>Altitude: '+Highcharts.numberFormat(this.y, 0)+"</h1>";
+						    return '<h1>'+oLayers[layer]["rQueryTooltip"]+' '+Highcharts.numberFormat(this.y, 0)+"</h1>";
 						}
 					    },
 					    series: [{

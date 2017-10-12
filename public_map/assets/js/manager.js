@@ -1086,9 +1086,10 @@ define([
 			    dataOutputs: [
 				{"identifier":"Result","type":"raw"},
 			    ],
-			    success: function(data){
+			    success: function(ldata){
 				console.log("SUCCESS");
-				var ldata=JSON.parse(data);
+				console.log(ldata);
+				//var ldata=JSON.parse(data);
 				var myRootLocation=$("#mm_layer_property_style_display");
 				myRootLocation.find('.mmstep-list').change(function(){
 				    var originalValue=$(this).val();
@@ -1125,7 +1126,7 @@ define([
 			    error: function(data){
 				console.log("ERROR");
 				$(".notifications").notify({
-				    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				    message: { text: ldata["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
 				    type: 'danger',
 				}).show();
 			    }
@@ -1719,14 +1720,13 @@ define([
 			    console.log($("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]'));
 			    $("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
 			    if($("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').parent().find('input[type="checkbox"]').first().length){
+				var myElem=$("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').parent().find('input[type="checkbox"]');
 				if(!ldata[i] || ldata[i]=="#-1-1-1" || ldata[i]=="")
 				    $("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').parent().find('input[type="checkbox"]').first().prop("checked",false).change();
 				else{
 				    $("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').parent().find('input[type="checkbox"]').first().prop("checked",true).change();
 				}
 			    }
-			    //console.log($("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]'));
-			    //console.log(i);
 			}
 			else{
 			    if((bindings[i]?bindings[i]:i)!="search_field")
@@ -1758,6 +1758,31 @@ define([
 	    else{
 		$("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').prop("checked",ldata[i]=="true").change();
 	    }
+	    
+	    if((bindings[i]?bindings[i]:i)=="query"){
+		$("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').parent().find('input[type="checkbox"]').first().off("change");
+		if(ldata["type"]==3){
+		    $("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').parent().find('input[type="checkbox"]').first().change((function(data){return function(){
+			if(data["type"]==3){
+			    if($(this).is(":checked"))
+				$(".require-query").show();
+			    else
+				$(".require-query").hide();
+			}
+		    }})(ldata));
+		}
+		console.log(ldata["type"]==3);
+		console.log(ldata["query"]);
+		if(ldata["type"]!=3)
+		    $(".require-query").hide();
+		if(ldata["type"]==3){
+		    if($("#manaLayerProperties").find('input[name="'+(bindings[i]?bindings[i]:i)+'"]').is(":checked"))
+			$(".require-query").show();
+		    else
+			$(".require-query").hide();
+		}
+	    }
+
 	}
 	if(shouldInit){
 	    window.setTimeout(function () { 
@@ -2143,6 +2168,8 @@ define([
 		"keywords": "kl",
 		"fees": "f",
 		"query": "q",
+		"raster_query_title": "rqt",
+		"raster_query_tooltip": "rqtt",
 		"timeline": "rtl",
 		"export": "e",
 		"filter": "_f",
