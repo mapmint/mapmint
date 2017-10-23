@@ -261,6 +261,11 @@ define([
 				    if($(this).hasClass("htmlEditor")){
 					$(this).code(data[i][j]);
 				    }
+				    console.log($(this));
+				    if($(this).attr("type")=="checkbox"){
+					console.log($(this));
+					$(this).prop("checked",(data[i][j]==true?true:false));
+				    }
 				});
 				if(data[i][j].indexOf && data[i][j].indexOf("POINT(")>=0){
 				    var coordinates=data[i][j].replace(/POINT\(/,"").replace(/\)/,"").split(" ");
@@ -328,6 +333,17 @@ define([
 			    }
 			    }else{
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
+				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
+				    if($(this).hasClass("htmlEditor")){
+					$(this).code(data[i][j]);
+				    }
+				    console.log($(this).attr("type"));
+				    if($(this).attr("type")=="checkbox"){
+					console.log($(this));
+					$(this).prop("checked",(data[i][j]==true?true:false));
+				    }
+				});
+
 			    }
 			}
 		    }
@@ -612,8 +628,13 @@ define([
 		    console.log($(this).parent().parent().parent());
 		    console.log($(this).parent().parent().parent().parent());
 		    if(!mainTableFiles[$(this).attr("name")]){
-			if($(this).attr("name").indexOf("link_col")<0)
-			    tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
+			if($(this).attr("name").indexOf("link_col")<0){
+			    if($(this).attr("type")=="checkbox"){
+				tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).prop("checked");
+			    }
+			    else
+				tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
+			}
 			else{
 			    tuple[$(this).val()]=$(this).next().val();
 			    tupleReal={};
@@ -985,8 +1006,7 @@ define([
 							$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="'+data[$(this).val()]['value'][j][0]+'">'+data[$(this).val()]['value'][j][1]+'</option>');
 						else
 						    $(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="NULL">'+module.config().localizationStrings.tables.none+'</option>');
-						    
-
+						$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").change();
 					    });
 					    closure.parent().find('select[name='+closure.attr('name')+']').first().change();
 					})(data);

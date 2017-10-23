@@ -3321,13 +3321,16 @@ def clientInsert(conf,inputs,outputs):
                     print >> sys.stderr,"TUPLE "+str(i)
                     if i >= len(realKeys):
                         print >> sys.stderr,"TUPLE "
-                        print >> sys.stderr," * "+str(tuple[columns[i]].encode("utf-8"))
-                        print >> sys.stderr," * "+str(adapt(str(tuple[columns[i]].encode("utf-8"))))
-                        if len(str(adapt(str(tuple[columns[i]].encode("utf-8")))))==2:
-                            col_sufix+=columns[i]+"=NULL"
-                        else:
-                            col_sufix+=columns[i]+"="+str(adapt(str(tuple[columns[i]].encode("utf-8")))).decode('utf-8')
-                        print >> sys.stderr," * "+str(adapt(str(tuple[columns[i]].encode("utf-8"))))
+                        try:
+                            print >> sys.stderr," * "+str(tuple[columns[i]].encode("utf-8"))
+                            print >> sys.stderr," * "+str(adapt(str(tuple[columns[i]].encode("utf-8"))))
+                            if len(str(adapt(str(tuple[columns[i]].encode("utf-8")))))==2:
+                                col_sufix+=columns[i]+"=NULL"
+                            else:
+                                col_sufix+=columns[i]+"="+str(adapt(str(tuple[columns[i]].encode("utf-8")))).decode('utf-8')
+                            print >> sys.stderr," * "+str(adapt(str(tuple[columns[i]].encode("utf-8"))))
+                        except:
+                            col_sufix+=columns[i]+"="+str(tuple[columns[i]])
                     else:
                         print >> sys.stderr,"TUPLE "
                         print >> sys.stderr,tupleReal[columns[i]].decode("utf-8")

@@ -70,7 +70,13 @@ $vals[4]
 $ftmpl.printHiddenContent({"rid":"runFirst_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][6],"optional":$isOptional})
 #end if
 
+#*
+ $ctype=="text" or $ctype=="varchar(255)" or $ctype=="html" or $ctype=="geometry" 
+ *#
 #if $ctype=="text" or $ctype=="varchar(255)" or $ctype=="html" or $ctype=="geometry" 
+#*
+ $ctype=="geometry" 
+ *#
 #if $ctype=="geometry"
 $ftmpl.printCoordInput({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
 #else
@@ -83,7 +89,13 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
 $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":"textarea","optional":$isOptional})
 #end if
 #end if
+#*
+ / $ctype=="geometry" 
+ *#
 #else
+#*
+  $ctype=="bytea" 
+ *#
 #if ctype=="bytea"
 $ftmpl.printBasicLine({"label":$vals[i][2].title(),"content":$ftmpl.printUploadInputNew({"id":"edit_"+str($vals[i][0]),"name":"edition_"+str($vals[i][1])})})
 #else
@@ -184,10 +196,14 @@ $ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content}
 #set preTitle='<input type="hidden" name="input_'+str($embeddedNb-1)+'_embedded_'+str($embeddedNb-1)+'_link_col" value="'+$vals[i][1]+'"/><input type="hidden" name="input_'+str($embeddedNb-1)+'_embedded_'+str($embeddedNb-1)+'_link_val" value="-1"/>'
 $ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content})
 #else
+#if $ctype=="boolean"
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"type":"checkbox","value":$vals[i][3],"optional":$isOptional})
+#else
 #*
  In other cases
 *#
 $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"optional":$isOptional})
+#end if
 #end if
 #end if
 #end if

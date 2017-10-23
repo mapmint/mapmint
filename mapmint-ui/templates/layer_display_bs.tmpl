@@ -34,6 +34,10 @@
 #set hasStep=False
 #end if
 
+#set c=$conf["lenv"]
+#if c.keys().count("lindex")==0
+#set $c["lindex"]=0
+#end if
 
 #if $layer.metadata.get('mm_group')!="Layers"
 #if ($layer.numclasses > 1 and $layer.metadata.get('mmClass')!="tl") and (not($layer.map.web.metadata.get("mmRT")) or ($layer.type==$mapscript.MS_LAYER_RASTER and $layer.map.web.metadata.get("mmRT") and $layer.map.web.metadata.get("mmRT").count("timeline")==0 and $layer.metadata.get("mmRasterTimeline") is not None and $layer.metadata.get("mmRasterTimeline")=="true"))

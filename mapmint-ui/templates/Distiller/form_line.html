@@ -111,7 +111,8 @@
     <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="password" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
 #else
 #if $obj["type"]=="date" or $obj["type"]=="datetime" or $obj["type"]=="checkbox"
-    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control#if $obj["type"]=="checkbox"#-checkbox#end if#" type="$obj["type"]#if $obj["type"]!="date" and $obj["type"]!="checkbox"#-local#end if#" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
+    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control#if $obj["type"]=="checkbox"#-checkbox#end if#" type="$obj["type"]#if $obj["type"]!="date" and $obj["type"]!="checkbox"#-local#end if#" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if# #if $obj.keys().count("value")>0 and $obj["type"]=="checkbox" and $obj["value"]=="true"#checked="checked"#end if#/>
+
 #else
 #if $obj["type"]=="float"
     <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="number" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
