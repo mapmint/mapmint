@@ -6,6 +6,9 @@
 #set embeddedNb=0
 #end try
 
+
+#set alreadyDisplayed={}
+
 #set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
 #include $tmpl
 #set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
@@ -56,7 +59,11 @@ $vals[4]
 #set codes=$cur.fetchall()
 
 #for i in range(len($vals))
-
+#if $alreadyDisplayed.keys().count($vals[i][1])==0
+#*$alreadyDisplayed.keys().count($vals[i][1])
+#while $alreadyDisplayed.keys().count($vals[i][1])>0
+#set $i+=1
+#end while*#
 #try
 
 #set ctype=$vals[i][5]
@@ -67,7 +74,7 @@ $vals[4]
 #if $vals[i][4]
 
 #if $vals[i][6] is not None and $vals[i][6]!=''
-$ftmpl.printHiddenContent({"rid":"runFirst_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][6],"optional":$isOptional})
+$ftmpl.printHiddenContent({"rid":"runFirst_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][6],"optional":$isOptional})
 #end if
 
 #*
@@ -78,15 +85,15 @@ $ftmpl.printHiddenContent({"rid":"runFirst_"+str($vals[i][1]),"id":"edit_"+str($
  $ctype=="geometry" 
  *#
 #if $ctype=="geometry"
-$ftmpl.printCoordInput({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+$ftmpl.printCoordInput({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
 #else
 #*
  In case it is a long text content
 *#
 #if $ctype=="html"
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
 #else
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":"textarea","optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":"textarea","optional":$isOptional})
 #end if
 #end if
 #*
@@ -97,7 +104,7 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
   $ctype=="bytea" 
  *#
 #if ctype=="bytea"
-$ftmpl.printBasicLine({"label":$vals[i][2].title(),"content":$ftmpl.printUploadInputNew({"id":"edit_"+str($vals[i][0]),"name":"edition_"+str($vals[i][1])})})
+$ftmpl.printBasicLine({"label":$vals[i][2],"content":$ftmpl.printUploadInputNew({"id":"edit_"+str($vals[i][0]),"name":"edition_"+str($vals[i][1])})})
 #else
 #if ctype=="tbl_linked" 
 #*
@@ -115,7 +122,7 @@ $ftmpl.printBasicLine({"label":$vals[i][2].title(),"content":$ftmpl.printUploadI
 #except Exception,e
 #set options=[["-1",$zoo._("No element")]]
 #end try
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"type":"multiple","options":$options,"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"multiple","options":$options,"optional":$isOptional})
 #else
 #if ctype=="ref" 
 #*
@@ -132,13 +139,13 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
 #except Exception,e
 #set options=[["-1",$zoo._("No element")]]
 #end try
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"type":"select","options":$options,"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"select","options":$options,"optional":$isOptional})
 #else
 #if ctype=="date" or ctype=="datetime" or ctype=="float"
 #*
  In case it is a date
 *#
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
 #else
 #if ctype=="link"
 #*
@@ -156,14 +163,35 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
 #set $embeddedNb+=1
 #except Exception,e
 <div class="alert alert-danger">$e</div>
+#set content="<div class='alert alert-danger'>"+str($e)+"</div>"
 #end try
 #set preTitle='<input type="hidden" name="embedded_'+str($embeddedNb-1)+'_link_col" value="'+$components[0]+'"/>'
 #try 
 #set $preTitle+=$toto
-#except
+#except Exception,e
 #set noTitle=True
+#set $preTitle+=str($e)
 #end try
-$ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content})
+
+#try
+$ftmpl.printBasicLine({"label":$preTitle+$vals[i][2],"content":$content})
+#except Exception,e
+<div class="alert alert-danger">$e</div>
+#try
+$preTitle
+#except Exception,e
+$e
+#end try
+#try
+$content
+#except Exception,e
+$e
+#end try
+#end try
+<!--
+$vals[i]
+$lvals
+-->
 #else
 #if ctype=="tbl_link"
 #set components=$vals[i][3].split(";")
@@ -179,7 +207,7 @@ $ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content}
 <div class="alert alert-danger">$e</div>
 #end try
 #set preTitle='<input type="hidden" name="embedded_'+str($embeddedNb-1)+'_link_col" value="'+$components[0]+'"/>'
-$ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content})
+$ftmpl.printBasicLine({"label":$preTitle+$vals[i][2],"content":$content})
 #else
 #if ctype=="tbl_list"
 #import psycopg2
@@ -197,12 +225,25 @@ $ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content}
 $ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content})
 #else
 #if $ctype=="boolean"
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"type":"checkbox","value":$vals[i][3],"optional":$isOptional})
+#try
+#set toto=eval($vals[i][6])
+#set originalI=$i
+#set content=""
+#for kk in range($toto[0]["main_cnt"])
+#set $content+=$ftmpl.printLine({"rid":"edition_"+str($vals[i+kk][1]),"id":"edit_"+str($vals[i+kk][0]),"name":$vals[i+kk][2],"type":"checkbox","value":$vals[i+kk][3],"optional":$isOptional})
+#set $alreadyDisplayed[str($vals[i+kk][1])]=True
+#end for
+$ftmpl.printBasicLine({"label":$toto[0]["main_title"],"content":$content})
+#except Exception,e
+<!-- $e -->
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"checkbox","value":$vals[i][3],"optional":$isOptional})
+#end try
+<!-- $vals[i] -->
 #else
 #*
  In other cases
 *#
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$vals[i][3],"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"optional":$isOptional})
 #end if
 #end if
 #end if
@@ -239,7 +280,7 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
 #end for
 #set lvalue="".join($fvalues)
 #end if
-$ftmpl.printHiddenContent({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2].title(),"value":$lvalue,"optional":$isOptional})
+$ftmpl.printHiddenContent({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$lvalue,"optional":$isOptional})
 
 #end if
 
@@ -259,6 +300,7 @@ $e
 </div>
 #end try
 
+#end if
 #end for
 
 #end if

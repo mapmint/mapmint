@@ -38,7 +38,7 @@
  </script>
   
  <script type="template/text" id="edition_c2_template">
-  <a href="#"><i class="fa fa-trash"> </i></a>
+  <a href="#edition_selector_template"><i class="fa fa-trash"> </i></a>
   <span id="oname_txt">[name]</span>
   <input name="oname" type="text" value="[name]" onkeyup="\$(this).prev().html(\$(this).val())" />
  </script>
@@ -71,7 +71,7 @@
     </td>
     <td><input name="edition" type="checkbox" [display] /></td>
     <td>
-      <a href="#"><i class="fa fa-trash"> </i></a>
+      <a href="#edition_selector_template"><i class="fa fa-trash"> </i></a>
       [name]
       <input name="oname" type="hidden" value="[name]" />
     </td>

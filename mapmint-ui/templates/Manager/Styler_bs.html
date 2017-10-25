@@ -276,12 +276,18 @@
 	</div>
       </div>
       <div class="col-sm-12 no-grid">
-	<button href="#" class="btn btn-default mmClassifier no-tc">$zoo._("Classify")</button>
-	<button href="#" class="btn btn-default mmClassifier
-	require-tc no-tl no-us no-uv no-gs no-raster">$zoo._("Generate")</button>
+	<div class="col-sm-3">
+	  <button href="#" class="btn btn-default mmClassifier no-tc">$zoo._("Classify")</button>
+	  <button href="#" class="btn btn-default mmClassifier require-tc no-tl no-us no-uv no-gs no-raster">$zoo._("Generate")</button>
 #if isBasic      
-	<button href="#" class="btn btn-default mmPreviewer">$zoo._("Preview")</button>
+	  <button href="#" class="btn btn-default mmPreviewer">$zoo._("Preview")</button>
 #end if
+	</div>
+	<div class="col-sm-9" id="classify_progress" style="display:none">
+	  <div class="progress">
+	    <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0</div>
+	  </div>
+	</div>
       </div>
       <div class="col-sm-12 classesTable">
 	<table id="classes"></table>

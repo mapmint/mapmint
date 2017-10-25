@@ -3819,6 +3819,9 @@ def massiveImport(conf,inputs,outputs):
     vals=cur.fetchall()
     import vector_tools.vectSql as vectSql
     for i in range(len(vals)):
+        req1="select name,value,(select code from mm_tables.ftypes where id=type),rlabel from mm_tables.page_fields where pid="+str(vals[i][5])
+        res1=cur.execute(req1)
+        vals1=cur.fetchall()
         try:
             print >> sys.stderr,str(('SELECT * FROM "'+vals[i][0]+'" order by '+vals[i][2]+' '+vals[i][3]+'').encode('utf-8'))
         except:
@@ -3829,9 +3832,6 @@ def massiveImport(conf,inputs,outputs):
             print >> sys.stderr,str(('SELECT * FROM "'+vals[i][0]+'" order by '+vals[i][2]+' '+vals[i][3]+'').encode('utf-8'))
         except:
             print >> sys.stderr,('SELECT * FROM "'+vals[i][0]+'" order by '+vals[i][2]+' '+vals[i][3]+'')
-        req1="select name,value,(select code from mm_tables.ftypes where id=type),rlabel from mm_tables.page_fields where pid="+str(vals[i][5])
-        res1=cur.execute(req1)
-        vals1=cur.fetchall()
         tname="imports.\"tmp_"+vals[i][4].replace(".","___")+"_"+conf["lenv"]["usid"]+"\""
         tname_1=vals[i][4]
         #reqTemp0="CREATE TEMPORARY TABLE "+tname+" ("
@@ -3859,7 +3859,7 @@ def massiveImport(conf,inputs,outputs):
                 for k in range(len(refs)):
                     ref=eval(refs[k])
                     if vals[i][2].count("Field")==0:
-                        fieldName=j[0]
+                        fieldName=j[3]
                     else:
                         fieldName="Field"+str(ref[0]+1)
                     value+=res[ref[1]][fieldName]
@@ -3908,15 +3908,15 @@ def massiveImport(conf,inputs,outputs):
                         ref=eval(refs[l])
                         if ref[1]>=0 and ref[0]>=0:
                             if vals[i][2].count("Field")==0:
-                                fieldName=j[0]
+                                fieldName=j[3]
                             else:
                                 fieldName="Field"+str(ref[0]+1)
                         else:
                             fieldName=str(j[3].encode("utf-8"))
                         print >> sys.stderr,vals[i][2].count("Field")
-                        print >> sys.stderr,fieldName
+                        #print >> sys.stderr,fieldName
                         print >> sys.stderr,res[k]
-                        value+=res[k][fieldName.decode('utf-8')]
+                        value+=res[k][fieldName]#.decode('utf-8')]
                         valueX+="(null)"
                     try:
                         print >> sys.stderr,"+++++++++++----- 0 -------=++++++++++++++++"
@@ -3961,13 +3961,13 @@ def massiveImport(conf,inputs,outputs):
         if vals[i][6]:
             reqInsertTemp_1+=" RETURNING id"
         print >> sys.stderr,"******* 0 *********"
-        print >> sys.stderr,reqTemp
+        #print >> sys.stderr,reqTemp
         print >> sys.stderr,"******* 1 *********"
-        print >> sys.stderr,reqTemp_1
+        #print >> sys.stderr,reqTemp_1
         print >> sys.stderr,"******* 2 *********"
-        print >> sys.stderr,reqInsertTemp
+        #print >> sys.stderr,reqInsertTemp
         print >> sys.stderr,"******* 3 *********"
-        print >> sys.stderr,reqInsertTemp_1
+        #print >> sys.stderr,reqInsertTemp_1
         print >> sys.stderr,"******* 4 *********"
         con.pexecute_req([reqTemp,{}])
         con.pexecute_req([reqTemp_1,{}])

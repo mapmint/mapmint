@@ -43,10 +43,10 @@
 
 #def printBasicLine(obj)
 <div class="form-group row #if $obj.keys().count("classes")>0#$obj["classes"]#end if#">
-  <label class="col-sm-3 control-label">
+  <label class="col-sm-6 col-md-5 col-lg-4 control-label">
   $obj["label"]
   </label>
-  <div class="col-sm-9 ">
+  <div class="col-sm-6 col-md-7 col-lg-8 ">
    $obj["content"]
   </div>
 </div>
@@ -54,10 +54,10 @@
 
 #def printCoordInput(obj0)
 <div class="form-group row #if $obj0.keys().count("classes")>0#$obj0["classes"]#end if#">
-  <label class="col-sm-3 control-label">
+  <label class="col-sm-6 col-md-5 col-lg-4 control-label">
   $obj0["name"]
   </label>
-  <div class="col-sm-9 ">
+  <div class="col-sm-6 col-md-7 col-lg-8 ">
     <div class="col-xs-6">
       <div class="input-group">
 	<span class="input-group-addon" id="basic-addon1">X</span>
@@ -95,8 +95,8 @@
 #def printLine(obj)
 #set ltypes=["select","multiple","textarea","date","datetime","float","html","checkbox"]
 <div class="form-group row #if $obj.keys().count("classes")>0#$obj["classes"]#end if#">
-  <label class="col-sm-3 control-label">$obj["name"]</label>
-  <div class="col-sm-9 ">
+  <label class="col-sm-6 col-md-5 col-lg-4 control-label">$obj["name"]</label>
+  <div class="col-sm-6 col-md-7 col-lg-8 ">
 
 #if $obj.keys().count("optional")>0 and $obj["optional"]
     <div class="input-group">
