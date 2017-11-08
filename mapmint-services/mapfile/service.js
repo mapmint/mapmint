@@ -112,10 +112,12 @@ function saveLabelJS(conf,inputs,outputs){
 		    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.addLabelLayer0');
 		    var myExecuteResult2=myProcess2.Execute(inputs2,myOutputs2,"Cookie: MMID="+conf["senv"]["MMID"]);
 		    alert(myExecuteResult2);
-		    
-		    return {result: ZOO.SERVICE_SUCCEEDED, outputs: {"Result":{"dataType": "string","value": myExecuteResult2}}};
+
+		    outputs["Result"]["value"]=myExecuteResult2;
+		    return {result: ZOO.SERVICE_SUCCEEDED, outputs: outputs};
 		}catch(e){
 		    alert(e);
+		    conf["lenv"]["message"]=e;
 		    return {result: ZOO.SERVICE_FAILED, conf: conf};
 		}
             }else{

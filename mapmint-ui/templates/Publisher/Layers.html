@@ -52,9 +52,10 @@
       </div>
       <div class="row">
 	<label class="col-sm-3 control-label">$conf["mm"]["boLayerAlias"]</label>
-        <div class="col-sm-9 range">
+      <div class="col-sm-9 range">
+	<!-- $m.web.metadata.get('mmMBaseLayers') -->
 	  <select multiple id="mapquest" class="form-control" onchange="app.updateBaseLayers();">
-	    <option value="-1" #if not($m.web.metadata.get('mmMBaseLayers'))#selected="true"#end if#>$zoo._("None")</option>
+	    <option value="-1" #if $m.web.metadata.get('mmMBaseLayers')=="-1"#selected="true"#end if#>$zoo._("None")</option>
 #set a=$conf["mm"]["bmLayers"].split(",")
 #set b=$conf["mm"]["bmLayerAlias"].split(",")
 #if $m.web.metadata.get('mmMBaseLayers')
@@ -113,9 +114,10 @@
       </div>
       <div class="row">
 	<label class="col-sm-3 control-label">$zoo._("Created layers")</label>
-        <div class="col-sm-9 range">
+      <div class="col-sm-9 range">
+	<!-- $m.web.metadata.get('mmBProject') -->
 	  <select multiple id="mmBProject" class="select-window form-control" onchange="app.updateBaseLayers();">
-	    <option value="-1">$zoo._("None")</option>
+	    <option value="-1" #if $m.web.metadata.get('mmBProject')==""#selected="true"#end if#>$zoo._("None")</option>
 #try
 #set sel=$m.web.metadata.get('mmBProject').split(",")
 #except

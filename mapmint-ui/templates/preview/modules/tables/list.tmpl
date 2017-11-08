@@ -22,6 +22,15 @@
 #set tmp=$conf["lenv"]
 #set $tmp["mylevel"]=$currentLoadIndex
 
+<!--
+#try
+#set cLevel=$rLevel
+#except Exception,e
+$e
+#set cLevel=0
+#end try
+-->
+
 #try
 #if $embedded>=0
 #set prefix="embedded_"+str($embedded)+"_"
@@ -48,6 +57,15 @@
 #set isInput=False
 #end try
 #end try
+
+<!--
+#try
+$embedded
+#except Exception,e
+#set embedded=0
+#end try
+-->
+
 
 #set req="SELECT mm_tables.p_views.name,mm_tables.p_tables.description,mm_tables.p_tables.name,mm_tables.p_tables.id,mm_tables.p_views.clause FROM mm_tables.p_views,mm_tables.p_tables where mm_tables.p_tables.id=mm_tables.p_views.ptid and mm_tables.p_views.id="+$qComponents[0]
 #set res=$cur.execute($req)
@@ -368,7 +386,7 @@ $content
 #set inputs0={"id":{"value":str($vals[i][0])}}
 #end if
 #end if
-$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmpl",searchList={"conf": $conf,"inputs": $inputs0,"cur":$cur,"con":$con}))
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmpl",searchList={"conf": $conf,"inputs": $inputs0,"cur":$cur,"con":$con,"cid":12,"cLevel":$cLevel}))
 
 #if $vals[i][2]==-10
 </div></div>
@@ -398,7 +416,7 @@ $ftmpl.printTabHeaderNew({"id":$prefix+"edit0_"+str($vals1[i][0]),"title":$vals1
 #for i in range(len($vals1))
      <div id="$(prefix)edit0_$vals1[i][0]" role="tabpanel" class="tab-pane" >
 #set inputs0={"id":{"value":str($vals1[i][0])},"isReference":{"value":"true"}}
-$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmpl",searchList={"conf": $conf,"inputs": $inputs0,"cur":$cur,"con":$con,"cid":(i+1)*10}))
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmpl",searchList={"conf": $conf,"inputs": $inputs0,"cur":$cur,"con":$con,"cid":$currentLoadIndex+((i+1)*10),"cLevel":$cLevel}))
      </div>
 #end for
 </div>
@@ -408,6 +426,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 
 <input type="hidden" name="$(prefix)mainTableId" value="$tableId" />
 <input type="hidden" name="$(prefix)mainTableViewId" value="$qComponents[0]" />
+<input type="hidden" name="$(prefix)mainTableLevel" value="$cLevel" />
 
 
 #set req="SELECT mm_tables.p_view_fields.id,mm_tables.p_view_fields.alias,mm_tables.p_view_fields.value,mm_tables.p_view_fields.view,mm_tables.p_view_fields.search,mm_tables.p_view_fields.class,mm_tables.p_view_fields.width,mm_tables.p_view_fields.name FROM mm_tables.p_views,mm_tables.p_view_fields where mm_tables.p_views.id=mm_tables.p_view_fields.vid and mm_tables.p_views.id="+$qComponents[0]
@@ -475,6 +494,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 #else
     var obj={};
     obj["id"]="$prefix";
+    obj["level"]=$cLevel;
     obj["mainTableRFields"]=
 #end if
         [#for i in range(len($contents))#"$vals[i][7]",#end for#];
@@ -494,11 +514,23 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 #end for
         ];
 #if $prefix!=""
-#if $currentLoadIndex==1 or $embedded==1024
-#if not($isInput)
+#try
+#set toto=$conf["lenv"]["defined_e"]
+#set toto=$conf["lenv"]["defined_ie"]
+#except
+#set c=$conf["lenv"]
+#set $c["defined_e"]=False
+#set $c["defined_ie"]=False
+#end try
+#if not($isInput) and not($conf["lenv"]["defined_e"])
     var embeddeds=[];
+#set c=$conf["lenv"]
+#set $c["defined_e"]=True
 #else
+#if not($conf["lenv"]["defined_ie"])
     var iembeddeds=[];
+#set c=$conf["lenv"]
+#set $c["defined_ie"]=True
 #end if
 #end if
 #if not($isInput)

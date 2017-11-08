@@ -26,11 +26,42 @@ import os
 import sys
 import zoo
 import mm_access
+import mapscript
 
 if sys.platform == 'win32':
 	import ntfslink
 	os.readlink=ntfslink.readlink
 	os.symlink=ntfslink.symlink
+
+def sample(conf,inputs,outputs):
+    import mappyfile,io
+    myMap=mappyfile.load(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+    f=io.open(conf["main"]["dataPath"]+"/maps/debug_issue_project_"+inputs["map"]["value"]+".map","w",encoding='utf-8')
+    f.write(mappyfile.dumps(myMap))
+    f.close()
+    outputs["Result"]["value"]=conf["main"]["dataPath"]+"/maps/debug_issue_project_"+inputs["map"]["value"]+".map"
+    return zoo.SERVICE_SUCCEEDED
+    
+def issue(conf,inputs,outputs):
+    import mapscript,time,mappyfile,io
+    for i in range(10):
+        conf["lenv"]["message"]="Step "+str((i+1)*10)
+        zoo.update_status(conf,(i+1)*10)
+        f=open(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map","r")
+        f1=open(conf["main"]["dataPath"]+"/maps/debug_issue1_project_"+inputs["map"]["value"]+".map","w")
+        f1.write(f.read())
+        f1.close()
+        f.close()
+        myMap=mappyfile.load(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+        f1=io.open(conf["main"]["dataPath"]+"/maps/debug_issue2_project_"+inputs["map"]["value"]+".map","w",encoding='utf-8')
+        f1.write(mappyfile.dumps(myMap))
+        f1.close()
+        myMap=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+        print >> sys.stderr,dir(myMap)
+        print >> sys.stderr,myMap.save(conf["main"]["dataPath"]+"/maps/debug_issue_project_"+inputs["map"]["value"]+".map")
+        time.sleep(2)
+    outputs["Result"]["value"]=conf["main"]["dataPath"]+"/maps/debug_issue_project_"+inputs["map"]["value"]+".map"
+    return zoo.SERVICE_SUCCEEDED
 
 def canAccessLayer(conf,inputs,outputs):
     import mapscript,mm_access
@@ -971,7 +1002,6 @@ def createLegend0(conf,inputs,outputs):
     import json
     import math
     import mapscript
-    print >> sys.stderr,"Create new style for symbol fill"
     mapPath=conf["main"]["dataPath"]+"/maps/"
     if inputs.has_key("prefix"):
         if inputs["prefix"]["value"]=="indexes":
@@ -1008,6 +1038,8 @@ def createLegend0(conf,inputs,outputs):
             inputs0=inputs.copy()
             inputs0["mmStep"]={"value":str(kk)}
             outputs0=outputs.copy()
+            conf["lenv"]["message"]=zoo._("Create new style for step: ")+str(kk)
+            zoo.update_status(conf,10+((i*80/len(tmpSteps))))
             tmp_res=createLegend0(conf,inputs0,outputs0)
             print >> sys.stderr,json.loads(outputs0["Result"]["value"])
             mySteps+=[json.loads(outputs0["Result"]["value"],encoding="utf-8")]
@@ -2043,11 +2075,13 @@ def saveLayerStyle0(conf,inputs,outputs):
     outputs["Result"]["value"]=json.dumps(getClassObject(conf,inputs,layer,layer.getClass(nClass),nClass))
     outputs1={"Result": {"value": ""}}
     inputs["name"]={"value":inputs["map"]["value"]}
+    zoo.update_status(conf,10)
     createLegend(conf,inputs,outputs1)
+    zoo.update_status(conf,15)
     if layer.type==mapscript.MS_LAYER_RASTER  and layer.numclasses>1:
-	    if layer.metadata.get("mmTiled") is not None:
+        if layer.metadata.get("mmTiled") is not None:
 		    createColorRamp(conf,m,layer,int(layer.metadata.get("mmTiled")));
-	    else:
+        else:
 		    createColorRamp(conf,m,layer);
     try:
 	    if inputs.has_key("mmStep"):
@@ -2058,6 +2092,7 @@ def saveLayerStyle0(conf,inputs,outputs):
 	    f.close()
     except:
 	    pass
+    zoo.update_status(conf,95)
     return 3
 
 def saveLayerStyle(conf,inputs,outputs):
@@ -2326,6 +2361,13 @@ def updateProcessing(layer,resm):
 
 def createColorRamp(conf,m,layer,useTile=0):
     import mapscript,sys
+    print >> sys.stderr,conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map"
+    myMap=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
+    print >> sys.stderr,myMap.numlayers
+    myMap.save(conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+".map")
+    myMap.save(conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+"TOTO.map")
+    print >> sys.stderr,"DEBUG createColorRamp"
+    print >> sys.stderr,myMap.numlayers
     print >> sys.stderr,layer.numclasses
     color_file=open(conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr","w+")    
     for i in range(0,layer.numclasses):
@@ -2354,8 +2396,8 @@ def createColorRamp(conf,m,layer,useTile=0):
     color_file.close()
     import urllib2
     tmp0=layer.data.split("/")
-    print >>sys.stderr,conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";co=COMPRESSION=DEFLATE;utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result"
-    response = urllib2.urlopen(conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";co=COMPRESSION=DEFLATE;utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result")
+    print >>sys.stderr,conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";co=COMPRESS=DEFLATE;utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result"
+    response = urllib2.urlopen(conf["main"]["serverAddress"]+"?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.Gdal_Dem&DataInputs=InputDSN="+layer.data+";OutputDSN="+conf["main"]["dataPath"]+"/"+tmp0[len(tmp0)-1].replace(".","_"+conf["senv"]["last_map"]+"_colored.")+";co=COMPRESS=DEFLATE;utility=color-relief;cfn="+conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr;a=true&RawDataOutput=Result")
     value = response.read()
     print >> sys.stderr,useTile
     if useTile>0:
@@ -2396,9 +2438,15 @@ def createColorRamp(conf,m,layer,useTile=0):
 	    value=conf["main"]["dataPath"]+"/tile_"+conf["senv"]["last_map"]+"_"+layer.name+".shp"
 	    print >> sys.stderr,response.read()
 	    
+    print >> sys.stderr,"DEBUG createColorRamp"
     print >> sys.stderr,value
-    saveProjectMap(m,conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+".map")
-    m2=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+".map")
+    print >> sys.stderr,myMap.numlayers
+    #saveProjectMap(m,conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+".map")
+    #saveProjectMap(m,conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+"TOTO.map")
+    #myMap.save(conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+".map")
+    #myMap.save(conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+"TOTO.map")
+    #print >> sys.stderr,conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+"TOTO.map"
+    m2=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
     removeAllLayers(m2,layer.name)
     l=m2.getLayerByName(layer.name)
     a=l.numclasses
@@ -2511,7 +2559,16 @@ def getLayerStylesArray(conf,inputs,myLayer):
             break
     return res
 
-
+traditionalClassificationSteps=[
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80"
+    ]
 def classifyMap0(conf,inputs,outputs):
     import mapscript
     import sqlite3
@@ -2519,6 +2576,9 @@ def classifyMap0(conf,inputs,outputs):
     import json
     import sys
     import classifier.service as cs
+    if conf["lenv"].keys().count("statusHandled")==0:
+        conf["lenv"]["message"]=zoo._("Starting classification...")
+        zoo.update_status(conf,10)
     mapPath=conf["main"]["dataPath"]+"/maps"
     if inputs.has_key('prefix'):
         mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps"
@@ -2551,6 +2611,8 @@ def classifyMap0(conf,inputs,outputs):
         print >> sys.stderr,ll
         linputs=inputs.copy()
         linputs.pop("stepField",None)
+        conf["lenv"]["message"]=zoo._("Producing map classifications...")
+        zoo.update_status(conf,10)
         for i in range(0,len(ll)):
             llayer=layer.clone()
             llayer.name=layer.name+"_"+ll[i]["c"]
@@ -2577,6 +2639,9 @@ def classifyMap0(conf,inputs,outputs):
             m.save(mapfile)
             print >> sys.stderr,linputs
             print >> sys.stderr,"**********\n\nclassifyMap0\n\n********\n\n"
+            conf["lenv"]["message"]=zoo._("Producing map %s / %s ...") % (str(i),str(len(ll)))
+            zoo.update_status(conf,10+(i*90/len(ll)))
+            conf["lenv"]["statusHandled"]="True"
             classifyMap0(conf,linputs,outputs)
             print >> sys.stderr,"**********\n\n/classifyMap0\n\n********\n\n"
             m=mapscript.mapObj(mapfile)
@@ -2709,7 +2774,13 @@ def classifyMap0(conf,inputs,outputs):
             print >> sys.stderr,"-- OK"
             print >> sys.stderr,lInputs
             print >> sys.stderr,"OK --"
+            if conf["lenv"].keys().count("statusHandled")==0:
+                conf["lenv"]["message"]=zoo._("Executing SQL Statement ...")
+                zoo.update_status(conf,25)
             res=vt.vectInfo(conf,lInputs,outputs)
+            if conf["lenv"].keys().count("statusHandled")==0:
+                conf["lenv"]["message"]=zoo._("SQL Statement succeeded.")
+                zoo.update_status(conf,35)
             print >> sys.stderr,"-- OK"
             print >> sys.stderr,res
             print >> sys.stderr,outputs["Result"]
@@ -2853,6 +2924,9 @@ def classifyMap0(conf,inputs,outputs):
 
     #if l.type==mapscript.MS_LAYER_RASTER and nbClasses>1:
     #	    color_file=open(conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr","w+")
+    if conf["lenv"].keys().count("statusHandled")==0:
+        conf["lenv"]["message"]=zoo._("Create classes ...")
+        zoo.update_status(conf,45)
 
     while i < nbClasses:
         try:
@@ -2962,17 +3036,25 @@ def classifyMap0(conf,inputs,outputs):
             pass
         i+=1
 
+    
     if l.type==mapscript.MS_LAYER_RASTER  and nbClasses>1:
-	    if inputs.keys().count("tiled"):
-		    l.metadata.set("mmTiled",inputs["tiled"]["value"])
-		    createColorRamp(conf,m,l,int(inputs["tiled"]["value"]));
-	    else:
-		    try:
-			    l.metadata.remove("mmTiled")
-		    except:
-			    pass
-		    createColorRamp(conf,m,l);
+        conf["lenv"]["message"]=zoo._("Producing color ramp using Gdal_Dem...")
+        zoo.update_status(conf,45)
+        if inputs.keys().count("tiled"):
+            l.metadata.set("mmTiled",inputs["tiled"]["value"])
+            createColorRamp(conf,m,l,int(inputs["tiled"]["value"]));
+        else:
+            try:
+                l.metadata.remove("mmTiled")
+            except:
+                pass
+            createColorRamp(conf,m,l);
+        conf["lenv"]["message"]=zoo._("Color ramp produced.")
+        zoo.update_status(conf,65)
     inputs["name"]=inputs["map"]
+    if conf["lenv"].keys().count("statusHandled")==0:
+        conf["lenv"]["message"]=zoo._("Classes created.")
+        zoo.update_status(conf,75)
     if inputs.keys().count("mmType")>0:
         nameSpace={"conf": conf, "inputs": inputs, "outputs": outputs, "m": m, "mmType": inputs["mmType"]["value"]}
     else:
@@ -2990,6 +3072,9 @@ def classifyMap0(conf,inputs,outputs):
     inputs1=inputs
     inputs1["name"]=inputs["map"]
     outputs1={"Result": {"value": ""}}
+    if conf["lenv"].keys().count("statusHandled")==0:
+        conf["lenv"]["message"]=zoo._("Create legend ...")
+        zoo.update_status(conf,85)
     createLegend0(conf,inputs1,outputs)
     if inputs.keys().count("noRecurs")==0 and l.type==mapscript.MS_LAYER_RASTER and nbClasses>1 and m.web.metadata.get('mmRT') and m.web.metadata.get('mmRT').count('timeline')>0:
         for i in range(m.numlayers):
@@ -2998,6 +3083,13 @@ def classifyMap0(conf,inputs,outputs):
                 inputs["noRecurs"]={"value":"true"}
                 inputs["layer"]["value"]=ll.name
                 classifyMap0(conf,inputs,outputs)
+    if inputs.keys().count("mmMEField")>0:
+        layer.data="SELECT * FROM "+layer.data+" WHERE "+inputs["mmMEField"]["value"]+"='"+inputs["mmMEValue"]["value"]+"'"
+        m.save(mapfile)
+    inputs0={"mmProjectName":{"value":inputs["map"]["value"]+"_"+layer.name},"mmActivatedLayers":{"value":layer.name}}
+    outputs0={"Result":{"value":""}}
+    updateMapcacheCfg0(conf,inputs0,outputs0)
+
     return zoo.SERVICE_SUCCEEDED
 
     
@@ -3736,6 +3828,9 @@ def setMapLayerProperties(conf,inputs,outputs):
         print >> sys.stderr,outputs["Result"]["value"]
         tmp=json.loads(outputs["Result"]["value"].decode("utf-8"))
         for i in range(0,len(tmp)):
+            if i>0 and i % 10 == 0:
+                conf["lenv"]["message"]=zoo._("Producing filtered map %d / %d") % (i,len(tmp))
+                zoo.update_status(conf,((i+1)*100)/len(tmp))
             _filter=""
             fval=""
             ffilter=""
@@ -4145,6 +4240,44 @@ def removeGroupFromMap(conf,inputs,outputs):
     outputs["Result"]["value"]=zoo._("Directory deleted.")
     return 3
 
+def updateMapcacheCfg0(conf,inputs,outputs):
+    aL=inputs["mmActivatedLayers"]["value"].split(',')
+
+    fL=""
+    for i in aL:
+        if fL!="":
+            fL+=","
+        fL+=i  
+    if fL is None:
+        # No need for updating the cache
+        return 3
+
+    import libxml2
+    doc=libxml2.parseDoc(open(conf["mm"]["mapcacheCfg"],'r').read())
+    root=doc.xpathEval('/mapcache')
+    nodes=doc.xpathEval('/mapcache/source[@name="'+inputs["mmProjectName"]["value"]+'"]')
+
+    from Cheetah.Template import Template
+    searchList={"conf": conf,"inputs": inputs,"outputs": outputs,"layers": fL}
+    xmlSection=Template(file=conf["main"]["templatesPath"]+"/mapcacheLayer1.tmpl",searchList=searchList).__str__()
+
+    #print >> sys.stderr,xmlSection
+    doc1=libxml2.parseMemory(xmlSection,len(xmlSection))
+    aNodes=doc1.xpathEval('/mapcache/*')
+
+    if len(nodes)==0:
+        for j in range(0,len(aNodes)):
+            root[0].addChild(aNodes[j])
+    else:
+        nodes[0].replaceNode(aNodes[0])
+        nodes=doc.xpathEval('/mapcache/tileset[@name="'+inputs["mmProjectName"]["value"]+'Tile"]')
+        nodes[0].replaceNode(aNodes[1])
+    f=open(conf["mm"]["mapcacheCfg"],'w')
+    #print >> sys.stderr, doc
+    doc.saveTo(f)
+    f.close
+    return 3   
+
 def updateMapcacheCfg(conf,inputs,outputs):
     rL=inputs["rasterLayers"]["value"].split(',')
     aL=inputs["mmActivatedLayers"]["value"].split(',')
@@ -4463,10 +4596,20 @@ def savePublishMap(conf,inputs,outputs):
     saveProjectMap(m,destMapfile)
 
     import shutil
+    files=os.listdir(conf["main"]["dataPath"]+"/maps/")
+    cnt=0
+    conf["lenv"]["message"]=zoo._("Checking files...")
+    zoo.update_status(conf,10)
     for i in os.listdir(conf["main"]["dataPath"]+"/maps/"):
+        cnt+=1
+        if cnt%int(conf["mm"]["files_list_limit_nb"])==0:
+            print >> sys.stderr,zoo._("Checking file %d / %d") % (cnt,len(files))
+            conf["lenv"]["message"]=zoo._("Checking file %d / %d") % (cnt,len(files))
+            zoo.update_status(conf,10+int((cnt*80)/len(files)))
         if i.count("_"+inputs["map"]["value"]+"_")>0:
             shutil.copy(conf["main"]["dataPath"]+"/maps/"+i,conf["main"]["dataPath"]+"/public_maps/"+i)
-
+    conf["lenv"]["message"]=zoo._("Save legend icons")
+    zoo.update_status(conf,95);
     saveLegendIcons(conf,m)
     saveProjectMap(m,destMapfile)
 
@@ -4474,7 +4617,6 @@ def savePublishMap(conf,inputs,outputs):
     return 3
 
 def savePublishPreview(conf,inputs,outputs):
-	import mapscript
 	mapfile=conf["main"]["dataPath"]+"/public_maps/project_"+inputs["map"]["value"]+".map"
 	destMapfile=mapfile.replace("public_maps","maps")
 	m = mapscript.mapObj(mapfile)

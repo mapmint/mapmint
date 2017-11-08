@@ -49,10 +49,11 @@ def GetConf(conf,inputs,outputs):
 
 def SaveConf(conf,inputs,outputs):
 	i = 0
+	envs=["lenv","senv","renv","cookies","request"]
 	try:
 		f=open(conf["lenv"]["cwd"].replace("\\","/")+'/main.cfg', 'w')
 		for a in conf:
-			if a != "lenv" and a != "senv" and a != "renv":
+			if envs.count(a)==0:
 				if i>0:
 					f.write("\n");
 				f.write("["+a+"]\n");

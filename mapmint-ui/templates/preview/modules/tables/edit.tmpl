@@ -1,10 +1,30 @@
 #import zoo
 #from Cheetah.Template import Template
 #try
-#set embeddedNb=0+$cid
+#set embeddedNb=$cid
+#except
+#try
+#set $embeddedNb+=1
 #except
 #set embeddedNb=0
 #end try
+#end try
+
+#*
+#try
+#set csenv=int($conf["senv"]["embedded_cnt"])
+#set c=$conf["senv"]
+#set $c["embedded_cnt"]=$embeddedNb+1
+#except
+#try
+#set c=$conf["senv"]
+#set $c["embedded_cnt"]=1
+#except
+#set embeddedNb=1
+#end try
+#end try
+<h2>EBNB $embeddedNb</h2>
+*#
 
 
 #set alreadyDisplayed={}
@@ -159,7 +179,7 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
 #set lvals=$cur.fetchone()
 #try
 #set toto=$ftmpl.printBasicCheckbox()
-#set content=Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"qComponents":[str(lvals[0])],"embedded":$embeddedNb,"con":$con})
+#set content=Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"qComponents":[str(lvals[0])],"embedded":$embeddedNb,"con":$con,"rLevel":$cLevel+1})
 #set $embeddedNb+=1
 #except Exception,e
 <div class="alert alert-danger">$e</div>
@@ -201,7 +221,7 @@ $lvals
 #set res=$cur.execute($req)
 #set lvals=$cur.fetchone()
 #try
-#set content=Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"qComponents":[str(lvals[0])],"embedded":$embeddedNb,"isPreInput": True,"con":$con})
+#set content=Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"qComponents":[str(lvals[0])],"embedded":$embeddedNb,"isPreInput": True,"con":$con,"rLevel":$cLevel+1})
 #set $embeddedNb+=1
 #except Exception,e
 <div class="alert alert-danger">$e</div>
@@ -216,7 +236,7 @@ $ftmpl.printBasicLine({"label":$preTitle+$vals[i][2],"content":$content})
 #set res=$cur.execute($req)
 #set lvals=$cur.fetchone()
 #try
-#set content=Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"qComponents":[str(lvals[0])],"embedded":$embeddedNb,"isInput":True,"con":$con})
+#set content=Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"qComponents":[str(lvals[0])],"embedded":$embeddedNb,"isInput":True,"con":$con,"rLevel":$cLevel+1})
 #set $embeddedNb+=1
 #except Exception,e
 <div class="alert alert-danger">$e</div>

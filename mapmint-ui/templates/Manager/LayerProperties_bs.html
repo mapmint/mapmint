@@ -108,7 +108,14 @@ $printCheckbox($i)
 $printText($i)
 #end if
 #end for
-<button class="btn btn-default mm-layer-save" >$zoo._("Save")</button>
+<div class="col-sm-3">
+  <button class="btn btn-default mm-layer-save" >$zoo._("Save")</button>
+  </div>
+<div class="col-sm-9" id="properties_progress" style="">
+ <div class="progress">
+   <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0</div>
+ </div>
+</div>
 <script type="text/template" id="query_raster_tempalte_src">
 <input name="raster_query_title" class="form-control col-sm-6" placeholder="Sample title" value="Elevation" type="text"/>
 <input name="raster_query_tooltip" class="form-control col-sm-6" placeholder="Sample tooltip" type="text" value="Altitude" />

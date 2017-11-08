@@ -574,6 +574,13 @@ define([
 		break;
 	    }
 	}
+	if($('select[name="filter_field"]').is(':enabled')){
+	    inputs.push({
+		"identifier": "filter",
+		"value": $('select[name="filter_field"]').val(),
+		"dataType": "string"
+	    });
+	}
 	if(!hasBs){
 	    inputs.push({
 		"identifier": "label",
@@ -1443,9 +1450,15 @@ define([
     }
 
     function loadAllDisplay(ldata){
+	$(".nav-tabs").each(function(){
+	    $(this).find("a").first().each(function(){
+		$(this).click();
+	    });
+	});
+
 	toggleStylerForms($("#manaLayerProperties"),ldata.type);
 	$("#mm_layer_property_label_display").find('input[name="displayLabels"]').prop("checked",false).change();
-	if(ldata.name.replace(/grid_/g,"")!=ldata.name){
+	if(ldata.name && ldata.name.replace(/grid_/g,"")!=ldata.name){
 	    $(".require-grid").show();
 	    $("#mm_layer_property_label_display").find('input[name="displayLabels"]').prop("checked",true).change();
 	    $(".no-grid").hide();
@@ -1577,6 +1590,13 @@ define([
 	    if(ldata.type!=3)
 		myRootLocation.find(".require-raster").hide();
 	    myRootLocation.find(".require-add-step").hide();
+
+	    console.log(myRootLocation.find("input[name=minBandValue]").is(":visible"));
+	    console.log(myRootLocation.find("select[name=classification]").val());
+	    if(myRootLocation.find("select[name=classification]").val()!="us" )
+		$("#classify_progress").show();
+	    else
+		$("#classify_progress").hide();
 	});
 
 	var myRootLocation=$("#mm_layer_property_style_display");
@@ -2014,7 +2034,8 @@ define([
 	$("#mm_layer_property_style_display").find("button.mmClassifier").off("click");
 	$("#mm_layer_property_style_display").find("button.mmClassifier").click(function(e){
 	    console.log("Classifiy");
-	    var myLocation=$(this).parent().parent();
+	    var myLocation=$(this).parent().parent().parent();
+	    console.log(myLocation);
 	    var params=[];
 	    var edisabled=[];
 	    var classifierBindings={
@@ -2043,6 +2064,7 @@ define([
 		params.push({"id":"type","value": cbindings[myLocation.find("select[name="+cfield+"]").val()]});
 
 	    myLocation.find("input[type=text],input[type=range],textarea,select").each(function(){
+		console.log($(this).attr('name'));
 		if($(this).is(":visible") && $(this).is(":disabled"))
 		    edisabled.push($(this).attr('name'));
 		if($(this).is(":visible") && !$(this).is(":disabled") && $(this).val()!=null)
@@ -2090,60 +2112,135 @@ define([
 	    });
 	    
 	    console.log(inputs);
-	    zoo.execute({
-		identifier: "mapfile.classifyMap0",
-		type: "POST",
-		dataInputs: inputs,
-		dataOutputs: [
-		    {"identifier":"Message"},
-		    {"identifier":"Result"},
-		],
-		success: function(data){
-		    var outputs=data["ExecuteResponse"]["ProcessOutputs"]["Output"];
-		    $(".notifications").notify({
-			message: { text: outputs[0]["Data"]["LiteralData"]["__text"] },
-			type: 'success',
-		    }).show();
-		    var myNewData=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
-		    if(mmStep>=0){
-			console.log(mmStep-1);
-			loadStyleTable(myNewData);
-			if(mmStep==0){
-			    //ldata=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
-			    //loadStyleTable(ldata);
-			    $("#mmm_properties").trigger("click");
-			}
-			else{
-			    ldata["mmSteps"][mmStep-1]=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
-			}
+	    if( myLocation.find("select[name=classification]").val()!="us" ){
+		zoo.execute({
+		    identifier: "mapfile.classifyMap0",
+		    type: "POST",
+		    dataInputs: inputs,
+		    dataOutputs: [
+			{"identifier":"Message"},
+			{"identifier":"Result"},
+		    ],
+		    storeExecuteResponse: true,
+		    status: true,
+		    success: function(data){
+			console.log(data);
+			console.log(zoo.launched);
+			var cid=0;
+			for(var i in zoo.launched)
+			    cid=i;
+			var progress=$("#classify_progress").find(".progress-bar").first();
+			progress.removeClass("progress-bar-success");
+			progress.attr("aria-valuenow",0);
+			progress.css('width', (0)+'%');
+			zoo.watch(cid, {
+			    onPercentCompleted: function(data) {
+				console.log("**** PercentCompleted ****");
+				console.log(data);
+				console.log(progress.attr("aria-valuenow"));
+				progress.css('width', (eval(data.percentCompleted))+'%');
+				progress.attr("aria-valuenow",eval(data.percentCompleted));
+				console.log(progress.attr("aria-valuenow"));
+				progress.text(data.text+' : '+(data.percentCompleted)+'%');
+			    },
+			    onProcessSucceeded: function(data) {
+				progress.attr("aria-valuenow",100);
+				progress.css('width', (100)+'%');
+				progress.text(data.text+' : '+(100)+'%');
+				progress.addClass("progress-bar-success");
+				console.log(data);
+				ClassifyMapReact(data["result"],ldata,mmStep);
+				if (data.result.ExecuteResponse.ProcessOutputs) {
+				    console.log("**** onSuccess ****");
+				    console.log(data.result);
+				}
+				//ClassifyMapReact(data,ldata);
+			    },
+			    onError: function(data) {
+				console.log("**** onError ****");
+				console.log(data);
+				progress.attr("aria-valuenow",100);
+				progress.css('width', (100)+'%');
+				progress.text(data.text+' : '+(100)+'%');
+				try{
+				    $(".notifications").notify({
+					message: { text: data["result"]["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+					type: 'danger',
+				    }).show();
+				}catch(e){
+				    console.log(e);
+				}
+			    },
+			});
+		    },
+		    error: function(data){
+			console.log("ERROR");
+			$(".notifications").notify({
+			    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			    type: 'danger',
+			}).show();
 		    }
-		    else{
-			ldata["Style"]=myNewData["Style"];
-			loadStyleTable(ldata);
+		});
+	    }else{
+		zoo.execute({
+		    identifier: "mapfile.classifyMap0",
+		    type: "POST",
+		    dataInputs: inputs,
+		    dataOutputs: [
+			{"identifier":"Message"},
+			{"identifier":"Result"},
+		    ],
+		    success: function(data){
+			ClassifyMapReact(data,ldata,mmStep);
+		    },
+		    error: function(data){
+			console.log("ERROR");
+			$(".notifications").notify({
+			    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			    type: 'danger',
+			}).show();
 		    }
-		    console.log("LDATA TYPE: "+ldata.type);
-		    if(ldata.type==3){
-			var mapUrl=module.config().msUrl+"?map="+module.config().dataPath+"/maps/project_"+$("#save-map").val()+".map";
-			if(hasTiles)
-			    mapUrl=module.config().msUrl+"?map="+module.config().dataPath+"/maps/color_ramp_"+$("#save-map").val()+"_"+ldata.name+".map";
-			redrawLayer(ldata.name,mapUrl);
-		    }
-		    else
-			redrawLayer(ldata.name);
-		    if($('select[name="classification"]').val()=="tc"){
-			document.location.reload(false);
-		    }
-		},
-		error: function(data){
-		    console.log("ERROR");
-		    $(".notifications").notify({
-			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
-			type: 'danger',
-		    }).show();
-		}
-	    });
+		});
+	    }
 	    return false;
 	});
+    }
+
+    function ClassifyMapReact(data,ldata,mmStep){
+	var outputs=data["ExecuteResponse"]["ProcessOutputs"]["Output"];
+	$(".notifications").notify({
+	    message: { text: outputs[0]["Data"]["LiteralData"]["__text"] },
+	    type: 'success',
+	}).show();
+	var myNewData=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
+	if(mmStep>=0){
+	    console.log(mmStep-1);
+	    loadStyleTable(myNewData);
+	    if(mmStep==0){
+		//ldata=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
+		//loadStyleTable(ldata);
+		$("#mmm_properties").trigger("click");
+	    }
+	    else{
+		ldata["mmSteps"][mmStep-1]=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
+	    }
+	}
+	else{
+	    ldata["Style"]=myNewData["Style"];
+	    loadStyleTable(ldata);
+	}
+	console.log("LDATA TYPE: "+ldata.type);
+	if(ldata.type==3){
+	    var mapUrl=module.config().msUrl+"?map="+module.config().dataPath+"/maps/project_"+$("#save-map").val()+".map";
+	    if(ldata.tiled!=null)
+		mapUrl=module.config().msUrl+"?map="+module.config().dataPath+"/maps/color_ramp_"+$("#save-map").val()+"_"+ldata.name+".map";
+	    redrawLayer(ldata.name,mapUrl);
+	}
+	else
+	    redrawLayer(ldata.name);
+	if($('select[name="classification"]').val()=="tc"){
+	    document.location.reload(false);
+	}
     }
     
     /**
@@ -2234,9 +2331,73 @@ define([
 		type: "POST",
 		dataInputs: params,
 		dataOutputs: [
-		    {"identifier":"Result","type":"raw"},
+		    {"identifier":"Result"},
 		],
+		storeExecuteResponse: true,
+		status: true,
 		success: function(data){
+		    console.log(data);
+		    console.log(zoo.launched);
+		    var cid=0;
+		    for(var i in zoo.launched)
+			cid=i;
+		    var progress=$("#properties_progress").find(".progress-bar").first();
+		    progress.removeClass("progress-bar-success");
+		    progress.attr("aria-valuenow",0);
+		    progress.css('width', (0)+'%');
+		    zoo.watch(cid, {
+			onPercentCompleted: function(data) {
+			    console.log("**** PercentCompleted ****");
+			    console.log(data);
+			    console.log(progress.attr("aria-valuenow"));
+			    progress.css('width', (eval(data.percentCompleted))+'%');
+			    progress.attr("aria-valuenow",eval(data.percentCompleted));
+			    console.log(progress.attr("aria-valuenow"));
+			    progress.text(data.text+' : '+(data.percentCompleted)+'%');
+			},
+			onProcessSucceeded: function(data) {
+			    progress.attr("aria-valuenow",100);
+			    progress.css('width', (100)+'%');
+			    progress.text(data.text+' : '+(100)+'%');
+			    progress.addClass("progress-bar-success");
+			    console.log(data);
+			    ClassifyMapReact(data["result"],ldata,mmStep);
+			    if (data.result.ExecuteResponse.ProcessOutputs) {
+				console.log("**** onSuccess ****");
+				console.log(data.result);
+				$(".notifications").notify({
+				    message: { text: data },
+				    type: 'success',
+				}).show();
+			    }
+			    //ClassifyMapReact(data,ldata);
+			},
+			onError: function(data) {
+			    console.log("**** onError ****");
+			    console.log(data);
+			    progress.attr("aria-valuenow",100);
+			    progress.css('width', (100)+'%');
+			    progress.text(data.text+' : '+(100)+'%');
+			    try{
+				$(".notifications").notify({
+				    message: { text: data["result"]["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				    type: 'danger',
+				}).show();
+			    }catch(e){
+				console.log(e);
+			    }
+			},
+		    });
+		},
+		error: function(data){
+		    console.log("ERROR");
+		    $(".notifications").notify({
+			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			type: 'danger',
+		    }).show();
+		}
+
+		/*success: function(data){
 		    console.log("SUCCESS");
 		    console.log(data);
 		    $(".notifications").notify({
@@ -2251,7 +2412,7 @@ define([
 			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
 			type: 'danger',
 		    }).show();
-		}
+		}*/
 	    });
 	    return false;
 	});

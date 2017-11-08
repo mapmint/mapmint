@@ -259,15 +259,52 @@ define([
 	    type: "POST",
 	    dataInputs: inputs,
 	    dataOutputs: [
-		{"identifier":"Result","type":"raw"},
+		{"identifier":"Result"},
 	    ],
+	    storeExecuteResponse: true,
+	    status: true,
 	    success: function(data){
-		console.log("SUCCESS");
-		console.log(data);
-		$(".notifications").notify({
-		    message: { text: data },
-		    type: 'success',
-		}).show();
+		var cid=0;
+		for(var i in zoo.launched)
+		    cid=i;
+		var progress=$("#manaMap").find(".progress-bar").first();
+		progress.parent().show();
+		progress.removeClass("progress-bar-success");
+		progress.attr("aria-valuenow",0);
+		progress.css('width', (0)+'%');
+		zoo.watch(cid, {
+		    onPercentCompleted: function(data) {
+			progress.css('width', (eval(data.percentCompleted))+'%');
+			progress.attr("aria-valuenow",eval(data.percentCompleted));
+			progress.text(data.text+' : '+(data.percentCompleted)+'%');
+		    },
+		    onProcessSucceeded: function(data) {
+			progress.attr("aria-valuenow",100);
+			progress.css('width', (100)+'%');
+			progress.text(data.text+' : '+(100)+'%');
+			progress.addClass("progress-bar-success");
+			if (data.result.ExecuteResponse.ProcessOutputs) {
+			    progress.text(data.result.ExecuteResponse.ProcessOutputs.Output.Data.LiteralData.__text );
+			    $(".notifications").notify({
+				message: { text: data.result.ExecuteResponse.ProcessOutputs.Output.Data.LiteralData.__text },
+				type: 'success',
+			    }).show();
+			}
+		    },
+		    onError: function(data) {
+			progress.attr("aria-valuenow",100);
+			progress.css('width', (100)+'%');
+			progress.text(data.text+' : '+(100)+'%');
+			try{
+			    $(".notifications").notify({
+				message: { text: data["result"]["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				type: 'danger',
+			    }).show();
+			}catch(e){
+			    console.log(e);
+			}
+		    },
+		});
 	    },
 	    error: function(data){
 		console.log("ERROR");
@@ -422,7 +459,7 @@ define([
             "info":           false,
 	    "responsive":     false,
 	    deferRender:      true,
-	    crollCollapse:    true,
+	    scrollCollapse:    true,
 	    bFilter:          false
 	} );
 	$('table.gen').DataTable( {
@@ -433,7 +470,7 @@ define([
             "info":           false,
 	    "responsive":     false,
 	    deferRender:      true,
-	    crollCollapse:    true,
+	    scrollCollapse:    true,
 	    bFilter:          false
 	} );
 	// DataTables with reponsive parameter requires the following for re-activating the input radio
@@ -465,6 +502,11 @@ define([
 	    $(".mm-editor").summernote({height: 150});
 	}, 110);
 
+	$(".nav-tabs").each(function(){
+	    $(this).find("a").first().each(function(){
+		$(this).click();
+	    });
+	});
     };
 
     // Return public methods

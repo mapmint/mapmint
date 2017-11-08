@@ -3302,10 +3302,11 @@ def clientInsert(conf,inputs,outputs):
         keys=tuple.keys()
         columns=realKeys+keys
         print >> sys.stderr,columns
+        cnt=0
         for i in range(len(columns)):
             if specialFields.count(columns[i])==0:
                 print >> sys.stderr,columns[i]
-                if i>0:
+                if cnt>0:
                     col_sufix+=","
                     val_sufix+=","
                 if inputs.keys().count("id")==0:
@@ -3335,10 +3336,11 @@ def clientInsert(conf,inputs,outputs):
                         print >> sys.stderr,"TUPLE "
                         print >> sys.stderr,tupleReal[columns[i]].decode("utf-8")
                         col_sufix+=columns[i]+"="+str(tupleReal[columns[i]])
+                cnt+=1
             else:
                 hasElement=False
                 if dcols[specialFields.index(columns[i])]["type"]=="tbl_list":
-                    if i>0:
+                    if cnt>0:
                         col_sufix+=","
                         val_sufix+=","
                     if inputs.keys().count("id")==0:
@@ -3388,7 +3390,8 @@ def clientInsert(conf,inputs,outputs):
             cur.execute(req)
             cid=inputs["id"]["value"]
         for i in range(len(dcols)):
-            print >> sys.stderr,dcols[i]
+            print >> sys.stderr,"+++++"+str(dcols[i])
+            print >> sys.stderr,"+++++"+str(dvals[i])
             if dcols[i]["type"]=="bytea":
                 print >> sys.stderr,dcols[i]
                 if inputs.keys().count("id"):
@@ -3411,9 +3414,10 @@ def clientInsert(conf,inputs,outputs):
                     cur.execute(req)
                 except:
                     con.conn.commit()
-                for j in range(len(dvals[i])):
+                print >> sys.stderr,"-------" + str(tuple[dcols[i]["name"]])
+                for j in range(len(tuple[dcols[i]["name"]])):
                     try:
-                        req="INSERT INTO "+lcomponents[2]+" ("+lcomponents[0]+","+lcomponents[1]+") VALUES ("+cid+","+str(dvals[i][j])+")"
+                        req="INSERT INTO "+lcomponents[2]+" ("+lcomponents[0]+","+lcomponents[1]+") VALUES ("+cid+","+str(tuple[dcols[i]["name"]][j])+")"
                         print >> sys.stderr,req
                         cur.execute(req)
                     except:
@@ -3636,9 +3640,10 @@ def clientView(conf,inputs,outputs):
     files={}
     for i in range(len(vals)):
         print >> sys.stderr,vals[i][3]
-        if vals[i][2].count("unamed")==0:
+        if vals[i][2].count("unamed")==0 or vals[i][3]=="tbl_linked":
             columns+=[vals[i][2]]
         else:
+            #columns+=[vals[i][2]]
             fcolumns+=[vals[i][2]]
         if vals[i][3]=="tbl_linked":
             components=vals[i][4].split(';')
@@ -3681,7 +3686,6 @@ def clientView(conf,inputs,outputs):
         res=cur.execute(req)
         cvals=cur.fetchall()
         for j in range(len(cvals)):
-            print >> sys.stderr,cvals[j]
             if files.keys().count(cvals[j][2])>0:
                 if rvals[rcolumns.index(cvals[j][2])] is not None:
                     file=unpackFile(conf,rvals[rcolumns.index(cvals[j][2])])
@@ -3690,6 +3694,11 @@ def clientView(conf,inputs,outputs):
                 if rvals is not None and columns.count(cvals[j][2])>0 and columns.index(cvals[j][2])<len(rvals):
                     fres[ovals[i][0]][cvals[j][1]]=rvals[columns.index(cvals[j][2])]
                 else:
+                    print>> sys.stderr,"+++++ "+str(cvals[j])
+                    print>> sys.stderr,"+++++ "+str(ovals[i])
+                    print >> sys.stderr,columns.index(cvals[j][2])
+                    print >> sys.stderr,rvals
+                    print>> sys.stderr,"+++++ "+str(columns)
                     fres[ovals[i][0]][cvals[j][1]]="Not found"
             print >> sys.stderr,cvals[j]
     #fres["ref"]=inputs["id"]["value"] 

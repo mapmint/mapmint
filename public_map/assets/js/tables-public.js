@@ -218,7 +218,7 @@ define([
 		if(lid=="mainListing_display")
 		    mainTableSelectedId=$(this).find("input[name=id]").val();
 		else{
-		    embeddedTableSelectedId.push({name:lid,value:$(this).find("input[name=id]").val()});
+		    embeddedTableSelectedId/*[$("input[name="+prefix+"mainTableLevel]").val()]*/.push({name:lid,value:$(this).find("input[name=id]").val()});
 		}
 		CRowSelected.push(  lid+"_"+$(this).find("input[name=id]").val() );
 		$(this).addClass("selected");
@@ -350,15 +350,114 @@ define([
 		    try{
 			if(prefix==""){
 			    console.log("____ loadEmbeddedTables ____");
-			    loadEmbeddedTables(function(i){
+			    loadEmbeddedTables(/*$("input[name="+prefix+"mainTableLevel]").val(),*/function(i){
+				console.log($("input[name="+prefix+"mainTableLevel]").val());
 				console.log("____ EmbeddedTables load "+embeddeds[i].id);
 				//$("embedded_"+i+"_mainListing_display").dataTable().fnDraw();
 				//$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-				console.log("____ EmbeddedTables loaded"+i);
-				displayTable(embeddeds[i].id+"mainListing_display",$("input[name="+embeddeds[i].id+"mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),embeddedTableFilter[i]);
+				console.log("____ EmbeddedTables loaded "+i);
+				if(embeddeds[i].level==1)
+				    displayTable(embeddeds[i].id+"mainListing_display",$("input[name="+embeddeds[i].id+"mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),embeddedTableFilter[i]);
 				$(".require-"+embeddeds[i].id+"select").hide();
 			    });
 			    console.log("____ loadEmbeddedTables");
+			}else{
+			    console.log("ELSE ____ loadEmbeddedTables ____ "+prefix+" ");
+			    for(var i=0;i<embeddeds.length;i++){
+				console.log(embeddeds[i].level);
+				console.log(eval($("input[name="+prefix+"mainTableLevel]").val())+1);
+				if(eval($("input[name="+prefix+"mainTableLevel]").val())+1==embeddeds[i].level){
+				    console.log(embeddeds[i].level);
+				    var lprefix=embeddeds[i].id;
+				    console.log(prefix);
+				    try{
+					if(tableDisplayed[lprefix+"mainListing_display"]){
+					    console.log(tableDisplayed[lprefix+"mainListing_display"]);
+					    tableDisplayed[lprefix+"mainListing_display"].destroy();
+					}
+				    }catch(e){
+					console.log(e);
+				    }
+				    var oRoot=$("#"+lprefix+"mainListing_display");
+				    console.log(oRoot);
+				    for(var j=0;j<6;j++){
+					oRoot=oRoot.parent();
+					console.log(oRoot);
+				    }
+				    console.log(oRoot);
+				    var lRoot=oRoot.find("input").last();
+				    console.log(lRoot);
+				    if(lRoot.length==0){
+					console.log("************ "+oRoot.parent().parent().parent());
+					lRoot=oRoot.parent().parent().parent().find("input").last();
+				    }
+				    lRoot.each(function(){
+					console.log($(this));
+					var lid=oRoot.find("input[name="+lprefix+"link_col]").val();
+					console.log(lid);
+					var obj={"linkClause":" AND "};
+					obj[lid]=$(this).val();
+					embeddedTableFilter[i].push(obj);
+				    });
+				    console.log(lRoot);
+				    console.log(embeddedTableFilter);
+				    try{
+					console.log("RUN DISPLAY TABLE !");
+					displayTable(embeddeds[i].id+"mainListing_display",$("input[name="+embeddeds[i].id+"mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),embeddedTableFilter[i]);
+					//func(i);
+				    }catch(e){
+					console.log('-----!!!!! ERROR: '+e);
+				    }
+
+				}
+			    }
+			    /*for(var i=0;i<embeddeds.length;i++)
+				if($("input[name="+prefix+"mainTableLevel]").val()+1==embeddeds[i].level){
+				console.log(embeddeds[i].level);
+				var prefix=embeddeds[i].id;
+				console.log(prefix);
+				try{
+				    if(tableDisplayed[prefix+"mainListing_display"]){
+					console.log(tableDisplayed[prefix+"mainListing_display"]);
+					tableDisplayed[prefix+"mainListing_display"].destroy();
+				    }
+				}catch(e){
+				    console.log(e);
+				}
+				embeddedTableFilter.push([]);
+				var oRoot=$("#"+prefix+"mainListing_display");
+				console.log(oRoot);
+				for(var j=0;j<6;j++){
+				    oRoot=oRoot.parent();
+				    console.log(oRoot);
+				}
+				console.log(oRoot);
+				var lRoot=oRoot.find("input").last();
+				console.log(lRoot);
+				if(lRoot.length==0){
+				    console.log("************ "+oRoot.parent().parent().parent());
+				    lRoot=oRoot.parent().parent().parent().find("input").last();
+				}
+				lRoot.each(function(){
+				    console.log($(this));
+				    var lid=oRoot.find("input[name="+prefix+"link_col]").val();
+				    console.log(lid);
+				    var obj={"linkClause":" AND "};
+				    obj[lid]=$(this).val();
+				    embeddedTableFilter[i].push(obj);
+				});
+				console.log(lRoot);
+				console.log(embeddedTableFilter);
+				try{
+				    func(i);
+				}catch(e){
+				    console.log('-----!!!!! ERROR: '+e);
+				}
+			    }
+
+			    /*loadEmbeddedTables(function(i){
+				console.log($("input[name="+prefix+"mainTableLevel]").val());
+			    });*/
 			}
 		    }catch(e){
 			console.log(e);
@@ -599,7 +698,8 @@ define([
 		console.log($(this).attr("name"));
 		console.log($(this).attr("id"));
 		console.log($(this)[0].innerHTML);
-		tupleReal[$(this).attr("id").replace(/edition_/,"")]=$(this)[0].innerHTML;
+		if($(this).attr("id").replace(/edition_/,"")!="importer_progress" && $(this).attr("id").indexOf("_template")<0)
+		    tupleReal[$(this).attr("id").replace(/edition_/,"")]=$(this)[0].innerHTML;
 	    });
 	    var tuple={};
 	    myRoot.find("input,textarea,select").each(function(){
@@ -609,13 +709,15 @@ define([
 		    var noDisplay=false;
 		    try{
 			console.log("**********- "+myRoot1.attr('id'))
-			noDisplay=(($(this).attr("id").replace(/edition_/,"")=="tuple_id") ||
-				   ($(this).attr("id").replace(/edition_/,"")=="table_id") ||
-				   ($(this).attr("id").replace(/edition_/,"")=="edition_id") );
-			console.log($(this).attr("id").replace(/edition_/,""));
+			console.log($(this));
+			console.log("**********- "+($(this).parent().parent().parent().parent().attr('id') && $(this).parent().parent().parent().parent().attr('id').indexOf("embedded_")>=0));
+			console.log("**********- "+($(this).parent().parent().parent().attr('id') && $(this).parent().parent().parent().attr('id').indexOf("embedded_")>=0));
+			noDisplay=($(this).attr("id")==null ||
+				   ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="tuple_id") ||
+				   ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="table_id") ||
+				   ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="edition_id") );
 			console.log("**********- "+(myRoot1.attr('id').indexOf('embedded')<0));
-			console.log("**********- "+($(this).parent().parent().parent().parent().attr('id').indexOf("embedded_")>=0));
-			console.log("**********- "+($(this).parent().parent().parent().attr('id').indexOf("embedded_")>=0));
+			console.log("**********- "+noDisplay);
 		    }catch(e){
 			console.log(e);
 		    }
@@ -627,6 +729,7 @@ define([
 			return;
 		    console.log($(this).parent().parent().parent());
 		    console.log($(this).parent().parent().parent().parent());
+		    console.log("++++++ "+$(this).attr("id").replace(/edition_/,""));
 		    if(!mainTableFiles[$(this).attr("name")]){
 			if($(this).attr("name").indexOf("link_col")<0){
 			    if($(this).attr("type")=="checkbox"){
@@ -645,7 +748,7 @@ define([
 			mainTableFiles[$(this).attr("name")]=null;
 		    }
 		}catch(e){
-		    console.log($(this));
+		    console.log("!!!!!!!! ERROR "+$(this).attr("id"));
 		}
 	    });
 	    console.log(myRoot1.attr('id'));
@@ -897,11 +1000,16 @@ define([
 	embeddedTableFilter=[];
 	//var prefix="embedded_"+i;
 	for(var i=0;i<embeddeds.length;i++){
+	    console.log(embeddeds[i].level);
 	    var prefix=embeddeds[i].id;
 	    console.log(prefix);
-	    if(tableDisplayed[prefix+"mainListing_display"]){
-		console.log(tableDisplayed[prefix+"mainListing_display"]);
-		tableDisplayed[prefix+"mainListing_display"].destroy();
+	    try{
+		if(tableDisplayed[prefix+"mainListing_display"]){
+		    console.log(tableDisplayed[prefix+"mainListing_display"]);
+		    tableDisplayed[prefix+"mainListing_display"].destroy();
+		}
+	    }catch(e){
+		console.log(e);
 	    }
 	    embeddedTableFilter.push([]);
 	    var oRoot=$("#"+prefix+"mainListing_display");
@@ -942,14 +1050,33 @@ define([
 	$('#side-menu').metisMenu({ toggle: false });
 
 	$('#side-menu').css({"max-height": ($(window).height()-50)+"px","overflow":"scroll"});
-
+	try{   
+	    console.log(embeddeds);
+	}catch(e){
+	    console.log(e);
+	}
 	adminBasic.initialize(zoo);
+	try{   
+	    console.log(embeddeds);
+	}catch(e){
+	    console.log(e);
+	}
 	$(".mmdatastore").click(function(e){
 	    document.location=$(this).attr("href");
 	    return false;
 	});
 
+	try{   
+	    console.log(embeddeds);
+	}catch(e){
+	    console.log(e);
+	}
 	displayTable("mainListing_display",$("input[name=mainTableViewId]").val(),mainTableFields,mainTableRFields.join(","),mainTableFilter);
+	try{   
+	    console.log(embeddeds);
+	}catch(e){
+	    console.log(e);
+	}
 
 	$(".tab-pane").find("script").each(function(){
 	    console.log($(this));
@@ -1000,13 +1127,17 @@ define([
 						console.log(data)
 						console.log(data[$(this).val()])
 						console.log($(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]"));*/
-						$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").html("");
-						if(data[$(this).val()]['value'].length>0)
-						    for(var j=0;j<data[$(this).val()]['value'].length;j++)
-							$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="'+data[$(this).val()]['value'][j][0]+'">'+data[$(this).val()]['value'][j][1]+'</option>');
-						else
-						    $(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="NULL">'+module.config().localizationStrings.tables.none+'</option>');
-						$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").change();
+						try{
+						    $(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").html("");
+						    if(data[$(this).val()]['value'].length>0)
+							for(var j=0;j<data[$(this).val()]['value'].length;j++)
+							    $(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="'+data[$(this).val()]['value'][j][0]+'">'+data[$(this).val()]['value'][j][1]+'</option>');
+						    else
+							$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="NULL">'+module.config().localizationStrings.tables.none+'</option>');
+						    $(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").change();
+						}catch(e){
+						    console.log("MM ERROR: "+e);
+						}
 					    });
 					    closure.parent().find('select[name='+closure.attr('name')+']').first().change();
 					})(data);
@@ -1045,7 +1176,7 @@ define([
 	    console.log("----- DEBUG :"+e);
 	}
 	try{
-	    loadEmbeddedTables(function(i){
+	    loadEmbeddedTables(/*$("input[name=embedded_"+i+"_mainTableLevel]").val(),*/function(i){
 		displayTable("embedded_"+i+"_mainListing_display",$("input[name=embedded_"+i+"_mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),embeddedTableFilter[i]);
 	    });
 	}catch(e){
