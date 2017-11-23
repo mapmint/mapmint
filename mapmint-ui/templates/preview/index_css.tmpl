@@ -51,12 +51,16 @@ div#header{
 #if $l.metadata.get('mmSprite') is not None
 #set cn=0
 #import base64
+#try
 #set fs=open($l.metadata.get('mmSprite').replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
 #set fc=base64.b64encode(fs.read())
 #for j0 in range(0,$l.numclasses)##if $cn>0#,#end if#.tree_layer$(i)_class$(j0)#set $cn+=1##end for#{
     background:	url(data:image/png;base64,$fc) no-repeat;
 }
 #end if
+#except Exception,e
+ /* $e */
+#end try
 #for j in range(0,$l.numclasses)
 .tree_layer$(i)_class$(j){
 #if $l.metadata.get('mmSprite') is None
@@ -83,11 +87,15 @@ div#header{
 #if $layer.metadata.get('mmSprite') is not None
 #set cn=0
 #import base64
+#try
 #set fs=open($layer.metadata.get('mmSprite').replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
 #set fc=base64.b64encode(fs.read())
 #for j0 in range(0,$layer.numclasses)##if $cn>0#,#end if#.tree_layer$(i)_step$(cnt)_class$(j0)#set $cn+=1##end for#{
     background:	url(data:image/png;base64,$fc) no-repeat;
 }
+#except Exception,e
+ /* $e */
+#end try
 #end if
 #for j in range(0,$layer.numclasses)
 .tree_layer$(i)_step$(cnt)_class$(j){

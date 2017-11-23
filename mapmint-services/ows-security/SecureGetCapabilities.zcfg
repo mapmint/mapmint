@@ -1,0 +1,54 @@
+[SecureGetCapabilities]
+ Title = Securing access to any OGC Web Services.
+ Abstract = Securing access to any OGC Web Services.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [server]
+   Title = Input string
+   Abstract = The OGC server.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [token]
+   Title = Input string
+   Abstract = The token providing privileged access.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [Query]
+   Title = Input string
+   Abstract = The intial request (POST / GET).
+   minOccurs = 1
+   maxOccurs = 1
+   <ComplexData>
+    <Default>
+     mimeType = application/json
+     encoding = utf-8
+    </Default>
+    <Supported>
+     mimeType = text/xml 
+     encoding = utf-8
+    </Supported>
+   </ComplexData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <ComplexData>
+    <Default>
+     mimeType = text/xml 
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

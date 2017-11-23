@@ -7,6 +7,15 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
+CREATE OR REPLACE FUNCTION searchField(val text) RETURNS text
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+BEGIN
+        RETURN '%'||val||'%';
+END;
+$$;
+
 
 CREATE FUNCTION get_nb_of(my_array smallint[], val smallint) RETURNS integer
     LANGUAGE plpgsql
@@ -318,6 +327,117 @@ CREATE TABLE documents_themes (
     t_id integer REFERENCES mm.themes(id),
     d_id integer REFERENCES mm.documents(id)
 );
+
+
+CREATE TABLE servers (
+    id serial PRIMARY KEY,
+    name character varying(50),
+    url text
+);
+
+CREATE TABLE protocols (
+    id serial PRIMARY KEY,
+    name character varying(3),
+    cname character varying(25),
+    ename character varying(25),
+    lname character varying(50)
+);
+
+CREATE TABLE server_privileges (
+    id serial PRIMARY KEY,
+    id_group integer REFERENCES groups(id),
+    id_server integer REFERENCES servers(id),
+    id_protocol integer REFERENCES protocols(id),
+    r boolean,
+    w boolean,
+    x boolean
+);
+
+CREATE TABLE layer_privileges (
+    id serial PRIMARY KEY,
+    id_group integer REFERENCES groups(id),
+    id_server integer REFERENCES servers(id),
+    id_protocol integer REFERENCES protocols(id),
+    entity character varying(255),
+    r boolean,
+    w boolean,
+    x boolean
+);
+
+CREATE TABLE tokens(
+       id serial PRIMARY KEY,
+       id_group int4 REFERENCES groups(id), 
+       value varchar(25)
+);
+
+create table categories (
+       id serial primary key, 
+       name varchar(50)
+);
+
+
+create table requests(
+       id serial PRIMARY KEY,
+       name varchar(50)
+);
+
+create table request_protocol(
+       id serial PRIMARY KEY,
+       id_protocol int4 REFERENCES protocols(id),
+       id_request int4 REFERENCES requests(id), 
+       pos int,
+       id_category int4 references categories(id) 
+);
+
+CREATE TABLE mm.ip_restirction (id serial primary key, sid int4 references servers(id), address varchar(15));
+
+CREATE TABLE mm.security_logs (id serial primary key, request text, client varchar(15));
+
+
+INSERT INTO categories (id, name) VALUES (1, 'Read');
+INSERT INTO categories (id, name) VALUES (2, 'Write');
+INSERT INTO categories (id, name) VALUES (3, 'Execute');
+
+
+INSERT INTO protocols (id, name, cname, ename, lname) VALUES (1, 'SOS', 'SensorObservationService', NULL, NULL);
+INSERT INTO protocols (id, name, cname, ename, lname) VALUES (4, 'WMS', 'WebMapService', 'Layer', NULL);
+INSERT INTO protocols (id, name, cname, ename, lname) VALUES (2, 'WCS', 'WebCoverageService', 'CoverageOfferingBrief', NULL);
+INSERT INTO protocols (id, name, cname, ename, lname) VALUES (5, 'WPS', 'WebProcessingService', 'Process', NULL);
+INSERT INTO protocols (id, name, cname, ename, lname) VALUES (3, 'WFS', 'WebFeatureService', 'FeatureType', 'typeName');
+
+
+INSERT INTO requests (id, name) VALUES (1, 'GETCAPABILITIES');
+INSERT INTO requests (id, name) VALUES (2, 'GETMAP');
+INSERT INTO requests (id, name) VALUES (3, 'GETFEATUREINFO');
+INSERT INTO requests (id, name) VALUES (4, 'DESCRIBELAYER');
+INSERT INTO requests (id, name) VALUES (5, 'GETLEGENDGRAPHIC');
+INSERT INTO requests (id, name) VALUES (6, 'GETSTYLES');
+INSERT INTO requests (id, name) VALUES (7, 'DESCRIBEFEATURETYPE');
+INSERT INTO requests (id, name) VALUES (8, 'GETPROPERTYVALUE');
+INSERT INTO requests (id, name) VALUES (9, 'GETFEATURE');
+INSERT INTO requests (id, name) VALUES (10, 'LOCKFEATURE');
+INSERT INTO requests (id, name) VALUES (11, 'GETFEATUREWITHLOCK');
+INSERT INTO requests (id, name) VALUES (12, 'TRANSACTION');
+INSERT INTO requests (id, name) VALUES (13, 'DESCRIBEPROCESS');
+INSERT INTO requests (id, name) VALUES (14, 'EXECUTE');
+
+
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (8, 3, 7, -1, 1);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (10, 3, 9, -1, 3);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (13, 3, 12, -1, 2);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (14, 5, 13, -1, 1);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (15, 5, 14, -1, 3);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (11, 3, 10, -1, 2);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (12, 3, 11, -1, 2);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (6, 4, 6, -1, 1);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (5, 4, 5, -1, 3);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (4, 4, 4, -1, 1);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (3, 4, 3, -1, 3);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (2, 4, 2, -1, 3);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (16, 5, 1, 1, 1);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (9, 3, 8, -1, 1);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (7, 3, 1, 1, 1);
+INSERT INTO request_protocol (id, id_protocol, id_request, pos, id_category) VALUES (1, 4, 1, 1, 1);
 
 
 SET search_path = mm, pg_catalog;

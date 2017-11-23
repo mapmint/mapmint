@@ -114,6 +114,49 @@ define([
 	}
     }
 
+    function fillGeoreferencing(data){
+	console.log("**********-------------*************");
+	var cnt=0;
+	$("select[name='georef_field']").each(function(){
+	    if(cnt>0)
+		$(this).parent().parent().remove();
+	    cnt++;
+	});
+	for(var key in data.pages){
+	    console.log(data.pages[key]["georef"]);
+	    if(data.pages[key]["georef"] && data.pages[key]["georef"].length>0){
+		console.log("**********-------------*************");
+		for(var i=0;i<data.pages[key]["georef"].length;i++){
+		    var currentGeoref=data.pages[key]["georef"][i];
+		    $("#document_georef_id").val(currentGeoref.id);
+		    console.log($("#document_georef_id").val());
+		    console.log("**********-------------*************");
+		    console.log("    REQUIRE TO LOAD THE FIELDS !");
+		    $("#documents_georef_method").val(currentGeoref.fields.length==0?-1:currentGeoref.fields.length>2?"georef":"coord").change();
+		    for(var i=0;i<currentGeoref.fields.length;i++){
+			if(i>0){
+			    $("a.georef_add").click();
+			    console.log("**********------ CLICK -------*************");
+			}
+			console.log("select[name='georef_field']:eq("+i+")");
+			console.log($("select[name='georef_field']:eq("+i+")"));
+			console.log(currentGeoref.fields[i]["column_name"]);
+			$("select[name='georef_field']:eq("+i+")").val(currentGeoref.fields[i]["column_name"]);
+			if(i>0){
+			    console.log("input[name='georef_sep']:eq("+(i-1)+")");
+			    console.log($("input[name='georef_sep']:eq("+(i-1)+")"));
+			    $("input[name='georef_sep']:eq("+(i-1)+")").val(currentGeoref.fields[i]["separator"]);
+			}
+
+			console.log(currentGeoref.fields[i]);
+		    }
+		    console.log("**********-------------*************");
+		}
+		console.log("**********-------------*************");
+	    }
+	}
+    }
+    
     var hasBeenDone=false;
     function fillForm(data){
 	$(".project-title").html(data["name"]+' <i class="fa fa-'+(data["published"]=="false"?"exclamation":"check")+'"> </i>');
@@ -176,7 +219,7 @@ define([
 				
 			    }
 			    var tbody="";
-			    console.log(managerTools.generateFromTemplate($("#page_fields_table_template").html(),["tbody"],[tbody]));
+			    //console.log(managerTools.generateFromTemplate($("#page_fields_table_template").html(),["tbody"],[tbody]));
 			    $("#page_table_init").html(managerTools.generateFromTemplate($("#page_fields_table_template").html(),["tbody"],[tbody]));
 			    $("#pages_fields_table_display").DataTable({
 				rowReorder:       true,
@@ -259,6 +302,48 @@ define([
 				console.log(params);
 			    });
 
+			    $("select[name='georef_method']").off('change');
+			    $("select[name='georef_method']").change(function(){
+				console.log($(this).val());
+				if($(this).val()=="coord")
+				    $(this).parent().parent().next().show();
+				else
+				    $(this).parent().parent().next().hide();
+				if($(this).val()=="-1")
+				    $(this).parent().parent().next().next().hide();
+				else
+				    $(this).parent().parent().next().next().show();
+			    });
+			    $("select[name='georef_method']").change();
+			    $("a.georef_add").off('click');
+			    $("a.georef_add").click(function(e){
+				e.stopPropagation();
+				$(this).parent().parent().parent().parent().find("div.form-group").last().after($(this).parent().parent().parent().clone());
+				//$(this).parent().parent().parent().after($(this).parent().parent().parent().clone())
+				//$(this).parent().parent().parent().next().find(".btn-group").remove();
+				$(this).parent().parent().parent().parent().find("div.form-group").last().find(".btn-group").remove();
+				if($("select[name='georef_method']").val()=="georef"){
+				    //$(this).parent().parent().parent().next().find("label").append($("#template_georef_separator").html());
+				    $(this).parent().parent().parent().parent().find("div.form-group").last().find("label").append($("#template_georef_separator").html());
+				}
+				if($("select[name='georef_field']").length==1)
+				    $("a.georef_delete").addClass("disabled");
+				if($("select[name='georef_field']").length>1)
+				    $("a.georef_delete").removeClass("disabled");
+				console.log($(this));
+			    });
+			    $("a.georef_delete").off('click');
+			    $("a.georef_delete").click(function(e){
+				e.stopPropagation();
+				$(this).parent().parent().parent().parent().find("div.form-group").last().remove();
+				console.log($("select[name='georef_field']").length);
+				if($("select[name='georef_field']").length==1)
+				    $(this).addClass("disabled");
+				console.log($(this));
+			    });
+			    if($("select[name='georef_field']").length==1)
+				$("a.georef_delete").addClass("disabled");
+			    
 			    try{
 				$("#DS_table_indicatorTable_indicator").dataTable().fnSettings().aoDrawCallback.push( {
 				    "fn": function () {
@@ -266,11 +351,13 @@ define([
 					if(cData["pages"][$("#documents_ifile_page").val()]["fields"].length>0){
 					    console.log("****** TABLE REFRESH WITH VALUES !");
 					    var tbody="";
+					    $("#documents_georef_field").html("");
 					    for(var i=0;i<cData["pages"][$("#documents_ifile_page").val()]["fields"].length;i++){
 						var celem=cData["pages"][$("#documents_ifile_page").val()]["fields"][i];
 						tbody+=managerTools.generateFromTemplate($("#page_fields_line_template").html(),
 											 ["id","name","label","label_index","value","clause"],
 											 [i+1,celem["name"],celem["rlabel"],celem["label"],celem["value"],celem["clause"]]);
+						$("#documents_georef_field").append('<option>'+celem["name"]+'</option>');
 					
 						try{
 						    var tmp=celem["label"].split('||');
@@ -318,6 +405,7 @@ define([
 						cnt+=1;
 					    });
 					}
+					fillGeoreferencing(cData);
 				    },
 				    "sName": "user"
 				} );
@@ -651,6 +739,7 @@ define([
 	    ],
 	    success: function(data){
 		fillForm(data);
+		//fillGeoreferencing(data);
 		fileUrlSelection(data);
 		$("#indicatorForm").find(".nav").find("li").first().trigger("click");
 		if(data.it_id){
@@ -710,9 +799,10 @@ define([
 			    $(this).trigger("click");
 		    });
 		    var fields=["query"];
-		    for(var i=0;i<fields.length;i++)
-			$("#documents_data_"+fields[i]).val(data[fields[i]]);
-			    console.log($("#DS_indicatorTable_indicator"));
+		    for(var i=0;i<fields.length;i++){
+			$("#documents_data_"+fields[i]).val(data[fields[i]]);			
+		    }
+		    console.log($("#DS_indicatorTable_indicator"));
 		    if(data["file_link"] && !data["query"]){
 			$("#documents_ifile_link").attr("href",data["file_url"]).text(data["file_name"]);
 			fetchInfoAndDisplay(data["file_link"]);
@@ -1673,6 +1763,49 @@ define([
 	$("#page-wrapper").find("[role=presentation]").first().children().first().click();
 	
 
+	$("[data-mmaction=georef_save]").off('click');
+	$("[data-mmaction=georef_save]").click(function(){
+	    var columns=["pid"];
+	    if($("#tprj").is(":visible"))
+		columns.push("srs");
+	    var params=[
+		{"identifier": "table","value": "mm_tables.page_geom","dataType":"string"},
+		{"identifier": "columns","value": JSON.stringify(columns, null, ' '),"mimeType":"application/json"},
+	    	{"identifier": "links","value": JSON.stringify({"fields":{"table":"mm_tables.page_geom_fields","ocol":"pid","tid":"pid"}}, null, ' '),"mimeType":"application/json"},
+		{"identifier": "pid","value": $("#pages_id").val(),"dataType":"string"},
+		{"identifier": "iid","value": $("#pages_id").val(),"dataType":"string"}
+	    ];
+	    if($("#tprj").is(":visible"))
+		params.push({"identifier": "srs","value": $("#tprj").val(),"dataType":"string"});
+	    var fcnt=0;
+	    var lfields=[];
+	    $("select[name='georef_field']").each(function(){
+		if(fcnt>0){
+		    lfields.push({"column_name": $(this).val(), "separator": $("input[name='georef_sep']:eq("+(fcnt-1)+")").val()});
+
+		    console.log(lfields);
+		    console.log(lfields.length-1);
+		    console.log(lfields[lfields.lengh-1]);
+		    //lfields[lfields.lengh-1]["separator"]=$("input[name='georef_sep']:eq("+(fcnt-1)+")").val();
+		    //separators.push($("input[name='georef_sep']:eq("+(fcnt-1)+")").val());
+		}else{
+		    lfields.push({"column_name": $(this).val()});
+		}
+		fcnt+=1;
+	    });
+	    params.push({"identifier": "fields","value": JSON.stringify(lfields, null, ' '),"mimeType":"application/json"});
+	    //params.push({"identifier": "separators","value": JSON.stringify(separators, null, ' '),"mimeType":"application/json"});
+	    console.log(params);
+	    insert(params,($("#tables_view_id").val()!=-1),function(data){
+		console.log(data);
+		$(".notifications").notify({
+		    message: { text: data },
+		    type: 'success',
+		}).show();
+		loadAnElement($("#documents_id").val(),false);
+	    });
+	});
+	
 	$("[data-mmaction=join]").off('click');
 	$("[data-mmaction=join]").click(function(){
 	    console.log($(this));

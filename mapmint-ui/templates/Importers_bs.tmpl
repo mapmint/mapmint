@@ -117,14 +117,14 @@ var counter=0;
 <script type="text/javascript">
 var icounter=0;
 </script>
-  <div class="ifile form-group">
+  <div class="ifile">
 
-    $ftmpl.printLine({"rid":"documents_template_name","id":"template_name","name":$zoo._("Current template"),"classes":"disabled"})
+    $ftmpl.printLine({"rid":"documents_template_name","id":"template_name","name":$zoo._("Current template")})
 
-      <label class="col-sm-3 control-label">
+      <label class="col-sm-6 col-md-5 col-lg-4  control-label">
         $zoo._("Upload your file")
       </label>
-      <div class="col-sm-9 ">
+      <div class="col-sm-6 col-md-7 col-lg-8  ">
       <div class="col-sm-9 ">
   <form id="ifileUpload" action="$conf["main"]["serverAddress"]?request=Execute&service=WPS&version=1.0.0&Identifier=upload.saveOnServer&dataInputs=file=upload" method="post" enctype="multipart/form-data" target="iuploader">
     <input type="file" name="file" id="ifile" class="form-control file" />
@@ -156,6 +156,7 @@ var icounter=0;
 $printTab({"font":"info","title":$zoo._("Metadata")})
 $printTab({"font":"link","title":$zoo._("Data")})
 $printTab({"font":"table","title":$zoo._("Table")})
+$printTab({"font":"map","title":$zoo._("Georeferencing")})
 </ul>
 <div class="tab-content">
   <div id="indicators_form_info" role="tabpanel" class="tab-pane" >
@@ -200,6 +201,34 @@ $ftmpl.printLine({"rid":"documents_description","id":"dname","type":"textarea","
     $ftmpl.printButton({"id":"setAttribute","name":$zoo._("Set Attribute")})
     $ftmpl.printButton({"id":"useColumnNV","name":$zoo._("Use Column Definitions")})
     $ftmpl.printButton({"id":"setValue","name":$zoo._("Set Value")})
+  </div>
+
+  <div id="indicators_form_map" role="tabpanel" class="tab-pane" >
+        <input type="hidden" id="document_georef_id" value="-1" />
+#set options=[[-1,$zoo._("None")],["coord",$zoo._("Coordinates from columns")],["georef",$zoo._("Georeferencing address from column(s)")]]
+    $ftmpl.printLine({"rid":"documents_georef_method","id":"georef_method","name":$zoo._("Georeferencing method"), "type": "select","options":$options})  
+
+#from Cheetah.Template import Template
+#set content1=Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",searchList={"conf": $conf,"prefix":"","selected": "EPSG:4326","shouldDisplay":False,"class": "form-control"})
+  $ftmpl.printBasicLine({
+	"label": $zoo._("Projection system"),
+	"content": $content1
+	})
+
+#set columnGesture0=$ftmpl.printButtonGroupA0({
+  "class": "pull-right",
+  "a": [
+  {"target":"adder","title":$zoo._("Add a column"),"classes": "fa fa-plus georef_add"},
+  {"target":"deleter","title":$zoo._("Delete a column"),"classes": "fa fa-trash georef_delete"}
+]})
+
+    $ftmpl.printLine({"rid":"documents_georef_field","id":"georef_field","name":$zoo._("Column")+$columnGesture0, "type": "select","options":[[-1,$zoo._("First choose a table")]]})
+
+    $ftmpl.printButton({"id":"georef_save","name":$zoo._("Save")})
+
+<script type="txt/template" id="template_georef_separator">
+<input class="form-control pull-right" name="georef_sep" placeholder="Separator" value="" style="width: 60%">
+</script>
   </div>
 
   <div id="indicators_form_table" role="tabpanel" class="tab-pane form-horizontal" >

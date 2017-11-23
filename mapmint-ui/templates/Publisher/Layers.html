@@ -202,7 +202,7 @@
 	      <td><input name="maxScale" type="text" style="width:75px;" id="max_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmMaxScale")" /></td>
 	      <td><input name="lminScale" type="text" style="width:75px;" id="label_min_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmLabelMinScale")" /></td>
 	      <td><input name="lmaxScale" type="text" style="width:75px;" id="label_max_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmLabelMaxScale")" /></td>
-	      <td><a href="#access" onclick="MapMintUsersManager.editPrivilege('$m.getLayer($i).name')">priv.</a></td>
+	      <td><a href="#access" onclick="app.displayPermissionForm(\$(this) ,'$m.getLayer($i).metadata.get("mmDSTN")','$m.getLayer($i).name')">priv.</a></td>
 	    </tr>
 #end if
 #end for

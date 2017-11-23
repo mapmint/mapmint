@@ -9,6 +9,14 @@
 </div>   
 #end def
 
+#def printButtonGroupA0($obj)
+<div class="btn-group #if $obj.keys().count('class')>0#$obj["class"]#end if#">
+#for o in $obj["a"]
+  $printButtonA($o)
+#end for
+</div>
+#end def
+
 #def printButtonGroupA($obj)
 <div class="btn-group">
 #for o in $obj

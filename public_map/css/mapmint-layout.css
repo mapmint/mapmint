@@ -109,8 +109,11 @@ font-weight:normal;
 			
 			.tree label.tree-parent {
 				color: #222;
-			}
-			
+                                font-weight: bold;
+                        }
+                        .tree .layer label.tree-parent {
+                                font-weight: unset;
+                        }			
 			.tree label.tree-parent:hover {
 				text-decoration: none;
 			}

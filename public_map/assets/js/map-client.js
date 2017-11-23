@@ -121,7 +121,42 @@ define([
 	    else
 		popup.hide();*/
 	});
+    }
 
+    var featuresCnt=0;
+    function printFeatureInfo(gfLayer){
+	return function(res){
+	    if(res.length>1){
+		featuresCnt+=1;
+		if($(".window.active").length){
+		    if(!$(".window.active").find("h4").first().find("select").length){
+			var tmpTxt=$(".window.active").find("h4").first().text();
+			$(".window.active").find("h4").first().html("<select><option value='"+(featuresCnt)+"'>"+tmpTxt+"</option></select>");
+		    }
+		    $(".window.active").find("h4").first().find("select").append("<option value='"+(featuresCnt+1)+"'>"+oLayers[gfLayer].alias+"</option>")
+		    $(".window.active").find(".window-body").first().append("<div class='featureInfo' id='featureInfo_"+(featuresCnt+1)+"'><p>"+res.replace(/script1/g,"script")+"</p></div>");
+		    $(".window.active").find("h4").first().find("select").off("change");
+		    $(".window.active").find("h4").first().find("select").on("change",function(){
+			$(".window.active").find(".featureInfo").hide();
+			$(".window.active").find("#featureInfo_"+$(this).val()).show();
+		    });
+		   $(".window.active").find("h4").first().find("select").change();
+		}else{
+		    wm.createWindow({
+			title: oLayers[gfLayer].alias,
+			bodyContent: "<div class='featureInfo' id='featureInfo_"+(featuresCnt+1)+"'><p>"+res.replace(/script1/g,"script")+"</p></div>",
+			footerContent: '',
+			top: "79px"
+		    });
+		    $(".window.active").css({"width":"90%","top":"79px","left":"5%"});
+		}
+	    }else{
+		if(hasAddedFeature){
+		    selectLayer.getSource().clear();
+		    hasAddedFeature=false;
+		}
+	    }
+	}
     }
     
     function startSearchEngine(){
@@ -157,6 +192,8 @@ define([
 		console.log($(this));
 		var url=msUrl+"?map="+mapPath+"/search_"+mapProject+"_"+$(this).attr("data-name")+".map&version=1.1.0&service=WFS&request=GetFeature&typename="+$(this).attr("data-name")+"&propertyname=msGeometry,"+$(this).attr("data-field");
 		var cfield=$(this).attr("data-field");
+		$("nav").find("input[name=search_value]").val("Loading, please wait ...");
+		$("nav").find("input[name=search_value]").attr("disabled",true);
 		console.log(url);
 		    $.ajax({
 			url: url,
@@ -201,6 +238,7 @@ define([
 			    }catch(e){
 				console.log(e);
 			    }
+                            $("nav").find("input[name=search_value]").attr("disabled",false);
 			    $("nav").find("input[name=search_value]").typeahead(null, {
 				name: 'countries',
 				limit: 50,
@@ -216,7 +254,9 @@ define([
 				    map.getView().fit(searchExtents[searchValues.indexOf(datum)],map.getSize());				    
 				});
 			    });
-			    
+			    $("nav").find("input[name=search_value]").val("");
+                            $("nav").find("input[name=search_value]").prev().attr("disabled",false);
+                            $("nav").find("input[name=search_value]").prev().css({"background-color":"#fff"});
 			}
 		    });
 		    $('#scrollable-dropdown-menu .typeahead').click(function(){
@@ -1385,29 +1425,16 @@ define([
 		popup[1].hide();
 	    }
 	    var gfLayer="";
+	    featuresCnt=0;
+	    $(".window.active").remove();
 	    for(var i in oLayers){
 		if(selectedLayers.indexOf(i)==-1 && oLayers[i]["click"] && oLayers[i]["activated"]){
 		    console.log(oLayers[i]["searchMap"]);
 		    gfLayer=i;
 		    if(gfLayer!=""){
 			var closure=gfLayer;
-			displayFeatureInfo(evt,gfLayer,(function(gfLayer){return function(res){
-			    $(".window.active").remove();
-			    if(res.length>1){
-				wm.createWindow({
-				    title: oLayers[gfLayer].alias,
-				    bodyContent: "<p>"+res.replace(/script1/g,"script")+"</p>",
-				    footerContent: '',
-				    top: "79px"
-				});
-				$(".window.active").css({"width":"90%","top":"79px","left":"5%"});
-			    }else{
-				if(hasAddedFeature){
-				    selectLayer.getSource().clear();
-				    hasAddedFeature=false;
-				}
-			    }
-			}})(closure));
+			displayFeatureInfo(evt,gfLayer,printFeatureInfo(closure));
+			featuresCnt+=1;
 		    }
 		}
 	    }
@@ -1711,11 +1738,12 @@ define([
 			console.log(myLayer.index);
 			console.log(myLayer.rindex);
 			console.log(map.getLayers().item(myBaseLayers.length+myLayer.index).getVisible())
-			if(map.getLayers().item(myBaseLayers.length+myLayer.index).getVisible()){
+			console.log($(this).find('div.active'));
+			if(map.getLayers().item(myBaseLayers.length+myLayer.index).getVisible() && $(this).find('div.active').attr("id")){
 			    console.log($(this));
 			    var reg0=new RegExp("layer_"+myLayer.rindex+"_step","g");
-			    console.log($(this).find('.active'));
-			    var cid=parseInt($(this).find('.active').attr("id").replace(reg0,""));
+			    console.log($(this).find('div.active'));
+			    var cid=parseInt($(this).find('div.active').attr("id").replace(reg0,""));
 			    console.log(cid);
 			    //$(this).carousel('pause');
 			    console.log(myLayer.maps[cid]);
@@ -1799,7 +1827,12 @@ define([
 			    $("#mm_layers_display").find(".layer_"+myLayer.index).addClass("hide");
 			    $("#mm_layers_display").find(".layer_"+myLayer.index+".step"+cid).removeClass("hide");
 			    console.log(myBaseLayers.length+myLayer.index);
-			    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+			    console.log(myLayer);
+			    try{
+				map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+			    }catch(e){
+				map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().updateParams({"LAYERS": i});
+			    }
 			    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
 			    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().changed();
 			    //}
@@ -1810,7 +1843,16 @@ define([
 	    }
 	}
 
-
+	map.getView().on('propertychange', function(e) {
+	    switch (e.key) {
+	    case 'resolution':
+		console.log("#################################");
+		console.log(e.oldValue);
+		console.log(e);
+		break;
+	    }
+	});
+	
     }
 
     var myMMDataTableObject;
@@ -2536,7 +2578,7 @@ define([
 			console.log(sVal1);
 			var layer;
 			for(layer in oLayers){
-			    //console.log(oLayers[layer]);
+			    console.log(oLayers[layer]);
 			    console.log(oLayers[layer]["query"]+" "+oLayers[layer]["type"]=="raster");
 			    console.log(oLayers[layer]["query"] && oLayers[layer]["type"]=="raster");
 			    if(oLayers[layer]["query"] && oLayers[layer]["type"]=="raster"){

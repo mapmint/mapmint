@@ -59,6 +59,11 @@ define([
 	}
 
 	inputs.push({
+	    "identifier": "mmIPRestriction",
+	    "value": $("input[name='projectIp']").val(),
+	    "dataType": "string"
+	});
+	inputs.push({
 	    "identifier": "layout_t",
 	    "value": "leftcol_bs",
 	    "dataType": "string"
@@ -428,6 +433,82 @@ define([
 	console.log(baselayers);
     }
 
+    function displayPermissionForm(obj,dataStore,layer){
+	console.log(obj);
+	var params=[
+	    {
+		"identifier": "tmpl",
+		"value": "UsersManagement/LayerAccess_bs",
+		"dataType": "string"
+	    },
+	    {
+		"identifier": "layer",
+		"value": layer,
+		"dataType": "string"
+	    },
+	    {
+		"identifier": "hasIpRestriction",
+		"value": "True",
+		"dataType": "string"
+	    }
+	];
+	zoo.execute({
+	    identifier: "template.display",
+	    type: "POST",
+	    dataInputs: params,
+	    dataOutputs: [
+		{"identifier":"Result","type":"raw"},
+	    ],
+	    success: function(data){
+		var cindex=obj.parent().parent().index();
+		try{
+		    $("#datasources_list").find("tbody > tr:eq("+(cindex+1)+")").find('#datasourcePrivileges').parent().remove();
+		}catch(e){}
+		    
+		$("#datasources_list").find("tbody > tr:eq("+cindex+")").after('<tr><td colspan="11">'+data+'</td></tr>');
+		var relement=$("#datasources_list").find("tbody > tr:eq("+cindex+")").next();
+		console.log(relement);
+		if(relement.find("select").length==1){
+		    relement.find(".gselectDel").hide();
+		}
+		relement.find(".gselectAdd").click(function(){
+		    try{
+			var newElement=$(this).parent().next().next().next().clone();
+			console.log($(this).parent().next().next().next());
+			console.log(newElement);
+			$(this).parent().parent().append($(newElement)[0].outerHTML);
+			if(relement.find("select").length>1){
+			    relement.find(".gselectDel").show();
+			}
+		    }catch(e){
+			alert(e);
+		    }
+		    return false;
+		});
+		relement.find(".gselectDel").click(function(){
+		    try{
+			console.log($(this).parent().parent().find(".row").last());
+			$(this).parent().parent().find(".row").last().remove();
+			if(relement.find("select").length>1){
+			    relement.find(".gselectDel").show();
+			}else
+			    relement.find(".gselectDel").hide();
+		    }catch(e){
+			alert(e);
+		    }
+		    return false;
+		});
+
+	    },
+	    error: function(data){
+		$(".notifications").notify({
+		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+		    type: 'danger',
+		}).show();
+	    }
+	});
+    }
+    
     var actions={
 	"publish": publishMap,
 	"publishPreview": publishPreview
@@ -513,6 +594,7 @@ define([
     return {
         initialize: initialize,
 	updateBaseLayers: updateBaseLayers,
+	displayPermissionForm: displayPermissionForm,
     };
 
 

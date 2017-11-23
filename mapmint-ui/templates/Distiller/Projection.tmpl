@@ -1,6 +1,18 @@
 #import zoo
+#try
+#set test=$shouldDisplay
+#except
+#set test=True
+#end try
+#try
+#set lclass=$class
+#except
+#set lclass=""
+#end try
+#if $test
          <span>$zoo._("Projection System:")</span>
-	 <select id="${prefix}tprj">
+#end if	 
+	 <select id="${prefix}tprj" class="$lclass">
 #import sqlite3
 #set conn = sqlite3.connect($conf['main']['dblink'])
 #set c = $conn.cursor()

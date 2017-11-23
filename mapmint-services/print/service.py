@@ -307,4 +307,106 @@ END''')
     
     return 3
 
+def printOnlyMap(conf,inputs,outputs):
+    import sys
+    
+    coeff=1;
+    sizes={
+        "preview": (1024*coeff,768*coeff),
+        "A4l": (1024*coeff,768*coeff),
+        "A4": (768*coeff,1024*coeff)
+        }
+    csize=sizes[inputs["iFormat"]["value"]]
+    
+    # Load the map
+    import mapscript
+    mapfile=conf["main"]["dataPath"]+"/public_maps/project_"+inputs["map"]["value"]+".map"
+    m=mapscript.mapObj(mapfile)
+    for i in range(m.numlayers):
+        m.getLayer(i).status=mapscript.MS_OFF
+    m.setProjection("init=epsg:900913")
 
+    # Set activated layers to on
+    layers=inputs["layers"]["value"].split(",")
+    layerNames=[]
+    script0=""
+    print >> sys.stderr,"LAYERS:"+str(layers)
+    nblayer=0
+    for i in layers:
+        if i!="":
+            layer=m.getLayer(int(i))
+            if layer is None:
+                break
+            layer.status=mapscript.MS_ON
+            nblayer+=1
+    print >> sys.stderr,script0
+    #We should use a BoundingBoxData here rather than simple string.
+    ext=inputs["ext"]["value"].split(',')
+
+
+    # Fix extent based on zoom Level
+    if not(inputs.has_key("zoom")):
+        import math
+        n0=math.log((((20037508.34*2)*csize[0])/(256*(float(ext[2])-float(ext[0])))),2)
+        m0=math.log(((20037508.34*csize[1])/(256*(float(ext[3])-float(ext[1])))),2)
+        print >> sys.stderr,"+++++++++++++++++++++++++++++++++++++"
+        if n0 > m0:
+            zl=n0
+            print >> sys.stderr,n0
+        else:
+            zl=m0
+            print >> sys.stderr,m0
+            #print >> sys.stderr,inputs["zoom"]["value"]
+        print >> sys.stderr,"+++++++++++++++++++++++++++++++++++++"
+    else:
+        zl=int(float(inputs["zoom"]["value"]))
+    
+    delta=(100*(2**(18-zl)))
+    m.setExtent(float(ext[0])+delta,float(ext[1])+delta,float(ext[2])-delta,float(ext[3])-delta)
+
+    # Fix size
+    print >> sys.stderr,"OK"
+    m.setSize(csize[0],csize[1])
+    print >> sys.stderr,"OK"
+
+    # Replace the Background Map image in the document template if any
+    print >> sys.stderr,"OK"
+    if inputs.has_key("bgMap"):
+        print >> sys.stderr,"OK"
+        nl=mapscript.layerObj(m)
+        print >> sys.stderr,"OK"
+        nl.updateFromString('''LAYER 
+ NAME "BaseLayerMap" 
+ TYPE RASTER
+ UNITS METERS
+ STATUS ON
+ DATA "'''+inputs["bgMap"]["value"]+'''"
+ PROCESSING "RESAMPLE=AVERAGE"
+ PROJECTION 
+   "init=epsg:900913"
+ END
+END''')
+        print >> sys.stderr,"OK"
+        ordon=()
+        ordon+=((m.numlayers-1),)
+        for a in range(0,m.numlayers-1):
+            ordon+=(a,)
+        m.setLayerOrder(ordon)
+        print >> sys.stderr,"OK"
+
+    # Draw the image and save it
+    print >> sys.stderr,"Draw"
+    i=m.draw()
+    print >> sys.stderr,"OK"
+    import time
+    savedImage=conf["main"]["tmpPath"]+"/print_"+conf["lenv"]["usid"]+"_"+str(time.clock()).split(".")[1]+".png"
+    print >> sys.stderr,"OK"
+    try:
+        os.unlink(savedImage)
+    except:
+        pass
+    i.save(savedImage)
+    # ISSUE when using JS support and binary data returned by Execution...
+    #outputs["Result"]["value"]=open(savedImage,"rb").read()
+    outputs["Result"]["value"]=savedImage
+    return 3

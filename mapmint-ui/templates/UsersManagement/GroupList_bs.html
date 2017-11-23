@@ -74,6 +74,11 @@
 #end if
 #end if
 #end if
+#try
+#set ipTest=$ipRestriction
+#except
+#set ipTest=False
+#end try
 <legend>$zoo._("Groups")
 #if len(q0)>1
 <input type="submit" class="gselectAdd" value="$zoo._("Add")" />
@@ -82,9 +87,14 @@
 </legend>
 #if $inputs.has_key("layer") or $inputs.has_key("dataStore")
 <div class="row col-sm-12 col-xs-12">
-  <div class="col-sm-9 col-xs-6 ">
+  <div class="#if $ipTest#col-sm-6#else#col-sm-9#end if# col-xs-6 ">
     $zoo._("Group")
   </div>
+#if $ipTest  
+  <div class="col-sm-3 col-xs-3 ">
+    $zoo._("IP restiction")
+  </div>
+#end if
   <div class="col-sm-3 col-xs-3 ">
     $zoo._("Access")
   </div>
@@ -105,7 +115,7 @@
 #end if
 #for k in range(0,len($q1))
 <div id="$(prefix)um_gtr_$k" class="row col-sm-12 col-xs-12">
-  <div class="col-sm-9 col-xs-6 ">
+  <div class="#if $ipTest#col-sm-6#else#col-sm-9#end if# col-xs-6 ">
     <select id="$(prefix)um_group_$k" name="group" class="$(prefix)gselect gselect form-control">
       <option value="-1">$zoo._("Choose")</option>
 #for i in range(0,len($q0))
@@ -115,6 +125,11 @@
 #end for
     </select>
   </div>
+#if $ipTest    
+  <div class="col-sm-3 col-xs-3 ">
+    <input type="text" value="" class="form-control" id="ipAddress" placeholder="$zoo._("IP Address")" />
+  </div>
+#end if  
 #if $inputs.has_key("layer")  or $inputs.has_key("dataStore")
 #set l=0
 #for m in ["r","w","x"]

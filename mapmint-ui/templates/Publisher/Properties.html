@@ -25,6 +25,7 @@
       #include $conf["main"]["templatesPath"]+"/UsersManagement/GroupList_bs.html"
     </div>
   </div>
+  $printText({"name":"projectIp","title":$zoo._("IP restriction"),"value": $m.web.metadata.get("mm_access_ip")})
   <div class="form-group">
     <label class="col-sm-3 control-label">$zoo._("Classify in theme")</label>
     <div class="col-sm-9">

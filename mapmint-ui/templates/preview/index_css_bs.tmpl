@@ -68,12 +68,16 @@ body{
 #if $l.metadata.get('mmSprite') is not None
 #set cn=0
 #import base64
+#try
 #set fs=open($l.metadata.get('mmSprite').replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
 #set fc=base64.b64encode(fs.read())
 #for j0 in range(0,$l.numclasses)##if $cn>0#,#end if#.layer_$(i)_class$(j0)#set $cn+=1##end for#{
     background:	url(data:image/png;base64,$fc) no-repeat !important;
     content: "$l.metadata.get('mmSprite')";
 }
+#except Exception,e
+ /* $e */
+#end try
 #end if
 #for j in range(0,$l.numclasses)
 .layer_$(i)_class$(j){
@@ -112,7 +116,11 @@ body{
 #for kk in steps
 #set m0=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/timeline_"+$conf["senv"]["last_map"]+"_"+$l.name+"_step"+str($cnt)+".map")
 #set layer=m0.getLayer($i)
+#try
 #set res=$m0.web.metadata.set("cstep",str($cnt))
+#except
+#set res=0
+#end try
 #if $layer.metadata.get('mmSprite') is not None
 #set cn=0
 #import base64

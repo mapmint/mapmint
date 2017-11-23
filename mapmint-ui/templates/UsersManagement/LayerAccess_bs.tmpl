@@ -13,7 +13,12 @@
 #if ($inputs.has_key("dataStore") and $mm_access.checkDataSourcePriv($conf,$m,$inputs["dataStore"]["value"],$inputs["layer"]["value"],"rwx")) or not($inputs.has_key("dataStore"))
 <form>
 <div>
-$(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/GroupList_bs.html",searchList={"conf": $conf,"prefix":"","m": $m,"inputs": $inputs1}))
+#try
+#set test=eval($inputs["hasIpRestriction"]["value"])
+#except
+#set test=False
+#end try
+$(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/GroupList_bs.html",searchList={"conf": $conf,"prefix":"","m": $m,"inputs": $inputs1,"ipRestriction": $test}))
 </div>
 <div>
 <input type="hidden" id="am_layerName" value="$inputs["layer"]["value"]" />

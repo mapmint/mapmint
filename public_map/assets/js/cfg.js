@@ -10,7 +10,8 @@ requirejs.config({
 	olpopup: 'js/lib/openlayers/ol-popup',
 
         jquery: 'js/lib/jquery/jquery-2.1.3.min',
-        bootstrap: 'js/lib/bootstrap-3.1.1-dist/js/bootstrap.min',
+	Popper: 'js/lib/popper',
+        bootstrap: 'js/lib/bootstrap-3.3.7-dist/js/bootstrap.min',
 	bootselect: 'js/lib/bootstrap-select.min',
         notify: 'js/lib/bootstrap-notify',
 	slider: 'js/lib/bootstrap-slider',
@@ -60,8 +61,11 @@ requirejs.config({
 	mmDataTables: {
 	        deps: ['notify']
 	},
+	Popper: {
+	    deps: ['jquery']
+	},
         bootstrap: {
-            deps: ['jquery'],
+            deps: ['Popper'],
         },
 	window: {
 	    deps: ['bootstrap'],
@@ -79,7 +83,7 @@ requirejs.config({
 	    deps: ['bootstrap'],
 	},
 	dataTables: {
-	    deps: ['jquery'],
+	    deps: ['bootstrap'],
 	},
 	buttons: {
 	    deps: ['dataTables'],
@@ -135,6 +139,13 @@ requirejs.config({
 	    deps: ['highcharts','mmDataTables','olpopup', 'slider','cmenu','treeview','notify','colResize','enquire','bootselect','select','responsive','notify','window','myApp']
 	}
     },
+    map: {
+      '*': {
+        'datatables': 'dataTables',
+        'datatables.net': 'dataTables',
+        'datatables.net-buttons': 'dataTables_buttons'
+      }
+    },
     waitSeconds: 0
 });
 
@@ -161,7 +172,6 @@ require(['domReady', 'app'], function(domReady, app) {
     window.app=app;
 });
 
-
-
-
-
+require(["Popper"],function(p){
+  window.Popper = p;
+});

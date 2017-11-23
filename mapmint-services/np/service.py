@@ -2039,7 +2039,7 @@ def details(conf,inputs,outputs):
             res=detailsDocuments(con,inputs["id"]["value"],prefix)
         if inputs["table"]["value"].count("."):
             import datastores.postgis.pgConnection as pg
-            outputs0=[{"Result":{"value":""}},{"Result":{"value":""}},{"Result":{"value":""}},{"Result":{"value":""}}]
+            outputs0=[{"Result":{"value":""}},{"Result":{"value":""}},{"Result":{"value":""}},{"Result":{"value":""}},{"Result":{"value":""}}]
             tres=pg.getTableDescription(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":inputs["table"],"clause":{"value":"id='"+inputs["id"]["value"]+"'"}},outputs0[0])
             tres=pg.getTableContent(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":inputs["table"],"clause":{"value":"id='"+inputs["id"]["value"]+"'"}},outputs0[1])
             desc=json.loads(outputs0[0]["Result"]["value"])
@@ -2084,6 +2084,7 @@ def details(conf,inputs,outputs):
                     print >> sys.stderr,"******** -- "+str(outputs0[3])+" -- **************"
                     ldesc1=json.loads(outputs0[3]["Result"]["value"])
                     req="select * from mm_tables.page_fields where pid="+str(res1[j][0])+";"
+                    print >> sys.stderr,"******** -- "+str(req)+" -- **************"
                     cur.execute(req)
                     res2=cur.fetchall()
                     lfields=[]
@@ -2094,6 +2095,36 @@ def details(conf,inputs,outputs):
                         lfields+=[lobj1]
 
                     lobj["fields"]=lfields
+
+                    tres=pg.getTableDescription(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":{"value":"mm_tables.page_geom"},"clause":{"value":"pid='"+str(res1[j][0])+"'"}},outputs0[3])
+                    print >> sys.stderr,"******** -- "+str(outputs0[3])+" -- **************"
+                    ldesc2=json.loads(outputs0[3]["Result"]["value"])
+                    req="select * from mm_tables.page_geom where pid="+str(res1[j][0])+";"
+                    print >> sys.stderr,"******** -- "+str(req)+" -- **************"
+                    cur.execute(req)
+                    res3=cur.fetchall()
+                    print >> sys.stderr,"******** -- "+str(res3)+" -- **************"
+                    lfields=[]
+                    for k in range(len(res3)):
+                        lobj1={}
+                        for l in range(0,len(ldesc2)):
+                            lobj1[str(ldesc2[l][1]).encode("utf-8")]=res3[k][l]
+                        lfields+=[lobj1]
+                        tres=pg.getTableDescription(conf,{"dataStore":{"value":conf["main"]["dbuserName"]},"table":{"value":"mm_tables.page_geom_fields"},"clause":{"value":"pid='"+str(res3[k][0])+"'"}},outputs0[4])
+                        ldesc3=json.loads(outputs0[4]["Result"]["value"])
+                        req="select * from mm_tables.page_geom_fields where pid="+str(res3[k][0])+";"
+                        print >> sys.stderr,req
+                        cur.execute(req)
+                        res4=cur.fetchall()
+                        lfields1=[]
+                        for kk in range(len(res4)):
+                            lobj2={}
+                            for l in range(0,len(ldesc3)):
+                                lobj2[str(ldesc3[l][1]).encode("utf-8")]=res4[kk][l]
+                            lfields1+=[lobj2]
+                        lfields[len(lfields)-1]["fields"]=lfields1
+                    lobj["georef"]=lfields
+
                     res["pages"][lobj["name"]]=lobj
 
             if inputs["table"]["value"]=='"mm_tables"."p_tables"':
@@ -3831,6 +3862,9 @@ def massiveImport(conf,inputs,outputs):
         req1="select name,value,(select code from mm_tables.ftypes where id=type),rlabel from mm_tables.page_fields where pid="+str(vals[i][5])
         res1=cur.execute(req1)
         vals1=cur.fetchall()
+        req2="select id,srs from mm_tables.page_geom where pid="+str(vals[i][5])
+        res2=cur.execute(req2)
+        vals2=cur.fetchall()
         try:
             print >> sys.stderr,str(('SELECT * FROM "'+vals[i][0]+'" order by '+vals[i][2]+' '+vals[i][3]+'').encode('utf-8'))
         except:
@@ -3846,6 +3880,28 @@ def massiveImport(conf,inputs,outputs):
         #reqTemp0="CREATE TEMPORARY TABLE "+tname+" ("
         reqTemp0="CREATE TABLE "+tname+" ("
         reqTemp0_1="CREATE TABLE "+tname_1+" (id serial PRIMARY KEY, "
+        reqTemp0_1_suffix=""
+        vals3=[]
+        if len(vals2)>0:
+            from geopy import geocoders
+            geocoder=eval("geocoders."+conf["main"]["geocoder"]+"()")
+            req3="select id,column_name,separator from mm_tables.page_geom_fields where pid="+str(vals2[0][0])
+            res3=cur.execute(req3)
+            vals3=cur.fetchall()
+            names=tname_1.split('.')
+            if len(vals3)>2:
+                reqTemp0_1_suffix="SELECT AddGeometryColumn ('"+names[0]+"','"+names[1]+"','wkb_geometry',4326,'POINT',2);"
+            else:
+                reqTemp0_1_suffix="SELECT AddGeometryColumn ('"+names[0]+"','"+names[1]+"','wkb_geometry',"+vals2[0][1]+",'POINT',2);"
+            req4="select id, "
+            for kk in range(len(vals3)):
+                if req4!="select id, ":
+                    req4+=" || "
+                req_suffix=""
+                if len(vals3)>kk+1 and vals3[kk+1][2] is not None:
+                    req_suffix=" || $q$"+vals3[kk+1][2]+"$q$ "
+                req4+=" CASE WHEN "+vals3[kk][1]+" is not NULL and "+vals3[kk][1]+" != '(null)' THEN "+vals3[kk][1]+""+req_suffix+" ELSE '' END "
+            req4+=" as address from "+tname_1
         reqTemp=reqTemp0
         reqTemp_1=reqTemp0_1
         cattr=""
@@ -3994,5 +4050,30 @@ def massiveImport(conf,inputs,outputs):
         con.pexecute_req([reqInsertTemp_1,{}])
         if vals[i][6]:
             cid=con.cur.fetchone()[0]
+        
+        res4=cur.execute(req4)
+        vals4=cur.fetchall()
+        for kk in range(len(vals4)):
+            for jj in range(4):
+                try:
+                    print >> sys.stderr,"OK 1"
+                    obj=geocoder.geocode(vals4[kk][1].encode('utf-8'))
+                    print >> sys.stderr,"OK 2"
+                    #print >> sys.stderr,obj
+                    print >> sys.stderr,"OK 3"
+                    print >> sys.stderr,dir(obj)
+                    print >> sys.stderr,"OK 4"
+                    if len(vals3)>2:
+                        srid=4326
+                    else:
+                        srid=vlas2[0][1]
+                    reqTemp0_1_suffix+="UPDATE "+tname_1+" set wkb_geometry=ST_SetSRID(ST_GeometryFromText('POINT("+str(obj.longitude)+" "+str(obj.latitude)+")'),"+str(srid)+") where id = "+str(vals4[kk][0])+";"
+                    print >> sys.stderr,"OK 5"
+                    break
+                except Exception,e:
+                    print >> sys.stderr,"Cannot find coordinates for address ("+str(jj)+"): "+vals4[kk][1].encode('utf-8')
+                    print >> sys.stderr,str(e)
+        con.pexecute_req([reqTemp0_1_suffix,{}])
+
     outputs["Result"]["value"]=zoo._("File imported successfully")
     return zoo.SERVICE_SUCCEEDED

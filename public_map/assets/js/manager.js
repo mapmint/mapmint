@@ -165,7 +165,7 @@ define([
 		    //llevelInit=false;
 		    mmenu[level].push(id);
 		    var lid=id.replace(/ /g,"-_-");
-		    var cid=id.replace(/-_-/g," ");
+		    var cid=id.replace(/-_-/g," ").replace(/-__-/g,"(").replace(/-___-/g,")");
 		    var regs=[
 			new RegExp("\\[id\\]","g"),
 			new RegExp("\\[lid\\]","g"),
@@ -232,7 +232,7 @@ define([
 	    if(id!="steps" && id!="tiled" && id!="labels"){
 		if($.isArray(data[id])){
 		    var lid=id.replace(/ /g,"-_-");
-		    var cid=id.replace(/-_-/g," ");
+		    var cid=id.replace(/-_-/g," ").replace(/-__-/g,"(").replace(/-___-/g,")");
 		    var regs=[
 			new RegExp("\\[id\\]","g"),
 			new RegExp("\\[lid\\]","g"),
