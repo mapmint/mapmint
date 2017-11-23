@@ -33,6 +33,15 @@ if sys.platform == 'win32':
 	os.readlink=ntfslink.readlink
 	os.symlink=ntfslink.symlink
 
+def setMetadata(layer,field,value):
+    try:
+        layer.metadata.set(field,value)
+    except:
+        try:
+            layer.setMetaData(field,value)
+        except:
+            layer.metadata[field]=value
+
 def sample(conf,inputs,outputs):
     import mappyfile,io
     myMap=mappyfile.load(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
@@ -47,15 +56,15 @@ def issue(conf,inputs,outputs):
     for i in range(10):
         conf["lenv"]["message"]="Step "+str((i+1)*10)
         zoo.update_status(conf,(i+1)*10)
-        f=open(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map","r")
-        f1=open(conf["main"]["dataPath"]+"/maps/debug_issue1_project_"+inputs["map"]["value"]+".map","w")
-        f1.write(f.read())
-        f1.close()
-        f.close()
-        myMap=mappyfile.load(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
-        f1=io.open(conf["main"]["dataPath"]+"/maps/debug_issue2_project_"+inputs["map"]["value"]+".map","w",encoding='utf-8')
-        f1.write(mappyfile.dumps(myMap))
-        f1.close()
+        #f=open(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map","r")
+        #f1=open(conf["main"]["dataPath"]+"/maps/debug_issue1_project_"+inputs["map"]["value"]+".map","w")
+        #f1.write(f.read())
+        #f1.close()
+        #f.close()
+        #myMap=mappyfile.load(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
+        #f1=io.open(conf["main"]["dataPath"]+"/maps/debug_issue2_project_"+inputs["map"]["value"]+".map","w",encoding='utf-8')
+        #f1.write(mappyfile.dumps(myMap))
+        #f1.close()
         myMap=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
         print >> sys.stderr,dir(myMap)
         print >> sys.stderr,myMap.save(conf["main"]["dataPath"]+"/maps/debug_issue_project_"+inputs["map"]["value"]+".map")
@@ -101,12 +110,14 @@ def saveComplexSearch(conf,inputs,outputs):
 	import mapscript
 	m = mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
 	l=m.getLayerByName(inputs["layer"]["value"])
-	l.metadata.set("mmCS","true")
+	setMetadata(l,"mmCS","true")    
+	#l.metadata.set("mmCS","true")
 	tmp=["colonne_class","alias_class","ids_class","sessions_class","values_class","deps_class","orders_class","multiples_class","subscription","legend"]
 	tmp0=inputs.keys()
 	for i in tmp:
 		if tmp0.count(i)>0:
-			l.metadata.set("mmCS_"+i,inputs[i]["value"])
+			setMetadata(l,"mmCS_"+i,inputs[i]["value"])
+			#l.metadata.set("mmCS_"+i,inputs[i]["value"])
 		else:
 			try:
 				l.metadata.remove("mmCS_"+i)
@@ -266,9 +277,9 @@ def openInManager(conf,inputs,outputs):
 	    l.setMetaData("mmDSTN",inputs["dstn"]["value"])
         i-=1
 
-    m.web.metadata.set("mm_group_0","Layers")
-    m.web.metadata.set("mm_group_1","Legend,")
-    m.web.metadata.set("mm_group_2","Group,|Legend;")
+    setMetadata(m.web,"mm_group_0","Layers")
+    setMetadata(m.web,"mm_group_1","Legend,")
+    setMetadata(m.web,"mm_group_2","Group,|Legend;")
 
     llogin=conf["senv"]["login"].replace('.','_')
     m.save(conf["main"]["dataPath"]+"/maps/project_Untitled_0_"+llogin+".map")
@@ -407,13 +418,15 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
     print >> sys.stderr,mapfile
     try:
         m = mapscript.mapObj(mapfile)
-        m.web.metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
+        setMetadata(m.web,"ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
         for i in range(0,m.numlayers):
             if m.getLayer(i).metadata.get("ows_srs") is None or m.getLayer(i).metadata.get("ows_srs").count('EPSG:3857')==0:
                 if m.getLayer(i).metadata.get("ows_srs") is None:
-                    m.getLayer(i).metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
+                    setMetadata(m.getLayer(i),"ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
+                    #m.getLayer(i).metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
                 else:
-                    m.getLayer(i).metadata.set("ows_srs",m.getLayer(i).metadata.get("ows_srs")+"  EPSG:3857 EPSG:900914")
+                    setMetadata(m.getLayer(i),"ows_srs",m.getLayer(i).metadata.get("ows_srs")+" EPSG:3857 EPSG:900914 EPSG:900913")
+                    #m.getLayer(i).metadata.set("ows_srs",m.getLayer(i).metadata.get("ows_srs")+"  EPSG:3857 EPSG:900914")
         m.save(mapfile)
     except Exception,e:
         print >> sys.stderr,e
@@ -433,7 +446,8 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
                     print >> sys.stderr,m.web.metadata.get("ows_srs")
                     #print >> sys.stderr,dir(m)
                     srs=m.web.metadata.get("ows_srs")
-                    m.web.metadata.set("ows_srs",srs+" EPSG:3857")
+                    setMetadata(m.web,"ows_srs",srs+" EPSG:3857")
+                    #m.web.metadata.set("ows_srs",srs+" EPSG:3857")
                     for i in range(0,m.numlayers):
                         l=m.getLayer(i)
                         con=l.connection
@@ -502,8 +516,10 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
                                         layersList = wmsGetCapDocument.getElementsByTagName('Layer')
                                     print >> sys.stderr,"************************"
                                     v0=layersList[i].getElementsByTagName('LegendURL')[0].getElementsByTagName('OnlineResource')[0]
-                                    l.metadata.set("mmIcon",v0.getAttribute("xlink:href"))
-                                    l.metadata.set("mmWMS","true")
+                                    setMetadata(l,"mmIcon",v0.getAttribute("xlink:href"))
+                                    setMetadata(l,"mmWMS","true")
+                                    #l.metadata.set("mmIcon",v0.getAttribute("xlink:href"))
+                                    #l.metadata.set("mmWMS","true")
                                     v=layersList[i].getElementsByTagName('Dimension')
                                     lcnt=0
                                     if len(v)>0:
@@ -523,7 +539,8 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
                                                     f.close()
                                                     l0=l.clone()
                                                     l0.name=l0.name.encode('utf-8')+"_"+str(lcnt)
-                                                    l0.metadata.set("ows_title",str(l0.metadata.get("ows_title"))+" "+dimension[j])
+                                                    setMetadata(l0,"ows_title",str(l0.metadata.get("ows_title"))+" "+dimension[j])
+                                                    #l0.metadata.set("ows_title",str(l0.metadata.get("ows_title"))+" "+dimension[j])
                                                     #l0.metadata.set("ows_title",l.metadata.get("ows_title").encode('utf-8')+" "+dimension[j].encode('utf-8'))
                                                     l0.connection=None
                                                     l0.connectiontype=-1
@@ -548,7 +565,8 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
                                     f.close()
                                     l.connection=None
                                     l.connectiontype=-1
-                                    l.metadata.set("mmWMS","true")
+                                    setMetadata(l,"mmWMS","true")
+                                    #l.metadata.set("mmWMS","true")
                                     #l.setConnectionType(mapscript.MS_RASTER,"")
                                     l.data=fName
                                 except Exception,e:
@@ -668,7 +686,8 @@ def _loadMapForDs(conf,inputs,outputs):
         i=m1.numlayers
         j=0
         #print >> sys.stderr, m1
-        m1.web.metadata.set("mm_group_0","Layers")
+        setMetdata(m1.web,"mm_group_0","Layers")
+        #m1.web.metadata.set("mm_group_0","Layers")
         while i >=0 :
             #print >> sys.stderr,i
             #print >> sys.stderr,m1.getLayer(i)
@@ -680,7 +699,8 @@ def _loadMapForDs(conf,inputs,outputs):
             elif m.getLayer(i) is not None:
                 #print >> sys.stderr,i
                 #print >> sys.stderr,m1.getLayer(i)
-                m1.getLayer(i).metadata.set("mm_group","Layers")
+                setMetadata(m1.getLayer(i),"mm_group","Layers")
+                #m1.getLayer(i).metadata.set("mm_group","Layers")
             i-=1
     else:
         mapfile=conf["main"]["dataPath"]+"/dirs/"+inputs["dstName"]["value"]+"/ds_ows.map"
@@ -702,15 +722,19 @@ def _loadMapForDs(conf,inputs,outputs):
         for i in range(0,m2.numlayers):
             if m2.getLayer(i).name==inputs["dsoName"]["value"]:
                 demo=m2.getLayer(i).clone()
-                demo.metadata.set("mm_group",inputs["dsgName"]["value"])
-                demo.metadata.set("mmDSTN",inputs["dstName"]["value"])
-                demo.metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
+                setMetadata(demo,"mm_group",inputs["dsgName"]["value"])
+                setMetadata(demo,"mmDSTN",inputs["dstName"]["value"])
+                setMetadata(demo,"ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
+                #demo.metadata.set("mm_group",inputs["dsgName"]["value"])
+                #demo.metadata.set("mmDSTN",inputs["dstName"]["value"])
+                #demo.metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
                 m1.insertLayer(demo)
     m1.setProjection("EPSG:4326")
     mapfile=conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map"
     #print >> sys.stderr, m1
     #print >> sys.stderr, mapfile
-    m1.web.metadata.set("mmEditor",conf["senv"]["login"])
+    #m1.web.metadata.set("mmEditor",conf["senv"]["login"])
+    setMetadata(m1.web,"mmEditor",conf["senv"]["login"])
     saveProjectMap(m1,mapfile)
 
     initMintMapfile(conf,m1,inputs["map"]["value"],inputs["dsoName"]["value"])
@@ -979,7 +1003,8 @@ def loadLegendMapfile(conf,inputs):
                 else:
                     m=mapscript.mapObj(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_Index"+conf["senv"]["last_index"]+".map")			    
                     removeAllLayers(m,inputs["layer"]["value"])
-                    m.web.metadata.set("mmEditor",conf["senv"]["login"])
+                    setMetadata(m.web,"mmEditor",conf["senv"]["login"])
+                    #m.web.metadata.set("mmEditor",conf["senv"]["login"])
                     saveProjectMap(m,conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
                 pass
         mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/"
@@ -1014,7 +1039,8 @@ def createLegend0(conf,inputs,outputs):
                 else:
                     m=mapscript.mapObj(conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_Index"+conf["senv"]["last_index"]+".map")			    
                 removeAllLayers(m,inputs["layer"]["value"])
-                m.web.metadata.set("mmEditor",conf["senv"]["login"])
+                setMetadata(m.web,"mmEditor",conf["senv"]["login"])
+                #m.web.metadata.set("mmEditor",conf["senv"]["login"])
                 saveProjectMap(m,conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/project_"+inputs["name"]["value"]+".map")
                 pass
         mapPath=conf["main"]["dataPath"]+"/"+inputs["prefix"]["value"]+"_maps/"
@@ -1109,7 +1135,8 @@ def createLegend0(conf,inputs,outputs):
             k=0
             for j in layers:
                 j.name+="_"+str(k+1)
-                j.metadata.set("ows_name",j.name)
+                setMetadata(j,"ows_name",j.name)
+                #j.metadata.set("ows_name",j.name)
                 #print >> sys.stderr,j.name
                 l=j.numclasses-1
                 while l >= 0:
@@ -1560,7 +1587,8 @@ def createLegend(conf,inputs,outputs):
             k=0
             for j in layers:
                 j.name+="_"+str(k+1)
-                j.metadata.set("ows_name",j.name)
+                setMetadata(j,"ows_name",j.name)
+                #j.metadata.set("ows_name",j.name)
                 #print >> sys.stderr,j.name
                 l=j.numclasses-1
                 while l >= 0:
@@ -1750,9 +1778,11 @@ def saveMap(conf,inputs,outputs):
     import time
     try:
         m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["mapOrig"]["value"]+".map")
-        m.web.metadata.set("mmProjectName",inputs["map"]["value"])
+        #m.web.metadata.set("mmProjectName",inputs["map"]["value"])
+        setMetadata(m.web,"mmProjectName",inputs["map"]["value"])
         if m.web.metadata.get("mmTitle")=="" or m.web.metadata.get("mmTitle") is None :
-            m.web.metadata.set("mmTitle",inputs["map"]["value"])
+            #m.web.metadata.set("mmTitle",inputs["map"]["value"])
+            setMetadata(m.web,"mmTitle",inputs["map"]["value"])
         saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
         import authenticate.service as auth
         con = auth.getCon(conf)
@@ -1803,7 +1833,8 @@ def addGroup(conf,inputs,outputs):
     try:
         pref=m.web.metadata.get("mm_group_"+inputs["id"]["value"])
         if int(inputs["id"]["value"]) > 1:
-            m.web.metadata.set("mm_group_"+inputs["id"]["value"],pref+inputs["name"]["value"]+"|"+inputs["inherit"]["value"])
+            setMetadata(m.web,"mm_group_"+inputs["id"]["value"],pref+inputs["name"]["value"]+"|"+inputs["inherit"]["value"])
+            #m.web.metadata.set("mm_group_"+inputs["id"]["value"],pref+inputs["name"]["value"]+"|"+inputs["inherit"]["value"])
         else:
             tmp=pref.split(",")
             res=""
@@ -1815,9 +1846,11 @@ def addGroup(conf,inputs,outputs):
                     ind+=1
                     res+=tmp[i]
             res+=""
-            m.web.metadata.set("mm_group_"+inputs["id"]["value"],pref+inputs["name"]["value"])
+            setMetadata(m.web,"mm_group_"+inputs["id"]["value"],pref+inputs["name"]["value"])
+            #m.web.metadata.set("mm_group_"+inputs["id"]["value"],pref+inputs["name"]["value"])
     except:
-        m.web.metadata.set("mm_group_"+inputs["id"]["value"],inputs["name"]["value"])
+        setMetadata(m.web,"mm_group_"+inputs["id"]["value"],inputs["name"]["value"])
+        #m.web.metadata.set("mm_group_"+inputs["id"]["value"],inputs["name"]["value"])
     saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
     return 4
 
@@ -1911,7 +1944,8 @@ def saveLayerStyle0(conf,inputs,outputs):
         layer.getClass(nClass).getStyle(mmStyle).outlinewidth=float(inputs["mmStrokeWidth"]["value"])
 
     if inputs.keys().count("force")>0:
-        layer.metadata.set("mmClass","us")
+        setMetadata(layer,"mmClass","us")
+        #layer.metadata.set("mmClass","us")
         j=layer.numclasses-1
         while j >= 0:
             if j!=0:
@@ -2054,7 +2088,8 @@ def saveLayerStyle0(conf,inputs,outputs):
         if layer.getClass(nClass).numstyles>2:
             layer.getClass(nClass).removeStyle(2)
 
-    m.web.metadata.set("wms_feature_info_mime_type","text/html")
+    setMetadata(m.web,"wms_feature_info_mime_type","text/html")
+    #m.web.metadata.set("wms_feature_info_mime_type","text/html")
     if layer.name.count("grid_")>0:
         layer.connectiontype=-1
         layer.connection=None
@@ -2182,7 +2217,8 @@ def saveLayerStyle(conf,inputs,outputs):
         layer.getClass(nClass).getStyle(mmStyle).outlinewidth=float(inputs["mmStrokeWidth"]["value"])
 
     if inputs.keys().count("force")>0:
-        layer.metadata.set("mmClass","us")
+        setMetadata(layer,"mmClass","us")
+        #layer.metadata.set("mmClass","us")
         j=layer.numclasses-1
         while j >= 0:
             if j!=0:
@@ -2321,7 +2357,8 @@ def saveLayerStyle(conf,inputs,outputs):
         if layer.getClass(nClass).numstyles>2:
             layer.getClass(nClass).removeStyle(2)
 
-    m.web.metadata.set("wms_feature_info_mime_type","text/html")
+    #m.web.metadata.set("wms_feature_info_mime_type","text/html")
+    setMetadata(m.web,"wms_feature_info_mime_type","text/html")
     if layer.name.count("grid_")>0:
         layer.connectiontype=-1
 
@@ -4319,28 +4356,35 @@ def updateMapcacheCfg(conf,inputs,outputs):
     return 3
 
 def saveLayerPrivileges(conf,inputs,outputs):
-	import mapscript
-	if inputs.has_key("dataStore"):
-		import datastores.service as ds
-		mapfile=ds.getPath(conf,inputs["dataStore"]["value"])+"ds_ows.map"
-	else:
-		mapfile=conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map"
-	m = mapscript.mapObj(mapfile)
-	tmpS=""
-	layer=m.getLayerByName(inputs["layer"]["value"])
-	if inputs["group"].has_key("length"):
-		for i in range(0,len(inputs["group"]["value"])):
-			if tmpS!="":
-				tmpS+=","
-			layer.metadata.set("mm_access_"+inputs["group"]["value"][i],inputs["group_r"]["value"][i]+','+inputs["group_w"]["value"][i]+','+inputs["group_x"]["value"][i])
-			tmpS+=inputs["group"]["value"][i]
-	else:
-		tmpS+=inputs["group"]["value"]
-		layer.metadata.set("mm_access_"+inputs["group"]["value"],inputs["group_r"]["value"]+','+inputs["group_w"]["value"]+','+inputs["group_x"]["value"])
-	layer.metadata.set("mm_access_groups",tmpS)
-	m.save(mapfile)
-	outputs["Result"]["value"]=zoo._("Layer privileges saved.")
-	return 3
+    import mapscript
+    if inputs.has_key("dataStore"):
+        import datastores.service as ds
+        mapfile=ds.getPath(conf,inputs["dataStore"]["value"])+"ds_ows.map"
+    else:
+        mapfile=conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map"
+    m = mapscript.mapObj(mapfile)
+    tmpS=""
+    layer=m.getLayerByName(inputs["layer"]["value"])
+    print >> sys.stderr,inputs["group"]
+    print >> sys.stderr,inputs["group"].keys().count("length")>0
+    if inputs["group"].keys().count("length")>0:
+        print >> sys.stderr,inputs["group"].keys().count("length")>0
+        for i in range(0,len(inputs["group"]["value"])):
+            if tmpS!="":
+                tmpS+=","
+            #layer.metadata.set("mm_access_"+inputs["group"]["value"][i],inputs["group_r"]["value"][i]+','+inputs["group_w"]["value"][i]+','+inputs["group_x"]["value"][i])
+            setMetadata(layer,"mm_access_"+inputs["group"]["value"][i],inputs["group_r"]["value"][i]+','+inputs["group_w"]["value"][i]+','+inputs["group_x"]["value"][i])
+            tmpS+=inputs["group"]["value"][i]
+    else:
+        tmpS+=inputs["group"]["value"]
+        print >> sys.stderr,dir(layer)
+        setMetadata(layer,"mm_access_"+inputs["group"]["value"],inputs["group_r"]["value"]+','+inputs["group_w"]["value"]+','+inputs["group_x"]["value"])
+        #layer.metadata.set("mm_access_"+inputs["group"]["value"],inputs["group_r"]["value"]+','+inputs["group_w"]["value"]+','+inputs["group_x"]["value"])
+    #layer.metadata.set("mm_access_groups",tmpS)
+    setMetadata(layer,"mm_access_groups",tmpS)
+    m.save(mapfile)
+    outputs["Result"]["value"]=zoo._("Layer privileges saved.")
+    return 3
 
 def saveNavPrivileges(conf,inputs,outputs):
 	import mapscript
@@ -4462,7 +4506,7 @@ def savePublishMap(conf,inputs,outputs):
     mapfile=conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map"
     destMapfile=mapfile.replace("maps","public_maps")
     m = mapscript.mapObj(mapfile)
-    args=["mmPopupList","mmWindowList","mmProjectName","mmTitle","mmKeywords","mmAuthor","mmCopyright","mmRestricted","mmMBaseLayers","mmPBaseLayers","mmProprietaryBaseLayers","mmOSMBaseLayers","mmActivatedBaseLayers","mmBAK","mmOT","mmVT","mmRT","mmNav","mmBProject","mmRenderer","default_minx","default_maxx","default_miny","default_maxy","max_minx","max_miny","max_maxx","max_maxy","mmActivatedLayers","layout_t","mmProjectName","vectorLayers","rasterLayers","mmLayoutColor","base_osm","tuom","tprj","fsize","ffamily","font-colorpicker","mmLSPos","mmLSAct"]
+    args=["mmPopupList","mmWindowList","mmProjectName","mmTitle","mmKeywords","mmAuthor","mmCopyright","mmRestricted","mmMBaseLayers","mmPBaseLayers","mmProprietaryBaseLayers","mmOSMBaseLayers","mmActivatedBaseLayers","mmBAK","mmOT","mmVT","mmRT","mmNav","mmBProject","mmRenderer","default_minx","default_maxx","default_miny","default_maxy","max_minx","max_miny","max_maxx","max_maxy","mmActivatedLayers","layout_t","mmProjectName","vectorLayers","rasterLayers","mmLayoutColor","base_osm","tuom","tprj","fsize","ffamily","font-colorpicker","mmLSPos","mmLSAct","mmIPRestriction"]
     isPassed=-1
     for i in args:
         if inputs.keys().count(i)>0:
@@ -4502,6 +4546,10 @@ def savePublishMap(conf,inputs,outputs):
 	    m.web.metadata.set("ows_abstract",conf["main"]["tmpUrl"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html")
     print >> sys.stderr,"OK "
     m.web.metadata.set("mmEditor",conf["senv"]["login"])
+    m.web.metadata.set("tile_map_edge_buffer","32")
+    m.web.metadata.set("tile_metatile_level","1")
+    m.web.metadata.set("ows_title",inputs["mmTitle"]["value"]);
+    m.web.metadata.set("ows_onlineresource",conf["main"]["mapserverAddress"]+"?map="+conf["main"]["dataPath"]+"/public_maps/project_"+inputs["map"]["value"]+".map")
   
     if inputs.has_key("mm_access_groups"):
 	    if inputs["mm_access_groups"].has_key("length"):
@@ -4590,8 +4638,6 @@ def savePublishMap(conf,inputs,outputs):
             m.getLayer(l).labelmaxscaledenom=int(m.getLayer(l).metadata.get('mmLabelMaxScale'))
         if inputs["mmProprietaryBaseLayers"]["value"]==conf["mm"]["biName"]:
             m.getLayer(l).metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
-    m.web.metadata.set("ows_title",inputs["mmTitle"]["value"]);
-
     saveProjectMap(m,mapfile)
     saveProjectMap(m,destMapfile)
 
