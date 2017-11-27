@@ -238,7 +238,7 @@ def display(conf,inputs,outputs):
 			except Exception,e:
 				outputs["Result"]["value"]="/* Failed to shrink with message "+str(e)+" */\n"+outputs["Result"]["value"]
 				pass
-		outputs["Result"]["mimeType"]="application/js"
+		outputs["Result"]["mimeType"]="application/javascript"
 	if inputs["tmpl"]["value"].count('_xml'):
 		outputs["Result"]["mimeType"]="text/xml"
 	return zoo.SERVICE_SUCCEEDED
