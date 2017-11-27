@@ -208,7 +208,8 @@ CREATE TABLE mm_tables.pages (
     ofield text,
     otype text,
     iid integer REFERENCES mm_tables.importers(id) ON DELETE CASCADE,
-    length integer
+    length integer,
+    isreference boolean
 );
 
 --
@@ -226,6 +227,22 @@ CREATE TABLE mm_tables.page_fields (
     name character varying(50),
     type integer REFERENCES mm_tables.ftypes(id),
     rlabel text
+);
+
+--
+-- Table used to store pages' geographic field information
+--
+CREATE TABLE mm_tables.page_geom (
+    id serial PRIMARY KEY,
+    pid integer REFERENCES mm_tables.pages(id)  ON DELETE CASCADE,
+    srs text
+);
+
+CREATE TABLE mm_tables.page_geom_fields (
+    id serial PRIMARY KEY,
+    pid integer REFERENCES mm_tables.page_geom(id) ON DELETE CASCADE,
+    column_name text,
+    separator text default NULL
 );
 
 
