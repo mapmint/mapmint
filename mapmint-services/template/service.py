@@ -32,7 +32,6 @@ import customize
 
 def display(conf,inputs,outputs):
 	sys.path+=[conf["main"]["templatesPath"]]
-	print >> sys.stderr,"*****************n"+str(inputs)
 	nameSpace = {'conf': conf,'inputs': inputs, 'outputs': outputs}
 	tmpName=inputs["tmpl"]["value"].split('/')
 	toLoad=None
@@ -226,11 +225,11 @@ def display(conf,inputs,outputs):
 			conf["lenv"]["cookie"]="MMID=deleted; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
 			outputs["Result"]["value"]=t1.__str__()
 
-	if inputs["tmpl"]["value"].count('_css'):
+	if inputs["tmpl"]["value"].count('_css') or inputs["tmpl"]["value"].count('.css')>0:
 		outputs["Result"]["mimeType"]="text/css"
 		import cssmin
 		outputs["Result"]["value"]=cssmin.cssmin(outputs["Result"]["value"])
-	if inputs["tmpl"]["value"].count('_js'):
+	if inputs["tmpl"]["value"].count('_js')>0 or inputs["tmpl"]["value"].count('.js')>0:
 		if conf["main"].has_key('jsCache') and conf["main"]["jsCache"]=="prod":
 			try:
 				from slimit import minify
