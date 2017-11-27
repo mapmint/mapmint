@@ -235,7 +235,7 @@ MapMint: Dashboard
                                 <li class="left clearfix">
                                     <span class="chat-img pull-left">
 
-                                        <img src="$purl" alt="Preview" class="img-circle" width="50" />
+                                        <img osrc="$purl" alt="Preview" class="img-circle" width="50" />
 
                                     </span>
                                     <div class="chat-body clearfix">
@@ -263,7 +263,7 @@ MapMint: Dashboard
                             </ul>
                             <a href="./Manager_bs#" class="btn btn-default btn-block">$zoo._("Launch the Manager") ($conf["senv"]["last_map"])</a>
                         </div>
-                        <a href="#dashManagerBody" data-toggle="collapse">
+                        <a href="#dashManagerBody" data-toggle="collapse" onclick="\$(this).prev().find('img').each(function(){if(\$(this).attr('src')==null){\$(this).attr('src',\$(this).attr('osrc'));}});">
                             <div class="panel-footer">
                                 <span class="pull-left">$zoo._("View Details")</span>
                                 <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
