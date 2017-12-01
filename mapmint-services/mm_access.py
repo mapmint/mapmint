@@ -31,8 +31,11 @@ def checkMapNavPriv(conf,map,navId):
 def checkMapPriv(conf,map):
     groups=getGroup(conf)
     tmp=None
-    if map.web.metadata.numitems>0:
-        tmp=map.web.metadata.get("mm_access_groups")
+    #if map.web.metadata.numitems>0:
+    try:
+        tmp=map.web.metadata.get("mm_access_groups").split(',')
+    except:
+        pass
     if tmp is None or tmp=="":
         return True
     else:

@@ -244,6 +244,7 @@ define([
 				    {"identifier": "id","value": localId,"dataType":"string"},
 				    {"identifier": "dstName","value": dstName,"dataType":"string"}
 				];
+				
 				zoo.execute({
 				    identifier: "np.massiveImport",
 				    type: "POST",
@@ -256,6 +257,57 @@ define([
 				    ],
 				    success: function(data){
 					console.log(data);
+					var progress=$("#indicators_form_table").find(".progress-bar").first();
+					progress.parent().show();
+					progress.removeClass("progress-bar-success");
+					progress.attr("aria-valuenow",0);
+					progress.css('width', (0)+'%');
+					zoo.watch(cid, {
+					    onPercentCompleted: function(data) {
+						progress.css('width', (eval(data.percentCompleted))+'%');
+						progress.attr("aria-valuenow",eval(data.percentCompleted));
+						progress.text(data.text+' : '+(data.percentCompleted)+'%');
+					    },
+					    onProcessSucceeded: function(data) {
+						progress.attr("aria-valuenow",100);
+						progress.css('width', (100)+'%');
+						progress.text(data.text+' : '+(100)+'%');
+						progress.addClass("progress-bar-success");
+						if (data.result.ExecuteResponse.ProcessOutputs) {
+						    progress.text(data.result.ExecuteResponse.ProcessOutputs.Output.Data.LiteralData.__text );
+						    $(".notifications").notify({
+							message: { text: data.result.ExecuteResponse.ProcessOutputs.Output.Data.LiteralData.__text },
+							type: 'success',
+						    }).show();
+						}
+					    },
+					    onError: function(data) {
+						progress.attr("aria-valuenow",100);
+						progress.css('width', (100)+'%');
+						progress.text(data.text+' : '+(100)+'%');
+						try{
+						    $(".notifications").notify({
+							message: { text: data["result"]["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+							type: 'danger',
+						    }).show();
+						}catch(e){
+						    console.log(e);
+						    var progress=$("#indicators_form_table").find(".progress-bar").first();
+						    progress.attr("aria-valuenow",100);
+						    progress.css('width', (100)+'%');
+						    progress.text(data.text+' : '+(100)+'%');
+						    try{
+							$(".notifications").notify({
+							    message: { text: data["result"]["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+							    type: 'danger',
+							}).show();
+						    }catch(e){
+							console.log(e);
+						    }
+						}
+					    },
+					});
+
 				    },
 				    error: function(data){
 					console.log(data);

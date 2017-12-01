@@ -112,27 +112,32 @@ class manage_users:
 		return True
 
 	'''
-	Example "SELECT * FROM table WHERE name=[arg1]" {"arg1": {value: "myval",format: "s"}} 
+	Example "SELECT * FROM table WHERE name=[_arg1_]" {"arg1": {value: "myval",format: "s"}} 
 	'''
 	def pexecute_req(self,req):
 		params=None
-		for i in req[1]:
+		for i in req[1].keys():
+			print >> sys.stderr,"KEY: "+i
 			if self.paramstyle=="qmark":
 				if params is None:
 					params=()
 				req[0]=req[0].replace("[_"+i+"_]","?")
 				params+=(req[1][i]["value"],)
 			else:
-				if self.paramstyle=="pyformat":			
+				if self.paramstyle=="pyformat":
+					print >> sys.stderr,"KEY: "+i
 					if params is None:
 						params={}
 					req[0]=req[0].replace("[_"+i+"_]","%("+i+")"+req[1][i]["format"])
 					params[i]=req[1][i]["value"]
+		print >> sys.stderr,"params"
+		print >> sys.stderr,params
 		try:
 			self.cur.execute(req[0],params)
 			self.conn.commit()
 		except Exception,e:
-			print >> sys.stderr,e
+			print >> sys.stderr,"ERROR SQL: "+req[0]
+			print >> sys.stderr,"ERROR SQL: "+str(e)
 			self.conn.commit()
 			return False
 		return True

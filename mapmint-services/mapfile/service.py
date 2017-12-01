@@ -1065,7 +1065,7 @@ def createLegend0(conf,inputs,outputs):
             inputs0["mmStep"]={"value":str(kk)}
             outputs0=outputs.copy()
             conf["lenv"]["message"]=zoo._("Create new style for step: ")+str(kk)
-            zoo.update_status(conf,10+((i*80/len(tmpSteps))))
+            zoo.update_status(conf,10+((kk*80/len(tmpSteps))))
             tmp_res=createLegend0(conf,inputs0,outputs0)
             print >> sys.stderr,json.loads(outputs0["Result"]["value"])
             mySteps+=[json.loads(outputs0["Result"]["value"],encoding="utf-8")]
@@ -4089,6 +4089,10 @@ def saveMapFor(conf,inputs,outputs):
     import urllib
     m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
     m.getLayerByName(inputs["layers"]["value"]).metadata.set("mm"+inputs["type"]["value"]+"Fields",inputs["fields"]["value"])
+    m.getLayerByName(inputs["layers"]["value"]).metadata.set("gml_include_items",inputs["fields"]["value"])
+    m.getLayerByName(inputs["layers"]["value"]).metadata.set("gml_exclude_items","all")
+    m.getLayerByName(inputs["layers"]["value"]).metadata.set("wms_include_items",inputs["fields"]["value"])
+    m.getLayerByName(inputs["layers"]["value"]).metadata.set("wms_exclude_items","all")
     if inputs.keys().count("fwidth") > 0:
         m.getLayerByName(inputs["layers"]["value"]).metadata.set("mm"+inputs["type"]["value"]+"FieldsWidth",inputs["fwidth"]["value"])
     if inputs.keys().count("faliases") > 0:
@@ -4550,7 +4554,7 @@ def savePublishMap(conf,inputs,outputs):
     m.web.metadata.set("tile_metatile_level","1")
     m.web.metadata.set("ows_title",inputs["mmTitle"]["value"]);
     m.web.metadata.set("ows_onlineresource",conf["main"]["mapserverAddress"]+"?map="+conf["main"]["dataPath"]+"/public_maps/project_"+inputs["map"]["value"]+".map")
-  
+    m.web.metadata.set("mm_access_ip",inputs["mmIPRestriction"]["value"])
     if inputs.has_key("mm_access_groups"):
 	    if inputs["mm_access_groups"].has_key("length"):
 		    tmpS=""
@@ -5067,7 +5071,7 @@ def updateGridStyle(conf,inputs,outputs):
     m.setExtent(p1.x,p1.y,p2.x,p2.y)
     layer.data=inputs["data"]["value"]
     layer.name="currentGrid"
-    layer.metadata.set("ows_name","currentGrid")
+    setMetadata(layer,"ows_name","currentGrid")
     m.save(conf["main"]["dataPath"]+"/grids/project_gridStyle_"+inputs["data"]["value"]+".map")
     outputs["Result"]["value"]=zoo._("Grid map has been updated successfully")
     return zoo.SERVICE_SUCCEEDED

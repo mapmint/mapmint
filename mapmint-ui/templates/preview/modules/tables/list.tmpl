@@ -79,19 +79,23 @@ $embedded
 #set tableId=str($vals[3])
 #set clause=$vals[4]
 
-#set req="SELECT mm_tables.p_editions.id,mm_tables.p_editions.name,mm_tables.p_editions.step FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+$tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.step>=0 order by mm_tables.p_editions.step asc"
+#* Edition *#
+#set req="SELECT distinct mm_tables.p_editions.id,mm_tables.p_editions.name,mm_tables.p_editions.step FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+$tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.step>=0 order by mm_tables.p_editions.step asc"
 #set res=$cur.execute($req)
 #set evals=$cur.fetchall()
 
-#set req="SELECT mm_tables.p_editions.id,mm_tables.p_editions.name,mm_tables.p_editions.step FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+$tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.step<=0 order by mm_tables.p_editions.step asc"
+#* Search / Delete *#
+#set req="SELECT distinct mm_tables.p_editions.id,mm_tables.p_editions.name,mm_tables.p_editions.step FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+$tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.step<=0 order by mm_tables.p_editions.step asc"
 #set res=$cur.execute($req)
 #set vals=$cur.fetchall()
 
-#set req="SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid="+$tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') order by mm_tables.p_reports.id asc"
+#* Reports *#
+#set req="SELECT distinct mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid="+$tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') order by mm_tables.p_reports.id asc"
 #set rres=$cur.execute($req)
 #set rvals=$cur.fetchall()
 
-#set ireq="SELECT mm_tables.importers.id,mm_tables.importers.name,mm_tables.importers.description FROM mm_tables.importers,mm_tables.importer_groups where  mm_tables.importers.id=mm_tables.importer_groups.iid and tid="+$tableId+" and mm_tables.importer_groups.gid in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') order by mm_tables.importers.id asc"
+#* Importers *#
+#set ireq="SELECT distinct mm_tables.importers.id,mm_tables.importers.name,mm_tables.importers.description FROM mm_tables.importers,mm_tables.importer_groups where  mm_tables.importers.id=mm_tables.importer_groups.iid and tid="+$tableId+" and mm_tables.importer_groups.gid in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') order by mm_tables.importers.id asc"
 #set ires=$cur.execute($ireq)
 #set ivals=$cur.fetchall()
 
@@ -260,7 +264,9 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
     <select name="processing_service" class="form-control form-control-sm" onchange="\$(this).find('option').each(function(){console.log(\$(this).is(':selected'));var closure=\$(this);if(\$(this).is(':selected')){ \$('#'+closure.attr('data-display')).find('select').first().html('');\$('#addedLayers').find('option').each(function(){ if(!\$(this).is(':selected')) \$('#'+closure.attr('data-display')).find('select').first().append(\$(this).clone());});\$('#'+\$(this).attr('data-display')).show();}else \$('#'+\$(this).attr('data-display')).hide();});">
     	   <option data-display="pbuffer" value="Buffer">$zoo._("Buffer")</option>
     	   <option data-display="punion" value="Union">$zoo._("Union")</option>
+    	   <option data-display="pintersection" value="Intersection">$zoo._("Intersection")</option>
     	   <option data-display="psymdifference" value="SymDifference">$zoo._("SymDifference")</option>
+    	   <option data-display="punionone" value="UnionOne">$zoo._("Union (one geom)")</option>
     </select>
     <div id="pbuffer">
     <label>$zoo._("Length")</label>
@@ -269,6 +275,12 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
     <input type="text" name="BufferDistance" style="display:none" data-type="float" data-transmission="force" class="form-control form-control-sm" />
     </div>
     <div id="punion">
+    <label>$zoo._("Layer")</label>
+    <input type="hidden" name="param1" value="InputEntity1" />
+    <select name="InputEntity2" class="form-control form-control-sm">
+    </select>
+    </div>
+    <div id="pintersection">
     <label>$zoo._("Layer")</label>
     <input type="hidden" name="param1" value="InputEntity1" />
     <select name="InputEntity2" class="form-control form-control-sm">
@@ -363,7 +375,7 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
 #for i in range(len($vals))
 #if $vals[i][2]==-10
      <div id="$(prefix)edit0_$(vals[i][0])" role="tabpanel" class="tab-pane" >
-#set req="SELECT mm_tables.p_views.id from mm_tables.p_views,mm_tables.p_tables where mm_tables.p_views.ptid=mm_tables.p_tables.id AND mm_tables.p_tables.name='mm_ghosts."+$table.replace(".","_")+"' and mm_tables.p_views.id in (SELECT mm_tables.p_views.id from mm_tables.p_views,mm_tables.p_view_groups where mm_tables.p_views.id=mm_tables.p_view_groups.vid and mm_tables.p_views.id=mm_tables.p_view_groups.vid and gid in (select id_group from mm.users,mm.user_group where mm.users.id=mm.user_group.id_user and mm.users.id="+$conf["senv"]["id"]+" )  )"
+#set req="SELECT distinct mm_tables.p_views.id from mm_tables.p_views,mm_tables.p_tables where mm_tables.p_views.ptid=mm_tables.p_tables.id AND mm_tables.p_tables.name='mm_ghosts."+$table.replace(".","_")+"' and mm_tables.p_views.id in (SELECT mm_tables.p_views.id from mm_tables.p_views,mm_tables.p_view_groups where mm_tables.p_views.id=mm_tables.p_view_groups.vid and mm_tables.p_views.id=mm_tables.p_view_groups.vid and gid in (select id_group from mm.users,mm.user_group where mm.users.id=mm.user_group.id_user and mm.users.id="+$conf["senv"]["id"]+" )  )"
 #set tmp=$cur.execute($req)
 #set tmp=$cur.fetchone()
 
@@ -398,9 +410,11 @@ $ftmpl.printHidden({"rid":"edition_tuple_id","id":"edit_tuple_id","name":"editio
 
 
      <div id="$(prefix)edit" role="tabpanel" class="tab-pane" >
-#set req="SELECT mm_tables.p_editions.id,mm_tables.p_editions.name,mm_tables.p_editions.step FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+$tableId+" and mm.groups.id in (SELECT id from mm.groups where name='"+$conf["senv"]["group"]+"') and mm_tables.p_editions.step>=0 order by mm_tables.p_editions.step asc"
+     
+#set req="SELECT distinct mm_tables.p_editions.id,mm_tables.p_editions.name,mm_tables.p_editions.step FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+$tableId+" and mm.groups.id in (select id_group from mm.users,mm.user_group where mm.users.id=mm.user_group.id_user and mm.users.id="+$conf["senv"]["id"]+" ) and mm_tables.p_editions.step>=0 order by mm_tables.p_editions.step asc"
 #set res=$cur.execute($req)
 #set vals1=$cur.fetchall()
+
 <ul class="nav nav-tabs">
 #for i in range(len($vals1))
 #set classes="require-"+$prefix+"select"

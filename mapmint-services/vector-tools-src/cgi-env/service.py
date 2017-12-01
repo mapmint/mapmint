@@ -444,6 +444,29 @@ def UnionOne(conf,inputs,outputs):
     #outputResult(conf,outputs["Result"],rgeometries)
     return 3
 
+def UnionOnePy(conf,inputs,outputs):
+    import sys
+    #print >> sys.stderr,"DEBG"
+    geometry1=extractInputs(conf,inputs["InputPolygon"])
+    #print >> sys.stderr,"DEUBG"
+    i=0
+    geometryRes=None
+    #print >> sys.stderr,"DEUBG"
+    while i < len(geometry1):
+        j=0
+        if i==0:
+            geometryRes=geometry1[i].Clone()
+        else:
+            tres=geometryRes.GetGeometryRef().Union(geometry1[i].GetGeometryRef())
+            if tres is not None and not(tres.IsEmpty()):
+                geometryRes.SetGeometryDirectly(tres.Clone())
+                tres.Destroy()
+        geometry1[i].Destroy()
+        i+=1
+    outputs["Result"]["value"]=geometryRes.ExportToJson()
+    #outputResult(conf,outputs["Result"],rgeometries)
+    return 3
+
 def UnionOneBis(conf,inputs):
     import sys
     #print >> sys.stderr,"DEBG"
@@ -540,14 +563,8 @@ def UnionOneGeom(conf,inputs,outputs):
 
 def Intersection(conf,inputs,outputs):
 
-    print >> sys.stderr, "Starting service ..."
     geometry1=extractInputs(conf,inputs["InputEntity1"])
-    #print >> sys.stderr, "Starting 1 ... "+inputs["InputEntity1"]["mimeType"]
     geometry2=extractInputs(conf,inputs["InputEntity2"])
-    #print >> sys.stderr, "Starting 2 ... "+inputs["InputEntity2"]["mimeType"]
-
-    #print >> sys.stderr,str(len(geometry1))+" "+str(len(geometry2))
-
     rgeometries=[]
     fids=[]
     i=0
@@ -559,7 +576,10 @@ def Intersection(conf,inputs,outputs):
             #resg=resg.Intersection(geometry1[i].GetGeometryRef())
             resg=geometry1[i].GetGeometryRef().Intersection(resg)
             tmp.SetGeometryDirectly(resg)
-            #print >> sys.stderr, dir(tmp)
+            print >> sys.stderr, resg.IsEmpty()
+            print >> sys.stderr, resg
+            print >> sys.stderr, geometry1[i].GetGeometryRef().Intersects(geometry2[j].GetGeometryRef())
+            print >> sys.stderr, geometry2[j].GetGeometryRef().Intersects(geometry1[i].GetGeometryRef())
             if resg is not None and not(resg.IsEmpty()) and fids.count(tmp.GetFID())==0:
                 rgeometries+=[tmp]
                 fids+=[tmp.GetFID()]

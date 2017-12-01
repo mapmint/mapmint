@@ -1223,9 +1223,124 @@ define([
 		$("#listing_Toggler").click();
 	    },100);
 	},100);
-	
+	var win=$("#associatedMap")[0].contentWindow || $("#associatedMap")[0];
+	loopTillAppLoaded(win);
     }
 
+    function loopTillAppLoaded(win){
+	if(!win.app)
+	    setTimeout(function(){loopTillAppLoaded(win)},0.1);
+	else{
+	    console.log(" *****_________***** ok 0 *****_________*****");
+	    console.log(win.app.getLayers());
+	    var layers=win.app.getLayers();
+	    for(var i in layers){
+		console.log(" *****_________***** ok "+i+"*****_________*****");
+		console.log(layers[i]);
+		console.log(" *****_________***** ok *****_________*****");
+		$("#addedLayers").append('<option data-map="'+layers[i].searchMap+'" value="'+i+'">'+layers[i].alias+'</option>');
+		registerAddedLayersEvent();
+	    }
+	}
+    }
+
+    function registerAddedLayersEvent(){
+	var win=$("#associatedMap")[0].contentWindow || $("#associatedMap")[0];
+	$("#addedLayers").off('change');
+	$("#addedLayers").on('change',function(){
+	    
+	    managerTools.getTableDesc(module.config().msUrl,$(this).find('option:selected').attr("data-map"),$(this).val(),null,function(obj,rdata,idata){
+		$("#layerExtract").find('select[name="field"]').html("");
+		for(var i=0;i<rdata.fields.length;i++)
+		    if(rdata.fields[i]!="msGeometry"){
+			$("#layerExtract").find('select[name="field"]').append('<option  data-type="'+rdata.types[i]+'" value="'+rdata.fields[i]+'">'+rdata.fields[i]+'</option>');
+		    }
+		$("#layerExtract").find('select[name="values"]').html("");
+		bindFilterLayer();
+		console.log(obj);
+		console.log(rdata);
+		console.log(idata);
+	    });
+	    $("#layerExtract").find('button').first().off('click');
+	    $("#layerExtract").find('button').first().on('click',function(){
+		console.log(" START FILTERING ");
+		var clauses=[];
+		var joins=[];
+		$(this).parent().parent().find("form").each(function(){
+		    clauses.push('<ogc:'+$(this).find('select[name="operator"]').val()+($(this).find('select[name="operator"]').val()=="PropertyIsLike"?" wildcard='*' singleChar='.' escape='!'":"")+'>'+
+				 '<ogc:PropertyName>'+$(this).find('select[name="field"]').val()+'</ogc:PropertyName>'+
+				 '<ogc:Literal>'+$(this).find('select[name="values"]').val()+'</ogc:Literal>'+
+				 '</ogc:'+$(this).find('select[name="operator"]').val()+'>');
+		    if($(this).find('select[name="link_clause"]').is(":visible")){
+			joins.push($(this).find('select[name="link_clause"]').val());
+		    }
+		});
+		var filter="<ogc:Filter>";
+		if(joins.length>0){
+		    var previous="";
+		    var current=clauses[0];
+		    for(var i=0;i<joins.length;i++){
+			previous=current;
+			current='<ogc:'+joins[i]+'>'+
+			    previous+clauses[i+1]+
+			    '</ogc:'+joins[i]+'>';
+		    }
+		    filter+=current;
+		}
+		else
+		    filter+=clauses[0];
+		filter+="</ogc:Filter>";
+		var wfsUrl=module.config().msUrl+'?map='+module.config().dataPath+"/maps/search_Overlays_"+$("#addedLayers").val()+".map";
+		console.log($("#addedLayers").find("option:selected").attr("data-map"));
+		if($("#addedLayers").find("option:selected").attr("data-map").indexOf("project_Overlays.map")<0)
+		    wfsUrl=module.config().msUrl+'?map='+$("#addedLayers").find("option:selected").attr("data-map");
+		//maxFeatures="1000000" 
+		var wfsRequest='<wfs:GetFeature xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.0.0" outputFormat="text/xml; subtype=gml/3.1.1">'+
+		    '<wfs:Query xmlns:ms="http://geolabs.fr/" typeName="'+$("#addedLayers").val()+'">'+
+		    filter+
+		    '</wfs:Query>'+
+		    '</wfs:GetFeature>';
+		zoo.execute({
+		    "identifier": "vector-tools.Append",
+		    "type": "POST",
+		    dataInputs: [
+			{"identifier":"InputEntity1","href": wfsUrl,"value": wfsRequest, "mimeType": "text/xml", "method": "POST","headers":[{"key":"Content-Type","value":"text/xml"}]}
+		    ],
+		    dataOutputs: [
+			{"identifier":"Result","mimeType":"image/png"}
+		    ],
+		    success: function(data){
+			console.log("SUCCESS !");
+			var ref=data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Reference"]["_href"];
+			var mapParts=ref.split('&');
+			console.log(mapParts[0]);
+			var mapParts=mapParts[0].split("=");
+			console.log(mapParts[1]);
+			win.app.addLayerToMap({
+			    mapfile: mapParts[1],
+			    layers: ["Result"],
+			    labels: [$("#layerTitle").val()],
+			    listHTML: $("#layerTitle").val(),
+			    cselection: ""
+			});
+			$("#layerExtract").find('form:gt(0)').remove();
+			$("#layerTitle").val("");
+			console.log(data);
+			console.log(mapParts);
+		    },
+		    error: function(data){
+			console.log("ERROR !");
+			console.log(data);
+		    }
+		});
+		
+		console.log(wfsUrl);
+		console.log(wfsRequest);
+		
+	    });
+	});
+    }
+    
     var searchMap;
     function setMapSearch(){
 	$("#associatedMap").contents().find( "#search_value").val(arguments[0]);
@@ -1251,98 +1366,7 @@ define([
 	    console.log("**--** OK **--**");
 	    for(var i=0;i<a.layers.length;i++)
 		$("#addedLayers").append('<option data-map="'+a.mapfile+'" value="'+a.layers[i]+'">'+a.labels[i]+'</option>');
-	    $("#addedLayers").off('change');
-	    $("#addedLayers").on('change',function(){
-		
-		managerTools.getTableDesc(module.config().msUrl,$(this).find('option:selected').attr("data-map"),$(this).val(),null,function(obj,rdata,idata){
-		    $("#layerExtract").find('select[name="field"]').html("");
-		    for(var i=0;i<rdata.fields.length;i++)
-			if(rdata.fields[i]!="msGeometry"){
-			    $("#layerExtract").find('select[name="field"]').append('<option  data-type="'+rdata.types[i]+'" value="'+rdata.fields[i]+'">'+rdata.fields[i]+'</option>');
-			}
-		    $("#layerExtract").find('select[name="values"]').html("");
-		    bindFilterLayer();
-		    console.log(obj);
-		    console.log(rdata);
-		    console.log(idata);
-		});
-		$("#layerExtract").find('button').first().off('click');
-		$("#layerExtract").find('button').first().on('click',function(){
-		    console.log(" START FILTERING ");
-		    var clauses=[];
-		    var joins=[];
-		    $(this).parent().parent().find("form").each(function(){
-			clauses.push('<ogc:'+$(this).find('select[name="operator"]').val()+($(this).find('select[name="operator"]').val()=="PropertyIsLike"?" wildcard='*' singleChar='.' escape='!'":"")+'>'+
-				     '<ogc:PropertyName>'+$(this).find('select[name="field"]').val()+'</ogc:PropertyName>'+
-				     '<ogc:Literal>'+$(this).find('select[name="values"]').val()+'</ogc:Literal>'+
-				     '</ogc:'+$(this).find('select[name="operator"]').val()+'>');
-			if($(this).find('select[name="link_clause"]').is(":visible")){
-			    joins.push($(this).find('select[name="link_clause"]').val());
-			}
-		    });
-		    var filter="<ogc:Filter>";
-		    if(joins.length>0){
-			var previous="";
-			var current=clauses[0];
-			for(var i=0;i<joins.length;i++){
-			    previous=current;
-			    current='<ogc:'+joins[i]+'>'+
-				previous+clauses[i+1]+
-				'</ogc:'+joins[i]+'>';
-			}
-			filter+=current;
-		    }
-		    else
-			filter+=clauses[0];
-		    filter+="</ogc:Filter>";
-		    var wfsUrl=module.config().msUrl+'?map='+module.config().dataPath+"/maps/search_Overlays_"+$("#addedLayers").val()+".map";
-		    console.log($("#addedLayers").find("option:selected").attr("data-map"));
-		    if($("#addedLayers").find("option:selected").attr("data-map").indexOf("project_Overlays.map")<0)
-			wfsUrl=module.config().msUrl+'?map='+$("#addedLayers").find("option:selected").attr("data-map");
-		    var wfsRequest='<wfs:GetFeature xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.0.0" maxFeatures="1000" outputFormat="text/xml; subtype=gml/3.1.1">'+
-			'<wfs:Query xmlns:ms="http://geolabs.fr/" typeName="'+$("#addedLayers").val()+'">'+
-			filter+
-			'</wfs:Query>'+
-			'</wfs:GetFeature>';
-		    zoo.execute({
-			"identifier": "vector-tools.Append",
-			"type": "POST",
-			dataInputs: [
-			    {"identifier":"InputEntity1","href": wfsUrl,"value": wfsRequest, "mimeType": "text/xml", "method": "POST","headers":[{"key":"Content-Type","value":"text/xml"}]}
-			],
-			dataOutputs: [
-			    {"identifier":"Result","mimeType":"image/png"}
-			],
-			success: function(data){
-			    console.log("SUCCESS !");
-			    var ref=data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Reference"]["_href"];
-			    var mapParts=ref.split('&');
-			    console.log(mapParts[0]);
-			    var mapParts=mapParts[0].split("=");
-			    console.log(mapParts[1]);
-			    win.app.addLayerToMap({
-				mapfile: mapParts[1],
-				layers: ["Result"],
-				labels: [$("#layerTitle").val()],
-				listHTML: $("#layerTitle").val(),
-				cselection: ""
-			    });
-			    $("#layerExtract").find('form:gt(0)').remove();
-			    $("#layerTitle").val("");
-			    console.log(data);
-			    console.log(mapParts);
-			},
-			error: function(data){
-			    console.log("ERROR !");
-			    console.log(data);
-			}
-		    });
-		    
-		    console.log(wfsUrl);
-		    console.log(wfsRequest);
-		    
-		});
-	    });
+	    registerAddedLayersEvent();
 	}
 	$('button[mm-action="processLayer"]').off('click');
 	$('button[mm-action="processLayer"]').on('click',function(){
@@ -1364,7 +1388,8 @@ define([
 			    console.log($(this).find("option:selected").attr("data-map"));
 			    if($(this).find("option:selected").attr("data-map").indexOf("project_Overlays.map")<0)
 				wfsUrl=module.config().msUrl+'?map='+$(this).find("option:selected").attr("data-map");
-			    var wfsRequest='<wfs:GetFeature xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.0.0" maxFeatures="1000" outputFormat="text/xml; subtype=gml/3.1.1">'+
+			    // maxFeatures="1000000"
+			    var wfsRequest='<wfs:GetFeature xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.0.0" outputFormat="text/xml; subtype=gml/3.1.1">'+
 				'<wfs:Query xmlns:ms="http://geolabs.fr/" typeName="'+$(this).val()+'">'+
 				'</wfs:Query>'+
 				'</wfs:GetFeature>';
@@ -1387,7 +1412,8 @@ define([
 	    console.log($("#addedLayers").find("option:selected").attr("data-map"));
 	    if($("#addedLayers").find("option:selected").attr("data-map").indexOf("project_Overlays.map")<0)
 		wfsUrl=module.config().msUrl+'?map='+$("#addedLayers").find("option:selected").attr("data-map");
-	    var wfsRequest='<wfs:GetFeature xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.0.0" maxFeatures="1000" outputFormat="text/xml; subtype=gml/3.1.1">'+
+	    //maxFeatures="1000000"
+	    var wfsRequest='<wfs:GetFeature xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.0.0"  outputFormat="text/xml; subtype=gml/3.1.1">'+
 		'<wfs:Query xmlns:ms="http://geolabs.fr/" typeName="'+$("#addedLayers").val()+'">'+
 		'</wfs:Query>'+
 		'</wfs:GetFeature>';

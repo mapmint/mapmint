@@ -409,7 +409,7 @@ def SecureAccess(conf,inputs,outputs):
                 .replace("[Identifier]","SecureResponse")
 
             req=urllib2.Request(
-                url=conf["main"]["serverAddress"]+"?metapath=ows-security",
+                url=conf["main"]["serverAddress"],
                 data=xmlQuery,
                 headers={'Content-Type': 'text/xml'}
             )

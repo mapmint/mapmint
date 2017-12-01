@@ -68,10 +68,10 @@ def setIndexQuote(conf,inputs,outputs):
 def splitGroup(conf):
     res=""
     c=conf["senv"]["group"].split(',')
-    for i in c:
+    for i in range(len(c)):
         if res!="":
-            res+=" AND "
-        res+="name='"+i+"'"
+            res+=" OR "
+        res+="name='"+c[i]+"'"
     return res
 
 
@@ -3311,7 +3311,7 @@ def clientInsert(conf,inputs,outputs):
         conf["lenv"]["message"]=zoo._("Unable to identify your parameter as a table")
         return zoo.SERVICE_FAILED
     try:
-        req="SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.ftypes,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_edition_fields.ftype=mm_tables.ftypes.id and not(mm_tables.ftypes.basic) and mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+inputs["editId"]["value"]+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where name='"+conf["senv"]["group"]+"')) as a ORDER BY a.id"
+        req="SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.ftypes,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_edition_fields.ftype=mm_tables.ftypes.id and not(mm_tables.ftypes.basic) and mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+inputs["editId"]["value"]+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where "+splitGroup(conf)+")) as a ORDER BY a.id"
         print >> sys.stderr,req
         res=cur.execute(req)
         originalColumns=cur.fetchall()
@@ -3654,7 +3654,7 @@ def clientView(conf,inputs,outputs):
         return zoo.SERVICE_FAILED
     tableName=vals[0]
     #clientPrint(conf,inputs,outputs)
-    req="SELECT mm_tables.p_editions.id,mm_tables.p_editions.name FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where name='"+conf["senv"]["group"]+"') and (mm_tables.p_editions.step=-2 or mm_tables.p_editions.step=-10 or mm_tables.p_editions.step>=0 ) order by mm_tables.p_editions.step asc"
+    req="SELECT mm_tables.p_editions.id,mm_tables.p_editions.name FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where "+splitGroup(conf)+") and (mm_tables.p_editions.step=-2 or mm_tables.p_editions.step=-10 or mm_tables.p_editions.step>=0 ) order by mm_tables.p_editions.step asc"
     print >> sys.stderr,req
     res=cur.execute(req)
     ovals=cur.fetchall()
@@ -3713,7 +3713,7 @@ def clientView(conf,inputs,outputs):
     rvals=cur.fetchone()
     for i in range(len(ovals)):
         fres[ovals[i][0]]={}
-        req="SELECT * FROM (SELECT mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+str(ovals[i][0])+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where name='"+conf["senv"]["group"]+"')) as a ORDER BY a.id"
+        req="SELECT * FROM (SELECT mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+str(ovals[i][0])+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where "+splitGroup(conf)+")) as a ORDER BY a.id"
         res=cur.execute(req)
         cvals=cur.fetchall()
         for j in range(len(cvals)):
@@ -3727,7 +3727,7 @@ def clientView(conf,inputs,outputs):
                 else:
                     print>> sys.stderr,"+++++ "+str(cvals[j])
                     print>> sys.stderr,"+++++ "+str(ovals[i])
-                    print >> sys.stderr,columns.index(cvals[j][2])
+                    #print >> sys.stderr,columns.index(cvals[j][2])
                     print >> sys.stderr,rvals
                     print>> sys.stderr,"+++++ "+str(columns)
                     fres[ovals[i][0]][cvals[j][1]]="Not found"
@@ -3859,6 +3859,8 @@ def massiveImport(conf,inputs,outputs):
     vals=cur.fetchall()
     import vector_tools.vectSql as vectSql
     for i in range(len(vals)):
+        conf["lenv"]["message"]=zoo._("Importing "+str(i)+" / "+str(len(vals)))
+        zoo.update_status(conf,(i*100)/len(vals))
         req1="select name,value,(select code from mm_tables.ftypes where id=type),rlabel from mm_tables.page_fields where pid="+str(vals[i][5])
         res1=cur.execute(req1)
         vals1=cur.fetchall()

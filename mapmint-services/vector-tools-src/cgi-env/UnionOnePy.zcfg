@@ -1,6 +1,6 @@
-[IntersectionPy]
- Title = Compute intersection. 
- Abstract = Generates a new geometry which is the region of intersection of the two geometries operated on.
+[UnionOnePy]
+ Title = Compute union. 
+ Abstract = Generates a new geometry which is the region of union of the two geometries operated on.
  Profile = urn:ogc:wps:1.0.0:union
  processVersion = 2
  storeSupported = true
@@ -11,7 +11,7 @@
    title = Demo
  </MetaData>
  <DataInputs>
-  [InputEntity1]
+  [InputPolygon]
    Title = the first geometry 
    Abstract = the first geometry to compare against.
    minOccurs = 1
@@ -26,39 +26,18 @@
      schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
     </Default>
     <Supported>
-     mimeType = text/xml
-     encoding = base64
-     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
-    </Supported>
-   </ComplexData>
-  [InputEntity2]
-   Title = the other geometry
-   Abstract = the other geometry to compare against.
-   minOccurs = 1
-   maxOccurs = 1
-   <MetaData>
-    title = Mon test
-   </MetaData>   
-   <ComplexData>
-    <Default>
-     mimeType = text/xml
-     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+     mimeType = application/json
      encoding = UTF-8
-    </Default>
-    <Supported>
-     mimeType = text/xml
-     encoding = base64
-     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
     </Supported>
    </ComplexData>
  </DataInputs>
  <DataOutputs>
   [Result]
-   Title = Intersection of the two geometries
-   Abstract = A new geometry representing the intersection or NULL if there is no intersection or an error occurs.
+   Title = The union of the geometries
+   Abstract = The geometry representing the union of the geometries contained in the dataset.
    <MetaData>
-    title = Mon test
-   </MetaData>
+    title = Mon test  
+   </MetaData>   
     <ComplexData>
      <Default>
       mimeType = text/xml
@@ -76,6 +55,18 @@
       useMapserver = true
       asReference = true
       msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 0.3 OPACITY 65 END
-     </Supported>
+    </Supported>
+    <Supported>
+      mimeType = image/tif
+      useMapserver = true
+      asReference = true
+      msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 0.3 END
+    </Supported>
+    <Supported>
+      mimeType = application/vnd.google-earth.kmz
+      useMapserver = true
+      asReference = true
+      msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 0.3 END
+    </Supported>
     </ComplexData>
  </DataOutputs>  

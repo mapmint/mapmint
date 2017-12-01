@@ -39,7 +39,7 @@
 #set isH=False
 #end if
 
-#set req="SELECT mm_tables.p_editions.name,mm_tables.p_editions.step,mm_tables.p_editions.ptid,mm_tables.p_editions.id,mm_tables.p_editions.description FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm.groups.id in (SELECT mm.groups.id from mm.groups,mm.user_group where mm.groups.id=mm.user_group.id_group and mm.user_group.id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.id="+$inputs["id"]["value"]
+#set req="SELECT distinct mm_tables.p_editions.name,mm_tables.p_editions.step,mm_tables.p_editions.ptid,mm_tables.p_editions.id,mm_tables.p_editions.description FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm.groups.id in (SELECT mm.groups.id from mm.groups,mm.user_group where mm.groups.id=mm.user_group.id_group and mm.user_group.id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.id="+$inputs["id"]["value"]
 #set res=$cur.execute($req)
 #set vals=$cur.fetchone()
 #set tblId=vals[2]

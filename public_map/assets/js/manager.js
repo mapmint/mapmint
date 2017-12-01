@@ -1040,6 +1040,36 @@ define([
 		map.getView().fit(extent,map.getSize());
 	    }
 	},
+	"refresh": {
+	    "run": function(layer){
+		zoo.execute({
+		    identifier: "mapfile.refreshLayerInfo",
+		    type: "POST",
+		    dataInputs: [
+			{"identifier": "map","value":$("#save-map").val(),"dataType":"string"},
+			{"identifier": "layer","value":layer,"dataType":"string"}
+		    ],
+		    dataOutputs: [
+			{"identifier":"Result","type":"raw"},
+		    ],
+		    success: function(ldata){
+			console.log(ldata);
+			$(".notifications").notify({
+			    message: { text: ldata },
+			    type: 'success',
+			}).show();
+			document.location.reload(false);	
+		    },
+		    error: function(data){
+			$(".notifications").notify({
+			    message: { text: ldata["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			    type: 'danger',
+			}).show();
+		    }
+		});
+		console.log(layer);
+	    }
+	},
 	"properties": {
 	    "run": function(layer){
 		$("#main").removeClass("col-sm-12").addClass("col-sm-6");

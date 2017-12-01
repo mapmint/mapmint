@@ -90,6 +90,7 @@ def delete(conf,inputs,outputs):
 	try: 
 		#print >> sys.stderr, conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"+inputs["name"]["value"]+".xml"
 		os.unlink(conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"+inputs["name"]["value"]+".xml")
+		os.unlink(conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"+inputs["name"]["value"]+"ds_ows.map")
 	except:
 		conf["lenv"]["message"]=zoo._("Unable to access the database configuration file to remove")
 		return 4

@@ -1,4 +1,4 @@
-// Filename: main.js
+// Filename: cfg.js
 
 requirejs.config({
     baseUrl: '/~djay/progede2/public_map/assets',
@@ -10,6 +10,7 @@ requirejs.config({
 	olpopup: 'js/lib/openlayers/ol-popup',
 
         jquery: 'js/lib/jquery/jquery-2.1.3.min',
+        popper: 'js/lib/popper',
         bootstrap: 'js/lib/bootstrap-3.1.1-dist/js/bootstrap.min',
 	bootselect: 'js/lib/bootstrap-select.min',
         notify: 'js/lib/bootstrap-notify',
@@ -57,8 +58,11 @@ requirejs.config({
 	mmDataTables: {
 	        deps: ['notify']
 	},
+	popper: {
+		deps: ['jquery']
+	},
         bootstrap: {
-            deps: ['jquery'],
+            deps: ['popper'],
         },
 	window: {
 	    deps: ['bootstrap'],
@@ -76,7 +80,7 @@ requirejs.config({
 	    deps: ['bootstrap'],
 	},
 	dataTables: {
-	    deps: ['jquery'],
+	    deps: ['jquery','bootstrap'],
 	},
 	buttons: {
 	    deps: ['dataTables'],
@@ -147,10 +151,11 @@ requirejs.config({
 
 requirejs.onResourceLoad = function (context, map, depArray) {
     console.log(map.name + ' : ' + map.url);
+    if(map.name=="popper")
+      window.Popper = p;
 };
 
 require(['domReady', 'app'], function(domReady, app) {
-
     domReady(function() {
 	app.initialize();
     });
@@ -197,5 +202,6 @@ var pmapfiles={
 #end for
 }
 
-
-
+require(["popper"],function(p){
+  window.Popper = p;
+});

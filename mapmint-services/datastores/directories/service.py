@@ -161,9 +161,6 @@ def list(conf,inputs,outputs):
 	status="closed"
 	if inputs.has_key('state') and inputs["state"].has_key('value'):
 		status=inputs["state"]["value"]
-	#print >> sys.stderr, conf["main"]["dataPath"]+"/dirs/"
-	#print >> sys.stderr, original_dir
-	#print >> sys.stderr, inputs["dir"]["value"]
 	try:
 		tmp=mmListDir(original_dir)
 	except:
@@ -189,18 +186,13 @@ def list(conf,inputs,outputs):
 		prefix=""
 		argument2=""
 		suffix=""
-	#print >> sys.stderr,"TMP > "+str(tmp)
 	outputs["Result"]["value"]=""
 	for t in tmp:
 		try:
-			#print >> sys.stderr,"TMP > "+str(original_dir+t)
 			open(original_dir+t)
 			hasValue=False
 		except:
 			i+=1
-			#print >> sys.stderr,"TMP > "+str(original_dir+t)+" "+str(i)
-			#print >> sys.stderr,os.access(original_dir+t,os.X_OK)
-			#print >> sys.stderr,t.split('.')
 			tmpStr=original_dir+t
 			if tmpStr[len(tmpStr)-1]!="/":
 				tmpStr+="/"
@@ -316,15 +308,18 @@ def details(conf,inputs,outputs):
     
 def delete(conf,inputs,outputs):
     a=conf["main"]["dataPath"]+"/dirs/"+inputs["name"]["value"]
-    if inputs["name"]["value"].count(conf["main"]["dataPath"]):
-		a=inputs["name"]["value"]
-		a=a[0:len(a)-1]
+    mapfile=a+"/ds_ows.map"
+    if inputs["name"]["value"].count(conf["main"]["dataPath"])>0:
+        a=inputs["name"]["value"]
+        mapfile=a+"/ds_ows.map"
+        a=a[0:len(a)-1]
     try:
-		os.unlink(a)
+        os.unlink(mapfile)
+        os.unlink(a)
     except:
-		er=sys.exc_info()
-		conf["lenv"]["message"]="Unable to drop directory ("+a[0:len(a)-1]+"): "+er[1][1]
-		return 4
+        er=sys.exc_info()
+        conf["lenv"]["message"]="Unable to drop directory ("+a[0:len(a)-1]+"): "+er[1][1]
+        return 4
     outputs["Result"]["value"]="Datastore deleted"
     return 3
 

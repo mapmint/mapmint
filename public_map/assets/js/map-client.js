@@ -1,8 +1,30 @@
-// Filename: app.js
-/*
-    This work was supported by a grant from the European Union's 7th Framework Programme (2007-2013)
-    provided for the project PublicaMundi (GA no. 609608).
-*/
+/**
+ * Author : Gérald FENOY
+ *
+ * Copyright 2009-2017 GeoLabs SARL. All rights reserved.
+ *
+ * This work was supported by a grant from the European Union's 7th Framework 
+* Programme (2007-2013) provided for the project PublicaMundi (GA no. 609608).
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+// Filename: map-client.js
 
 
 define([
@@ -621,104 +643,6 @@ define([
 
 	    addLayerToMap({"mapfile":cmapfile,"layers":clayers,"labels":clabels,"listHTML":listHTML,"cselection":cselection});
 	    
-	    /*if(externalCallbacks["addLayer"])
-		externalCallbacks["addLayer"]({"mapfile":cmapfile,"layers":clayers,"labels":clabels});
-
-	    addedLayers.push(new ol.layer.Tile({
-		visible: true,
-		source: new ol.source.TileWMS({
-		    url: msUrl+"?map="+cmapfile,
-		    params: {'LAYERS': myStr, 'TILED': true},
-		    serverType: 'mapserver'
-		})
-	    }));
-	    map.addLayer(addedLayers[addedLayers.length-1]);
-	    
-	    var reg=[
-		new RegExp("\\[nn\\]","g"),
-		new RegExp("\\[n\\]","g"),
-		new RegExp("\\[list\\]","g")
-	    ];
-
-	    var myStr=$("#addedLayer_item_template")[0].innerHTML.replace(reg[0],(addedLayers.length-1)+"").replace(reg[1],addedLayers.length+"").replace(reg[2],listHTML);
-	    $("#mm_layers_display").find(".tree").first().append(myStr);
-	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find('button').first().each(function(){
-		$(this).click(function(){
-		    var myRoot=$(this).parent().parent().parent();
-		    var cid=parseInt(myRoot.attr('id').replace(/overlays_/g,""));
-		    map.removeLayer(addedLayers[cid]);
-		    myRoot.remove();
-		});
-	    });
-	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find('input[type=checkbox]').first().each(function(){
-		$(this).click(function(){
-		    var myRoot=$(this).parent().parent().parent();
-		    var cid=parseInt(myRoot.attr('id').replace(/overlays_/g,""));			
-		    addedLayers[cid].setVisible($(this).is(':checked'));
-		});
-	    });
-	    clayer="overlays_"+(addedLayers.length-1);
-	    if(!oLayers[clayer])
-		oLayers[clayer]={'opacity':1};
-
-	    console.log( $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)));
-	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find("li.layer").each(function(){
-		console.log($(this));
-		if(cselection=="mm_overlays_wms_display")
-		    $(this).find("input[type=checkbox]").parent().prepend('<i class="fa fa-server"> </i>  ');
-		$(this).find("input[type=checkbox]").remove();
-	    });
-	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).find('.tree-toggle').click(function () {
-		$(this).parent().children('ul.tree').slideToggle(200);
-		$(this).find('.ud').toggleClass('fa-caret-square-o-down fa-caret-square-o-right');
-	    });
-	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).contextmenu({
-		target: "#context-menu"
-	    });
-	    $("#mm_layers_display").find("#overlays_"+(addedLayers.length-1)).bind("contextmenu",function(e){
-		console.log(e);
-		console.log($(this).attr("id").indexOf("overlays_"));
-		if($(this).attr("id").indexOf("overlays_")==0){
-		    cid=parseInt($(this).attr("id").replace(/overlays_/,""));
-		    clayer="overlays_"+cid;
-		}
-		else{
-		    cid=eval($(this).attr("id").replace(/layer_/,""));
-		    clayer=getLayerById(cid);
-		}
-		console.log(clayer);
-		if(!oLayers[clayer])
-		    oLayers[clayer]={'opacity':1};
-
-		$("#mm_layers_display").find(".tree").find(".layer-active").toggleClass("layer-active");
-		$(e.currentTarget).toggleClass("layer-active");
-		var myRootLocation=$("#context-menu");
-		for(i in {"export":0,"query":0,"zoomTo":0}){
-		    myRootLocation.find("#mmm_"+i).parent().addClass("hidden");
-		}
-		console.log(clayer);
-		myRootLocation.find("#mmm_opacity").off("input");
-		myRootLocation.find("#mmm_opacity").on("input",function(){
-		    myRootLocation.find("#mmm_range").val($(this).val()+"%");
-		    var cLayer=$("#mm_layers_display").find(".tree").find("li.layer-active").first();
-		    if(cLayer.attr("id").indexOf("overlays_")==0){
-			var cid=parseInt(cLayer.attr("id").replace(/overlays_/,""));
-			addedLayers[cid].setOpacity($(this).val()/100);
-			clayer="overlays_"+cid;
-		    }
-		    else{
-			var cid=eval("myBaseLayers.length+"+(cLayer.attr("id").replace(/layer_/,"").split("_")[0]));
-			var clayer=getLayerById(eval(cLayer.attr("id").replace(/layer_/,"")));
-			map.getLayers().item(cid).setOpacity($(this).val()/100);
-			clayer=getLayerById(cid);
-		    }
-		    oLayers[clayer]["opacity"]=$(this).val()/100;
-		});
-		myRootLocation.find("#mmm_opacity").val(oLayers[clayer]["opacity"]*100);
-		myRootLocation.find("#mmm_range").val(Math.round(oLayers[clayer]["opacity"]*100).toFixed(0)+"%");
-		$('body, #context-menu > ul > li > a').on('click', function (e) {console.log("CLICK !! ");$(".tree").find(".layer-active").removeClass('layer-active');});
-		return;
-	    });*/
 	});
 	}catch(e){
 	    console.log(e);
@@ -986,6 +910,10 @@ define([
 	    console.log(oLayers[layerName]);
 	    if(oLayers[layerName].maps)
 		timelines.push(layerName);
+	    else
+		if(externalCallbacks["loadLayer"])
+		    externalCallbacks["loadLayer"](layerName);
+
 	    if(oLayers[layerName].display=="raster"){
 		console.log(oLayers[layerName]);
 		var lmapfile=pmapfile;
@@ -995,13 +923,15 @@ define([
 		if(layerName.indexOf("grid_")===-1){
 		    console.log(oLayers[layerName]);
 		    if(!oLayers[layerName].labels){
-			if(oLayers[layerName].dataType=="point")
+			if(oLayers[layerName].dataType=="point"){
 			    layer=new ol.layer.Tile({
 				visible: oLayers[layerName]["activated"],
 				source: new ol.source.OSM({
 				    url: msUrl+"?map="+lmapfile+"&layers="+layerName+"&mode=tile&tilemode=gmap&tile={x}+{y}+{z}"
 				})
 			    });
+			    oLayers[layerName].real_name=layerName;
+			}
 			else
 			    layer=new ol.layer.Tile({
 				visible: oLayers[layerName]["activated"],
@@ -1279,15 +1209,17 @@ define([
 		    }
 		}
 		else{
+		    var isChecked=$(this).is(":checked");
 		    $(this).parent().find(".cm").each(function(){
-			console.log(myBaseLayers.length);
+			$(this).find("input[type='checkbox']").prop("checked",isChecked).change();
+			/*console.log(myBaseLayers.length);
 			console.log($(this)[0]["id"]);
 			var tmp=eval($(this)[0]["id"].replace(/layer_/g,"")+'+myBaseLayers.length');
 			console.log(tmp);
 			console.log($(this).find("input").is(":checked"));
 			map.getLayers().item(tmp).setVisible(($(this).find("input").is(":checked")));
 			
-			console.log($(this)[0]["id"]);
+			console.log($(this)[0]["id"]);*/
 		    });
 		}
 	    });
@@ -1830,10 +1762,26 @@ define([
 			    console.log(myLayer);
 			    try{
 				map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().updateParams({"LAYERS":myLayer.layers[cid]});
+				map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
 			    }catch(e){
-				map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().updateParams({"LAYERS": i});
+				try{
+				    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().updateParams({"LAYERS": i});
+				    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
+				}catch(e){
+					console.log(e);
+				    try{
+					console.log(map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource());
+					console.log(myLayer.maps[cid]);
+					console.log(map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource());
+					console.log(msUrl+"?map="+myLayer.maps[cid]+"&layers="+"toto"+"&mode=tile&tilemode=gmap&tile={x}+{y}+{z}");
+					map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]+"&layers="+myLayer.real_name+"&mode=tile&tilemode=gmap&tile={x}+{y}+{z}");
+					//map.getLayers().item(myLayer.index+(myBaseLayers.length)).change();
+					//myLayer.layers[cid]
+				    }catch(e){
+					console.log(e);
+				    }
+				}
 			    }
-			    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().setUrl(msUrl+"?map="+myLayer.maps[cid]);
 			    map.getLayers().item(myLayer.index+(myBaseLayers.length)).getSource().changed();
 			    //}
 			    map.updateSize();
@@ -1852,7 +1800,11 @@ define([
 		break;
 	    }
 	});
-	
+
+	console.log(" *****_________***** CHECK ENDLOADING *****_________*****");
+	if(externalCallbacks["endLoading"])
+	    externalCallbacks["endLoading"]();
+
     }
 
     var myMMDataTableObject;
@@ -3666,6 +3618,10 @@ define([
 
 	map.addLayer(layer);
     }
+
+    function getLayers(){
+	return oLayers;
+    }
     
     // Return public methods
     return {
@@ -3677,7 +3633,8 @@ define([
 	getSearchValues: getSearchValues,
 	addALayer: addALayer,
 	addLayerToMap: addLayerToMap,
-	externalCallbacks: externalCallbacks
+	externalCallbacks: externalCallbacks,
+	getLayers: getLayers
     };
 
 
