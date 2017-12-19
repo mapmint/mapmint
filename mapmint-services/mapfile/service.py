@@ -4089,10 +4089,11 @@ def saveMapFor(conf,inputs,outputs):
     import urllib
     m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
     m.getLayerByName(inputs["layers"]["value"]).metadata.set("mm"+inputs["type"]["value"]+"Fields",inputs["fields"]["value"])
-    m.getLayerByName(inputs["layers"]["value"]).metadata.set("gml_include_items",inputs["fields"]["value"])
-    m.getLayerByName(inputs["layers"]["value"]).metadata.set("gml_exclude_items","all")
-    m.getLayerByName(inputs["layers"]["value"]).metadata.set("wms_include_items",inputs["fields"]["value"])
-    m.getLayerByName(inputs["layers"]["value"]).metadata.set("wms_exclude_items","all")
+    if inputs["type"]["value"]=="GFI":
+        m.getLayerByName(inputs["layers"]["value"]).metadata.set("gml_include_items",inputs["fields"]["value"])
+        m.getLayerByName(inputs["layers"]["value"]).metadata.set("gml_exclude_items","all")
+        m.getLayerByName(inputs["layers"]["value"]).metadata.set("wms_include_items",inputs["fields"]["value"])
+        m.getLayerByName(inputs["layers"]["value"]).metadata.set("wms_exclude_items","all")
     if inputs.keys().count("fwidth") > 0:
         m.getLayerByName(inputs["layers"]["value"]).metadata.set("mm"+inputs["type"]["value"]+"FieldsWidth",inputs["fwidth"]["value"])
     if inputs.keys().count("faliases") > 0:
@@ -4643,6 +4644,12 @@ def savePublishMap(conf,inputs,outputs):
         if inputs["mmProprietaryBaseLayers"]["value"]==conf["mm"]["biName"]:
             m.getLayer(l).metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
     saveProjectMap(m,mapfile)
+    for i in range(m.numlayers):
+        m.getLayer(i).metadata.set("gml_include_items",m.getLayer(i).metadata.get('mmGFIFields'))
+        m.getLayer(i).metadata.set("gml_exclude_items","all")
+        m.getLayer(i).metadata.set("wms_include_items",m.getLayer(i).metadata.get('mmGFIFields'))
+        m.getLayer(i).metadata.set("wms_exclude_items","all")
+    correctExtent(m)
     saveProjectMap(m,destMapfile)
 
     import shutil
@@ -4665,6 +4672,30 @@ def savePublishMap(conf,inputs,outputs):
 
     outputs["Result"]["value"]=zoo._("Project saved")
     return 3
+
+def correctExtent(myMap):
+    extent=None
+    mainProj=mapscript.projectionObj(myMap.getProjection())
+    for i in range(myMap.numlayers):
+        tmp_extent=myMap.getLayer(i).getExtent()
+        currentProj=mapscript.projectionObj(myMap.getLayer(i).getProjection())
+        minp=mapscript.pointObj(tmp_extent.minx,tmp_extent.miny)
+        minp1=minp.project(currentProj,mainProj)
+        maxp=mapscript.pointObj(tmp_extent.maxx,tmp_extent.maxy)
+        maxp1=maxp.project(currentProj,mainProj)
+        if i==0:
+             extent=[minp.x,minp.y,maxp.x,maxp.y]
+        else:
+            if(extent[0]>minp.x):
+                extent[0]=minp.x
+            if(extent[1]>minp.y):
+                extent[1]=minp.y
+            if(extent[2]<maxp.x):
+                extent[2]=maxp.x
+            if(extent[3]<maxp.y):
+                extent[3]=maxp.y
+    if extent is not None:
+        myMap.setExtent(extent[0],extent[1],extent[2],extent[3])
 
 def savePublishPreview(conf,inputs,outputs):
 	mapfile=conf["main"]["dataPath"]+"/public_maps/project_"+inputs["map"]["value"]+".map"

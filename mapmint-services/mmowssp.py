@@ -15,7 +15,7 @@ import cgi
 class HelloResource(resource.Resource):
     isLeaf = True
     numberRequests = 0
-    SecureAccessUrl = "http://localhost/cgi-bin/mm/zoo_loader.cgi"
+    SecureAccessUrl = "http://host1/cgi-bin/mm/zoo_loader.cgi"
     req_tmpl=\
         '<wps:Execute service="WPS" version="1.0.0" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 ../wpsExecute_request.xsd">'+\
         '<ows:Identifier>ows-security.SecureAccess</ows:Identifier>'+\
@@ -64,22 +64,33 @@ class HelloResource(resource.Resource):
         '</wps:ResponseForm>'+\
         '</wps:Execute>'
 
+    def setDefaultHeaders(self,request):
+        request.setHeader('Server', 'MapMint OWS-Security')
+        request.setHeader('X-Fowarded-By', 'MapMint OWS-Security')
+
     def reparse(self,parsed_path):
         for i in parsed_path.keys():
             if i.lower()!=i:
                 parsed_path[i.lower()]=parsed_path[i]
         
     def render_GET(self, request):
+        self.setDefaultHeaders(request)
         import json
         #ip, port = self.transport.socket.getpeername()
         print >> sys.stderr,dir(request)#protocol.transport.getPeer()
         print >> sys.stderr,request.getHeader("x-real-ip")
-        print >> sys.stderr,dir(request.transport)
+        print >> sys.stderr,request.path
         print >> sys.stderr,request.transport.getPeer().host
         print >> sys.stderr,request.getUser()
         print >> sys.stderr,request.getPassword()
+        rcontent=request.path.split('/')
+        print >> sys.stderr,rcontent
         parsed_path = request.args
         self.reparse(parsed_path)
+        if parsed_path.keys().count("token") > 0 and parsed_path.keys().count("server"):
+            params=[parsed_path["server"][0],parsed_path["token"][0]]
+        else:
+            params=[rcontent[3],rcontent[2]]
         log.msg(parsed_path)
         clientIp=request.getHeader("x-real-ip")
         if clientIp is None:
@@ -91,7 +102,7 @@ class HelloResource(resource.Resource):
             for i in parsed_path.keys():
                 if i!="server" and i!="token":
                     query[i]=parsed_path[i][0]
-            res=self.req_tmpl.replace("[server]",parsed_path["server"][0]).replace("[token]",parsed_path["token"][0]).replace("[query]",'<wps:ComplexData mimeType="application/json">'+json.dumps(query)+'</wps:ComplexData>').replace("[ip_address]","<wps:LiteralData>"+clientIp+"</wps:LiteralData>").replace("[user]",request.getUser()).replace("[password]",request.getPassword())
+            res=self.req_tmpl.replace("[server]",params[0]).replace("[token]",params[1]).replace("[query]",'<wps:ComplexData mimeType="application/json">'+json.dumps(query)+'</wps:ComplexData>').replace("[ip_address]","<wps:LiteralData>"+clientIp+"</wps:LiteralData>").replace("[user]",request.getUser()).replace("[password]",request.getPassword())
             log.msg(res)
             req=urllib2.Request(url=self.SecureAccessUrl,
                             data=res,
@@ -99,6 +110,8 @@ class HelloResource(resource.Resource):
             try:
                 response = urllib2.urlopen(req)
             except Exception,e:
+                request.setResponseCode(e.code)
+                request.setHeader("WWW-Authenticate",'Basic realm="MapMint OWS-Security", charset="UTF-8"')
                 request.setHeader("content-type", "text/xml")
                 return e.read()
             log.msg(response.info())
@@ -115,15 +128,21 @@ class HelloResource(resource.Resource):
         return "I am request #" + str(self.numberRequests) + "\n"
 
     def render_POST(self, request):
+        self.setDefaultHeaders(request)
         try:
             query={}
+            rcontent=request.path.split('/')
             log.msg(request.args)
             pquery=request.content.read()
             log.msg(pquery)
+            if request.args.keys().count("token") > 0 and request.args.keys().count("server"):
+                params=[request.args["server"][0],request.args["token"][0]]
+            else:
+                params=[rcontent[3],rcontent[2]]
             clientIp=request.getHeader("x-real-ip")
             if clientIp is None:
                 clientIp=request.transport.getPeer().host
-            res=self.req_tmpl.replace("[server]",request.args["server"][0]).replace("[token]",request.args["token"][0]).replace("[query]",'<wps:ComplexData mimeType="text/xml">'+pquery+'</wps:ComplexData>').replace("[ip_address]","<wps:LiteralData>"+clientIp+"</wps:LiteralData>").replace("[user]",request.getUser()).replace("[password]",request.getPassword())
+            res=self.req_tmpl.replace("[server]",rcontent[3]).replace("[token]",rcontent[2]).replace("[query]",'<wps:ComplexData mimeType="text/xml">'+pquery+'</wps:ComplexData>').replace("[ip_address]","<wps:LiteralData>"+clientIp+"</wps:LiteralData>").replace("[user]",request.getUser()).replace("[password]",request.getPassword())
             req=urllib2.Request(url=self.SecureAccessUrl,
                             data=res,
                             headers={'Content-Type': 'text/xml'})
@@ -136,7 +155,7 @@ class HelloResource(resource.Resource):
         except Exception,e:
             print >> sys.stderr,"ERROR: "+str(e)
             log.msg(req)
-            return '<html><body>You submitted: %s</body></html>\n' % (pquery,)
+            return '<html><body>You submitted the following request which is not supported: %s</body></html>\n' % (pquery,)
 
 log.startLogging(sys.stderr)
 reactor.listenTCP(8080, server.Site(HelloResource()))

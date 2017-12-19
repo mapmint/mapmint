@@ -24,7 +24,7 @@
 </select>
 
 <p>$zoo._("Select Data Source:")</p>
-<select id="select-datasource" class="select-window" multiple="true">
+<select id="select-datasource" class="select-window" multiple="true" style="overflow-y:auto">
 #for j in range(0,len($inputs["dsList"]))
 #if $mm_access.checkDataSourcePriv($conf,None,$qdefault,$inputs["dsList"][$j]["name"],"r")
   <option value="$inputs["dsList"][$j]["name"]">$inputs["dsList"][$j]["name"]</option>

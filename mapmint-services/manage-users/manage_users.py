@@ -117,7 +117,6 @@ class manage_users:
 	def pexecute_req(self,req):
 		params=None
 		for i in req[1].keys():
-			print >> sys.stderr,"KEY: "+i
 			if self.paramstyle=="qmark":
 				if params is None:
 					params=()
@@ -125,13 +124,10 @@ class manage_users:
 				params+=(req[1][i]["value"],)
 			else:
 				if self.paramstyle=="pyformat":
-					print >> sys.stderr,"KEY: "+i
 					if params is None:
 						params={}
 					req[0]=req[0].replace("[_"+i+"_]","%("+i+")"+req[1][i]["format"])
 					params[i]=req[1][i]["value"]
-		print >> sys.stderr,"params"
-		print >> sys.stderr,params
 		try:
 			self.cur.execute(req[0],params)
 			self.conn.commit()

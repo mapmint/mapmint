@@ -396,11 +396,18 @@ define([
 
 		    if($(this).attr("name") && CFeaturesSelected[0][attribute]){
 			console.log($(this).attr("name"));
-			if($(this).attr("type")!="checkbox")
+			if($(this).attr("type")!="checkbox"){
 			    $(this).val(CFeaturesSelected[0][attribute].replace(reg0,""));
+			    $(this).find('option').each(function(){
+				if($(this).text()==CFeaturesSelected[0][attribute]){
+				    $(this).prop("selected",true);
+				}else
+				    $(this).prop("selected",false);
+			    });
+			}
 			else{
 			    console.log(CFeaturesSelected[0][attribute].replace(reg0,""));
-			    $(this).prop("checked",CFeaturesSelected[0][attribute].replace(reg0,"")=="1");
+			    $(this).prop("checked",CFeaturesSelected[0][attribute].replace(reg0,"")=="1"||CFeaturesSelected[0][attribute].replace(reg0,"")=="True");
 			}
 		    }
 		});
