@@ -303,9 +303,6 @@ CREATE TABLE themes_groups (
     g_id integer REFERENCES mm.groups(id)
 );
 
-
-
-
 CREATE TABLE documents (
     id serial PRIMARY KEY,
     name character varying(50),
@@ -314,7 +311,6 @@ CREATE TABLE documents (
     filename character varying(255),
     url text
 );
-
 
 CREATE TABLE documents_groups (
     id serial PRIMARY KEY,
@@ -326,6 +322,13 @@ CREATE TABLE documents_themes (
     id serial PRIMARY KEY,
     t_id integer REFERENCES mm.themes(id),
     d_id integer REFERENCES mm.documents(id)
+);
+
+
+CREATE TABLE pages (
+    id integer NOT NULL,
+    title character varying(255),
+    content text
 );
 
 

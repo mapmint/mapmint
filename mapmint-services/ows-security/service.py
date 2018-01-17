@@ -50,7 +50,7 @@ def validIp(conf,con,prefix,oip,cType,names):
     m=mapscript.mapObj(mapfile)
     ips=m.web.metadata.get("mm_access_ip")
     ip=None
-    if ips is not None and ips!="":
+    if ips is not None:
         ip=ips.split(",")
     # PROJECT
     if cType==0:
@@ -76,12 +76,12 @@ def checkEntityPriv(conf,con,prefix,server,service,entity,priv,token):
         fields+=tmp[i]
     try:
         req="SELECT "+fields+" from "+prefix+"servers,"+prefix+"layer_privileges, "+prefix+"tokens WHERE tokens.id_group=layer_privileges.id_group AND id_protocol=(SELECT id from "+prefix+"protocols where name='"+service.upper()+"') AND layer_privileges.entity='"+entity+"' AND layer_privileges.id_server=servers.id and name='"+server+"' AND value='"+token+"';"
-        #print >> sys.stderr,req
+        print >> sys.stderr,req
         con.cur.execute(req)
         vals=con.cur.fetchone()
-        #print >> sys.stderr,vals
+        print >> sys.stderr,vals
         if vals is not None:
-            #print >> sys.stderr,vals[0]
+            print >> sys.stderr,vals[0]
             return vals[0]
     except Exception,e:
         print >> sys.stderr,e
@@ -107,29 +107,16 @@ def BasicRewrite(conf,inputs,outputs):
         c = auth.getCon(conf)
         prefix=auth.getPrefix(conf)
         sUrl=getUrl(conf,c,prefix,inputs["server"]["value"])
-        #outputs["Result"]["value"]=inputs["Query"]["value"].replace(sUrl,conf["main"]["owsSecurityUrl"]+"?server="+inputs["server"]["value"]+"&amp;token="+inputs["token"]["value"])
-        outputs["Result"]["value"]=inputs["Query"]["value"].replace(sUrl,conf["main"]["owsSecurityUrl"]+inputs["token"]["value"]+"/"+inputs["server"]["value"]+"/")
-        outputs["Result"]["mimeType"]=inputs["Query"]["fmimeType"]
+        outputs["Result"]["value"]=inputs["Query"]["value"].replace(sUrl,conf["main"]["owsSecurityUrl"]+"?server="+inputs["server"]["value"]+"&amp;token="+inputs["token"]["value"])
     return zoo.SERVICE_SUCCEEDED
     
 def SecureResponse(conf,inputs,outputs):
     c = auth.getCon(conf)
     prefix=auth.getPrefix(conf)
     sUrl=getUrl(conf,c,prefix,inputs["server"]["value"])
-    #print >> sys.stderr," ** "
-    #print >> sys.stderr,inputs
-    #print >> sys.stderr," ** "
-
     if sUrl is None:
         conf["lenv"]["message"]=zoo._("No server found.")
         return zoo.SERVICE_FAILED
-    if inputs["Query"].keys().count("fmimeType")==0 and inputs["Query"].keys().count("mimeType")>0:
-        inputs["Query"]["fmimeType"]=inputs["Query"]["mimeType"]
-        outputs["Result"]["mimeType"]=inputs["Query"]["fmimeType"]
-        if inputs["Query"]["fmimeType"]!="text/xml":
-            outputs["Result"]["value"]=inputs["Query"]["value"]
-            outputs["Result"]["mimeType"]=inputs["Query"]["fmimeType"]
-            return zoo.SERVICE_SUCCEEDED
     vals=getEntities(c,prefix,inputs["service"]["value"],"GetCapabilities")
     context = etree.iterparse(StringIO(inputs["Query"]["value"].replace('<?xml version="1.0" encoding="utf-8"?>\n','')), events=('end',), tag='{*}'+vals[0])
     lName="Name"
@@ -168,11 +155,8 @@ def SecureResponse(conf,inputs,outputs):
                 a.getparent().getparent().remove(a.getparent())
                 break
     
-    #outputs["Result"]["value"]=etree.tostring(doc).replace(sUrl,conf["main"]["owsSecurityUrl"]+"?server="+inputs["server"]["value"]+"&amp;token="+inputs["token"]["value"])
-    outputs["Result"]["value"]=etree.tostring(doc).replace(sUrl,conf["main"]["owsSecurityUrl"]+inputs["token"]["value"]+"/"+inputs["server"]["value"]+"/")
-    if inputs["Query"].keys().count("fmimeType")==0 and inputs["Query"].keys().count("mimeType")>0:
-        inputs["Query"]["fmimeType"]=inputs["Query"]["mimeType"]
-    outputs["Result"]["mimeType"]=inputs["Query"]["fmimeType"]#"text/xml"
+    outputs["Result"]["value"]=etree.tostring(doc).replace(sUrl,conf["main"]["owsSecurityUrl"]+"?server="+inputs["server"]["value"]+"&amp;token="+inputs["token"]["value"])
+    outputs["Result"]["mimeType"]="text/xml"
     return zoo.SERVICE_SUCCEEDED
 
 
@@ -212,7 +196,7 @@ def tryIdentifyUser(conf,user,password):
     if user is not None and user!="" and password is not None and password!="":
         import authenticate.service as auth
         outputs={"Result":{"value":""}}
-        res=auth.clogIn(conf,{"login":{"value":user},"password":{"value":password},"no-trace":{"value":None}},outputs)
+        res=auth.logIn(conf,{"login":{"value":user},"password":{"value":password}},outputs)
         if res==zoo.SERVICE_SUCCEEDED:
             return True
         else:
@@ -231,20 +215,9 @@ def SecureAccess(conf,inputs,outputs):
     if not(validIp(conf,c,prefix,inputs["ip"]["value"],0,[inputs["server"]["value"]])):
         conf["lenv"]["message"]=zoo._("You are not allowed to access the ressource using this ip address!")
         return zoo.SERVICE_FAILED
-    q=None
-    if inputs["Query"]["mimeType"]=="application/json":
-        import json
-        q=json.loads(inputs["Query"]["value"])
     myAutorizedGroups=myMap.web.metadata.get('mm_access_groups').split(',')
-    print >> sys.stderr,"********"
-    print >> sys.stderr,myAutorizedGroups
-    print >> sys.stderr,myAutorizedGroups.count('public')==0 
-    print >> sys.stderr,not(q is None or q["request"].upper()=="GETCAPABILITIES" or q["request"].upper()=="GETLEGENDGRAPHIC")
-
-    if myAutorizedGroups.count('public')==0 and not(q is None or q["request"].upper()=="GETCAPABILITIES" or q["request"].upper()=="GETLEGENDGRAPHIC") and not(tryIdentifyUser(conf,inputs["user"]["value"],inputs["password"]["value"])):
+    if myAutorizedGroups.count('public')==0 and not(tryIdentifyUser(conf,inputs["user"]["value"],inputs["password"]["value"])):
         conf["lenv"]["message"]=zoo._("You are not allowed to access the ressource using this user / password!")
-        conf["lenv"]["rcode"]="401 Unauthorized"
-        print >> sys.stderr,conf["lenv"]
         return zoo.SERVICE_FAILED
     if conf.keys().count("senv")==0:
         conf["senv"]={"group": getGroupFromToken(c,prefix,inputs["token"]["value"])}
@@ -258,7 +231,6 @@ def SecureAccess(conf,inputs,outputs):
             break
     if not(isAuthorized):
         conf["lenv"]["message"]=zoo._("Your group is not allowed to access the ressource!")
-        conf["lenv"]["rcode"]="403 Forbidden"
         return zoo.SERVICE_FAILED
     if myCookies is not None:
         print >> sys.stderr," ** COOKIES"
@@ -316,7 +288,6 @@ def SecureAccess(conf,inputs,outputs):
     except Exception,e:
         print >> sys.stderr,frameinfo.filename, get_linenumber()
         print >> sys.stderr,e
-    print >> sys.stderr," +++++++++++++++++++ "+inputs["Query"]["mimeType"]
     if inputs["Query"]["mimeType"]=="application/json":
         import json
         q=json.loads(inputs["Query"]["value"])
@@ -324,15 +295,12 @@ def SecureAccess(conf,inputs,outputs):
         for i in range(0,len(lkeys)):
             if lkeys[i].lower()!=lkeys[i]:
                 q[lkeys[i].lower()]=q[lkeys[i]]
-        if q.keys().count("request")==0:
+        if q.keys().count("request")<0:
             conf["lenv"]["message"]=zoo._("Parameter &lt;request&gt; was missing")
             return zoo.SERVICE_FAILED
-        if q.keys().count("service")==0:
-            if q["request"].upper()=="GETMAP" or q["request"].upper()=="GETFEATUREINFO":
-                q["service"]="WMS"
-            else:
-                conf["lenv"]["message"]=zoo._("Parameter &lt;service&gt; was missing")
-                return zoo.SERVICE_FAILED
+        if q.keys().count("service")<0:
+            conf["lenv"]["message"]=zoo._("Parameter &lt;service&gt; was missing")
+            return zoo.SERVICE_FAILED
         if not(checkDataStorePriv(conf,c,prefix,inputs["server"]["value"],q["service"],"r,x",inputs["token"]["value"])):
             conf["lenv"]["message"]=zoo._("You're not allowed to access this ressource. Please contact your system administrator for more informations on access restriction settings.")
             return zoo.SERVICE_FAILED
@@ -358,33 +326,13 @@ def SecureAccess(conf,inputs,outputs):
                 .replace("[Identifier]","SecureResponse")
 
             req=urllib2.Request(
-                url=conf["main"]["owsServerAddress"],#rserverAddress"],
+                url=conf["main"]["serverAddress"],
                 data=xmlQuery,
                 headers={'Content-Type': 'text/xml',"Cookie": myCookies}
             )
-            try:
-                response = urllib2.urlopen(req)
-                outputs["Result"]["value"]=response.read()
-            except Exception,e:
-                conf["lenv"]["message"]=str(e.read())
-                return zoo.SERVICE_FAILED
-            lkeys=response.headers.keys()
-            lvalues=response.headers.values()
-            useDefault=True
-            for i in range(0,len(lkeys)):
-                #print >> sys.stderr," --------- KEY : "+lkeys[i]
-                if "content-type"==lkeys[i]:# and lvalues[i].count("text/")==0:
-                    useDefault=False
-                    outputs["Result"]["mimeType"]=lvalues[i]
-                    res=outputs["Result"].pop("encoding")
-                    break
-            if useDefault:
-                outputs["Result"]["mimeType"]="text/xml"
-            #print >> sys.stderr,dir(response)
-            #outputs["Result"]["mimeType"]="text/xml"
-            response.close()
-            if conf.keys().count("senv")>0:
-                conf.pop("senv",None)
+            response = urllib2.urlopen(req)
+            outputs["Result"]["value"]=response.read()
+            outputs["Result"]["mimeType"]="text/xml"
             return zoo.SERVICE_SUCCEEDED
         else:
             if vals[1]<0:
@@ -434,21 +382,16 @@ def SecureAccess(conf,inputs,outputs):
                 lvalues=response.headers.values()
                 useDefault=True
                 for i in range(0,len(lkeys)):
-                    #print >> sys.stderr," --------- KEY : "+lkeys[i]+" "+lvalues[i]
-                    if "content-type"==lkeys[i]:# and lvalues[i].count("text/")==0:
+                    if "content-type"==lkeys[i] and lvalues[i].count("text/")==0:
                         useDefault=False
                         outputs["Result"]["mimeType"]=lvalues[i]
                         res=outputs["Result"].pop("encoding")
                         break
                 if useDefault:
                     outputs["Result"]["mimeType"]="text/xml"
-                response.close()
-                if conf.keys().count("senv")>0:
-                    conf.pop("senv",None)
-
                 return zoo.SERVICE_SUCCEEDED
     else:
-        inputs["Query"]["value"]=inputs["Query"]["value"].replace('<?xml version="1.0" encoding="utf-8"?>','').replace('\n','')
+        inputs["Query"]["value"]=inputs["Query"]["value"].replace('<?xml version="1.0" encoding="utf-8"?>\n','')
         doc=etree.fromstring(inputs["Query"]["value"])
         req=doc.tag.split("}")
         if len(req)>0:
@@ -462,7 +405,7 @@ def SecureAccess(conf,inputs,outputs):
                 .replace("[_service_]",doc.attrib["service"])\
                 .replace("[_request_]",req)\
                 .replace("[_token_]",inputs["token"]["value"])\
-                .replace("[_query_]",'<wps:Reference xlink:href="'+sUrl+'" mimeType="text/xml" method="POST"><Header key="Content-Type" value="text/xml" /><Body>'+inputs["Query"]["value"].replace('<?xml version="1.0" encoding="utf-8"?>','').replace('\n','')+'</Body></wps:Reference>')\
+                .replace("[_query_]",'<wps:Reference xlink:href="'+sUrl+'" mimeType="text/xml" method="POST"><Header key="Content-Type" value="text/xml" /><Body>'+inputs["Query"]["value"]+'</Body></wps:Reference>')\
                 .replace("[Identifier]","SecureResponse")
 
             req=urllib2.Request(
@@ -472,21 +415,7 @@ def SecureAccess(conf,inputs,outputs):
             )
             response = urllib2.urlopen(req)
             outputs["Result"]["value"]=response.read()
-            lkeys=response.headers.keys()
-            lvalues=response.headers.values()
-            useDefault=True
-            for i in range(0,len(lkeys)):
-                if "content-type"==lkeys[i] and lvalues[i].count("text/")==0:
-                    useDefault=False
-                    outputs["Result"]["mimeType"]=lvalues[i]
-                    res=outputs["Result"].pop("encoding")
-                    break
-            if useDefault:
-                outputs["Result"]["mimeType"]="text/xml"
-            #outputs["Result"]["mimeType"]="text/xml"
-            response.close()
-            if conf.keys().count("senv")>0:
-                conf.pop("senv",None)
+            outputs["Result"]["mimeType"]="text/xml"
             return zoo.SERVICE_SUCCEEDED
         else:
             if vals[1]<0:
@@ -553,9 +482,6 @@ def SecureAccess(conf,inputs,outputs):
                         break
                 if useDefault:
                     outputs["Result"]["mimeType"]="text/xml"
-                response.close()
-                if conf.keys().count("senv")>0:
-                    conf.pop("senv",None)
                 return zoo.SERVICE_SUCCEEDED
         conf["lenv"]["message"]="Not yet implemented"
         return zoo.SERVICE_FAILED

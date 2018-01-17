@@ -167,6 +167,14 @@ var oLayers={
 #end if
 	"searchMap": "$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map",
 	"dataType": #if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER or $m.getLayer($l).type==$mapscript.MS_LAYER_TILEINDEX#"raster"#else##if $m.getLayer($l).type==$mapscript.MS_LAYER_POINT#"point"#else##if $m.getLayer($l).type==$mapscript.MS_LAYER_LINE#"line"#else#"polygon"#end if##end if##end if#,
+#if $m.getLayer($l).type==$mapscript.MS_LAYER_POINT
+       "size": $m.getLayer($l).getClass(0).getStyle(0).size,
+#end if
+       "legend": [
+#for li in range($m.getLayer($l).numclasses)
+               "$conf["main"]["dataPath"]/public_maps/map4legend_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map",
+#end for
+       ],
 	"display": #if vl.count($m.getLayer($l).name)>0#"vector"#else#"raster"#end if#,
 	"opacity": 1,
 	"filter": #if $m.getLayer($l).metadata.get('mmFilterField') and $inputs.has_key('filter')#true#else#false#end if#,

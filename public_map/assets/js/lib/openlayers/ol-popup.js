@@ -14,7 +14,11 @@ define([
 	
 	this.ani = options.ani;
 	if (this.ani === undefined) {
-            this.ani = ol.animation.pan;
+	    try{
+		this.ani = ol.animation.pan;
+	    }catch(e){
+		console.log("-- Catched error: "+e);
+	    }
 	}
 	
 	this.ani_opts = options.ani_opts;

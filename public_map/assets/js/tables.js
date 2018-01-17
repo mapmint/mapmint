@@ -114,7 +114,7 @@ define([
 	    console.log($(this).attr("id").replace(reg,""));
 	    if($(this).attr("id").replace(reg,"").replace(reg0,"")=="description"){
 		console.log($(this).attr("id"));
-		$(this).code(data[$(this).attr("id").replace(reg,"")]);
+		$(this).summernote("code",data[$(this).attr("id").replace(reg,"")]);
 	    }
 	    else
 		$(this).val(data[$(this).attr("id").replace(reg,"")]).change();
@@ -355,7 +355,7 @@ define([
 	    $("#tables_edition_id").val("-1");
 	    $("#tables_edition_title").val("");
 	    $("#tables_edition_step").val("");
-	    $("#tables_edition_code").code("");
+	    $("#tables_edition_code").summernote("code","");
 	    console.log(data.mmDesc);
 	    for(var i=0;i<data.mmDesc.length;i++){
 		ebody+=managerTools.generateFromTemplate(
@@ -406,7 +406,7 @@ define([
 		    $("#tables_edition_"+i.replace(/name/g,"title")).val(data.mmEdits[id].view[i]);
 		    console.log("**************");
 		    if(i.replace(/name/g,"title")=="description")
-			$("#tables_edition_"+i.replace(/name/g,"title")).code(data.mmEdits[id].view[i]);
+			$("#tables_edition_"+i.replace(/name/g,"title")).summernote("code",data.mmEdits[id].view[i]);
 		}
 		else{
 		    var obj=JSON.parse(data.mmEdits[id].view[i]);
@@ -791,7 +791,7 @@ define([
 		return;
 	    var cid=$(this).attr('id').replace(reg0,"");
 	    if(cid=="description")
-		params[cid]=$(this).code();
+		params[cid]=$(this).summmernote("code");
 	    else
 		params[cid]=$(this).val();
 	});
@@ -1577,7 +1577,7 @@ define([
 		{"identifier": "id","value": $("#indicators_form_gear").find("#tables_id").val(),"dataType":"string"},
 		{"identifier": "name","value": $("#indicators_form_gear").find("#pg_table").val(),"dataType":"string"},
 		{"identifier": "title","value": $("#indicators_form_gear").find("#tables_title").val(),"dataType":"string"},
-		{"identifier": "description","value": $("#indicators_form_gear").find('#tables_description').code(),"mimeType":"application/json"}
+		{"identifier": "description","value": $("#indicators_form_gear").find('#tables_description').summernote("code"),"mimeType":"application/json"}
 	    ],true,function(data){
 		console.log(data);
 		$(".notifications").notify({

@@ -1,0 +1,19 @@
+#import zoo
+#from Cheetah.Template import Template
+#import authenticate.service as auth
+#set prefix=auth.getPrefix($conf)
+
+
+#set req="SELECT distinct title, content FROM "+$prefix+"pages where id="+$pid[1]
+#set res=$cur.execute($req)
+#set vals=$cur.fetchone()
+
+#try
+$(Template($vals[1],searchList={"conf": $conf,"inputs": $inputs,"outputs":$outputs,"cur":$cur,"con":$con,"pid":$pid}))
+
+#except Exception,e
+
+$e
+
+#end try
+

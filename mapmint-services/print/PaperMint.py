@@ -414,13 +414,17 @@ class LOClient:
         #print(str(diagram.getData()),file=sys.stderr)
 
         #print(str(data[0]),file=sys.stderr)
-        dat.setColumnDescriptions(tuple(data[0]))
-        dat.setRowDescriptions(tuple(data[1]))
+        dat.setColumnDescriptions(tuple(data[1]))
+        dat.setRowDescriptions(tuple(data[0]))
         #print(str(data[2]),file=sys.stderr)
         lstData = []
-        for i in range(0,len(data[2])):
-            lstData.append(tuple(data[2][i]))
-        dat.setData(tuple(lstData))
+        try:
+            for i in range(0,len(data[2])):
+                lstData.append(tuple(data[2][i]))
+            dat.setData(tuple(lstData))
+        except:
+            dat.setData(tuple(data[2]))
+            
 
     def exportStatAsImage(self,imgName,diagName,data):
         """ Export a diagram as image

@@ -28,7 +28,7 @@ define([
 	};
 	var inputs=[];
 
-	var val=$("textarea[name=projectDescription]").code();
+	var val=$("textarea[name=projectDescription]").summernote("code");
 	inputs.push({
 	    "identifier": "mmDescription",
 	    "value": (val.indexOf("<div>")==0?"":"<div>")+val+(val.indexOf("<div>")==0?"":"</div>"),

@@ -194,7 +194,11 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #set mm=mapscript.mapObj($mpath)
 #set ll=mm.web.metadata.get('mmActivatedLayers')
 #set a=$mm.getLayer(0).getExtent()
+#try
 #set dd=$a.project(mapscript.projectionObj(mm.getLayer(0).getProjection()),mapscript.projectionObj(mm.getProjection()))
+#except
+#set dd=$a
+#end try
 #set x=(($a.maxx-$a.minx)/2)+$a.minx
 #set y=(($a.maxy-$a.miny)/2)+$a.miny
 
@@ -222,8 +226,12 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 <h4 class="text-center">$mm.web.metadata.get('mmTitle')</h4>
  </div>
 
-#except
- Error occured
+#except Exception,e
+<div class="col-sm-6 col-md-3">
+<div class="thumbnail">
+ $zoo._("Error occured:") $e
+</div>
+</div>
 #end try
 #end if
 

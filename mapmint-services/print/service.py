@@ -101,7 +101,9 @@ def printMap(conf,inputs,outputs):
     sizes={
         "preview": (1024*coeff,768*coeff),
         "A4l": (1024*coeff,768*coeff),
-        "A4": (768*coeff,1024*coeff)
+        "A4lp": (1024*coeff,768*coeff),
+        "A4": (768*coeff,1024*coeff),
+        "A4p": (768*coeff,1024*coeff)
         }
     csize=sizes[inputs["iFormat"]["value"]]
     
@@ -192,6 +194,52 @@ def printMap(conf,inputs,outputs):
     #We should use a BoundingBoxData here rather than simple string.
     ext=inputs["ext"]["value"].split(',')
 
+    if inputs.keys().count("profile")>0:
+        import json
+        tmp=json.loads(inputs["profile"]["value"])
+        #print >> sys.stderr,tmp
+        #print >> sys.stderr,tmp["features"][0]["geometry"]["coordinates"]
+        if inputs.keys().count("profileLayer")>0:
+            layer=m.getLayerByName(inputs["profileLayer"]["value"])
+            title=layer.metadata.get('mmQueryTitle')
+            rvals=[[title],[],[]]
+        else:
+            rvals=[[zoo._("Profile")],[],[]]
+        totald=0
+        for i in range(0,len(tmp["coordinates"])):
+            rvals[1]+=[i]
+            rvals[2]+=[tmp["coordinates"][i][2]]
+        script+="pm.statThis(\"Profile\","+json.dumps(rvals)+")\n"
+
+        layer=mapscript.layerObj(m)
+        layer.type=mapscript.MS_LAYER_LINE
+        layer.name="drawn_line"
+        geojson={
+            "type": "Feature",
+            "geometry": tmp,
+            "properties": {
+                "name": zoo._("Drawn line")
+                }
+            }
+        filename=conf["main"]["tmpPath"]+"/result_"+conf["senv"]["MMID"]+".json"
+        fileo=open(filename,"w")
+        fileo.write(json.dumps(geojson))
+        fileo.close()
+        layer.connection=None
+        #layer.setConnectionType(mapscript.MS_OGR,filename)
+        #layer.data="OGRGeoJSON"
+        layer.data=None
+        layer.tileitem=None
+        layer.units=mapscript.MS_PIXELS
+        layer.sizeunits=mapscript.MS_PIXELS
+        layer.toleranceunits=mapscript.MS_PIXELS
+        tmpClass=mapscript.classObj(layer)
+        tmpClass.name=zoo._("Drawn line")
+        tmpStyle=mapscript.styleObj(tmpClass)
+        tmpStyle.updateFromString('STYLE COLOR 255 202 75 WIDTH 2 END')
+        layer.setProjection("+init=epsg:4326")
+        layer.status=mapscript.MS_ON
+        layer.updateFromString("LAYER CONNECTIONTYPE OGR CONNECTION \""+filename+"\" END")
 
     # Fix extent based on zoom Level
     if not(inputs.has_key("zoom")):

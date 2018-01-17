@@ -1802,7 +1802,7 @@ define([
 			//console.log($("#manaLayerProperties").find('textarea[name="'+(bindings[i]?bindings[i]:i)+'"]'));
 			$("#manaLayerProperties").find('textarea[name="'+(bindings[i]?bindings[i]:i)+'"]').val(ldata[i]);
 			if((bindings[i]?bindings[i]:i)=="editor")
-			    $(".mm-editor").code(ldata[i]);
+			    $(".mm-editor").summernote("code",ldata[i]);
 		    }
 	    }
 	    else{
@@ -1842,7 +1842,7 @@ define([
 	}
 	$("#mm_layer_template_display").find("select[name=case]").change(function(e){
 	    e.stopPropagation();
-	    $(".mm-editor").code(ldata[($(this).val()=="click"?"click_tmpl":"default_tmpl")]);
+	    $(".mm-editor").summernote("code",ldata[($(this).val()=="click"?"click_tmpl":"default_tmpl")]);
 	});
 
 	if($('select[name="classification"]').val()!="tl")
@@ -2478,7 +2478,7 @@ define([
 	    });
 	    params.push({
 		"identifier": "content",
-		"value": $('.mm-editor').code(),
+		"value": $('.mm-editor').summernote("code"),
 		"mimeType": "text/plain"
 	    });
 	    zoo.execute({

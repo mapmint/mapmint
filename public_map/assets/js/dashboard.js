@@ -496,7 +496,7 @@ define([
 			if($(this).attr("name") && $(this).val())
 			    params.push({
 				"identifier": $(this).attr("name"),
-				"value": ($(this).code().indexOf("<div>")==0?"":"<div>")+$(this).code()+($(this).code().indexOf("<div>")==0?"":"</div>"),
+				"value": ($(this).summernote("code").indexOf("<div>")==0?"":"<div>")+$(this).summernote("code")+($(this).summernote("code").indexOf("<div>")==0?"":"</div>"),
 				"mimeType": "text/plain"
 			    });
 		    });

@@ -1,7 +1,7 @@
 // Filename: main.js
 
 requirejs.config({
-    baseUrl: '/~djay/progede2/public_map/assets',
+    baseUrl: '/pm/assets',
     paths: {
         text: 'js/lib/require-text-2.0.12',
         hgn: 'js/lib/require-hgn-0.3.0',
@@ -11,7 +11,7 @@ requirejs.config({
 
         jquery: 'js/lib/jquery/jquery-2.1.3.min',
 	Popper: 'js/lib/popper',
-        bootstrap: 'js/lib/bootstrap-3.3.7-dist/js/bootstrap.min',
+        bootstrap: 'js/lib/bootstrap-3.1.1-dist/js/bootstrap.min',
 	bootselect: 'js/lib/bootstrap-select.min',
         notify: 'js/lib/bootstrap-notify',
 	slider: 'js/lib/bootstrap-slider',

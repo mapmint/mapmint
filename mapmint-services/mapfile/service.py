@@ -4645,10 +4645,11 @@ def savePublishMap(conf,inputs,outputs):
             m.getLayer(l).metadata.set("ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
     saveProjectMap(m,mapfile)
     for i in range(m.numlayers):
-        m.getLayer(i).metadata.set("gml_include_items",m.getLayer(i).metadata.get('mmGFIFields'))
-        m.getLayer(i).metadata.set("gml_exclude_items","all")
-        m.getLayer(i).metadata.set("wms_include_items",m.getLayer(i).metadata.get('mmGFIFields'))
-        m.getLayer(i).metadata.set("wms_exclude_items","all")
+        if m.getLayer(i).metadata.get('mmGFIFields') is not None and m.getLayer(i).metadata.get('mmGFIFields')!="":
+            m.getLayer(i).metadata.set("gml_include_items",m.getLayer(i).metadata.get('mmGFIFields'))
+            m.getLayer(i).metadata.set("gml_exclude_items","all")
+            m.getLayer(i).metadata.set("wms_include_items",m.getLayer(i).metadata.get('mmGFIFields'))
+            m.getLayer(i).metadata.set("wms_exclude_items","all")
     correctExtent(m)
     saveProjectMap(m,destMapfile)
 

@@ -3,8 +3,7 @@
 #attr mmenu0=[]
 
 #encoding UTF-8
-#from Skeleton_bs import Skeleton_bs
-#extends Skeleton_bs
+#extends PSkeleton_bs
 
 #attr $mmodule = "tables-public"
 
@@ -139,8 +138,7 @@ $appendMenu($lmenu,$res)
 #set global lurl=("/".join(tmp[:len(tmp)-1]))+"/"
 #end if
 
-#def printLine(lurl,level,obj)
-
+#def printLineO(lurl,level,obj)
 #set levels=["first","second","third","forth"]
  <ul class="nav nav-$(levels[level])-level collapse in">
   <li>
@@ -154,8 +152,64 @@ $appendMenu($lmenu,$res)
  </ul>
 #end def
 
+#def printLine4(lurl,level,obj)
+#set levels=["first","second","third","forth"]
+#if obj.keys().count("children")>0 and len($obj["children"])>0
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink$obj["id"]" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+           $obj["text"]
+	</a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink$obj["id"]">
+#for i in range(len($obj["children"]))
+    $printLine(lurl,level+1,$obj["children"][i])
+#end for
+        </div>
+#else
+        <a class="dropdown-item" href="#if $obj.keys().count("link")>0#$(lurl)/$(obj["link"])#else#\##end if#"> $obj["text"]</a>
+#end if
+#*
+ <ul class="nav nav-$(levels[level])-level collapse in">
+  <li>
+   <a id="#if obj.keys().count("id")>0#$(obj["id"])#end if#" href="#if $obj.keys().count("link")>0#$(lurl)/$(obj["link"])#else#\##end if#" role="tab" data-toggle="tab" class="#if $obj.keys().count("link")>0#mmdatastore#end if#"> $obj["text"]</a>
+#if $obj.keys().count("children")
+#for i in range(len($obj["children"]))
+    $printLine(lurl,level+1,$obj["children"][i])
+#end for
+#end if
+  </li>
+ </ul>
+*#
+#end def
+
+#def printLine(lurl,level,obj)
+#set levels=["first","second","third","forth"]
+#if obj.keys().count("children")>0 and len($obj["children"])>0
+    <li class="dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink$obj["id"]" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+           $obj["text"] <span class="caret"></span>
+	</a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink$obj["id"]">
+#for i in range(len($obj["children"]))
+    $printLine(lurl,level+1,$obj["children"][i])
+#end for
+        </ul>
+	</li>
+#else
+	<li>
+        <a class="dropdown-item" href="#if $obj.keys().count("link")>0#$(lurl)/$(obj["link"])#else#\##end if#"> $obj["text"]</a>
+	</li>
+#end if
+#end def
+
 #for i in range(len($lmenu))
-     $printLine($conf["main"]["rootUrl"]+"tables",0,$lmenu[i])
+#if $lmenu[i]['text']=="Menu"
+#if $lmenu[i].keys().count("children")
+#for j in range(len($lmenu[i]["children"]))
+      <li class="nav-item dropdown">
+     $printLine($conf["main"]["rootUrl"]+"tables",0,$lmenu[i]["children"][j])
+      </li>
+#end for
+#end if
+#end if
 #end for
 
 #end def
@@ -189,6 +243,11 @@ $(Template(file=$conf["main"]["templatesPath"]+"/login_bs_body.html",searchList=
 #set prefix=auth.getPrefix($conf)
 
 #set qComponents=$inputs["query"]["value"].split('/')
+
+#if $qComponents[0]=="p"
+#*$qComponents*#
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/pages/view.tmpl",searchList={"conf": $conf,"inputs": $inputs,"outputs":$outputs,"cur":$cur,"con":$con,"pid":$qComponents}))
+#end if
 
 #set c=$conf["lenv"]
 #try

@@ -99,16 +99,16 @@ $embedded
 #set ires=$cur.execute($ireq)
 #set ivals=$cur.fetchall()
 
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs" role="tablist">
 #if $prefix!=""
 #set cPrefix=" toActivate"
 #else
 #set cPrefix=""
 #end if
-$ftmpl.printTabHeader($prefix+"listing",$zoo._("Table"),"fa-table","none"+$cPrefix)
+$ftmpl.printTabHeader($prefix+"listing",$zoo._("Table"),"fa-table","nav-item"+$cPrefix)
 #if len($vals)>0 or len($evals)
 #if not($isPreInput)
-$ftmpl.printTabHeaderNew({"id":$prefix+"edit","title":$zoo._("Edit"),"font":"fa-edit","classe":"require-"+$prefix+"select"})
+$ftmpl.printTabHeaderNew({"id":$prefix+"edit","title":$zoo._("Edit"),"font":"fa-edit","classe":"nav-item require-"+$prefix+"select"})
 #end if
 #for i in range(len($vals))
 #set font="fa-search"
@@ -182,15 +182,16 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
 </ul>
 
 <div class="tab-content">
-
 #* Associated Map *#
 #if $hasAssociatedMap
      <div id="$(prefix)map" role="tabpanel" class="tab-pane" >
+       <div class="row">
      	  <div class="col-sm-9">
 		<iframe id="associatedMap" src="$conf["main"]["rootUrl"]$associatedMapName" style="border:0;width:100%;"></iframe>
 	  </div>
 	  <div class="col-sm-3">
 	  <div>
+
 	  <label>$zoo._("Layer")</label>
 	  <select id="addedLayers" class="form-control form-control-sm require-select" >
 	  	  <option value="-1">$zoo._("None")</option>
@@ -200,7 +201,7 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
       <label>Title</label>
       <input id="layerTitle" type="text" class="form-control form-control-sm" />
 
-<div>
+     <div>
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
     <li class="active" role="presentation"><a href="#layerExtract" aria-controls="extract" role="tab" data-toggle="tab">$zoo._("Filter")</a></li>
@@ -305,6 +306,8 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
 
 	  </div>
      </div>
+       </div>
+
 #end if
 
 #* Importers *#

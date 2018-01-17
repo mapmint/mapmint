@@ -3,9 +3,11 @@
 #set m=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/project_"+$conf["senv"]["last_map"]+".map")
 #import mm_access
 #if not($mm_access.checkMapPriv($conf,$m))
-#set page="/error.tmpl"
-#set nameSpace={"conf":$conf, "errorMsg": $zoo._("You're not authorized to access this content")}
-$Template(file=$conf["main"]["templatesPath"]+$page,searchList=$nameSpace)
+#from Cheetah.Template import Template
+#set page="/error_bs.tmpl"
+#set toto=(Template(file=$conf["main"]["templatesPath"]+"/login_bs_body.html",searchList={"title":$zoo._("Authentication required"),"hasHeader": False}))
+#set nameSpace={"conf":$conf, "errorMsg": $zoo._("You're not allowed to access this content"),"alternative":$toto,"alternativeTitle": $zoo._("Authentication required")}
+$(Template(file=$conf["main"]["templatesPath"]+$page,searchList=$nameSpace))
 #else
 #if m.web.metadata.get("mmTitle") is not None and m.web.metadata.get("mmTitle")!=""
 #set title=m.web.metadata.get("mmTitle")
@@ -336,6 +338,9 @@ $(printWrapper())
     </div>
     <div class="print-map-info">
     $zoo._("The geographical zone displayed on this map will be printed.")
+    </div>
+    <div class="print-map-form-element" style="display:none">
+      <input type="checkbox" name="profile" /> $zoo._("Include profile")
     </div>
     <input type="submit" onclick="app.printDocument()" value="Print"/>
     <div id="print-loader" style="display:none">

@@ -2,8 +2,8 @@
 
 
 define([
-    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic',"datepicker","fileinput","fileinput_local","managerTools","ol"
-], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,datepicker,fileinput,fileinput_local,managerTools,ol) {
+    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic',"datepicker","fileinput","fileinput_local","managerTools"
+], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,datepicker,fileinput,fileinput_local,managerTools) {
     
 
     (function(){
@@ -40,7 +40,6 @@ define([
 	language: module.config().language
     });
 
-    var importerUploadedFiles=[];
     var mainTableSelectedId=null;
     var mainTableFilter=[];
     var mainTableFiles={};
@@ -91,6 +90,7 @@ define([
 	    "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
 		console.log("Starting datatable download");
 		console.log(aoData);
+
 
 		var llimit=[];
 		for(j in {"iDisplayStart":0,"iDisplayLength":0,"iSortCol_0":0,"sSortDir_0":0,"sSearch":0})
@@ -175,18 +175,6 @@ define([
 		    }
 		    
 
-		    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
-		    $('.inner_displayer').off('click');
-		    $('.inner_displayer').on('click',function(){
-			var closure=$(this);
-			console.log($(this).parent().next());
-			if($(this).is(':checked')){
-			    $(this).parent().next().show();
-			}else {
-			    $(this).parent().next().hide();
-			};
-		    });
-
 		    console.log('finish');
 		    
 
@@ -207,7 +195,7 @@ define([
 	    var row = $('#'+lid).DataTable().row($(this));
 	    console.log(row);
 	    console.log("ID: "+$(this).find("input[name=id]").val());
-
+	    
 	    var test=$(this).hasClass("selected");
 	    $('#'+lid+' tbody tr').each(function(){
 		$(this).removeClass("selected");
@@ -218,12 +206,12 @@ define([
 		if(lid=="mainListing_display")
 		    mainTableSelectedId=$(this).find("input[name=id]").val();
 		else{
-		    embeddedTableSelectedId/*[$("input[name="+prefix+"mainTableLevel]").val()]*/.push({name:lid,value:$(this).find("input[name=id]").val()});
+		    embeddedTableSelectedId.push({name:lid,value:$(this).find("input[name=id]").val()});
 		}
 		CRowSelected.push(  lid+"_"+$(this).find("input[name=id]").val() );
 		$(this).addClass("selected");
 		$('#'+lid).DataTable().row($(this)).select();
-		if(prefix.indexOf("input_")<0 && prefix.indexOf('embedded')<0)
+		if(prefix.indexOf("input_")<0)
 		    $(".toActivate").each(function(){
 			$(this).children().first().click();
 			console.log($(this));
@@ -234,16 +222,6 @@ define([
 		    {"identifier":"id","value":$(this).find("input[name=id]").val(),"dataType": "integer"}
 		];
 		var cid=$(this).find("input[name=id]").val();
-
-		if($("#associatedMap").length){
-		    var lcnt=0;
-		    $(this).find("td").each(function(){
-			if(lcnt==1)
-			    setMapSearch($(this).text());
-			lcnt++;
-		    });
-		}
-		    
 		if(prefix.indexOf("input_")<0)
 		adminBasic.callService("np.clientView",params,function(data){
 		    for(i in data){
@@ -255,24 +233,13 @@ define([
 			for(j in data[i]){
 			    console.log(data[i][j]);
 			    if(data[i][j]){
-			    if(/*data[i][j] && */!data[i][j].type){
+			    if(!data[i][j].type){
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
 				    if($(this).hasClass("htmlEditor")){
-					$(this).summernote('code',data[i][j]);
-				    }
-				    console.log($(this));
-				    if($(this).attr("type")=="checkbox"){
-					console.log($(this));
-					$(this).prop("checked",(data[i][j]==true?true:false));
+					$(this).code(data[i][j]);
 				    }
 				});
-				if(data[i][j].indexOf && data[i][j].indexOf("POINT(")>=0){
-				    var coordinates=data[i][j].replace(/POINT\(/,"").replace(/\)/,"").split(" ");
-				    myRoot.find("input[name=edit_"+j+"_x]").val(coordinates[0]).change();
-				    myRoot.find("input[name=edit_"+j+"_y]").val(coordinates[1]).change();
-				    //console.log(pStr);
-				}
 			    }else{
 				myRoot.find("input[name=edit_"+j+"]").each(function(){
 				    var closure=$(this);
@@ -331,133 +298,20 @@ define([
 				    
 				});
 			    }
-			    }else{
-				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
-				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
-				    if($(this).hasClass("htmlEditor")){
-					$(this).summernote('code', data[i][j]);
-				    }
-				    console.log($(this).attr("type"));
-				    if($(this).attr("type")=="checkbox"){
-					console.log($(this));
-					$(this).prop("checked",(data[i][j]==true?true:false));
-				    }
-				});
-
 			    }
 			}
 		    }
 		    try{
 			if(prefix==""){
 			    console.log("____ loadEmbeddedTables ____");
-			    loadEmbeddedTables(/*$("input[name="+prefix+"mainTableLevel]").val(),*/function(i){
-				console.log($("input[name="+prefix+"mainTableLevel]").val());
+			    loadEmbeddedTables(function(i){
 				console.log("____ EmbeddedTables load "+embeddeds[i].id);
 				//$("embedded_"+i+"_mainListing_display").dataTable().fnDraw();
 				//$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-				console.log("____ EmbeddedTables loaded "+i);
-				if(embeddeds[i].level==1)
-				    displayTable(embeddeds[i].id+"mainListing_display",$("input[name="+embeddeds[i].id+"mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),embeddedTableFilter[i]);
-				$(".require-"+embeddeds[i].id+"select").hide();
+				console.log("____ EmbeddedTables loaded"+i);
+				displayTable(embeddeds[i].id+"mainListing_display",$("input[name="+embeddeds[i].id+"mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),embeddedTableFilter[i]);
 			    });
 			    console.log("____ loadEmbeddedTables");
-			}else{
-			    console.log("ELSE ____ loadEmbeddedTables ____ "+prefix+" ");
-			    for(var i=0;i<embeddeds.length;i++){
-				console.log(embeddeds[i].level);
-				console.log(eval($("input[name="+prefix+"mainTableLevel]").val())+1);
-				if(eval($("input[name="+prefix+"mainTableLevel]").val())+1==embeddeds[i].level){
-				    console.log(embeddeds[i].level);
-				    var lprefix=embeddeds[i].id;
-				    console.log(prefix);
-				    try{
-					if(tableDisplayed[lprefix+"mainListing_display"]){
-					    console.log(tableDisplayed[lprefix+"mainListing_display"]);
-					    tableDisplayed[lprefix+"mainListing_display"].destroy();
-					}
-				    }catch(e){
-					console.log(e);
-				    }
-				    var oRoot=$("#"+lprefix+"mainListing_display");
-				    console.log(oRoot);
-				    for(var j=0;j<6;j++){
-					oRoot=oRoot.parent();
-					console.log(oRoot);
-				    }
-				    console.log(oRoot);
-				    var lRoot=oRoot.find("input").last();
-				    console.log(lRoot);
-				    if(lRoot.length==0){
-					console.log("************ "+oRoot.parent().parent().parent());
-					lRoot=oRoot.parent().parent().parent().find("input").last();
-				    }
-				    lRoot.each(function(){
-					console.log($(this));
-					var lid=oRoot.find("input[name="+lprefix+"link_col]").val();
-					console.log(lid);
-					var obj={"linkClause":" AND "};
-					obj[lid]=$(this).val();
-					embeddedTableFilter[i].push(obj);
-				    });
-				    console.log(lRoot);
-				    console.log(embeddedTableFilter);
-				    try{
-					console.log("RUN DISPLAY TABLE !");
-					displayTable(embeddeds[i].id+"mainListing_display",$("input[name="+embeddeds[i].id+"mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),embeddedTableFilter[i]);
-					//func(i);
-				    }catch(e){
-					console.log('-----!!!!! ERROR: '+e);
-				    }
-
-				}
-			    }
-			    /*for(var i=0;i<embeddeds.length;i++)
-				if($("input[name="+prefix+"mainTableLevel]").val()+1==embeddeds[i].level){
-				console.log(embeddeds[i].level);
-				var prefix=embeddeds[i].id;
-				console.log(prefix);
-				try{
-				    if(tableDisplayed[prefix+"mainListing_display"]){
-					console.log(tableDisplayed[prefix+"mainListing_display"]);
-					tableDisplayed[prefix+"mainListing_display"].destroy();
-				    }
-				}catch(e){
-				    console.log(e);
-				}
-				embeddedTableFilter.push([]);
-				var oRoot=$("#"+prefix+"mainListing_display");
-				console.log(oRoot);
-				for(var j=0;j<6;j++){
-				    oRoot=oRoot.parent();
-				    console.log(oRoot);
-				}
-				console.log(oRoot);
-				var lRoot=oRoot.find("input").last();
-				console.log(lRoot);
-				if(lRoot.length==0){
-				    console.log("************ "+oRoot.parent().parent().parent());
-				    lRoot=oRoot.parent().parent().parent().find("input").last();
-				}
-				lRoot.each(function(){
-				    console.log($(this));
-				    var lid=oRoot.find("input[name="+prefix+"link_col]").val();
-				    console.log(lid);
-				    var obj={"linkClause":" AND "};
-				    obj[lid]=$(this).val();
-				    embeddedTableFilter[i].push(obj);
-				});
-				console.log(lRoot);
-				console.log(embeddedTableFilter);
-				try{
-				    func(i);
-				}catch(e){
-				    console.log('-----!!!!! ERROR: '+e);
-				}
-			    }
-
-			    /*loadEmbeddedTables(function(i){
-				console.log($("input[name="+prefix+"mainTableLevel]").val());
-			    });*/
 			}
 		    }catch(e){
 			console.log(e);
@@ -467,7 +321,6 @@ define([
 			message: { text: "Tuple loaded." },
 			type: 'success',
 		    }).show();
-
 		},function(data){
 		    myRoot.append(data["ExceptionReport"]["Exception"]["ExceptionText"].toString());
 		    $(".notifications").notify({
@@ -490,115 +343,31 @@ define([
 
 	$(".mmFile").each(function(){
 	    var closure=$(this);
-	    console.log(closure.parent());
-	    var isInput=(!closure.parent().hasClass("importer_upload"));
-	    //console.log("***** MMFILE : "+closure.parent().attr('id'));
-	    //var isInput=(closure.parent().parent().attr('id')&&closure.parent().parent().attr('id').indexOf("importer")>=0?false:true);
-	    console.log("***** MMFILE : "+isInput);
-	    var lparams={
+	    $(this).fileinput({
 		language: module.config().lang,
 		uploadUrl: module.config().url+"?service=WPS&version=1.0.0&request=Execute&RawDataOutput=Result&Identifier=upload.saveOnServer0&dataInputs=filename="+closure.attr("name")+";"+closure.attr("name")+"=Reference@isFile=true;dest=none", // server upload action
 		uploadAsync: true,
+		maxFileCount: 1,
 		done: function (e, data) {
 		    console.log(data);
                     $.each(data.result.files, function (index, file) {
                         $('<p/>').text(file.name).appendTo('#files');
                     });
                 }
-	    };
-	    if(isInput)
-		lparams["maxFileCount"]=1;
-	    console.log(lparams);
-	    $(this).fileinput(lparams);
+	    });
 	    $(this).on('fileuploaded', function(event, data, previewId, index) {
 		var form = data.form, files = data.files, extra = data.extra,
 		    response = data.response, reader = data.reader;
 		console.log('File uploaded triggered');
-		console.log("***** MMFILE : "+isInput);
-		if(isInput)
-		    mainTableFiles[closure.attr("name")]=data.response.files[0].fileName;
-		else{
-		    importerUploadedFiles.push(data.response.files[0].fileName);
-		    $('.importer_submit').show();
-		    console.log(data.response.files[0]);
-		    $(".importer_submit_log").append(
-			$(managerTools.generateFromTemplate($("#importer_progress").html(),["id","file"],[importerUploadedFiles.length-1,data.files[0].name]))
-		    );
-		}
+		mainTableFiles[closure.attr("name")]=data.response.files[0].fileName;
 		console.log(data);
 		console.log(data.response.files[0].fileName);
 	    });
 	});
 
-	$('.importer_submit').hide();
 
     }
 
-    function bindImport(){
-	$("[data-mmaction=runImport]").click(function(){
-	    console.log("run importer");
-	    var loparams=[
-		{"identifier": "id","value": $(this).parent().find('input[name="import_id"]').val(),"dataType":"string"}
-	    ];
-	    
-	    for(var i=0;i<importerUploadedFiles.length;i++){
-		var lparams=loparams;
-		lparams.push({"identifier": "dstName","value": importerUploadedFiles[i],"dataType":"string"});
-		console.log(lparams);
-		(function(i){
-		    var progress=$("#progress-process-"+i);
-		    var infomsg=$("#infoMessage"+i);
-		    zoo.execute({
-			identifier: "np.massiveImport",
-			type: "POST",
-			mode: "async",
-			storeExecuteResponse: true,
-			status: true,
-			dataInputs: lparams,
-			dataOutputs: [
-			    {"identifier":"Result","mimeType":"text/plain"},
-			],
-			success: function(data, launched){
-			    console.log(data);
-			    console.log("****** +++++++ Execute asynchrone launched: "+launched.sid, 'info');
-			    console.log("****** +++++++ Execute asynchrone launched: "+launched.sid, 'info');
-			    zoo.watch(launched.sid, {
-				onPercentCompleted: function(data) {
-				    console.log("**** PercentCompleted **** "+i);
-				    console.log(data);
-				    progress.css('width', (data.percentCompleted)+'%');
-				    progress.text(data.text+' : '+(data.percentCompleted)+'%');
-				    progress.attr("aria-valuenow",data.percentCompleted);
-				    infomsg.html(data.text+' : '+(data.percentCompleted)+'%');
-				},
-				onProcessSucceeded: function(data) {
-				    console.log("**** ProcessSucceeded **** "+i);
-				    console.log(data);
-				    progress.css('width', (100)+'%');
-				    progress.text(data.text+' : '+(100)+'%');
-				    progress.removeClass("progress-bar-info").addClass("progress-bar-success");
-				    progress.attr("aria-valuenow",100);
-				    progress.parent().next().html(data.text+' : '+(100)+'%');
-				},
-				onError: function(data) {
-				    console.log("**** onError **** "+i);
-				    console.log(data);
-				    infomsg.html('<div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.result.ExceptionReport.Exception.ExceptionText.toString()+'</div>');
-				}
-			    });
-			},
-			error: function(data){
-			    console.log("**** error **** "+i);
-			    console.log(data);
-			}
-		    });
-		})(i);
-	    }
-	    
-	});
-					    
-    }
-    
     function bindSave(){
 	$("[data-mmaction=runPrint]").click(function(){
 	    var closure=$(this);
@@ -631,9 +400,7 @@ define([
 	    console.log($('#listing').first().find('input[name=mainTableId]').val());
 	    params=[
 		{identifier: "tableId", value: tableId, dataType: "string"},
-		{identifier: "id", value: tupleId, dataType: "string"},
-		{identifier: "rid", value: $(this).parent().find('input[name="edit_report_id"]').val(), dataType: "string"},
-		{"identifier":"filters","value":JSON.stringify(mainTableFilter, null, ' '),"mimeType":"application/json"}
+		{identifier: "id", value: tupleId, dataType: "string"}
 	    ];
 	    
 	    closure=$(this);
@@ -664,11 +431,6 @@ define([
 		    );
 		}
 		closure.parent().parent().find(".report_display").html(ul);
-	    },function(data){
-		closure.removeClass("disabled");
-		closure.children().first().show();
-		closure.children().first().next().hide();
-		closure.parent().parent().find(".report_display").html('<div class="alert alert-danger">'+data["ExceptionReport"]["Exception"]["ExceptionText"].toString()+'</div>');
 	    });
 	});
 	$("[data-mmaction=save]").click(function(){
@@ -698,8 +460,7 @@ define([
 		console.log($(this).attr("name"));
 		console.log($(this).attr("id"));
 		console.log($(this)[0].innerHTML);
-		if($(this).attr("id").replace(/edition_/,"")!="importer_progress" && $(this).attr("id").indexOf("_template")<0)
-		    tupleReal[$(this).attr("id").replace(/edition_/,"")]=$(this)[0].innerHTML;
+		tupleReal[$(this).attr("id").replace(/edition_/,"")]=$(this)[0].innerHTML;
 	    });
 	    var tuple={};
 	    myRoot.find("input,textarea,select").each(function(){
@@ -709,15 +470,13 @@ define([
 		    var noDisplay=false;
 		    try{
 			console.log("**********- "+myRoot1.attr('id'))
-			console.log($(this));
-			console.log("**********- "+($(this).parent().parent().parent().parent().attr('id') && $(this).parent().parent().parent().parent().attr('id').indexOf("embedded_")>=0));
-			console.log("**********- "+($(this).parent().parent().parent().attr('id') && $(this).parent().parent().parent().attr('id').indexOf("embedded_")>=0));
-			noDisplay=($(this).attr("id")==null ||
-				   ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="tuple_id") ||
-				   ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="table_id") ||
-				   ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="edition_id") );
+			noDisplay=(($(this).attr("id").replace(/edition_/,"")=="tuple_id") ||
+				   ($(this).attr("id").replace(/edition_/,"")=="table_id") ||
+				   ($(this).attr("id").replace(/edition_/,"")=="edition_id") );
+			console.log($(this).attr("id").replace(/edition_/,""));
 			console.log("**********- "+(myRoot1.attr('id').indexOf('embedded')<0));
-			console.log("**********- "+noDisplay);
+			console.log("**********- "+($(this).parent().parent().parent().parent().attr('id').indexOf("embedded_")>=0));
+			console.log("**********- "+($(this).parent().parent().parent().attr('id').indexOf("embedded_")>=0));
 		    }catch(e){
 			console.log(e);
 		    }
@@ -729,15 +488,9 @@ define([
 			return;
 		    console.log($(this).parent().parent().parent());
 		    console.log($(this).parent().parent().parent().parent());
-		    console.log("++++++ "+$(this).attr("id").replace(/edition_/,""));
 		    if(!mainTableFiles[$(this).attr("name")]){
-			if($(this).attr("name").indexOf("link_col")<0){
-			    if($(this).attr("type")=="checkbox"){
-				tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).prop("checked");
-			    }
-			    else
-				tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
-			}
+			if($(this).attr("name").indexOf("link_col")<0)
+			    tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
 			else{
 			    tuple[$(this).val()]=$(this).next().val();
 			    tupleReal={};
@@ -748,31 +501,17 @@ define([
 			mainTableFiles[$(this).attr("name")]=null;
 		    }
 		}catch(e){
-		    console.log("!!!!!!!! ERROR "+$(this).attr("id"));
+		    console.log($(this));
 		}
 	    });
-	    console.log(myRoot1.attr('id'));
 	    var parts=myRoot1.attr('id').split("_");
 	    if(parts[0]=="embedded"){
-		var ei=-1;
-		console.log(ei);
-		console.log(embeddedTableFilter);
-		console.log(embeddeds);
-		var tmp=parts[0]+"_"+parts[1]+"_";
-		var elem=null;
-		for(var kk=0;kk<embeddeds.length;kk++){
-		    if(embeddeds[kk].id==tmp){
-			ei=kk;
-			break;
-		    }
-		}
-		if(ei>=0){
-		    var obj=embeddedTableFilter[ei][0];
-		    console.log(obj);
-		    for(var key in obj)
-			if(key!="linkClause")
-			    tuple[key]=obj[key];
-		}
+		var ei=parseInt(parts[1]);
+		var obj=embeddedTableFilter[ei][0];
+		console.log(obj);
+		for(var key in obj)
+		    if(key!="linkClause")
+			tuple[key]=obj[key];
 	    }
 	    myRoot1.find("#edition_table_id").last().each(function(){
 		params.push({identifier: "tableId", value: $(this).val(), dataType: "string"});
@@ -1000,17 +739,10 @@ define([
 	embeddedTableFilter=[];
 	//var prefix="embedded_"+i;
 	for(var i=0;i<embeddeds.length;i++){
-	    console.log(embeddeds[i].level);
 	    var prefix=embeddeds[i].id;
 	    console.log(prefix);
-	    try{
-		if(tableDisplayed[prefix+"mainListing_display"]){
-		    console.log(tableDisplayed[prefix+"mainListing_display"]);
-		    tableDisplayed[prefix+"mainListing_display"].destroy();
-		}
-	    }catch(e){
-		console.log(e);
-	    }
+	    if(tableDisplayed[prefix+"mainListing_display"])
+		tableDisplayed[prefix+"mainListing_display"].destroy();
 	    embeddedTableFilter.push([]);
 	    var oRoot=$("#"+prefix+"mainListing_display");
 	    console.log(oRoot);
@@ -1034,76 +766,30 @@ define([
 		embeddedTableFilter[i].push(obj);
 	    });
 	    console.log(lRoot);
-	    console.log(embeddedTableFilter);
 	    try{
 		func(i);
 	    }catch(e){
-		console.log('-----!!!!! ERROR: '+e);
+		console.log('!!!!! ERROR: '+e);
 	    }
 	}
-	console.log(embeddedTableFilter);
     }
 
     var changingFields=[];
     var initialize=function(){
 	var closure=this;
-	$( '.dropdown-menu a.dropdown-toggle' ).on( 'click', function ( e ) {
-            var $el = $( this );
-            var $parent = $( this ).offsetParent( ".dropdown-menu" );
-            if ( !$( this ).next().hasClass( 'show' ) ) {
-		$( this ).parents( '.dropdown-menu' ).first().find( '.show' ).removeClass( "show" );
-            }
-            var $subMenu = $( this ).next( ".dropdown-menu" );
-            $subMenu.toggleClass( 'show' );
-            
-            $( this ).parent( "li" ).toggleClass( 'show' );
-	    
-            $( this ).parents( 'li.nav-item.dropdown.show' ).on( 'hidden.bs.dropdown', function ( e ) {
-		$( '.dropdown-menu .show' ).removeClass( "show" );
-            } );
-            
-            if ( !$parent.parent().hasClass( 'navbar-nav' ) ) {
-		$el.next().css( { "top": $el[0].offsetTop, "left": $parent.outerWidth() - 4 } );
-            }
-	    
-            return false;
-	} );
-	
-	
 	$('#side-menu').metisMenu({ toggle: false });
 
 	$('#side-menu').css({"max-height": ($(window).height()-50)+"px","overflow":"scroll"});
-	try{   
-	    console.log(embeddeds);
-	}catch(e){
-	    console.log(e);
-	}
+
 	adminBasic.initialize(zoo);
-	try{   
-	    console.log(embeddeds);
-	}catch(e){
-	    console.log(e);
-	}
 	$(".mmdatastore").click(function(e){
 	    document.location=$(this).attr("href");
 	    return false;
 	});
 
-	try{   
-	    console.log(embeddeds);
-	}catch(e){
-	    console.log(e);
-	}
 	displayTable("mainListing_display",$("input[name=mainTableViewId]").val(),mainTableFields,mainTableRFields.join(","),mainTableFilter);
-	try{   
-	    console.log(embeddeds);
-	}catch(e){
-	    console.log(e);
-	}
 
 	$(".tab-pane").find("script").each(function(){
-	    console.log($(this));
-	    if($(this).attr('name'))
 	    try{
 		changingFields.push(JSON.parse("{\""+$(this).attr('name')+"\":"+$(this).html()+"}"));
 		
@@ -1113,7 +799,7 @@ define([
 		 * Create the options array containing initial values
 		 */
 		$(this).parent().find('select[name='+$(this).attr('name')+']').first().find('option').each(function(){
-		    //console.log(changingFields[changingFields.length-1][lname])
+		    console.log(changingFields[changingFields.length-1][lname])
 		    for(var i in changingFields[changingFields.length-1][lname]){
 			for(var j in changingFields[changingFields.length-1][lname][i]){
 			    changingFields[changingFields.length-1][lname][i][j]["options"].push($(this).val());
@@ -1145,22 +831,19 @@ define([
 					closure.parent().find('select[name='+closure.attr('name')+']').first().off('change');
 					(function(data){
 					    closure.parent().find('select[name='+closure.attr('name')+']').first().change(function(){
-						/*console.log(ref)
+						console.log(ref)
 						console.log($(this).val());
 						console.log(data)
 						console.log(data[$(this).val()])
-						console.log($(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]"));*/
-						try{
-						    $(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").html("");
-						    if(data[$(this).val()]['value'].length>0)
-							for(var j=0;j<data[$(this).val()]['value'].length;j++)
-							    $(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="'+data[$(this).val()]['value'][j][0]+'">'+data[$(this).val()]['value'][j][1]+'</option>');
-						    else
-							$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="NULL">'+module.config().localizationStrings.tables.none+'</option>');
-						    $(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").change();
-						}catch(e){
-						    console.log("MM ERROR: "+e);
-						}
+						console.log($(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]"));
+						$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").html("");
+						if(data[$(this).val()]['value'].length>0)
+						    for(var j=0;j<data[$(this).val()]['value'].length;j++)
+							$(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="'+data[$(this).val()]['value'][j][0]+'">'+data[$(this).val()]['value'][j][1]+'</option>');
+						else
+						    $(this).parent().parent().parent().parent().find("[name=edit_"+data[$(this).val()]['id']+"]").append('<option value="NULL">'+module.config().localizationStrings.tables.none+'</option>');
+						    
+
 					    });
 					    closure.parent().find('select[name='+closure.attr('name')+']').first().change();
 					})(data);
@@ -1183,7 +866,7 @@ define([
 
 	try{
 	    for(var i=0;i<embeddeds.length;i++){
-		$(".require-"+embeddeds[i].id+"_select").hide();
+		$(".require-embedded_"+i+"_select").hide();
 	    }
 	}catch(e){
 	    console.log("----- DEBUG :"+e);
@@ -1198,13 +881,13 @@ define([
 	}catch(e){
 	    console.log("----- DEBUG :"+e);
 	}
-	try{
-	    loadEmbeddedTables(/*$("input[name=embedded_"+i+"_mainTableLevel]").val(),*/function(i){
+	/*try{
+	    loadEmbeddedTables(function(i){
 		displayTable("embedded_"+i+"_mainListing_display",$("input[name=embedded_"+i+"_mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),embeddedTableFilter[i]);
 	    });
 	}catch(e){
 	    console.log("No embedded tables");
-	}
+	}*/
 	$(".require-select").hide();
 	$("#listing_Toggler").click();
 	bindSave();
@@ -1217,375 +900,17 @@ define([
 	    },500);
 	});
 	$('a[data-toggle="tab"]').on( 'shown.bs.tab', function (e) {
-	    try{
-		$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-	    }catch(e){console.log(e)};
+            $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
 	} );
-
-	bindImport();
-	
 	console.log("Start Table Public Module");
 
-	$("#associatedMap").css({"min-height": ($(window).height()-280)+"px"});
-	setTimeout(function(){
-	    initializeMap();
-	}, 100);
-	//$( "#associatedMap" ).contents().find( "a" ).css( "background-color", "#BADA55" );
-
-
-	//$("#associatedMap").load(function(){
-	//alert("OK LOADED");
-	//});
     };
 
-    function initializeMap(){
-	setTimeout(function(){
-	    $("#map_Toggler").click();
-	    setTimeout(function(){
-		$("#associatedMap").contents().find("body").find( ".ol-zoom-extent" ).find("button").click();
-		$("#listing_Toggler").click();
-	    },100);
-	},100);
-	try{
-	    var win= $("#associatedMap")[0] || $("#associatedmap")[0].contentWindow;
-	    console.log(win);
-	    loopTillAppLoaded(win.contentWindow);
-	}catch(e){
-	}   
-    }
-
-    function loopTillAppLoaded(win){
-	if(!win.app){
-	    console.log(" *****_________***** ok -1 *****_________*****");
-	    setTimeout(function(){loopTillAppLoaded(win)},0.1);
-	}
-	else{
-	    console.log(" *****_________***** ok 0 *****_________*****");
-	    console.log(win.app.getLayers());
-	    var layers=win.app.getLayers();
-	    for(var i in layers){
-		console.log(" *****_________***** ok "+i+"*****_________*****");
-		console.log(layers[i]);
-		console.log(" *****_________***** ok *****_________*****");
-		$("#addedLayers").append('<option data-map="'+layers[i].searchMap+'" value="'+i+'">'+layers[i].alias+'</option>');
-		registerAddedLayersEvent();
-	    }
-	}
-    }
-
-    function registerAddedLayersEvent(){
-	var win=$("#associatedMap")[0].contentWindow || $("#associatedMap")[0];
-	$("#addedLayers").off('change');
-	$("#addedLayers").on('change',function(){
-	    
-	    managerTools.getTableDesc(module.config().msUrl,$(this).find('option:selected').attr("data-map"),$(this).val(),null,function(obj,rdata,idata){
-		$("#layerExtract").find('select[name="field"]').html("");
-		for(var i=0;i<rdata.fields.length;i++)
-		    if(rdata.fields[i]!="msGeometry"){
-			$("#layerExtract").find('select[name="field"]').append('<option  data-type="'+rdata.types[i]+'" value="'+rdata.fields[i]+'">'+rdata.fields[i]+'</option>');
-		    }
-		$("#layerExtract").find('select[name="values"]').html("");
-		bindFilterLayer();
-		console.log(obj);
-		console.log(rdata);
-		console.log(idata);
-	    });
-	    $("#layerExtract").find('button').first().off('click');
-	    $("#layerExtract").find('button').first().on('click',function(){
-		console.log(" START FILTERING ");
-		var clauses=[];
-		var joins=[];
-		$(this).parent().parent().find("form").each(function(){
-		    clauses.push('<ogc:'+$(this).find('select[name="operator"]').val()+($(this).find('select[name="operator"]').val()=="PropertyIsLike"?" wildcard='*' singleChar='.' escape='!'":"")+'>'+
-				 '<ogc:PropertyName>'+$(this).find('select[name="field"]').val()+'</ogc:PropertyName>'+
-				 '<ogc:Literal>'+$(this).find('select[name="values"]').val()+'</ogc:Literal>'+
-				 '</ogc:'+$(this).find('select[name="operator"]').val()+'>');
-		    if($(this).find('select[name="link_clause"]').is(":visible")){
-			joins.push($(this).find('select[name="link_clause"]').val());
-		    }
-		});
-		var filter="<ogc:Filter>";
-		if(joins.length>0){
-		    var previous="";
-		    var current=clauses[0];
-		    for(var i=0;i<joins.length;i++){
-			previous=current;
-			current='<ogc:'+joins[i]+'>'+
-			    previous+clauses[i+1]+
-			    '</ogc:'+joins[i]+'>';
-		    }
-		    filter+=current;
-		}
-		else
-		    filter+=clauses[0];
-		filter+="</ogc:Filter>";
-		var wfsUrl=module.config().msUrl+'?map='+module.config().dataPath+"/maps/search_Overlays_"+$("#addedLayers").val()+".map";
-		console.log($("#addedLayers").find("option:selected").attr("data-map"));
-		if($("#addedLayers").find("option:selected").attr("data-map").indexOf("project_Overlays.map")<0)
-		    wfsUrl=module.config().msUrl+'?map='+$("#addedLayers").find("option:selected").attr("data-map");
-		//maxFeatures="1000000" 
-		var wfsRequest='<wfs:GetFeature xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.0.0" outputFormat="text/xml; subtype=gml/3.1.1">'+
-		    '<wfs:Query xmlns:ms="http://geolabs.fr/" typeName="'+$("#addedLayers").val()+'">'+
-		    filter+
-		    '</wfs:Query>'+
-		    '</wfs:GetFeature>';
-		zoo.execute({
-		    "identifier": "vector-tools.Append",
-		    "type": "POST",
-		    dataInputs: [
-			{"identifier":"InputEntity1","href": wfsUrl,"value": wfsRequest, "mimeType": "text/xml", "method": "POST","headers":[{"key":"Content-Type","value":"text/xml"}]}
-		    ],
-		    dataOutputs: [
-			{"identifier":"Result","mimeType":"image/png"}
-		    ],
-		    success: function(data){
-			console.log("SUCCESS !");
-			var ref=data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Reference"]["_href"];
-			var mapParts=ref.split('&');
-			console.log(mapParts[0]);
-			var mapParts=mapParts[0].split("=");
-			console.log(mapParts[1]);
-			win.app.addLayerToMap({
-			    mapfile: mapParts[1],
-			    layers: ["Result"],
-			    labels: [$("#layerTitle").val()],
-			    listHTML: $("#layerTitle").val(),
-			    cselection: ""
-			});
-			$("#layerExtract").find('form:gt(0)').remove();
-			$("#layerTitle").val("");
-			console.log(data);
-			console.log(mapParts);
-		    },
-		    error: function(data){
-			console.log("ERROR !");
-			console.log(data);
-		    }
-		});
-		
-		console.log(wfsUrl);
-		console.log(wfsRequest);
-		
-	    });
-	});
-    }
-    
-    var searchMap;
-    function setMapSearch(){
-	$("#associatedMap").contents().find( "#search_value").val(arguments[0]);
-	$("#associatedMap").contents().find( "#search_value").typeahead('val',arguments[0],false);
-	var win=$("#associatedMap")[0].contentWindow || $("#associatedMap")[0];
-	var searchResults=win.app.getSearchValues();
-	searchMap=win.app.getMap();
-
-	var extent=searchResults[1][searchResults[0].indexOf(arguments[0])];
-	console.log(extent);
-
-	searchMap.getView().fit(extent,searchMap.getSize());
-
-	var myGeom=ol.geom.Polygon.fromExtent(extent);
-	var feature = new ol.Feature({
-	    geometry: myGeom,
-	    name: arguments[0]
-	});
-	win.app.addASelectedFeature([feature]);
-	win.app.externalCallbacks["addLayer"]=function(a){
-	    console.log("**--** OK **--**");
-	    console.log(a);
-	    console.log("**--** OK **--**");
-	    for(var i=0;i<a.layers.length;i++)
-		$("#addedLayers").append('<option data-map="'+a.mapfile+'" value="'+a.layers[i]+'">'+a.labels[i]+'</option>');
-	    registerAddedLayersEvent();
-	}
-	$('button[mm-action="processLayer"]').off('click');
-	$('button[mm-action="processLayer"]').on('click',function(){
-	    console.log("Run service !");
-	    var params=[];
-	    $(this).parent().find("div").each(function(){
-		if($(this).is(":visible")){
-		    $(this).find('input[type="text"]').each(function(){
-			if($(this).is(":visible") || $(this).attr("data-transmission")=="force")
-			    params.push({
-				"identifier": $(this).attr("name"),
-				"value": $(this).val(),
-				"dataType": $(this).attr("data-type")
-			    });
-		    });
-		    $(this).find('select[name="InputEntity2"]').each(function(){
-			if($(this).is(":visible") || $(this).attr("data-transmission")=="force"){
-			    var wfsUrl=module.config().msUrl+'?map='+module.config().dataPath+"/maps/search_Overlays_"+$(this).val()+".map";
-			    console.log($(this).find("option:selected").attr("data-map"));
-			    if($(this).find("option:selected").attr("data-map").indexOf("project_Overlays.map")<0)
-				wfsUrl=module.config().msUrl+'?map='+$(this).find("option:selected").attr("data-map");
-			    // maxFeatures="1000000"
-			    var wfsRequest='<wfs:GetFeature xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.0.0" outputFormat="text/xml; subtype=gml/3.1.1">'+
-				'<wfs:Query xmlns:ms="http://geolabs.fr/" typeName="'+$(this).val()+'">'+
-				'</wfs:Query>'+
-				'</wfs:GetFeature>';
-			    
-			    params.push({
-				"identifier": $(this).attr("name"),
-				"href": wfsUrl,
-				"value": wfsRequest,
-				"mimeType":  "text/xml",
-				"method": "POST",
-				"headers": [{"key":"Content-Type","value":"text/xml"}]
-			    });
-			}
-		    });
-		    
-		}
-	    });
-	    console.log(params);
-	    var wfsUrl=module.config().msUrl+'?map='+module.config().dataPath+"/maps/search_Overlays_"+$("#addedLayers").val()+".map";
-	    console.log($("#addedLayers").find("option:selected").attr("data-map"));
-	    if($("#addedLayers").find("option:selected").attr("data-map").indexOf("project_Overlays.map")<0)
-		wfsUrl=module.config().msUrl+'?map='+$("#addedLayers").find("option:selected").attr("data-map");
-	    //maxFeatures="1000000"
-	    var wfsRequest='<wfs:GetFeature xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.0.0"  outputFormat="text/xml; subtype=gml/3.1.1">'+
-		'<wfs:Query xmlns:ms="http://geolabs.fr/" typeName="'+$("#addedLayers").val()+'">'+
-		'</wfs:Query>'+
-		'</wfs:GetFeature>';
-	    var param1="InputPolygon";
-	    $("#processing").find('input[name="param1"]').each(function(){
-		console.log($(this).parent());
-		if($(this).parent().is(":visible")){
-		    param1=$(this).val();
-		    return ;
-		}
-	    });
-	    params.push({"identifier":param1,"href": wfsUrl,"value": wfsRequest, "mimeType": "text/xml", "method": "POST","headers":[{"key":"Content-Type","value":"text/xml"}]});
-	    zoo.execute({
-		"identifier": "vector-tools."+$('select[name="processing_service"]').val()+"Py",
-		"type": "POST",
-		dataInputs: params,
-		dataOutputs: [
-		    {"identifier":"Result","mimeType":"image/png"}
-		],
-		success: function(data){
-		    console.log("SUCCESS !");
-		    var ref=data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Reference"]["_href"];
-		    var mapParts=ref.split('&');
-		    console.log(mapParts[0]);
-		    var mapParts=mapParts[0].split("=");
-		    console.log(mapParts[1]);
-		    win.app.addLayerToMap({
-			mapfile: mapParts[1],
-			layers: ["Result"],
-			labels: [$("#layerTitle").val()],
-			listHTML: $("#layerTitle").val(),
-			cselection: ""
-		    });
-		    $("#layerExtract").find('form:gt(0)').remove();
-		    $("#layerTitle").val("");
-		    console.log(data);
-		    console.log(mapParts);
-		},
-		error: function(data){
-		    console.log("ERROR !");
-		    console.log(data);
-		}
-	    });
-	    
-	});
-	$('button[mm-action="createGrid"]').off('click');
-	$('button[mm-action="createGrid"]').on('click',function(){
-	    zoo.execute({
-		"identifier": "vector-tools.createGrid",
-		"type": "POST",
-		dataInputs: [
-		    {"identifier":"id","value": mainTableSelectedId,"dataType":"string"},
-		    {"identifier":"extent","value": extent[0]+","+extent[1]+","+extent[2]+","+extent[3], "dataType": "string"}
-		],
-		dataOutputs: [
-		    {"identifier":"Result","mimeType":"text/plain"}
-		],
-		success: function(data){
-		    console.log("SUCCESS !");
-		    console.log(data);
-		    var lmap=data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"].toString();
-		    console.log(lmap);
-		    win.app.addALayer({map: lmap, layer: "currentGrid"});
-		},
-		error: function(data){
-		    console.log("ERROR !");
-		    console.log(data);
-		}
-	    });
-	});
-    }
-
-    function bindFilterLayer(){
-	$("#layerExtract").find('select[name="field"]').off('change');
-	$("#layerExtract").find('select[name="field"]').on('change',function(){
-	    var localContext=$(this);
-	    zoo.execute({
-		"identifier": "mapfile.getMapLayersInfo",
-		"type": "POST",
-		dataInputs: [
-		    {"identifier":"map","value": ($("#addedLayers").find("option:selected").attr("data-map").indexOf("project_Overlays.map")<0?$("#addedLayers").find("option:selected").attr("data-map"):module.config().dataPath+"/maps/project_Overlays.map"),"dataType":"string"},
-		    {"identifier":"layer","value": $("#addedLayers").val(), "dataType": "string"},
-		    {"identifier":"fullPath","value": "true","type":"string"}
-		],
-		dataOutputs: [
-		    {"identifier":"Result","mimeType":"text/plain","type":"raw"}
-		],
-		success: function(data){
-		    console.log("SUCCESS !");
-		    console.log(data.replace(/None/,"NULL"));
-		    var jsonObj=eval(data.replace(/None/,"null"));
-		    //alert(data[1]);
-		    console.log(jsonObj);
-		    localContext.parent().next().next().find("select").last().html("");
-		    zoo.execute({
-			"identifier": "vector-tools.vectInfo",
-			"type": "POST",
-			dataInputs: [
-			    {"identifier":"dstName","value": jsonObj[0],"dataType":"string"},
-			    {"identifier":"dsoName","value": "","dataType":"string"},
-			    {"identifier":"dialect","value": "sqlite","dataType":"string"},
-			    {"identifier":"q","value": "SELECT DISTINCT "+localContext.val()+" as value FROM "+jsonObj[1]+" ORDER BY "+localContext.val(), "dataType": "string"}
-			],
-			dataOutputs: [
-			    {"identifier":"Result","mimeType":"application/json",type:"raw"}
-			],
-			success: function(data){
-			    console.log("SUCCESS !");
-			    console.log(data);
-			    for(i in data)
-				localContext.parent().next().next().find("select").last().append('<option value="'+data[i].value+'">'+data[i].value+'</option>');
-			    //var lmap=data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"].toString();
-			    //console.log(lmap);
-			    //win.app.addALayer({map: lmap, layer: "currentGrid"});
-			},
-			error: function(data){
-			    console.log("ERROR !");
-			    console.log(data);
-			}
-		    });
-		    //var lmap=data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"].toString();
-		    //console.log(lmap);
-		    //win.app.addALayer({map: lmap, layer: "currentGrid"});
-		},
-		error: function(data){
-		    console.log("ERROR !");
-		    console.log(data);
-		}
-	    });
-	    
-	    /**/
-	    
-	});
-    }
-
-    
     // Return public methods
     return {
         initialize: initialize,
 	datepicker: datepicker,
-	embedded: embedded,
-	initializeMap: initializeMap,
-	bindFilterLayer: bindFilterLayer
+	embedded: embedded
     };
 
 

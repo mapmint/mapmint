@@ -812,7 +812,6 @@ int main( int nArgc, char ** papszArgv )
     tmpMap=NULL;
     tmpMap=getMapFromMaps(inputs,"nlt","value");
     if(tmpMap!=NULL && strncasecmp(tmpMap->value,"NULL",4)!=0){
-	  pszNewLayerName = tmpMap->value;
 	  if( EQUAL(tmpMap->value,"NONE") )
 		  eGType = wkbNone;
 	  else if( EQUAL(tmpMap->value,"GEOMETRY") )

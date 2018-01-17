@@ -3344,8 +3344,12 @@ def clientInsert(conf,inputs,outputs):
                     print >> sys.stderr,"TUPLE "+str(i)
                     col_sufix+=columns[i]
                     if i >= len(realKeys):
-                        print >> sys.stderr," * "+str(tuple[columns[i]].encode("utf-8"))
-                        val_sufix+=str(adapt(str(tuple[columns[i]].encode("utf-8"))))
+                        try:
+                            print >> sys.stderr," * "+str(tuple[columns[i]].encode("utf-8"))
+                            val_sufix+=str(adapt(str(tuple[columns[i]].encode("utf-8"))))
+                        except:
+                            print >> sys.stderr," * "+str(tuple[columns[i]])
+                            val_sufix+=str(adapt(str(tuple[columns[i]])))
                     else:
                         print >> sys.stderr," * "+str(tupleReal[columns[i]])
                         val_sufix+=str(tupleReal[columns[i]])

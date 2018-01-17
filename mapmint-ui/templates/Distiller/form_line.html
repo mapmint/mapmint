@@ -154,8 +154,8 @@
 #end def
 
 #def printTabHeader(id,title,font,classe)
-<li role="presentation" #if $classe is not None#class="$classe"#end if#>
-  <a id="$(id)_Toggler" href="#$id" aria-controls="home" role="tab" data-toggle="tab">
+<li role="presentation" class="nav-item #if $classe is not None#$classe"#end if#>
+  <a id="$(id)_Toggler" class="nav-link" href="#$id" aria-controls="home" role="tab" data-toggle="tab">
     <i class="fa $font fa-fw"></i>
     <span class="hidden-xs hidden-sm hidden-md">
       $title
@@ -165,8 +165,8 @@
 #end def
 
 #def printTabHeaderNew(obj)
-<li role="presentation" #if obj.keys().count("classe")>0#class="$(obj.classe)"#end if#>
-  <a id="#if obj.keys().count("id")>0#$(obj.id)#end if#_Toggler" href="\##if obj.keys().count("id")>0#$(obj.id)#end if#" aria-controls="home" role="tab" data-toggle="tab">
+<li role="presentation" class="nav-item #if obj.keys().count("classe")>0#$(obj.classe)#end if#">
+  <a class="nav-link" id="#if obj.keys().count("id")>0#$(obj.id)#end if#_Toggler" href="\##if obj.keys().count("id")>0#$(obj.id)#end if#" aria-controls="home" role="tab" data-toggle="tab">
 #if obj.keys().count("font")
     <i class="fa $(obj.font) fa-fw"></i>
 #end if

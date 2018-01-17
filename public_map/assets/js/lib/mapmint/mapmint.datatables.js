@@ -227,6 +227,7 @@ define([
 		var language={};
 		if(closure.config && closure.config.translationUrl)
 		    language["url"]=closure.config.translationUrl;
+		console.log('#mmm_table-content_'+key.replace(this.regs[0],"_"));
 		$('#mmm_table-content_'+key.replace(this.regs[0],"_")).DataTable( {
 		    language: language,
 		    data: [],
@@ -270,7 +271,6 @@ define([
 				    lprop.push(oLayers[key]["queryParams"]["fields"][i]);
 			    lprop.push("msGeometry");
 			    window["complexPayload_InputData_GML_"+key] = function(){
-				var format=new ol.format.WFS();
 				var opts={
 				    featureTypes: [localUrl.data.typename],
 				    propertyNames: lprop,
@@ -287,15 +287,16 @@ define([
 						  ]
 						  :[-180,-90,180,90]);
 				}
-				var lRequest=(format.writeGetFeature(opts));
+				var lRequest=(new ol.format.WFS().writeGetFeature(opts));
 				if(localUrl.feature){
 				    firstParam["href"]=msUrl+"?map="+oLayers[key]["map"];
 				    $(lRequest).find("Query").append('<Filter xmlns:ogc="http://www.opengis.net/ogc"><ogc:Intersects> <ogc:PropertyName>msGeometry</ogc:PropertyName>'+$(localUrl.feature).find("Polygon")[0].outerHTML+'</ogc:Intersects></Filter>');
 				}
-				return lRequest.outerHTML.replace(/1.1.0/,"1.0.0");
+				return new XMLSerializer().serializeToString(lRequest).replace(/1.1.0/,"1.0.0");
+				//return lRequest.outerHTML.replace(/1.1.0/,"1.0.0");
 			    };
 			    firstParam["complexPayload_callback"]="complexPayload_InputData_GML_"+key;
-			    console.log(window["complexPayload_InputData_GML_"+key]);
+			    //console.log(window["complexPayload_InputData_GML_"+key]);
 			    /*}else{
 				firstParam["href"]=localUrl.lurl+"&service=WFS&version=1.0.0&request=GetFeature&typename=Result&srs=EPSG:4326";
 			    }*/

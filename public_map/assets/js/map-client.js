@@ -70,7 +70,8 @@ define([
     var tiletoload={};
     var searchValues,searchExtents;
     var externalCallbacks={};
-
+    var elevationProfiles=[];
+    
     function notify(text, type) {
         mynotify.notify({
             message: { text: text },
@@ -1059,9 +1060,9 @@ define([
 				    }else{
 					console.log(obj["StyledLayerDescriptor"]["NamedLayer"]["UserStyle"]["FeatureTypeStyle"]["Rule"]["PointSymbolizer"]);
 					var tmp0=obj["StyledLayerDescriptor"]["NamedLayer"]["UserStyle"]["FeatureTypeStyle"]["Rule"]["PointSymbolizer"];
-					console.log(tmp0["Graphic"]["Mark"]["WellKnownName"]);
+					//console.log(tmp0["Graphic"]["Mark"]["WellKnownName"]);
 				    
-					if(tmp0["Graphic"]["Mark"]["WellKnownName"]!=""){
+					if(tmp0!="" && tmp0["Graphic"]["Mark"]["WellKnownName"]!=""){
 
 					    console.log(tmp0["Graphic"]["Mark"]["WellKnownName"]);
 
@@ -1082,7 +1083,14 @@ define([
 						image: new ol.style.Circle(lobj)
 					    });
 					    
+					}else{
+					    style=new ol.style.Style({
+                                                image: new ol.style.Icon({
+                                                    src: msUrl+"?map="+oLayers[this.localID].legend[0]+"&SERVICE=WMS&&version=1.0.0&request=Getmap&LAYERS="+this.localID+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-0.2,-0.2,6.2,6.2&SRS=EPSG:4326&WIDTH="+(oLayers[this.localID].size*2)+"&HEIGHT="+(oLayers[this.localID].size*2)+"&mmtime1514554115.25&timestamp=1514554145466",
+                                                })
+                                            });
 					}
+					
 				    }
 				    styles.push(style);
 				}catch(e){
@@ -1160,6 +1168,9 @@ define([
 			    j++;
 			}
 			col.removeAt(j+myBaseLayers.length);
+			if(oLayers[this.localID]["activated"]!="true"){
+                            layerVector.setVisible(false);
+                        }
 			col.insertAt(j+myBaseLayers.length,layerVector);
 			if(j+myBaseLayers.length!=col.getLength()){
 			    console.log(j+myBaseLayers.length);
@@ -1448,12 +1459,12 @@ define([
 		//console.log(feature.getStyle());
 		return [new ol.style.Style({
 		    image: new ol.style.Circle({
-			radius: 10,
+			radius: 15,
 			fill: new ol.style.Fill({
-			    color: '#FF0000'
+			    color: 'rgba(255,0,0,0.05)'
 			    }),
 			    stroke: new ol.style.Stroke({
-				color: '#fff',
+				color: 'rgba(255,255,255,0.4)',
 				width: 2
 			    }),
 			    text: new ol.style.Text({
@@ -1898,6 +1909,7 @@ define([
 				$("#table-wrapper").collapse("show");
 
 			    $('#mmm_table-content-display_'+key).tab("show");
+			    $('.print-map-form-element').show();
 
 			    var chart = new Highcharts.Chart({
 				chart: {
@@ -2615,7 +2627,8 @@ define([
 					    values.push(data.coordinates[i][2]);
 					    sspoints.push([data.coordinates[i][0],data.coordinates[i][1]]);
 					}
-					
+					$('.print-map-form-element').show();
+					elevationProfiles.push(data);
 					for(var i in {"container":0,"header":0})
 					    $("#mmm_table-wrapper-"+i).find(".active").each(function(){
 						$(this).removeClass("active");
@@ -2636,7 +2649,7 @@ define([
 					    map.updateSize();
 					}
 					$("#table-wrapper").on("removeClass",function(){
-					    if(arguments.length>=2 && arguments[1].indexOf(" in ")>=0 && arguments[2].indexOf(" in ")<=0){
+					    if(arguments.length>=2 && arguments[1] &&  arguments[1].indexOf(" in ")>=0 && arguments[2] && arguments[2].indexOf(" in ")<=0){
 						setMapHeight();
 						console.log("== ******* == DEBUG");
 						map.updateSize();
@@ -2644,7 +2657,7 @@ define([
 					    $("#table-wrapper").removeAttr("style");
 					});
 					$("#table-wrapper").on("addClass",function(){
-					    if(arguments.length>=2 && arguments[1].indexOf(" in ")>=0 && arguments[2].indexOf(" in ")<=0){
+					    if(arguments.length>=2 && arguments[1] &&  arguments[1].indexOf(" in ")>=0 && arguments[2] && arguments[2].indexOf(" in ")<=0){
 						console.log("== ******* == DEBUG");
 						setMapHeight();
 						map.updateSize();
@@ -3169,7 +3182,7 @@ define([
 		var content='<div class="tab-content">';
 		var header='<ul class="nav nav-tabs" role="tablist">';
 		for(k in tmp){
-		    header+='<li role="presentation" '+(k==0?'class="active"':'')+'><a href="#feature_'+k+'" aria-controls="feature_'+k+'" role="tab" data-toggle="tab">Feature '+eval(k+'+1')+'</a></li>';
+		    header+='<li role="presentation" class="nav-link '+(k==0?'active':'')+'"><a class="nav-link" href="#feature_'+k+'" aria-controls="feature_'+k+'" role="tab" data-toggle="tab">Feature '+eval(k+'+1')+'</a></li>';
 		    console.log(k);
 		    console.log(tmp[k]);
 		    tmp[k].set("layerName",layer);
@@ -3187,6 +3200,8 @@ define([
 			$(this).click(function (e) {
 			    e.preventDefault()
 			    $(this).tab('show');
+			    $(this).parent().parent().find(".active").removeClass("active");
+			    $(this).parent().addClass("active");
 			});
 		    });
 		}else
@@ -3387,19 +3402,25 @@ define([
 		var activatedLayers=[];
 		for(var i=myBaseLayers.length;i<map.getLayers().getLength()-myToolsLayers.length;i++){
 		    if(map.getLayers().item(i).getVisible())
-			activatedLayers.push(i-myBaseLayers.length);
+			activatedLayers.push(i);
 		}
+		var inputs=[
+                        {"identifier":"layers","value":activatedLayers,"dataType":"string"},
+                        {"identifier":"ext","value":tmpExt0,"dataType":"string"},
+                        {"identifier":"tDoc","value":"MM-PrintedMap.pdf","dataType":"string"},
+                        {"identifier":"map","value":lastMap,"dataType":"string"},
+                        {"identifier":"bgMap","value":data,"dataType":"string"},
+                        {"identifier":"zoom","value":map.getView().getZoom(),"dataType":"string"}
+                    ];
+               if($('.print-map-form-element').find("input[type=checkbox]").first().is(":checked")){
+                       inputs.push({"identifier":"profile","value":JSON.stringify(elevationProfiles[elevationProfiles.length-1]),"mimeType":"application/json"});
+                       inputs.push({"identifier":"iFormat","value":$('#iFormat').val()+"p","dataType":"string"});
+               }else
+                       inputs.push({"identifier":"iFormat","value":$('#iFormat').val(),"dataType":"string"});
+ 
 		zoo.execute({
 		    identifier: "print.printMap",
-		    dataInputs: [
-			{"identifier":"layers","value":activatedLayers,"dataType":"string"},
-			{"identifier":"ext","value":tmpExt0,"dataType":"string"},
-			{"identifier":"iFormat","value":$('#iFormat').val(),"dataType":"string"},
-			{"identifier":"tDoc","value":"MM-PrintedMap.pdf","dataType":"string"},
-			{"identifier":"map","value":lastMap,"dataType":"string"},
-			{"identifier":"bgMap","value":data,"dataType":"string"},
-			{"identifier":"zoom","value":map.getView().getZoom(),"dataType":"string"}
-		    ],
+		    dataInputs: inputs,
 		    dataOutputs: [
 			{"identifier":"Result","asReference":"true"},
 		    ],
@@ -3429,6 +3450,14 @@ define([
 
     }
 
+    function createParam(obj){
+	return {
+	    "identifier": $(obj).attr("name"),
+	    "value": $(obj).val(),
+	    "dataType": "string"
+	}
+    }
+    
     function authenticateSetup(){
 	$("#authenticate_setup").click(function(){
 	    $("#mmtabs").append($("#auth_header_template")[0].innerHTML);
@@ -3449,6 +3478,53 @@ define([
 		}
 	    })
 	});
+	$("#authenticate_logout").click(function(){
+	    console.log("Logout!");
+	    	var params=[];
+	    $(this).parent().find("input").each(function(){
+		console.log($(this).attr("type"));
+		if($(this).attr("type")!="submit"){
+		    if($(this).attr("type")=="checkbox"){
+			if($(this).is(":checked"))
+			    params.push(createParam(this));
+		    }else{
+			params.push(createParam(this));
+		    }
+		}
+	    });
+	    zoo.execute({
+		identifier: "authenticate.clogOut",
+		type: "POST",
+		dataInputs: params,
+		dataOutputs: [
+		    {"identifier":"Result","type":"raw"},
+		],
+		success: function(data){
+		    $(".notifications").notify({
+			message: { text: data },
+			type: 'success',
+		    }).show();
+		    document.location.reload(false);
+		},
+		error: function(data){
+		    console.log(data);
+		    if($.isArray(data["ExceptionReport"]["Exception"])){
+			for(var i=0;i<data["ExceptionReport"]["Exception"].length;i++)
+			    $(".notifications").notify({
+				message: { text:  data["ExceptionReport"]["Exception"][i]["ExceptionText"] },
+				type: 'danger',
+			    }).show();
+		    }
+		    else
+			$(".notifications").notify({
+			    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"] },
+			    type: 'danger',
+			}).show();
+		}
+	    });
+	    return false;
+	});
+	
     }
 
     var hasAddedFeature=false;
