@@ -1,0 +1,247 @@
+#import zoo
+// Filename: admin.js
+
+requirejs.config({
+    baseUrl: '$conf["main"]["publicationUrl"]/assets',
+    paths: {
+        text: 'js/lib/require-text-2.0.12',
+        hgn: 'js/lib/require-hgn-0.3.0',
+
+	ol: 'js/lib/openlayers/ol',
+	olpopup: 'js/lib/openlayers/ol-popup',
+
+        jquery: 'js/lib/jquery/jquery-2.1.3.min',
+	splitter: 'js/lib/jquery.splitter-0.16.0',
+        Popper: 'js/lib/popper',
+        bootstrap: 'js/lib/bootstrap-3.3.7-dist/js/bootstrap.min',
+	bootselect: 'js/lib/bootstrap-select.min',
+	colorpicker: 'js/bootstrap-colorpicker.min',
+        notify: 'js/lib/bootstrap-notify',
+	slider: 'js/lib/bootstrap-slider',
+	summernote: 'js/lib/summernote.min',
+	summernoteB: 'js/lib/summernote-bs4.min',
+
+	typeahead: 'js/lib/typeahead.jquery.min',
+	validator: 'js/lib/validator.min',
+	metisMenu: 'js/lib/metisMenu.min',
+	adminBasic: 'js/admin-basic',
+	managerTools: 'js/manager-tools',
+	datasources: 'js/datasources',
+	mmDataTables: 'js/lib/mapmint/mapmint.datatables',
+	dataTables: 'js/lib/jquery/jquery.dataTables.min',
+	dataTablesB: [
+		'js/lib/jquery/dataTables.bootstrap4.min'
+	],
+	buttons: 'js/lib/datatables/dataTables.buttons.min',
+	buttonsCol: 'js/lib/datatables/buttons.colVis.min',
+	colReorder: 'js/lib/datatables/dataTables.colReorder.min',
+	rowReorder: 'js/lib/datatables/dataTables.rowReorder.min',
+	responsive: 'js/lib/datatables/dataTables.responsive.min',
+	select: 'js/lib/datatables/dataTables.select.min',
+	colResize: 'js/lib/datatables/dataTables.colResize',
+	highcharts: 'js/lib/highcharts/highcharts',
+
+	// Unable to load datatables from one file
+	//datatables: 'js/lib/datatables.min',
+	fileinput: 'js/lib/fileinput',
+#set lang=$conf["main"]["language"].split("-")[0]
+	fileinput_local: 'js/lib/fileinput/fileinput_locale_$lang',
+	sortable: 'js/lib/jquery-sortable',
+	treeview: 'js/lib/treeview',
+	cmenu: 'js/lib/bootstrap-contextmenu',
+	enquire: 'js/lib/enquire.min',
+        datepicker: 'js/lib/bootstrap-datepicker',
+
+        hogan: 'js/lib/hogan/hogan-3.0.2',
+        xml2json: 'js/lib/xml2json/xml2json.min',
+        queryString: 'js/lib/query-string/query-string',
+        wpsPayloads: 'js/lib/zoo/payloads',
+        wpsPayload: 'js/lib/zoo/wps-payload',
+        utils: 'js/lib/zoo/utils',
+
+        zoo: 'js/lib/zoo/zoo',
+
+        domReady: 'js/lib/domReady',
+#if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false")
+        app: 'js/$inputs["module"]["value"].lower()',
+#else
+        app: 'js/login',
+#end if
+            
+    },
+    moduleName: "$inputs["module"]["value"]",
+    shim: {
+#if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false")
+        app: {
+	        deps: [#*'highcharts','enquire',*#'colResize','responsive','select','validator',#*'typeahead',*#'dataTablesB'#if $inputs["module"]["value"]=="Manager"#,'ol','splitter','colorpicker','cmenu'#end if#],
+	    },
+#end if
+	typeahead: {
+	    deps: ['jquery'],
+	    init: function ($) {
+            	   return require.s.contexts._.registry['typeahead.js'].factory( $ );
+       	    }
+	},
+	fileinput: {
+	      deps: ['bootstrap']
+	},
+#*if $lang!="en"*#
+	fileinput_local: {
+	    deps: ['fileinput'],
+	},
+#*end if*#
+	cmenu: {
+	    deps: ['jquery'],
+	},
+	splitter: {
+	    deps: ['jquery'],
+	},
+	validator: {
+	    deps: ['jquery'],
+	},
+	datepicker: {
+	    deps: ['bootstrap'],
+	},
+	dataTables: {
+	    deps: ['jquery'],
+	},
+	dataTablesB: {
+	    deps: ['dataTables'],
+	},
+	buttons: {
+	    deps: ['dataTables'],
+	},
+	buttonsCol: {
+	    deps: ['buttons'],
+	},
+	colReorder: {
+	    deps: ['dataTables'],
+	},
+	responsive: {
+	    deps: ['dataTables'],
+	},
+	select: {
+	    deps: ['dataTables'],
+	},
+	colResize: {
+	    deps: ['dataTables'],
+	},
+        wpsPayloads: {
+	        deps: ['hogan'],
+	    },
+        wpsPayload: {
+	    deps: ['wpsPayloads'],
+            exports: 'wpsPayload',
+        },
+        hogan: {
+            exports: 'Hogan',
+        },
+        xml2json: {
+          exports: "X2JS",
+        },
+        queryString: {
+            exports: 'queryString',
+        },
+        highcharts: {
+	    exports: "Highcharts",
+	    deps: ["jquery"]
+	},
+        metisMenu: {
+            deps: ['jquery'],
+        },
+	Popper: {
+	    deps: ['jquery']
+	},
+        bootstrap: {
+            deps: ['Popper'],
+        },
+        notify: {
+            deps: ['jquery','bootstrap'],
+        },
+    },
+    map: {
+      '*': {
+        'datatables': 'dataTables',
+        'datatables.net': 'dataTables',
+        'datatables.net-buttons': 'dataTables_buttons'
+      }
+    },
+    waitSeconds: 0
+});
+
+
+requirejs.config({ 
+    config: {
+        app: {
+            url: '$conf["main"]["serverAddress"]',
+            db: '$conf["main"]["dbuserName"]',
+#if $conf.keys().count($conf["main"]["dbuser"])
+            dbschema: '$conf[$conf["main"]["dbuser"]]["schema"]',
+#end if
+            delay: 2000,
+	    default_ext: "$conf["main"]["default_extent"]",
+            language: '$conf["main"]["language"]',
+	    tmpUrl: '$conf["main"]["tmpUrl"]',
+	    tmpPath: '$conf["main"]["tmpPath"]',
+	    publicationUrl: '$conf["main"]["publicationUrl"]',
+	    dataPath: '$conf["main"]["dataPath"]',
+	    msUrl: '$conf["main"]["mapserverAddress"]',
+	    lang: "$lang",
+#set myCorrespondances={"fr-FR":"French.json","en-US":"English.json"}
+            translationUrl: "http://cdn.datatables.net/plug-ins/1.10.10/i18n/#if myCorrespondances.keys().count($conf["main"]["language"])>0#$myCorrespondances[$conf["main"]["language"]]#else#$myCorrespondances["en-US"]#end if#",
+	    localizationStrings:{
+	        tables: {
+			    none: "$zoo._("None")"
+		},
+		dataTables: {
+			    selection: "$zoo._("[dd] rows selected")",
+	    		    selection0: "$zoo._("[dd] row selected")",
+			    selectionm: "$zoo._("[dd] rows shown on [ee] rows selected")",
+			    selectionm0: "$zoo._("[dd] row shown on [ee] row selected")",
+		},
+		manager: {
+			 id: "$zoo._("Id")",
+			     legend: "$zoo._("Legend")",
+			 name: "$zoo._("Name")",
+		}
+            },		    
+#if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false")
+#if $conf["senv"].keys().count("last_map")==0
+#set t=$conf
+#set $t["senv"]["last_map"]="Georeferencer"
+#end if
+	    pmapfile: '$conf["senv"]["last_map"]',
+#end if
+#if $inputs["module"]["value"].lower()=="georeferencer"
+	    georef: {
+	    	    img: '$conf["senv"]["mmGeoImg"]',
+#if $conf["senv"].keys().count("mmGeoSize")>0
+	    	    size: '$conf["senv"]["mmGeoSize"]',
+#end if
+	    	    map: '$conf["senv"]["mmGeoMap"]',
+	    	    gcp: '$conf["senv"]["mmGeoGCPFile"]',
+	    	    dst: '$conf["senv"]["mmGeoDST"]',
+	    	    dso: '$conf["senv"]["mmGeoDSO"]',
+	    },
+#end if
+        }
+    } 
+});
+
+requirejs.onResourceLoad = function (context, map, depArray) {
+    console.log(map.name + ' : ' + map.url);
+};
+
+require(['domReady', 'app'], function(domReady, app) {
+    domReady(function() {
+	app.initialize();
+    });
+    window.app=app;
+});
+
+require(["Popper"],function(p){
+  window.Popper = p;
+});
+
+
+
