@@ -21,6 +21,7 @@ define([
 
     function react(obj){
 	console.log($(obj).parent());
+	var serviceName=$(obj).data("service");
 	var params=[];
 	$(obj).parent().find("input").each(function(){
 	    console.log($(this).attr("type"));
@@ -34,7 +35,7 @@ define([
 	    }
 	});
 	zoo.execute({
-	    identifier: "authenticate.logIn",
+	    identifier: "authenticate."+serviceName,
 	    type: "POST",
 	    dataInputs: params,
 	    dataOutputs: [
@@ -76,37 +77,6 @@ define([
 	});
 	$(".btn-lg").on("click",function(){
 	    return react(this);
-	    /*var params=[];
-	    $(this).parent().find("input").each(function(){
-		if($(this).attr("type")=="checkbox"){
-		    if($(this).is(":checked"))
-			params.push(createParam(this));
-		}else{
-		    params.push(createParam(this));
-		}
-	    });
-	    zoo.execute({
-		identifier: "authenticate.logIn",
-		type: "POST",
-		dataInputs: params,
-		dataOutputs: [
-		    {"identifier":"Result","type":"raw"},
-		],
-		success: function(data){
-		    $(".notifications").notify({
-			message: { text: data },
-			type: 'success',
-		    }).show();
-		    document.location.reload(false);
-		},
-		error: function(data){
-		    $(".notifications").notify({
-			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
-			type: 'danger',
-		    }).show();
-		}
-	    });
-	    return false;*/
 	});
     };
 

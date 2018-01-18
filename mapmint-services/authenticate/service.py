@@ -221,7 +221,7 @@ def clogIn(conf,inputs,outputs):
     h.update(inputs['password']['value'])
     c = conn.cursor()
     try:
-        con.pexecute_req([" SELECT login,(select adm from "+prefix+"groups,"+prefix+"user_group where "+prefix+"groups.id=id_group and id_user="+prefix+"users.id) FROM "+prefix+"users WHERE login=[_login_] AND passwd=[_password_]",{"login":{"value":inputs['login']['value'],"format":"s"},"password": {"value":h.hexdigest(),"format":"s"}}])
+        con.pexecute_req([" SELECT users.*,(select max(adm) from "+prefix+"groups,"+prefix+"user_group where "+prefix+"groups.id=id_group and id_user="+prefix+"users.id) FROM "+prefix+"users WHERE login=[_login_] AND passwd=[_password_]",{"login":{"value":inputs['login']['value'],"format":"s"},"password": {"value":h.hexdigest(),"format":"s"}}])
     except Exception as e:
         conf["lenv"]["message"]=zoo._("Error when processing SQL query: ")+str(e)
         return zoo.SERVICE_FAILED
@@ -237,18 +237,35 @@ def clogIn(conf,inputs,outputs):
             conf["senv"]={}
             conf["senv"]["MMID"]=cid
 
-        conf["senv"]["login"]=a[0][0].encode('utf-8')
+        c.execute(con.desc)
+        desc=c.fetchall()
+        for i in desc:
+            if isinstance(a[0][i[0]],int):
+                conf["senv"][i[1]]=str(a[0][i[0]])
+            else:
+                if a[0][i[0]] is not None:
+                    try:
+                        conf["senv"][i[1]]=a[0][i[0]].encode('utf-8')
+                    except:
+                        conf["senv"][i[1]]=a[0][i[0]]
+                else:
+                    conf["senv"][i[1]]=str(a[0][i[0]])
+
+        for i in desc:
+            if i[0]=='login':
+                conf["senv"]["login"]=a[0][i[0]].encode('utf-8')
+                break
         conf["senv"]["loggedin"]="true"
         if conf["main"].has_key("isTrial") and conf["main"]["isTrial"]=="true":
             conf["senv"]["isTrial"]="true"
         else:
             conf["senv"]["isTrial"]="false"
         conf["senv"]["group"]=getGroup(conf,con,inputs['login']['value'])
-        if a[0][1]==1:
+        if a[0][len(desc)]==1:
             conf["senv"]["isAdmin"]="true"
         else:
             conf["senv"]["isAdmin"]="false"
-        conf["lenv"]["cookie"]="MMID=MM"+conf["lenv"]["usid"]+"; path=/"
+        #conf["lenv"]["cookie"]="MMID=MM"+conf["lenv"]["usid"]+"; path=/"
         outputs["Result"]["value"]=zoo._("User ")+conf["senv"]["login"]+zoo._(" authenticated")
         sql=" UPDATE "+prefix+"users set last_con="+con.now+" WHERE login=[_login_]"
         con.pexecute_req([sql,{"login":{"value":inputs['login']['value'],"format":"s"}}])
@@ -270,7 +287,6 @@ def clogOut(conf,inputs,outputs):
         conf["senv"]["login"]="anonymous"
         conf["senv"]["group"]="public"
         conf["lenv"]["cookie"]="MMID="+conf["senv"]["MMID"]+"; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
-        print >> sys.stderr,conf["senv"]
         return zoo.SERVICE_SUCCEEDED
     else:
         conf["lenv"]["message"]=zoo._("User not authenticated")
@@ -312,11 +328,9 @@ def isSadm(conf):
 	con=getCon(conf)
 	con.conf=conf
 	prefix=getPrefix(conf)
-	req="select sadm from "+prefix+"groups where id in (select id_group from "+prefix+"user_group where id_user=[_uid_])"
+	req="select sadm from "+prefix+"groups where id in (select id_group from "+prefix+"user_group where id_user=[_uid_]) order by sadm desc"
 	con.pexecute_req([req,{"uid":{"value":conf["senv"]["id"],"format":"s"}}])
-	print >> sys.stderr,"************"+req
 	a=con.cur.fetchall()
-	print >> sys.stderr,a
 	return a[0][0]
 	
 def logIn(conf,inputs,outputs):
@@ -350,10 +364,11 @@ def logIn(conf,inputs,outputs):
         return zoo.SERVICE_FAILED
 
     if len(a)>0:
-        conf["lenv"]["cookie"]="MMID=MM"+str(time.time()).split(".")[0]+"; path=/"
+        cid=str(time.time()).split(".")[0]
+        conf["lenv"]["cookie"]="MMID=MM"+cid+"; path=/"
 
         conf["senv"]={}
-        conf["senv"]["MMID"]="MM"+str(time.time()).split(".")[0]
+        conf["senv"]["MMID"]="MM"+cid
         # Set all the Session environment variables using the users 
         # table content.
         #print >> sys.stderr,con.desc

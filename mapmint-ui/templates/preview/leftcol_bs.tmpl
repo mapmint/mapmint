@@ -5,7 +5,7 @@
 #if not($mm_access.checkMapPriv($conf,$m))
 #from Cheetah.Template import Template
 #set page="/error_bs.tmpl"
-#set toto=(Template(file=$conf["main"]["templatesPath"]+"/login_bs_body.html",searchList={"title":$zoo._("Authentication required"),"hasHeader": False}))
+#set toto=(Template(file=$conf["main"]["templatesPath"]+"/login_bs_body.html",searchList={"title":$zoo._("Authentication required"),"hasHeader": False,"targetService":"clogIn"}))
 #set nameSpace={"conf":$conf, "errorMsg": $zoo._("You're not allowed to access this content"),"alternative":$toto,"alternativeTitle": $zoo._("Authentication required")}
 $(Template(file=$conf["main"]["templatesPath"]+$page,searchList=$nameSpace))
 #else
