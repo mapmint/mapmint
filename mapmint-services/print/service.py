@@ -72,7 +72,9 @@ def preview(conf,inputs,outputs):
         error_msg+=open(conf["main"]["tmpPath"]+"/polux.log","r").read()
         pass
     try:
-        outputs["Result"]["value"]=open(filename,"rb").read()
+        #outputs["Result"]["value"]=open(filename,"rb").read()
+        outputs["Result"]["produced_file"]=filename
+        outputs["Result"]["generated_file"]=filename
         return zoo.SERVICE_SUCCEEDED
     except Exception,e:
         conf["lenv"]["message"]=error_msg+"\nUnable to open to generated preview: "+str(e)
@@ -290,7 +292,28 @@ END''')
             ordon+=(a,)
         m.setLayerOrder(ordon)
         print >> sys.stderr,"OK"
-
+    if inputs.has_key("lat"):
+        nl1=mapscript.layerObj(m)
+        nl1.updateFromString('''LAYER 
+ NAME "myPosition" 
+ TYPE POINT
+ UNITS METERS
+ STATUS ON
+ PROJECTION 
+   "init=epsg:4326"
+ END
+ CLASS
+  STYLE
+   COLOR 255 255 255
+   OUTLINECOLOR 60 80 80
+   SIZE 15
+   SYMBOL 7
+   WIDTH 2
+  END # STYLE
+ END # CLASS
+END''')
+        feature=mapscript.shapeObj(nl1.type)
+        feature=feature.fromWKT("POINT("+inputs["lat"]["value"]+" "+inputs["lon"]["value"]+")")
     # Draw the image and save it
     print >> sys.stderr,"Draw"
     i=m.draw()

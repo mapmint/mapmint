@@ -1,4 +1,3 @@
-#from Skeleton import Skeleton
 #extends Skeleton
 #import zoo
 #attr $ocss = ['error.css']
@@ -14,6 +13,15 @@ MapMint: $zoo._("Error occurs")
 #end def
 
 #def body
+
+#try
+$alternative
+#set default=False
+#except
+#set default=True
+#end try
+
+#if $default
 <div id="container">
 
 <div id="error-box">
@@ -23,6 +31,7 @@ $errorMsg
 </p>
 <input type="button" class="butt ui-corner-all" value="$zoo._("Go back to Dashboard")" onclick="document.location='$conf["mm"]["address"]/Dashboard';" />   
 </div>
+#end if
 
 <script>
 \$(".loader-container").hide();

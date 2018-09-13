@@ -62,6 +62,7 @@ MapMint: Dashboard
 #import zoo
 #import mm_access
 
+
 #from datastores.directories.service import *
 #set loutputs={"Result":{"value":""}}
 #set a=displayJSON($conf,$inputs,$loutputs)
@@ -85,7 +86,10 @@ MapMint: Dashboard
 #import mapscript
 #set ln=0
 #set ln1=1
+
+
 #for i in range(len($b))
+#set $ln1+=1
 #try
 #set mm1=mapscript.mapObj($b[$i]["id"].replace("__","/")+"/ds_ows.map")
 #for kk in range(0,mm1.numlayers):
@@ -98,7 +102,6 @@ MapMint: Dashboard
 #set $ln1+=1
 #end try
 #end for
-
 
 #set layersNumber=0
 #for i in range(len($dbs))
@@ -122,6 +125,7 @@ MapMint: Dashboard
 #set loutputs={"Result":{"value":""}}
 #set a1=listMap($conf,$inputs,$loutputs)
 #set nmaps=json.loads($loutputs["Result"]["value"])
+
 
 <div class="tab-content">  
 
@@ -182,6 +186,7 @@ MapMint: Dashboard
                         </a>
                     </div>
                 </div>
+
                 <div class="col-lg-6 col-md-6">
                     <div class="panel panel-green">
                         <div class="panel-heading">
@@ -199,6 +204,8 @@ MapMint: Dashboard
                             <ul class="chat">
 #import mapfile.service as mms
 
+
+
 #set limit=3
 #if len($nmaps)<3
 #set limit=len($nmaps)
@@ -207,10 +214,11 @@ MapMint: Dashboard
 #set mpath=$conf["main"]["dataPath"]+"/maps/"+$nmaps[i]["value"]
 #set mm=mapscript.mapObj($mpath)
 #set purl=$mm.web.metadata.get('previewUrl')
-#try
+
 #if $mm.web.metadata.get("previewUrl")
 #set purl=$mm.web.metadata.get('previewUrl')
 #else
+#*try*#
 #set ll=$mm.web.metadata.get('mmActivatedLayers')
 #if ll==""
 #for kk in range(0,$mm.numlayers)
@@ -220,16 +228,23 @@ MapMint: Dashboard
 #end if
 #end for
 #end if
+#try
 #set a=$mm.getLayer(0).getExtent()
+#except Exception,e
+$e
+#end try
+
+#*
 #set tmp=$a.project(mapscript.projectionObj(mm.getLayer(0).getProjection()),mapscript.projectionObj("+init=epsg:4326"))
 #set x=(($a.maxx-$a.minx)/2)+$a.minx
 #set y=(($a.maxy-$a.miny)/2)+$a.miny
 #set purl=$conf["main"]["mapserverAddress"]+"?map="+$mpath+"&LAYERS="+$ll+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX="+str($a.minx)+","+str($a.miny)+","+str($a.maxx)+","+str($a.maxy)+"&SRS=EPSG:4326&WIDTH=230&HEIGHT=170"
-#end if
 #except Exception,e
 <!-- $e -->
+#end try*#
 #set purl="http://placehold.it/50/55C1E7/fff"
-#end try
+#end if
+
 
 
                                 <li class="left clearfix">
@@ -272,6 +287,7 @@ MapMint: Dashboard
                         </a>
                     </div>
                 </div>
+		
                 <div class="col-lg-3 col-md-6">
                     <div class="panel panel-yellow">
                         <div class="panel-heading">
@@ -348,7 +364,7 @@ $(printVersion($softs[i][0],$softs[i][1]))
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
+		<div class="col-lg-3 col-md-6">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <div class="row">
@@ -391,6 +407,7 @@ $t.sort()
 </button>
 </div>
 </div>
+
 
 <div id="symbolAdd"  class="point-symbol-container" style="max-height: 200px;overflow:auto;margin-top: 20px;">
 </div>
@@ -471,7 +488,6 @@ function symbolAddToRSelection(){
             <!-- /.row -->
 </div>
 
-
       #include $conf['main']['templatesPath']+"/UsersManagement.tmpl"
       #include $conf['main']['templatesPath']+"/Configuration_bs.tmpl"
 
@@ -492,5 +508,4 @@ function symbolAddToRSelection(){
 <img style="width:500px" class="img-responsive" src="[datasource]" />
 </div>
 </script>
-
 #end def

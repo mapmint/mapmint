@@ -88,6 +88,14 @@ define([
          */         
         this.zoo = (params.zook?params.zook:null);
 
+	/**
+         * @access public
+	 * @memberof MMDataTable#
+	 * @var height {Integer} the dataTable' height
+	 * @default null
+         */         
+        this.height = (params.height?params.height:null);
+
         /**
          * @access public
 	 * @memberof MMDataTable#
@@ -96,6 +104,23 @@ define([
          */         
         this.config = (params.config?params.config:null);
 
+        /**
+         * @access public
+	 * @memberof MMDataTable#
+	 * @var CRowSelected {Array} containing the selected row identifiers
+	 * @default null
+         */         
+	this.CRowSelected=[];
+
+        /**
+         * @access public
+	 * @memberof MMDataTable#
+	 * @var modules {js.objects} 
+	 * @default null
+         */         
+        this.modules = (params.modules?params.modules:null);
+	
+	
 	this.parseFidToHtml = function(fid){
 	    var closure=this;
 	    try{
@@ -154,7 +179,6 @@ define([
 
 	    var key=layer;//getLayerById(layer);
 	    console.log(layer);
-	    var CRowSelected=[];
 	    if(closure.debug)
 		console.log(key);
 	    if(lforce){
@@ -181,10 +205,25 @@ define([
 			$(this).removeClass("active");
 		    });
 		
-
+		console.log(this.container);
 		this.container.append($('<div id="mmm_table-content-wrapper_'+key.replace(this.regs[0],"_")+'" class="tab-pane active"></div>').append('<table id="mmm_table-content_'+key.replace(this.regs[0],"_")+'" class="display" width="100%"></table>'));
 		$("#mmm_table-wrapper-header").append('<li role="presentation" class="active"><a id="mmm_table-content-display_'+key+'" title="'+oLayers[key]["alias"]+'" data-toggle="tab" data-target="#mmm_table-content-wrapper_'+key+'" href="#mmm_table-content-wrapper_'+key+'"><i class="fa fa-table"></i><b class="ncaret"> </b><span class="hidden-xs hidden-sm">'+oLayers[key]["alias"]+'</span> </a>  </li>');
-		
+
+		console.log($('#mmm_table-content-wrapper_'+key.replace(this.regs[0],"_")));
+		console.log($('#table-wrapper').find("h3").find('.btn-group'));
+		if(this.modules!=null)
+		    for(var im=0;im<this.modules.length;im++){
+			if(this.modules[im].displayTable)
+			    try{
+				var tmpStr=this.modules[im].displayTable();
+				if(tmpStr!='')
+				    $('#table-wrapper').find("h3").first().find('.btn-group').first().prepend(tmpStr);
+				this.modules[im].recordTableAction();
+			    }catch(e){
+				console.log("Map-Client Module ERROR: "+e); 
+			    }
+		    }
+		//console.log(this.container.find(""));
 		
 		if(this.selectLayer.getSource().getFeatures().length==0)
 		    $(".require-select").hide();
@@ -233,7 +272,7 @@ define([
 		    data: [],
 		    "dom": 'Zlfrtip',
 		    "colReorder": true,
-		    "scrollY":  ((lheight/2.5)-($(".navbar").height()*4))+"px",
+		    "scrollY":  (this.height==null?((lheight/2.5)-($(".navbar").height()*4)):height)+"px",
 		    "scrollCollapse": true,
 		    "scrollX": true,
 		    "lengthMenu": [[5, 10, 25, 50, 1000], [5, 10, 25, 50, "All"]],
@@ -367,7 +406,7 @@ define([
 				console.log($.inArray(data[d].fid, CRowSelected) !== -1 );
 				console.log($("#"+data[d].fid));
 				console.log($("#"+data[d].DT_RowId));*/
-				if ( $.inArray(data[d].fid+"", CRowSelected) !== -1 ) {
+				if ( $.inArray(data[d].fid+"", closure.CRowSelected) !== -1 ) {
 				    //console.log(data[d].fid);
 				    $('#mmm_table-content_'+key).DataTable().row($("#"+data[d].DT_RowId)).select();
 				}else{
@@ -381,13 +420,14 @@ define([
 				console.log("clear table");
 			    }
 
-			    console.log(CRowSelected);
+			    console.log(closure.CRowSelected);
 			    var existing=$('#mmm_table-content_'+key+'_info').children('span.select-info');
 			    if(existing.length)
 				existing.remove();
-			    $('#mmm_table-content_'+key+'_info').append($('<span class="select-info"/>').append(
-				$('<span class="select-item"/>').append('dd rows selected'.replace(/dd/g,CRowSelected.length))
-			    ));
+			    if(closure.CRowSelected.length)
+				$('#mmm_table-content_'+key+'_info').append($('<span class="select-info"/>').append(
+				    $('<span class="select-item"/>').append('dd rows selected'.replace(/dd/g,closure.CRowSelected.length))
+				));
 			    console.log('finish');
 			};
 			opts["error"]=function(){
@@ -408,12 +448,12 @@ define([
 			info: false,
 		    },
 		    "rowCallback": function( row, data ) {
-			console.log(CRowSelected);
+			console.log(closure.CRowSelected);
 			console.log(data.DT_RowId);
 			$(row).removeClass('selected');
 			console.log($(row));
-			console.log($.inArray(data.DT_RowId, CRowSelected) !== -1 );
-			if ( $.inArray(data.DT_RowId, CRowSelected) !== -1 ) {
+			console.log($.inArray(data.DT_RowId, closure.CRowSelected) !== -1 );
+			if ( $.inArray(data.DT_RowId, closure.CRowSelected) !== -1 ) {
 			    console.log(data.DT_RowId);
 			    console.log($('#mmm_table-content_'+key).DataTable());
 			    $('#mmm_table-content_'+key).DataTable().row($(row)).select();
@@ -440,31 +480,44 @@ define([
 		      }
 		      }*/
 		});
-		
+
+		    var localThis=this;
 		$('#mmm_table-content_'+key+' tbody').on('click', 'tr', function () {
 		    var id = this.id+"";
 		    console.log("CURRENT ID: "+id+" "+key);
-		    var index = $.inArray(id, CRowSelected);
+		    var index = $.inArray(id, closure.CRowSelected);
 		    if ( index === -1 ) {
 			if(closure.selectLayer.getSource().getFeatures().length==0)
 			    $(".require-select").show();
 			
-			CRowSelected.push( id );
+			closure.CRowSelected.push( id );
 			$('#mmm_table-content_'+key).DataTable().row("#"+id).select();
 			console.log(CFeatures.length);
 			for(var i=0;i<CFeatures.length;i++){
-			    console.log("FEATURE ID: "+CFeatures[i].getId());
-			    console.log("FEATURE ID: "+CFeatures[i].get("fid"));
 			    if(closure.parseFidToHtml(CFeatures[i].get("fid"))==id){
-				console.log(CFeatures.length);
+				console.log("FEATURE ID: "+CFeatures[i].getId());
+				console.log("FEATURE ID: "+CFeatures[i].get("fid"));
+			    	console.log(CFeatures.length);
 				CFeatures[i].set("origin","query_selected_"+key);
 				CFeatures[i].setId(CFeatures[i].get("fid"));
 				closure.selectLayer.getSource().addFeature(CFeatures[i]);
+				console.log(closure.modules);
+				if(closure.modules!=null)
+				    for(var im=0;im<closure.modules.length;im++){
+					if(closure.modules[im].setFeature)
+					    try{
+						console.log("Map-Client Module SetFeature Start");
+						closure.modules[im].setFeature(CFeatures[i]);
+						console.log("Map-Client Module SetFeature End");
+					    }catch(e){
+						console.log("Map-Client Module Error: "+e);
+					    }
+				    }
 			    }
 			}
 			console.log(CFeatures);
 		    } else {
-			CRowSelected.splice( index, 1 );
+			closure.CRowSelected.splice( index, 1 );
 			$('#mmm_table-content_'+key).DataTable().row("#"+id).deselect();
 			for(var i=0;i<CFeatures.length;i++){
 			    if(closure.parseFidToHtml(CFeatures[i].get("fid"))==id){
@@ -480,10 +533,10 @@ define([
 		    console.log('#mmm_table-content_'+key+'_info');
 		    console.log($('#mmm_table-content_'+key+'_info'));
 		    console.log(closure.selectLayer.getSource().getFeatures().length);
-		    console.log(CRowSelected.length);
+		    console.log(closure.CRowSelected.length);
 		    console.log('#mmm_table-content_'+key+'_info');
 		    $('#mmm_table-content_'+key+'_info').append($('<span class="select-info"/>').append(
-			$('<span class="select-item"/>').append((closure.selectLayer.getSource().getFeatures().length!=CRowSelected.length?'dd rows selected (ee total selected)'.replace(/dd/g,CRowSelected.length).replace(/ee/g,closure.selectLayer.getSource().getFeatures().length):'dd rows selected'.replace(/dd/g,CRowSelected.length)))
+			$('<span class="select-item"/>').append((closure.selectLayer.getSource().getFeatures().length!=closure.CRowSelected.length?'dd rows selected (ee total selected)'.replace(/dd/g,closure.CRowSelected.length).replace(/ee/g,closure.selectLayer.getSource().getFeatures().length):'dd rows selected'.replace(/dd/g,closure.CRowSelected.length)))
 		    ));
 		} );
 		

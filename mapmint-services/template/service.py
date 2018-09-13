@@ -185,7 +185,7 @@ def display(conf,inputs,outputs):
 				t = Template(file=conf["main"]["templatesPath"]+"/"+inputs["tmpl"]["value"]+".tmpl",searchList=nameSpace)
 			except Exception,e:
 				print >> sys.stderr,"ERROR => "+str(e)
-				page="/error.tmpl"
+				page="/error_bs.tmpl"
 				nameSpace["errorMsg"]=e
 				t = Template(file=conf["main"]["templatesPath"]+page,searchList=nameSpace)
 				
@@ -212,7 +212,7 @@ def display(conf,inputs,outputs):
 		outputs["Result"]["value"]=t.__str__()
 	except Exception,e:
 		if conf.keys().count('senv')>0 and conf["senv"].keys().count('lastname')>0:
-			page="/error.tmpl"
+			page="/error_bs.tmpl"
 			import traceback
 			nameSpace["errorMsg"]=str(e)+"\n"+str(traceback.format_exc())
 			t1 = Template(file=conf["main"]["templatesPath"]+page,searchList=nameSpace)

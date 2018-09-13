@@ -50,6 +50,147 @@ function ConverterJs(conf,inputs,outputs){
   return {result: ZOO.SERVICE_SUCCEEDED, outputs: {"Result": {"value": "Map Update"}} };
 }
 
+function convert1(conf,inputs,outputs){
+  var myOutputs= {"Result": { "type": 'RawDataOutput', "mimeType": "application/json" }};
+  var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.getMapLayersInfo');
+  /**
+   * Check what are the input DataStore and DataSource
+   */
+  var inputs1={
+      "map": {"value": inputs["dst_in"]["value"],"type":"string"},
+      "fullPath": {"value": "true","type":"string"},
+      "layer": {"value": inputs["dso_in"]["value"],"type":"string"}
+  };
+  var myExecuteResult1=myProcess.Execute(inputs1,myOutputs);
+  alert(myExecuteResult1);
+  var tmp1;
+  try{tmp1=eval(myExecuteResult1.replace(/None/g,"null"));}
+  catch(e){
+      conf["lenv"]["message"]="Error occured: "+e;
+      alert(e);
+      return {result: ZOO.SERVICE_FAILED, conf: conf}
+  }
+  /**
+   * Take care of encoding system defined for the input data to add
+   * PGCLIENTENCODING or OGR_FORCE_ASCII when needed.
+   */
+    alert(tmp1[2]);
+  if(tmp1[2]=="iso-8859-15" || tmp1[2]=="iso-8859-1" ){
+      var input1={"section": {"value":"env","type":"string"}};
+      for(i in conf["env"]){
+	  input1[i]={"value": conf["env"][i],"type":"string"};
+      }
+      if(inputs["dso_f"]["value"]=="PostgreSQL")
+	  input1["PGCLIENTENCODING"]={"value": "Latin1","type":"string"};
+      else
+	  input1["OGR_FORCE_ASCII"]={"value": "NO","type":"string"};
+      var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"],'configuration.SaveConf');
+      var res=myProcess0.Execute(input1,myOutputs);
+      alert(res);
+  }
+  /**
+   * Check what is the output DataStore
+   */
+  var inputs2={
+      "map": {"value": (inputs["dso_f"]["value"]=="PostgreSQL"?conf["main"]["dataPath"]+"/PostGIS/"+inputs["dst_out"]["value"]:conf["main"]["dataPath"]+"/dirs/"+inputs["dst_out"]["value"]+"/")+"ds_ows.map","type":"string"},
+      "fullPath": {"value":"true","type":"string"},
+      "layer": {"value":"-1","type":"string"}
+  };
+  alert(inputs2["map"]["value"]);
+  var myExecuteResult2=myProcess.Execute(inputs2,myOutputs);
+  alert(myExecuteResult2);
+  var tmp2;
+  try{tmp2=eval(myExecuteResult2.replace(/None/g,"null"))}
+  catch(e){
+      conf["lenv"]["message"]="Error occured: "+e;
+      alert(e);
+      return {result: ZOO.SERVICE_FAILED, conf: conf, outputs: {"Result": {"value":""}}};
+  }
+  /**
+   * Run the Converter service
+   */
+  var inputs3={
+      "F": {"value":inputs["dso_f"]["value"],"type":"string"},
+      "InputDSN": {"value": (tmp1[0].indexOf(".")>0?tmp1[0]:tmp1[0]+"/"+tmp1[1]+".shp"),"type":"string"},
+      "OutputDSTN": {"value": tmp2[0]+(inputs["dso_f"]["value"]=="PostgreSQL"?"":"/"+inputs["dso_out"]["value"]),"type":"string"},
+      "OutputDSN": {"value": inputs["dso_out"]["value"],"type":"string"},
+      "nln": {"value": inputs["dso_out"]["value"],"type":"string"}
+  };
+
+  if(inputs["sql"] && inputs["sql"]["value"]!="NULL"){
+    if(inputs["sql"]["value"].indexOf("OutputedDataSource")>0){
+	//inputs["sql"]["value"]=inputs["sql"]["value"].replace(/OutputedDataSourceName/g,"\"SELECT\" ")
+	//inputs["sql"]["type"]="complex";
+    }
+      inputs3["sql"]={"value":inputs["sql"]["value"].replace(/OutputedDataSourceName/g,'"SELECT"'),"type":"complex"};//,"type":"complex", "mimeType":"text/plain"};
+  }
+  if(inputs["simplify"] && inputs["simplify"]["value"]!="NULL"){
+    inputs3["simplify"]={"value":inputs["simplify"]["value"],"type":"string"};
+  }
+  if(inputs["overwrite"] && inputs["overwrite"]["value"]!="NULL"){
+    inputs3["overwrite"]={"value":inputs["overwrite"]["value"],"type":"string"};
+  }
+/*
+  if(inputs["append"] && inputs["append"]["value"]!="NULL"){
+    inputs3["append"]={"value":inputs["append"]["value"],"type":"string"};
+  }
+  if(inputs["nlt"] && inputs["nlt"]["value"]!="NULL"){
+    inputs3["nlt"]={"value":inputs["nlt"]["value"],"type":"string"};
+  }
+    for(i in inputs){
+	if(inputs3[i]==null){
+	    alert(i);
+	    inputs3[i]=inputs[i];
+	}
+    }*/
+    for(i in inputs3){
+	alert(i+" => "+inputs3[i]["value"]);
+    }
+  var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Converter');
+  var myFinalOutputs= {"Result": { "type": 'RawDataOutput', "dataType": "string" }};
+  var myFinalResult=myProcess2.Execute(inputs3,myFinalOutputs);
+  alert(myFinalResult);
+  if(myFinalResult.indexOf("ExceptionReport")>=0){
+      conf["lenv"]["message"]="Unable to convert your data.";
+      return {result: ZOO.SERVICE_FAILED, conf: conf };
+  }
+  /**
+   * Remove the PGCLIENTENCODING from the [env] section when needed.
+   */
+  if(tmp1[2]=="iso-8859-15" || tmp1[2]=="iso-8859-1" ){
+      var input1={"section": {"value":"env","type":"string"},"force": {"value":"true","type":"string"}};
+      for(i in conf["env"])
+	  if(i!="PGCLIENTENCODING"){
+	      input1[i]={"value": conf["env"][i],"type":"string"};
+	  }
+      var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'configuration.SaveConf');
+      var res=myProcess.Execute(input1,myOutputs);
+      var formats=["GeoJSON","KML","GeoRSS","GML","GPX"];
+      for(var k=0;k<formats.length;k++)
+      if(inputs["dso_f"]["value"]==formats[k]){
+	  var myProcess0 = new ZOO.Process(conf["main"]["serverAddress"],'vecotr-converter.Recode');
+	  var input2={
+	      "file": {"value": tmp2[0]+"/"+inputs["dso_out"]["value"],"type": "string"},
+	      "sEncoding": {"value": tmp1[2],"type":"string"},
+	      "tEncoding": {"value": "utf-8","type":"string"}
+	  };
+	  var res=myProcess.Execute(input1,myOutputs);
+      }
+  }
+  /**
+   * When only (null) is returned by the Converter service, it means that
+   * the table was sucessfully imported into PostgreSQL database.
+   */
+  if(myFinalResult=='(null)'){
+      outputs["Result"]["value"]="Convertion successfully made";
+      outputs["Result"]["mimeType"]="application/json";
+  }
+  else
+      outputs["Result"]["value"]=myFinalResult;
+  return {result: ZOO.SERVICE_SUCCEEDED, outputs: outputs };
+}
+
+
 function convert(conf,inputs,outputs){
   var myOutputs= {"Result": { "type": 'RawDataOutput', "mimeType": "application/json" }};
   var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'mapfile.getMapLayersInfo');

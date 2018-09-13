@@ -17,7 +17,7 @@ class pgConnection:
         self.conf=conf
 
     def parseConf(self):
-	libxml2.initParser()
+        libxml2.initParser()
         doc = libxml2.parseFile(self.conf["main"]["dataPath"]+"/PostGIS/"+self.dbfile+".xml")
         styledoc = libxml2.parseFile(self.conf["main"]["dataPath"]+"/PostGIS/conn.xsl")
         style = libxslt.parseStylesheetDoc(styledoc)
@@ -119,7 +119,7 @@ def getTableDescription(conf,inputs,outputs):
 	if db.connect():
             tmp=inputs["table"]["value"].split('.')
             req=getDesc(db.cur,inputs["table"]["value"])
-            print >> sys.stderr,req
+            #print >> sys.stderr,req
             res=db.execute(req)
             if res!=False and len(res)>0:
                 outputs["Result"]["value"]=json.dumps(res)
@@ -132,19 +132,19 @@ def getTableDescription(conf,inputs,outputs):
             return zoo.SERVICE_FAILED
 
 def getTableContent(conf,inputs,outputs):
-	import authenticate.service as auth
+    import authenticate.service as auth
 	#if not(auth.is_ftable(inputs["table"]["value"])):
 	#	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
 	#	return zoo.SERVICE_FAILED
-        db=pgConnection(conf,inputs["dataStore"]["value"])
-	db.parseConf()
-        getTableDescription(conf,inputs,outputs)
-        tmp=eval(outputs["Result"]["value"].replace("null","None"))
-        pkey=0
-        geom=[]
-        files=[]
-        fields=""
-        for i in range(0,len(tmp)):
+    db=pgConnection(conf,inputs["dataStore"]["value"])
+    db.parseConf()
+    getTableDescription(conf,inputs,outputs)
+    tmp=eval(outputs["Result"]["value"].replace("null","None"))
+    pkey=0
+    geom=[]
+    files=[]
+    fields=""
+    for i in range(0,len(tmp)):
             if tmp[i][3]=="PRI":
                 pkey=tmp[i][0]
             if tmp[i][2]=="geometry":
@@ -178,12 +178,24 @@ def getTableContent(conf,inputs,outputs):
                 if fields!="":
                     fields+=","
                 fields+=tmp[i][1]
-	if db.connect():
-            tmp=inputs["table"]["value"].split(".")
-            tmp[0]='"'+tmp[0]+'"'
-            tmp[1]='"'+tmp[1]+'"'
-            inputs["table"]["value"]=(".").join(tmp)
+    if db.connect():
+            tmp1=inputs["table"]["value"].split(".")
+            tmp1[0]='"'+tmp1[0]+'"'
+            tmp1[1]='"'+tmp1[1]+'"'
+            inputs["table"]["value"]=(".").join(tmp1)
             req="select count(*) from "+inputs["table"]["value"]
+            if inputs.has_key("clause") and inputs["clause"]["value"]!="NULL":
+                req+=" WHERE "+inputs["clause"]["value"]
+            if inputs.has_key("search") and inputs["search"]["value"]!="NULL" and inputs["search"]["value"]!="asc":
+                req+=" WHERE "
+                print >> sys.stderr,req
+                cnt=0
+                print >> sys.stderr,req
+                for i in range(0,len(tmp)):
+                    if cnt>0:
+                        req+=" OR "
+                    req+=tmp[i][1]+"::varchar like '%"+inputs["search"]["value"]+"%'"
+                    cnt+=1
             res=db.execute(req)
             if res!=False:
                 total=res[0][0]
@@ -195,6 +207,16 @@ def getTableContent(conf,inputs,outputs):
             req+=" from "+inputs["table"]["value"]
             if inputs.has_key("clause") and inputs["clause"]["value"]!="NULL":
                 req+=" WHERE "+inputs["clause"]["value"]
+            if inputs.has_key("search") and inputs["search"]["value"]!="NULL" and inputs["search"]["value"]!="asc":
+                req+=" WHERE "
+                print >> sys.stderr,req
+                cnt=0
+                print >> sys.stderr,req
+                for i in range(0,len(tmp)):
+                    if cnt>0:
+                        req+=" OR "
+                    req+=tmp[i][1]+"::varchar like '%"+inputs["search"]["value"]+"%'"
+                    cnt+=1
             if inputs.has_key("sortname") and inputs["sortname"]["value"]!="NULL":
                 req+=" ORDER BY "+inputs["sortname"]["value"]+" "+inputs["sortorder"]["value"]
             if inputs.has_key("limit") and inputs["limit"]["value"]!="NULL":
@@ -231,10 +253,139 @@ def getTableContent(conf,inputs,outputs):
             else:
                 print >> sys.stderr,"unable to run request"
                 return zoo.SERVICE_FAILED
+    else:
+        print >> sys.stderr,"Unable to connect"
+        return zoo.SERVICE_FAILED
+
+def getTableContent1(conf,inputs,outputs):
+    import authenticate.service as auth
+	#if not(auth.is_ftable(inputs["table"]["value"])):
+	#	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
+	#	return zoo.SERVICE_FAILED
+    db=pgConnection(conf,inputs["dataStore"]["value"])
+    db.parseConf()
+    getTableDescription(conf,inputs,outputs)
+    tmp=eval(outputs["Result"]["value"].replace("null","None"))
+    pkey=0
+    geom=[]
+    files=[]
+    fields=""
+    for i in range(0,len(tmp)):
+        if tmp[i][3]=="PRI":
+            pkey=tmp[i][0]
+        if tmp[i][2]=="geometry":
+            geom+=[i]
+        if tmp[i][2]=="bytea":
+            files+=[i]
+        if tmp[i][3]=="FOR" and not(inputs.has_key("force")):
+            input1=inputs
+            otbl=inputs["table"]["value"]
+            inputs["table"]["value"]=tmp[i][4]
+            getTableDescription(conf,inputs,outputs)
+            tmp2=eval(outputs["Result"]["value"].replace("null","None"))
+            pkey1=0
+            for j in range(0,len(tmp2)):
+                if tmp2[j][3]=="PRI":
+                    pkey1=j
+                    break
+            hasV=False
+            for j in range(0,len(tmp2)):
+                if not(hasV) and (tmp2[j][2].count("char")>0 or tmp2[j][2].count("text")>0):
+                    if fields!="":
+                        fields+=","
+                    hasV=True
+                    fields+="(SELECT "+tmp2[j][1]+" FROM "+tmp[i][4]+" as a WHERE a."+tmp2[pkey][1]+"="+otbl+"."+tmp[i][1]+")"
+            if not(hasV):
+                if fields!="":
+                    fields+=","
+                fields+="(SELECT "+tmp2[0][1]+" FROM "+tmp[i][4]+" as a WHERE a."+tmp2[pkey][1]+"="+otbl+"."+tmp[i][1]+")"
+                inputs["table"]["value"]=otbl
+            else:
+                if fields!="":
+                    fields+=","
+                fields+=tmp[i][1]
+        
+    if db.connect():
+        tmp1=inputs["table"]["value"].split(".")
+        tmp1[0]='"'+tmp1[0]+'"'
+        tmp1[1]='"'+tmp1[1]+'"'
+        inputs["table"]["value"]=(".").join(tmp1)
+        req="select count(*) from "+inputs["table"]["value"]
+        if inputs.has_key("clause") and inputs["clause"]["value"]!="NULL":
+            req+=" WHERE "+inputs["clause"]["value"]
+        if inputs.has_key("search") and inputs["search"]["value"]!="NULL" and inputs["search"]["value"]!="asc":
+            req+=" WHERE "
+            print >> sys.stderr,req
+            cnt=0
+            print >> sys.stderr,req
+            for i in range(0,len(tmp)):
+                if cnt>0:
+                    req+=" OR "
+                req+=tmp[i][1]+"::varchar like '%"+inputs["search"]["value"]+"%'"
+                cnt+=1
+        print >> sys.stderr,req
+        res=db.execute(req)
+        if res!=False:
+            total=res[0][0]
+        req="select "
+        if inputs.has_key("cols") and inputs["cols"]["value"]!="NULL":
+            req+=inputs["cols"]["value"]
         else:
-            print >> sys.stderr,"Unable to connect"
+            req+=fields
+        req+=" from "+inputs["table"]["value"]
+        if inputs.has_key("clause") and inputs["clause"]["value"]!="NULL":
+            req+=" WHERE "+inputs["clause"]["value"]
+        if inputs.has_key("search") and inputs["search"]["value"]!="NULL" and inputs["search"]["value"]!="asc":
+            req+=" WHERE "
+            print >> sys.stderr,req
+            cnt=0
+            print >> sys.stderr,req
+            for i in range(0,len(tmp)):
+                if cnt>0:
+                    req+=" OR "
+                req+=tmp[i][1]+"::varchar like '%"+inputs["search"]["value"]+"%'"
+                cnt+=1
+            print >> sys.stderr,req
+        if inputs.has_key("sortname") and inputs["sortname"]["value"]!="NULL":
+            req+=" ORDER BY "+inputs["sortname"]["value"]+" "+inputs["sortorder"]["value"]
+        if inputs.has_key("limit") and inputs["limit"]["value"]!="NULL":
+            if inputs.has_key("page") and inputs["page"]["value"]!="":
+                req+=" OFFSET "+str((int(inputs["page"]["value"])-1)*int(inputs["limit"]["value"]))
+                page=inputs["page"]["value"]
+                req+=" LIMIT "+inputs["limit"]["value"]
+        else:
+            page=1
+            req+=" LIMIT 10"
+        print >> sys.stderr,req
+        res=db.execute(req)
+        if res!=False:
+            rows=[]
+            for i in range(0,len(res)):
+                res0=[]
+                for k in range(0,len(res[i])):
+                    try:
+                        tmp=res[i][k].encode('utf-8')
+                        #print >> sys.stderr,dir(tmp)
+                    except Exception,e:
+                        #print >> sys.stderr,e
+                        tmp=str(res[i][k])
+                    res0+=[str(tmp)]
+                    if len(geom)>0:
+                        for j in range(0,len(geom)):
+                            res0[geom[j]]="GEOMETRY"
+                    if len(files)>0:
+                        for j in range(0,len(files)):
+                            res0[files[j]]="BINARY FILE"
+                    rows+=[{"id": res[i][pkey],"cell": res0}]
+            outputs["Result"]["value"]=json.dumps({"page": page, "total": total,"rows": rows},ensure_ascii=False)
+            return zoo.SERVICE_SUCCEEDED
+        else:
+            print >> sys.stderr,"unable to run request"
             return zoo.SERVICE_FAILED
-                
+    else:
+        print >> sys.stderr,"Unable to connect"
+        return zoo.SERVICE_FAILED
+    
 def deleteTuple(conf,inputs,outputs):
     db=pgConnection(conf,inputs["dataStore"]["value"])
     db.parseConf()
@@ -323,7 +474,7 @@ def editTuple(conf,inputs,outputs):
                 conf["lenv"]["message"]=db.conf["lenv"]["message"]
                 return zoo.SERVICE_FAILED
             db.conn.commit()
-            print >> sys.stderr,res
+            #print >> sys.stderr,res
             return zoo.SERVICE_SUCCEEDED
         except Exception,e:
             conf["lenv"]["message"]="Unable to run the request "+str(e)

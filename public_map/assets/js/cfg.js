@@ -1,7 +1,7 @@
-// Filename: main.js
+// Filename: public_maps/assets/js/cfg.js
 
 requirejs.config({
-    baseUrl: '/pm/assets',
+    baseUrl: '/~djay/progede2/public_map/assets',
     paths: {
         text: 'js/lib/require-text-2.0.12',
         hgn: 'js/lib/require-hgn-0.3.0',
@@ -11,7 +11,7 @@ requirejs.config({
 
         jquery: 'js/lib/jquery/jquery-2.1.3.min',
 	Popper: 'js/lib/popper',
-        bootstrap: 'js/lib/bootstrap-3.1.1-dist/js/bootstrap.min',
+        bootstrap: 'js/lib/bootstrap-3.3.7-dist/js/bootstrap.min',
 	bootselect: 'js/lib/bootstrap-select.min',
         notify: 'js/lib/bootstrap-notify',
 	slider: 'js/lib/bootstrap-slider',
@@ -29,6 +29,10 @@ requirejs.config({
 	select: 'js/lib/datatables/dataTables.select.min',
 	colResize: 'js/lib/datatables/dataTables.colResize',
 	highcharts: 'js/lib/highcharts/highcharts',
+
+	managerTools: 'js/manager-tools',
+	metisMenu: 'js/lib/metisMenu.min',
+	colorpicker: 'js/bootstrap-colorpicker.min',
 
 	typeahead: 'js/lib/typeahead.jquery.min',
 
@@ -115,6 +119,9 @@ requirejs.config({
         highcharts: {
 	    exports: "Highcharts",
 	    deps: ["jquery"]
+	},
+	managerTools: {
+	    deps: ["colorpicker"]
 	},
         wpsPayloads: {
 	        deps: ['hogan'],

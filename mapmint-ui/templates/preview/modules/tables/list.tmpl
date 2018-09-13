@@ -1,5 +1,8 @@
 #encoding UTF-8
 #import zoo
+
+<!-- OK 0 -->
+
 #set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
 #include $tmpl
 #set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
@@ -13,6 +16,8 @@
 #except
 #set isPreInput=False
 #end try
+
+<!-- OK 0 -->
 
 #try 
 #set currentLoadIndex=int($conf["lenv"]["mylevel"])+1
@@ -67,6 +72,7 @@ $embedded
 -->
 
 
+
 #set req="SELECT mm_tables.p_views.name,mm_tables.p_tables.description,mm_tables.p_tables.name,mm_tables.p_tables.id,mm_tables.p_views.clause FROM mm_tables.p_views,mm_tables.p_tables where mm_tables.p_tables.id=mm_tables.p_views.ptid and mm_tables.p_views.id="+$qComponents[0]
 #set res=$cur.execute($req)
 #set vals=$cur.fetchone()
@@ -79,12 +85,13 @@ $embedded
 #set tableId=str($vals[3])
 #set clause=$vals[4]
 
+
 #* Edition *#
 #set req="SELECT distinct mm_tables.p_editions.id,mm_tables.p_editions.name,mm_tables.p_editions.step FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+$tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.step>=0 order by mm_tables.p_editions.step asc"
 #set res=$cur.execute($req)
 #set evals=$cur.fetchall()
 
-#* Search / Delete *#
+#* Search / Delete / History *#
 #set req="SELECT distinct mm_tables.p_editions.id,mm_tables.p_editions.name,mm_tables.p_editions.step FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+$tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.step<=0 order by mm_tables.p_editions.step asc"
 #set res=$cur.execute($req)
 #set vals=$cur.fetchall()
@@ -98,6 +105,7 @@ $embedded
 #set ireq="SELECT distinct mm_tables.importers.id,mm_tables.importers.name,mm_tables.importers.description FROM mm_tables.importers,mm_tables.importer_groups where  mm_tables.importers.id=mm_tables.importer_groups.iid and tid="+$tableId+" and mm_tables.importer_groups.gid in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') order by mm_tables.importers.id asc"
 #set ires=$cur.execute($ireq)
 #set ivals=$cur.fetchall()
+
 
 <ul class="nav nav-tabs" role="tablist">
 #if $prefix!=""
@@ -118,8 +126,12 @@ $ftmpl.printTabHeaderNew({"id":$prefix+"edit","title":$zoo._("Edit"),"font":"fa-
 #if $vals[i][2]==-2
 #set font="fa-trash"
 #else
+#if $vals[i][2]==-3
+#set font="fa-download"
+#else
 #if $vals[i][2]==-10
 #set font="fa-history"
+#end if
 #end if
 #end if
 #end if
@@ -147,7 +159,7 @@ $ftmpl.printTabHeaderNew({"id":$prefix+"edit_"+str($vals[i][0]),"title":$vals[i]
 #import os.path
 #set names=[$conf["main"]["dataPath"]+"/public_maps/project_"+$tblSplit[0]+"___"+$tblSplit[1]+".map",$conf["main"]["dataPath"]+"/public_maps/project_"+$tblSplit[1]+".map"]
 #for i in range(0,len($names))
-#if os.path.isfile(names[i]) 
+#if os.path.isfile(names[i]) and $embedded==0
 $ftmpl.printTabHeader($prefix+"map",$zoo._("Map"),$font,"")
 #set associatedMap=$names[$i]
 #if i>0
@@ -155,7 +167,11 @@ $ftmpl.printTabHeader($prefix+"map",$zoo._("Map"),$font,"")
 #else
 #set associatedMapName=$tblSplit[0]+"___"+$tblSplit[1]
 #end if
+#if $embedded==0
 #set $hasAssociatedMap=True
+#else
+#set $hasAssociatedMap=False
+#end if
 #end if
 #end for
 
@@ -193,12 +209,12 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
 	  <div>
 
 	  <label>$zoo._("Layer")</label>
-	  <select id="addedLayers" class="form-control form-control-sm require-select" >
+	  <select id="addedLayers" class="form-control form-control-sm" >
 	  	  <option value="-1">$zoo._("None")</option>
 	  </select>
 	  </div>
 
-      <label>Title</label>
+      <label>$zoo._("Title")</label>
       <input id="layerTitle" type="text" class="form-control form-control-sm" />
 
      <div>
@@ -206,7 +222,8 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
   <ul class="nav nav-tabs" role="tablist">
     <li class="active" role="presentation"><a href="#layerExtract" aria-controls="extract" role="tab" data-toggle="tab">$zoo._("Filter")</a></li>
     <li role="presentation"><a href="#processing" aria-controls="processing" role="tab" data-toggle="tab">$zoo._("Processing")</a></li>
-    <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+    <li role="presentation"><a href="#sql" aria-controls="sql" role="tab" data-toggle="tab">$zoo._("Report")</a></li>
+<!--    <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li> -->
   </ul>
 
   <!-- Tab panes -->
@@ -252,7 +269,7 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
      </select>
     </div>
     <div class="col-sm-3">
-      <label> Add </label>
+      <label> $zoo._("Add") </label>
       <div class="btn-group btn-group-sm" role="group" aria-label="Button group">
       <button class="btn btn-default require-filter"  style="display:none" onclick="var tmp=\$(this).parent().parent().parent().parent().find('form').last().remove();app.bindFilterLayer();return false;"><i class="fa fa-minus"></i></button>
       <button class="btn btn-default" onclick="var tmp=\$(this).parent().parent().parent().parent().find('form').first().clone();\$(this).parent().parent().parent().parent().append(tmp);\$(this).parent().parent().parent().parent().find('form').last().find('.require-filter').show();app.bindFilterLayer();return false;"><i class="fa fa-plus"></i></button>
@@ -262,18 +279,70 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
     </div>
     <div role="tabpanel" class="tab-pane" id="processing">
     <label>$zoo._("Services")</label>
-    <select name="processing_service" class="form-control form-control-sm" onchange="\$(this).find('option').each(function(){console.log(\$(this).is(':selected'));var closure=\$(this);if(\$(this).is(':selected')){ \$('#'+closure.attr('data-display')).find('select').first().html('');\$('#addedLayers').find('option').each(function(){ if(!\$(this).is(':selected')) \$('#'+closure.attr('data-display')).find('select').first().append(\$(this).clone());});\$('#'+\$(this).attr('data-display')).show();}else \$('#'+\$(this).attr('data-display')).hide();});">
-    	   <option data-display="pbuffer" value="Buffer">$zoo._("Buffer")</option>
-    	   <option data-display="punion" value="Union">$zoo._("Union")</option>
-    	   <option data-display="pintersection" value="Intersection">$zoo._("Intersection")</option>
-    	   <option data-display="psymdifference" value="SymDifference">$zoo._("SymDifference")</option>
-    	   <option data-display="punionone" value="UnionOne">$zoo._("Union (one geom)")</option>
+    <select name="processing_service" class="form-control form-control-sm layer-select-list" >
+    	   <option data-display="pexterior" value="ExteriorRingPy">$zoo._("Extract exterior ring")</option>
+    	   <option data-display="pcreategrid" value="createGrid">$zoo._("Compute grid for extent")</option>
+    	   <option data-display="pvoronoi" value="RVoronoi">$zoo._("Voronoi")</option>
+    	   <option data-display="pfusionintersects" value="FusionIntersectsPy">$zoo._("FusionIntersects")</option>
+    	   <option data-display="pbuffer" value="BufferPy">$zoo._("Buffer")</option>
+    	   <option data-display="punion" value="UnionPy">$zoo._("Union")</option>
+    	   <option data-display="pintersection" value="IntersectionPy">$zoo._("Intersection")</option>
+    	   <option data-display="psymdifference" value="SymDifferencePy">$zoo._("SymDifference")</option>
+    	   <option data-display="punionone" value="UnionOnePy">$zoo._("Union (one geom)")</option>
+    	   <option data-display="pselection" value="Selection">$zoo._("Select")</option>
+    	   <option data-display="pselection1" value="SelectionAdd">$zoo._("Select / Add")</option>
     </select>
+
+    <div id="pselection">
+    <label>$zoo._("Type:")</label>
+    <select name="drawFeatureType" class="form-control form-control-sm"  onchange="\$(this).val()=='Layer'?\$('.require-layer').show():\$('.require-layer').hide();">
+      <option value="Point">$zoo._("Point")</option>
+      <option value=Box>$zoo._("Rectangle")</option>
+      <option value="Polygon">$zoo._("Polygon")</option>
+      <option value="Circle">$zoo._("Circle")</option>
+      <option value="Layer">$zoo._("Layer")</option>
+    </select>
+    <div class="require-layer">
+    <select name="InputEntity2" class="form-control form-control-sm">
+    </select>
+    </div>
+    </div>
+    <div id="pselection1">
+    <label>$zoo._("Type:")</label>
+    <select name="drawFeatureType" class="form-control form-control-sm" onchange="\$(this).val()=='Layer'?\$('.require-layer').show():\$('.require-layer').hide();">
+      <option value="Point">$zoo._("Point")</option>
+      <option value=Box>$zoo._("Rectangle")</option>
+      <option value="Polygon">$zoo._("Polygon")</option>
+      <option value="Circle">$zoo._("Circle")</option>
+      <option value="Layer">$zoo._("Layer")</option>
+    </select>
+    <div class="require-layer">
+    <select name="InputEntity2" class="form-control form-control-sm">
+    </select>
+    </div>
+    <div class="require-add">
+    <label>$zoo._("Add to the following layer:")</label>
+    <select name="InputEntity3" class="form-control form-control-sm">
+    </select>
+    </div>
+    </div>
+    <div id="pcreategrid">
+    <label>$zoo._("Grid length")</label>
+    <input type="text" name="len" class="form-control form-control-sm" value="100" />
+    <input type="text" style="display: none" name="id" data-transmission="force" class="form-control form-control-sm" value="100" />
+    <input type="text" style="display: none" name="extent" data-transmission="force" class="form-control form-control-sm" value="100" />
+    </div>
     <div id="pbuffer">
     <label>$zoo._("Length")</label>
     <input type="hidden" name="param1" value="InputPolygon" />
     <input type="text" name="BufferDistance1" data-type="noTransmited" onkeypress="\$(this).next().val(eval(\$(this).val())/(11119.487428468118));" class="form-control form-control-sm" />
     <input type="text" name="BufferDistance" style="display:none" data-type="float" data-transmission="force" class="form-control form-control-sm" />
+    </div>
+    <div id="pfusionintersects">
+    <label>$zoo._("Layer")</label>
+    <input type="hidden" name="param1" value="InputEntity1" />
+    <select name="InputEntity2" class="form-control form-control-sm">
+    </select>
     </div>
     <div id="punion">
     <label>$zoo._("Layer")</label>
@@ -293,13 +362,41 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
     <select name="InputEntity2" class="form-control form-control-sm">
     </select>
     </div>
-    <button mm-action="processLayer" class="btn btn-default require-select" ><i class="fa fa-gear"></i> $zoo._("Run")</button>
+    
+    <label>$zoo._("Use original extent")</label>
+    <input type="checkbox" name="fixExtent" class="form-control" />
+    
+    <button mm-action="processLayer" class="btn btn-default" ><i class="fa fa-gear"></i> $zoo._("Run")</button>
+    <div class="progress" style="width: 80%;position:absolute;right: 0px;margin-top: 5px;display:none;">
+      <div class="progress-bar progress-bar-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
     </div>
-    <div role="tabpanel" class="tab-pane" id="union">
+
     </div>
-    <div role="tabpanel" class="tab-pane" id="settings">
+    <div role="tabpanel" class="tab-pane" id="sql">
+     <div class="col-sm-12">
+      <p>$zoo._("Create a new layer or a report by running a SQL query on the features from the selected layer")</p>
+      <p>$zoo._('You can  use the SQLite dialect supported by GDAL <a target="_blank" href="http://www.gdal.org/ogr_sql_sqlite.html"><i class="fa fa-question"></i></a>.')</p> 
+     </div>
+     <div class="col-sm-12">
+      <label>$zoo._("Create a new layer")</label>
+      <input type="checkbox"  />
+     </div>
+     <div class="col-sm-12">
+      <input id="sqlQueryTid" type="hidden" value="$tableId" />
+      <select id="sqlQueryIdentifiers" class="form-control">
+       <option value="-1">$zoo._("Choose")</option>
+      </select>
+     </div>
+     <div class="col-sm-12">
+      <textarea id="sqlQuery" class="form-control" placeholder="$zoo._("SQL Query")"></textarea>
+     </div>
+     <button mm-action="queryLayer" class="btn btn-default" ><i class="fa fa-gear"></i> $zoo._("Execute")</button>
+     <div id="queryLayerResult">
+     </div>
+    </div>
+<!--    <div role="tabpanel" class="tab-pane" id="settings">
     <button mm-action="createGrid" class="btn btn-default require-select" ><i class="fa fa-gear"></i> $zoo._("Compute grid for extent")</button>
-    </div>
+    </div>-->
   </div>
 
 </div>
@@ -307,6 +404,37 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
 	  </div>
      </div>
        </div>
+<script type="template/txt" id="processLayer_template">
+        <div class="alert alert-dismissible">
+	  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+	  <div class="input-group mb-3">
+  	    <div class="input-group-addon">
+	      <span class="input-group-text" id="basic-addon1"><i class="fa fa-gear"></i> [_N_]</span>
+  	    </div>
+  	    <input type="text" name="processLayer_[_N_]" class="form-control" value="[_V_]" aria-label="Process Name" aria-describedby="basic-addon1" disabled>
+	  </div>
+          <div class="progress" style="width: 80%;margin-top: 5px;display:none;">
+            <div class="progress-bar progress-bar-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+          </div>
+	  <div class="process_info">
+	  </div>
+	  <div class="process_detailed_info">
+	    <div class="col-sm-4">
+	      $zoo._("Layer") [L1]
+	    </div>
+	    <div class="col-sm-4">
+	      $zoo._("Service") [S]
+	    </div>
+	    <div class="col-sm-4">
+	      $zoo._("Layer") [L2]
+	    </div>
+	    <!--
+	    [_P_]
+	    -->
+	  </div>
+	</div>
+</script>
+
 
 #end if
 
@@ -352,6 +480,9 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
          $ftmpl.printButton({"id":"runPrint","name":'<i class="fa fa-print fa-fw"></i><i class="fa fa-spinner fa-spin" style="display:none"></i> '+$zoo._("Run")})
 	 $ftmpl.printHidden({"rid":"edition_tuple_id","id":"edit_tuple_id","name":"edition_tuple_id","value":"-1"})
 	 $ftmpl.printHidden({"rid":"edition_report_id","id":"edit_report_id","name":"edition_report_id","value":$rvals[i][0]})
+        <div class="progress" style="width: 80%;margin-top: 5px;display:none;">
+         <div class="progress-bar progress-bar-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+        </div>
        </div>
        <div class="report_display" >
        </div>
@@ -375,8 +506,11 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
 </script>
 #end for
 
+
 #for i in range(len($vals))
+#* History *#
 #if $vals[i][2]==-10
+#try
      <div id="$(prefix)edit0_$(vals[i][0])" role="tabpanel" class="tab-pane" >
 #set req="SELECT distinct mm_tables.p_views.id from mm_tables.p_views,mm_tables.p_tables where mm_tables.p_views.ptid=mm_tables.p_tables.id AND mm_tables.p_tables.name='mm_ghosts."+$table.replace(".","_")+"' and mm_tables.p_views.id in (SELECT mm_tables.p_views.id from mm_tables.p_views,mm_tables.p_view_groups where mm_tables.p_views.id=mm_tables.p_view_groups.vid and mm_tables.p_views.id=mm_tables.p_view_groups.vid and gid in (select id_group from mm.users,mm.user_group where mm.users.id=mm.user_group.id_user and mm.users.id="+$conf["senv"]["id"]+" )  )"
 #set tmp=$cur.execute($req)
@@ -392,6 +526,16 @@ $preTitle
 $content
 
 #set inputs0={"id":{"value":str($vals[i][0])},"isHistory":{"value":"true"}}
+#except Exception,e
+ERROR 
+$e
+#set inputs0={"id":{"value":str($vals[i][0])},"isHistory":{"value":"true"}}
+#end try
+#else
+
+#if $vals[i][2]==-3
+     <div id="$(prefix)edit_$(vals[i][0])" role="tabpanel" class="tab-pane" >
+#set inputs0={"id":{"value":str($vals[i][0])},"isImport":{"value":"true"}}
 #else
 #if $vals[i][2]==-2
      <div id="$(prefix)edit0_$(vals[i][0])" role="tabpanel" class="tab-pane" >
@@ -401,6 +545,9 @@ $content
 #set inputs0={"id":{"value":str($vals[i][0])}}
 #end if
 #end if
+
+#end if
+
 $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmpl",searchList={"conf": $conf,"inputs": $inputs0,"cur":$cur,"con":$con,"cid":12,"cLevel":$cLevel}))
 
 #if $vals[i][2]==-10
@@ -418,7 +565,8 @@ $ftmpl.printHidden({"rid":"edition_tuple_id","id":"edit_tuple_id","name":"editio
 #set res=$cur.execute($req)
 #set vals1=$cur.fetchall()
 
-<ul class="nav nav-tabs">
+
+<ul class="nav nav-tabs" #if len($vals1)==1#style="display:none"#end if#>
 #for i in range(len($vals1))
 #set classes="require-"+$prefix+"select"
 #if i+1==len($vals1)
@@ -459,7 +607,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 #set contents=[]
 #for i in range(len($vals))
 #if $vals[i][3]
-	<th style="width:25px">$vals[i][1].title()</th>
+	<th style="width:25px">$vals[i][1]</th>
 #set $values+=[$vals[i][2]]
 #set contents+=['']
 #end if
@@ -502,6 +650,8 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
     </tbody>
   </table>
 
+<input type="hidden" name="$(prefix)mainTableOrder" value="$classifier" />
+
      </div>
 </div>
 
@@ -525,7 +675,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
        	  {
 		"mData": "$vals[i][7]",
 	  	"sNname": "$vals[i][7]",
-	  	"sTitle": "$(vals[i][1].title())",
+	  	"sTitle": "$(vals[i][1])",
 	  	"sWidth": "$vals[i][6]"
 	  },
 #end for
@@ -563,4 +713,73 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 $contents[i]
 </script>
 #end for
+
+<script type="text/template" id="template_layerQuery_display">
+<div id="my-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                 <h4 class="modal-title">$zoo._("Query result")</h4>
+            </div>
+            <div class="modal-body">
+	      <ul class="nav nav-tabs" id="myTab" role="tablist">
+  	        <li class="nav-item">
+    		  <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">$zoo._("Table")</a>
+  		</li>
+  		<li class="nav-item">
+    		  <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">$zoo._("Graph")</a>
+  		</li>
+	      </ul>
+              <div class="tab-content" id="myTabContent">
+	        <div class="tab-pane fade active" id="home" role="tabpanel" aria-labelledby="home-tab">CONTENT</div>
+		<div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+		 <div id="layerQueryParameters">
+		   <div class="col-sm-3">
+		    $zoo._("Title:")
+		   </div>
+		   <div class="col-sm-9">
+		   <input id="queryLayerDiagramTitle" class="form-control" type="text" placeholder="Title" />
+		   </div>
+		   <div class="col-sm-3">
+		    $zoo._("Type:")
+		   </div>
+		   <div class="col-sm-9">
+		   <select id="queryLayerDiagramType" class="form-control">
+		    <option value="column">$zoo._("Column")</option>
+		    <option value="bar">$zoo._("Bar")</option>
+		    <option value="pie">$zoo._("Pie")</option>
+		   </select>
+		   </div>
+		   <div class="col-sm-1">
+		    $zoo._("X:")
+		   </div>
+		   <div class="col-sm-3">
+		   <select id="queryLayerDiagramX" class="form-control"/>
+		   </div>
+		   <div class="col-sm-1">
+		    $zoo._("Y:")
+		   </div>
+		   <div class="col-sm-3">
+		   <select id="queryLayerDiagramY" class="form-control"/>
+		   </div>
+		   <div class="col-sm-3">
+		     <button type="button" class="btn btn-default">$zoo._("Apply")</button>
+		   </div>
+		 </div>
+		 <div id="layerQueryDiagram" style="width:550px"></div>
+		</div>
+	      </div>	      
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">$zoo._("Close")</button>
+                <button type="button" class="btn btn-primary">$zoo._("Save changes")</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+</script>
 

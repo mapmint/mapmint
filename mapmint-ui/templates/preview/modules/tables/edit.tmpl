@@ -10,11 +10,11 @@
 #end try
 #end try
 
-#*
 #try
 #set csenv=int($conf["senv"]["embedded_cnt"])
 #set c=$conf["senv"]
-#set $c["embedded_cnt"]=$embeddedNb+1
+#set $c["embedded_cnt"]=str($csenv+1+int($inputs["id"]["value"]))
+#set embeddedNb=int($c["embedded_cnt"])
 #except
 #try
 #set c=$conf["senv"]
@@ -23,8 +23,7 @@
 #set embeddedNb=1
 #end try
 #end try
-<h2>EBNB $embeddedNb</h2>
-*#
+<!-- EBNB $embeddedNb -->
 
 
 #set alreadyDisplayed={}
@@ -39,6 +38,13 @@
 #set isH=False
 #end if
 
+#if $inputs.keys().count("isImport") and $inputs["isImport"]["value"]=="true"
+#set isImport=True
+#else
+#set isImport=False
+#end if
+
+
 #set req="SELECT distinct mm_tables.p_editions.name,mm_tables.p_editions.step,mm_tables.p_editions.ptid,mm_tables.p_editions.id,mm_tables.p_editions.description FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm.groups.id in (SELECT mm.groups.id from mm.groups,mm.user_group where mm.groups.id=mm.user_group.id_group and mm.user_group.id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.id="+$inputs["id"]["value"]
 #set res=$cur.execute($req)
 #set vals=$cur.fetchone()
@@ -52,7 +58,84 @@
 
 <div id="mm_table_editor_form">
 <div class="table_description">
+#if $vals[4] is not None and $vals[4].count('(_')>0 and $vals[4].count('_)')>0
+#if $step==-1
+#set isOptional=True
+#else
+#set isOptional=False
+#end if
+
+
+#set step=$vals[1]
+
+#set description=$vals[4]
+
+#set req="SELECT mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,mm_tables.p_edition_fields.alias,mm_tables.p_edition_fields.value,mm_tables.p_edition_fields.edition,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.dependencies FROM mm_tables.p_editions,mm_tables.p_edition_fields where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm_tables.p_editions.id="+$inputs["id"]["value"]
+#set res=$cur.execute($req)
+#set vals=$cur.fetchall()
+
+#set req="select code from mm_tables.ftypes where ftype='e' order by id asc;"
+#set res=$cur.execute($req)
+#set codes=$cur.fetchall()
+
+#try
+#for i in range(len($vals))
+#if $alreadyDisplayed.keys().count($vals[i][1])==0
+#set ctype=$vals[i][5]
+#if $description.count("(_"+$vals[i][1]+"_)")>0
+#set $alreadyDisplayed[$vals[i][1]]=True
+#end if
+<!--
+LOG
+$ctype
+$vals[i][1]
+-->
+
+#if ctype=="ref" 
+#*
+ In case it is a select list
+*#
+#set res1=$cur.execute($vals[i][3])
+#try
+#set vals1=$cur.fetchall()
+#set options=[]
+#for j in range(len(vals1))
+#set $options+=[vals1[j]]
+#end for
+#except Exception,e
+#set options=[["-1",$zoo._("No element")]]
+#end try
+#set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"select","options":$options,"optional":$isOptional})
+#else
+#if ctype=="date" or ctype=="datetime" or ctype=="float"
+#*
+ In case it is a date
+*#
+#set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+#else
+#*
+ In case it HTML
+*#
+#if $ctype=="html"
+#set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+#else
+#set tmpDisplay=$ftmpl.printEmbeddedLine({"noline":True,"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"optional":$isOptional})
+#end if
+#end if
+#end if
+#end if
+
+
+#set $description=$description.replace("(_"+$vals[i][1]+"_)",tmpDisplay)
+#end for
+#except Exception, e
+<h2>$e</h2>
+#end try
+<!-- MM Edition template -->
+$description
+#else
 $vals[4]
+#end if
 </div>
 #if not($isH)
 
@@ -78,7 +161,18 @@ $vals[4]
 #set res=$cur.execute($req)
 #set codes=$cur.fetchall()
 
+#if $isImport
+ <input type="hidden" name="columnNames" value ="#for i in range(len($vals))#$vals[i][2]#if i+1<len($vals)#,#end if##end for#" />
+ <ul class="list-inline inline">
+  <li>$zoo._("Column names:")</li>
+#end if
 #for i in range(len($vals))
+#if $isImport
+ <li>$vals[i][2]</li>
+#if $i+1 == len($vals)
+ </ul>
+#end if
+#else
 #if $alreadyDisplayed.keys().count($vals[i][1])==0
 #*$alreadyDisplayed.keys().count($vals[i][1])
 #while $alreadyDisplayed.keys().count($vals[i][1])>0
@@ -105,7 +199,48 @@ $ftmpl.printHiddenContent({"rid":"runFirst_"+str($vals[i][1]),"id":"edit_"+str($
  $ctype=="geometry" 
  *#
 #if $ctype=="geometry"
+#set tmpReq="select name from mm_tables.p_tables where id="+str($tblId)
+#set res0=$cur.execute($tmpReq)
+#set tmpVals=$cur.fetchone()
+#set schemaTable=$tmpVals[0].split(".")
+
+#set tmpReq="SELECT type from geometry_columns where f_table_schema='"+$schemaTable[0]+"' and f_table_name='"+$schemaTable[1]+"'"
+#set res0=$cur.execute($tmpReq)
+#set toto=$cur.fetchone()
+#if $toto[0]=='POINT'
 $ftmpl.printCoordInput({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+#else
+$ftmpl.printHidden({"rid":"edit_"+str($vals[i][0])+"_geotype","id":"edit_"+str($vals[i][0])+"_geotype","name":$vals[i][2],"value":$toto[0],"optional":$isOptional})
+
+#set options=[["layer",$zoo._("Use an existing geometry")],["draw",$zoo._("Draw a geometry on map")]]
+
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1])+"_mmtype","id":"edit_"+str($vals[i][0])+"_mmtype","name":$vals[i][2]+'<input type="checkbox" name="edit_'+str($vals[i][0])+'_mmcheck" onchange="console.log($(this).prop(\'checked\'));if($(this).prop(\'checked\')){$(this).parent().next().find(\'select\').change();$(this).parent().next().show();$(this).parent().parent().next().show();}else{$(this).parent().next().hide();$(this).parent().parent().next().hide();}" />',"type":"select","options":$options,"optional":$isOptional})
+
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1])+"_mmlayer","id":"edit_"+str($vals[i][0])+"_mmlayer","name":"","type":"select","options":[[-1,$zoo._("Please first create feature.")]],"optional":$isOptional})
+
+<script name="edition_$(vals[i][1])" type="application/javascript" id="geometryField_runFirst">
+try{
+  console.log("geometryFields",geometryFields);
+}catch(e){
+  geometryFields=[];
+}
+if(geometryFields.indexOf("edit_$vals[i][0]")<0)
+geometryFields.push("edit_$vals[i][0]");
+console.log("***************** GEOMETRY *****************");
+try{
+  \$("#edit_$(vals[i][0])_type").off("change");
+  \$("#edit_$(vals[i][0])_type").change(function(){
+    console.log("CHANGE TO DRAW ?");
+  });
+}catch(e){
+  console.log();
+}
+console.log("***************** GEOMETRY *****************");
+</script>
+
+#end if
+
+
 #else
 #*
  In case it is a long text content
@@ -148,7 +283,6 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
 #*
  In case it is a select list
 *#
-#set req0=str($vals[i][3])
 #set res1=$cur.execute($vals[i][3])
 #try
 #set vals1=$cur.fetchall()
@@ -179,7 +313,23 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
 #set lvals=$cur.fetchone()
 #try
 #set toto=$ftmpl.printBasicCheckbox()
+
+#try
+#set csenv=int($conf["senv"]["embedded_cnt"])
+#set c=$conf["senv"]
+#set $c["embedded_cnt"]=str($csenv+1)
+#set embeddedNb=int($c["embedded_cnt"])
+#except
+#try
+#set c=$conf["senv"]
+#set $c["embedded_cnt"]=1
+#except
+#set embeddedNb=1
+#end try
+#end try
+
 #set content=Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"qComponents":[str(lvals[0])],"embedded":$embeddedNb,"con":$con,"rLevel":$cLevel+1})
+
 #set $embeddedNb+=1
 #except Exception,e
 <div class="alert alert-danger">$e</div>
@@ -260,10 +410,15 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
 #end try
 <!-- $vals[i] -->
 #else
+#if ctype=="varchar(32)"
+#* Password *#
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"optional":True,"isPassword":True,"type":"password"})
+#else
 #*
  In other cases
 *#
 $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"optional":$isOptional})
+#end if
 #end if
 #end if
 #end if
@@ -321,7 +476,10 @@ $e
 #end try
 
 #end if
+
+#end if
 #end for
+
 
 #end if
 
@@ -333,7 +491,35 @@ $ftmpl.printHidden({"rid":"edition_uid","id":"edit_uid","name":"edit_uidName","v
 #if $step==-2
 $ftmpl.printButton({"id":"delete","name":$zoo._("Delete")})
 #else
-#if $step!=-10
+
+#if $step==-3
+
+$ftmpl.printLine({"rid":"import_mmlayer","id":"edit_"+str($editId)+"_mmlayer","name":$zoo._("Layer"),"type":"select","options":[[-1,$zoo._("Please first create feature.")]],"optional":$isOptional})
+
+<script name="edition_$(editId)" type="application/javascript" id="geometryField_runFirst">
+try{
+  console.log("geometryFields",geometryFields);
+}catch(e){
+  geometryFields=[];
+}
+if(geometryFields.indexOf("edit_$editId")<0)
+geometryFields.push("edit_$editId");
+console.log("***************** GEOMETRY *****************");
+try{
+  \$("#edit_$(vals[i][0])_type").off("change");
+  \$("#edit_$(vals[i][0])_type").change(function(){
+    console.log("CHANGE TO DRAW ?");
+  });
+}catch(e){
+  console.log();
+}
+console.log("***************** GEOMETRY *****************");
+</script>
+
+$ftmpl.printButton({"id":"import1","name":$zoo._("Import")})
+#end if
+
+#if $step!=-10 and $step!=-3 
 
 #set opts=[$zoo._("OR"),$zoo._("AND")]
 $ftmpl.printLine({"rid":"edition_linkClause","id":"edit_linkClause","name":$zoo._("Link clauses with"),"value":$vals[i][3],"optional":False,"type":"select","options":opts})
@@ -361,7 +547,7 @@ $ftmpl.printButton({"id":"save","name":$zoo._("Save")})
 $ftmpl.printHidden({"rid":"edition_table_id","id":"edit_table_id","name":"table_id","value":$tblId})
 $ftmpl.printHidden({"rid":"edition_edition_id","id":"edit_edition_id","name":"edition_id","value":$editId})
 
-#if $inputs.keys().count("isReference")>0 and $inputs["isReference"]["value"]=="true"
+#if ($inputs.keys().count("isReference")>0 and $inputs["isReference"]["value"]=="true") or $isImport
 $ftmpl.printHidden({"rid":"edition_tuple_id","id":"edit_tuple_id","name":"table_id","value":"-1"})
 #end if
 

@@ -21,9 +21,15 @@ define([
 
     function react(obj){
 	console.log($(obj).parent());
+	console.log($(obj).parent().parent().parent());
+	var myRoot=null;
+	if($(obj).parent().is("form"))
+	    myRoot=$(obj).parent();
+	else
+	    myRoot=$(obj).parent().parent().parent();
 	var serviceName=$(obj).data("service");
 	var params=[];
-	$(obj).parent().find("input").each(function(){
+	myRoot.find("input").each(function(){
 	    console.log($(this).attr("type"));
 	    if($(this).attr("type")!="submit"){
 		if($(this).attr("type")=="checkbox"){

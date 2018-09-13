@@ -92,7 +92,7 @@ href="https://cdn.datatables.net/r/dt/dt-1.10.8,b-1.0.0,b-colvis-1.0.0,cr-1.2.0,
    <div class="btn-group" role="group" aria-label="...">
       <button href="#" class="btn btn-default table-toggle grey require-select" title="$zoo._("Zoom to selected elements")" rel="tooltip" href="#" data-toggle="zoomToElement"> <i class="icon-search"></i></button>
       <div class="btn-group dropdown">
-      <button href="#" class="btn btn-default table-toggle grey require-select" title="Export" rel="tooltip" href="#" data-toggle="dropdown" data-mapaction="export" "> <i class="fa fa-share"></i></button>
+      <button href="#" class="btn btn-default table-toggle grey require-select" title="Export" rel="tooltip" href="#" data-toggle="dropdown" data-mapaction="export" > <i class="fa fa-share"></i></button>
       <ul id="exportFormats" class="dropdown-menu pull-right padd">
       <li>
        	 <form id="formLExport"> 
@@ -381,6 +381,8 @@ $(printWrapper())
    </div>
   </div>
  </script>
+
+#include($conf["main"]["templatesPath"]+"/preview/modules/style/templates.html")
 
 #if $inputs.keys().count("filter")>0
 <input type="hidden" name="mmIniFilter" value="$inputs["filter"]["value"]" />

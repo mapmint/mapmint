@@ -116,15 +116,27 @@ def checkDataSourcePriv(conf,m,dst,ds,priv):
         import mapscript
         import datastores.service as dss
         path=dss.getPath(conf,dst)
-        m=mapscript.mapObj(path+"ds_ows.map")
+        try:
+            m=mapscript.mapObj(path+"ds_ows.map")
+        except Exception, e:
+            conf["lenv"]["message"]=zoo._("Unalbe to open the map ")+str(e)
+            return False
     if priv.count("w")==0:
-        if checkDataStorePriv(conf,dst,"rx"):
-            return checkLayerPriv(conf,m,ds,priv)
-        else:
+        try:
+            if checkDataStorePriv(conf,dst,"rx"):
+                return checkLayerPriv(conf,m,ds,priv)
+            else:
+                return False
+        except Exception, e:
+            conf["lenv"]["message"]=zoo._("Unalbe to check datastore privileges ")+str(e)
             return False
     else:
-        if checkDataStorePriv(conf,dst,"rwx"):
-            return checkLayerPriv(conf,m,ds,priv)
-        else:
+        try:
+            if checkDataStorePriv(conf,dst,"rwx"):
+                return checkLayerPriv(conf,m,ds,priv)
+            else:
+                return False
+        except Exception, e:
+            conf["lenv"]["message"]=zoo._("Unalbe to check datastore privileges ")+str(e)
             return False
         

@@ -20,6 +20,7 @@ define([
 	"tl": "timeline"
     };
 
+    var llcnt=0;
 
     var _x2js = new X2JS({
         arrayAccessFormPaths: [
@@ -37,14 +38,99 @@ define([
 
     var datasources={};
     var zoo=null;
+    var map=null;
+    var myBaseLayers=null;
+    var moduleO=null;
     var sort={"type":"none","field":"none"};
 
     var initialize=function(){
 	if(arguments[0]){
 	    zoo=arguments[0];
 	}
+	if(arguments[1]){
+	    map=arguments[1];
+	}
+	if(arguments[2]){
+	    myBaseLayers=arguments[2];
+	}
+	if(arguments[3]){
+	    moduleO=arguments[3];
+	    console.log(moduleO);
+	    console.log(moduleO.config());
+	}
     }
 
+    function defineMap(lMap){
+	map=lMap;
+    }
+    function defineBaseLayers(lBL){
+	myBaseLayers=lBL;
+    }
+    
+    function getLayerIndexByName(layer){
+	var lindex=myBaseLayers.length;
+	var hasValue=-1;
+	for(var i in oLayers){
+	    console.log(layer+" "+i);
+	    if(i==layer){
+		console.log(oLayers[i]);
+		if(oLayers[i].data && oLayers[i].data.index)
+		    return oLayers[i].data.index;
+		hasValue=1;
+		break;
+	    }
+	    lindex+=1;
+	}
+	if(hasValue>0)
+	    return lindex;
+	else
+	    return -1;
+    }
+    
+    function redrawLayer(layer,url,opts,itemIndex){
+	var lindex=getLayerIndexByName(layer);
+	console.log(layer);
+	console.log(lindex);
+	var iId=(itemIndex?itemIndex:0);
+	var params={time_: (new Date()).getTime()};
+	if(opts)
+	    for(var a in opts)
+		params[a]=opts[a];
+	console.log(params);
+	try{
+	    map.getLayers().item(lindex).getSource().updateParams(params);
+	}catch(e){
+	    try{
+		map.getLayers().item(lindex).getLayers().item(iId).getSource().updateParams(params);
+	    }catch(e){
+		console.log("Unable to update layer params.");
+	    }
+	}
+	if(url){
+	    try{
+		map.getLayers().item(lindex).getSource().setUrl(url);
+	    }catch(e){
+		try{
+		    map.getLayers().item(lindex).getLayers().item(iId).getSource().setUrl(url);
+		}catch(e){
+		    console.log("Unable to update layer url.");
+		}
+	    }
+	}
+	try{
+	    map.getLayers().item(lindex).getSource().changed();
+	}catch(e){
+	    try{
+		map.getLayers().item(lindex).getLayers().item(iId).getSource().changed();
+	    }catch(e){
+		console.log("Unable to change layer source.");
+	    }
+	}
+	map.render();
+	console.log("Layer should be refreshed.");
+	map.updateSize();
+    }
+    
     function displayVector(data,param,dsid,datasource,rdatasource,sfunc,efunc){
 	console.log(data);
 	var ldatasource=datasource.replace(/\./g,"_");
@@ -122,7 +208,7 @@ define([
 		    identifier: "vector-tools.mmExtractVectorInfo",
 		    dataInputs: [
 			{"identifier":"dataSource","value":param,"dataType":"string"},
-			{"identifier":"layer","value":rdatasource,"dataType":"string"},
+			{"identifier":"layer","value":rdatasource,"mimeType":"application/json"},
 			{"identifier":"getFeatures","value":"true","dataType":"boolean"},
 			{"identifier":"page","value":(llimit[0]/llimit[1])+1,"dataType":"integer"},
 			{"identifier":"limit","value":llimit[1],"dataType":"integer"},
@@ -204,7 +290,12 @@ define([
 	    ],
 	    success: function(data){
 		console.log("SUCCESS");
-		var ldata=JSON.parse(data);
+		var ldata=null;
+		try {
+		    ldata=JSON.parse(data);
+		}catch(e){
+		    ldata=data;
+		}
 		var myRootLocation=$("#mm_layer_property_style_display");
 		lfunction(ldata);
 	    },
@@ -333,6 +424,108 @@ define([
 	    ],
 	    rowId: 3
 	});
+
+	$(".class-switcher").off('change');
+	$(".class-switcher").change(function(){
+	    console.log(".class-switcher CHANGE ! "+llcnt);
+	    llcnt+=1;
+	    var myRootLocation=$(this).parent().parent().parent();
+	    var index=0;
+	    var hasElement=true;
+	    var closure=$(this);
+	    myRootLocation.find('.class-switcher').each(function(){
+		if(closure[0]==$(this)[0]){
+		    hasElement=false;
+		}
+		else
+		    if(hasElement)
+			index+=1;
+	    });
+	    var scnt=0;
+	    $(this).find('option').each(function(){
+		if(!$(this).is(':selected'))
+		    myRootLocation.find('.no-'+$(this).attr('value')).show();
+		scnt+=1;
+	    });
+	    $(this).find('option:selected').each(function(){
+		myRootLocation.find('.no-'+$(this).attr('value')).hide();
+	    });
+	    console.log(index);
+	    if(index>0){
+		console.log(" INDEX "+index+" SCNT "+scnt);
+		myRootLocation.find(".require-tl").show();
+	    }
+	    if($(this).val()!="tl")
+		myRootLocation.find('.require-tl').hide();
+	    if($(this).val()!="tc")
+		myRootLocation.find('.require-tc').hide();
+	    if($("select[name=classification]").val()=="tc"){
+		myRootLocation.find('.require-tc').show();
+	    }else{
+		if($("select[name=classification]").val()=="tl")
+		    myRootLocation.find(".require-tl").show();
+	    }
+	    if(scnt==4){
+		console.log($('select[name="classification"]').val());
+		if($("select[name=classification]").val()=="tc"){
+		    myRootLocation.find('.require-tc').show();
+		}else{
+		    myRootLocation.find(".require-tl").show();
+		}
+	    }else{
+	    }
+	    if(ldata.type!=3)
+		myRootLocation.find(".require-raster").hide();
+	    myRootLocation.find(".require-add-step").hide();
+
+	    console.log(myRootLocation.find("input[name=minBandValue]").is(":visible"));
+	    console.log(myRootLocation.find("select[name=classification]").val());
+	    if(myRootLocation.find("select[name=classification]").val()!="us" )
+		$("#classify_progress").show();
+	    else
+		$("#classify_progress").hide();
+	});
+
+	$.ajax({
+	    url: msUrl+"?map="+($("#save-map").val().indexOf(dataPath)<0?(dataPath+"/maps/project_"+$("#save-map").val()+".map"):$("#save-map").val())+"&service=WFS&version=1.0.0&request=DescribeFeatureType&typename="+layer+"&_="+Date(),
+	    success: function(){
+		var obj=_x2js.xml_str2json( arguments[2].responseText );
+		$("#manaLayerProperties").find('select.mmField').html("");
+		$("#manaLayerProperties").find('input[type="checkbox"]').each(function(){
+		    $(this).prop("checked",false).change();
+		});
+		if(obj.schema && obj.schema.complexType){
+		    var ldata=obj.schema.complexType.complexContent.extension.sequence.element;
+		    if(oLayers[layer])
+			oLayers[layer]["queryParams"]={
+			    fields: [],
+			    aliases: [],
+			    sizes: []
+			};
+		    var lcnt=0;
+		    $('select.mmField').each(function(){
+			for(i in ldata){
+			    if(ldata[i]["_name"]!="msGeometry"){
+				if(lcnt==0 && oLayers[layer]){
+				    oLayers[layer]["queryParams"].fields.push(ldata[i]["_name"]);
+				    oLayers[layer]["queryParams"].aliases.push(ldata[i]["_name"]);
+				    oLayers[layer]["queryParams"].sizes.push(100);
+				}
+				$(this).append('<option value="'+ldata[i]["_name"]+'">'+ldata[i]["_name"]+'</option>');
+			    }
+			}
+			lcnt+=1;
+		    });
+		}
+	    },
+	    error: function(data){
+		console.log("ERROR");
+		$(".notifications").notify({
+		    message: { text: ldata["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+		    type: 'danger',
+		}).show();
+	    }
+	});	
 	//(function(ldata){
 	$('#classes tbody tr').on('click', function () {
 	    console.log($(this));
@@ -462,166 +655,172 @@ define([
 		
 		tr.addClass('shown');
 		rootLocation.find(".cpicker").each(function(){
+		    console.log($(this));
 		    $(this).colorpicker({format: "hex",input: $(this).find("input[type=text]")});
+		    console.log($(this).colorpicker);
 		});
 		rootLocation.find("button").last().click(function(e){
 		    try{
-		    var elem=$(this);
-		    var params=[];
-		    var edisabled=[];
-		    elem.parent().parent().find("input[type=hidden]").each(function(){
-			if($(this).parent().is(":visible"))
-			    params.push({"id":$(this).attr('name'),"value": $(this).val()});
-		    });
-		    elem.parent().parent().find("input[type=text],textarea").each(function(){
-			if($(this).is(":visible") && $(this).is(":disabled"))
-			    edisabled.push($(this).attr('name'));
-			if($(this).is(":visible") && !$(this).is(":disabled"))
-			    params.push({"id":$(this).attr('name'),"value": $(this).val().replace(/\#/g,"")});
-		    });
-		    var cId=elem.parent().parent().parent().parent().prev().attr("id");
-		    var tmp=cId.split("_");
-		    var index=tmp[tmp.length-1];
-		    var reg=new RegExp("_"+index,"g");
-		    var cLayer=cId.replace(reg,"");
-		    console.log(cLayer);
-		    console.log(index);
-		    console.log(params);
-		    var ibindings={
-			"className": "mmClassName",
-			"fillColorValue": "mmFill",
-			"strokeColorValue": "mmStroke",
-			"classOutlineWidth": "mmStrokeWidth",
-			"classWidth": "mmWidth",
-			"classPattern": "pattern",
-			"classExpression0": "mmExpr",
-			"classSymbol": "mmSymb",
-			"classSize": "mmSize",
-			"hatchAngle": "mmAngle",
-			"hatchSize": "mmSize",
-			"hatchWidth": "mmHatchWidth",
-			"symbSymbol": "mmSymbolFill",
-			"symbFillColorValue": "mmSymbolFillColor",
-			"symbStrokeColorValue": "mmSymbolStrokeColor",
-			"symbSize": "mmSymbolSize",
-			"symbWidth": "mmSymbolWidth",
-			"symbGap": "mmSymbolGap"							    
-		    };
-		    var inputs=[];
-		    for(var i in ibindings){
-			for(var j in params){
-			    if(params[j].id==i){
+			var elem=$(this);
+			var params=[];
+			var edisabled=[];
+			elem.parent().parent().find("input[type=hidden]").each(function(){
+			    if($(this).parent().is(":visible"))
+				params.push({"id":$(this).attr('name'),"value": $(this).val()});
+			});
+			elem.parent().parent().find("input[type=text],textarea").each(function(){
+			    if($(this).is(":visible") && $(this).is(":disabled"))
+				edisabled.push($(this).attr('name'));
+			    if($(this).is(":visible") && !$(this).is(":disabled"))
+				params.push({"id":$(this).attr('name'),"value": $(this).val().replace(/\#/g,"")});
+			});
+			var cId=elem.parent().parent().parent().parent().prev().attr("id");
+			var tmp=cId.split("_");
+			var index=tmp[tmp.length-1];
+			var reg=new RegExp("_"+index,"g");
+			var cLayer=cId.replace(reg,"");
+			console.log(cLayer);
+			console.log(index);
+			console.log(params);
+			var ibindings={
+			    "className": "mmClassName",
+			    "fillColorValue": "mmFill",
+			    "strokeColorValue": "mmStroke",
+			    "classOutlineWidth": "mmStrokeWidth",
+			    "classWidth": "mmWidth",
+			    "classPattern": "pattern",
+			    "classExpression0": "mmExpr",
+			    "classSymbol": "mmSymb",
+			    "classSize": "mmSize",
+			    "hatchAngle": "mmAngle",
+			    "hatchSize": "mmSize",
+			    "hatchWidth": "mmHatchWidth",
+			    "symbSymbol": "mmSymbolFill",
+			    "symbFillColorValue": "mmSymbolFillColor",
+			    "symbStrokeColorValue": "mmSymbolStrokeColor",
+			    "symbSize": "mmSymbolSize",
+			    "symbWidth": "mmSymbolWidth",
+			    "symbGap": "mmSymbolGap"							    
+			};
+			var inputs=[];
+			for(var i in ibindings){
+			    for(var j in params){
+				if(params[j].id==i){
+				    inputs.push({
+					"identifier": ibindings[i],
+					"value": params[j].value,
+					"dataType": "string"
+				    });
+				    break;
+				}
+			    }
+			}
+			for(var i in inputs){
+			    if(inputs[i]["identifier"]=="mmHatchWidth"){
 				inputs.push({
-				    "identifier": ibindings[i],
-				    "value": params[j].value,
+				    "identifier": "mmSymb",
+				    "value": "polygon_hatch",
 				    "dataType": "string"
 				});
 				break;
 			    }
 			}
-		    }
-		    for(var i in inputs){
-			if(inputs[i]["identifier"]=="mmHatchWidth"){
-			    inputs.push({
-				"identifier": "mmSymb",
-				"value": "polygon_hatch",
-				"dataType": "string"
-			    });
-			    break;
-			}
-		    }
 
 			if(lparams){
 			    console.log(lparams);
 			    for(var kk=0;kk<lparams.length;kk++){
 				inputs.push(lparams[kk]);
 			    }
-			}else
+			}
+			if($("#save-map").length)
 			    inputs.push({
 				"identifier": "map",
 				"value": $("#save-map").val(),
 				"dataType": "string"
 			    });
-		    if($("#mm_layer_property_style_display").find("select[name=step_classification]").is(":visible"))
+			if($("#mm_layer_property_style_display").find("select[name=step_classification]").is(":visible"))
+			    inputs.push({
+				"identifier": "mmStep",
+				"value": $("#mm_layer_property_style_display").find("select[name=step]").val(),
+				"dataType": "string"
+			    });
+			
+			var hasStep=$("#mm_layer_property_style_display").find("select[name=step_classification]").is(":visible");
+			var cfield=(hasStep?"step_classification":"classification");
 			inputs.push({
-			    "identifier": "mmStep",
-			    "value": $("#mm_layer_property_style_display").find("select[name=step]").val(),
+			    "identifier": "mmType",
+			    "value": cbindings[$("#mm_layer_property_style_display").find("select[name="+cfield+"]").val()],
 			    "dataType": "string"
 			});
-		
-		    var hasStep=$("#mm_layer_property_style_display").find("select[name=step_classification]").is(":visible");
-		    var cfield=(hasStep?"step_classification":"classification");
-		    inputs.push({
-			"identifier": "mmType",
-			"value": cbindings[$("#mm_layer_property_style_display").find("select[name="+cfield+"]").val()],
-			"dataType": "string"
-		    });
-		    inputs.push({
-			"identifier": "layer",
-			"value": cLayer,
-			"dataType": "string"
-		    });
-		    inputs.push({
-			"identifier": "mmClass",
-			"value": index,
-			"dataType": "integer"
-		    });
-		    inputs.push({
-			"identifier": "mmOpacity",
-			"value": $("#mm_layer_property_style_display").find("input[type=range]").first().val(),
-			"dataType": "integer"
-		    });
-		    if($("#mm_layer_property_style_display").find("select[name="+cfield+"]").val()=="us")
-			inputs.push({"identifier": "force","value": "true","dataType": "boolean"});
-		    
-		    zoo.execute({
-			identifier: "mapfile.saveLayerStyle0",
-			type: "POST",
-			dataInputs: inputs,
-			dataOutputs: [
-			    {"identifier":"Message"},
-			    {"identifier":"Result"},
-			],
-			success: function(data){
-			    console.log("SUCCESS");
-			    console.log(data);
-			    var outputs=data["ExecuteResponse"]["ProcessOutputs"]["Output"];
-			    $(".notifications").notify({
-				message: { text: outputs[0]["Data"]["LiteralData"]["__text"] },
-				type: 'success',
-			    }).show();
-			    ldata.Style.classes[index]=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
-			    /* ici */
-			    if(hasStep){
-				console.log(elem);
-				var originalValue=$("#mm_layer_property_style_display").find("select[name=step]").val();
-				var lmapfile="timeline_"+module.config().pmapfile+"_"+cLayer+"_step"+originalValue+".map";
-				var url=module.config().msUrl+"?map="+module.config().dataPath+"/maps/"+lmapfile;
-				console.log(url);
-				redrawLayer(layer,url);
-				$("#"+cId).find("img").first().attr('src',ldata.Style.classes[index].legend);
-			    }
-			    else
-				redrawLayer(layer);
-			    var tmpVal=$("#"+cId).find("img").first().attr('src');
-			    $("#"+cId).find("img").first().removeAttr("src").attr('src',tmpVal+"&timestamp=" + new Date().getTime());
-			    for(var i in inputs){
-				if(inputs[i]["identifier"]=="mmClassName"){
-				    $("#"+cId).find("img").parent().next().html($("#"+cId).next().find("input[name=className]").val());
-				    break;
+			inputs.push({
+			    "identifier": "layer",
+			    "value": cLayer,
+			    "dataType": "string"
+			});
+			inputs.push({
+			    "identifier": "mmClass",
+			    "value": index,
+			    "dataType": "integer"
+			});
+			inputs.push({
+			    "identifier": "mmOpacity",
+			    "value": $("#mm_layer_property_style_display").find("input[type=range]").first().val(),
+			    "dataType": "integer"
+			});
+			if($("#mm_layer_property_style_display").find("select[name="+cfield+"]").val()=="us")
+			    inputs.push({"identifier": "force","value": "true","dataType": "boolean"});
+			$("button[mm-action='processLayer']").addClass("disabled");
+			zoo.execute({
+			    identifier: "mapfile.saveLayerStyle0",
+			    type: "POST",
+			    dataInputs: inputs,
+			    dataOutputs: [
+				{"identifier":"Message"},
+				{"identifier":"Result"},
+			    ],
+			    success: function(data){
+				console.log("SUCCESS");
+				console.log(data);
+				var outputs=data["ExecuteResponse"]["ProcessOutputs"]["Output"];
+				$(".notifications").notify({
+				    message: { text: outputs[0]["Data"]["LiteralData"]["__text"] },
+				    type: 'success',
+				}).show();
+				ldata.Style.classes[index]=JSON.parse(outputs[1]["Data"]["ComplexData"]["__cdata"]);
+				/* ici */
+				if(hasStep){
+				    console.log(elem);
+				    var originalValue=$("#mm_layer_property_style_display").find("select[name=step]").val();
+				    var lmapfile="timeline_"+module.config().pmapfile+"_"+cLayer+"_step"+originalValue+".map";
+				    var url=module.config().msUrl+"?map="+module.config().dataPath+"/maps/"+lmapfile;
+				    console.log(url);
+				    redrawLayer(($("#save-layer").length>0?$("#save-layer").val():layer),url);
 				}
+				else{
+				    redrawLayer(($("#save-layer").length>0?$("#save-layer").val():layer));
+				}
+				$("#"+cId).find("img").first().attr('src',ldata.Style.classes[index].legend);
+				var tmpVal=$("#"+cId).find("img").first().attr('src');
+				$("#"+cId).find("img").first().removeAttr("src").attr('src',tmpVal+"&timestamp=" + new Date().getTime());
+				for(var i in inputs){
+				    if(inputs[i]["identifier"]=="mmClassName"){
+					$("#"+cId).find("img").parent().next().html($("#"+cId).next().find("input[name=className]").val());
+					break;
+				    }
+				}
+				$("button[mm-action='processLayer']").removeClass("disabled");
+			    },
+			    error: function(data){
+				console.log("ERROR");
+				$(".notifications").notify({
+				    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				    type: 'danger',
+				}).show();
+				$("button[mm-action='processLayer']").prop("disabled",false);
 			    }
-			},
-			error: function(data){
-			    console.log("ERROR");
-			    $(".notifications").notify({
-				message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
-				type: 'danger',
-			    }).show();
-			}
-		    });
-		    
-		    console.log(inputs);
+			});
+			
+			console.log(inputs);
 		    }catch(e){
 			console.log(e);
 		    }
@@ -888,6 +1087,8 @@ define([
     // Return public methods
     return {
         initialize: initialize,
+	defineMap: defineMap,
+	defineBaseLayers: defineBaseLayers,
 	sort: sort,
 	displayVector: displayVector,
 	displayVector: displayVector,

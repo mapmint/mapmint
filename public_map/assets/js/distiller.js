@@ -1729,59 +1729,117 @@ define([
 		$("#tileindex-form").find(".row").last().html($("#add-directory").find(".form-group").last()[0].outerHTML);
 		$("#tileindex-submit").click(function(){
 		    $("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").find(".fa-spin").removeClass('hide');
-		    var params=[
-			{
-			    "identifier": "idir",
-			    "value": dsid,
-			    "dataType": "string"
-			},
-			{
-			    "identifier": "dir",
-			    "value": $("#tileindex-form").find('input[name="browse"]:checked').val()+"/",
-			    "dataType": "string"
-			},
-			{
-			    "identifier": "iname",
-			    "value": $("#tileindex-form").find('input[name="tileindex_name"]').val(),
-			    "dataType": "string"
-			},
-			{
-			    "identifier": "ext",
-			    "value": $("#tileindex-form").find('input[name="filenameExt"]').val(),
-			    "dataType": "string"
-			},
-			{
-			    "identifier": "srs",
-			    "value": $("#tileindex-form").find('input#tileindextprj').val(),
-			    "dataType": "string"
-			},
-		    ];
-		    zoo.execute({
-			identifier: "raster-tools.createTindex",
-			type: "POST",
-			dataInputs: params,
-			dataOutputs: [
-			    {"identifier":"Result","type":"raw"},
-			],
-			success: function(data){
-			    console.log("SUCCESS");
-			    $(".notifications").notify({
-				message: { text: data },
-				type: 'success',
-			    }).show();
-			    $("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").remove();
-			    $("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").find(".fa-spin").addClass('hide');
-			    doCleanup(ldata,param,dsid,dataType,obj);
-			    //loadDatastore(param,dsid,dataType);
-			    //console.log(data);
-			},
-			error: function(data){
-			    $(".notifications").notify({
-				message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
-				type: 'danger',
-			    }).show();
-			}
-		    });		    
+		    if($("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").find("#tileindex_type").val()=="raster"){
+			var params=[
+			    {
+				"identifier": "idir",
+				"value": dsid,
+				"dataType": "string"
+			    },
+			    {
+				"identifier": "dir",
+				"value": $("#tileindex-form").find('input[name="browse"]:checked').val()+"/",
+				"dataType": "string"
+			    },
+			    {
+				"identifier": "iname",
+				"value": $("#tileindex-form").find('input[name="tileindex_name"]').val(),
+				"dataType": "string"
+			    },
+			    {
+				"identifier": "ext",
+				"value": $("#tileindex-form").find('input[name="filenameExt"]').val(),
+				"dataType": "string"
+			    },
+			    {
+				"identifier": "srs",
+				"value": $("#tileindex-form").find('input#tileindextprj').val(),
+				"dataType": "string"
+			    },
+			];
+			zoo.execute({
+			    identifier: "raster-tools.createTindex",
+			    type: "POST",
+			    dataInputs: params,
+			    dataOutputs: [
+				{"identifier":"Result","type":"raw"},
+			    ],
+			    success: function(data){
+				console.log("SUCCESS");
+				$(".notifications").notify({
+				    message: { text: data },
+				    type: 'success',
+				}).show();
+				$("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").remove();
+				$("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").find(".fa-spin").addClass('hide');
+				doCleanup(ldata,param,dsid,dataType,obj);
+				//loadDatastore(param,dsid,dataType);
+				//console.log(data);
+			    },
+			    error: function(data){
+				$(".notifications").notify({
+				    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				    type: 'danger',
+				}).show();
+			    }
+			});
+		    }else{
+			var params=[
+			    {
+				"identifier": "idir",
+				"value": dsid,
+				"dataType": "string"
+			    },
+			    			    {
+				"identifier": "path",
+				"value": $("#tileindex-form").find('input[name="browse"]:checked').val()+"/",
+				"dataType": "string"
+			    },
+			    {
+				"identifier": "OutputName",
+				"value": $("#tileindex-form").find('input[name="tileindex_name"]').val(),
+				"dataType": "string"
+			    },
+			    {
+				"identifier": "ext",
+				"value": $("#tileindex-form").find('input[name="filenameExt"]').val(),
+				"dataType": "string"
+			    },
+			    {
+				"identifier": "srs",
+				"value": $("#tileindex-form").find('input#tileindextprj').val(),
+				"dataType": "string"
+			    },
+			];
+			zoo.execute({
+			    identifier: "vector-tools.createTindex",
+			    type: "POST",
+			    dataInputs: params,
+			    dataOutputs: [
+				{"identifier":"Result","type":"raw"},
+			    ],
+			    success: function(data){
+				console.log("SUCCESS");
+				$(".notifications").notify({
+				    message: { text: data },
+				    type: 'success',
+				}).show();
+				$("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").remove();
+				$("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").find(".fa-spin").addClass('hide');
+				doCleanup(ldata,param,dsid,dataType,obj);
+				//loadDatastore(param,dsid,dataType);
+				//console.log(data);
+			    },
+			    error: function(data){
+				$(".notifications").notify({
+				    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+				    type: 'danger',
+				}).show();
+				$("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").remove();
+				$("#DS_"+dsid).find(".panel-body").first().find("#tileindex-form").find(".fa-spin").addClass('hide');
+			    }
+			});
+		    }
 		});
 		return;
 	    });

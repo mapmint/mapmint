@@ -92,6 +92,40 @@ $conf["identification"]["title"]
 #set $favorites+=[$i[0]]
 #end for
 
+
+#if $inputs.keys().count("page")>0
+#set qComponents=["p"]+$inputs["page"]["value"].split('/')
+
+#try 
+#set val=int($qComponents[1])
+#except
+#set val=""
+#set output=$outputs
+#set output["Result"]["size"]=0
+#set output["Result"]["mimeType"]="text/html"
+#set output["Result"]["value"]=""
+#end try
+<div class="col-sm-12">
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/pages/view.tmpl",searchList={"conf": $conf,"inputs": $inputs,"outputs":$outputs,"cur":$cur,"con":$con,"pid":$qComponents}))
+</div>
+<script>
+\$(document).ready(function(){
+        console.log('Start page view !!!!');
+        var head = document.getElementsByTagName('head')[0].getElementsByTagName('script');
+        console.log(head);
+        for(var i=0;i<head.length;i++){
+                if(\$(head[i]).attr('src')=="./init_js" || \$(head[i]).attr('src')=="./index_js")
+                        \$(head[i]).remove();
+
+        }
+        console.log('End start page view !!!!');
+        
+});
+</script>
+#*
+$inputs["page"]
+#end if*#
+#else
 <div class="all">
     <div id="home">
     <div id="map">
@@ -470,8 +504,9 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 </div>
 </div>
 
-
     </div>
+#end if
+
 
  <footer id="footer" role="contentinfo">
 <div class="container">

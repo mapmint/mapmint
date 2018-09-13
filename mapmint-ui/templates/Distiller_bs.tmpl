@@ -457,6 +457,15 @@ $zoo._("You can mozaic only raster data, please change your selection and try ag
 <h2>$zoo._("Create a TileIndex") <i class="fa fa-spinner fa-spin hide"> </i></h2>
 $ftmpl.printAdder({"id":"tileindex-submit","name": "tileindex_name","Name":$zoo._("TileIndex Name"),"title":$zoo._("TileIndex")})
   <div class="row myWell">
+    <label class="col-sm-3 control-label"><span>$zoo._("Type")</label>
+    <div class="col-sm-9">
+      <select id="tileindex_type" class="form-control" onchange="var elem=\$(this).parent().parent().next().next().find('input').first();console.log(elem);if(\$(this).val()=='raster') elem.val('tif'); else elem.val('shp');">
+	<option value="raster">$zoo._("Raster")</option>
+        <option value="vector">$zoo._("Vector")</option>
+      <select>
+    </div>
+  </div>
+  <div class="row myWell">
     <label class="col-sm-3 control-label"><span>$zoo._("Projection System")</label>
     <div class="col-sm-9">
 #from Cheetah.Template import Template

@@ -12,11 +12,16 @@ if sys.platform == 'win32':
 	os.readlink=ntfslink.readlink
 	os.symlink=ntfslink.symlink
 
-def mmListDir(path):
+def mmListOnlyDir(path):
 	"""
 	Order all directories
 	"""
 	dirs = sorted([d for d in os.listdir(path) if os.path.isdir(path + os.path.sep + d)])
+	return dirs
+
+    
+def mmListDir(path):
+	dirs = mmListOnlyDir(path)
 	"""
 	Order all files
 	"""
@@ -71,6 +76,15 @@ def removeDS(conf,inputs,outputs):
 				tmpStr+="Unable to remove: "+i+" "+str(e)+"<br/>"
 	outputs["Result"]["value"]="Files deleted: "+tmpStr
 	return 3
+
+def listJson(conf,inputs,outputs):
+    import os,glob,time,json
+    if inputs.keys().count("path")>0:
+        prefix=inputs["path"]["value"]
+    files = filter(os.path.isfile, glob.glob(prefix + "*."+inputs["ext"]["value"]))
+    files.sort(key=lambda x: -os.path.getmtime(x))
+    outputs["Result"]["value"]=json.dumps(files,ensure_ascii=False)
+    return zoo.SERVICE_SUCCEEDED
 
 
 def display(conf,inputs,outputs):

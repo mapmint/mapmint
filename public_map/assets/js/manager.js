@@ -147,6 +147,7 @@ define([
     var colorRamps={};
     var layerLabels={};
     function addToLayerSwitcher(oid,data,level){
+	console.log(data);
 	for(var id in data){
 	    if(id=="labels"){
 		layerLabels[data["layer"]]=data[id];
@@ -448,6 +449,7 @@ define([
     function loadLabelTab(ldata){
 	var lbindings={
 	    "field": "labelField",
+	    "text": "labelString",
 	    "bufferSize": "labelBufferSize",
 	    "angle": "labelAngle",
 	    "cleanSize": "labelCleanSize",
@@ -524,6 +526,7 @@ define([
     function saveLabelSettings(layer,ldata){
 	var lbindings={
 	    "labelField": "label",
+	    "labelString": "text",
 	    "labelBufferSize": "lbs",
 	    "labelAngle": "angle",
 	    "labelCleanSize": "bs",
@@ -551,7 +554,7 @@ define([
 		    inputs.push({
 			"identifier": lbindings[i],
 			"value": params[j].value,
-			"dataType": "string"
+			"mimeType": "application/json"
 		    });
 		    break;
 		}
@@ -884,9 +887,12 @@ define([
 			    if(params[j].id==i){
 				inputs.push({
 				    "identifier": ibindings[i],
-				    "value": params[j].value,
-				    "dataType": "string"
+				    "value": params[j].value
 				});
+				if(i=="mmExpr")
+				    inputs[inputs.length-1]["mimeType"]="application/json";
+				else
+				    inputs[inputs.length-1]["dataType"]="string";
 				break;
 			    }
 			}
@@ -2694,7 +2700,7 @@ define([
 		    identifier: "mapfile.updateLayersOrder",
 		    type: "POST",
 		    dataInputs: [
-			{"identifier":"layers","value":jsonString,"dataType":"string"},
+			{"identifier":"layers","value":jsonString,"mimeType":"application/json"},
 			{"identifier":"map","value":$("#save-map").val(),"dataType":"string"}
 		    ],
 		    dataOutputs: [

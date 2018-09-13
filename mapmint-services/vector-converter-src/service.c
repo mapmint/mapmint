@@ -1600,8 +1600,6 @@ int main( int nArgc, char ** papszArgv )
         }
     }
 
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
-
 /* -------------------------------------------------------------------- */
 /*      Find the output driver.                                         */
 /* -------------------------------------------------------------------- */
@@ -1646,7 +1644,7 @@ int main( int nArgc, char ** papszArgv )
 #if GDAL_VERSION_MAJOR >=2
 	if( !CPLTestBool( CSLFetchNameValueDef(poDriver->GetMetadata(), GDAL_DCAP_CREATE, "FALSE") ) )
 #else
-	  if( !poDriver->TestCapability( ODrCCreateDataSource ) )
+	if( !poDriver->TestCapability( ODrCCreateDataSource ) )
 #endif
         {
 #ifdef ZOO_SERVICE
@@ -1816,7 +1814,7 @@ int main( int nArgc, char ** papszArgv )
 /*      the layer name isn't specified                                  */
 /* -------------------------------------------------------------------- */
             VSIStatBufL  sStat;
-            if (
+    /*            if (
 #if GDAL_VERSION_MAJOR >=2
 		EQUAL(poDriver->GetDescription(), "ESRI Shapefile")
 #else
@@ -1828,7 +1826,7 @@ int main( int nArgc, char ** papszArgv )
                 VSIStatL(pszDestDataSource, &sStat) == 0 && VSI_ISREG(sStat.st_mode))
             {
                 pszNewLayerName = CPLStrdup(CPLGetBasename(pszDestDataSource));
-            }
+		}*/
 
             if( !TranslateLayer( poDS, poPassedLayer, poODS, papszLCO, 
                                  pszNewLayerName, bTransform, poOutputSRS, bNullifyOutputSRS,
@@ -1850,12 +1848,17 @@ int main( int nArgc, char ** papszArgv )
                 exit( 1 );
 #endif
             }
-
+    
             if (poPassedLayer != poResultSet)
                 delete poPassedLayer;
 
             poDS->ReleaseResultSet( poResultSet );
-        }
+        }else{
+	  setMapInMaps(conf,"lenv","message",
+		       "Error executing sql query" );
+	  return SERVICE_FAILED;
+	  
+	}
     }
 
     else
@@ -2078,54 +2081,35 @@ int main( int nArgc, char ** papszArgv )
 /* -------------------------------------------------------------------- */
 
     poODS->SetStyleTable( poDS->GetStyleTable () );
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 
 /* -------------------------------------------------------------------- */
 /*      Close down.                                                     */
 /* -------------------------------------------------------------------- */
     OGRSpatialReference::DestroySpatialReference(poOutputSRS);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     OGRSpatialReference::DestroySpatialReference(poSourceSRS);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 #if GDAL_VERSION_MAJOR < 2
     if (bCloseODS)
         OGRDataSource::DestroyDataSource(poODS);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     OGRDataSource::DestroyDataSource(poDS);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 #endif
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     OGRGeometryFactory::destroyGeometry(poSpatialFilter);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     OGRGeometryFactory::destroyGeometry(poClipSrc);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     OGRGeometryFactory::destroyGeometry(poClipDst);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 
     CSLDestroy(papszSelFields);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 #ifndef ZOO_SERVICE
     CSLDestroy( papszArgv );
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 #endif
     CSLDestroy( papszLayers );
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     CSLDestroy( papszDSCO );
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     CSLDestroy( papszLCO );
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     CSLDestroy( papszFieldTypesToString );
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     CPLFree( pszNewLayerName );
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     
     free(pszDataSource);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
     free(pszDestDataSource);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 
     OGRCleanupAll();
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
 
 #ifdef DBMALLOC
     malloc_dump(1);
@@ -2415,7 +2399,6 @@ static int TranslateLayer(
             fprintf(stderr, "-wrapdateline option only works when reprojecting to a geographic SRS\n");
         }
     }
-    
 /* -------------------------------------------------------------------- */
 /*      Get other info.                                                 */
 /* -------------------------------------------------------------------- */

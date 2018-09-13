@@ -192,7 +192,32 @@ define([
 		"value": "",
 		"dataType": "string"
 	    });
-	    
+
+	if($("#mmWMTSBL").is(":checked")){
+	    inputs.push({
+		"identifier": "mmWMTSBLURL",
+		"value":      $("#wmts_layers_list").prev().find('input[type="text"]').val(),
+		"dataType":   "string"
+	    });
+	    var val=$("textarea[name=wmts_attribution]").summernote("code");
+	    inputs.push({
+		"identifier": "mmWMTSAttribution",
+		"value": (val.indexOf("<div>")==0?"":"<div>")+val+(val.indexOf("<div>")==0?"":"</div>"),
+		"mimeType": "text/plain"
+	    });
+	    var value="";
+	    $("#wmts_layers_list").find('input[type="checkbox"]').each(function(){
+		if(value!="")
+		    value+=",";
+		value+=$(this).parent().next().attr("data-value")+"|"+$(this).parent().parent().parent().next().find('input[type="text"]').first().val();
+	    });
+	    inputs.push({
+		"identifier": "mmWMTSBaseLayers",
+		"value": value,
+		"dataType": "string"
+	    });
+
+	}
 
 	inputs.push({
 	    "identifier": "mmProprietaryBaseLayers",
@@ -528,6 +553,53 @@ define([
             $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
 	} );
 
+	$("#mmBBDefault").on("change",function(){
+	    console.log("BBDefault change!");
+	    if($(this).val()=="Planet"){
+		$("#Planet").find("option").each(function(){
+		    if($(this).val().indexOf("http")>=0){
+			var myElement=$(this);
+			$.ajax({
+			    url: $(this).val(),
+			    success: function(data){
+				//alert("ok");
+				console.log(data);
+				try{
+				    for(var i=0;i<data.mosaics.length;i++){
+					console.log(data.mosaics[i]);
+					$("#Planet").append('<option>'+data.mosaics[i].name+'</option>');
+				    }
+				}catch(e){
+				    var tmp=$(data).find("Contents").find("Layer").each(function(){
+					console.log($(this).find("ows\\:Title").text());
+					console.log($(this).find("ows\\:Identifier").text());
+					console.log($(this).find("ResourceURL").attr("template"));
+					console.log($(this));
+					$("#Planet").append('<option value="'+$(this).find("ows\\:Identifier").text().replace(/ /g,"__")+'|'+$(this).find("ResourceURL").attr("template").replace(/TileMatrix/g,"z").replace(/TileCol/g,"x").replace(/TileRow/g,"y")+'|'+$(this).find("ows\\:Title").text()+'">'+$(this).find("ows\\:Title").text()+'</option>');
+				    });
+				    console.log(data);
+				}
+				myElement.remove();
+
+				if($("#mmBBDefault_ini").length && $("#mmBBDefault_ini").val()!=""){
+				    var tmp=$("#mmBBDefault_ini").val().split(',');
+				    $("#Planet").find("option").each(function(){
+					if(tmp.indexOf($(this).val())>=0)
+					    $(this).prop("selected",true);
+				    });
+				    $("#mmBBDefault_ini").val("");
+				}
+
+			    },
+			    error: function(){
+				alert("NO OK");
+			    }
+			});
+		    }
+		});
+	    }
+	});
+
 	$(".tab-pane").css({"max-height":($(window).height()-(4*$("nav").height()))+"px","overflow-x":"hidden","overflow-y":"auto"});
 	console.log("Start Publisher");
 	$('#datasources_list').DataTable( {
@@ -588,6 +660,66 @@ define([
 		$(this).click();
 	    });
 	});
+
+	console.log($("#wmts_server_url").find("input").first());
+	$("#wmts_server_url").find("input").first().on('input', function(){
+	    if($(this).val().indexOf("http://")>=0 || $(this).val().indexOf("https://")>=0){
+		$(this).prev().find("button").first().removeClass("disabled");
+		$(this).prev().find("button").first().off("click");
+		var myElement=$(this).val();
+		$(this).prev().find("button").first().on("click",function(){
+		    console.log($(this));
+		    $("#wmts_layers_list").html("");
+		    $.ajax({
+			url: myElement,
+			success: function(data){
+			    //alert("ok");
+			    console.log(data);
+			    var tmp=$(data).find("Contents").find("Layer").each(function(){
+				var template=$("#template_wmts_layers")[0].innerHTML;
+				template=template.replace(/VAL/g,$(this).find("ows\\:Identifier").text().replace(/ /g,"__")+'|'+$(this).find("ResourceURL").attr("template").replace(/TileMatrix/g,"z").replace(/TileCol/g,"x").replace(/TileRow/g,"y")+'|'+$(this).find("ows\\:Title").text());
+				template=template.replace(/NEWTITLE/g,$(this).find("ows\\:Title").text());
+				template=template.replace(/TITLE/g,$(this).find("ows\\:Title").text());
+				$("#wmts_layers_list").append(template);
+			    });
+			    console.log(data);
+			    $("#wmts_layers_list").find('input[type="checkbox"]').each(function(){
+				$(this).off("change");
+				$(this).on("change",function(){
+				    var closure=$(this);
+				    if($(this).is(":checked")){
+					$("#base_layer_active").append("<option value='"+$("#base_layer_active").find("option").lengh+"'>"+closure.parent().parent().parent().next().find('input').first().val()+"</option>");
+				    }else{
+					$("#base_layer_active").find("option").each(function(){
+					    if($(this).text()==closure.parent().parent().parent().next().find('input').first().val())
+						$(this).remove();
+					});
+				    }
+				});
+			    });
+			    if($("#mmBBDefault_ini").length && $("#mmBBDefault_ini").val()!=""){
+				var tmp=$("#mmBBDefault_ini").val().split(',');
+				$("#Planet").find("option").each(function(){
+				    if(tmp.indexOf($(this).val())>=0)
+					$(this).prop("selected",true);
+				});
+				$("#mmBBDefault_ini").val("");
+			    }
+
+			},
+			error: function(){
+			    alert("NO OK");
+			}
+		    });
+		});
+	    }
+	});
+
+	if($("#wmts_layers_list").parent().find("input[type=text]").first().val()!=""){
+	    $("#mmWMTSBL").prop("checked",true).change();
+	    $("#wmts_server_url").find("input").first().input();
+	}
+	$("#mmBBDefault").change();
     };
 
     // Return public methods

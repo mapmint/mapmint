@@ -21,6 +21,7 @@
 #if nbBL>1
     <ul class="baselayers list-group">
 #if $getVar('bpLayer','Untitled') != "Untitled"
+$bpLayer    
 #if $bpLayer == "google"
 #set lname="g"
 #else
@@ -29,6 +30,10 @@
 #else
 #if $bpLayer == "ign"
 #set lname="i"
+#else
+#if $bpLayer == "planet"
+#set lname="pl"
+#end if
 #end if
 #end if
 #end if
@@ -76,7 +81,10 @@ $Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",s
 #end for
 
 #if $m.web.metadata.get('mmPBaseLayers')
+
 #set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+
+#if $m.web.metadata.get("mmProprietaryBaseLayers")!="Planet"
 #set cnt=0
 #for j in $conf["mm"]["bpList"].split(',')
 #if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"]
@@ -93,12 +101,32 @@ $Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",s
 #if $setM.count($a2[$i])>0
 #for j in $conf["mm"]["bpList"].split(',')
 #if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"]
-$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $conf["mm"]["b"+$j+"Name"]+" "+$b2[$i],"l": $a2[$i],"lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))})
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $conf["mm"]["b"+$j+"Name"]+" "+$b2[$i],"l": $a2[$i], "lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))})
 #set lcount=$lcount+1
 #end if
 #end for
 #end if
 #end for
+
+#else
+
+#* PLANET *#
+
+#for i in range(len($setM))
+#*set a3=$setM[$i].split("|")[0]
+#try
+#set a4=$a2[$i].split("|")[1]
+#except
+#set $a4=None
+#end try
+#end for*#
+
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $conf["mm"]["bplName"]+" "+$setM[i].replace("_"," ").title(),"l": $setM[i],"lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))})
+#set lcount=$lcount+1
+#end for
+
+#end if
+#* END PLANET *#
 
 #end if
 
@@ -108,6 +136,15 @@ $Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",s
 #set m1=mapscript.mapObj(os.readlink($conf["main"]["dataPath"]+"/public_maps/"+$ls))
 #set ts=m1.web.metadata.get('mmTitle')
 $Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $ts,"l": $ls,"lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))}) 
+#set lcount=$lcount+1
+#end for
+#end if
+
+#if $m.web.metadata.get('mmWMTSBaseLayers')
+#set setM=$m.web.metadata.get('mmWMTSBaseLayers').split(",")
+#for j in range(len($setM))
+#set tmp=$setM[j].split("|")
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $tmp[len($tmp)-1],"l": $setM[$j],"lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))})
 #set lcount=$lcount+1
 #end for
 #end if

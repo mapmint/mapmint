@@ -34,7 +34,6 @@ def saveLayer(conf,inputs,outputs):
     for i in dirs:
         ii=i.split('.')
         if ii[0] == "TEMP_"+inputs["MMID"]["value"]+"-1":
-            print >> sys.stderr,conf["main"]["tmpPath"]+"/"+i+" => "+inputs["InputDSTN"]["value"]+"/"+inputs["InputDSON"]["value"]+"."+ii[1]
             shutil.move(conf["main"]["tmpPath"]+"/"+i,inputs["InputDSTN"]["value"]+"/"+inputs["InputDSON"]["value"]+"."+ii[1])
             #shutil.move(conf["main"]["tmpPath"]+"/"+i,inputs["InputDSTN"]["value"]+"/"+inputs["InputDSON"]["value"]+"."+ii[1])
             try:
@@ -79,7 +78,6 @@ def doZip(conf,inputs,outputs):
     for name in glob.glob(rpath+"/"+inputs["dso"]["value"]+".*"):
         if name.count("zip")==0:
             d.write(name.replace("\\","/"),os.path.basename(name), zipfile.ZIP_DEFLATED)
-        print >> sys.stderr,name.replace("\\","/")
     d.close()
     outputs["Result"]["value"]=conf["main"]["tmpUrl"]+inputs["dstn"]["value"]
     return 3
@@ -88,7 +86,6 @@ def cleanUp(conf,inputs,outputs):
     import glob,os
     tmp=inputs["dso"]["value"].split('.')
     for name in glob.glob(conf["main"]["tmpPath"]+"/"+tmp[0]+".*"):
-        print >> sys.stderr,name.replace("\\","/")
         os.remove(name.replace("\\","/"))
     outputs["Result"]["value"]=zoo._("Cleanup done")
     return 3

@@ -25,6 +25,15 @@
     DataType = string
     <Default />
    </LiteralData>
+  [co]
+   Title = The scale
+   Abstract = Scale is the ratio of vertical units to horizontal, for Feet:Latlong use 370400, for Meters:LatLong use 111120
+   minOccurs = 0
+   maxOccurs = 1024
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
   [utility]
    Title = The mode
    Abstract = This service has 4 different modes :  hillshade,  slope,  aspect, color-relief

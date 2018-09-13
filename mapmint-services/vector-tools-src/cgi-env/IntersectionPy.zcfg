@@ -75,7 +75,6 @@
       mimeType = image/png
       useMapserver = true
       asReference = true
-      msStyle = STYLE COLOR 125 0 105 OUTLINECOLOR 0 0 0 WIDTH 0.3 OPACITY 65 END
      </Supported>
     </ComplexData>
  </DataOutputs>  

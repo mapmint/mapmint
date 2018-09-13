@@ -27,7 +27,7 @@
 <meta name="author" content="$conf["provider"]["providerName"]">
 <link rel="shortcut icon" href="$conf["main"]["mmAddress"]/favicon.ico" />
 <link rel="alternate" type="application/rss+xml" title="MapMint RSS Feed" href="$(conf["main"]["applicationAddress"])public/rss" />
-<title>$page_title</title>
+<title>$conf["identification"]["title"] / $page_title</title>
 
 
 #if $conf["mm"].keys().count("useCdn")>0 and $conf["mm"]["useCdn"]=="true"
@@ -85,7 +85,7 @@ $istyles
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="$conf["main"]["rootUrl"]/tables/">$zoo._("Tables management")</a>
+      <a class="navbar-brand" href="$conf["main"]["rootUrl"]/tables/">$conf["identification"]["title"]</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
@@ -120,6 +120,19 @@ $istyles
        <!-- /.dropdown-user -->
      </li>
       </ul>
+#try
+#set lmenu0=$mmenuleft
+      <div class="navbar-default sidebar" role="navigation" style="margin-left: -32.5px;">
+       <div class="sidebar-nav navbar-collapse" >
+        <ul class="nav" id="side-menu">
+         $lmenu0
+       </ul> 
+       </div>
+      </div>
+#except Exception, e
+<!-- Left menu : $e -->
+#end try
+
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
@@ -137,7 +150,13 @@ $tfooter
 #end if
 	</div>
 #if $mmodule!="public" and ($conf.keys().count("senv")>0 and $conf["senv"]["loggedin"]!="false" and $conf["senv"].keys().count("firstname")>0) and not($verr)
-<div class="ui-layout-south hide"></div>
+<div class="ui-layout-south ">
+  <div class="text-center">
+#from datetime import datetime
+#set d=datetime.today()
+    <p>Copyright &copy; <a href="$conf["provider"]["providerSite"]">$conf["provider"]["providerName"]</a> $d.year</p>
+  </div>
+</div>
 #else
 #if $conf["mm"].keys().count("nofooter")==0 or ($conf["mm"]["nofooter"]!="true" and $conf["mm"].keys().count("nofooter")>0)
 <footer>

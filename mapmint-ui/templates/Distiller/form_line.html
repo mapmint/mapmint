@@ -51,10 +51,14 @@
 
 #def printBasicLine(obj)
 <div class="form-group row #if $obj.keys().count("classes")>0#$obj["classes"]#end if#">
+#if obj.keys().count('label')
   <label class="col-sm-6 col-md-5 col-lg-4 control-label">
   $obj["label"]
   </label>
   <div class="col-sm-6 col-md-7 col-lg-8 ">
+#else
+  <div class="col-sm-12 col-md-12 col-lg-12 ">
+#end if
    $obj["content"]
   </div>
 </div>
@@ -98,6 +102,45 @@
 
 #def printUploadInputNew(obj)
   <input type="file" name="$obj["id"]" id="$(obj["name"])" class="form-control mmFile" />
+#end def
+
+#def printEmbeddedLine(obj)
+#set ltypes=["select","multiple","textarea","date","datetime","float","html","checkbox"]
+#if $obj.keys().count("optional")>0 and $obj["optional"]
+    <div class="input-group">
+      <span class="input-group-addon">
+        <input type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" name="filter" value=""/>
+      </span>
+#end if
+#if $obj.keys().count("type")==0
+    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control form-control-inline" type="text" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
+#else
+#if $obj["type"]=="date" or $obj["type"]=="datetime" or $obj["type"]=="checkbox"
+    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control form-control-inline#if $obj["type"]=="checkbox"#-checkbox#end if#" type="$obj["type"]#if $obj["type"]!="date" and $obj["type"]!="checkbox"#-local#end if#" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if# #if $obj.keys().count("value")>0 and $obj["type"]=="checkbox" and $obj["value"]=="true"#checked="checked"#end if#/>
+
+#else
+#if $obj["type"]=="float"
+    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control form-control-inline" type="number" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
+#else
+#if $obj["type"]=="textarea" or $obj["type"]=="html"
+    <textarea #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control form-control-inline #if $obj["type"]=="html"# htmlEditor #end if# #if $obj.keys().count("iclasses")>0#$obj["iclasses"]#end if#">#if $obj.keys().count("value")>0#$obj["value"]#end if#</textarea>
+#else	  
+    <select #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# #if $obj["type"]=="multiple"#multiple="multiple"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control form-control-inline #if $obj.keys().count("iclasses")>0#$obj["iclasses"]#end if#">
+#for a in $obj["options"]
+#if type($a)==type("")	    
+      <option value="$a">$a</option>
+#else
+      <option value="$a[0]">$a[1]</option>
+#end if
+#end for
+    </select>
+#end if
+#end if
+#end if
+#end if
+#if $obj.keys().count("optional")>0 and $obj["optional"]
+    </div>
+#end if
 #end def
 
 #def printLine(obj)

@@ -185,6 +185,8 @@ requirejs.config({
 	    publicationUrl: '$conf["main"]["publicationUrl"]',
 	    dataPath: '$conf["main"]["dataPath"]',
 	    msUrl: '$conf["main"]["mapserverAddress"]',
+#import mapscript
+	    msVersion: "$mapscript.MS_VERSION",
 	    lang: "$lang",
 #set myCorrespondances={"fr-FR":"French.json","en-US":"English.json"}
             translationUrl: "http://cdn.datatables.net/plug-ins/1.10.10/i18n/#if myCorrespondances.keys().count($conf["main"]["language"])>0#$myCorrespondances[$conf["main"]["language"]]#else#$myCorrespondances["en-US"]#end if#",

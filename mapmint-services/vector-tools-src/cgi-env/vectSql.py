@@ -57,7 +57,6 @@ def EQUAL(a, b):
 #/************************************************************************/
 
 def vectInfo(conf,inputs,outputs):
-    print >> sys.stderr,"START VECTSQL"
     global bReadOnly
     global bVerbose
     global bSummaryOnly
@@ -79,7 +78,6 @@ def vectInfo(conf,inputs,outputs):
     if inputs.keys().count("dialect")>0 and pszDataSource.count("dbname")==0:
         pszDialect = inputs["dialect"]["value"]
 
-    print >> sys.stderr,pszDialect
     #papszLayers.append(inputs["dsoName"]["value"])
 
 
@@ -93,7 +91,6 @@ def vectInfo(conf,inputs,outputs):
     if poDS is None and not bReadOnly:
         poDS = ogr.Open( pszDataSource, False )
         if poDS is not None and bVerbose:
-            print >> sys.stderr,"Had to open data source read-only."
             bReadOnly = True
 #/* -------------------------------------------------------------------- */
 #/*      Report failure                                                  */
@@ -127,14 +124,12 @@ def vectInfo(conf,inputs,outputs):
 
         poResultSet = poDS.ExecuteSQL( pszSQLStatement, poSpatialFilter, 
                                         pszDialect )
-        print >> sys.stderr,"OK VECTSQL 1"
         
         if poResultSet is None:
             print >> sys.stderr, (( "failed to run the following SQL statement: %s!") % pszSQLStatement )
             return 4
         
         if poResultSet is not None:
-            print >> sys.stderr,"OK VECTSQL 2"
             if pszWHERE is not None:
                 poResultSet.SetAttributeFilter( pszWHERE )
 
@@ -142,7 +137,6 @@ def vectInfo(conf,inputs,outputs):
             ReportOnLayer( inputs, res, poResultSet, None, None, options )
             outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False)
             poDS.ReleaseResultSet( poResultSet )
-            print >> sys.stderr,"/OK VECTSQL 2"
     else:
         for iRepeat in range(nRepeatCount):
             if papszLayers is None:
@@ -193,9 +187,6 @@ def vectInfo(conf,inputs,outputs):
 #/* -------------------------------------------------------------------- */
     poDS.Destroy()
     #import json
-    print >> sys.stderr,"OK VECTSQL"
-    print >> sys.stderr,str(outputs)
-    print >> sys.stderr,"/OK VECTSQL"
     #outputs["Result"]["value"]=str(outputs["Result"]["value"])
     return 3
 

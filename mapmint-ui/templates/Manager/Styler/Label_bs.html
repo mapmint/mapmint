@@ -9,8 +9,46 @@
   <div class="form-group require-label-display no-grid">
     <label class="col-sm-3 control-label">$zoo._("Labeling field")</label>
     <div class="col-sm-9 ">
-      <select name="labelField" class="form-control  mmField">
-      </select>
+	<select name="labelField" class="form-control  mmField">
+	</select>
+#*      <div class="input-group">
+	<select name="labelField" class="form-control  mmField">
+	</select>
+	<span class="input-group-addon  no-grid">
+	  <a href="#toto" onclick="console.log(\$('#label_lines'));\$(this).parent().parent().parent().append(\$('#label_lines')[0].innerHTML); \$('select[name=labelField]').find('option').each(function(){\$('select[name=labelFieldX]').append(\$(this).innerHTML);});"><i class="fa fa-plus"></i></a>
+	</span>
+      </div>
+*#
+    </div>
+  </div>
+  <script id="label_lines" type="text/template">
+  <div class="row">
+    <div class="col-sm-12">
+      <input type="text" name="beforeFieldX" class="form-control" placeholder="$zoo._("Before ")"/>
+    </div>
+    <div class="col-sm-12">
+      <div class="input-group">
+	<select name="labelFieldX" class="form-control  mmField">
+	</select>
+	<span class="input-group-addon  no-grid">
+	  <a href="#toto" onclick="\$(this).parent().parent().parent().parent().remove();"><i class="fa fa-minus"></i></a>
+	</span>
+      </div>
+    </div>
+    <div class="col-sm-12">
+      <input type="text" name="endFieldX" class="form-control" placeholder="$zoo._("End ")"/>
+    </div>
+  </div>
+  </script>
+  <div class="form-group require-label-display no-grid">
+    <label class="col-sm-3 control-label">$zoo._("Your own label") </label>
+  <div class="col-sm-9 ">
+   <div class="input-group">
+      <input name="labelString" type="text" class="form-control mmString" />
+      <span class="input-group-addon  no-grid">
+      <input type="checkbox" name="displayLabelString" onchange="\$(this).is(':checked')?\$(this).parent().prev().attr('disabled',false):\$(this).parent().prev().attr('disabled',true);" />
+      </span>
+    </div> 
     </div>
   </div>
   <div class="form-group require-label-display">

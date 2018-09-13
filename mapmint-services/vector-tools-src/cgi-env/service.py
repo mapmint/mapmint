@@ -31,6 +31,41 @@ import zoo
 
 layerName=None
 
+try:
+    from osgeo import ogr, osr, gdal
+except:
+    sys.exit('ERROR: cannot find GDAL/OGR modules')
+
+# example GDAL error handler function
+class GdalErrorHandler(object):
+    def __init__(self):
+        self.err_level=gdal.CE_None
+        self.err_no=0
+        self.err_msg=''
+
+    def setConf(self,obj):
+        self.conf=obj
+    
+    def handler(self, err_level, err_no, err_msg):
+        self.err_level=err_level
+        self.err_no=err_no
+        self.conf["lenv"]["message"]=err_msg
+        self.err_msg=err_msg
+
+def gdal_error_handler(err_class, err_num, err_msg):
+    errtype = {
+            gdal.CE_None:'None',
+            gdal.CE_Debug:'Debug',
+            gdal.CE_Warning:'Warning',
+            gdal.CE_Failure:'Failure',
+            gdal.CE_Fatal:'Fatal'
+    }
+    err_msg = err_msg.replace('\n',' ')
+    err_class = errtype.get(err_class, 'None')
+    print >> sys.stderr, 'Error Number: %s' % (err_num)
+    print >> sys.stderr,'Error Type: %s' % (err_class)
+    print >> sys.stderr,'Error Message: %s' % (err_msg)
+
 def test(conf,inputs,outputs):
     conf["lenv"]["message"]="Error message"
     return zoo.SERVICE_FAILED
@@ -46,11 +81,12 @@ def readFileFromBuffer(data,ext,sql=None):
             if sql.count("from")==0:
                 layerName=ds.GetLayerByIndex(0).GetName()
                 sql+=" from "+layerName
-            lyr=ds.ExecuteSQL( sql, None, None )
+            lyr=ds.ExecuteSQL( sql, dialect="spatialite" )
             print >> sys.stderr,lyr
         else:
             lyr = ds.GetLayer(0)
             print >> sys.stderr,lyr
+        print >> sys.stderr,lyr.GetFeatureCount()
         feat = lyr.GetNextFeature()
         while feat is not None:
             geometry+=[feat.Clone()]
@@ -102,6 +138,24 @@ def createLayerFromJson(conf,obj,sql=None):
         return buildFeatureFromGeomtry(conf,geom,"GeoJSON","json")
 
 def extractInputs(conf,obj,sql=None):
+    if obj.keys().count("cache_file"):
+        print >> sys.stderr,obj
+        geometry=[]
+        ds = osgeo.ogr.Open(obj["cache_file"])
+        if sql is not None:
+            if sql.count("from")==0:
+                layerName=ds.GetLayerByIndex(0).GetName()
+                sql+=" from "+layerName
+            lyr=ds.ExecuteSQL( sql, dialect="spatialite" )
+        else:
+            lyr = ds.GetLayer(0)
+        feat = lyr.GetNextFeature()
+        while feat is not None:
+            geometry+=[feat.Clone()]
+            feat.Destroy()
+            feat = lyr.GetNextFeature()
+        ds.Destroy()
+        return geometry
     if obj["mimeType"]=="application/json":
         return createLayerFromJson(conf,obj["value"],sql)
     else:
@@ -132,14 +186,15 @@ def outputResult(conf,obj,geom):
                 j=0
                 for iField in range(nDstFieldCount):
                     poSrcFieldDefn = poDstFDefn.GetFieldDefn(iField)
-                    if poSrcFieldDefn.GetNameRef()=="fid0":
-                        hasFid0=True
-                        fid0I=j
-                    oFieldDefn = osgeo.ogr.FieldDefn(poSrcFieldDefn.GetNameRef(),poSrcFieldDefn.GetType())
-                    oFieldDefn.SetWidth( poSrcFieldDefn.GetWidth() )
-                    oFieldDefn.SetPrecision( poSrcFieldDefn.GetPrecision() )
-                    lyr.CreateField( oFieldDefn )
-                    j+=1
+                    if True or poSrcFieldDefn.GetNameRef()!="gml_id":
+                        if poSrcFieldDefn.GetNameRef()=="fid0":
+                            hasFid0=True
+                            fid0I=j
+                        oFieldDefn = osgeo.ogr.FieldDefn(poSrcFieldDefn.GetNameRef(),poSrcFieldDefn.GetType())
+                        oFieldDefn.SetWidth( poSrcFieldDefn.GetWidth() )
+                        oFieldDefn.SetPrecision( poSrcFieldDefn.GetPrecision() )
+                        lyr.CreateField( oFieldDefn )
+                        j+=1
         #if hasFid0:
         #    geom[i].setFid(geom[i].get)
         lyr.CreateFeature(geom[i].Clone())
@@ -200,6 +255,8 @@ def access(conf,inputs,outputs):
     osgeo.gdal.FileFromMemBuffer('/vsimem//temp1',inputs["InputData"]["value"])
     ds = osgeo.ogr.Open('/vsimem//temp1')
     print >> sys.stderr,ds
+    if ds is None:
+        ds = osgeo.ogr.Open(inputs["InputData"]["cache_file"])
     displayCnt=0
     geometry=[]
     sqlResults=[]
@@ -268,15 +325,20 @@ def Buffer(conf,inputs,outputs):
     i=0
     rgeometries=[]
     while i < len(geometry):
+        conf["lenv"]["message"]=str(i)+" / "+str(len(geometry))+" Run Buffer Operation .."
+        zoo.update_status(conf,(i*100)/len(geometry))
         tmp=geometry[i].Clone()
         resg=geometry[i].GetGeometryRef().Buffer(bdist)
         tmp.SetGeometryDirectly(resg)
         rgeometries+=[tmp]
         geometry[i].Destroy()
-        resg.thisown=False 
-        tmp.thisown=False
+        #tmp.Destroy()
+        #resg.thisown=False 
+        #tmp.thisown=False
         i+=1
     outputResult(conf,outputs["Result"],rgeometries)
+    #conf["lenv"]["message"]="Buffer Operation run successfully"
+    #zoo.update_status(conf,100)
     i=0
     return zoo.SERVICE_SUCCEEDED
 
@@ -446,23 +508,136 @@ def UnionOne(conf,inputs,outputs):
 
 def UnionOnePy(conf,inputs,outputs):
     import sys
+    eHandler=GdalErrorHandler()
+    eHandler.setConf(conf)
+    gdal.PushErrorHandler(eHandler.handler)
+    print >> sys.stderr,"DEBG LOAD"
+    geometry1=extractInputs(conf,inputs["InputPolygon"])
+    print >> sys.stderr,"DEUBG / LOAD"
+    i=0
+    geometryRes=None
+    multi  = osgeo.ogr.Geometry(osgeo.ogr.wkbMultiPolygon)
+    geometryRes=[geometry1[0].Clone()]
+    while i < len(geometry1):
+        print >> sys.stderr," STEP "+str(i)
+        geom=geometry1[i].GetGeometryRef()
+        if geom is not None and not(geom.IsValid()):
+            print >> sys.stderr," ******** STEP "+str(geom.IsValid())
+        if geom is not None and geom.GetGeometryType()==osgeo.ogr.wkbGeometryCollection or geom.GetGeometryType()==osgeo.ogr.wkbMultiPolygon :
+            for kk in range(geom.GetGeometryCount()):
+                print >> sys.stderr," STEP 1 "+str(kk)
+                multi.AddGeometry(validateGeom(geom.GetGeometryRef(kk)).Clone())
+        else:
+            multi.AddGeometry(validateGeom(geom).Clone())
+        print >> sys.stderr,"DEBG ISET"
+        geometry1[i].Destroy()
+        i+=1
+    print >> sys.stderr,"DEBG SET"
+    geom=multi.UnionCascaded()
+    try:
+        geometryRes[0].SetGeometryDirectly(geom.Clone())
+    except:
+        conf["lenv"]["message"]=zoo._("Unable to make union of the given geometries")
+        return zoo.SERVICE_FAILED
+    print >> sys.stderr,"DEBG / SET"
+    #outputs["Result"]["value"]=geometryRes.ExportToJson()
+    outputResult(conf,outputs["Result"],geometryRes)
+    gdal.PopErrorHandler()
+    return 3
+
+def UnionOnePy1(conf,inputs,outputs):
+    import sys
+    print >> sys.stderr,"DEBG LOAD"
+    geometry1=extractInputs(conf,inputs["InputPolygon"])
+    print >> sys.stderr,"DEUBG / LOAD"
+    i=0
+    geometryRes=None
+    #print >> sys.stderr,"DEUBG"
+    multi  = osgeo.ogr.Geometry(osgeo.ogr.wkbMultiPolygon)
+    #for g in geometries:
+    #    
+    #return multi.UnionCascaded()
+    geometryRes=geometry1[0].Clone()
+    while i < len(geometry1):
+        print >> sys.stderr," STEP "+str(i)
+        geom=geometry1[i].GetGeometryRef()
+        if geom is not None and not(geom.IsValid()):
+            print >> sys.stderr," ******** STEP "+str(geom.IsValid())
+        if geom is not None and geom.GetGeometryType()==osgeo.ogr.wkbGeometryCollection or geom.GetGeometryType()==osgeo.ogr.wkbMultiPolygon :
+            multi1  = osgeo.ogr.Geometry(osgeo.ogr.wkbMultiPolygon)
+            for kk in range(geom.GetGeometryCount()):
+                print >> sys.stderr," STEP 1 "+str(kk)
+                multi1.AddGeometry(geom.GetGeometryRef(kk).Clone())
+            if multi1 is not None and not(multi1.IsEmpty()):
+                tmpGeom=multi1.UnionCascaded()
+                if tmpGeom is not None:
+                    print >> sys.stderr," ******** STEP "+str(tmpGeom.IsValid())
+                if tmpGeom is not None and not(tmpGeom.IsEmpty()) and tmpGeom.IsValid():
+                    geom=tmpGeom
+                else:
+                    geom=multi1
+        print >> sys.stderr,"DEBG ISET"
+        if geom is not None:
+            print >> sys.stderr," STEP "+str(geom.IsValid())
+        multi.AddGeometry(validateGeom(geom).Clone())
+        print >> sys.stderr,"DEBG ISET"
+        geometry1[i].Destroy()
+        i+=1
+    print >> sys.stderr,"DEBG SET"
+    geom=multi.UnionCascaded()
+    geometryRes.SetGeometryDirectly(geom.Clone())
+    print >> sys.stderr,"DEBG / SET"
+    outputs["Result"]["value"]=geometryRes.ExportToJson()
+    #outputResult(conf,outputs["Result"],rgeometries)
+    return 3
+
+def UnionOnePy0(conf,inputs,outputs):
+    import sys
     #print >> sys.stderr,"DEBG"
     geometry1=extractInputs(conf,inputs["InputPolygon"])
     #print >> sys.stderr,"DEUBG"
     i=0
     geometryRes=None
     #print >> sys.stderr,"DEUBG"
+    multi  = osgeo.ogr.Geometry(osgeo.ogr.wkbMultiPolygon)
+    #for g in geometries:
+    #    
+    #return multi.UnionCascaded()
+    geometryRes=geometry1[0].Clone()
     while i < len(geometry1):
+        multi.AddGeometry(geometry1[i].GetGeometryRef())
         j=0
         if i==0:
             geometryRes=geometry1[i].Clone()
+            geom=geometryRes.GetGeometryRef()
+            if geom.GetGeometryType()==osgeo.ogr.wkbGeometryCollection or geom.GetGeometryType()==osgeo.ogr.wkbMultiPolygon :
+                tmpGeom=geom.GetGeometryRef(0)
+                for kk in range(1,geom.GetGeometryCount()):                    
+                    tmp0=validateGeom(tmpGeom).Union(validateGeom(geom.GetGeometryRef(kk)))
+                    if tmp0 is not None and not(tmp0.IsEmpty()):
+                        tmpGeom=validateGeom(tmp0).Clone()
+                        tmp0.Destroy()
+                if tmpGeom is not None and not(tmpGeom.IsEmpty()):
+                    geom=tmpGeom
+            geometryRes.SetGeometryDirectly(validateGeom(geom).Clone())
         else:
-            tres=geometryRes.GetGeometryRef().Union(geometry1[i].GetGeometryRef())
+            geom=geometryRes.GetGeometryRef()
+            tres=geom.Union(validateGeom(geometry1[i].GetGeometryRef()))
             if tres is not None and not(tres.IsEmpty()):
-                geometryRes.SetGeometryDirectly(tres.Clone())
+                if tres.GetGeometryType()==osgeo.ogr.wkbGeometryCollection or tres.GetGeometryType()==osgeo.ogr.wkbMultiPolygon :
+                    tmpGeom=tres.GetGeometryRef(0)
+                    for kk in range(1,tres.GetGeometryCount()):                    
+                        tmp0=validateGeom(tmpGeom).Union(validateGeom(tres.GetGeometryRef(kk)))
+                        if tmp0 is not None and not(tmp0.IsEmpty()):
+                            tmpGeom=validateGeom(tmp0).Clone()
+                            tmp0.Destroy()
+                    if tmpGeom is not None and not(tmpGeom.IsEmpty()):
+                        tres=tmpGeom
+                geometryRes.SetGeometryDirectly(validateGeom(tres).Clone())
                 tres.Destroy()
         geometry1[i].Destroy()
         i+=1
+    geometryRes.SetGeometryDirectly(multi.UnionCascaded())
     outputs["Result"]["value"]=geometryRes.ExportToJson()
     #outputResult(conf,outputs["Result"],rgeometries)
     return 3
@@ -475,16 +650,21 @@ def UnionOneBis(conf,inputs):
     i=0
     geometryRes=None
     #print >> sys.stderr,"DEUBG"
+    multi = osgeo.ogr.Geometry(osgeo.ogr.wkbMultiPolygon)    
     while i < len(geometry1):
         j=0
-        if i==0:
-            geometryRes=geometry1[i].Clone()
-        else:
-            tres=geometryRes.GetGeometryRef().Union(geometry1[i].GetGeometryRef())
+        multi.AddGeometry(geometry1[i].Clone())
+        #if i==0:
+        #    geometryRes=geometry1[i].Clone()
+        #else:
+        #    try:
+        #        tres=geometryRes.GetGeometryRef().Union(geometry1[i].GetGeometryRef().Buffer(0.0))
+        #    except:
+        #        continue
         geometry1[i].Destroy()
         i+=1
-    if not(tres.IsEmpty()):
-        geometryRes.SetGeometryDirectly(tres.Clone())
+    if not(multi.IsEmpty()):
+        geometryRes.SetGeometryDirectly(multi.UnionCascaded().Clone())
         tres.Destroy()
     #outputs["Result"]["value"]=geometryRes.ExportToJson()
     #outputResult(conf,outputs["Result"],rgeometries)
@@ -522,6 +702,8 @@ def UnionOneGeom(conf,inputs,outputs):
     points=[]
     origin=[]
     while i < len(geometry1):
+        conf["lenv"]["message"]="("+str(i)+"/"+str(len(geometry1))+") "+zoo._("Running process...")
+        zoo.update_status(conf,(i*100)/len(geometry1))
         j=0
         tmp=geometry1[i].GetGeometryRef()
         line=shapely.wkt.loads(tmp.ExportToWkt())
@@ -561,33 +743,142 @@ def UnionOneGeom(conf,inputs,outputs):
     outputs["Result"]["value"]=geometryRes.ExportToJson()
     return 3
 
-def Intersection(conf,inputs,outputs):
 
+def FusionIntersectsPy(conf,inputs,outputs):
+    print >> sys.stderr, "***** 1: "+str(inputs)
     geometry1=extractInputs(conf,inputs["InputEntity1"])
     geometry2=extractInputs(conf,inputs["InputEntity2"])
+    print >> sys.stderr, "***** 1: "+str(len(geometry1))+" 2: "+str(len(geometry2))
     rgeometries=[]
     fids=[]
     i=0
-    while i < len(geometry1):
+    rmulti  = ogr.Geometry(ogr.wkbMultiPolygon)
+    for i in range(len(geometry1)):
+        conf["lenv"]["message"]="("+str(i)+"/"+str(len(geometry1))+") "+zoo._("Running process...")
+        zoo.update_status(conf,(i*100)/len(geometry1))
+        resg0=geometry1[i].GetGeometryRef().Clone()
+        print >> sys.stderr,"****** 3: "+str(resg0)
         j=0
-        while j < len(geometry2):
-            tmp=geometry2[j].Clone()
-            resg=geometry2[j].GetGeometryRef()
-            #resg=resg.Intersection(geometry1[i].GetGeometryRef())
-            resg=geometry1[i].GetGeometryRef().Intersection(resg)
-            tmp.SetGeometryDirectly(resg)
-            print >> sys.stderr, resg.IsEmpty()
-            print >> sys.stderr, resg
-            print >> sys.stderr, geometry1[i].GetGeometryRef().Intersects(geometry2[j].GetGeometryRef())
-            print >> sys.stderr, geometry2[j].GetGeometryRef().Intersects(geometry1[i].GetGeometryRef())
-            if resg is not None and not(resg.IsEmpty()) and fids.count(tmp.GetFID())==0:
-                rgeometries+=[tmp]
-                fids+=[tmp.GetFID()]
+        for j in range(len(geometry2)):
+            if geometry1[i].GetGeometryRef().GetGeometryType()==osgeo.ogr.wkbMultiPolygon:
+                for k in range(geometry1[i].GetGeometryRef().GetGeometryCount()):
+                    if geometry1[i].GetGeometryRef().GetGeometryRef(k).Intersects(geometry2[j].GetGeometryRef()):
+                        print >> sys.stderr,"****** 2: "+str(geometry2[j].GetGeometryRef())
+                        print >> sys.stderr,"****** 2: "+str(geometry2[j].GetGeometryRef().IsValid())
+                        print >> sys.stderr,"****** 2: "+str(geometry2[j].GetGeometryRef().IsEmpty())
+                        print >> sys.stderr,"****** 3: "+str(resg0.IsValid())
+                        print >> sys.stderr,"****** 3: "+str(resg0.IsEmpty())
+                        print >> sys.stderr,"****** 3: "+str(resg0)
+                        tmp=geometry2[j].Clone()
+                        print >> sys.stderr,"****** 3: "+str(dir(tmp))
+                        tmp.SetGeometryDirectly(geometry1[i].GetGeometryRef().GetGeometryRef(k).Clone())
+                        print >> sys.stderr,"****** 3: "+str(dir(tmp))
+                        isPresent=False
+                        for l in range(len(rgeometries)):
+                            if rgeometries[l].GetGeometryRef().Equals(tmp.GetGeometryRef()):
+                                isPresent=True
+                                break
+                        #if rmulti.GetGeometryCount()>0 and rmulti.Contains(tmp.GetGeometryRef()):
+                        #    isPresent=True
+                        if not(isPresent):
+                            #rmulti.AddGeometry(tmp.GetGeometryRef())
+                            rgeometries+=[tmp.Clone()]
+                            fids+=[tmp.GetFID()]
+                        tmp.Destroy()
             else:
-                tmp.Destroy()
-            j+=1
+                if resg0.Intersects(geometry2[j].GetGeometryRef()):
+                    print >> sys.stderr,"****** 2: "+str(geometry2[j].GetGeometryRef())
+                    print >> sys.stderr,"****** 2: "+str(geometry2[j].GetGeometryRef().IsValid())
+                    print >> sys.stderr,"****** 2: "+str(geometry2[j].GetGeometryRef().IsEmpty())
+                    print >> sys.stderr,"****** 3: "+str(resg0.IsValid())
+                    print >> sys.stderr,"****** 3: "+str(resg0.IsEmpty())
+                    print >> sys.stderr,"****** 3: "+str(resg0)
+                    tmp=geometry2[j].Clone()
+                    print >> sys.stderr,"****** 3: "+str(dir(tmp))
+                    tmp.SetGeometryDirectly(resg0.Clone())
+                    print >> sys.stderr,"****** 3: "+str(dir(tmp))
+                    isPresent=False
+                    for l in range(len(rgeometries)):
+                        if rgeometries[l].GetGeometryRef().Equals(tmp.GetGeometryRef()):
+                            isPresent=True
+                            break
+                    #if rmulti.GetGeometryCount()>0 and rmulti.Contains(tmp.GetGeometryRef()):
+                    #    isPresent=True
+                    if not(isPresent):
+                        rgeometries+=[tmp.Clone()]
+                        fids+=[tmp.GetFID()]
+                    tmp.Destroy()
+        #resg.Destroy()
         geometry1[i].Destroy()
+    i=0
+    while i < len(geometry2):
+        geometry2[i].Destroy()
         i+=1
+    print >> sys.stderr,"outputResult"
+    outputResult(conf,outputs["Result"],rgeometries)
+    print >> sys.stderr,"/outputResult"
+    return 3
+
+
+def Intersection(conf,inputs,outputs):
+    geometry1=extractInputs(conf,inputs["InputEntity1"])
+    geometry2=extractInputs(conf,inputs["InputEntity2"])
+    print >> sys.stderr, "***** 1: "+str(len(geometry1))+" 2: "+str(len(geometry2))
+    rgeometries=[]
+    fids=[]
+    i=0
+    for i in range(len(geometry1)):
+        conf["lenv"]["message"]="("+str(i)+"/"+str(len(geometry1))+") "+zoo._("Running process...")
+        zoo.update_status(conf,(i*100)/len(geometry1))
+        j=0
+        for j in range(len(geometry2)):
+            tmp=geometry2[j].Clone()
+            #resg=validateGeom(geometry2[j].GetGeometryRef())
+            resg=geometry2[j].GetGeometryRef()
+            #print >> sys.stderr," ***** 1 : "+str(resg)
+            #resg=resg.Intersection(geometry1[i].GetGeometryRef())
+            if len(geometry1)==1:
+                conf["lenv"]["message"]="("+str(j)+"/"+str(len(geometry2))+") "+zoo._("Run intersection process...")
+                zoo.update_status(conf,(j*100)/len(geometry2))
+            if geometry1[i].GetGeometryRef().GetGeometryType()==osgeo.ogr.wkbMultiPolygon:
+                for k in range(geometry1[i].GetGeometryRef().GetGeometryCount()):
+                    try:
+                        #tmpGeom=validateGeom(geometry1[i].GetGeometryRef().GetGeometryRef(k))
+                        tmpGeom=geometry1[i].GetGeometryRef().GetGeometryRef(k)
+                        if tmpGeom.Intersects(resg):
+                            tmp1=geometry2[j].Clone()
+                            #print >> sys.stderr," ***** 2 : "+str(resg)
+                            resg1=tmpGeom.Intersection(resg)
+                            #tmp1.SetGeometryDirectly(validateGeom(resg1))
+                            tmp1.SetGeometryDirectly(resg1)
+                            tmp1.SetFID(len(rgeometries))
+                            if resg1 is not None and not(resg1.IsEmpty()):# and fids.count(tmp.GetFID())==0:
+                                rgeometries+=[tmp1]
+                                fids+=[tmp.GetFID()]
+                            else:
+                                tmp1.Destroy()
+                    except Exception,e:
+                        #tmp1.Destroy()
+                        print >>sys.stderr,e
+                tmp.Destroy()
+            else:
+                #print >> sys.stderr," ***** 2 : "+str(geometry1[i].GetGeometryRef())
+                #resg=validateGeom(geometry1[i].GetGeometryRef()).Intersection(validateGeom(resg))
+                #resg=validateGeom(geometry1[i].GetGeometryRef()).Intersection(resg)
+                resg=geometry1[i].GetGeometryRef().Intersection(resg)
+                #print >> sys.stderr," ***** 3 : "+str(resg)
+                try:
+                    #tmp.SetGeometryDirectly(validateGeom(resg))
+                    tmp.SetGeometryDirectly(resg)
+                    tmp.SetFID(len(rgeometries))
+                    if resg is not None and not(resg.IsEmpty()):# and fids.count(tmp.GetFID())==0:
+                        rgeometries+=[tmp]
+                        fids+=[tmp.GetFID()]
+                    else:
+                        tmp.Destroy()
+                except Exception,e:
+                    print >>sys.stderr,e
+        geometry1[i].Destroy()
     i=0
     while i < len(geometry2):
         geometry2[i].Destroy()
@@ -730,6 +1021,8 @@ def Append(conf,inputs,outputs):
     
     while i < len(geometry1):
         tmp=geometry1[i].Clone()
+        if tmp is None:
+            print >> sys.stderr, "Unable to create a clone of your feature, does it contain a FID column?"
         rgeometries+=[tmp]
         fids+=[tmp.GetFID()]
         geometry1[i].Destroy()
@@ -748,7 +1041,9 @@ def Append(conf,inputs,outputs):
     if len(rgeometries)==0:
         conf["lenv"]["message"]="No feature found !"
         return zoo.SERVICE_FAILED
+    print >> sys.stderr,rgeometries
     outputResult(conf,outputs["Result"],rgeometries)
+    print >> sys.stderr,outputs["Result"]
     print >> sys.stderr,"/outputResult"
     return zoo.SERVICE_SUCCEEDED
 
@@ -826,7 +1121,7 @@ def SymDifferencePy(conf,inputs,outputs):
     geometry1=extractInputs(conf,inputs["InputEntity1"])
     #geometry2=extractInputs(conf,inputs["InputEntity2"])
     outputs1={"Result":{"mimeType":"application/json"}}
-    res=UnionOneGeom(conf,{"InputEntity":inputs["InputEntity2"]})
+    geometry2=UnionOneBis(conf,{"InputEntity":inputs["InputEntity2"]})
     rgeometries=[]
     i=0
     while i < len(geometry1):
@@ -834,8 +1129,11 @@ def SymDifferencePy(conf,inputs,outputs):
         while j < len(geometry2):
             tmp=geometry2[j].Clone()
             resg=geometry1[i].GetGeometryRef()
-            resg=resg.SymmetricDifference(geometry2[i].GetGeometryRef())
-            tmp.SetGeometryDirectly(resg)
+            try:
+                resg=resg.SymmetricDifference(geometry2[i].GetGeometryRef())
+            except:
+                continue
+            tmp.SetGeometryDirectly(validateGeom(resg))
             rgeometries+=[tmp]
             j+=1
         geometry1[i].Destroy()
@@ -847,6 +1145,38 @@ def SymDifferencePy(conf,inputs,outputs):
     outputResult(conf,outputs["Result"],rgeometries)
     return 3
 
+def ExteriorRingPy(conf,inputs,outputs):
+    #print >> sys.stderr,inputs
+    geometry1=extractInputs(conf,inputs["InputPolygon"])
+    outputs1={"Result":{"mimeType":"application/json"}}
+    rgeometries=[]
+    i=0
+    while i < len(geometry1):
+        tmp=geometry1[i].Clone()
+        resg=geometry1[i].GetGeometryRef().Buffer(0.0)
+        print >> sys.stderr,"OK"
+        print >> sys.stderr,resg
+        print >> sys.stderr,"OK"
+        print >> sys.stderr,geometry1[i].GetGeometryRef()
+        nbrRings = resg.GetGeometryCount()
+        for i in range(nbrRings):
+            tmp1=resg.GetGeometryRef(i)
+            line = osgeo.ogr.Geometry(osgeo.ogr.wkbLineString)
+            for j in range(tmp1.GetPointCount()):
+                pt=tmp1.GetPoint(j)
+                line.AddPoint(pt[0],pt[1])
+            tmp.SetGeometryDirectly(line.Clone())
+            line.Destroy()
+            break
+        
+        rgeometries+=[tmp]
+        geometry1[i].Destroy()
+        i+=1
+    i=0
+    outputResult(conf,outputs["Result"],rgeometries)
+    return 3
+
+
 def CreateRegularGrid(conf,inputs,outputs):
     ext=inputs["extent"]["value"].split(",")
     query="SELECT ST_AsGeoJSON(geom) AS geomWKT FROM ST_RegularGrid(ST_Transform(ST_SetSRID(ST_GeomFromText('LINESTRING("+ext[0]+" "+ext[1]+", -"+ext[2]+" "+ext[3]+")',0),3857),32628),1,100,100,false);"
@@ -856,3 +1186,22 @@ def CreateRegularGrid(conf,inputs,outputs):
     cur=con.conn.cursor()
     res=cur.execute(query)
     return zoo.SERVICE_SUCCEEDEED
+
+def validateGeom(geom):
+    if geom.GetGeometryType()==osgeo.ogr.wkbGeometryCollection:
+        return geom
+    elif geom.GetGeometryType()==osgeo.ogr.wkbPolygon:
+        if not(geom.IsValid()):
+            try:
+                tres=geom.Buffer(0.0)
+                if tres is not None and not(tres.IsEmpty()):
+                    return tres
+                else:
+                    return geom
+            except Exception,e:
+                print >>sys.stderr,e
+                return geom
+        else:
+            return geom
+    else:
+        return geom

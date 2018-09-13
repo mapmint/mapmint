@@ -601,7 +601,7 @@ define([
 	    if(!$(this).attr("id"))
 		return;
 	    if($(this).attr("id").replace(reg,"")=="description"){
-		$(this).code(data[$(this).attr("id").replace(reg,"")]);
+		$(this).summernote("code",data[$(this).attr("id").replace(reg,"")]);
 	    }
 	    else
 		$(this).val(data[$(this).attr("id").replace(reg,"")]).change();
@@ -1421,7 +1421,7 @@ define([
 	    type: "POST",
 	    dataInputs: [
 		{"identifier":"dataSource","value":dataSource,"dataType":"string"},
-		{"identifier":"layer","value":layer,"dataType":"integer"}
+		{"identifier":"layer","value":layer,"mimeType":"application/json"}
 	    ],
 	    dataOutputs: [
 		{"identifier":"Result","type":"raw"},
@@ -1952,7 +1952,7 @@ define([
 		{"identifier": "columns","value": JSON.stringify(["name","description","tid"], null, ' '),"mimeType":"application/json"},
 		{"identifier": "links","value": JSON.stringify({"importer_groups":{"table":"mm_tables.importer_groups","ocol":"iid","tid":"gid"},"importer_themes":{"table":"mm_tables.importer_themes","ocol":"iid","tid":"tid"}}, null, ' '),"mimeType":"application/json"},
 		{"identifier": "name","value": $("#documents_name").val(),"dataType":"string"},
-		{"identifier": "description","value": $("#documents_description").val(),"dataType":"string"},
+		{"identifier": "description","value": $("#documents_description").val(),"mimeType":"text/html"},
 		{"identifier": "tid","value": ($("#documents_tid").val()!="None"?$("#documents_tid").val():"NULL"),"dataType":"string"},
 		{"identifier": "importer_groups","value": JSON.stringify(multiples[0], null, ' '),"mimeType":"application/json"},
 		{"identifier": "importer_themes","value": JSON.stringify(multiples[1], null, ' '),"mimeType":"application/json"},

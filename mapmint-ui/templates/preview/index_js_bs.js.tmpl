@@ -7,6 +7,7 @@ var layersList=[];
 var queryLayersList=[];
 var finalLayers=[];
 var lastMap="$(conf["senv"]["last_map"])";
+var dataPath="$conf["main"]["dataPath"]";
 var mapPath="$conf["main"]["dataPath"]/public_maps/";
 var mapProject="$(conf["senv"]["last_map"])";
 var pmapfile="$conf["main"]["dataPath"]/public_maps/project_$(conf["senv"]["last_map"]).map";
@@ -20,6 +21,12 @@ var templatesUrl="$conf["main"]["templatesAddress"]";
 var tselect=[];
 var processResultLayer;
 var _MMID="MMID=$conf["senv"]["MMID"]";
+#try
+#set val=open($m.web.metadata.get("mmWMTSAttribution").replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"])).read()
+#except Exception,e
+#set val=$m.web.metadata.get("mmWMTSAttribution")
+#end try
+var attributionsWMTS='$val';
 #if $conf["senv"]["last_map"]=='indicateurs'
 #include($conf["main"]["templatesPath"]+"/preview/modules/indexes/_init.js")
 #end if
@@ -92,6 +99,10 @@ var baseLayers={
 #end if
 #if $cnt==0
 "proprietary": {'type':'None'}
+#end if
+#if $m.web.metadata.get('mmWMTSBaseLayers')
+#set setM=$m.web.metadata.get('mmWMTSBaseLayers').split(',')
+,"wmtsBaseLayers": $(json.dumps(setM))
 #end if
 #if $m.web.metadata.get('mmBProject')
 #set setM=$m.web.metadata.get('mmBProject').split(',')

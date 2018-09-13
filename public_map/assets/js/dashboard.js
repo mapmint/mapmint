@@ -82,7 +82,7 @@ define([
 	    "bServerSide": true,
 	    fixedHeader: true,
 	    //searching: true,
-	    responsive: true,
+	    responsive: false,
 	    deferRender: true,
 	    crollCollapse:    true,
 	    rowId: 'fid',
@@ -221,6 +221,7 @@ define([
 	    var id = this.id+"";
 	    console.log("CURRENT ID: "+id);
 	    var reg0=new RegExp(ltype+'_',"g");
+	    var reg1=new RegExp(ltype+'_h_',"g");
 	    var index = $.inArray(id, CRowSelected);
 	    if ( index == -1 ) {
 		if(CRowSelected.length>0){
@@ -249,7 +250,10 @@ define([
 		    console.log("NAME: "+$(this).val()+' _');
 		    var attribute=null;
 		    if($(this).attr("name")){
-			attribute=$(this).attr("name").replace(reg0,'');
+			if($(this).attr("name").indexOf("up_h_")<0)
+			    attribute=$(this).attr("name").replace(reg0,'');
+			else
+			    attribute=$(this).attr("name").replace(reg1,'');
 			if(attribute=="id")
 			    attribute="fid";
 			    console.log(CFeaturesSelected[0][attribute]+'_');
@@ -331,6 +335,9 @@ define([
 	    var reg0=new RegExp(ltype+'_',"g");
 	    var reg1=new RegExp(ltype+'s_',"g");
 
+	    if(ltype=="user" && rType!="insert")
+		params.push({identifier: "login",value: CFeaturesSelected[0]["login"],dataType: "string"});
+	    
 	    $(this).parent().find("input").each(function(){
 		if($(this).attr('id')=="um_utype"){
 		    rType=$(this).val();
@@ -370,8 +377,6 @@ define([
 	    });
 	    params.push({identifier: attId,value: JSON.stringify(set),mimeType: "application/json"});
 	    //if(rType!="insert")
-	    if(ltype=="user" && rType!="insert")
-		params.push({identifier: "login",value: set.login,dataType: "string"});
 
 	    
 	    console.log(CRowSelected[0]);
@@ -785,6 +790,7 @@ define([
 	    "name,description,adm,sadm"
 	);
 
+	$(".btn").tooltip();
     };
 
     function displaySymbols(){

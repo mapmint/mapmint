@@ -6,13 +6,18 @@
 	</div>
 #if $inputs.keys().count('type')==0
     <div class="sti-top">
-
 #from Cheetah.Template import Template
 $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",searchList={"conf": $conf,"prefix":"","selected":""}))
-
 	</div>
 #end if
         <div class="ti-mid">
+         <span>$zoo._("Type:")</span>
+         <select id="tileindex_dest">
+	   <option value="vector">_("Vector")</option>
+	   <option value="raster">_("Raster")</option>
+	 </select>
+        </div>
+       <div class="ti-mid">
          <span>$zoo._("Targeted DataStore:")</span>
          <select id="tileindex_dest">
        	   <option>Choose </i>

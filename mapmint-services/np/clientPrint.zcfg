@@ -37,4 +37,13 @@
      encoding = utf-8
     </Default>
    </ComplexData>
+  [Values]
+   Title = The welcome message
+   Abstract = The welcome message created by service.
+   <ComplexData>
+    <Default>
+     mimeType = application/json
+     encoding = utf-8
+    </Default>
+   </ComplexData>
  </DataOutputs>

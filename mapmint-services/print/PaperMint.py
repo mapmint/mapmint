@@ -486,6 +486,8 @@ class LOClient:
         
     def addTable(self,tName,tData):
         text=self.doc.Text
+        print("*** AddTable START ***",file=sys.stderr)
+        sys.stderr.flush()
         self.searchTable(tName)
         if self.cursor is None:
             self.getCursor()
@@ -497,7 +499,9 @@ class LOClient:
         i=0
         i0=1
         countline=0
+        hasElement=False
         while i<len(tData):
+            hasElement=True
             j=0
             if countline > 1:
                 myLines=self.table.Rows
@@ -508,8 +512,14 @@ class LOClient:
                     cell=self.table.getCellByPosition(j,i)
                 except:
                     myCols=self.table.Columns
-                    myCols.insertByIndex(j,1)
-                    cell=self.table.getCellByPosition(j,i)
+                    myCols.insertByIndex(i,1)
+                    print("*** AddTable AddLine ***",file=sys.stderr)
+                    try:
+                        cell=self.table.getCellByPosition(j,i)
+                        print("*** AddTable AddLine Success ***",file=sys.stderr)
+                    except Exception as e:
+                        print("*** ERROR ***"+str(e),file=sys.stderr)
+                        pass
                 try:
                     if toto.count("<")>0 and toto.count(">")>0 :
                         cell.setFormula(toto.replace("i",str(j)))
@@ -524,6 +534,8 @@ class LOClient:
             countline+=1
             i0+=1
             i+=1
+        print("*** AddTable END ***",file=sys.stderr)
+        sys.stderr.flush()
 
     def addImageTable(self,tName,tData,sizes):
         text=self.doc.Text

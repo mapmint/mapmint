@@ -84,6 +84,10 @@
 	    <option value="$conf["mm"]["b"+$i+"Name"]" #if $lname==$conf["mm"]["b"+$i+"Name"]#selected="true"#end if#>$conf["mm"]["b"+$i+"Name"]</option>
 #end for
 	  </select>
+#if $lname=="Planet"
+	  <input name="mmBBDefault_ini" id="mmBBDefault_ini" value="$m.web.metadata.get('mmPBaseLayers')" type="hidden" />
+	  <!-- $lname -->
+#end if	  
 	</div>
       </div>
       <div class="row">
@@ -112,6 +116,71 @@
 	  <input class="form-control" name="mmBAK" value="$m.web.metadata.get('mmBAK')" />
 	</div>
       </div>
+      <div class="row">
+	<label class="col-sm-3 control-label"> $zoo._("WMTS Server")
+	<input id="mmWMTSBL" type="checkbox" class="form-check"
+	onchange="if(\$(this).is(':checked'))\$(this).parent().next().show();else
+	\$(this).parent().next().hide();" /> </label>
+        <div class="col-sm-9 range" style="display:none">
+	  <div class="input-group" id="wmts_server_url">
+	    <span class="input-group-btn" title="$zoo._("Set URL")" rel="tooltip">
+	    <button class="btn btn-default disabled" type="button">$zoo._("Set")</button>
+	    </span>
+	    <input type="text" class="form-control" placeholder="$zoo._("WMTS Server URL")" value="$m.web.metadata.get("mmWMTSBLURL")"/>
+	  </div>
+	  <div id="wmts_layers_list">
+#try	    
+#if $m.web.metadata.get("mmWMTSBLURL")!=""
+#set tmp=$m.web.metadata.get("mmWMTSBaseLayers").split(",")
+#for i in range(len($tmp))	    
+#set tmp0=tmp[$i].split("|")
+	    <div class="col-sm-6">
+	      <div class="input-group">
+		<span class="input-group-addon" title="$zoo._("Display this layer")" rel="tooltip">
+		<input type="checkbox" class="form-check" checked="checked" />
+		</span>
+		<input type="text" class="form-control" disabled
+		placeholder="$zoo._("Original Layer title")" data-value="$(tmp0[0])|$(tmp0[1])|$(tmp0[2])" value="$tmp0[2]" />
+	      </div>
+	    </div>
+	    <div class="col-sm-6">
+	      <input type="text" class="form-control"
+	      placeholder="$zoo._("Layer title")" value="$tmp0[3]" />
+	    </div>
+#end for
+#end if
+#except
+	    <!-- no wmts layer -->
+#end try	    
+	  </div>
+	  <div id="wmts_layers_attributions">
+	    <label class="col-sm-2">$zoo._("Attributions")</label>
+	    <div class="col-sm-10">
+#try
+#set val=open($m.web.metadata.get("mmWMTSAttribution").replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"])).read()
+#except
+#set val=$m.web.metadata.get("mmWMTSAttribution")
+#end try
+	      <textarea name="wmts_attribution" class="form-control mm-editor">$val</textarea>
+	    </div>
+	  </div>
+	</div>
+      </div>
+<script id="template_wmts_layers" type="template/text">
+	    <div class="col-sm-6">
+	      <div class="input-group">
+		<span class="input-group-addon" title="$zoo._("Display this layer")" rel="tooltip">
+		<input type="checkbox" class="form-check" />
+		</span>
+		<input type="text" class="form-control" disabled
+		placeholder="$zoo._("Original Layer title")" data-value="VAL" value="TITLE" />
+	      </div>
+	    </div>
+	    <div class="col-sm-6">
+	      <input type="text" class="form-control"
+	      placeholder="$zoo._("Layer title")" value="NEWTITLE" />
+	    </div>
+</script>
       <div class="row">
 	<label class="col-sm-3 control-label">$zoo._("Created layers")</label>
       <div class="col-sm-9 range">
@@ -151,6 +220,7 @@
       <div class="row myWell">
 	<table id="datasources_list">
 	  <thead>
+	  <th width="50">$zoo._("Id")</th>
 	  <th width="350">$zoo._("Layer Name")</th>
 	  <th width="50">$zoo._("Popup")</th>
 	  <th width="50">$zoo._("Window")</th>
@@ -192,6 +262,7 @@
 #for i in range(0,$m.numlayers)
 #if $m.getLayer($i).name.count("_mmlabel")==0
 	    <tr>
+	      <td>$m.getLayer($i).index</td>
 	      <td>$m.getLayer($i).name</td>
 	      <td><input name="popup" type="checkbox" value="p$i" id="layer_has_popup_$m.getLayer($i).name" #if ($popupList.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>
 	      <td><input name="windows" type="checkbox" value="w$i" id="layer_has_click_$m.getLayer($i).name" #if ($windowList.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>

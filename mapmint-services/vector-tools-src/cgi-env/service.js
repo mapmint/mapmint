@@ -133,6 +133,17 @@ function createGrid(conf,inputs,outputs){
 	"dst_out": { type: "string", value: conf["main"]["dbuserName"] },
 	"dso_out": { type: "string", value: layerData },
     };
+    /*    var myInputs1 = {
+	"sql": { type: 'string',  value: "SELECT * from (SELECT geom AS geomWKT FROM ST_RegularGrid(ST_Transform(ST_SetSRID(ST_GeomFromText('LINESTRING("+ext[0]+" "+ext[1]+", "+ext[2]+" "+ext[3]+")',0),3857),32628),1,100,100,false)) as foo"},
+	"dst_in": { type: "string", value: conf["main"]["dbuserName"] },
+	"dso_in": { type: "string", value: "forets" },
+	"dso_f": { type: "string", value: "PostgreSQL" },
+	"dst_out": { type: "string", value: conf["main"]["dbuserName"] },
+	"dso_out": { type: "string", value: layerData },
+	//"dso_f": { type: "string", value: "ESRI Shapefile" },
+	//"dst_out": { type: "string", value: conf["main"]["dataPath"]+"/data_"+conf["lenv"]["usid"]+".shp" },
+	//"dso_out": { type: "string", value: "data_"+conf["lenv"]["usid"] },
+    };*/
     var myOutputs1= {Result: { type: 'RawDataOutput', "mimeType": "application/json" } };
     var myExecuteResult1=myProcess1.Execute(myInputs1,myOutputs1);
     alert(myExecuteResult1);
@@ -146,4 +157,28 @@ function createGrid(conf,inputs,outputs){
     alert(myExecuteResult2);
     outputs["Result"]["value"]=conf["main"]["dataPath"]+"/grids/project_gridStyle_"+layerData+".map";
     return {result: ZOO.SERVICE_SUCCEEDED, outputs: outputs };
+}
+
+function createTindex(conf,inputs,outputs){
+    var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'datastores.directories.listJson');
+    var myOutputs1= {Result: { type: 'RawDataOutput', "mimeType": "application/json" } };
+    var myExecuteResult1=myProcess1.Execute(inputs,myOutputs1);
+    alert(myExecuteResult1);
+    var files=eval(myExecuteResult1);
+    var myInputs1 = {
+	"files": {"type": "string","isArray": "true","length": files.length, "value": files},
+	"OutputName": {"type": "string","value":conf["main"]["dataPath"]+"/dirs/"+inputs["idir"]["value"]+"/vtile_"+inputs["OutputName"]["value"]+".shp" }
+    };
+    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.Ogrtindex');
+    var myOutputs2= {Result: { type: 'RawDataOutput', "mimeType": "application/json" } };
+    var myExecuteResult2=myProcess2.Execute(myInputs1,myOutputs2);
+    alert(myExecuteResult2);
+    if(myExecuteResult2.indexOf("ExceptionReport")>=0){
+	conf["lenv"]["message"]=ZOO._("Unable to create the vector tileindex!");
+	return {result: ZOO.SERVICE_FAILED,conf:conf};
+    }
+    else{
+	outputs["Result"]["value"]=myExecuteResult2;
+	return {result: ZOO.SERVICE_SUCCEEDED, outputs: outputs};
+    }
 }

@@ -1531,13 +1531,14 @@ __declspec(dllexport)
       char *tmp1=strdup(mapPath);
       free(mapPath);
       map* tmpMap1=getMapFromMaps(conf,"main","dataPath");
-      mapPath=(char*)malloc((strlen(tmpMap1->value)+strlen(mapPath)+strlen(type)+4+1)*sizeof(char));
+      mapPath=(char*)malloc((strlen(tmpMap1->value)+strlen(tmp1)+strlen(type)+4+1)*sizeof(char));
       fprintf(stderr,"MAPFILE TO SAVE %s !\n",tmp1);    
       if(isWxs>0)
 	sprintf(mapPath,"%s/%s/%s",tmpMap1->value,type,strstr(tmp1,":")+1);
       else
 	sprintf(mapPath,"%s/%s/%s",tmpMap1->value,type,tmp1);
       fprintf(stderr,"MAPFILE TO SAVE %s\n",mapPath);
+      free(tmp1);
     }
     struct stat mstat;
     int s=stat(mapPath,&mstat);
@@ -1985,66 +1986,76 @@ __declspec(dllexport)
 	myLayer->type = MS_LAYER_RASTER;
 	msLayerAddProcessing(myLayer,"RESAMPLE=AVERAGE");
       }else{
-	myLayer->tileitem=NULL;
-	
-	myLayer->data = strdup(poDefn->GetName());
-	myLayer->index = m->numlayers;
-	myLayer->dump = MS_TRUE;
-	myLayer->status = MS_ON;
-	if(strncasecmp(pszDataSource,"WFS",3)==0){
-	  char  *tmp=strdup(strstr(pszDataSource,":")+1);
-	  myLayer->connection = strdup(tmp);
-	  msConnectLayer(myLayer,MS_WFS,tmp);
-	  fprintf(stderr,"WFS %s\n",tmp);
-	  free(tmp);
-	}
-	else{
-	  myLayer->connection = strdup(pszDataSource);
-	  msConnectLayer(myLayer,MS_OGR,pszDataSource);
-	}
-	if(strncasecmp(pszDataSource,"PG:",3)==0 ||
-	   strncasecmp(pszDataSource,"MYSQL:",6)==0 ||
-	   strncasecmp(pszDataSource,"OCI:",4)==0 )
-	  msLayerAddProcessing(myLayer,"CLOSE_CONNECTION=DEFER");
-
-	/**
-	 * Detect the Geometry Type or use Polygon
-	 */
-	if(OGR_L_GetGeomType(poLayer) != wkbUnknown){
-	  switch(OGR_L_GetGeomType(poLayer)){
-	  case wkbPoint:
-	  case wkbMultiPoint:
-	  case wkbPoint25D:
-	  case wkbMultiPoint25D:
-#ifdef DEBUGMS
-	    fprintf(stderr,"%s %s POINT DataSource Layer \n",pszDataSource,myLayer->data);
-#endif
-	    myLayer->type = MS_LAYER_POINT;
-	    break;
-	  case wkbLineString :
-	  case wkbMultiLineString :
-	  case wkbLineString25D:
-	  case wkbMultiLineString25D:
-#ifdef DEBUGMS
-	    fprintf(stderr,"%s %s LINE DataSource Layer \n",pszDataSource,myLayer->data);
-#endif
-	    myLayer->type = MS_LAYER_LINE;
-	    break;
-	  case wkbPolygon:
-	  case wkbMultiPolygon:
-	  case wkbPolygon25D:
-	  case wkbMultiPolygon25D:
-#ifdef DEBUGMS
-	    fprintf(stderr,"%s %s POLYGON DataSource Layer \n",pszDataSource,myLayer->data);
-#endif
-	    myLayer->type = MS_LAYER_POLYGON;
-	    break;
-	  default:
-	    myLayer->type = MS_LAYER_POLYGON;
-	    break;
-	  }
-	}else
+	if(strncasecmp(myLayer->name,"vtile_",4)==0){
+	  myLayer->tileindex = (char*)malloc((strlen(pszDataSource)+strlen(myLayer->name)+5+1)*sizeof(char));
+	  sprintf(myLayer->tileindex,"%s/%s.shp",pszDataSource,myLayer->name);
+	  myLayer->tileitem=strdup("Location");
+	  OGRLayer * poiLayer;
+	  
 	  myLayer->type = MS_LAYER_POLYGON;
+	  //msLayerAddProcessing(myLayer,"RESAMPLE=AVERAGE");
+	}else{
+	  myLayer->tileitem=NULL;
+	
+	  myLayer->data = strdup(poDefn->GetName());
+	  myLayer->index = m->numlayers;
+	  myLayer->dump = MS_TRUE;
+	  myLayer->status = MS_ON;
+	  if(strncasecmp(pszDataSource,"WFS",3)==0){
+	    char  *tmp=strdup(strstr(pszDataSource,":")+1);
+	    myLayer->connection = strdup(tmp);
+	    msConnectLayer(myLayer,MS_WFS,tmp);
+	    fprintf(stderr,"WFS %s\n",tmp);
+	    free(tmp);
+	  }
+	  else{
+	    myLayer->connection = strdup(pszDataSource);
+	    msConnectLayer(myLayer,MS_OGR,pszDataSource);
+	  }
+	  if(strncasecmp(pszDataSource,"PG:",3)==0 ||
+	     strncasecmp(pszDataSource,"MYSQL:",6)==0 ||
+	     strncasecmp(pszDataSource,"OCI:",4)==0 )
+	    msLayerAddProcessing(myLayer,"CLOSE_CONNECTION=DEFER");
+
+	  /**
+	   * Detect the Geometry Type or use Polygon
+	   */
+	  if(OGR_L_GetGeomType(poLayer) != wkbUnknown){
+	    switch(OGR_L_GetGeomType(poLayer)){
+	    case wkbPoint:
+	    case wkbMultiPoint:
+	    case wkbPoint25D:
+	    case wkbMultiPoint25D:
+#ifdef DEBUGMS
+	      fprintf(stderr,"%s %s POINT DataSource Layer \n",pszDataSource,myLayer->data);
+#endif
+	      myLayer->type = MS_LAYER_POINT;
+	      break;
+	    case wkbLineString :
+	    case wkbMultiLineString :
+	    case wkbLineString25D:
+	    case wkbMultiLineString25D:
+#ifdef DEBUGMS
+	      fprintf(stderr,"%s %s LINE DataSource Layer \n",pszDataSource,myLayer->data);
+#endif
+	      myLayer->type = MS_LAYER_LINE;
+	      break;
+	    case wkbPolygon:
+	    case wkbMultiPolygon:
+	    case wkbPolygon25D:
+	    case wkbMultiPolygon25D:
+#ifdef DEBUGMS
+	      fprintf(stderr,"%s %s POLYGON DataSource Layer \n",pszDataSource,myLayer->data);
+#endif
+	      myLayer->type = MS_LAYER_POLYGON;
+	      break;
+	    default:
+	      myLayer->type = MS_LAYER_POLYGON;
+	      break;
+	    }
+	  }else
+	    myLayer->type = MS_LAYER_POLYGON;
+	}
       }
 
       /**

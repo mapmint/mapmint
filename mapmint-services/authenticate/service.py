@@ -36,6 +36,29 @@ try:
 except:
 	from manage_users import manage_users
 
+def loginFlux(conf,h):
+    import requests
+    print >>  sys.stderr," ***************** TEST 1 **************"
+    dataParam = {'mp': h.hexdigest(), 'email': conf["senv"]["mail"]}
+    print >>  sys.stderr,str(dataParam)
+    urlCon ="http://sigcod.geolabs.fr/flux/Services/service_connect"
+    try:
+        print >>  sys.stderr," ***************** TEST 2 **************"
+        myRequest = requests.post(urlCon, data=dataParam)         
+        print >>  sys.stderr," ***************** TEST 3 **************"
+        print >>  sys.stderr,myRequest.headers["set-cookie"].split(";")[2].split(",")[1]
+        conf["senv"]["ecookie"]=myRequest.headers["set-cookie"].split(";")[2].split(",")[1]+"; path=/"
+        conf["senv"]["ecookie_length"]=str(1)
+        print >>  sys.stderr,dir(myRequest)
+        conf["lenv"]["ecookie"]=myRequest.headers["set-cookie"].split(";")[2].split(",")[1]+"; path=/"
+        conf["lenv"]["ecookie_length"]=str(1)
+        print >>  sys.stderr," ***************** TEST 4 **************"
+        return zoo.SERVICE_SUCCEEDED
+    except:
+        print >>  sys.stderr," ***************** EXCEPT **************"
+        conf["lenv"]["message"]=zoo._("Unable to connect to flux")
+        return zoo.SERVICE_FAILED
+    
 def setDefaultExtent(conf,inputs,outputs):
 	conf["senv"]["default_extent"]=inputs["bbox"]["value"]
 	import mmsession
@@ -221,7 +244,7 @@ def clogIn(conf,inputs,outputs):
     h.update(inputs['password']['value'])
     c = conn.cursor()
     try:
-        con.pexecute_req([" SELECT users.*,(select max(adm) from "+prefix+"groups,"+prefix+"user_group where "+prefix+"groups.id=id_group and id_user="+prefix+"users.id) FROM "+prefix+"users WHERE login=[_login_] AND passwd=[_password_]",{"login":{"value":inputs['login']['value'],"format":"s"},"password": {"value":h.hexdigest(),"format":"s"}}])
+        con.pexecute_req([" SELECT users.*,(select max(adm) from "+prefix+"groups,"+prefix+"user_group where "+prefix+"groups.id=id_group and id_user="+prefix+"users.id) FROM "+prefix+"users WHERE (login=[_login_] OR mail=[_login_]) AND passwd=[_password_]",{"login":{"value":inputs['login']['value'],"format":"s"},"password": {"value":h.hexdigest(),"format":"s"}}])
     except Exception as e:
         conf["lenv"]["message"]=zoo._("Error when processing SQL query: ")+str(e)
         return zoo.SERVICE_FAILED
@@ -231,12 +254,15 @@ def clogIn(conf,inputs,outputs):
         # Set all the Session environment variables using the users 
         # table content.
         print >> sys.stderr,a
+        cid="MM"+conf["lenv"]["usid"]
+        conf["lenv"]["cookie"]="MMID="+cid+"; path=/"
         if conf.keys().count("senv")==0:
             cid="MM"+conf["lenv"]["usid"]
             conf["lenv"]["cookie"]="MMID="+cid+"; path=/"
+            conf["lenv"]["cookieArray"]="MMID="+cid+"; path=/"
             conf["senv"]={}
             conf["senv"]["MMID"]=cid
-
+        import requests
         c.execute(con.desc)
         desc=c.fetchall()
         for i in desc:
@@ -251,9 +277,30 @@ def clogIn(conf,inputs,outputs):
                 else:
                     conf["senv"][i[1]]=str(a[0][i[0]])
 
+        
         for i in desc:
-            if i[0]=='login':
-                conf["senv"]["login"]=a[0][i[0]].encode('utf-8')
+            if i[1]=='login':
+                print >>  sys.stderr," ***************** TEST **************"
+                #conf["senv"]["login"]=a[0][i[0]].encode('utf-8')
+                dataParam = {'mp': h.hexdigest(), 'email': conf["senv"]["mail"]}
+                print >>  sys.stderr,str(dataParam)
+                urlCon ="http://sigcod.geolabs.fr/flux/Services/service_connect"
+                try:
+                    print >>  sys.stderr," ***************** TEST **************"
+                    myRequest = requests.post(urlCon, data=dataParam)
+                    
+                    print >>  sys.stderr," ***************** TEST **************"
+                    print >>  sys.stderr,myRequest.headers["set-cookie"].split(";")[2].split(",")[1]
+                    conf["senv"]["ecookie"]=myRequest.headers["set-cookie"].split(";")[2].split(",")[1]+"; path=/"
+                    conf["senv"]["ecookie_length"]=str(1)
+                    print >>  sys.stderr,dir(myRequest)
+                    conf["lenv"]["ecookie"]=myRequest.headers["set-cookie"].split(";")[2].split(",")[1]+"; path=/"
+                    conf["lenv"]["ecookie_length"]=str(1)
+                    print >>  sys.stderr," ***************** TEST **************"
+                except:
+                    conf["lenv"]["message"]=zoo._("Unable to connect to flux")
+                    return zoo.SERVICE_FAILED
+                
                 break
         conf["senv"]["loggedin"]="true"
         if conf["main"].has_key("isTrial") and conf["main"]["isTrial"]=="true":
@@ -286,7 +333,9 @@ def clogOut(conf,inputs,outputs):
         conf["senv"]["loggedin"]="false"
         conf["senv"]["login"]="anonymous"
         conf["senv"]["group"]="public"
-        conf["lenv"]["cookie"]="MMID="+conf["senv"]["MMID"]+"; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
+        conf["lenv"]["ecookie_length"]="1"
+        conf["lenv"]["ecookie"]="sid=empty"
+        conf["lenv"]["cookie"]="MMID="+conf["lenv"]["usid"]+"; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
         return zoo.SERVICE_SUCCEEDED
     else:
         conf["lenv"]["message"]=zoo._("User not authenticated")
@@ -298,7 +347,13 @@ def logOut(conf,inputs,outputs):
     if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
         outputs["Result"]["value"]=zoo._("User disconnected")
         conf["senv"]["loggedin"]="false"
-        conf["lenv"]["cookie"]="MMID="+conf["senv"]["MMID"]+"; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
+        conf["senv"]["login"]="anonymous"
+        conf["senv"]["group"]="public"
+        conf["lenv"]["ecookie_length"]="1"
+        conf["lenv"]["ecookie"]="sid=empty; path=/"
+        conf["senv"]["ecookie_length"]="1"
+        conf["senv"]["ecookie"]="sid=empty; path=/"
+        conf["lenv"]["cookie"]="MMID="+conf["lenv"]["usid"]+"; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
         return zoo.SERVICE_SUCCEEDED
     else:
         conf["lenv"]["message"]=zoo._("User not authenticated")
@@ -364,8 +419,11 @@ def logIn(conf,inputs,outputs):
         return zoo.SERVICE_FAILED
 
     if len(a)>0:
-        cid=str(time.time()).split(".")[0]
-        conf["lenv"]["cookie"]="MMID=MM"+cid+"; path=/"
+        cid="MM"+conf["lenv"]["usid"]
+        conf["lenv"]["cookie"]="MMID="+cid+"; path=/"
+        
+        #cid=str(time.time()).split(".")[0]
+        #conf["lenv"]["cookie"]="MMID=MM"+cid+"; path=/"
 
         conf["senv"]={}
         conf["senv"]["MMID"]="MM"+cid
@@ -399,6 +457,10 @@ def logIn(conf,inputs,outputs):
         sql=" UPDATE "+prefix+"users set last_con="+con.now+" WHERE login=[_login_]"
         con.pexecute_req([sql,{"login":{"value":inputs["login"]["value"],"format":"s"}}])
         conn.commit()
+        try:
+            loginFlux(conf,h)
+        except:
+            pass
         #print >> sys.stderr, str(conf["senv"])
         return zoo.SERVICE_SUCCEEDED
     else:
