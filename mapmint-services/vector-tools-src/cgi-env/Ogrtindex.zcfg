@@ -1,0 +1,67 @@
+[Ogrtindex]
+ Title = Create a tileindex. 
+ Abstract = http://www.gdal.org/ogrtindex.html
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceType = C
+ serviceProvider = ogrtindex_service.zo
+ <MetaData>
+   title = My Demo
+ </MetaData>
+ <DataInputs>
+  [f]
+   Title = Format of the output data
+   Abstract = Select the output format.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+     value = ESRI ShapeFile
+     AllowedValues = KML,geojson,ESRI Shapefile,csv
+    </Default>
+   </LiteralData>
+  [of]
+   Title = Format of the output data
+   Abstract = Select the output format.
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+     value = ESRI ShapeFile     
+     AllowedValues = KML,geojson,ESRI Shapefile,csv
+    </Default>
+    <Supported>
+     value = KML
+    </Supported>
+   </LiteralData>
+  [files]
+   Title = The input data source name
+   Abstract = The input data source name to use as source for convertion.
+   minOccurs = 1
+   maxOccurs = 1024
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [OutputName]
+   Title = The output data source name
+   Abstract = The output data name.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataOutputs>  

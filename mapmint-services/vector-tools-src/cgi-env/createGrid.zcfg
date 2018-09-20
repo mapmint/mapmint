@@ -1,0 +1,40 @@
+[createGrid]
+ Title = Compute a grid of 1ha parcels over a specific extent
+ Abstract = Compute a grid of 1ha parcels over a specific extent
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service.js
+ serviceType = JS
+ <DataInputs>
+  [extent]
+   Title = Extent
+   Abstract = The extent to use to compute the polygon grid
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    <Default>
+    dataType = string
+    </Default>
+   </LiteralData>
+  [id]
+   Title = id
+   Abstract = The id used to name the produced grid
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    <Default>
+    dataType = integer
+    </Default>
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting string
+   Abstract = The string created by service.
+   <ComplexOutput>
+     <Default>
+     mimeType = application/json
+     </Default>
+   </ComplexOutput>
+ </DataOutputs>  

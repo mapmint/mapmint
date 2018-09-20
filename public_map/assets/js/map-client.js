@@ -88,8 +88,10 @@ define([
     }
 
     function setMapHeight(){
-	var mpheight= $(window).height() - $('.navbar-header').height() - ($('#table-wrapper').hasClass('in') && !shouldDisplayTabsForToggle?$('#table-wrapper').height():0);
-	$('#map').height(mpheight);
+	if(!shouldDisplayTabsForToggle){
+	    var mpheight= $(window).height() - $('.navbar-header').height() - ($('#table-wrapper').hasClass('in') && !shouldDisplayTabsForToggle?$('#table-wrapper').height():0);
+	    $('#map').height(mpheight);
+	}	    
     }
 
     $(window).resize(function() {
@@ -1774,6 +1776,7 @@ define([
 	loadContextualMenu();
 	load_menu();
 	$('[data-toggle="remove"]').on('click',function(e){
+	    e.preventDefault();
 	    console.log("data-toggle");
 	    console.log("* DEBUG DJAY !!!!!!!");
 	    console.log("* DEBUG DJAY !!!!!!!");
@@ -1784,10 +1787,12 @@ define([
 		$($("#mmm_table-wrapper-header").find("li a")[1]).tab('show');
 	    else{
 		$("#table-wrapper").collapse("hide");
-		setMapHeight();
-		map.updateSize();
+		if(!shouldDisplayTabsForToggle){
+		    setMapHeight();
+		    map.updateSize();
+		}else
+		    $("#mapwrap").find("a").first().click();
 	    }
-	    e.preventDefault();
 	});
 
 	$("[data-toggle=zoomToElement]").on('click',function(){

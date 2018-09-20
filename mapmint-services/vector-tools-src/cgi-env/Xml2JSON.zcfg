@@ -1,0 +1,36 @@
+[Xml2JSON]
+ Title = Convert XML file into json format. 
+ Abstract = Convert XML file into json format.
+ processVersion = 1
+ serviceProvider = mmservice
+ serviceType = Python
+ <DataInputs>
+  [xml]
+   Title = Polygon to get the centroid
+   Abstract = The centroid which is not necessarily within the geometry.
+   minOccurs = 1
+   maxOccurs = 1
+   <ComplexData>
+    <Default>
+     mimeType = text/xml
+     encoding = UTF-8
+     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+    </Default>
+    <Supported>
+     mimeType = text/xml
+     encoding = base64
+     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+    </Supported>
+   </ComplexData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The JSON String
+   Abstract = The produced JSON String
+   <ComplexData>
+    <Default>
+     mimeType = application/json
+     encoding = UTF-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>  

@@ -1,0 +1,47 @@
+[listJson]
+ Title = List all files with a given extension from a directory.
+ Abstract = List all files with a given extension from a directory.
+ processVersion = 2
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <MetaData lang="en">
+   title = Demo
+ </MetaData>
+ <DataInputs>
+  [path]
+   Title = Input string
+   Abstract = The name of the map to extract values from.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default>
+     UOM = meter
+    </Default>
+    <Supported>
+     UOM = meter
+    </Supported>
+   </LiteralData>
+  [ext]
+   Title = File extension
+   Abstract = The extension of files to list.
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The file list
+   Abstract = The file list.
+   <ComplexData>
+    <Default>
+     mimeType = application/json
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

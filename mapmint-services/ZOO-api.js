@@ -3685,8 +3685,26 @@ ZOO.Format.WPS = ZOO.Class(ZOO.Format, {
 	data=null;
       }
       return res.length>1?res:res[0];
-    } else
-      return null;
+    }
+    else{
+      var hasPercentCompleted=true;
+      var status = node.*::Status.*::ProcessStarted;
+      var msg = node.*::Status.*::ProcessStarted.*::*[0];
+      if(!status || !msg){
+        status = node.*::Status.*::ProcessAccepted;
+	msg = node.*::Status.*::ProcessAccepted.*::*[0];
+	msg=msg.toString();
+        hasPercentCompleted=false;
+      }else
+	  msg=msg.toString();
+      if(status!=null && node.@statusLocation){
+        var res={"status": node.@statusLocation.toXMLString(), "message": msg};
+	if(hasPercentCompleted)
+	  res["percentCompleted"]=status.@percentCompleted.toXMLString();
+        return res;
+      }else
+	return null;
+    }
   },
   /**
    * Property: parseData
@@ -6142,6 +6160,11 @@ ZOO.Process = ZOO.Class({
    */
   identifier: null,
   /**
+   * Property: async
+   * {Bool} Define if the process should run asyncrhonously (true) or not (false, default).
+   */
+  async: null,
+  /**
    * Constructor: ZOO.Process
    * Create a new Process
    *
@@ -6153,6 +6176,7 @@ ZOO.Process = ZOO.Class({
   initialize: function(url,identifier) {
     this.url = url;
     this.identifier = identifier;
+    this.async = (arguments.length>2?arguments[2]:false);
   },
   /**
    * Method: Execute
@@ -6168,7 +6192,7 @@ ZOO.Process = ZOO.Class({
   Execute: function(inputs,outputs) {
     if (this.identifier == null)
       return null;
-    var body = new XML('<wps:Execute service="WPS" version="1.0.0" xmlns:wps="'+this.namespaces['wps']+'" xmlns:ows="'+this.namespaces['ows']+'" xmlns:xlink="'+this.namespaces['xlink']+'" xmlns:xsi="'+this.namespaces['xsi']+'" xsi:schemaLocation="'+this.schemaLocation+'"><ows:Identifier>'+this.identifier+'</ows:Identifier>'+this.buildDataInputsNode(inputs)+this.buildDataOutputsNode(outputs)+'</wps:Execute>');
+      var body = new XML('<wps:Execute service="WPS" version="1.0.0" xmlns:wps="'+this.namespaces['wps']+'" xmlns:ows="'+this.namespaces['ows']+'" xmlns:xlink="'+this.namespaces['xlink']+'" xmlns:xsi="'+this.namespaces['xsi']+'" xsi:schemaLocation="'+this.schemaLocation+'"><ows:Identifier>'+this.identifier+'</ows:Identifier>'+this.buildDataInputsNode(inputs)+this.buildDataOutputsNode(outputs)+'</wps:Execute>');
     body = body.toXMLString();
     var headers=['Content-Type: text/xml; charset=UTF-8'];
     if(arguments.length>2){
@@ -6321,7 +6345,7 @@ ZOO.Process = ZOO.Class({
         outputsArray[1].push(builder.apply(this,[attr,data]));	    
     }
     var responseDocuments=(outputsArray[0].length>0?
-			   new XML('<wps:ResponseDocument xmlns:wps="'+this.namespaces['wps']+'">'+
+			   new XML('<wps:ResponseDocument  '+(this.async?'storeExecuteResponse="true" status="true"':'')+' xmlns:wps="'+this.namespaces['wps']+'">'+
 				   outputsArray[0].join('\n')+
 				   '</wps:ResponseDocument>')
 			   :
