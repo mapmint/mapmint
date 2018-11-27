@@ -1,12 +1,6 @@
 RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^public$ /ui/public/ [L,R=301]
-RewriteRule ^public/tables/(.*)  /cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=template.display&DataInputs=tmpl=public/tables;query=$1&RawDataOutput=Result [L,QSA]
-RewriteRule ^public/page/init_js /cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=template.display&DataInputs=tmpl=preview/init_js&RawDataOutput=Result [L,QSA]
-RewriteRule ^public/page/index_js /cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=template.display&DataInputs=tmpl=preview/index_js&RawDataOutput=Result  [L,QSA]
-RewriteRule ^public/page/(.*)  /cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=template.display&DataInputs=tmpl=public/;page=$1&RawDataOutput=Result [L,QSA]
-RewriteRule ^$ /ui/public/ [L,R=301]
 RewriteRule ^(.*);module=(.*).js$ /ui/$1.js;module=$2 [L,QSA]
 RewriteRule ^preview/assets/(.*)$ /pm/assets/$1 [L,QSA]
 RewriteRule ^preview/css/(.*)$ /pm/css/$1 [L,QSA]

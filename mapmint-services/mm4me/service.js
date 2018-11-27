@@ -59,10 +59,12 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": conf["senv"]["last_file"],"type":"string"},
-	"q": {"value": req,"type":"string"},
+	"q": {"value": req,"mimeType":"application/json","type": "complex"},
     }
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult1=myProcess.Execute(myInputs,myOutputs1);
+    alert(myExecuteResult1);
+
     var efields=eval(myExecuteResult1);
     var sqlPartContent="INSERT INTO "+(obj["tbl"].replace(/_/,"."))+" (";
     var initContent=sqlPartContent;
@@ -122,7 +124,7 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": conf["senv"]["last_file"],"type":"string"},
-	"q": {"value": req,"type":"string"},
+	"q": {"value": req,"mimeType":"application/json","type": "complex"},
     }
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
@@ -177,7 +179,7 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": inputDSN,"type":"string"},
-	"q": {"value": sqlPartContent,"type":"string"},
+	"q": {"value": sqlPartContent,"mimeType":"application/json"},
     }
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
@@ -207,7 +209,7 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
 				"table": {"value": obj["tbl"],"type":"string"},
 				"tableName": {"value": obj["tbl"].replace(/_/,"."),"type":"string"},
 				"field": {"value": binaryValues[kk]["name"],"type":"string"},
-				"q": {"value": initReq,"type":"string"},
+				"q": {"value": initReq,"mimeType":"application/json"},
 				"dstName": {"value": conf["senv"]["last_file"],"type":"string"},
 				"dsoName": {"value": "","type":"string"},
 				"id": {"value": currentTuple[k]["id"],"type":"string"}
@@ -260,7 +262,7 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": conf["senv"]["last_file"],"type":"string"},
-	"q": {"value": req,"type":"string"},
+	"q": {"value": req,"mimeType":"application/json","type":"complex"},
     }
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult1=myProcess.Execute(myInputs,myOutputs1);
@@ -348,7 +350,7 @@ function replaySqliteHistory(conf,inputs,outputs){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": conf["senv"]["last_file"],"type":"string"},
-	"q": {"value": req,"type":"string"},
+	"q": {"value": req,"mimeType":"application/json"},
     }
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
@@ -358,9 +360,7 @@ function replaySqliteHistory(conf,inputs,outputs){
 	var sqlPartContent="";
 	conf["lenv"]["message"]="Replay step: "+(i+1);
 	ZOOUpdateStatus(conf,14+((i)*(86/localResult.length)));
-
 	replayHistoryForTable(conf,localResult[i],sqlResult,sqlContent,null);
-
     }
 
     sqlResult.push("DELETE FROM history_log");
@@ -409,6 +409,10 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	"mm4me_tables": {
 	    "table": "mm_tables.p_tables",
 	    "clause": "where id in (select ptid from mm_tables.p_views where id in (select vid from mm_tables.p_view_groups where gid in (select id from mm.groups where name in ('"+groups.join("','")+"')))) or id in (select ptid from mm_tables.p_editions where id in (select eid from mm_tables.p_edition_groups where gid in (select id from mm.groups where name in ('"+groups.join("','")+"'))))",
+	},
+	"mm4me_gc": {
+	    "table": "public.geometry_columns",
+	    "clause": " where f_table_schema in (select split_part(name,'.',1) as schema from mm_tables.p_tables where id in (select ptid from mm_tables.p_editions where id in (select eid from mm_tables.p_edition_fields where ftype=18))) and f_table_name in (select split_part(name,'.',2) as schema from mm_tables.p_tables where id in (select ptid from mm_tables.p_editions where id in (select eid from mm_tables.p_edition_fields where ftype=18)))"
 	},
     };
     var tmpTot=12;
@@ -782,7 +786,10 @@ function createSqliteDB4ME(conf,inputs,outputs){
     }
     outputs["Result"]["generated_file"]=conf["main"]["tmpPath"]+"/"+dbFile;
     outputs["Result1"]["generated_file"]=conf["main"]["tmpPath"]+"/"+dbFile0;
+    if(inputs["tileId"]["value"]==0)
     outputs["Result2"]["generated_file"]=conf["main"]["tmpPath"]+"/tiles.db";
+    else
+    outputs["Result2"]["generated_file"]=conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+inputs["tileId"]["value"]+".db";
     return {result: ZOO.SERVICE_SUCCEEDED, conf: conf, outputs: outputs };
     
 }

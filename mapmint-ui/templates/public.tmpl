@@ -1,6 +1,7 @@
 #import os
 #import customize
 #import mapscript
+#import mapfile.service as mms
 #if $project!=""
 #set myProject=$project
 #set mapfile=$conf["main"]["dataPath"]+"/public_maps/"+myProject
@@ -15,7 +16,7 @@
 #set $tmp["senv"]["last_map"]=$lastMap
 #end if
 #set m=mapscript.mapObj($mapfile)
-#include $conf["main"]["templatesPath"]+"/preview/"+$m.web.metadata.get('layout_t')+".tmpl"
+#include $conf["main"]["templatesPath"]+"/preview/"+$mms.getMetadata($m.web,'layout_t')+".tmpl"
 #else
 $(Template(file=$conf["main"]["templatesPath"]+"/public-access.tmpl",searchList=$searchList))
 #end if

@@ -1,11 +1,12 @@
 #encoding UTF-8
-#import mapscript
 #import zoo
+#import mapscript
+#import mapfile.service as mms
 #import mm_access
 #set mapfile=$conf["main"]["dataPath"]+"/public_maps/project_"+$conf["senv"]["last_map"]+".map"
 #set m=mapscript.mapObj($mapfile)
-#if $m.web.metadata.get('mmNav')
-#set nav=$m.web.metadata.get('mmNav').split(',')
+#if $mms.getMetadata($m.web,'mmNav')
+#set nav=$mms.getMetadata($m.web,'mmNav').split(',')
 #else
 #set nav=[]
 #end if
@@ -22,20 +23,20 @@ System.loaded=0;
 System.flexi_cnt=0
 System.ProcessLayers=[]
 
-#if $m.web.metadata.get("tprj") and $m.web.metadata.get("tprj")!=""
+#if $mms.getMetadata($m.web,"tprj") and $mms.getMetadata($m.web,"tprj")!=""
 #import sqlite3
 #set conn = sqlite3.connect($conf['main']['dblink'])
 #set c = $conn.cursor()
-#set i=$c.execute(" SELECT code,proj4str FROM spatial_ref_sys WHERE fav and code='"+$m.web.metadata.get("tprj")+"'")
+#set i=$c.execute(" SELECT code,proj4str FROM spatial_ref_sys WHERE fav and code='"+$mms.getMetadata($m.web,"tprj")+"'")
 #set a=$c.fetchall()
 #for i in $a
 Proj4js.defs["$i[0]"]="$i[1]";
 #end for
 #end if
 
-#if $m.web.metadata.get("mmActivatedLayers") is not None
+#if $mms.getMetadata($m.web,"mmActivatedLayers") is not None
 #set res=[]
-#for i in $m.web.metadata.get("mmActivatedLayers").split(',')
+#for i in $mms.getMetadata($m.web,"mmActivatedLayers").split(',')
 #if $i!="" and $mm_access.checkLayerPriv($conf,$m,$i,"r")
 #set $res+=[i]
 #end if
@@ -45,8 +46,8 @@ Proj4js.defs["$i[0]"]="$i[1]";
   System.activatedLayers=[];
 #end if
 
-#if $m.web.metadata.get("vectorLayers") is not None
-  System.vectorLayers=$m.web.metadata.get("vectorLayers").split(',');
+#if $mms.getMetadata($m.web,"vectorLayers") is not None
+  System.vectorLayers=$mms.getMetadata($m.web,"vectorLayers").split(',');
 #else
   System.vectorLayers=[];
 #end if
@@ -54,7 +55,7 @@ Proj4js.defs["$i[0]"]="$i[1]";
 var vtLayers={};
 #for i in range($m.numlayers)
 #if $mm_access.checkLayerPriv($conf,$m,$m.getLayer($i).name,"r")
-#if $m.getLayer(i).metadata.get("mmQuery") and $m.getLayer(i).metadata.get("mmQuery")=="true"
+#if $mms.getMetadata($m.getLayer(i),"mmQuery") and $mms.getMetadata($m.getLayer(i),"mmQuery")=="true"
 #if $mm_access.checkLayerPriv($conf,$m,$m.getLayer($i).name,"x")
 vtLayers["$m.getLayer(i).name"]=true;
 #else
@@ -69,7 +70,7 @@ vtLayers["$m.getLayer(i).name"]=false;
 var svtLayers={};
 #for i in range($m.numlayers)
 #if $mm_access.checkLayerPriv($conf,$m,$m.getLayer($i).name,"r")
-#if $m.getLayer(i).metadata.get("mmSpatialQuery") and $m.getLayer(i).metadata.get("mmSpatialQuery")=="true" and ($m.getLayer(i).metadata.get("mmSpatialQueryType")=="both" or $m.getLayer(i).metadata.get("mmSpatialQueryType")=="contains" )
+#if $mms.getMetadata($m.getLayer(i),"mmSpatialQuery") and $mms.getMetadata($m.getLayer(i),"mmSpatialQuery")=="true" and ($mms.getMetadata($m.getLayer(i),"mmSpatialQueryType")=="both" or $mms.getMetadata($m.getLayer(i),"mmSpatialQueryType")=="contains" )
 #if $mm_access.checkLayerPriv($conf,$m,$m.getLayer($i).name,"x")
 svtLayers["$m.getLayer(i).name"]=true;
 #else
@@ -143,7 +144,7 @@ function init(){
     $.ajaxSetup({data: {language: "$conf["main"]["language"]"}});
 
     tinit();
-#if $m.web.metadata.get('layout_t')!="mobile"
+#if $mms.getMetadata($m.web,'layout_t')!="mobile"
     \$("#layers_list").tree({
 	checkbox: true,
 	onCheck: function(node, checked){
@@ -214,8 +215,8 @@ function init(){
     wgs84=new OpenLayers.Projection("EPSG:4326");
     mercator=new OpenLayers.Projection("EPSG:900913");
 
-#if $m.web.metadata.get("max_minx")
-    mybounds = new OpenLayers.Bounds($m.web.metadata.get("max_minx"),$m.web.metadata.get("max_miny"),$m.web.metadata.get("max_maxx"),$m.web.metadata.get("max_maxy"));
+#if $mms.getMetadata($m.web,"max_minx")
+    mybounds = new OpenLayers.Bounds($mms.getMetadata($m.web,"max_minx"),$mms.getMetadata($m.web,"max_miny"),$mms.getMetadata($m.web,"max_maxx"),$mms.getMetadata($m.web,"max_maxy"));
 #else
     mybounds = new OpenLayers.Bounds(-179.99999692067183,-85.05112851416298,179.99999692067183,85.05112851416298);
 #end if
@@ -233,7 +234,7 @@ function init(){
 	tileManager: null,
 	fallThrough: true,
 	zoomMethod: null,
-#if $m.web.metadata.get('mmRestricted')=="true"
+#if $mms.getMetadata($m.web,'mmRestricted')=="true"
     	restrictedExtent: mybounds,
 	maxExtent: mybounds
 #else
@@ -322,9 +323,9 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/measure/polygon
   	var pixel = new OpenLayers.Pixel(e.xy.x,e.xy.y);
   	var lonlat = map.getLonLatFromPixel(pixel);  
 	System.lonlat=map.getLonLatFromPixel(pixel);
-	var lonlatGCS = lonlat.transform(map.getProjectionObject(),new OpenLayers.Projection("#if $m.web.metadata.get('tprj')#$m.web.metadata.get('tprj')#else#EPSG:4326#end if#")); 
-#if $m.web.metadata.get('mmOT')
-#set f0=$m.web.metadata.get('mmOT').split(',')
+	var lonlatGCS = lonlat.transform(map.getProjectionObject(),new OpenLayers.Projection("#if $mms.getMetadata($m.web,'tprj')#$mms.getMetadata($m.web,'tprj')#else#EPSG:4326#end if#")); 
+#if $mms.getMetadata($m.web,'mmOT')
+#set f0=$mms.getMetadata($m.web,'mmOT').split(',')
 #if f0.count('MousePosition')>0
         OpenLayers.Util.getElement("coords").innerHTML = '' + Math.round(lonlatGCS.lon*100)/100 + ', ' + Math.round(lonlatGCS.lat*100)/100;
 #end if
@@ -333,8 +334,8 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/measure/polygon
 #end if
     });
 
-#if $m.web.metadata.get("default_minx")
-    var tmp=new OpenLayers.Bounds($m.web.metadata.get("default_minx"),$m.web.metadata.get("default_miny"),$m.web.metadata.get("default_maxx"),$m.web.metadata.get("default_maxy"));
+#if $mms.getMetadata($m.web,"default_minx")
+    var tmp=new OpenLayers.Bounds($mms.getMetadata($m.web,"default_minx"),$mms.getMetadata($m.web,"default_miny"),$mms.getMetadata($m.web,"default_maxx"),$mms.getMetadata($m.web,"default_maxy"));
     map.zoomToExtent(tmp.transform(
 	new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
 	map.getProjectionObject() // to Spherical Mercator Projection
@@ -370,7 +371,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/geolocation/_in
 #end if
 
     tend();
-#if $m.web.metadata.get('mmOT') and $m.web.metadata.get('mmOT').count('Routing')>0
+#if $mms.getMetadata($m.web,'mmOT') and $mms.getMetadata($m.web,'mmOT').count('Routing')>0
 #from Cheetah.Template import Template
 $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/routing/_init.js",searchList={"m": $m,"conf":$conf}))
 #end if
@@ -409,7 +410,7 @@ function checkForScales(){
 
 $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/export/init.js",searchList={"m": $m,"conf": $conf}))
 
-#if $m.web.metadata.get('mmOT') and $m.web.metadata.get('mmOT').count('Routing')>0
+#if $mms.getMetadata($m.web,'mmOT') and $mms.getMetadata($m.web,'mmOT').count('Routing')>0
 #from Cheetah.Template import Template
 $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/routing/init.js",searchList={"m": $m,"conf": $conf}))
 #end if
@@ -467,7 +468,7 @@ function toggleControl(element) {
   }
   for(key in mapControls) {
     var control = mapControls[key];
-    if(cname == key #if $m.web.metadata.get('layout_t')!="mobile"#&& \$(element).is('.ui-state-active')#end if#) {
+    if(cname == key #if $mms.getMetadata($m.web,'layout_t')!="mobile"#&& \$(element).is('.ui-state-active')#end if#) {
       if(cname == "geolocate"){
     	try{geolocation.removeAllFeatures();}catch(e){}
 	if(element.name == "track")
@@ -555,7 +556,7 @@ function toggleControl(element) {
 
 \$(document).ready(function() {
     
-#if ["natureparif-indicateur","fullscreen"].count($m.web.metadata.get('layout'))>0
+#if ["natureparif-indicateur","fullscreen"].count($mms.getMetadata($m.web,'layout'))>0
     \$("#layerswitcher").toggle();
 #end if
     
@@ -615,7 +616,7 @@ function toggleControl(element) {
     
 
 
-#if $m.web.metadata.get('layout_t')!="mobile"
+#if $mms.getMetadata($m.web,'layout_t')!="mobile"
     try{
 	\$('.fg-toolbar a').tipsy({fade: true, offset:2, opacity: 1, gravity: 'nw'});
 	\$('.toolbar-noborder a').tipsy({fade: true, offset:3, opacity: 1, gravity: 'nw'});
@@ -743,7 +744,7 @@ function singleGeom() {
 	var dist = document.getElementById(arguments[0]+'_buffer-value')?document.getElementById(arguments[0]+'_buffer-value').value:'1';
 	if (isNaN(dist))
 	    return alert("Distance is not a Number!");
-	url+='Identifier=vector-tools.'+aProcess+'&DataInputs='+((aProcess == 'SpatialQuery')?"layer="+\$("#"+arguments[0]+"_spatial-query-choice").val()+";":"")+'BufferDistance='+(dist/#if $m.web.metadata.get('tuom')=="metric"#111120#else##if $m.web.metadata.get('tuom')=="geographic"#1#else#(111120/0.3048)#end if##end if#)+'@datatype=interger;'+(aProcess=="BufferMask" || aProcess=="SpatialQuery"?'InputData':'InputPolygon')+'=Reference@xlink:href=';
+	url+='Identifier=vector-tools.'+aProcess+'&DataInputs='+((aProcess == 'SpatialQuery')?"layer="+\$("#"+arguments[0]+"_spatial-query-choice").val()+";":"")+'BufferDistance='+(dist/#if $mms.getMetadata($m.web,'tuom')=="metric"#111120#else##if $mms.getMetadata($m.web,'tuom')=="geographic"#1#else#(111120/0.3048)#end if##end if#)+'@datatype=interger;'+(aProcess=="BufferMask" || aProcess=="SpatialQuery"?'InputData':'InputPolygon')+'=Reference@xlink:href=';
     } else
 	if(aProcess == "SimpleBBOX" || aProcess == "SimpleChain" || 
 	   aProcess == "Mask" || aProcess == "BufferMask" || 
@@ -831,7 +832,7 @@ function saveContext(func){
 	    params[params.length]={name: "layers",value:map.layers[i].real_name,dataType: "string"};
 	}
     
-#if $m.web.metadata.get('mmOT') and $m.web.metadata.get('mmOT').count('Routing')>0
+#if $mms.getMetadata($m.web,'mmOT') and $mms.getMetadata($m.web,'mmOT').count('Routing')>0
     if(route_layer){
         System.params=params;
 	System.func1=func;
@@ -861,7 +862,7 @@ function _saveContext(params,func){
     });
 }
 
-#if $conf["senv"].has_key("last_index") and $conf["senv"]["last_index"]!="" and $m.web.metadata.get('layout_t')=="natureparif-indicateurs"
+#if $conf["senv"].has_key("last_index") and $conf["senv"]["last_index"]!="" and $mms.getMetadata($m.web,'layout_t')=="natureparif-indicateurs"
 System.index="$conf["senv"]["last_index"]";
 #end if
 System.ilayers=[];

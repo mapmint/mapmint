@@ -141,7 +141,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/toolbar_bs.tmpl",search
  </div>
  <div id="wrapper">
 
-#if $m.web.metadata.get("mmLSPos")=="Right"
+#if $mms.getMetadata($m.web,"mmLSPos")=="Right"
 $(printWrapper())
 #end if
 
@@ -154,8 +154,8 @@ $(printWrapper())
 	 <a href="#ltree" aria-controls="ltree" role="tab" data-toggle="tab"><i class="mm0-layers mm-layers-layers fa-fw"></i></a>
 	</li>
 
-#if $m.web.metadata.get('mmOT')
-#set f0=$m.web.metadata.get('mmOT').split(',')
+#if $mms.getMetadata($m.web,'mmOT')
+#set f0=$mms.getMetadata($m.web,'mmOT').split(',')
 #if $f0.count('Routing')>0
 	<li role="presentation">
 	 <a href="#routing-ui" aria-controls="datasources" role="tab" data-toggle="tab"><i class="fa fa-road"></i></a>
@@ -195,8 +195,8 @@ $(printWrapper())
 
                 <div class="info-img-content">
 		  <div class="col-xs-12">
-#if $m.web.metadata.get("previewUrl")
-                    <img src="$m.web.metadata.get("previewUrl")" class="img-responsive"/>
+#if $mms.getMetadata($m.web,"previewUrl")
+                    <img src="$mms.getMetadata($m.web,"previewUrl")" class="img-responsive"/>
 #else
                     <img src="http://placehold.it/460x250/FF0000/ffffff&text=No Preview." class="col-xs-12 img-responsive"/>
 #end if		  
@@ -232,7 +232,7 @@ $(printWrapper())
  </div>
  </div>
 
-#if $m.web.metadata.get("mmLSPos")=="Left"
+#if $mms.getMetadata($m.web,"mmLSPos")=="Left"
 $(printWrapper())
 #end if
 

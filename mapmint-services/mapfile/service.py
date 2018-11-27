@@ -33,14 +33,26 @@ if sys.platform == 'win32':
 	os.readlink=ntfslink.readlink
 	os.symlink=ntfslink.symlink
 
+def getMetadata(elem,field):
+    try:
+        return elem.metadata.get(field)
+    except:
+        try:
+            return elem.getMetadata(field)
+        except:
+            return elem.metadata[field]
+
 def setMetadata(layer,field,value):
     try:
         layer.setMetaData(field,value)
-    except:
+    except Exception,e:
         try:
+            if mapscript.MS_VERSION.count('7.2')>0:
+                layer.metadata[field]=value
+            else:
+                layer.metadata.set(field,value)
+        except Exception,e:
             layer.metadata.set(field,value)
-        except:
-            setMetadata(layer.map,field,value)
 
 def sample(conf,inputs,outputs):
     import mappyfile,io
@@ -2002,13 +2014,13 @@ def saveLayerStyle0(conf,inputs,outputs):
                     layer.getClass(nClass).removeStyle(layer.getClass(nClass).numstyles-1)
     if inputs.has_key("mmClassName") and layer is not None and layer is not None and layer.getClass(nClass) is not None:
 	    layer.getClass(nClass).name=inputs["mmClassName"]["value"]
-    if inputs.has_key("mmExpr"):
+    if inputs.has_key("mmExpr") and layer is not None:
 	    layer.getClass(nClass).setExpression(inputs["mmExpr"]["value"])
 	    print >> sys.stderr,layer.getClass(nClass).getExpressionString()
 
 
     print >> sys.stderr,"Edit the "+str(nClass)+" classe "+str(not(noColor))
-    if not(noColor):
+    if not(noColor) and layer is not None:
         layer.getClass(nClass).getStyle(mmStyle).opacity=int(inputs["mmOpacity"]["value"])
         if inputs.keys().count('noFill') > 0 or inputs.keys().count('mmFill')==0:
             layer.getClass(nClass).getStyle(mmStyle).color.setRGB(-1,-1,-1)
@@ -2865,7 +2877,10 @@ def classifyMap0(conf,inputs,outputs):
     
     rClass=False
     if layer.metadata.get("mmMethod"):
+        try:
 	    layer.metadata.remove("mmMethod")
+        except:
+            layer.metadata.pop("mmMethod",None)
     #if inputs.keys().count("mmType") and inputs["mmType"]["value"]=="gradSymb":
     if layer.type!=mapscript.MS_LAYER_RASTER and inputs.keys().count("method")>0 and conf["main"].has_key("Rpy2") and conf["main"]["Rpy2"]=="true":
         lInputs1={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT "+inputs["field"]["value"]+" as val FROM "+layerName}}
@@ -2967,9 +2982,9 @@ def classifyMap0(conf,inputs,outputs):
 		    #layer.clearProcessing()
             if inputs.keys().count("processing")==0:
                 layer.setProcessing("BAND="+inputs["field"]["value"])
-            else:
-                for kk in range(0,len(inputs["processing"]["value"])):
-                    layer.setProcessing(inputs["processing"]["value"][kk])
+            #else:
+            #    for kk in range(0,len(inputs["processing"]["value"])):
+            #        layer.setProcessing(inputs["processing"]["value"][kk])
 
 		    #tmp=[{"min": b.GetMinimum(),"max": b.GetMaximum()}]
 		    #print >> sys.stderr,tmp
@@ -2981,13 +2996,15 @@ def classifyMap0(conf,inputs,outputs):
             return zoo.SERVICE_FAILED
 
     if inputs.has_key("resm"):
-        updateProcessing(layer,inputs["resm"])
         layer.clearProcessing()
-        if inputs.keys().count("processing")>0:
+        updateProcessing(layer,inputs["resm"])
+        if inputs.keys().count("processing")>0 and isinstance(inputs["processing"]["value"], (list, tuple)):
             for kk in range(0,len(inputs["processing"]["value"])):            
                 print >> sys.stderr," *********** OK"
                 layer.setProcessing(inputs["processing"]["value"][kk])
                 print >> sys.stderr," *********** OK"
+        else:
+            layer.setProcessing(inputs["processing"]["value"])
 
     i=layer.numclasses-1
     while i >= 0:
@@ -3927,9 +3944,12 @@ def setMapLayerProperties(conf,inputs,outputs):
         setMetadata(l,"mmSpatialQueryType",inputs["sqf"]["value"])
     else:
         setMetadata(l,"mmSpatialQueryType",inputs["sqt"]["value"])
+    cor=["ows_abstract","ows_keywordlist","ows_fees"]
+    i=0
     for a in ["ab","kl","f"]:
         if inputs[a].keys().count("value")>0:
-            setMetadata(l,"ows_abstract",urllib.unquote(inputs[a]["value"]))
+            setMetadata(l,cor[i],urllib.unquote(inputs[a]["value"]))
+        i+=1
             
     if inputs["q"]["value"]=="true":
         i=0
@@ -4537,7 +4557,7 @@ def getShortDescription(conf,m):
 		description=tmp.desc[:100]
 	except Exception,e:
 		print >> sys.stderr,e
-		description=str(e)+" "+m.web.metadata.get("ows_abstract")[:100]
+		description=open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"],conf["main"]["tmpPath"])).read().replace("\t","")#str(e)+" "+m.web.metadata.get("ows_abstract")[:100]
 	return description
 
 def saveLegendIconsForLayer(conf,m,lm,layer,i,step=None):

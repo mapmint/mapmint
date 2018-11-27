@@ -1,13 +1,14 @@
 #encoding UTF-8
 #import zoo
+#import mapfile.service as mms
 
-#if $m.web.metadata.get('mmNav')
-#set mmNav=$m.web.metadata.get('mmNav').split(',')
+#if $mms.getMetadata($m.web,'mmNav')
+#set mmNav=$mms.getMetadata($m.web,'mmNav').split(',')
 #else
 #set mmNav=[]
 #end if
-#if $m.web.metadata.get('mmOT')
-#set mmOT=$m.web.metadata.get('mmOT').split(',')
+#if $mms.getMetadata($m.web,'mmOT')
+#set mmOT=$mms.getMetadata($m.web,'mmOT').split(',')
 #else
 #set mmOT=[]
 #end if
@@ -41,13 +42,13 @@
       </select>
     </div>
   </div>
-#if $m.web.metadata.get('mmVT')
-#set mmT={"V":$m.web.metadata.get('mmVT').split(',')}
+#if $mms.getMetadata($m.web,'mmVT')
+#set mmT={"V":$mms.getMetadata($m.web,'mmVT').split(',')}
 #else
 #set mmT={"V":[]}
 #end if
-#if $m.web.metadata.get('mmRT')
-#set $mmT["R"]=$m.web.metadata.get('mmRT').split(',')
+#if $mms.getMetadata($m.web,'mmRT')
+#set $mmT["R"]=$mms.getMetadata($m.web,'mmRT').split(',')
 #else
 #set $mmT["R"]=[]
 #end if

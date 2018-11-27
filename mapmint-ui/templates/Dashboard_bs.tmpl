@@ -62,7 +62,6 @@ MapMint: Dashboard
 #import zoo
 #import mm_access
 
-
 #from datastores.directories.service import *
 #set loutputs={"Result":{"value":""}}
 #set a=displayJSON($conf,$inputs,$loutputs)
@@ -103,6 +102,7 @@ MapMint: Dashboard
 #end try
 #end for
 
+
 #set layersNumber=0
 #for i in range(len($dbs))
 #for j in range(len($dbs[i]))
@@ -125,6 +125,7 @@ MapMint: Dashboard
 #set loutputs={"Result":{"value":""}}
 #set a1=listMap($conf,$inputs,$loutputs)
 #set nmaps=json.loads($loutputs["Result"]["value"])
+
 
 
 <div class="tab-content">  
@@ -212,14 +213,12 @@ MapMint: Dashboard
 #end if
 #for i in range(0,$limit)
 #set mpath=$conf["main"]["dataPath"]+"/maps/"+$nmaps[i]["value"]
-#set mm=mapscript.mapObj($mpath)
-#set purl=$mm.web.metadata.get('previewUrl')
-
-#if $mm.web.metadata.get("previewUrl")
-#set purl=$mm.web.metadata.get('previewUrl')
+#set mm=$mapscript.mapObj($mpath)
+#set purl=$mms.getMetadata($mm.web,'previewUrl')
+#if $mms.getMetadata($mm.web,"previewUrl")
+#set purl=$mms.getMetadata($mm.web,'previewUrl')
 #else
-#*try*#
-#set ll=$mm.web.metadata.get('mmActivatedLayers')
+#set ll=$mms.getMetadata($mm.web,'mmActivatedLayers')
 #if ll==""
 #for kk in range(0,$mm.numlayers)
 #set $ll+=$mm.getLayer(0).name
@@ -234,14 +233,6 @@ MapMint: Dashboard
 $e
 #end try
 
-#*
-#set tmp=$a.project(mapscript.projectionObj(mm.getLayer(0).getProjection()),mapscript.projectionObj("+init=epsg:4326"))
-#set x=(($a.maxx-$a.minx)/2)+$a.minx
-#set y=(($a.maxy-$a.miny)/2)+$a.miny
-#set purl=$conf["main"]["mapserverAddress"]+"?map="+$mpath+"&LAYERS="+$ll+"&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX="+str($a.minx)+","+str($a.miny)+","+str($a.maxx)+","+str($a.maxy)+"&SRS=EPSG:4326&WIDTH=230&HEIGHT=170"
-#except Exception,e
-<!-- $e -->
-#end try*#
 #set purl="http://placehold.it/50/55C1E7/fff"
 #end if
 
@@ -255,7 +246,7 @@ $e
                                     </span>
                                     <div class="chat-body clearfix">
                                         <div class="header">
-                                            <strong class="primary-font">$mm.web.metadata.get('ows_title')</strong>
+                                            <strong class="primary-font">$mms.getMetadata($mm.web,'ows_title')</strong>
 #set cname=$nmaps[i]["value"].replace(".map","").replace("project_","")
                                             <a class="pull-right text-muted" href="#" onclick="try{app.adminBasic.loadMap(app.zoo,['$cname','$cname'],function(){document.location='./Manager_bs'});}catch(e){console.log(e);}">
                                                 <i class="glyphicon glyphicon-pencil fa-fw"></i>
@@ -266,7 +257,7 @@ $e
                                         </p>
                                         <div class="footer">
                                             <small class="text-muted">
-					    	<i class="fa fa-user fa-fw"></i>#if $mm.web.metadata.get('mmEditor') is not None#$mm.web.metadata.get('mmEditor')#else#$zoo._("Unknown")#end if#
+					    	<i class="fa fa-user fa-fw"></i>#if $mms.getMetadata($mm.web,'mmEditor') is not None#$mms.getMetadata($mm.web,'mmEditor')#else#$zoo._("Unknown")#end if#
 					    </small>
                                             <small class="pull-right text-muted">
                                                 <i class="fa fa-clock-o fa-fw"></i> $nmaps[$i]["mTime"]
@@ -276,6 +267,7 @@ $e
                                 </li>
 #end for
                             </ul>
+
                             <a href="./Manager_bs#" class="btn btn-default btn-block">$zoo._("Launch the Manager") ($conf["senv"]["last_map"])</a>
                         </div>
                         <a href="#dashManagerBody" data-toggle="collapse" onclick="\$(this).prev().find('img').each(function(){if(\$(this).attr('src')==null){\$(this).attr('src',\$(this).attr('osrc'));}});">
@@ -508,4 +500,7 @@ function symbolAddToRSelection(){
 <img style="width:500px" class="img-responsive" src="[datasource]" />
 </div>
 </script>
+
+*#
+
 #end def

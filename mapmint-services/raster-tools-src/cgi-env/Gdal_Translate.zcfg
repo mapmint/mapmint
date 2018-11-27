@@ -1,6 +1,6 @@
 [Gdal_Translate]
  Title = Convert raster data from one format to another. 
- Abstract = Converts raster data between different formats.
+ Abstract = http://www.gdal.org/gdal_translate.html
  processVersion = 1
  storeSupported = true
  statusSupported = true

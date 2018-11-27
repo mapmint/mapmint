@@ -1,3 +1,4 @@
+#import mapfile.service as mms
 function startExport(){
     \$(".dialog-export").show();
     \$(".dialog-export").window({
@@ -12,7 +13,7 @@ function startExport(){
 
 
 function exportData(){
-#if $m.web.metadata.get('layout_t')=="mobile"
+#if $mms.getMetadata($m.web,'layout_t')=="mobile"
     $.mobile.showPageLoadingMsg();
 #end if
     //alert("$conf["senv"]["last_map"] <=> "+System.mmNodeId);
@@ -21,7 +22,7 @@ function exportData(){
         dataType: "html",
 	url: zooUrl+"?request=Execute&service=WPS&version=1.0.0&Identifier=vector-converter.exportTo"+"&DataInputs=map=$conf["senv"]["last_map"];layer="+System.mmNodeId.replace(/layer_/g,"")+";format="+\$("#select_export").val()+"&RawDataOutput=Result",
 	success: function(xml){
-#if $m.web.metadata.get('layout_t')=="mobile"
+#if $mms.getMetadata($m.web,'layout_t')=="mobile"
 	    $.mobile.hidePageLoadingMsg();
 #end if
 	    \$("#export_dl_link").attr("href",xml);

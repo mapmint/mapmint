@@ -487,7 +487,7 @@ define([
 		    console.log("CURRENT ID: "+id+" "+key);
 		    var index = $.inArray(id, closure.CRowSelected);
 		    if ( index === -1 ) {
-			if(closure.selectLayer.getSource().getFeatures().length==0)
+			//if(closure.selectLayer.getSource().getFeatures().length==0)
 			    $(".require-select").show();
 			
 			closure.CRowSelected.push( id );
@@ -524,7 +524,7 @@ define([
 				closure.selectLayer.getSource().removeFeature(closure.selectLayer.getSource().getFeatureById(CFeatures[i].get("fid")));
 			    }
 			}
-			if(closure.selectLayer.getSource().getFeatures().length==0)
+			//if(closure.selectLayer.getSource().getFeatures().length==0)
 			    $(".require-select").hide();
 		    }
 		    var existing=$('#mmm_table-content_'+key+'_info').children('span.select-info');

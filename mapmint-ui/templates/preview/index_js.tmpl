@@ -1,6 +1,7 @@
 #encoding UTF-8
 #import zoo
 #import mapscript
+#import mapfile.service as mms
 #set m=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/project_"+$conf["senv"]["last_map"]+".map")
 #import mm_access
 var layersList=[];
@@ -30,7 +31,7 @@ var pmapfiles={
 #if $cnt >0
     ,
 #end if
-     "$m.getLayer($l).name":[ "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($m.getLayer($l).metadata.get('mmFilterField') or $m.getLayer($l).metadata.get('mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map","$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map","$m.getLayer($l).metadata.get("mmTitle")",#if $m.getLayer($l).metadata.get('mmMaxScale')!=None#$m.getLayer($l).metadata.get('mmMaxScale')#else#100000000000000#end if#,#if $m.getLayer($l).metadata.get('mmMinScale')!=None#$m.getLayer($l).metadata.get('mmMinScale')#else#0#end if#,#if $m.getLayer($l).metadata.get('mmExport')=="true"#true#else#false#end if#,#if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $m.getLayer($l).metadata.get('mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#]
+     "$m.getLayer($l).name":[ "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($mms.getMetadata($m.getLayer($l),'mmFilterField') or $mms.getMetadata($m.getLayer($l),'mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map","$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map","$mms.getMetadata($m.getLayer($l),"mmTitle")",#if $mms.getMetadata($m.getLayer($l),'mmMaxScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMaxScale')#else#100000000000000#end if#,#if $mms.getMetadata($m.getLayer($l),'mmMinScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMinScale')#else#0#end if#,#if $mms.getMetadata($m.getLayer($l),'mmExport')=="true"#true#else#false#end if#,#if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $mms.getMetadata($m.getLayer($l),'mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#]
 #set $cnt+=1
 #end if
 #end for
@@ -41,7 +42,7 @@ function startOverlay(){
     \$('#swc').click(function(){
 	refresh();
     });
-#if $m.web.metadata.get('layout_t')!="mobile"
+#if $mms.getMetadata($m.web,'layout_t')!="mobile"
     \$("#layers_bg").tree({checkbox: false});
 #end if
 
@@ -59,7 +60,7 @@ function startOverlay(){
     
 #set blCount=0
     
-#if $m.web.metadata.get('mmOSMBaseLayers')=="true"
+#if $mms.getMetadata($m.web,'mmOSMBaseLayers')=="true"
     var osm2 = new OpenLayers.Layer.OSM("OSM Tiles");
     registerLoadEvents(osm2);
     map.addLayer(osm2);
@@ -69,9 +70,9 @@ function startOverlay(){
     
 #set b=$conf["mm"]["bmLayerAlias"].split(',')
 #set a=$conf["mm"]["bmLayers"].split(',')
-    
-#if $m.web.metadata.get('mmMBaseLayers')
-#set setM=$m.web.metadata.get('mmMBaseLayers').split(',')
+   
+#if $mms.getMetadata($m.web,'mmMBaseLayers')
+#set setM=$mms.getMetadata($m.web,'mmMBaseLayers').split(',')
 #else
 #set setM=[]
 #end if
@@ -110,22 +111,22 @@ function startOverlay(){
     
 #end for
     
-#if $m.web.metadata.get('mmPBaseLayers')
-#if $m.web.metadata.get('mmProprietaryBaseLayers')=="Google"
+#if $mms.getMetadata($m.web,'mmPBaseLayers')
+#if $mms.getMetadata($m.web,'mmProprietaryBaseLayers')=="Google"
 #set a2=$conf["mm"]["bgLayerAlias"].split(',')
 #set b2=$conf["mm"]["bgLayers"].split(',')
-#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+#set setM=$mms.getMetadata($m.web,'mmPBaseLayers').split(',')
 #else
-    var apikey="$m.web.metadata.get('mmBAK')";
-#if $m.web.metadata.get('mmProprietaryBaseLayers')=="Bing"
+    var apikey="$mms.getMetadata($m.web,'mmBAK')";
+#if $mms.getMetadata($m.web,'mmProprietaryBaseLayers')=="Bing"
 #set a2=$conf["mm"]["bbLayerAlias"].split(',')
 #set b2=$conf["mm"]["bbLayers"].split(',')
-#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+#set setM=$mms.getMetadata($m.web,'mmPBaseLayers').split(',')
 #else
-#if $m.web.metadata.get('mmProprietaryBaseLayers')=="IGN"
+#if $mms.getMetadata($m.web,'mmProprietaryBaseLayers')=="IGN"
 #set a2=$conf["mm"]["biLayerAlias"].split(',')
 #set b2=$conf["mm"]["biLayers"].split(',')
-#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+#set setM=$mms.getMetadata($m.web,'mmPBaseLayers').split(',')
 #else
 #set a2=[]
 #end if
@@ -134,12 +135,12 @@ function startOverlay(){
 #else
 #set a2=[]
 #end if
-    
+   
 #for i in range(0,len($a2))
 #if $setM.count($b2[$i])
     
     
-#if $m.web.metadata.get('mmProprietaryBaseLayers')=="Google"     
+#if $mms.getMetadata($m.web,'mmProprietaryBaseLayers')=="Google"     
     var gmap$i = new OpenLayers.Layer.Google(
     	"Google $a2[$i]",
 	{#if $b2[$i]!="null"#type: $b2[$i]#end if##if $b2[$i]!="google.maps.MapTypeId.TERRAIN"##if $b2[$i]!="null"#,#end if#numZoomLevels: 19#*if $b2[$i]!="google.maps.MapTypeId.SATELLITE"#20#else#22#end if*##end if#}
@@ -149,7 +150,7 @@ function startOverlay(){
     map.addLayer(gmap$i);
     System.baseLayers[System.baseLayers.length]=gmap$i;
 #else
-#if $m.web.metadata.get('mmProprietaryBaseLayers')=="Bing"
+#if $mms.getMetadata($m.web,'mmProprietaryBaseLayers')=="Bing"
     var bing$i =  new OpenLayers.Layer.Bing({
     	name: "Bing $a2[$i]",
     	key: apikey,
@@ -176,16 +177,17 @@ function startOverlay(){
 #end if
 #end for
 
-#if $m.web.metadata.get('mmBProject')
-#set lls=$m.web.metadata.get('mmBProject').split(",")
+
+#if $mms.getMetadata($m.web,'mmBProject')
+#set lls=$mms.getMetadata($m.web,'mmBProject').split(",")
 #for ls1 in $lls
 #set m1p=os.readlink($conf["main"]["dataPath"]+"/public_maps/"+$ls1)
 #set m1=mapscript.mapObj(m1p)
-#set ls=$m1.web.metadata.get('mmActivatedLayers')
-#set ts=$m1.web.metadata.get('mmTitle')
-#set tn=$m1.web.metadata.get('mmProjectName')
-#set ps=$m1.web.metadata.get('mmPopupList')
-#set ws=$m1.web.metadata.get('mmWindowList')
+#set ls=$mms.getMetadata(m1.web,'mmActivatedLayers')
+#set ts=$mms.getMetadata(m1.web,'mmTitle')
+#set tn=$mms.getMetadata(m1.web,'mmProjectName')
+#set ps=$mms.getMetadata(m1.web,'mmPopupList')
+#set ws=$mms.getMetadata(m1.web,'mmWindowList')
 #if $ls
     var zoomOrigin=[156543.03392804099712520838,78271.51696402048401068896,39135.75848201022745342925,19567.87924100512100267224,9783.93962050256050133612,4891.96981025128025066806,2445.98490512564012533403,1222.99245256282006266702,611.49622628141003133351,305.74811314070478829308,152.87405657035250783338,76.43702828517623970583,38.21851414258812695834,19.10925707129405992646,9.55462853564703173959,4.77731426782351586979,2.38865713391175793490,1.19432856695587897633,0.59716428347793950593];
     var cZoom=map.getZoomForExtent(map.maxExtent,true);
@@ -213,21 +215,21 @@ function startOverlay(){
 #end if
 #end for
 #end if
-    
+   
     System.popupList={
-#set ps=$m.web.metadata.get('mmPopupList')
+#set ps=$mms.getMetadata($m.web,'mmPopupList')
 #if $ps is not None
 #set pss=$ps.split(',')
 #set pssc=0
 #for i in $pss
 #if $i!=""
-#if $pssc>0#,#end if#"$i": {"isLine":#if $m.getLayerByName($i).type==mapscript.MS_LAYER_LINE#true#else#false#end if#,"hasClick": #if $m.web.metadata.get('mmWindowList') is not None and $m.web.metadata.get('mmWindowList').split(',').count($i)>0#true#else#false#end if#,"hasOver": true}
+#if $pssc>0#,#end if#"$i": {"isLine":#if $m.getLayerByName($i).type==mapscript.MS_LAYER_LINE#true#else#false#end if#,"hasClick": #if $mms.getMetadata($m.web,'mmWindowList') is not None and $mms.getMetadata($m.web,'mmWindowList').split(',').count($i)>0#true#else#false#end if#,"hasOver": true}
 #set $pssc=$pssc+1
 #end if
 #end for
 #end if
 #set ps1=$ps
-#set ps=$m.web.metadata.get('mmWindowList')
+#set ps=$mms.getMetadata($m.web,'mmWindowList')
 #if $ps is not None
 #set pss=$ps.split(',')
 #set opssc=pssc
@@ -247,8 +249,8 @@ function startOverlay(){
     System.baseLayers[System.baseLayers.length]=yourEmptyBaseLayer;
 #end if
     
-#if $m.web.metadata.get('mmActivatedBaseLayers')
-    map.setBaseLayer(System.baseLayers[$m.web.metadata.get('mmActivatedBaseLayers')-1]);
+#if $mms.getMetadata($m.web,'mmActivatedBaseLayers')
+    map.setBaseLayer(System.baseLayers[$mms.getMetadata($m.web,'mmActivatedBaseLayers')-1]);
 #end if
     
     
@@ -259,13 +261,20 @@ function startOverlay(){
     System.initZoomLevel=cZoom;
 
     
-    System.renderer=#if $m.web.metadata.get('mmRenderer')=="Canvas"#["Canvas","SVG","VML"]#else#OpenLayers.Layer.Vector.prototype.renderers#end if#;
-    System.useCanvas=#if $m.web.metadata.get('mmRenderer')=="Canvas"#true#else#false#end if#;
+    System.renderer=#if $mms.getMetadata($m.web,'mmRenderer')=="Canvas"#["Canvas","SVG","VML"]#else#OpenLayers.Layer.Vector.prototype.renderers#end if#;
+    System.useCanvas=#if $mms.getMetadata($m.web,'mmRenderer')=="Canvas"#true#else#false#end if#;
+
 #for i in range(0,$m.numlayers)
 #set l=$m.getLayer($i)
-    
+   
+ 
 #set lname=l.name
-#set p=$m.web.metadata.get('vectorLayers').split(',')
+#if $mms.getMetadata($m.web,'vectorLayers') is not None
+#set p=$mms.getMetadata($m.web,'vectorLayers').split(',')
+#else
+#set p=""
+#end if
+
 #if p.count(lname) > 0
     layersList[layersList.length]={value: "empty",real_name: "$lname"};
 #set l=$m.getLayerByName($lname)
@@ -287,6 +296,7 @@ function startOverlay(){
     
 #end if
     
+
 #if $l.type==mapscript.MS_SHAPE_POINT and not($isDefaultSymbol)
 #if $mm_access.checkLayerPriv($conf,$m,$l.name,"r")
 #set size=$l.getClass(0).getStyle(0).size
@@ -318,7 +328,11 @@ function startOverlay(){
 			}, {
 			    rules: [
 #for kk in range(0,$l.numclasses)
+#if $l.getClass($kk).getExpressionString() is not None
 #set expr=$l.getClass($kk).getExpressionString().split("=")
+#else
+#set expr=["",""]
+#end if
 #set $expr[0]=$expr[0].replace('( "[',"").replace(']" ',"");
 #set $expr[1]=$expr[1].replace(' "',"").replace('" )',"");
 #set ind=0
@@ -358,8 +372,9 @@ function startOverlay(){
 	    tmpLayer.mmLc=layersList[this.localID].mmLc;
 	    tmpLayer.mmUc=layersList[this.localID].mmUc;
     //alert(tmpLayer.mmLc+" "+tmpLayer.mmUc);
-	    tmpLayer.setVisibility(#if $m.web.metadata.get("mmActivatedLayers").split(',').count($lname)>0#true#else#false#end if#);
-#if $m.web.metadata.get("mmActivatedLayers").split(',').count($lname)>0
+	    tmpLayer.setVisibility(#if $mms.getMetadata($m.web,"mmActivatedLayers") is not None and $mms.getMetadata($m.web,"mmActivatedLayers").split(',').count($lname)>0#true#else#false#end if#);
+#set cmetadata=$mms.getMetadata($m.web,"mmActivatedLayers")
+#if cmetadata is not None and cmetadata.count($lname)>0
 	    try{
 		\$('#layers_list').tree('check',\$(".tree_layer"+this.localID)[0].parentNode);
 	    }catch(e){}
@@ -424,7 +439,8 @@ function startOverlay(){
 		System.layerFeatures={};
 	    if(tselect.length==0){
 		tselect[tselect.length]=new OpenLayers.Control.SelectFeature(System.hover, {
-#if $m.web.metadata.get("mmPopupList").split(',').count($lname)>0
+#set cmetadata=$mms.getMetadata($m.web,"mmPopupList")
+#if cmetadata is not None and cmetadata.split(',').count($lname)>0
 		    overFeature: function(feature) { 
 			if(System.popupList[feature.localName].hasOver){
 		            var vs=feature.geometry.getVertices();
@@ -437,8 +453,10 @@ function startOverlay(){
 		      if(System.popup!=null)
 		      map.removePopup(System.popup);
 		      }*/
-#if len($m.web.metadata.get("mmWindowList").split(','))>0
-#if $m.web.metadata.get("mmPopupList").split(',').count($lname)>0
+#set cmetadata=$mms.getMetadata($m.web,"mmWindowList")
+#if cmetadata is not None and len(cmetadata.split(','))>0
+#set cmetadata=$mms.getMetadata($m.web,"mmPopupList")
+#if cmetadata is not None and cmetadata.split(',').count($lname)>0
 		    ,
 #end if
 		    callbacks: 
@@ -468,7 +486,7 @@ System.postMap[System.postMap.length]={
 	\$.ajax({
 	    type: "GET",
 	    localID: this.length,
-	    url: "$conf["main"]["publicationUrl"]/styles/${lname}_#if $m.getLayerByName($l.name).metadata.get('mmFilterField') and $inputs.has_key('filter')#"+System.iniFilterValue+"_#end if#${conf["senv"]["last_map"]}_sld.xml?timestamp="+d.getTime(),
+	    url: "$conf["main"]["publicationUrl"]/styles/${lname}_#if $mms.getMetadata($m.getLayerByName($l.name),'mmFilterField') and $inputs.has_key('filter')#"+System.iniFilterValue+"_#end if#${conf["senv"]["last_map"]}_sld.xml?timestamp="+d.getTime(),
 	    complete: function(xml,status){
 		var format = new OpenLayers.Format.SLD();
 		var obj = format.read(xml.responseText);
@@ -502,8 +520,8 @@ System.postMap[System.postMap.length]={
 		tmpLayer.mmUc=layersList[this.localID].mmUc;
 		//alert(tmpLayer.mmLc+" "+tmpLayer.mmUc);
     		tmpLayer.local_id="$lname";
-    		tmpLayer.setVisibility(#if $m.web.metadata.get("mmActivatedLayers").split(',').count($lname)>0#true#else#false#end if#);
-#if $m.web.metadata.get("mmActivatedLayers").split(',').count($lname)>0
+    		tmpLayer.setVisibility(#if $mms.getMetadata($m.web,"mmActivatedLayers") is not None and $mms.getMetadata($m.web,"mmActivatedLayers").split(',').count($lname)>0#true#else#false#end if#);
+#if $mms.getMetadata($m.web,"mmActivatedLayers") is not None and $mms.getMetadata($m.web,"mmActivatedLayers").split(',').count($lname)>0
 		try{
 		    \$('#layers_list').tree('check',\$(".tree_layer"+this.localID)[0].parentNode);
 		}catch(e){}
@@ -522,7 +540,7 @@ System.postMap[System.postMap.length]={
 			}
 		    }			
 		});
-#if $l.metadata.get('mmQuery')=="true"
+#if $mms.getMetadata($l,'mmQuery')=="true"
 		if(!System.hover){
 		    System.hover = new OpenLayers.Layer.Vector("DisplaySelectedFeatures",{
                    styleMap: new OpenLayers.Style({
@@ -545,7 +563,7 @@ System.postMap[System.postMap.length]={
 			    tmpFeature.localName="$lname";
 			    System.hover.addFeatures(tmpFeature);
 			}
-#if $m.getLayerByName(lname).metadata.get('mmZFilterField') and $inputs.has_key('filter')
+#if $mms.getMetadata(m.getLayerByName(lname),'mmZFilterField') and $inputs.has_key('filter')
     			map.zoomToExtent(this.getDataExtent());
 #if $conf["senv"].keys().count("previous_map")>0 and $conf["senv"]["previous_map"]!="Default"
     			\$('.fg-toolbar').find(".fg-button").first().attr("href",\$('.fg-toolbar').find(".fg-button").first().attr("href")+"$conf["senv"]["previous_map"]");
@@ -574,7 +592,7 @@ System.postMap[System.postMap.length]={
 		    System.layerFeatures={};
 		if(tselect.length==0){
 		    tselect[tselect.length]=new OpenLayers.Control.SelectFeature(System.hover, {
-#if $m.web.metadata.get("mmPopupList").split(',').count($l.name)>0
+#if $mms.getMetadata($m.web,"mmPopupList") is not None and $mms.getMetadata($m.web,"mmPopupList").split(',').count($l.name)>0
 			overFeature: function(feature) { 
 			    if(System.popupList[feature.localName].hasOver){
 				this.select(feature);
@@ -613,8 +631,9 @@ System.postMap[System.postMap.length]={
 			  if(System.popup!=null)
 			  map.removePopup(System.popup);
 			  }*/
-#if len($m.web.metadata.get("mmWindowList").split(','))>0
-#if $m.web.metadata.get("mmPopupList").split(',').count($l.name)>0
+#set cmetadata=$mms.getMetadata($m.web,"mmPopupList")
+#if cmetadata is not None and len(cmetadata.split(','))>0
+#if $mms.getMetadata($m.web,"mmPopupList").split(',').count($l.name)>0
 			,
 #end if
 			callbacks: 
@@ -630,7 +649,7 @@ System.postMap[System.postMap.length]={
 		    tselect[tselect.length-1].activate();
 		}
 #else
-#if $m.getLayerByName(lname).metadata.get('mmZFilterField') and $inputs.has_key('filter')
+#if $mms.getMetadata(m.getLayerByName(lname),'mmZFilterField') and $inputs.has_key('filter')
 		layersList[this.localID].localID=this.localID;
 		layersList[this.localID].events.register('loadend', layersList[this.localID], function(){
 		    if(this.localID>=0){
@@ -654,14 +673,14 @@ System.postMap[System.postMap.length]={
 #if $mm_access.checkLayerPriv($conf,$m,$l.name,"r")
     var tmpLayer = new OpenLayers.Layer.WMS(
 	"$lname",
-	"$conf["main"]["mapserverAddress"]?map="+#if $l.metadata.get('mmFilterField') and $inputs.has_key('filter')#pmapfiles["$(lname)"][0]#else##if $l.type==mapscript.MS_LAYER_RASTER and $l.numclasses>1#pmapfiles["$(lname)"][0]#else#pmapfile#end if##end if#+"",
+	"$conf["main"]["mapserverAddress"]?map="+#if $mms.getMetadata($l,'mmFilterField') and $inputs.has_key('filter')#pmapfiles["$(lname)"][0]#else##if $l.type==mapscript.MS_LAYER_RASTER and $l.numclasses>1#pmapfiles["$(lname)"][0]#else#pmapfile#end if##end if#+"",
 	{layers: "$(l.name)",format: "image/png"},
-	{useCanvas: System.useCanvas,isBaseLayer: false, #if $l.type==mapscript.MS_SHAPE_POINT or $lname.count("grid_")>0#width: 1024, height: 1024,#end if# singleTile: false#if $l.metadata.get('mmLabelFormat') is not None#, ratio: 1#end if#,transitionEffect: null}
+	{useCanvas: System.useCanvas,isBaseLayer: false, #if $l.type==mapscript.MS_SHAPE_POINT or $lname.count("grid_")>0#width: 1024, height: 1024,#end if# singleTile: false#if $mms.getMetadata($l,'mmLabelFormat') is not None#, ratio: 1#end if#,transitionEffect: null}
 	
 	);
     tmpLayer.real_name="$(l.name)";
     tmpLayer.local_id="$lname";
-    tmpLayer.setVisibility(#if $m.web.metadata.get("mmActivatedLayers").split(',').count($lname)>0 or $m.web.metadata.get("mmActivatedLayers").split(',').count($lname.replace("_mmlabel",""))>0#true#else#false#end if#);
+    tmpLayer.setVisibility(#if $mms.getMetadata($m.web,"mmActivatedLayers") is not None and $mms.getMetadata($m.web,"mmActivatedLayers").split(',').count($lname)>0 or $mms.getMetadata($m.web,"mmActivatedLayers").split(',').count($lname.replace("_mmlabel",""))>0#true#else#false#end if#);
     layersList[layersList.length]=tmpLayer;
     if("$(l.name.count("_mmlabel")>0)"=="True"){
 
@@ -690,7 +709,7 @@ System.postMap[System.postMap.length]={
 	}
 
     }
-#if $m.web.metadata.get("mmActivatedLayers").split(',').count($lname)>0
+#if $mms.getMetadata($m.web,"mmActivatedLayers") is not None and $mms.getMetadata($m.web,"mmActivatedLayers").split(',').count($lname)>0
     try{
 	\$('#layers_list').tree('check',\$(".tree_layer"+(layersList.length-1))[0].parentNode);
     }catch(e){}
@@ -699,7 +718,7 @@ System.postMap[System.postMap.length]={
 
 
 #end if
-#if $m.getLayerByName(lname).metadata.get('mmZFilterField') and $inputs.has_key('filter')
+#if $mms.getMetadata(m.getLayerByName(lname),'mmZFilterField') and $inputs.has_key('filter')
     url="$conf["main"]["mapserverAddress"]?map="+pmapfiles["$(lname)"][0]+"&SERVICE=WFS&typename=$(lname)&VERSION=1.0.0&REQUEST=GetFeature";
     \$.ajax({
 	type: "GET",
@@ -773,19 +792,23 @@ System.postMap[System.postMap.length]={
 	});
 #end if
 
-#if $l.metadata.get('mmQuery')=="true"
+#if $mms.getMetadata($l,'mmQuery')=="true"
 var ok=1;
 #end if
 
-#set p=$m.web.metadata.get('vectorLayers').split(',')
-#if $l.metadata.get("mmQuery")=="true" and $p.count(lname) == 0
+#if $mms.getMetadata($m.web,'vectorLayers') is not None
+#set p=$mms.getMetadata($m.web,'vectorLayers').split(',')
+#else
+#set p=""
+#end if
+#if $mms.getMetadata($l,"mmQuery")=="true" and $p.count(lname) == 0
 #if $mm_access.checkLayerPriv($conf,$m,$lname,"x")
     queryLayersList[queryLayersList.length]=tmpLayer;
     queryLayersList[queryLayersList.length-1].real_name=tmpLayer.name;
-    queryLayersList[queryLayersList.length-1].displayed_fields="#if $l.metadata.get("mmGFIFields") is not None#$l.metadata.get("mmGFIFields")#else#all#end if#";
-    queryLayersList[queryLayersList.length-1].displayed_fields_width="#if $l.metadata.get("mmGFIFieldsWidth") is not None#$l.metadata.get("mmGFIFieldsWidth")#else#all#end if#";
+    queryLayersList[queryLayersList.length-1].displayed_fields="#if $mms.getMetadata($l,"mmGFIFields") is not None#$mms.getMetadata($l,"mmGFIFields")#else#all#end if#";
+    queryLayersList[queryLayersList.length-1].displayed_fields_width="#if $mms.getMetadata($l,"mmGFIFieldsWidth") is not None#$mms.getMetadata($l,"mmGFIFieldsWidth")#else#all#end if#";
 
-#if $m.web.metadata.get("mmPopupList").split(',').count($lname)>0
+#if $mms.getMetadata($m.web,"mmPopupList") is not None and $mms.getMetadata($m.web,"mmPopupList").split(',').count($lname)>0
   if(!System.wmsInfo){
    System.wmsInfo = new OpenLayers.Control.WMSGetFeatureInfo({
        url: System.mapUrl+"?map="+System.mapfile,
@@ -818,7 +841,7 @@ var ok=1;
    System.wmsInfo.activate();
   }
 #end if
-#if $m.web.metadata.get("mmWindowList").split(',').count($lname)>0
+#if  $mms.getMetadata($m.web,"mmWindowList") is not None and $mms.getMetadata($m.web,"mmWindowList").split(',').count($lname)>0
   if(!System.wmsInfo1){
    System.wmsInfo1 = new OpenLayers.Control.WMSGetFeatureInfo({
        url: System.mapUrl+"?map="+System.mapfile,
@@ -836,7 +859,7 @@ var ok=1;
 	}
 	    \$("#dialog-featureInfo").html(event.text);
 	    
-#if $m.web.metadata.get('layout_t')=="mobile"
+#if $mms.getMetadata($m.web,'layout_t')=="mobile"
 	    \$.mobile.changePage("#popup", "none"); 
 #else
 	    \$("#dialog-featureInfo")[0].title=System.messages["Feature Details"];
@@ -873,10 +896,22 @@ var ok=1;
 #end if
  
 
-#if $l.metadata.get("mmGFIFields") is not None and $l.metadata.get("mmAliasFields") is not None
-#set fs=$l.metadata.get("mmGFIFields").split(",")
-#set fn=$l.metadata.get("mmAliasFields").split(",")
-#set fa=$l.metadata.get("mmAliasFieldsAliases").split(",")
+#if $mms.getMetadata($l,"mmGFIFields") is not None and $mms.getMetadata($l,"mmAliasFields") is not None
+#if $mms.getMetadata($l,"mmGFIFields") is not None
+#set fs=$mms.getMetadata($l,"mmGFIFields").split(",")
+#else
+#set fs=""
+#end if
+#if $mms.getMetadata($l,"mmAliasFields") is not None
+#set fn=$mms.getMetadata($l,"mmAliasFields").split(",")
+#else
+#set fn=""
+#end if
+#if $mms.getMetadata($l,"mmAliasFieldsAliases")
+#set fa=$mms.getMetadata($l,"mmAliasFieldsAliases").split(",")
+#else
+#set fa=""
+#end if
 #set ffc=0
 #set ffr=""
 #set ffa=""
@@ -901,6 +936,7 @@ if(layersList[layersList.length-1] && (!layersList[layersList.length-1].value ||
     registerLoadEvents(layersList[layersList.length-1]);
     map.addLayer(tmpLayer);
 }
+
 #end for
      for(var kk=0;kk<finalLayers.length;kk++)
      try{
@@ -1280,7 +1316,7 @@ var react=Array(
 	if((obj.geom && System.lonlat && obj.geom.intersects(new OpenLayers.Geometry.Point(System.lonlat.lon,System.lonlat.lat))) ||obj.geom.getVertices().length==1||System.geoIsLine){
 	    \$("#dialog-featureInfo").html(xml.responseText);
 	    
-#if $m.web.metadata.get('layout_t')=="mobile"
+#if $mms.getMetadata($m.web,'layout_t')=="mobile"
 	    \$.mobile.changePage("#popup", "none"); 
 #else
 	    \$("#dialog-featureInfo")[0].title=System.messages["Feature Details"];
@@ -1388,7 +1424,7 @@ System.searchFields={
 
 \$(function() {
     
-#if $m.web.metadata.get('layout_t')=="mobile"
+#if $mms.getMetadata($m.web,'layout_t')=="mobile"
     \$("#searchField").change(function() {
 	\$('#search_results').empty();
 	var request={"term": \$("#searchField").val()};
@@ -1444,7 +1480,7 @@ System.searchFields={
 			response(data);
 			
 		    }});
-#if $m.web.metadata.get('layout_t')=="mobile"
+#if $mms.getMetadata($m.web,'layout_t')=="mobile"
 	    });
 #else
 				    },

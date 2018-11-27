@@ -1,4 +1,5 @@
 #import zoo
+#import mapfile.service as mms
 #import authenticate.service as auth
 #set sprefix=$auth.getPrefix($conf)
 #set con=$auth.getCon($conf)
@@ -33,9 +34,9 @@
 #else
 #set q1=[["public"]]
 #set q2=[["1","1","1"]]
-#if $m.web.metadata.get("mm_themes") is not None
+#if $mms.getMetadata($m.web,"mm_themes") is not None
 #set q1=[]
-#for i in $m.web.metadata.get("mm_themes").split(",")
+#for i in $mms.getMetadata($m.web,"mm_themes").split(",")
 #set $q1+=[[i]]
 #end for
 #end if
@@ -43,9 +44,9 @@
 <legend>$zoo._("Themes") #if len(q0)>1#<input type="submit" value="$zoo._("Add")" onclick="var tmp=(\$('.$(prefix)tselect').length);#if $inputs.has_key("layer") or $inputs.has_key("dataStore")#\$('#$(prefix)tm_ttr_0').clone().attr('id', '$(prefix)tm_ttr_'+tmp).appendTo('#$(prefix)tm_table');#else#\$('select#$(prefix)tm_themes_0').clone().attr('id', '$(prefix)tm_themes_'+tmp).appendTo('.$(prefix)tm_themes_f');#end if# if(tmp+1>1) \$('#$(prefix)tm_tdelete').show();return false;" /><input id="$(prefix)tm_tdelete" type="submit" value="$zoo._("Delete")" onclick="var tmp=(\$('.$(prefix)tselect').length-1);if(tmp>0){\$('select#$(prefix)tm_themes_'+tmp).remove();#if $inputs.has_key("layer") or $inputs.has_key("dataStore")#\$('#$(prefix)tm_ttr_'+tmp).remove();#end if#}else {alert('$zoo._("You should keep at least one group linked to a user")');\$('#$(prefix)tm_tdelete').toggle();}if(tmp-1==0) \$('#$(prefix)tm_tdelete').toggle();return false;" #if len($q1)==1#style="display:none"#end if#/>#end if#</legend>
 
 #try
-#set themes=$m.web.metadata.get('mm_themes_class').split(',')
+#set themes=$mms.getMetadata($m.web,'mm_themes_class').split(',')
 #except
-#set themes=[$m.web.metadata.get('mm_themes_class')]
+#set themes=[$mms.getMetadata($m.web,'mm_themes_class')]
 #end try
 
 

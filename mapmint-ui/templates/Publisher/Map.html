@@ -1,5 +1,6 @@
 #encoding UTF-8
 #import zoo,mapscript
+#import mapfile.service as mms
 
 <form class="form-horizontal mtpp" method="get" >
   <h1> <i class="fa fa-map-o"></i> $zoo._("Display")</h1>
@@ -7,7 +8,7 @@
     <label class="col-sm-3 control-label">$zoo._("Navigation Toolbar")</label>
     <div class="col-sm-9 range">
 #from Cheetah.Template import Template
-$(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",searchList={"conf": $conf,"prefix":"","selected": $m.web.metadata.get('tprj')}))
+$(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",searchList={"conf": $conf,"prefix":"","selected": $mms.getMetadata($m.web,'tprj')}))
     </div>
   </div>
 <!--
@@ -15,8 +16,8 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",sear
     <label class="col-sm-3 control-label">$zoo._("Renderer Method")</label>
     <div class="col-sm-9 range">
       <select name="render" class="form-control">
-	<option value="SVG" #if $m.web.metadata.get('mmRenderer') is None or $m.web.metadata.get('mmRenderer')=='SVG'#selected#end if#>SVG</option>
-	<option value="Canvas" #if $m.web.metadata.get('mmRenderer') is not None and $m.web.metadata.get('mmRenderer')=='Canvas'#selected#end if#>Canvas</option>
+	<option value="SVG" #if $mms.getMetadata($m.web,'mmRenderer') is None or $mms.getMetadata($m.web,'mmRenderer')=='SVG'#selected#end if#>SVG</option>
+	<option value="Canvas" #if $mms.getMetadata($m.web,'mmRenderer') is not None and $mms.getMetadata($m.web,'mmRenderer')=='Canvas'#selected#end if#>Canvas</option>
       </select>	    
     </div>
   </div>
@@ -24,8 +25,8 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",sear
     <label class="col-sm-3 control-label">$zoo._("Other Tools")</label>
     <div class="col-sm-9 range">
       <select name="render" class="form-control">
-	<option value="SVG" #if $m.web.metadata.get('mmRenderer') is None or $m.web.metadata.get('mmRenderer')=='SVG'#selected#end if#>SVG</option>
-	<option value="Canvas" #if $m.web.metadata.get('mmRenderer') is not None and $m.web.metadata.get('mmRenderer')=='Canvas'#selected#end if#>Canvas</option>
+	<option value="SVG" #if $mms.getMetadata($m.web,'mmRenderer') is None or $mms.getMetadata($m.web,'mmRenderer')=='SVG'#selected#end if#>SVG</option>
+	<option value="Canvas" #if $mms.getMetadata($m.web,'mmRenderer') is not None and $mms.getMetadata($m.web,'mmRenderer')=='Canvas'#selected#end if#>Canvas</option>
       </select>	    
     </div>
   </div>
@@ -51,11 +52,11 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",sear
 		<td valign="middle" style="width:120px;">
 		  $labels[$j]
 		  #if $i=="max"
-		  <input id="mmRestricted" class="rounded" type="checkbox" value="true" #if $m.web.metadata.get("mmRestricted")=="true"#checked="true"#end if# data-toggle="tooltip" title="$zoo._("Restricted")" />
+		  <input id="mmRestricted" class="rounded" type="checkbox" value="true" #if $mms.getMetadata($m.web,"mmRestricted")=="true"#checked="true"#end if# data-toggle="tooltip" title="$zoo._("Restricted")" />
 		  #end if
 		</td>
 #for k in ['minx','miny','maxx','maxy']
-		<td><input id="${i}_${k}" class="rounded" type="text" value="#if $m.web.metadata.get($i+'_'+$k)#$m.web.metadata.get($i+'_'+$k)#end if#" /></td>
+		<td><input id="${i}_${k}" class="rounded" type="text" value="#if $mms.getMetadata($m.web,$i+'_'+$k)#$mms.getMetadata($m.web,$i+'_'+$k)#end if#" /></td>
 #end for
 		<td style="width: 150px;">
 		<div id="form_move_$(i)" >
@@ -93,24 +94,24 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",sear
     <label class="col-sm-3 control-label">$zoo._("Text settings")</label>
     <div class="col-sm-3 range">
       <select name="layoutFont" class="form-control">
-	<option value="-1" #if $m.web.metadata.get("ffamily")==""#selected="selected"#end if#>$zoo._("Font-family")</option>
+	<option value="-1" #if $mms.getMetadata($m.web,"ffamily")==""#selected="selected"#end if#>$zoo._("Font-family")</option>
 #set fonts=["Arial","Courier","Georgia","Helvetica","Lucida","Tahoma","Trebuchet"]
 #for i in fonts		    
-	<option style="font-family:${i};font-size:1.1em;" value="${i}" #if $m.web.metadata.get("ffamily")==$i#selected="selected"#end if#>${i}</option>
+	<option style="font-family:${i};font-size:1.1em;" value="${i}" #if $mms.getMetadata($m.web,"ffamily")==$i#selected="selected"#end if#>${i}</option>
 #end for
       </select>	    
     </div>
     <div class="col-sm-3 range">
       <select name="layoutFontSize" class="form-control">
-	<option value="-1" #if $m.web.metadata.get("fsize")==""#selected="selected"#end if#>$zoo._("Font-size")</option>
+	<option value="-1" #if $mms.getMetadata($m.web,"fsize")==""#selected="selected"#end if#>$zoo._("Font-size")</option>
 #for i in range(9,15)
-	<option style="font-size:${i}px;" value="$i" #if $m.web.metadata.get("fsize")==str($i)#selected="selected"#end if#>${i}px</option>
+	<option style="font-size:${i}px;" value="$i" #if $mms.getMetadata($m.web,"fsize")==str($i)#selected="selected"#end if#>${i}px</option>
 #end for
       </select>	    
     </div>
     <div class="col-sm-3 range">
       <div class="input-group cpicker">
-	<input type="text" class="form-control" id="mmFontColor" name="layoutFontColor" value="#if $m.web.metadata.get("font-colorpicker")==""#selected="selected"#\#333333#else#$m.web.metadata.get("font-colorpicker")#end if#" />
+	<input type="text" class="form-control" id="mmFontColor" name="layoutFontColor" value="#if $mms.getMetadata($m.web,"font-colorpicker")==""#selected="selected"#\#333333#else#$mms.getMetadata($m.web,"font-colorpicker")#end if#" />
 	<span class="input-group-addon"><i></i></span>
       </div>
     </div>
@@ -124,7 +125,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",sear
 	[zoo._("Right"),"Right"]
 	]
 #for i in fonts		    
-	<option value="${i[1]}" #if $m.web.metadata.get("mmLSPosition")==$i#selected="selected"#end if#>${i[0]}</option>
+	<option value="${i[1]}" #if $mms.getMetadata($m.web,"mmLSPosition")==$i#selected="selected"#end if#>${i[0]}</option>
 #end for
       </select>	    
     </div>
@@ -133,7 +134,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",sear
       <select name="layerswitcherOpen" class="form-control">
 #set fonts=[zoo._("Open"),zoo._("Close")]
 #for i in fonts		    
-	<option value="${i}" #if $m.web.metadata.get("mmLSPosition")==$i#selected="selected"#end if#>${i}</option>
+	<option value="${i}" #if $mms.getMetadata($m.web,"mmLSPosition")==$i#selected="selected"#end if#>${i}</option>
 #end for
       </select>	    
     </div>

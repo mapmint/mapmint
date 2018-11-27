@@ -13,10 +13,10 @@
 <div class="row">
 <div class="col-md-6">
 <a href="$conf["main"]["applicationAddress"]/public/$inputs["id"]["value"]">
-#if mm.web.metadata.get("previewUrl")
-<img class="lmap img-responsive" src="$mm.web.metadata.get('previewUrl')" />
+#if $mms.getMetadata($mm.web,"previewUrl")
+<img class="lmap img-responsive" src="$mms.getMetadata($mm.web,'previewUrl')" />
 #else
-#set ll=$mm.web.metadata.get('mmActivatedLayers')
+#set ll=$mms.getMetadata($mm.web,'mmActivatedLayers')
 #set a=$mm.getLayer(0).getExtent()
 <!-- BaseLayer $a.project(mapscript.projectionObj(mm.getLayer(0).getProjection()),mapscript.projectionObj(mm.getProjection())) -->
 #set x=(($a.maxx-$a.minx)/2)+$a.minx
@@ -26,7 +26,7 @@
 </a>
 </div>
 <div class="col-md-6">
-<h4 class="ldesc">$mm.web.metadata.get('mmTitle')</h4>
+<h4 class="ldesc">$mms.getMetadata($mm.web,'mmTitle')</h4>
 #import time,json
 <p>Publiée le :
 $(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($mpath)))) </p>

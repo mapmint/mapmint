@@ -1177,6 +1177,27 @@ def listThemes(cur,prefix,group='public',clause=None,clause1=None):
         elems+=[celem]
     return elems
 
+def listExtent(conf,cur,tbl):
+    import datastores.directories.service as ds
+    import os
+    req0="select id, title as text, replace(replace(replace(ST_Extent(ST_transform(wkb_geometry,3857))::text,' ',','),'BOX(',''),')','') as ext from "+tbl+" group by id order by id desc"
+    print >> sys.stderr,"\n+++++++REQ0 === "+req0
+    res=cur.execute(req0)
+    vals=cur.fetchall()
+    elems=[]
+    for i in range(0,len(vals)):
+        #elems+=[{"id": vals[i][0],"text":vals[i][1],"ext":vals[i][2],"size":ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+str(vals[i][0])+".db"))}]
+        try:
+            elems+=[{"id": vals[i][0],"text":vals[i][1],"ext":vals[i][2],"size":ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+str(vals[i][0])+".db"))}]# elems[len(elems)-1]["size"]=ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+str(vals[i][0])+".db")
+        except Exception,e:
+            elems+=[{"id": vals[i][0],"text":vals[i][1],"ext":vals[i][2],"size":"0Mb"}]
+        #try:
+        #    elems[len(elems)-1]["size"]=ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+str(vals[i][0])+".db")
+    	#except Exception,e:
+        #    elems[len(elems)-1]["size"]=0
+		
+    return elems
+
 def flatElements(l,res):
     for i in range(0,len(l)):
         res["id_"+str(l[i]["id"])]=l[i]["text"]
@@ -1247,7 +1268,9 @@ def list(conf,inputs,outputs):
         if inputs["table"]["value"]=="themes":
             res=listThemes(cur,prefix,conf["senv"]["group"])
         else:
-            if inputs["table"]["value"]=="idicateurs":
+            if inputs["table"]["value"]=="mm.extents":
+                res=listExtent(conf,cur,inputs["table"]["value"])
+            elif inputs["table"]["value"]=="idicateurs":
                 res=listDefault(prefix+inputs["table"]["value"],cur," order by ord")
             else:
                 if inputs["table"]["value"].count('.')>0:
@@ -3683,7 +3706,7 @@ def _clientPrint(conf,inputs,cur,tableId,cid,filters,rid=None,rName=None):
                     else:
                         if vals0[i][3]=="diagram":
                             try:
-                                #script+="pm.statThis('[_"+vals0[i][2]+"_]',"+json.dumps(eval(unicode(str(rvals[rcnt]),"utf-8").replace("'{","[").replace("}'","]")),ensure_ascii=False)+")\ntime.sleep(1)\n"
+                                #script+="pm.statThis('[_"+vals0[i][2]+"_]',"+json.dumps(eval(unicode(str(rvals[rcnt]),"utf-8").replace("'{","[").replace("}'","]")),ensure_ascii=False)+")\ntime.sleep(0.01)\n"
                                 script+="pm.statThis('[_"+vals0[i][2]+"_]',"+unicode(str(rvals[rcnt]),"utf-8").replace("'{","[").replace("}'","]")+")\ntime.sleep(1)\n"
                                 script+="print('"+vals0[i][2]+"',file=sys.stderr)\nsys.stderr.flush()\ntime.sleep(1)\n"
                             except Exception,e:
@@ -3692,7 +3715,7 @@ def _clientPrint(conf,inputs,cur,tableId,cid,filters,rid=None,rName=None):
                                 #sys.setdefaultencoding('utf8')
                                 #print >> sys.stderr,rvals[rcnt].encode('utf-8')
                                 try:
-                                    script+="pm.statThis('[_"+vals0[i][2]+"_]',"+json.dumps(eval(str(rvals[rcnt].encode('utf-8')).replace("'{","[").replace("}'","]")))+")\ntime.sleep(1)\n"
+                                    script+="pm.statThis('[_"+vals0[i][2]+"_]',"+json.dumps(eval(str(rvals[rcnt].encode('utf-8')).replace("'{","[").replace("}'","]")))+")\ntime.sleep(0.01)\n"
                                     script+="print('"+vals0[i][2]+"',file=sys.stderr)\nsys.stderr.flush()\n"
                                 except Exception,e:
                                     print >> sys.stderr,"ERROR 1 !"
@@ -3864,9 +3887,10 @@ def clientView(conf,inputs,outputs):
     print >> sys.stderr," ------- 2 --------- "
     res=cur.execute(rreq)
     rvals=cur.fetchone()
+    restrictedTypes=["Date","Boolean","Reference"]
     for i in range(len(ovals)):
         fres[ovals[i][0]]={}
-        req="SELECT * FROM (SELECT mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+str(ovals[i][0])+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where "+splitGroup(conf)+")) as a ORDER BY a.id"
+        req="SELECT * FROM (SELECT mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select name from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype) FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+str(ovals[i][0])+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where "+splitGroup(conf)+")) as a ORDER BY a.id"
         print >> sys.stderr," ------- 3 --------- "
         print >> sys.stderr,req
         print >> sys.stderr," ------- 3 --------- "
@@ -3879,10 +3903,13 @@ def clientView(conf,inputs,outputs):
                     fres[ovals[i][0]][cvals[j][1]]={"type":"bytes","filename":file["name"],"fileurl":file["name"].replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])}
             else:
                 if rvals is not None and columns.count(cvals[j][2])>0 and columns.index(cvals[j][2])<len(rvals):
-                    fres[ovals[i][0]][cvals[j][1]]=rvals[columns.index(cvals[j][2])]
+                    if restrictedTypes.count(cvals[j][3])>0:
+                        fres[ovals[i][0]][cvals[j][1]]=str(rvals[columns.index(cvals[j][2])])
+                    else:
+                        fres[ovals[i][0]][cvals[j][1]]=rvals[columns.index(cvals[j][2])]
                     #print>> sys.stderr,"+++ 0 +++ "+str(rvals)
                     #print>> sys.stderr,"+++ 0 +++ "+str(columns)
-                    #print>> sys.stderr,"+++ 0 +++ "+str(cvals[j])
+                    print>> sys.stderr,"+++ 0 +++ "+str(cvals[j])
                     #print>> sys.stderr,"+++ 0 +++ "+str(rvals[columns.index(cvals[j][2])])
                     #print>> sys.stderr,"+++ 0 +++ "+str(ovals[i])
                 else:
@@ -3956,11 +3983,11 @@ def clientViewTable(conf,inputs,outputs):
     for i in range(len(vals)):
         values+=[vals[i][2]]
         if vals[i][5] is not None:
-            classifier=vals[i][6]+" "+classifiers[(vals[i][5]-1)]
+            classifier=table+"."+vals[i][6]+" "+classifiers[(vals[i][5]-1)]
     if inputs.keys().count("sortname")>0 and inputs.keys().count("sortname")!="":
         for i in range(len(vals)):
             if vals[i][6] == inputs["sortname"]["value"]:
-                classifier=vals[i][6]+" "+inputs["sortorder"]["value"]
+                classifier=table+"."+vals[i][6]+" "+inputs["sortorder"]["value"]
     if inputs.keys().count("filters")>0:
         filters=json.loads(inputs["filters"]["value"])
         if len(filters)>0:
@@ -3980,6 +4007,7 @@ def clientViewTable(conf,inputs,outputs):
     print >> sys.stderr,"***** "+str(values)
     print >> sys.stderr,"****** "+str(cid)
     print >> sys.stderr,"******* "+str(clause)
+    print >> sys.stderr,"******* "+str(classifier)
     req1="SELECT "+(",".join(values+[cid]))+" FROM "+table+" WHERE "+clause+" ORDER BY "+classifier+" LIMIT "+inputs["limit"]["value"]+" OFFSET "+inputs["offset"]["value"]
     #print >> sys.stderr,req1
     res=cur.execute(req1)

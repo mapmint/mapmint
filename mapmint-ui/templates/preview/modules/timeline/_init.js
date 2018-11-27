@@ -1,9 +1,10 @@
 #import zoo
 #import mapscript
+#import mapfile.service as mms
 System.TimelinedLayers=[];
 #for i in range(0,$m.numlayers)
 #set timelinr=False
-#if $m.getLayer($i).metadata.get('mmClass')=="tl"
+#if $mms.getMetadata($m.getLayer($i),'mmClass')=="tl"
 #set l=$m.getLayer($i)
 System.TimelinedLayers.push("$l.name");
 #set cid=$i
@@ -23,7 +24,7 @@ layersList[$cid].url=msUrl+"?map=$conf["main"]["dataPath"]/public_maps/timeline_
 layersList[$cid].url=msUrl+"?map=$conf["main"]["dataPath"]/public_maps/timeline_$(conf["senv"]["last_map"])_$(l.name)_step0.map";
 #set m0=None
 #end try
-#if ($m0 and $m0.web.metadata.get('layout_t')=="natureparif-indicateurs") or ($m.web.metadata.get('mmActivatedLayers') and $m.web.metadata.get('mmActivatedLayers').count($l.name)>0)
+#if ($m0 and $mms.getMetadata($m0.web,'layout_t')=="natureparif-indicateurs") or ($mms.getMetadata($m.web,'mmActivatedLayers') and $mms.getMetadata($m.web,'mmActivatedLayers').count($l.name)>0)
 layersList[$cid].redraw(true);
 #end if
 #end if

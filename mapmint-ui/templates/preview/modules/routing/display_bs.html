@@ -1,8 +1,8 @@
 #encoding UTF-8
-
 #import zoo
-#if $m.web.metadata.get('mmOT')
-#set f0=$m.web.metadata.get('mmOT').split(',')
+#import mapfile.service as mms
+#if $mms.getMetadata($m.web,'mmOT')
+#set f0=$mms.getMetadata($m.web,'mmOT').split(',')
 #if $f0.count('Routing')>0
 
 #def printInputGroup($obj)

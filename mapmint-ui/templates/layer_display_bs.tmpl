@@ -2,8 +2,8 @@
 #import zoo
 #import mapfile.service as mmap
 
-#if $layer.metadata.get("ows_title") is not None and $layer.metadata.get("ows_title")!=""
-#set title=$layer.metadata.get("ows_title")
+#if $mmap.getMetadata($layer,"ows_title") is not None and $mmap.getMetadata($layer,"ows_title")!=""
+#set title=$mmap.getMetadata($layer,"ows_title")
 #else
 #set title=$layer.name
 #end if
@@ -23,8 +23,8 @@
 #set p=""
 #end try
 #if p!=""
-#if $layer.metadata.get("cstep") is not None
-#set prefix="_step"+$layer.metadata.get("cstep")
+#if $mmap.getMetadata($layer,"cstep") is not None
+#set prefix="_step"+$mmap.getMetadata($layer,"cstep")
 #set hasStep=True
 #else
 #set prefix=""
@@ -39,9 +39,9 @@
 #set $c["lindex"]=0
 #end if
 
-#if $layer.metadata.get('mm_group')!="Layers"
-#if ($layer.numclasses > 1 and $layer.metadata.get('mmClass')!="tl") and (not($layer.map.web.metadata.get("mmRT")) or ($layer.type==$mapscript.MS_LAYER_RASTER and $layer.map.web.metadata.get("mmRT") and $layer.map.web.metadata.get("mmRT").count("timeline")==0 and $layer.metadata.get("mmRasterTimeline") is not None and $layer.metadata.get("mmRasterTimeline")=="true"))
-    <li id="layer_$(layer.index)$(p)" data-id="layer_$conf["lenv"]["lindex"]" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$(p)" #if not(hasStep)#state="closed"#end if# class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers") is not None and $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$title </label>
+#if $mmap.getMetadata($layer,'mm_group')!="Layers"
+#if ($layer.numclasses > 1 and $mmap.getMetadata($layer,'mmClass')!="tl") and (not($mmap.getMetadata($layer.map.web,"mmRT")) or ($layer.type==$mapscript.MS_LAYER_RASTER and $mmap.getMetadata($layer.map.web,"mmRT") and $mmap.getMetadata($layer.map.web,"mmRT").count("timeline")==0 and $mmap.getMetadata($layer,"mmRasterTimeline") is not None and $mmap.getMetadata($layer,"mmRasterTimeline")=="true"))
+    <li id="layer_$(layer.index)$(p)" data-id="layer_$conf["lenv"]["lindex"]" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$(p)" #if not(hasStep)#state="closed"#end if# class="list-group-item layer cm"><input type="checkbox" #if $mmap.getMetadata($layer.map.web,"mmActivatedLayers") is not None and $mmap.getMetadata($layer.map.web,"mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$title </label>
 	$bmenu
     	<ul class="list-group tree">
 #for j in range(0,$layer.numclasses)
@@ -53,19 +53,19 @@
 #set $cnf["lenv"]["lindex"]=str(int($conf["lenv"]["lindex"])+1)
 #else
 #try
-#set grt=int($layer.map.web.metadata.get("mmRT"))
+#set grt=int($mmap.getMetadata($layer.map.web,"mmRT"))
 #except
 #set grt=1
 #end try
-#if not($layer.type==$mapscript.MS_LAYER_RASTER and $grt>0 and $layer.map.web.metadata.get("mmRT").count("timeline")!=0 and $layer.metadata.get("mmRasterTimeline") is not None and $layer.metadata.get("mmRasterTimeline")=="true" )
+#if not($layer.type==$mapscript.MS_LAYER_RASTER and $grt>0 and $mmap.getMetadata($layer.map.web,"mmRT").count("timeline")!=0 and $mmap.getMetadata($layer,"mmRasterTimeline") is not None and $mmap.getMetadata($layer,"mmRasterTimeline")=="true" )
 $Template(file=$conf['main']['templatesPath']+"layer_basic_display_bs.tmpl",searchList={"layer": $layer,"conf": $conf,"p":$p,"isOverlays":$isOverlays,"bmenu":$bmenu,"hasStep":$hasStep,"title":$title})
 #set cnf=$conf
 #set $cnf["lenv"]["lindex"]=str(int($cnf["lenv"]["lindex"])+1)
 #else
-	<li id="layer_$(layer.index)$p" data-id="layer_$conf["lenv"]["lindex"]" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$p" class="list-group-item layer cm"><input type="checkbox" #if $layer.map.web.metadata.get("mmActivatedLayers") is not None and $layer.map.web.metadata.get("mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label><i class="fa fa-circle"></i> $zoo._("Raster Timeline")</label><!--</li>-->
+	<li id="layer_$(layer.index)$p" data-id="layer_$conf["lenv"]["lindex"]" #if $isOverlays#data-layer="$layer.name"#end if# iconCls="tree$(p)_layer$(layer.index)$p" class="list-group-item layer cm"><input type="checkbox" #if $mmap.getMetadata($layer.map.web,"mmActivatedLayers") is not None and $mmap.getMetadata($layer.map.web,"mmActivatedLayers").split(",").count($layer.name)>0#checked="checked"#end if# /><label><i class="fa fa-circle"></i> $zoo._("Raster Timeline")</label><!--</li>-->
 	$bmenu
 #set steps=[]
-#set cg=$layer.metadata.get("mm_group")
+#set cg=$mmap.getMetadata($layer,"mm_group")
 #set steps=[]
 #for k in range($layer.map.numlayers)
 #set l=$layer.map.getLayer(k)
@@ -148,8 +148,8 @@ $Template(file=$conf['main']['templatesPath']+"layer_basic_display_bs.tmpl",sear
 #set $cnf["lenv"]["lindex"]=str(int($cnf["lenv"]["lindex"])+1)
 #end if
 
-#if $layer.metadata.get('mmClass')=="tl"
-#set steps=$layer.metadata.get('mmSteps').split(',')
+#if $mmap.getMetadata($layer,'mmClass')=="tl"
+#set steps=$mmap.getMetadata($layer,'mmSteps').split(',')
 
 <ul class="list-group tree">
 <li class="list-group-item">
@@ -204,7 +204,7 @@ $Template(file=$conf['main']['templatesPath']+"layer_basic_display_bs.tmpl",sear
 #set cnf=$conf
 #set $cnf["lenv"]["lindex"]=str(int($cnf["lenv"]["lindex"])+1)
 #end if
-#* End layer.metadata.get('mmClass')=="tl" *#
+#* End mmap.getMetadata($layer,'mmClass')=="tl" *#
 
 	</li>
 #end if

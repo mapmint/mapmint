@@ -36,7 +36,7 @@
    </LiteralData>
   [utility]
    Title = The mode
-   Abstract = This service has 4 different modes :  hillshade,  slope,  aspect, color-relief
+   Abstract = This service has 7 different modes :  hillshade,  slope,  aspect, color-relief, TRI, TPI, roughness
    minOccurs = 1
    maxOccurs = 1
    <LiteralData>

@@ -1,5 +1,6 @@
 #encoding UTF-8
 #import zoo,mapscript
+#import mapfile.service as mms
 
 <ul class="nav nav-tabs" role="tablist">
   <li role="presentation" >
@@ -41,25 +42,25 @@
         <div class="col-sm-9 range">
 	  <select id="base_layer_active" class="form-control" onchange="\$('#base_layer_active_sel').val(this.value);">
 	  </select>
-	  <input type="hidden" id="base_layer_active_sel" value="$m.web.metadata.get('mmActivatedBaseLayers')" />
+	  <input type="hidden" id="base_layer_active_sel" value="$mms.getMetadata($m.web,'mmActivatedBaseLayers')" />
 	</div>
       </div>
       <div class="row">
 	<label class="col-sm-3 control-label">$conf["mm"]["boLayerAlias"]</label>
         <div class="col-sm-9 range">
-	  <input type="checkbox" id="base_osm" value="true" #if $m.web.metadata.get("mmOSMBaseLayers")=="true"#checked="true"#end if# onchange="app.updateBaseLayers();"/>
+	  <input type="checkbox" id="base_osm" value="true" #if $mms.getMetadata($m.web,"mmOSMBaseLayers")=="true"#checked="true"#end if# onchange="app.updateBaseLayers();"/>
 	</div>
       </div>
       <div class="row">
 	<label class="col-sm-3 control-label">$conf["mm"]["boLayerAlias"]</label>
       <div class="col-sm-9 range">
-	<!-- $m.web.metadata.get('mmMBaseLayers') -->
+	<!-- $mms.getMetadata($m.web,'mmMBaseLayers') -->
 	  <select multiple id="mapquest" class="form-control" onchange="app.updateBaseLayers();">
-	    <option value="-1" #if $m.web.metadata.get('mmMBaseLayers')=="-1"#selected="true"#end if#>$zoo._("None")</option>
+	    <option value="-1" #if $mms.getMetadata($m.web,'mmMBaseLayers')=="-1"#selected="true"#end if#>$zoo._("None")</option>
 #set a=$conf["mm"]["bmLayers"].split(",")
 #set b=$conf["mm"]["bmLayerAlias"].split(",")
-#if $m.web.metadata.get('mmMBaseLayers')
-#set setM=$m.web.metadata.get('mmMBaseLayers').split(',')
+#if $mms.getMetadata($m.web,'mmMBaseLayers')
+#set setM=$mms.getMetadata($m.web,'mmMBaseLayers').split(',')
 #else
 #set setM=[]
 #end if
@@ -72,8 +73,8 @@
       <div class="row">
 	<label class="col-sm-3 control-label">$zoo._("Proprietary:")</label>
         <div class="col-sm-9 range">
-#if $m.web.metadata.get("mmProprietaryBaseLayers")
-#set lname=$m.web.metadata.get("mmProprietaryBaseLayers")
+#if $mms.getMetadata($m.web,"mmProprietaryBaseLayers")
+#set lname=$mms.getMetadata($m.web,"mmProprietaryBaseLayers")
 #else
 #set lname=$conf["mm"]["bpDefault"]
 #end if
@@ -85,7 +86,7 @@
 #end for
 	  </select>
 #if $lname=="Planet"
-	  <input name="mmBBDefault_ini" id="mmBBDefault_ini" value="$m.web.metadata.get('mmPBaseLayers')" type="hidden" />
+	  <input name="mmBBDefault_ini" id="mmBBDefault_ini" value="$mms.getMetadata($m.web,'mmPBaseLayers')" type="hidden" />
 	  <!-- $lname -->
 #end if	  
 	</div>
@@ -95,11 +96,11 @@
         <div class="col-sm-9 range">
 #for j in $conf["mm"]["bpList"].split(',')
 	      <select multiple class="form-control select-window b$(j)Select" id="$conf["mm"]["b"+$j+"Name"]"  #if $lname!=$conf["mm"]["b"+$j+"Name"]#style="display: none"#end if# onchange="app.updateBaseLayers();">
-		<option value="-1" #if $m.web.metadata.get('mmProprietaryBaseLayers')!=$conf["mm"]["b"+$j+"Name"] or $m.web.metadata.get('mmPBaseLayers')==""#selected="true"#end if#>None</option>
+		<option value="-1" #if $mms.getMetadata($m.web,'mmProprietaryBaseLayers')!=$conf["mm"]["b"+$j+"Name"] or $mms.getMetadata($m.web,'mmPBaseLayers')==""#selected="true"#end if#>None</option>
 #set a=$conf["mm"]["b"+$j+"LayerAlias"].split(",")
 #set b=$conf["mm"]["b"+$j+"Layers"].split(",")
-#if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"] and $m.web.metadata.get('mmPBaseLayers')!=""
-#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+#if $mms.getMetadata($m.web,'mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"] and $mms.getMetadata($m.web,'mmPBaseLayers')!=""
+#set setM=$mms.getMetadata($m.web,'mmPBaseLayers').split(',')
 #else
 #set setM=[]
 #end if
@@ -110,10 +111,10 @@
 #end for
 	</div>
       </div>
-      <div class="row" #if $m.web.metadata.get("mmProprietaryBaseLayers")!=$conf["mm"]["bbName"] and $m.web.metadata.get("mmProprietaryBaseLayers")!=$conf["mm"]["biName"]#style="display:none"#end if#>
+      <div class="row" #if $mms.getMetadata($m.web,"mmProprietaryBaseLayers")!=$conf["mm"]["bbName"] and $mms.getMetadata($m.web,"mmProprietaryBaseLayers")!=$conf["mm"]["biName"]#style="display:none"#end if#>
 	<label class="col-sm-3 control-label">$zoo._("API Key")</label>
         <div class="col-sm-9 range">
-	  <input class="form-control" name="mmBAK" value="$m.web.metadata.get('mmBAK')" />
+	  <input class="form-control" name="mmBAK" value="$mms.getMetadata($m.web,'mmBAK')" />
 	</div>
       </div>
       <div class="row">
@@ -126,12 +127,12 @@
 	    <span class="input-group-btn" title="$zoo._("Set URL")" rel="tooltip">
 	    <button class="btn btn-default disabled" type="button">$zoo._("Set")</button>
 	    </span>
-	    <input type="text" class="form-control" placeholder="$zoo._("WMTS Server URL")" value="$m.web.metadata.get("mmWMTSBLURL")"/>
+	    <input type="text" class="form-control" placeholder="$zoo._("WMTS Server URL")" value="$mms.getMetadata($m.web,"mmWMTSBLURL")"/>
 	  </div>
 	  <div id="wmts_layers_list">
 #try	    
-#if $m.web.metadata.get("mmWMTSBLURL")!=""
-#set tmp=$m.web.metadata.get("mmWMTSBaseLayers").split(",")
+#if $mms.getMetadata($m.web,"mmWMTSBLURL")!=""
+#set tmp=$mms.getMetadata($m.web,"mmWMTSBaseLayers").split(",")
 #for i in range(len($tmp))	    
 #set tmp0=tmp[$i].split("|")
 	    <div class="col-sm-6">
@@ -157,9 +158,9 @@
 	    <label class="col-sm-2">$zoo._("Attributions")</label>
 	    <div class="col-sm-10">
 #try
-#set val=open($m.web.metadata.get("mmWMTSAttribution").replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"])).read()
+#set val=open($mms.getMetadata($m.web,"mmWMTSAttribution").replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"])).read()
 #except
-#set val=$m.web.metadata.get("mmWMTSAttribution")
+#set val=$mms.getMetadata($m.web,"mmWMTSAttribution")
 #end try
 	      <textarea name="wmts_attribution" class="form-control mm-editor">$val</textarea>
 	    </div>
@@ -184,11 +185,11 @@
       <div class="row">
 	<label class="col-sm-3 control-label">$zoo._("Created layers")</label>
       <div class="col-sm-9 range">
-	<!-- $m.web.metadata.get('mmBProject') -->
+	<!-- $mms.getMetadata($m.web,'mmBProject') -->
 	  <select multiple id="mmBProject" class="select-window form-control" onchange="app.updateBaseLayers();">
-	    <option value="-1" #if $m.web.metadata.get('mmBProject')==""#selected="true"#end if#>$zoo._("None")</option>
+	    <option value="-1" #if $mms.getMetadata($m.web,'mmBProject')==""#selected="true"#end if#>$zoo._("None")</option>
 #try
-#set sel=$m.web.metadata.get('mmBProject').split(",")
+#set sel=$mms.getMetadata($m.web,'mmBProject').split(",")
 #except
 #set sel=[]
 #end try
@@ -234,28 +235,28 @@
 	  <th width="50">$zoo._("Access")</th>
 	  </thead>
 	  <tbody>
-#if $m.web.metadata.get('mmActivatedLayers')
-#set activatedLayers=$m.web.metadata.get('mmActivatedLayers').split(",")
+#if $mms.getMetadata($m.web,'mmActivatedLayers')
+#set activatedLayers=$mms.getMetadata($m.web,'mmActivatedLayers').split(",")
 #else
 #set activatedLayers=[]
 #end if
-#if $m.web.metadata.get('mmPopupList')
-#set popupList=$m.web.metadata.get('mmPopupList').split(",")
+#if $mms.getMetadata($m.web,'mmPopupList')
+#set popupList=$mms.getMetadata($m.web,'mmPopupList').split(",")
 #else
 #set popupList=[]
 #end if
-#if $m.web.metadata.get('mmWindowList')
-#set windowList=$m.web.metadata.get('mmWindowList').split(",")
+#if $mms.getMetadata($m.web,'mmWindowList')
+#set windowList=$mms.getMetadata($m.web,'mmWindowList').split(",")
 #else
 #set windowList=[]
 #end if
-#if $m.web.metadata.get('rasterLayers')
-#set rasterLayers=$m.web.metadata.get('rasterLayers').split(",")
+#if $mms.getMetadata($m.web,'rasterLayers')
+#set rasterLayers=$mms.getMetadata($m.web,'rasterLayers').split(",")
 #else
 #set rasterLayers=[]
 #end if
-#if $m.web.metadata.get('vectorLayers')
-#set vectorLayers=$m.web.metadata.get('vectorLayers').split(",")
+#if $mms.getMetadata($m.web,'vectorLayers')
+#set vectorLayers=$mms.getMetadata($m.web,'vectorLayers').split(",")
 #else
 #set vectorLayers=[]
 #end if
@@ -269,11 +270,11 @@
 	      <td><input type="radio" id="layer_type_$m.getLayer($i).name" name="layer_type_$m.getLayer($i).name" #if vectorLayers.count($m.getLayer($i).name)>0#checked="checked"#end if# value="vector" #if $m.getLayer($i).type==3#disabled="true"#end if# /></td>
 	      <td><input type="radio" id="layer_type1_$m.getLayer($i).name" name="layer_type_$m.getLayer($i).name" #if rasterLayers.count($m.getLayer($i).name)>0#checked="checked"#end if# value="raster" /></td>
 	      <td><input name="activate" type="checkbox" value="a$i" id="is_activated_layer_$m.getLayer($i).name" #if ($activatedLayers.count($m.getLayer($i).name)>0)#checked="true"#end if#/></td>
-	      <td><input name="minScale" type="text" style="width:75px;" id="min_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmMinScale")" /></td>
-	      <td><input name="maxScale" type="text" style="width:75px;" id="max_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmMaxScale")" /></td>
-	      <td><input name="lminScale" type="text" style="width:75px;" id="label_min_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmLabelMinScale")" /></td>
-	      <td><input name="lmaxScale" type="text" style="width:75px;" id="label_max_scale_$m.getLayer($i).name" value="$m.getLayer($i).metadata.get("mmLabelMaxScale")" /></td>
-	      <td><a href="#access" onclick="app.displayPermissionForm(\$(this) ,'$m.getLayer($i).metadata.get("mmDSTN")','$m.getLayer($i).name')">priv.</a></td>
+	      <td><input name="minScale" type="text" style="width:75px;" id="min_scale_$m.getLayer($i).name" value="$mms.getMetadata($m.getLayer($i),"mmMinScale")" /></td>
+	      <td><input name="maxScale" type="text" style="width:75px;" id="max_scale_$m.getLayer($i).name" value="$mms.getMetadata($m.getLayer($i),"mmMaxScale")" /></td>
+	      <td><input name="lminScale" type="text" style="width:75px;" id="label_min_scale_$m.getLayer($i).name" value="$mms.getMetadata($m.getLayer($i),"mmLabelMinScale")" /></td>
+	      <td><input name="lmaxScale" type="text" style="width:75px;" id="label_max_scale_$m.getLayer($i).name" value="$mms.getMetadata($m.getLayer($i),"mmLabelMaxScale")" /></td>
+	      <td><a href="#access" onclick="app.displayPermissionForm(\$(this) ,'$mms.getMetadata($m.getLayer($i),"mmDSTN")','$m.getLayer($i).name')">priv.</a></td>
 	    </tr>
 #end if
 #end for

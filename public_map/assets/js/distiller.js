@@ -1915,15 +1915,17 @@ define([
 		    e.stopPropagation();
 		}
 		if(!DSPreviews["DS_"+dsid+"_"+ldatasource]){
+			
 		    var tmpPopover=$(obj).popover({
 			html: true,
 			placement: ($(obj).is("a")?'bottom':'left'),
 			trigger: 'click',
 			container: 'body',
 			viewport: { "selector": "#DS_"+dsid+"_"+ldatasource, "padding": 0 },
-			content: function(){console.log("temp"); return '<i class="fa fa-spinner fa-spin"></i>';}
+			content: function(){console.log("temp"); return '<div ><i id="preview_'+dsid+'_'+ldatasource+'" class="fa fa-spinner fa-spin" ></i></div>';}
 		    });
 		    $(obj).popover('toggle');
+			
 		    zoo.execute({
 			identifier: "template.display",
 			type: "POST",
@@ -1938,22 +1940,28 @@ define([
 			success: function(data){
 			    DSPreviews["DS_"+dsid+"_"+ldatasource]=data;
 			    $(obj).popover('destroy');
+				setTimeout(function(){
 			    $(obj).popover({
 				html: true,
 				placement: ($(obj).is("a")?'bottom':'left'),
 				trigger: 'click',
 				container: 'body',
 				viewport: { "selector": "#DS_"+dsid+"_"+ldatasource, "padding": 0 },
-				content: function(){return '<div><img style="width:500px" class="img-responsive" src="'+ DSPreviews["DS_"+dsid+"_"+ldatasource] + '" /></div>';}
+				content: function(){console.log("temp"); return '<div style="height:250px"><img style="width:500px" class="img-responsive" src="'+ DSPreviews["DS_"+dsid+"_"+ldatasource] + '" /></div>';}
 			    });
-			    $(obj).popover('hide');
-			    $(obj).popover('show');
-			    if(!$(obj).is("a"))
+			     $(obj).popover('show');
+				},250);
+				/*setTimeout(function(){*/
+			   //$(obj).popover('hide');
+			    //$(obj).popover('toggle');
+				/*}, 200);*/
+			    /*if(!$(obj).is("a"))
 				$(window).on("click",function(){
 				    if(arguments[0].target!=obj){
 					$(obj).popover('hide');
 				    }
-				});
+				});*/
+				
 			},
 			error: function(data){
 			    $(".notifications").notify({

@@ -1,7 +1,8 @@
 #import zoo
+#import mapfile.service as mms
 
-#if $m.web.metadata.get('mmOT')
-#set f0=$m.web.metadata.get('mmOT').split(',')
+#if $mms.getMetadata($m.web,'mmOT')
+#set f0=$mms.getMetadata($m.web,'mmOT').split(',')
 
 #if $f0.count('AddLayer')>0 or $f0.count('AddWMSLayer')>0
 

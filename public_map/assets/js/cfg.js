@@ -1,7 +1,7 @@
 // Filename: public_maps/assets/js/cfg.js
 
 requirejs.config({
-    baseUrl: '/~djay/progede2/public_map/assets',
+    baseUrl: '/pm/assets',
     paths: {
         text: 'js/lib/require-text-2.0.12',
         hgn: 'js/lib/require-hgn-0.3.0',

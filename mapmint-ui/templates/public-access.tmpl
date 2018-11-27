@@ -189,6 +189,7 @@ $inputs["page"]
 #import os
 #import mapscript
 #import time
+#import mapfile.service as mms
 #set dirpath=$conf["main"]["dataPath"]+"/public_maps/"
 #set mfiles=os.listdir(dirpath)
 #set mfiles1=[]
@@ -226,7 +227,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #if project is not None 
 #try
 #set mm=mapscript.mapObj($mpath)
-#set ll=mm.web.metadata.get('mmActivatedLayers')
+#set ll=$mms.getMetadata(mm.web,'mmActivatedLayers')
 #set a=$mm.getLayer(0).getExtent()
 #try
 #set dd=$a.project(mapscript.projectionObj(mm.getLayer(0).getProjection()),mapscript.projectionObj(mm.getProjection()))
@@ -240,7 +241,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 	<div class="thumbnail">
 
                 <div class="caption">
-			 <h4>$mm.web.metadata.get('mmTitle')</h4>
+			 <h4>$mms.getMetadata($mm.web,'mmTitle')</h4>
 
               <p class="date"> $(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($mpath)))) $(time.strftime("%H:%M",time.localtime(os.path.getmtime($mpath)))) </p>
                <p class="meta">$(mms.getShortDescription($conf,$mm))</p>
@@ -250,14 +251,14 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
         </ul>
        </div>
 
-#if mm.web.metadata.get("previewUrl")
-                      <img src="$mm.web.metadata.get('previewUrl')" class="img-responsive" />
+#if $mms.getMetadata(mm.web,"previewUrl")
+                      <img src="$mms.getMetadata($mm.web,'previewUrl')" class="img-responsive" />
 #else
             <img src="$conf["main"]["mapserverAddress"]?map=${project}&LAYERS=$(ll)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$a.minx,$a.miny,$a.maxx,$a.maxy&SRS=EPSG:4326&WIDTH=250&HEIGHT=160&r=1315253453.18" width="250" height="160" class="img-responsive"/>
 #end if
 
 	</div>
-<h4 class="text-center">$mm.web.metadata.get('mmTitle')</h4>
+<h4 class="text-center">$mms.getMetadata($mm.web,'mmTitle')</h4>
  </div>
 
 #except Exception,e
@@ -323,7 +324,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 	</div>
 	<div class="iovw">
 #set mm=mapscript.mapObj($indexes[0])
-#set ll=mm.web.metadata.get('mmActivatedLayers')
+#set ll=$mms.getMetadata(mm.web,'mmActivatedLayers')
 #set a=$mm.getLayer(0).getExtent()
 #set dd=$a.project(mapscript.projectionObj(mm.getLayer(0).getProjection()),mapscript.projectionObj("EPSG:4326"))
 #set x=(($a.maxx-$a.minx)/2)+$a.minx
@@ -398,7 +399,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #if project is not None
 #try
 #set mm=mapscript.mapObj($mpath)
-#set ll=mm.web.metadata.get('mmActivatedLayers')
+#set ll=$mms.getMetadata(mm.web,'mmActivatedLayers')
 #if $ll==""
 #set ll=$mm.getLayer(0).name
 #end if
@@ -407,8 +408,8 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 #set x=(($a.maxx-$a.minx)/2)+$a.minx
 #set y=(($a.maxy-$a.miny)/2)+$a.miny
 
-#if $mm.web.metadata.get('mm_themes_class')
-#set res=$cur.execute("SELECT name from "+$prefix+"themes where id in ("+$mm.web.metadata.get('mm_themes_class')+")")
+#if $mms.getMetadata($mm.web,'mm_themes_class')
+#set res=$cur.execute("SELECT name from "+$prefix+"themes where id in ("+$mms.getMetadata($mm.web,'mm_themes_class')+")")
 #set vals=$cur.fetchall()
 #set fvals=""
 #set cnt0=0
@@ -435,15 +436,15 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
                 <div id="$i[1]" class="thumbnail">
 
                 <div class="caption">
-              <h4>$mm.web.metadata.get('mmTitle')</h4>
+              <h4>$mms.getMetadata($mm.web,'mmTitle')</h4>
 <p class="date"> $(time.strftime($conf["mm"]["dateFormat"],time.localtime(os.path.getmtime($mpath))))  $(time.strftime("%H:%M",time.localtime(os.path.getmtime($mpath))))  </p>
                <p class="meta">$(mms.getShortDescription($conf,$mm))</p>
                 <a href="#" id="$i[1]" class="map-btn minfo">Information</a>
                 <a href="$conf["main"]["rootUrl"]#if $conf["main"]["rootUrl"][len($conf["main"]["rootUrl"])-1]!="/"#/#end if#$i[1]" class="map-btn">$zoo._("View")</a>
 </div>
 
-#if mm.web.metadata.get("previewUrl")
-                      <img src="$mm.web.metadata.get('previewUrl')" />
+#if $mms.getMetadata(mm.web,"previewUrl")
+                      <img src="$mms.getMetadata($mm.web,'previewUrl')" />
 #else
                       <img src="$conf["main"]["mapserverAddress"]?map=${project}&LAYERS=$(ll)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$a.minx,$a.miny,$a.maxx,$a.maxy&SRS=EPSG:4326&WIDTH=250&HEIGHT=160&r=1315253453.18" width="250" height="160" />
 #end if

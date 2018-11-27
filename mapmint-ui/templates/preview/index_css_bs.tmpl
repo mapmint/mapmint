@@ -1,20 +1,21 @@
 #import mapscript
+#import mapfile.service as mms
 #set m=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/project_"+$conf["senv"]["last_map"]+".map")
-#if $m.web.metadata.get('mmOT')
-#set f0=$m.web.metadata.get('mmOT').split(',')
+#if $mms.getMetadata($m.web,'mmOT')
+#set f0=$mms.getMetadata($m.web,'mmOT').split(',')
 #else
 #set f0=[]
 #end if
 
 body{
-#if $m.web.metadata.get("ffamily")!=""
-	font-family: $m.web.metadata.get("ffamily") !important;
+#if $mms.getMetadata($m.web,"ffamily")!=""
+	font-family: $mms.getMetadata($m.web,"ffamily") !important;
 #end if
-#if $m.web.metadata.get("fsize")!=""
-	font-size: $m.web.metadata.get("fsize") !important;
+#if $mms.getMetadata($m.web,"fsize")!=""
+	font-size: $mms.getMetadata($m.web,"fsize") !important;
 #end if
-#if $m.web.metadata.get("font-colorpicker")!=""
-	font-color: $m.web.metadata.get("font-colorpicker") !important;
+#if $mms.getMetadata($m.web,"font-colorpicker")!=""
+	font-color: $mms.getMetadata($m.web,"font-colorpicker") !important;
 #end if
 }
 
@@ -22,7 +23,7 @@ body{
 #set l=$m.getLayer($i)
 #if $l.numclasses == 1
 #layer_$(i) label .fa-circle:before{
-    background:url('#if $l.metadata.get('mmIcon') is not None#$l.metadata.get('mmIcon')#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_$(conf["senv"]["last_map"])_$(l.name).map&LAYERS=$(l.name)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat scroll 0 0 transparent !important;
+    background:url('#if $mms.getMetadata($l,'mmIcon') is not None#$mms.getMetadata($l,'mmIcon')#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_$(conf["senv"]["last_map"])_$(l.name).map&LAYERS=$(l.name)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat scroll 0 0 transparent !important;
     content: " ";
     display: block;
     height: 16px;
@@ -37,7 +38,7 @@ body{
 #set cextf=$cext.project(mapscript.projectionObj(l.getProjection()),mapscript.projectionObj(m.getProjection()))
 #set center=[(cext.maxx-cext.minx)/2,(cext.maxy-cext.miny)/2]
 #set bbox=[(cext.minx+center[0])-0.01,(cext.miny+center[1])-0.01,(cext.minx+center[0])+0.01,(cext.miny+center[1])+0.01]
-    background:url('#if $l.metadata.get('mmIcon') is not None#$l.metadata.get('mmIcon')#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/project_$(conf["senv"]["last_map"]).map&LAYERS=$(l.name)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$(bbox[0]),$(str(bbox[1])),$(str(bbox[2])),$(str(bbox[3]))&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat scroll 0 0 transparent !important;
+    background:url('#if $mms.getMetadata($l,'mmIcon') is not None#$mms.getMetadata($l,'mmIcon')#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/project_$(conf["senv"]["last_map"]).map&LAYERS=$(l.name)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$(bbox[0]),$(str(bbox[1])),$(str(bbox[2])),$(str(bbox[3]))&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat scroll 0 0 transparent !important;
 #except Exception,e
 /**
  The following error occcured!
@@ -65,15 +66,15 @@ body{
 }
 #end for
 #else
-#if $l.metadata.get('mmSprite') is not None
+#if $mms.getMetadata($l,'mmSprite') is not None
 #set cn=0
 #import base64
 #try
-#set fs=open($l.metadata.get('mmSprite').replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
+#set fs=open($mms.getMetadata($l,'mmSprite').replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
 #set fc=base64.b64encode(fs.read())
 #for j0 in range(0,$l.numclasses)##if $cn>0#,#end if#.layer_$(i)_class$(j0)#set $cn+=1##end for#{
     background:	url(data:image/png;base64,$fc) no-repeat !important;
-    content: "$l.metadata.get('mmSprite')";
+    content: "$mms.getMetadata($l,'mmSprite')";
 }
 #except Exception,e
  /* $e */
@@ -81,8 +82,8 @@ body{
 #end if
 #for j in range(0,$l.numclasses)
 .layer_$(i)_class$(j){
-#if $l.metadata.get('mmSprite') is None
-    background:url('#if $l.metadata.get('mmIcon_'+str($j)) is not None#$l.metadata.get('mmIcon_'+str($j))#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_$(conf["senv"]["last_map"])_$(l.name).map&LAYERS=$(l.name)_$(j+1)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat !important;
+#if $mms.getMetadata($l,'mmSprite') is None
+    background:url('#if $mms.getMetadata($l,'mmIcon_'+str($j)) is not None#$mms.getMetadata($l,'mmIcon_'+str($j))#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_$(conf["senv"]["last_map"])_$(l.name).map&LAYERS=$(l.name)_$(j+1)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat !important;
 #else
     background-position: -$($j*16)px 0px !important;
 #end if
@@ -93,7 +94,7 @@ body{
 #end for
 #end if
 #end if
-#if $l.type==mapscript.MS_LAYER_RASTER and $l.map.web.metadata.get("mmRT") and $l.map.web.metadata.get("mmRT").count('timeline')>0  and $l.metadata.get("mmRasterTimeline") is not None and $l.metadata.get("mmRasterTimeline")=="true"
+#if $l.type==mapscript.MS_LAYER_RASTER and $mms.getMetadata($l.map.web,"mmRT") and $mms.getMetadata($l.map.web,"mmRT").count('timeline')>0  and $mms.getMetadata($l,"mmRasterTimeline") is not None and $mms.getMetadata($l,"mmRasterTimeline")=="true"
 #layer_$(i) label .fa-circle:before{
     /*background:url('$conf["main"]["publicationUrl"]/img/timeline.png') no-repeat scroll 0 0 transparent !important;*/
     display: block;
@@ -103,7 +104,7 @@ body{
 }
 #end if
 
-#if $l.metadata.get("mmClass")=="tl" or $l.metadata.get("mmSteps") is not None 
+#if $mms.getMetadata($l,"mmClass")=="tl" or $mms.getMetadata($l,"mmSteps") is not None 
 #layer_$(i) label .fa-circle:before{
     /*background:url('$conf["main"]["publicationUrl"]/img/timeline.png') no-repeat scroll 0 0 transparent !important;*/
     display: block;
@@ -111,7 +112,7 @@ body{
     height: 16px;
     width: 16px;
 }
-#set steps=$l.metadata.get("mmSteps").split(',')
+#set steps=$mms.getMetadata($l,"mmSteps").split(',')
 #set $cnt=0
 #for kk in steps
 #set m0=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/timeline_"+$conf["senv"]["last_map"]+"_"+$l.name+"_step"+str($cnt)+".map")
@@ -148,8 +149,8 @@ body{
 #end if
 #end for
      
-#if $m.web.metadata.get("mmBProject")
-#set projects=$m.web.metadata.get("mmBProject").split(',')
+#if $mms.getMetadata($m.web,"mmBProject")
+#set projects=$mms.getMetadata($m.web,"mmBProject").split(',')
 #for i in $projects
 #import os
 #try

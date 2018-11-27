@@ -8,7 +8,7 @@ function mmVectorInfo2MapJs(conf,inputs,outputs){
     var myExecuteResult=myProcess.Execute(myInputs,myOutputs,"Cookie: MMID="+conf["senv"]["MMID"]+";");
     alert("ok",myExecuteResult);
     var myExecuteResult1;
-    //try{
+    /*try{*/
     if(!eval(myExecuteResult)){
 	var myInputs1=inputs;
 	myInputs1["dataSource"]=myInputs1["dataStore"];

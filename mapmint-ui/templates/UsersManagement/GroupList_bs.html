@@ -1,5 +1,6 @@
 #import zoo
 #import authenticate.service as auth
+#import mapfile.service as mms
 #set sprefix=$auth.getPrefix($conf)
 #set con=$auth.getCon($conf)
 #if $inputs.has_key("prefix")
@@ -39,13 +40,13 @@
 #if $inputs.has_key("dataStore")
 #set q1=[["admin"]]
 #end if
-#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mm_access_groups") is not None
+#if $mms.getMetadata($m.getLayerByName($inputs["layer"]["value"]),"mm_access_groups") is not None
 #set q1=[]
 #set q2=[]
-#for i in $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mm_access_groups").split(",")
+#for i in $mms.getMetadata($m.getLayerByName($inputs["layer"]["value"]),"mm_access_groups").split(",")
 #set $q1+=[[i]]
-#if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mm_access_"+i) is not None
-#set $q2+=[$m.getLayerByName($inputs["layer"]["value"]).metadata.get("mm_access_"+i).split(',')]
+#if $mms.getMetadata($m.getLayerByName($inputs["layer"]["value"]),"mm_access_"+i) is not None
+#set $q2+=[$mms.getMetadata($m.getLayerByName($inputs["layer"]["value"]),"mm_access_"+i).split(',')]
 #end if
 #end for
 #end if
@@ -65,9 +66,9 @@
 #set q1=[[$conf["senv"]["group"],"1","1","1"]]
 #end try
 #else
-#if $m.web.metadata.get("mm_access_groups") is not None
+#if $mms.getMetadata($m.web,"mm_access_groups") is not None
 #set q1=[]
-#for i in $m.web.metadata.get("mm_access_groups").split(",")
+#for i in $mms.getMetadata($m.web,"mm_access_groups").split(",")
 #set $q1+=[[i]]
 #end for
 #end if

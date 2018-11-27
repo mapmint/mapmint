@@ -1,13 +1,12 @@
-ZRPATH=/Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project
-include ${ZRPATH}/zoo-kernel/ZOOMakefile.opts
+
 PREFIX=/usr/local
 
-XSLT_LDFLAGS=-L/usr/local/lib -lxslt -lxml2 -lz -liconv -lm
+XSLT_LDFLAGS=-lxslt -lxml2
 
-ZOO_FILE=/Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel//service_internal_ms.o /Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel//response_print.o /Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel//server_internal.o /Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel//lex.sr.o /Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel//service_conf.tab.o /Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel//service_yaml.o /Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel//main_conf_read.tab.o /Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel/lex.cr.o
-ZOO_DIR=/Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel/
-ZRPATH=/Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel//../
-include ${ZRPATH}/zoo-kernel/ZOOMakefile.opts
+ZOO_FILE=/home/src/zoo/zoo-project/zoo-kernel/service_internal_ms.o /home/src/zoo/zoo-project/zoo-kernel/response_print.o /home/src/zoo/zoo-project/zoo-kernel/server_internal.o /home/src/zoo/zoo-project/zoo-kernel/lex.sr.o /home/src/zoo/zoo-project/zoo-kernel/lex.cr.o /home/src/zoo/zoo-project/zoo-kernel/main_conf_read.tab.o /home/src/zoo/zoo-project/zoo-kernel/service_conf.tab.o
+ZOO_DIR=/home/src/zoo/zoo-project/zoo-kernel
+ZRPATH=/home/src/zoo/zoo-project/zoo-kernel/../
+include ${ZOO_DIR}/ZOOMakefile.opts
 
 
 
@@ -19,7 +18,7 @@ BIN_LIST = cgi-env/service.zo
 default : $(BIN_LIST)
 
 cgi-env/service.zo: service.c
-	g++ -I${INST_INCLUDE} ${FCGI_CFLAGS} ${YAML_CFLAGS} ${MACOS_CFLAGS} ${XML2CFLAGS} ${GDAL_CFLAGS} ${MS_CFLAGS} ${CPPFLAGS} -shared -fpic $< ${ZOO_FILE} ${XSLT_LDFLAGS} ${XML2LDFLAGS} -L${INST_LIB} -lzoo_service ${MS_LDFLAGS} -lc ${MACOS_LD_FLAGS} ${MACOS_LD_NET_FLAGS} -L/usr/local/lib -lgdal  -lcurl -lfcgi ${YAML_LDFLAGS} ${ZOO_LDFLAGS} -o $@
+	g++ ${ZOO_CFLAGS} -I${INST_INCLUDE} ${FCGI_CFLAGS} ${YAML_CFLAGS} ${MACOS_CFLAGS} ${XML2CFLAGS} ${GDAL_CFLAGS} ${MS_CFLAGS} ${CPPFLAGS} -shared -fpic $< ${ZOO_FILE} ${XSLT_LDFLAGS} ${XML2LDFLAGS} -L${INST_LIB} -lzoo_service ${ZOO_LDFLAGS} -I${INST_INCLUDE} ${FCGI_CFLAGS} ${YAML_CFLAGS} ${MACOS_CFLAGS} ${XML2CFLAGS} ${GDAL_LIBS} ${MS_LDFLAGS} -lc ${MACOS_LD_FLAGS} ${MACOS_LD_NET_FLAGS} -lcrypto  -lcurl -lfcgi ${YAML_LDFLAGS} -o $@
 
 install:
 	install -d ${PREFIX}/vector-tools/

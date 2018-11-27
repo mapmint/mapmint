@@ -1,15 +1,16 @@
 #import mapscript
+#import mapfile.service as mms
 
 #set lcount=0
 
 #set nbBL=0
-#if $m.web.metadata.get('mmOSMBaseLayers')=="true"
+#if $mms.getMetadata($m.web,'mmOSMBaseLayers')=="true"
 #set nbBL=$nbBL+1
 #end if
 #for i in ('mmMBaseLayers','mmPBaseLayers','mmBProject')
 #try
-#if $m.web.metadata.get($i)!=""
-#for k in $m.web.metadata.get($i).split(",")
+#if $mms.getMetadata($m.web,$i)!=""
+#for k in $mms.getMetadata($m.web,$i).split(",")
 #set nbBL=$nbBL+1
 #end for
 #end if
@@ -41,8 +42,8 @@ $bpLayer
 #if $getVar('lname','Untitled') != "Untitled"
 #set a=$conf["mm"]["b"+$lname+"Layers"].split(",")
 #set b=$conf["mm"]["b"+$lname+"LayerAlias"].split(",")
-#if $m.web.metadata.get('mmMBaseLayers')
-#set setM=$m.web.metadata.get('mmMBaseLayers').split(',')
+#if $mms.getMetadata($m.web,'mmMBaseLayers')
+#set setM=$mms.getMetadata($m.web,'mmMBaseLayers').split(',')
 #else
 #set setM=[]
 #end if
@@ -59,8 +60,8 @@ $bpLayer
 #set b=$conf["mm"]["bmLayers"].split(',')
 #set a1=[$conf["mm"]["boLayers"]]+$b
 #set b1=[$conf["mm"]["boLayerAlias"]]+$a
-#if $m.web.metadata.get('mmMBaseLayers')
-#set setM=$m.web.metadata.get('mmMBaseLayers').split(',')
+#if $mms.getMetadata($m.web,'mmMBaseLayers')
+#set setM=$mms.getMetadata($m.web,'mmMBaseLayers').split(',')
 #else
 #set setM=[]
 #end if
@@ -68,26 +69,26 @@ $bpLayer
 #for i in range(0,len(a1))
 #if $i>=1 and i<=3
 #if $setM.count($a1[$i])
-$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $conf["mm"]["bmName"]+" "+$b1[$i],"l": $a1[$i],"lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))})
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $conf["mm"]["bmName"]+" "+$b1[$i],"l": $a1[$i],"lcount": $lcount,"default":int($mms.getMetadata($m.web,'mmActivatedBaseLayers'))})
 #set lcount=$lcount+1
 #end if
 #else
-#if $m.web.metadata.get('mmOSMBaseLayers')=="true"
-$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $b1[$i],"l": $a1[$i],"lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))})
+#if $mms.getMetadata($m.web,'mmOSMBaseLayers')=="true"
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $b1[$i],"l": $a1[$i],"lcount": $lcount,"default":int($mms.getMetadata($m.web,'mmActivatedBaseLayers'))})
 
 #set lcount=$lcount+1
 #end if
 #end if
 #end for
 
-#if $m.web.metadata.get('mmPBaseLayers')
+#if $mms.getMetadata($m.web,'mmPBaseLayers')
 
-#set setM=$m.web.metadata.get('mmPBaseLayers').split(',')
+#set setM=$mms.getMetadata($m.web,'mmPBaseLayers').split(',')
 
-#if $m.web.metadata.get("mmProprietaryBaseLayers")!="Planet"
+#if $mms.getMetadata($m.web,"mmProprietaryBaseLayers")!="Planet"
 #set cnt=0
 #for j in $conf["mm"]["bpList"].split(',')
-#if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"]
+#if $mms.getMetadata($m.web,'mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"]
 #set a2=$conf["mm"]["b"+$j+"Layers"].split(',')
 #set b2=$conf["mm"]["b"+$j+"LayerAlias"].split(',')
 #set cnt=1
@@ -100,8 +101,8 @@ $Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",s
 #for i in range(0,len($a2))
 #if $setM.count($a2[$i])>0
 #for j in $conf["mm"]["bpList"].split(',')
-#if $m.web.metadata.get('mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"]
-$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $conf["mm"]["b"+$j+"Name"]+" "+$b2[$i],"l": $a2[$i], "lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))})
+#if $mms.getMetadata($m.web,'mmProprietaryBaseLayers')==$conf["mm"]["b"+$j+"Name"]
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $conf["mm"]["b"+$j+"Name"]+" "+$b2[$i],"l": $a2[$i], "lcount": $lcount,"default":int($mms.getMetadata($m.web,'mmActivatedBaseLayers'))})
 #set lcount=$lcount+1
 #end if
 #end for
@@ -121,7 +122,7 @@ $Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",s
 #end try
 #end for*#
 
-$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $conf["mm"]["bplName"]+" "+$setM[i].replace("_"," ").title(),"l": $setM[i],"lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))})
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $conf["mm"]["bplName"]+" "+$setM[i].replace("_"," ").title(),"l": $setM[i],"lcount": $lcount,"default":int($mms.getMetadata($m.web,'mmActivatedBaseLayers'))})
 #set lcount=$lcount+1
 #end for
 
@@ -130,21 +131,21 @@ $Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",s
 
 #end if
 
-#if $m.web.metadata.get('mmBProject')
-#set lss=$m.web.metadata.get('mmBProject').split(",")
+#if $mms.getMetadata($m.web,'mmBProject')
+#set lss=$mms.getMetadata($m.web,'mmBProject').split(",")
 #for ls in $lss
 #set m1=mapscript.mapObj(os.readlink($conf["main"]["dataPath"]+"/public_maps/"+$ls))
 #set ts=m1.web.metadata.get('mmTitle')
-$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $ts,"l": $ls,"lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))}) 
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $ts,"l": $ls,"lcount": $lcount,"default":int($mms.getMetadata($m.web,'mmActivatedBaseLayers'))}) 
 #set lcount=$lcount+1
 #end for
 #end if
 
-#if $m.web.metadata.get('mmWMTSBaseLayers')
-#set setM=$m.web.metadata.get('mmWMTSBaseLayers').split(",")
+#if $mms.getMetadata($m.web,'mmWMTSBaseLayers')
+#set setM=$mms.getMetadata($m.web,'mmWMTSBaseLayers').split(",")
 #for j in range(len($setM))
 #set tmp=$setM[j].split("|")
-$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $tmp[len($tmp)-1],"l": $setM[$j],"lcount": $lcount,"default":int($m.web.metadata.get('mmActivatedBaseLayers'))})
+$Template(file=$conf['main']['templatesPath']+"/preview/baselayer_bs_new.tmpl",searchList={"t": $tmp[len($tmp)-1],"l": $setM[$j],"lcount": $lcount,"default":int($mms.getMetadata($m.web,'mmActivatedBaseLayers'))})
 #set lcount=$lcount+1
 #end for
 #end if

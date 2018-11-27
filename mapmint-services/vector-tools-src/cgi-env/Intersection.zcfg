@@ -1,12 +1,12 @@
 [Intersection]
  Title = Compute intersection. 
- Abstract = Generates a new geometry which is the region of intersection of the two geometries operated on.
+ Abstract = This function SHALL return a bag of geometry values representing the Point set intersection of geometry InputEntity1 and geometry InputEntity2.
  Profile = urn:ogc:wps:1.0.0:union
  processVersion = 2
  storeSupported = true
  statusSupported = true
- serviceProvider = service
- serviceType = Python
+ serviceProvider = ogr_service.zo
+ serviceType = C
  <MetaData>
    title = Demo
  </MetaData>
@@ -23,12 +23,12 @@
     <Default>
      mimeType = text/xml
      encoding = UTF-8
-     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+     schema = http://fooa/gml/3.1.0/polygon.xsd
     </Default>
     <Supported>
      mimeType = text/xml
      encoding = base64
-     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+     schema = http://fooa/gml/3.1.0/polygon.xsd
     </Supported>
    </ComplexData>
   [InputEntity2]
@@ -42,19 +42,19 @@
    <ComplexData>
     <Default>
      mimeType = text/xml
-     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+     schema = http://fooa/gml/3.1.0/polygon.xsd
      encoding = UTF-8
     </Default>
     <Supported>
      mimeType = text/xml
      encoding = base64
-     schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
+     schema = http://fooa/gml/3.1.0/polygon.xsd
     </Supported>
    </ComplexData>
  </DataInputs>
  <DataOutputs>
   [Result]
-   Title = Intersection of the two geometries
+   Title = Intersection of geometries
    Abstract = A new geometry representing the intersection or NULL if there is no intersection or an error occurs.
    <MetaData>
     title = Mon test  
@@ -62,10 +62,9 @@
     <ComplexData>
      <Default>
       mimeType = text/xml
-      schema = http://schemas.opengis.net/gml/3.1.0/base/feature.xsd
       encoding = UTF-8
+      schema = http://fooa/gml/3.1.0/polygon.xsd
       extension = xml
-      useMapserver = true
      </Default>
      <Supported>
       mimeType = application/json

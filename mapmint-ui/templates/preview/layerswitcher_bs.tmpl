@@ -1,6 +1,7 @@
 #encoding UTF-8
 #import zoo
 #import mapscript
+#import mapfile.service as mms
 #from Cheetah.Template import Template
 <div>
 
@@ -57,8 +58,8 @@ $Template(file=$conf['main']['templatesPath']+"/preview/baselayers_bs_new.tmpl",
     </div>
   </div>
 
-#if $m.web.metadata.get('mmOT')
-#set f0=$m.web.metadata.get('mmOT').split(',')
+#if $mms.getMetadata($m.web,'mmOT')
+#set f0=$mms.getMetadata($m.web,'mmOT').split(',')
 #if $f0.count('AddLayer')>0 or $f0.count('AddWMSLayer')>0
 <script id="addedLayer_item_template" type="template/text">
   <li class="list-group-item addedLayer" id="overlays_[nn]">

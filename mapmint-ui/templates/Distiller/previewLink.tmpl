@@ -1,5 +1,6 @@
 #import mapscript
 #import osgeo.gdal
+#import mapfile.service as mms
 #if $inputs["dst"]["value"].count($conf["main"]["dataPath"])>0
 #set mapfile=$inputs["dst"]["value"]+"/ds_ows.map"
 #set m=mapscript.mapObj($mapfile)
@@ -15,7 +16,7 @@
 #end for
 #end if
 #set l=m.getLayerByName($inputs["dso"]["value"])
-#set tmp=$l.metadata.get("ows_extent")
+#set tmp=$mms.getMetadata($l,"ows_extent")
 #if $tmp is not None
 #set tmp1=$tmp.split(' ')
 #else

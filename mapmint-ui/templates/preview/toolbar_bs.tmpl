@@ -1,7 +1,8 @@
-#import mm_access
 #import zoo
+#import mm_access
+#import mapfile.service as mms
 #try
-#set activatedTools=$m.web.metadata.get("mmNav").split(",")
+#set activatedTools=$mms.getMetadata($m.web,"mmNav").split(",")
 #except
 #set activatedTools=[]
 #end try
@@ -46,8 +47,8 @@
 #if $i=="other-tools"
 #set ot=True
     </ul>
-#if $m.web.metadata.get('mmOT')
-#set f=$m.web.metadata.get('mmOT').split(',')
+#if $mms.getMetadata($m.web,'mmOT')
+#set f=$mms.getMetadata($m.web,'mmOT').split(',')
 #if f.count('SearchBox')>0
 
     <div class="col-sm-3 col-md-3">
@@ -92,7 +93,7 @@ $printItem("home","icon-home","Home",True,True,"../public/")
 #import np.service as np
 #set myOut={"Result":{}}
 #set res=np.isFavoriteMap($conf,{},myOut)
-#if $m.web.metadata.get('layout_t')!="natureparif-indicateurs" and $conf["senv"]["login"]!="anonymous"
+#if $mms.getMetadata($m.web,'layout_t')!="natureparif-indicateurs" and $conf["senv"]["login"]!="anonymous"
       <li data-toggle="tooltip" data-placement="bottom" title="$zoo._("Add to favorites")">
 #if $myOut["Result"]["value"]=="false"
 $printItem("favorite","fa-star","Add to favorites",True,True)

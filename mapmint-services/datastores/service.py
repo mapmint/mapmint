@@ -72,11 +72,8 @@ def displayHTML(conf,inputs,outputs):
 def list(conf,inputs,outputs):
     elements={}
     import datastores.directories.service as dirs
-    import json
     dirs.displayJSON(conf,{"state": {"value": "open"}},outputs)
-    print >> sys.stderr,outputs["Result"]["value"]
     dirStr=eval(outputs["Result"]["value"])
-    #dirStr=json.loads(outputs["Result"]["value"])
     b=0
     for i in dirStr:
         if b==0:
@@ -84,7 +81,7 @@ def list(conf,inputs,outputs):
         elements["Directories"]+=[{"name": i["text"]}]
         b+=1
     import datastores.wfs.service as wfs
-    #import json
+    import json
 
     wxs=["WFS","WMS"]
     for k in range(0,len(wxs)):

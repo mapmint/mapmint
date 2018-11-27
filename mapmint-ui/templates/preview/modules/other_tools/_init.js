@@ -1,5 +1,6 @@
-#if $m.web.metadata.get('mmOT')
-#set f=$m.web.metadata.get('mmOT').split(',')
+#import mapfile.service as mms
+#if $mms.getMetadata($m.web,'mmOT')
+#set f=$mms.getMetadata($m.web,'mmOT').split(',')
 #if f.count('MMPanZoom')>0
 map.addControl(new OpenLayers.Control.MMPanZoom());
 #else

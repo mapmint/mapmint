@@ -2,15 +2,15 @@ MACOS_CPP=-arch x86_64
 
 
 PREFIX=/usr/local
-ZOO_FILE=#/Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel//service_internal.o
-ZOO_DIR=/Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel/
+ZOO_FILE=/home/src/zoo/zoo-project/zoo-kernel/service_internal.o
+ZOO_DIR=/home/src/zoo/zoo-project/zoo-kernel
 
-FT_LDFLAGS=-L/usr/local/lib -L/opt/X11/lib -lfreetype -lz -lbz2
-FT_CFLAGS=-I/opt/X11/include/freetype2
+FT_LDFLAGS=-lfreetype
+FT_CFLAGS=-I/usr/include/freetype2 -I/usr/include/libpng16
 
 
-ZRPATH=/Users/djay/MapMint/zoo-project-1.5.0/trunk/zoo-project/zoo-kernel//../
-include ${ZRPATH}/zoo-kernel/ZOOMakefile.opts
+ZRPATH=/home/src/zoo/zoo-project/zoo-kernel/../
+include ${ZOO_DIR}/ZOOMakefile.opts
 
 
 
@@ -21,7 +21,7 @@ BIN_LIST = cgi-env/service.zo
 default : $(BIN_LIST)
 
 cgi-env/service.zo: service.c
-	g++  ${FT_CFLAGS} ${CPPFLAGS} -shared -fpic $< ${ZOO_FILE} ${MACOS_LD_NET_FLAGS} ${FT_LDFLAGS} -lc  -lcrypto -lzoo_service ${GDAL_LDFLAGS} -o $@
+	g++  ${ZOO_CFLAGS}  ${FT_CFLAGS} ${CPPFLAGS} -shared -fpic $< ${MACOS_LD_NET_FLAGS} ${FT_LDFLAGS} -lc  -L${INST_LIB} -lzoo_service ${GDAL_LIBS} ${MACOS_LD_FLAGS} ${MACOS_LD_NET_FLAGS} ${ZOO_LDFLAGS} -lcrypto -o $@
 
 
 

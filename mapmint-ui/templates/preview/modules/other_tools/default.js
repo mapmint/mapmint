@@ -1,3 +1,4 @@
+#import mapfile.service as mms
 /*zoomTo slider*/
 var numzoomlevels = map.getNumZoomLevels();
 System.slider = \$('span.slider').slider({
@@ -15,7 +16,7 @@ System.slider = \$('span.slider').slider({
         map.zoomTo(ui.value);
     }
 }).hover(function(){
-#if $m.web.metadata.get('layout_t')!="mobile"
+#if $mms.getMetadata($m.web,'layout_t')!="mobile"
     \$('.ui-slider-vertical .ui-slider-handle').tipsy({live: true,title: function() { return (map.getZoom()); }, gravity: 'w'})
 #end if
 });
