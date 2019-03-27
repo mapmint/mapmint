@@ -683,7 +683,7 @@ margin:10px 0 10px 0;
 @media (max-width: 480px) {
 
   .pull-right {
-    float: none!important; 
+    float: right;/*none!important;*/ 
   }
 
 }

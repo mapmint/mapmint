@@ -1,0 +1,29 @@
+[getLocation]
+ Title = Get location in session file 
+ Abstract = Get location in session file 
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = demo
+ serviceType = Python
+ <DataInputs>
+  [MMID]
+   Title = Session identifier 
+   Abstract = Session identifier 
+   minOccurs = 0
+   maxOccurs = 1
+   <LiteralData>
+    dataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = Coordinate returned by MapMint4ME 
+   Abstract = Coordinate returned by MapMint4ME 
+   <ComplexOutput>
+    <Default>
+     mimeType = application/json
+    </Default>
+   </ComplexOutput>
+ </DataOutputs>  

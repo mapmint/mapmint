@@ -26,8 +26,8 @@
     <Default />
    </LiteralData>
   [co]
-   Title = The scale
-   Abstract = Scale is the ratio of vertical units to horizontal, for Feet:Latlong use 370400, for Meters:LatLong use 111120
+   Title = Creation Option
+   Abstract = string representing options (NAME=VALUE)
    minOccurs = 0
    maxOccurs = 1024
    <LiteralData>

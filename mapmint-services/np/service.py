@@ -1274,7 +1274,10 @@ def list(conf,inputs,outputs):
                 res=listDefault(prefix+inputs["table"]["value"],cur," order by ord")
             else:
                 if inputs["table"]["value"].count('.')>0:
-                    res=listDefault(inputs["table"]["value"],cur)
+                    if inputs.keys().count("cond"):
+                        res=listDefault(inputs["table"]["value"],cur,inputs["cond"]["value"])
+                    else:
+                        res=listDefault(inputs["table"]["value"],cur)
                 else:
                     res=listDefault(prefix+inputs["table"]["value"],cur)
     if res is not None:
@@ -3843,7 +3846,7 @@ def clientView(conf,inputs,outputs):
     files={}
     for i in range(len(vals)):
         print >> sys.stderr,vals[i][3]
-        if ( vals[i][2].count("unamed")==0 or vals[i][3]=="tbl_linked" ) and vals[i][3]!="link":
+        if vals[i][2].count("unamed")==0 or (vals[i][3]=="tbl_linked" and vals[i][3]!="link"):
             columns+=[vals[i][2]]
         else:
             #columns+=[vals[i][2]]
@@ -3858,7 +3861,7 @@ def clientView(conf,inputs,outputs):
             if vals[i][3]=="geometry":
                 rcolumns+=["ST_AsText("+vals[i][2]+") as "+vals[i][2]]
             else:
-                if vals[i][3]!="link" and vals[i][3]!="tbl_link":
+                if vals[i][3]!="link" and vals[i][3]!="tbl_link" and vals[i][2].count("unamed")==0:
                     if vals[i][5]:
                         if vals[i][3].count("date")>0:
                             if vals[i][3]=="date":
@@ -3890,7 +3893,7 @@ def clientView(conf,inputs,outputs):
     restrictedTypes=["Date","Boolean","Reference"]
     for i in range(len(ovals)):
         fres[ovals[i][0]]={}
-        req="SELECT * FROM (SELECT mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select name from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype) FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+str(ovals[i][0])+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where "+splitGroup(conf)+")) as a ORDER BY a.id"
+        req="SELECT * FROM (SELECT mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select name from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.dependencies, mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id="+str(ovals[i][0])+" and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+inputs["tableId"]["value"]+" and mm.groups.id in (SELECT id from mm.groups where "+splitGroup(conf)+")) as a ORDER BY a.id"
         print >> sys.stderr," ------- 3 --------- "
         print >> sys.stderr,req
         print >> sys.stderr," ------- 3 --------- "
@@ -3904,7 +3907,86 @@ def clientView(conf,inputs,outputs):
             else:
                 if rvals is not None and columns.count(cvals[j][2])>0 and columns.index(cvals[j][2])<len(rvals):
                     if restrictedTypes.count(cvals[j][3])>0:
-                        fres[ovals[i][0]][cvals[j][1]]=str(rvals[columns.index(cvals[j][2])])
+                        if cvals[j][3]=="Reference":
+                            try:
+                                import json
+                                myObj=json.loads(cvals[j][4])
+                                if myObj[0].keys().count("myself")>0:
+                                    myObj[0]["myself"]
+                                    print >> sys.stderr," **** MYSELF: "+str(myObj[0]["myself"])
+                                    print >> sys.stderr," **** MYSELF: "+str(cvals[j][5])
+                                    print >> sys.stderr," **** MYSELF: "+str(len(myObj[0]["myself"]))
+                                    print >> sys.stderr," **** MYSELF: "+str(myObj[0]["myself"][0].keys())
+                                    alphabet="abcdefghijklmnopqrstuvwxxyz"
+                                    tmpCnt=0
+                                    tmpReq=""
+                                    tmpParams=""
+                                    tmpClause=""
+                                    hasDep=False
+                                    initialReq=cvals[j][5]
+                                    if len(myObj[0]["myself"])>=1:
+                                        for uv in range(len(myObj[0]["myself"])):
+                                            print >> sys.stderr, str(myObj[0]["myself"][uv])
+                                            for uv1 in (myObj[0]["myself"][uv]):
+                                                print >> sys.stderr, str(myObj[0]["myself"][uv][uv1])
+                                                print >> sys.stderr, str(myObj[0]["myself"][uv][uv1]["sql_query"])+" AS "+alphabet[tmpCnt]
+                                                if tmpParams!="":
+                                                    tmpParams+=", "
+                                                    tmpReq+=", "
+                                                tmpReq+="("+ myObj[0]["myself"][uv][uv1]["sql_query"] +") AS "+alphabet[tmpCnt]
+                                                tmpParams+=alphabet[tmpCnt]+"."+myObj[0]["myself"][uv][uv1]["tfield"]
+                                                initialReq=initialReq.replace("from",", "+myObj[0]["myself"][uv][uv1]["tfield"]+" from")
+                                                #tmpParams+=alphabet[tmpCnt]+"."+ myObj[0]["myself"][uv][uv1]["tfield"] +"=="
+                                                tmpCnt=tmpCnt+1
+                                                if myObj[0]["myself"][uv][uv1].keys().count("dependents")>0:
+                                                    for uw in range(len(myObj[0]["myself"][uv][uv1]["dependents"])):
+                                                        for uw1 in myObj[0]["myself"][uv][uv1]["dependents"][uw]:
+                                                            print >> sys.stderr,str(myObj[0]["myself"][uv][uv1]["dependents"][uw][uw1]["sql_query"].replace("from",", "+myObj[0]["myself"][uv][uv1]["tfield"]+" from"))+" AS "+alphabet[tmpCnt] 
+                                                            if tmpParams!="":
+                                                                tmpParams+=", "
+                                                            if tmpReq!="":
+                                                                tmpReq+=", "
+                                                            tmpParams+=alphabet[tmpCnt]+"."+myObj[0]["myself"][uv][uv1]["dependents"][uw][uw1]["tfieldf"]
+                                                            tmpClause+=alphabet[tmpCnt-1]+"."+myObj[0]["myself"][uv][uv1]["tfield"]+"="+alphabet[tmpCnt]+"."+myObj[0]["myself"][uv][uv1]["tfield"];
+                                                            tmpReq+=" ("+ myObj[0]["myself"][uv][uv1]["dependents"][uw][uw1]["sql_query"].replace("from",", "+myObj[0]["myself"][uv][uv1]["tfield"]+" from") +") AS "+alphabet[tmpCnt]
+                                                            tmpCnt=tmpCnt+1
+                                                            tmpReq+=", ("+ initialReq.replace("from",", "+myObj[0]["myself"][uv][uv1]["dependents"][uw][uw1]["tfieldf"]+" from") +") AS "+alphabet[tmpCnt]
+                                                            tmpClause+=" AND "+alphabet[tmpCnt-1]+"."+myObj[0]["myself"][uv][uv1]["dependents"][uw][uw1]["tfieldf"]+"="+alphabet[tmpCnt]+"."+myObj[0]["myself"][uv][uv1]["dependents"][uw][uw1]["tfieldf"];
+                                                            tmpClause+=" AND "+alphabet[tmpCnt]+".id="+str(rvals[columns.index(cvals[j][2])])
+                                                            hasDep=True
+                                        print >> sys.stderr,tmpParams
+                                        tmpRes=[]
+                                        if not(hasDep):
+                                            fres[ovals[i][0]][str(cvals[j][1])+"_bind"]=[]
+                                            print >> sys.stderr,tmpClause
+                                            tmpReq+=", ("+ initialReq +") AS a1"
+                                            for uv2 in range(len(myObj[0]["myself"])):
+                                                for uv3 in myObj[0]["myself"][uv2]:
+						    if tmpClause!="":
+						        tmpClause+=" "+myObj[0]["myself"][uv2][uv3]["cond_join"]+" "
+						    tmpClause+=alphabet[uv2]+"."+myObj[0]["myself"][uv2][uv3]["tfield"]+"=a1."+myObj[0]["myself"][uv2][uv3]["tfield"]
+						    tmpRes+=[uv3]
+                                            tmpClause+=" AND a1.id="+str(rvals[columns.index(cvals[j][2])])
+                                        print >> sys.stderr,tmpReq
+                                        print >> sys.stderr,tmpParams
+                                        print >> sys.stderr,tmpClause
+                                        if tmpClause!="":
+                                            tmpReq="SELECT "+tmpParams+" FROM "+tmpReq+" WHERE "+tmpClause
+                                            print >> sys.stderr,tmpReq
+                                            res10=cur.execute(tmpReq)
+                                            res10=cur.fetchone()
+                                            fres[ovals[i][0]][str(cvals[j][1])+"_mdep"]=[]
+                                            for uv0 in range(tmpCnt):
+                                                fres[ovals[i][0]][str(cvals[j][1])+"_mdep"]+=[str(res10[uv0])]
+                                        if len(tmpRes)>0:
+                                            fres[ovals[i][0]][str(cvals[j][1])+"_bind"]+=[str(tmpRes)]
+                                        print >> sys.stderr,tmpReq
+
+                                    demoBug
+                            except Exception,e:
+                                print >> sys.stderr,str(e)
+                                con.conn.commit()
+                                fres[ovals[i][0]][cvals[j][1]]=str(rvals[columns.index(cvals[j][2])])
                     else:
                         fres[ovals[i][0]][cvals[j][1]]=rvals[columns.index(cvals[j][2])]
                     #print>> sys.stderr,"+++ 0 +++ "+str(rvals)
@@ -3913,12 +3995,31 @@ def clientView(conf,inputs,outputs):
                     #print>> sys.stderr,"+++ 0 +++ "+str(rvals[columns.index(cvals[j][2])])
                     #print>> sys.stderr,"+++ 0 +++ "+str(ovals[i])
                 else:
-                    #print>> sys.stderr,"+++ 1 +++ "+str(cvals[j])
+                    print>> sys.stderr,"+++ 1 +++ "+str(cvals[j])
+                    try:
+                        import json
+                        tmpObj=json.loads(cvals[j][4])
+                        tmpReq=""
+                        tmpCnt=0
+                        for vv in range(len(tmpObj)):
+                            for ww in tmpObj[vv]:
+                                tmpReq+=" CASE WHEN "+ww+" is not null THEN "+str(vv)+" ELSE "
+                        tmpReq+=" -1 "
+                        for vv in range(len(tmpObj)):
+                            tmpReq+=" END "
+                        print>> sys.stderr,"+++ 1 +++ "+str(tmpReq)
+                        tmpReq="SELECT "+tmpReq+" as v FROM "+tableName+" WHERE "+f+"="+inputs["id"]["value"] 
+                        res0=cur.execute(tmpReq)
+                        res0=cur.fetchone()
+                        print>> sys.stderr,"+++ 1 +++ "+str(res0)
+                        fres[ovals[i][0]][cvals[j][1]]=res0[0]
+                    except Exception,e:
+                        print>> sys.stderr,"+++ 999999 +++ "+str(e)
+                        fres[ovals[i][0]][cvals[j][1]]="Not found"
                     #print>> sys.stderr,"+++ 1 +++ "+str(ovals[i])
                     #print >> sys.stderr,columns.index(cvals[j][2])
                     #print >> sys.stderr,rvals
                     #print>> sys.stderr,"+++++ "+str(columns)
-                    fres[ovals[i][0]][cvals[j][1]]="Not found"
             #print >> sys.stderr,cvals[j]
         #fres["ref"]=inputs["id"]["value"] 
 

@@ -72,6 +72,7 @@ define([
     var externalCallbacks={};
     var elevationProfiles=[];
     var shouldDisplayTabsForToggle=false;
+    var positionFeature;
     
     function notify(text, type) {
         mynotify.notify({
@@ -823,7 +824,6 @@ define([
 	});
 	$("#context-menu").bind("addClass",function(){
 	    console.log("context-menu added");
-
 	    //$(".tree li.layer").removeClass("layer-active");
 	});
 
@@ -854,6 +854,14 @@ define([
 		clayer=getLayerById(cid);
 	    }
 	    $(this).addClass("layer-active");
+            console.log(cid);
+	    if(extentLayers["layer_extent_"+cid] && extentLayers["layer_extent_"+cid].getVisible()){
+		console.log("remove open add close");
+              $(".dropdown-menu").find(".glyphicon").removeClass("glyphicon-eye-open").addClass("glyphicon-eye-close");
+            }else{
+		console.log("remove close add open");
+              $(".dropdown-menu").find(".glyphicon").removeClass("glyphicon-eye-close").addClass("glyphicon-eye-open");
+            }
 	    console.log($(this));
 	    console.log(oLayers[clayer]);
 	    console.log(oLayers[clayer]["query"]);
@@ -1968,6 +1976,7 @@ define([
     var myMMDataTableObject;
     var tableDisplay=0;
     var stylerTemplate=null;
+    var extentLayers={};
     
     var contextualMenu={
 	"legend": {
@@ -2078,6 +2087,49 @@ define([
 		    map.getView().fit(extent,map.getSize());
 		}catch(e){
 		    console.log(layer);
+		    console.log(Object.keys(oLayers).length);
+		    var extent=ol.extent.applyTransform(addedLayers[key-Object.keys(oLayers).length]["extent"], transformer);
+		    map.getView().fit(extent,map.getSize());
+		}
+	    }
+	},
+	"showExtent": {
+	    "run": function(layer){
+		var key=getLayerById(layer);
+		if(key==null)
+		    key=layer;
+		var transformer = ol.proj.getTransform('EPSG:4326', 'EPSG:3857');
+		try{
+		    console.log(layer);
+		    console.log($("#mmm_showExtent"));
+		    var extent=ol.extent.applyTransform(oLayers[key]["extent"], transformer);
+		    //if($("#mmm_showExtent").find(".glyphicon").hasClass("glyphicon-eye-open")){
+		    console.log(extentLayers["layer_extent_"+layer]);
+		    if(!extentLayers["layer_extent_"+layer]){
+		      var feature = new ol.Feature({
+                        geometry: new ol.geom.Polygon.fromExtent(extent)
+                      });
+		      console.log(oLayers[key]["extent"]);
+		      var extentLayer=new ol.layer.Vector({
+		        source: new ol.source.Vector({
+		          features: [feature]
+		        })
+		      });
+		      extentLayers["layer_extent_"+layer]=extentLayer;
+		      map.addLayer(extentLayers["layer_extent_"+layer]);
+		    }else
+		      extentLayers["layer_extent_"+layer].setVisible(!extentLayers["layer_extent_"+layer].getVisible());
+ console.log(extentLayers["layer_extent_"+layer]);
+		    //$("#mmm_showExtent").find(".glyphicon").removeClass('glyphicon-eye-open').addClass('glyphicon-eye-close');
+		   /* }else{
+		      extentLayers["layer_extent_"+layer].setVisible(false);
+		      $("#mmm_showExtent").find(".glyphicon").removeClass('glyphicon-eye-close').addClass('glyphicon-eye-open');
+		    }*/
+		    map.getView().fit(extent,map.getSize());
+		}catch(e){
+		    console.log(e);
+		    console.log(layer);
+		    console.log(Object.keys(oLayers).length);
 		    console.log(Object.keys(oLayers).length);
 		    var extent=ol.extent.applyTransform(addedLayers[key-Object.keys(oLayers).length]["extent"], transformer);
 		    map.getView().fit(extent,map.getSize());
@@ -2313,6 +2365,7 @@ define([
 	    console.log($(this));
 	    var closure=$(this);
 	    (function(closure){
+		closure.off('click');
 		closure.on('click',function(e){
 		    console.log($(this));
 		    var cLayer=$(".tree li").find(".layer-active");
@@ -2347,7 +2400,9 @@ define([
 
     var oldItem;
     function load_menu(){
+	console.log("INVOKE LOAD MENU!!!");
 	$("#header").find(".mm-action").each(function(){
+		$(this).off('click');
 		$(this).on('click',function(){
 		    oldItem=$(this).parent().parent().find(".active").attr('id');
 		    for(var i in menuItems){
@@ -2356,11 +2411,26 @@ define([
 			    $("#"+i).parent().removeClass("active");
 			}
 		    }
+		console.log("LOCALMODULES");
+		console.log(localModules);
+		    for(var i in localModules){
+			console.log("**** BROWSER localModules "+i);
+			if(localModules[i]["deactivate"])
+				localModules[i]["deactivate"]();
+		    }
 		    //oldItem=$(this).attr('id');
 		    if(!$(this).hasClass("do-not-select")){
 			$(this).parent().addClass("active");
 		    }
+		    if(menuItems[$(this).attr('id')])
 		    menuItems[$(this).attr('id')]["activate"]();
+		    else{
+			for(var i in localModules){
+				console.log("**** BROWSER localModules "+i);
+				if(localModules[i].name==$(this).attr('id'))
+					if(localModules[i]["activate"]) localModules[i]["activate"]();
+			}
+		    }
 		    if(shouldDisplayTabsForToggle){
 			$(".navbar").find(".navbar-collapse").collapse("hide");
 		    }
@@ -2958,17 +3028,21 @@ define([
 					}
 					$("#table-wrapper").on("removeClass",function(){
 					    if(arguments.length>=2 && arguments[1] &&  arguments[1].indexOf(" in ")>=0 && arguments[2] && arguments[2].indexOf(" in ")<=0){
+						if(!shouldDisplayTabsForToggle){
 						setMapHeight();
 						console.log("== ******* == DEBUG");
 						map.updateSize();
+						}
 					    }
 					    $("#table-wrapper").removeAttr("style");
 					});
 					$("#table-wrapper").on("addClass",function(){
 					    if(arguments.length>=2 && arguments[1] &&  arguments[1].indexOf(" in ")>=0 && arguments[2] && arguments[2].indexOf(" in ")<=0){
+						if(!shouldDisplayTabsForToggle){
 						console.log("== ******* == DEBUG");
 						setMapHeight();
 						map.updateSize();
+						}
 					    }
 					    $("#table-wrapper").removeAttr("style");
 					});
@@ -3115,11 +3189,13 @@ define([
 	},
 	"print": {
 	    activate: function(){
+		var hasPrintTab=false;
 		if(!$("#mmprintTab").length){
 		    $("#mmtabs").append($("#printtab_header_template")[0].innerHTML);
 		    $("#mmtabs").next().prepend($('<div role="tabpanel" class="tab-pane" id="mmprintTab"></div>'));
 		    $("#mmprintTab").append($("#printtab_template")[0].innerHTML);
-		}
+		}else
+			hasPrintTab=true;
 		$("#mmprintAction").tab('show');
 		$("#mmprintTab").bind("removeClass",function(){
 		    console.log(arguments);
@@ -3138,6 +3214,7 @@ define([
 		    if(map.getLayers().item(i).getVisible())
 			my2BS.push(map.getLayers().item(i));
 		my2BS.push(printLayer);
+		if(!hasPrintTab)
 		pmap=new ol.Map({
 		    target: $("#print-map")[0],
 		    controls: [],
@@ -4123,6 +4200,9 @@ define([
 	mapInteractions: mapInteractions,
 	mmActivateDrawTool: mmActivateDrawTool,
 	getInteractions: getInteractions,
+	positionFeature: positionFeature,
+	load_menu: load_menu,
+	shouldDisplayTabsForToggle: shouldDisplayTabsForToggle,
     };
 
 

@@ -74,7 +74,7 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     for(var j=0;j<efields.length;j++){
 	var ctype=getType(conf,efields[j]["ftype"]);
 	//sqlContent+="[__"+ctype+"__]";
-	if(ctype!="tbl_linked" && ctype!="tbl_link" && ctype!="link"){
+	if(ctype!="tbl_linked" && ctype!="tbl_link" && ctype!="link" && efields[j]["name"].indexOf("unamed_")<0){
 	    if(lcnt>0){
 		sqlPartContent+=", ";
 		//currentValues+=", ";
@@ -137,15 +137,19 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     for(var j=0;j<efields.length;j++){
 	var ctype=getType(conf,efields[j]["ftype"]);
 	//sqlContent.push("[__"+ctype+"__]");
-	if(efields[j]["ftype"]!=11){
+	if(efields[j]["ftype"]!=11 && efields[j]["name"].indexOf("unamed_")<0){
 	    if(lcnt>0){
 		//sqlPartContent+=", ";
 		currentValues+=", ";
 	    }
 	    //sqlPartContent+=efields[j]["name"];
 	    var ctype=getType(conf,efields[j]["ftype"]);
-	    if(ctype!="bytea" && ctype!="geometry" )
-		currentValues+=protect+currentTuple[0][efields[j]["name"]]+protect;
+	    if(ctype!="bytea" && ctype!="geometry" ){
+		if(currentTuple[0][efields[j]["name"]]=="(null)")
+		    currentValues+=(ctype=="ref"?"null":(ctype=="float"?"0":(ctype=="boolean"?"false":"''")));
+	        else
+		    currentValues+=protect+currentTuple[0][efields[j]["name"]]+protect;
+	    }
 	    else{
 		if(ctype=="geometry")
 		    geometryValues.push({"name": efields[j]["name"], "value":currentTuple[0][efields[j]["name"]]});
@@ -595,9 +599,9 @@ function createSqliteDB4ME(conf,inputs,outputs){
     var indexesKeys={};
     var lcnt0=0;
     for(var i=0;i<myExecuteResult0.length;i++){
+	alert(myExecuteResult0[i]["value"]);
 	var matched=myExecuteResult0[i]["value"].match(/(\w+)(\d*)\.(\d*)(\w+)/);
-	alert("IndexOf: "+tablesImported.indexOf(matched[0]));
-	if(matched[0]){
+	if(matched!=null && matched[0]){
 	    conf["lenv"]["message"]="Export reference tables: "+matched[0];
 	    ZOOUpdateStatus(conf,(((20/myExecuteResult0.length)*i)+50));
 	    alert("+++++ >"+i+" "+matched[0]);

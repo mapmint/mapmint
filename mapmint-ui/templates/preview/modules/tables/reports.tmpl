@@ -1,0 +1,393 @@
+#encoding UTF-8
+#import zoo
+#set tmpl=$conf['main']['templatesPath']+"/Distiller/form_line.html"
+#include $tmpl
+#set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
+
+#import authenticate.service as auth
+#set prefix=auth.getPrefix($conf)
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+
+#set c=$conf["lenv"]
+#try
+#set $c["cid"]=str(1+int($c["cid"]))
+#except
+#set $c["cid"]="0"
+#end try
+
+#set c=$conf["lenv"]
+#set $c["cid"]=str(int($c["cid"])+1)
+
+#set firstListElement=0
+#try
+#set toto=$isPreInput
+#except
+#set isPreInput=False
+#end try
+
+#try 
+#set currentLoadIndex=int($conf["lenv"]["mylevel"])+1
+#except
+#set currentLoadIndex=0
+#end try
+
+#set tmp=$conf["lenv"]
+#set $tmp["mylevel"]=$currentLoadIndex
+
+<!--
+#try
+#set cLevel=$rLevel
+#except Exception,e
+$e
+#set cLevel=0
+#end try
+-->
+
+
+#try
+#if $embedded>=0
+#set prefix="embedded_"+str($embedded)+"_"
+#try
+#if $isInput
+#set $prefix="input_"+str($embedded)+"_"+$prefix
+#end if
+#except
+#set isInput=False
+#end try
+#else
+#set prefix=""
+#try
+#set toto=$isInput
+#except
+#set isInput=False
+#end try
+#end if
+#except
+#set prefix=""
+#try
+#set toto=$isInput
+#except
+#set isInput=False
+#end try
+#end try
+
+<!--
+#try
+$embedded
+#except Exception,e
+#set embedded=0
+#end try
+-->
+
+
+#set req="SELECT mm_tables.p_views.name,mm_tables.p_tables.description,mm_tables.p_tables.name,mm_tables.p_tables.id,mm_tables.p_views.clause FROM mm_tables.p_views,mm_tables.p_tables where mm_tables.p_tables.id=mm_tables.p_views.ptid and mm_tables.p_views.ptid=(select id from mm_tables.p_tables where name='"+$inputs["table"]["value"]+"')"
+#set res=$cur.execute($req)
+#set vals=$cur.fetchone()
+
+#set table=$vals[2]
+#set tableId=str($vals[3])
+#set clause=$vals[4]
+
+#* Edition *#
+#set req="SELECT distinct mm_tables.p_editions.id,mm_tables.p_editions.name,mm_tables.p_editions.step FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+$tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.step>=0 order by mm_tables.p_editions.step asc"
+#set res=$cur.execute($req)
+#set evals=$cur.fetchall()
+
+#* Search / Delete *#
+#set req="SELECT distinct mm_tables.p_editions.id,mm_tables.p_editions.name,mm_tables.p_editions.step FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+$tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') and mm_tables.p_editions.step<=0 order by mm_tables.p_editions.step asc"
+#set res=$cur.execute($req)
+#set vals=$cur.fetchall()
+
+#* Reports *#
+#set req="SELECT distinct mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid="+$tableId+" and mm.groups.id in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') order by mm_tables.p_reports.id asc"
+#set rres=$cur.execute($req)
+#set rvals=$cur.fetchall()
+
+#* Importers *#
+#set ireq="SELECT distinct mm_tables.importers.id,mm_tables.importers.name,mm_tables.importers.description FROM mm_tables.importers,mm_tables.importer_groups where  mm_tables.importers.id=mm_tables.importer_groups.iid and tid="+$tableId+" and mm_tables.importer_groups.gid in (SELECT id_group from mm.user_group where id_user='"+$conf["senv"]["id"]+"') order by mm_tables.importers.id asc"
+#set ires=$cur.execute($ireq)
+#set ivals=$cur.fetchall()
+
+<ul class="nav nav-tabs" role="tablist">
+#if $prefix!=""
+#set cPrefix=" toActivate"
+#else
+#set cPrefix=""
+#end if
+
+#* Reports *#
+#if len($rvals)>0
+#set font="fa-print"
+#for i in range(len($rvals))
+#if $rvals[i][2]=='t'
+#set classes="require-"+$prefix+"select"
+$ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,$classes)
+#else
+$ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
+#end if
+#end for
+#end if
+</ul>
+
+<div class="tab-content">
+
+
+#* Reports *#
+#for i in range(len($rvals))
+     <div id="$(prefix)report_$(rvals[i][0])" role="tabpanel" class="tab-pane" >
+       <div class="row">
+         <h2>$zoo._("Report")</h2>
+	 <p id="no_version_message">$zoo._("Depending on its complexity, producing a report may be a a time consuming process. For this reason, the reports are not generated everytime you access an element but on the specific user demand. You can generate a document by pressing the 'Run' button bellow.")</p>
+         $ftmpl.printButton({"id":"runPrint","name":'<i class="fa fa-print fa-fw"></i><i class="fa fa-spinner fa-spin" style="display:none"></i> '+$zoo._("Run")})
+	 $ftmpl.printHidden({"rid":"report_table_id","id":"report_table_id","name":"report_table_id","value":$tableId})
+	 $ftmpl.printHidden({"rid":"report_tuple_id","id":"report_tuple_id","name":"report_tuple_id","value":"-1"})
+	 $ftmpl.printHidden({"rid":"report_report_id","id":"report_report_id","name":"report_report_id","value":$rvals[i][0]})
+        <div class="progress" style="width: 80%;margin-top: 5px;display:none;">
+         <div class="progress-bar progress-bar-success" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+        </div>
+       </div>
+       <div class="report_display" >
+       </div>
+     </div>
+
+<script type="template/txt" id="$(prefix)report_$(rvals[i][0])_link">
+	<li class="list-group-item"><a href="[link]" target="_blank"> <i class="fa [class]"></i> [format] </a></li>
+</script>
+
+<script type="template/txt" id="$(prefix)report_$(rvals[i][0])_link_list">
+	<div class="panel panel-default">
+  	     <div class="panel-heading">
+	     	  <h3 class="panel-title"><i class="fa fa-th-list"></i> $zoo._("Produced documents")</h3>
+	     </div>
+  	     <div class="panel-body">
+	     	  <ul class="list-group">
+		  </ul>    	      
+  	     </div>
+	</div>
+
+</script>
+#end for
+
+#*
+     <div id="$(prefix)edit" role="tabpanel" class="tab-pane" >
+     
+#set req="SELECT distinct mm_tables.p_editions.id,mm_tables.p_editions.name,mm_tables.p_editions.step FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid="+$tableId+" and mm.groups.id in (select id_group from mm.users,mm.user_group where mm.users.id=mm.user_group.id_user and mm.users.id="+$conf["senv"]["id"]+" ) and mm_tables.p_editions.step>=0 order by mm_tables.p_editions.step asc"
+#set res=$cur.execute($req)
+#set vals1=$cur.fetchall()
+
+
+<ul class="nav nav-tabs" #if len($vals1)==1#style="display:none"#end if#>
+#for i in range(len($vals1))
+#set classes="require-"+$prefix+"select"
+#if i+1==len($vals1)
+#set $classes+=" toActivate"
+#end if
+$ftmpl.printTabHeaderNew({"id":$prefix+"edit0_"+str($vals1[i][0]),"title":$vals1[i][1],"classe":$classes,"cnt":($i+1)})
+#end for
+</ul>
+
+<div class="tab-content">
+
+#for i in range(len($vals1))
+     <div id="$(prefix)edit0_$vals1[i][0]" role="tabpanel" class="tab-pane" >
+#set inputs0={"id":{"value":str($vals1[i][0])},"isReference":{"value":"true"}}
+$(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmpl",searchList={"conf": $conf,"inputs": $inputs0,"cur":$cur,"con":$con,"cid":$currentLoadIndex+((i+1)*10),"cLevel":$cLevel}))
+     </div>
+#end for
+</div>
+     </div>
+
+     <div id="$(prefix)listing" role="tabpanel" class="tab-pane" >
+
+<input type="hidden" name="$(prefix)mainTableId" value="$tableId" />
+<input type="hidden" name="$(prefix)mainTableViewId" value="$qComponents[0]" />
+<input type="hidden" name="$(prefix)mainTableLevel" value="$cLevel" />
+
+
+#set req="SELECT mm_tables.p_view_fields.id,mm_tables.p_view_fields.alias,mm_tables.p_view_fields.value,mm_tables.p_view_fields.view,mm_tables.p_view_fields.search,mm_tables.p_view_fields.class,mm_tables.p_view_fields.width,mm_tables.p_view_fields.name FROM mm_tables.p_views,mm_tables.p_view_fields where mm_tables.p_views.id=mm_tables.p_view_fields.vid and mm_tables.p_views.id="+$qComponents[0]
+#set res=$cur.execute($req)
+#set vals=$cur.fetchall()
+#set values=[]
+#set classifiers=["asc","desc"]
+#set classifier=""
+
+<table id="$(prefix)mainListing_display">
+    <thead>
+      <tr>
+#set contents=[]
+#for i in range(len($vals))
+#if $vals[i][3]
+	<th style="width:25px">$vals[i][1]</th>
+#set $values+=[$vals[i][2]]
+#set contents+=['']
+#end if
+#if $vals[i][5] is not None
+#set $classifier=$vals[i][2]+" "+$classifiers[($vals[i][5]-1)]
+#end if
+#end for
+      </tr>
+    </thead>
+    <tbody>
+#*
+#set contents=[]
+#try
+#set req1="SELECT "+(",".join($values+["id"]))+" FROM "+$table+" WHERE "+$clause+" ORDER BY "+$classifier
+#set res1=$cur.execute($req1)
+#set vals1=$cur.fetchall()
+#for j in range(len($vals1))
+     <tr>
+#for k in range(len($values))
+#set content=[]
+#if j==0
+#if k==0
+#set $contents+=['<input type="hidden" name="id" value=""/> ']
+#else
+#end if
+#end if
+       <td>#if k==0#<input type="hidden" name="id" value="$vals1[$j][len($vals1[j])-1]" />#end if#$vals1[$j][$k]</td>
+#end for
+     </tr>
+#end for
+#except Exception,e
+     <tr>
+       <td class="alert alert-danger" colspan="$(len($vals))">$(zoo._("Configuration error: ")+str($e))</td>
+     </tr>
+     <tr>
+       <td class="alert alert-danger" colspan="$(len($vals))">$(zoo._("SQL Query: ")+str($req1))</td>
+     </tr>
+#end try
+*#
+    </tbody>
+  </table>
+
+     </div>
+</div>
+
+<script type="text/javascript" id="col_$(i)_template">
+#if $prefix==""
+    var mainTableRFields=
+#else
+    var obj={};
+    obj["id"]="$prefix";
+    obj["level"]=$cLevel;
+    obj["mainTableRFields"]=
+#end if
+        [#for i in range(len($contents))#"$vals[i][7]",#end for#];
+#if $prefix==""
+    var $(prefix)mainTableFields=
+#else
+    obj["mainTableFields"]=
+#end if
+	[
+#for i in range(len($contents))
+       	  {
+		"mData": "$vals[i][7]",
+	  	"sNname": "$vals[i][7]",
+	  	"sTitle": "$(vals[i][1])",
+	  	"sWidth": "$vals[i][6]"
+	  },
+#end for
+        ];
+#if $prefix!=""
+#try
+#set toto=$conf["lenv"]["defined_e"]
+#set toto=$conf["lenv"]["defined_ie"]
+#except
+#set c=$conf["lenv"]
+#set $c["defined_e"]=False
+#set $c["defined_ie"]=False
+#end try
+#if not($isInput) and not($conf["lenv"]["defined_e"])
+    var embeddeds=[];
+#set c=$conf["lenv"]
+#set $c["defined_e"]=True
+#else
+#if not($conf["lenv"]["defined_ie"])
+    var iembeddeds=[];
+#set c=$conf["lenv"]
+#set $c["defined_ie"]=True
+#end if
+#end if
+#if not($isInput)
+    embeddeds.push(obj);
+#else
+    iembeddeds.push(obj);
+#end if
+#end if
+</script>
+
+#for i in range(len($contents))
+<script type="template/text" id="col_$(i)_template">
+$contents[i]
+</script>
+#end for
+
+<script type="text/template" id="template_layerQuery_display">
+<div id="my-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                 <h4 class="modal-title">$zoo._("Query result")</h4>
+            </div>
+            <div class="modal-body">
+	      <ul class="nav nav-tabs" id="myTab" role="tablist">
+  	        <li class="nav-item">
+    		  <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">$zoo._("Table")</a>
+  		</li>
+  		<li class="nav-item">
+    		  <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">$zoo._("Graph")</a>
+  		</li>
+	      </ul>
+              <div class="tab-content" id="myTabContent">
+	        <div class="tab-pane fade active" id="home" role="tabpanel" aria-labelledby="home-tab">CONTENT</div>
+		<div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+		 <div id="layerQueryParameters">
+		   <div class="col-sm-3">
+		    $zoo._("Title:")
+		   </div>
+		   <div class="col-sm-9">
+		   <input id="queryLayerDiagramTitle" class="form-control" type="text" placeholder="Title" />
+		   </div>
+		   <div class="col-sm-3">
+		    $zoo._("Type:")
+		   </div>
+		   <div class="col-sm-9">
+		   <select id="queryLayerDiagramType" class="form-control">
+		    <option value="column">$zoo._("Column")</option>
+		    <option value="bar">$zoo._("Bar")</option>
+		    <option value="pie">$zoo._("Pie")</option>
+		   </select>
+		   </div>
+		   <div class="col-sm-1">
+		    $zoo._("X:")
+		   </div>
+		   <div class="col-sm-3">
+		   <select id="queryLayerDiagramX" class="form-control"/>
+		   </div>
+		   <div class="col-sm-1">
+		    $zoo._("Y:")
+		   </div>
+		   <div class="col-sm-3">
+		   <select id="queryLayerDiagramY" class="form-control"/>
+		   </div>
+		   <div class="col-sm-3">
+		     <button type="button" class="btn btn-default">$zoo._("Apply")</button>
+		   </div>
+		 </div>
+		 <div id="layerQueryDiagram" style="width:550px"></div>
+		</div>
+	      </div>	      
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+</script>

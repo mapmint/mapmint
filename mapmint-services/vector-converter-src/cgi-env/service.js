@@ -432,7 +432,7 @@ function exportTo(conf,inputs,outputs){
     inputs["InputDSTN"]={"value": tmp[0]};
     inputs["sql"]={"value": tmp[1]};
     inputs["F"]={"value": inputs["format"]["value"]};
-    inputs["OutputDSN"]={"value": "TEMP_"+conf["senv"]["MMID"]+"-1."};
+    inputs["OutputDSN"]={"value": "TEMP_"+conf["lenv"]["usid"]+"-1."};
     if(inputs["format"]["value"]=="KML")
 	inputs["OutputDSN"]["value"]+="kml"
     if(inputs["format"]["value"]=="CSV")

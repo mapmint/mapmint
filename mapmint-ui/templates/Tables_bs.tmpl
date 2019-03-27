@@ -249,8 +249,11 @@ $printTab({"font":"print","title":$zoo._("Report")})
     </div>
     <input type="hidden" id="tables_view_id" value="-1" />
     $ftmpl.printLine({"rid":"tables_view_title","id":"table_title","name":$zoo._("Title"),"classes":"row"})
+    $ftmpl.printLine({"rid":"tables_view_icon","id":"table_icon","name":$zoo._("Icon"),"classes":"row"})
+    <div id="tables_view_icon_preview"></div>
     $ftmpl.printLine({"rid":"tables_view_clause","id":"table_clause","name":$zoo._("Clause"),"classes":"row"})
     $ftmpl.printBasicLine({"label":$zoo._("Visible"),"content":'<input type="checkbox" id="tables_view_visible" />'})
+    $ftmpl.printBasicLine({"label":$zoo._("Order"),"content":'<input type="text" id="tables_view_menu_order" value="1" />'})
     $ftmpl.printLine({"rid":"tables_view_groups","id":"groups","name":$zoo._("Groups"),"type":"multiple","options":$options})  
      $ftmpl.printLine({"rid":"tables_view_themes","id":"tables_themes","name":$zoo._("Theme"),"type":"multiple","options":$options1})
     $(Template(file=$conf["main"]["templatesPath"]+"/Tables/Views.html",searchList={"conf": $conf,"inputs": {},"outputs":{},"basic":True}))

@@ -272,7 +272,7 @@ define([
 		    data: [],
 		    "dom": 'Zlfrtip',
 		    "colReorder": true,
-		    "scrollY":  (this.height==null?((lheight/2.5)-($(".navbar").height()*4)):height)+"px",
+		    "scrollY":  (this.height==null?((lheight/2.5)-($(".navbar").height()*4)):this.height)+"px",
 		    "scrollCollapse": true,
 		    "scrollX": true,
 		    "lengthMenu": [[5, 10, 25, 50, 1000], [5, 10, 25, 50, "All"]],

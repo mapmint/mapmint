@@ -1,0 +1,18 @@
+#encoding UTF-8
+#import zoo
+#import authenticate.service as auth
+#set prefix=auth.getPrefix($conf)
+#set con=auth.getCon($conf)
+#set cur=con.conn.cursor()
+
+#set req2="SELECT id, name, query, g_type, x_col, y_col from mm_tables.query_references where table_id="+$inputs["tid"]["value"]
+#set res2=$cur.execute($req2)
+#set vals2=$cur.fetchall()
+#set res=[]
+#for i in range(len(vals2))
+#set $res+=[{"id":$vals2[i][0],"name": $vals2[i][1], "query": $vals2[i][2], "g_type": $vals2[i][3], "x_col": $vals2[i][4], "y_col": $vals2[i][5]}]
+#end for
+
+#import json
+$json.dumps($res)
+

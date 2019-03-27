@@ -465,7 +465,7 @@ __declspec(dllexport)
     OGR_DS_Destroy( hTileIndexDS );
     
     GDALDestroyDriverManager();
-    OGRCleanupAll();
+    //OGRCleanupAll();
     setMapInMaps(outputs,"Result","value","Tile index successfully created.");
     //CSLDestroy(argv);
     

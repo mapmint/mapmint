@@ -212,10 +212,7 @@ define([
 		    params[oid].push($(this).val());
 		});
 	    }else{
-		if($(this).prop('multiple'))
-		    params[$(this).attr('id').replace(reg0,"")]=[];
-		else
-		    params[$(this).attr('id').replace(reg0,"")]=$(this).val();
+		params[$(this).attr('id').replace(reg0,"")]=$(this).val();
 	    }
 	});
 	return params;

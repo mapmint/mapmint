@@ -150,6 +150,7 @@ define([
 			{"identifier":"sortname","value":closestproperties.split(",")[llimit[2]],"dataType":"string"},
 			//{"identifier":"sortorder","value":(orderInit.length>1?orderInit[1]:llimit[3]),"dataType":"string"},
 			//{"identifier":"sortname","value":(orderInit.length>0?orderInit[0]:closestproperties.split(",")[llimit[2]]),"dataType":"string"},
+			{"identifier":"search","value":$('#'+lid+'_wrapper').find("input[type=search]").first().val(),"dataType":"string"},
 			{"identifier":"filters","value":JSON.stringify(tfilters, null, ' '),"mimeType":"application/json"}
 		    ],
 		    dataOutputs: [
@@ -158,7 +159,7 @@ define([
 		    type: 'POST',
 		    storeExecuteResponse: false
 		});
-		
+		console.log(lid);
 		console.log(opts);
 		opts["success"]=function(rdata) {
 		    features=rdata;
@@ -308,6 +309,14 @@ define([
 			    console.log(data[i][j]);
 			    if(data[i][j]){
 			    if(/*data[i][j] && */!data[i][j].type){
+				console.log(j);
+				if(data[i][j+"_mdep"]){
+				    for(var kk=0;kk<data[i][j+"_mdep"].length;kk++){
+				    	myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").parent().find("select"+":eq("+kk+")").val(data[i][j+"_mdep"]).change();
+					myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").parent().find("select"+":eq("+kk+")").attr("data-cvalue",data[i][j]);
+				    }
+				    console.log();
+ 				}
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
 				    if($(this).hasClass("htmlEditor")){
@@ -339,6 +348,7 @@ define([
 				if(data[i][j].indexOf && (data[i][j].indexOf("POLYGON(")>=0 || data[i][j].indexOf("LINESTRING(")>=0 || data[i][j].indexOf("POINT(")>=0)){
 				    console.log(j);
 				    console.log(data[i][j]);
+				    try{
 				    var fWKT=new ol.format.WKT();
 				    var myGeom=fWKT.readGeometry(data[i][j]).transform("EPSG:4326","EPSG:3857");
 				    myMapIframe=$("#associatedMap")[0].contentWindow || $("#associatedMap")[0];
@@ -350,10 +360,12 @@ define([
 					name: "Element"
 				    });
 				    myMapIframe.app.addASelectedFeature([feature]);
-
+				    }catch(e){
+					console.log("No map  "+e);
+				    }
 				}
 			    }else{
-				myRoot.find("input[name=edit_"+j+"]").each(function(){
+				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
 				    var closure=$(this);
 				    $(this).fileinput('destroy');
 				    var cname=data[i][j]["filename"].split('/');
@@ -1729,6 +1741,67 @@ define([
 						    }
 						    if(myObject["dependents"]){
 							bindEndDependencies(myObject,celement,l,myElement1,refObject);							
+						    }else{
+							console.log(myObject);
+							console.log(refObject);
+							console.log(celement);
+							for(var jj in refObject)
+							    for(var kk in refObject[jj][0]["myself"])
+								for(var ll in refObject[jj][0]["myself"][kk]){
+								celement.parent().find("select[name="+ll+"]").off('change');
+								(function(a,b,c,d){
+								celement.parent().find("select[name="+ll+"]").on('change',function(){
+									console.log("MYSELF");
+									console.log(a);
+									console.log(b);
+									console.log(c);
+									console.log(d);
+									var originalElement=$(this);
+									var tmpClause="";
+									var tmpId=0;
+									for(var i in refObject){
+									    tmpId=i.replace(/edit_/,"");
+									    for(var j in refObject[i][0]["myself"])
+										for(var k in refObject[i][0]["myself"][j]){
+											if(tmpClause!="")
+												tmpClause+=" "+refObject[i][0]["myself"][j][k]['cond_join']+" ";
+											tmpClause+=" "+refObject[i][0]["myself"][j][k]['tfield']+" "+refObject[i][0]["myself"][j][k]['operator']+" "+(refObject[i][0]["myself"][j][k]['operator']=="like"?"'":"")+(celement.parent().find("select[name="+k+"]").val())+(refObject[i][0]["myself"][j][k]['operator']=="like"?"'":"");
+										}
+									}
+									console.log(tmpClause);
+									zoo.execute({
+                                                				"identifier": "template.display",
+                                                				"type": "POST",
+                                                				dataInputs: [
+                                                    					{"identifier":"tmpl","value":"public/modules/tables/fetchDependencies1_js","dataType":"string"},
+                                                    					{"identifier":"element","value":tmpId,"dataType":"float"},
+											{"identifier":"cond","value":tmpClause,"mimeType":"applicatioin/json"},
+                                                				],
+                                                				dataOutputs: [
+                                                    					{"identifier":"Result","type":"raw"},
+                                                				],
+                                                				success: function(data){
+											tmpId1="edit_"+tmpId;
+											var tempVal=celement.parent().find("select[name='"+tmpId1+"']").val();
+											console.log(tempVal);
+											celement.parent().find("select[name='"+tmpId1+"']").html("");
+											for(var j in data)
+												celement.parent().find("select[name='"+tmpId1+"']").append('<option value="'+data[j][0]+'">'+data[j][1]+'</option>');
+											console.log(originalElement.attr("data-cvalue"));
+											if(originalElement.attr("data-cvalue"))
+												celement.parent().find("select[name='"+tmpId1+"']").val(originalElement.attr("data-cvalue")).change();
+											else
+											celement.parent().find("select[name='"+tmpId1+"']").val(tempVal).change();
+											console.log(data);
+										},
+										error: function(){
+										}
+									});
+									
+	
+								});
+								})(jj,kk,l,refObject);
+							    }
 						    }
 
 						},
