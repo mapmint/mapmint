@@ -29,4 +29,4 @@ MapMint is using numerous OSGeo softwares and bring them all together in a compl
  ![logo](http://geolabs.fr/mmws2014/_static/images/gdal-logo-green.png "GDAL logo") |	The abstraction library used to access and interract with datasources transparently is the GDAL/OGR library.
  ![logo](http://geolabs.fr/mmws2014/_static/images/ol-logo-green.png "OpenLayers logo") | 	MapMint User Interfaces (UI) are using OpenLayers. 
  
-For information on how to setup MapMint, please refer to https://github.com/mapmint/mapmint/blob/master/INSTALL.md.
+For information on how to setup MapMint, please refer to http://mapmint.github.io/userguide-fr/en/introduction/installmapmint.html.
