@@ -74,6 +74,30 @@ def splitGroup(conf):
         res+="name='"+c[i]+"'"
     return res
 
+def getBaseLayersForTable(conf,inputs,outputs):
+    import os,mapscript,json
+    import mapfile.service as mmap
+    bl=[]
+    if inputs["table"].keys().count("length")>0:
+        for i in range(len(inputs["table"]["value"])):
+            mapPath=conf["main"]["dataPath"]+"/public_maps/project_"+(inputs["table"]["value"][i].replace(".","___"))+".map"
+            if os.path.exists(mapPath):
+                m=mapscript.mapObj(mapPath)
+                if mmap.getMetadata(m.web,"mmProprietaryBaseLayers")=="Bing":
+                    bl+=[{"bing":{"key":mmap.getMetadata(m.web,"mmBAK"),"layers":mmap.getMetadata(m.web,"mmPBaseLayers").split(','),"all_layers": conf["mm"]["bbLayers"].split(","),"all_layer_labels": conf["mm"]["bbLayerAlias"].split(",")}}]
+                if mmap.getMetadata(m.web,"mmWMTSBLURL") is not None:
+                    bl+=[{"wmts":{"attribution":open(mmap.getMetadata(m.web,"mmWMTSAttribution").replace(conf["main"]["tmpUrl"],conf["main"]["tmpPath"])).read(),"layers":mmap.getMetadata(m.web,"mmWMTSBaseLayers").split(',')}}]
+    else:
+        mapPath=conf["main"]["dataPath"]+"/public_maps/project_"+(inputs["table"]["value"].replace(".","___"))+".map"
+        if os.path.exists(mapPath):
+            m=mapscript.mapObj(mapPath)
+            if mmap.getMetadata(m.web,"mmProprietaryBaseLayers")=="Bing":
+                bl+=[{"bing":{"key":mmap.getMetadata(m.web,"mmBAK"),"layers":mmap.getMetadata(m.web,"mmPBaseLayers").split(','),"all_layers": conf["mm"]["bbLayers"].split(","),"all_layer_labels": conf["mm"]["bbLayerAlias"].split(",")}}]
+            if mmap.getMetadata(m.web,"mmWMTSBLURL") is not None:
+                bl+=[{"wmts":{"attribution":open(mmap.getMetadata(m.web,"mmWMTSAttribution").replace(conf["main"]["tmpUrl"],conf["main"]["tmpPath"])).read(),"layers":mmap.getMetadata(m.web,"mmWMTSBaseLayers").split(',')}}]
+    outputs["Result"]["value"]=json.dumps(bl)
+    return zoo.SERVICE_SUCCEEDED
+
 
 def getIndexQuote(conf,inputs,outputs):
     import authenticate.service as auth

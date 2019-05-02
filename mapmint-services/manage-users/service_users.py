@@ -337,7 +337,7 @@ def AddUser(conf,inputs,outputs):
                 if inputs.has_key("group"):
                     if inputs["group"].has_key("length"):
                         for i in range(0,len(inputs["group"]["value"])):
-                            linkGroupToUser(conf,c,prefix,inputs["group"]["value"],user["login"])
+                            linkGroupToUser(conf,c,prefix,inputs["group"]["value"][i],user["login"])
                     else:
                         linkGroupToUser(conf,c,prefix,inputs["group"]["value"],user["login"])
                 return 3

@@ -485,10 +485,12 @@ function createSqliteDB4ME(conf,inputs,outputs){
     var myExecuteResult0=eval(myExecuteResult);
     alert(myExecuteResult);
     alert(myExecuteResult0);
+    var mmPrimaryTables=[];
     for(var i=0;i<myExecuteResult0.length;i++){
 	conf["lenv"]["message"]="Export structure:"+" "+myExecuteResult0[i]["name"];
 	ZOOUpdateStatus(conf,((((50-16)/myExecuteResult0.length)*i)+16));
 	alert("+++++ >"+i+" "+myExecuteResult0[i]);
+	mmPrimaryTables.push(myExecuteResult0[i]["name"]);
 	alert("+++++ >"+"SELECT * FROM "+myExecuteResult0[i]["name"]+" limit 0 ");
 	var myInputs={
 	    "append": {"value": "true","type":"string"},
@@ -601,7 +603,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
     for(var i=0;i<myExecuteResult0.length;i++){
 	alert(myExecuteResult0[i]["value"]);
 	var matched=myExecuteResult0[i]["value"].match(/(\w+)(\d*)\.(\d*)(\w+)/);
-	if(matched!=null && matched[0]){
+	if(matched!=null && matched[1]){
 	    conf["lenv"]["message"]="Export reference tables: "+matched[0];
 	    ZOOUpdateStatus(conf,(((20/myExecuteResult0.length)*i)+50));
 	    alert("+++++ >"+i+" "+matched[0]);
@@ -775,7 +777,6 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	    alert(myExecuteResult0[i]["name"]);
 	}
     }    
-
     for(var i=0;i<indexesToCreate.length;i++){
 	conf["lenv"]["message"]="Create indexes ...";
 	ZOOUpdateStatus(conf,((9/indexesToCreate.length)*i)+90);
@@ -794,6 +795,14 @@ function createSqliteDB4ME(conf,inputs,outputs){
     outputs["Result2"]["generated_file"]=conf["main"]["tmpPath"]+"/tiles.db";
     else
     outputs["Result2"]["generated_file"]=conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+inputs["tileId"]["value"]+".db";
+    myInputs={
+      "table": {"value": mmPrimaryTables,"isArray":true,"length": mmPrimaryTables.length,"dataType":"string"}
+    }
+    var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'np.getBaseLayersForTable');
+    var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
+    alert(myExecuteResult);
+    outputs["Result3"]["value"]=myExecuteResult;
     return {result: ZOO.SERVICE_SUCCEEDED, conf: conf, outputs: outputs };
     
 }
