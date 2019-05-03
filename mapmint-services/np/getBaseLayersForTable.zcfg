@@ -1,0 +1,30 @@
+[getBaseLayersForTable]
+ Title = Get base layers used by tables.
+ Abstract = Get the base layers available in every project linked to a table.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceProvider = service
+ serviceType = Python
+ <DataInputs>
+  [table]
+   Title = Fields used to joind the two dataSources
+   Abstract = Fields used to joind the two dataSources
+   minOccurs = 1
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting message
+   Abstract = The resulting message
+   <ComplexData>
+    <Default>
+     mimeType = application/json
+     encoding = utf-8
+    </Default>
+   </ComplexData>
+ </DataOutputs>

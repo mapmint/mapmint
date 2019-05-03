@@ -10,7 +10,7 @@ function getMapLayersInfo(conf){
     };
     var myExecuteResult1=myProcess1.Execute(inputs,myOutputs);
     var tmp=eval(myExecuteResult1.replace('None','null'));
-    return tmp;
+    return tmp[0];
 }
 
 /**
