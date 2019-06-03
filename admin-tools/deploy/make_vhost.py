@@ -1,16 +1,16 @@
 #!/usr/bin/python
 
-import ConfigParser
+import configparser
 import getopt, sys
 
 def usage():
-	print '''
+	print('''
 %s
 	-b, --base_dir repertoire d'installation de l'instance mapmint
 	-u, --url      vhost de l'instance mapmint 
 	-d, --dst      fichier destination
 	La configuration utilise l'arborescence standard de mapmint
-'''%(sys.argv[0])
+'''%(sys.argv[0]))
 
 base_dir = ""
 url = ""
@@ -19,8 +19,8 @@ dst = ""
 
 try:
 	opts, args = getopt.getopt(sys.argv[1:], "b:u:d:h", ["base_dir=", "url=","dst="])
-except getopt.GetoptError, err:
-	print str(err)
+except getopt.GetoptError as err:
+	print(str(err))
 	usage()
 	sys.exit(2)
 
@@ -92,8 +92,8 @@ try:
 	df = open(dst,'w')
 	df.write(conf_apache)
 	df.close()
-except Exception,e:
-	print 'impossible de crer la configuration du vhost %s'%(dst)
+except Exception as e:
+	print('impossible de crer la configuration du vhost %s'%(dst))
 	sys.exit(2)
 
 

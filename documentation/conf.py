@@ -40,8 +40,8 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General information about the project.
-project = u'MapMint User Guide'
-copyright = u'2014, MapMint team'
+project = 'MapMint User Guide'
+copyright = '2014, MapMint team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -189,8 +189,8 @@ htmlhelp_basename = 'ZOOProjectdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'MapMint.tex', u'MapMint User Guide',
-   u'Gérald Fenoy, Nicolas Bozon', 'manual'),
+  ('index', 'MapMint.tex', 'MapMint User Guide',
+   'Gérald Fenoy, Nicolas Bozon', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -222,18 +222,18 @@ latex_preamble = '\setcounter{tocdepth}{2}'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'mapmint', u'MapMint User Guide',
-     [u'Gérald Fenoy, Nicolas Bozon'], 1)
+    ('index', 'mapmint', 'MapMint User Guide',
+     ['Gérald Fenoy, Nicolas Bozon'], 1)
 ]
 
 
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'MapMint User Guide'
-epub_author = u'Gérald Fenoy, Nicolas Bozon'
-epub_publisher = u'Gérald Fenoy, Nicolas Bozon'
-epub_copyright = u'2011,Gérald Fenoy, Nicolas Bozon'
+epub_title = 'MapMint User Guide'
+epub_author = 'Gérald Fenoy, Nicolas Bozon'
+epub_publisher = 'Gérald Fenoy, Nicolas Bozon'
+epub_copyright = '2011,Gérald Fenoy, Nicolas Bozon'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

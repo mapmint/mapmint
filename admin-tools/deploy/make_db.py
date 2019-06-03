@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 
-import ConfigParser
+import configparser
 import getopt, sys
 import sqlite3
 import smtplib
@@ -12,21 +12,21 @@ import string
 
 
 def usage():
-	print '''
+	print('''
 %s
 	-u, --url      vhost de l'instance mapmint 
 	-e, --email    adresse utilisateur
 	-d, --dst      fichier destination
 	La configuration utilise l'arborescence standard de mapmint
-'''%(sys.argv[0])
+'''%(sys.argv[0]))
 
 url = ""
 email = ""
 dst = ""
 try:
 	opts, args = getopt.getopt(sys.argv[1:], "u:e:d:h", ["url=","email=","dst="])
-except getopt.GetoptError, err:
-	print str(err)
+except getopt.GetoptError as err:
+	print(str(err))
 	usage()
 	sys.exit(2)
 
@@ -73,8 +73,8 @@ try:
 	c.execute(req_create)
 	c.execute(req)
 	conn.commit()
-except Exception,e:
-	print repr(e)
+except Exception as e:
+	print(repr(e))
 	exit(2)
 c.close()
 
@@ -94,4 +94,4 @@ header = "Subject: Mapmint Free trial\r\nFrom: trial@mapmint.com\r\nTo: %s\r\n\r
 server = smtplib.SMTP('localhost')
 server.sendmail('david@mapmint.com', toaddrs, header+msg)
 
-print passwd
+print(passwd)

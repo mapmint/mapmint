@@ -1,18 +1,18 @@
 #!/usr/bin/python
 
 
-import ConfigParser
+import configparser
 import getopt, sys
 
 def usage():
-	print '''
+	print('''
 %s
 	-b, --base_dir repertoire d'installation de l'instance mapmint
 	-u, --url      vhost de l'instance mapmint 
 	-f, --file     fichier de conf de reference
 	-d, --dst      fichier destination
 	La configuration utilise l'arborescence standard de mapmint
-'''%(sys.argv[0])
+'''%(sys.argv[0]))
 
 base_dir = ""
 url = ""
@@ -22,8 +22,8 @@ dst = ""
 
 try:
 	opts, args = getopt.getopt(sys.argv[1:], "b:u:f:d:h", ["base_dir=", "url=","file=","dst="])
-except getopt.GetoptError, err:
-	print str(err)
+except getopt.GetoptError as err:
+	print(str(err))
 	usage()
 	sys.exit(2)
 
@@ -49,14 +49,14 @@ if base_dir == "" or url == "" or  fichier == "" or dst == "":
 
 
 
-config_default = ConfigParser.ConfigParser()
+config_default = configparser.ConfigParser()
 config_default.optionxform = str
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 config.optionxform = str
 try:
 	config_default.readfp(open(fichier))
-except Exception,e:
-	print 'Erreur d\'acces a %s'%(fichier)
+except Exception as e:
+	print('Erreur d\'acces a %s'%(fichier))
 	sys.exit(2)
 	
 main_d = {}
@@ -95,13 +95,13 @@ for s in sections:
 	i = config_default.items(s)
 	config.add_section(s)
 	for c in i:
-		if conf[s].has_key(c[0]):
+		if c[0] in conf[s]:
 			config.set(s,c[0],conf[s][c[0]])
 		else:
 			config.set(s,c[0],c[1])
 try:
 	with open(dst, 'w') as configfile:
 		config.write(configfile)
-except Exception,e:
-	print 'Erreur lors de l\'ecriture de % '%(dst)
+except Exception as e:
+	print('Erreur lors de l\'ecriture de % '%(dst))
 	sys.exit(2)
