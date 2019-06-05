@@ -220,21 +220,21 @@ def registerUser(conf,inputs,outputs):
 	cur=conn.cursor()
 	try:
 		sql="INSERT INTO "+prefix+"users ("+fieldsStr+") VALUES("+valuesStr+")"
-		print >> sys.stderr,sql
+		print(sql, file=sys.stderr)
 		con.pexecute_req([sql,params])
 		sql="INSERT INTO "+prefix+"user_group (id_group,id_user) VALUES([_id_group_],(select last_value from "+prefix+(prefix.replace(".","_"))+"users_idseq))"
 		con.pexecute_req([sql,{"id_group":{"value":inputs["values"]["value"][inputs["fields"]["value"].index("s_group_id")],"format":"s"}}])
-		if conf.has_key("smtp"):
+		if "smtp" in conf:
 			sendMail(conf,"register",mail,login,"XXX")
 		conn.commit()
-	except Exception,e:
+	except Exception as e:
 		conf["lenv"]["message"]=zoo._("Unable to register the user: ")+str(e)
 		return zoo.SERVICE_FAILED
 	outputs["Result"]["value"]=zoo._("User have been successfully registered.")
 	return zoo.SERVICE_SUCCEEDED
 
 def clogIn(conf,inputs,outputs):
-    if conf.keys().count("senv") > 0 and conf["senv"].has_key("loggedin") and conf["senv"]["loggedin"]=="true":
+    if list(conf.keys()).count("senv") > 0 and "loggedin" in conf["senv"] and conf["senv"]["loggedin"]=="true":
         conf["lenv"]["message"]=zoo._("No need to authenticate")
         return zoo.SERVICE_FAILED
     con=getCon(conf)
@@ -253,10 +253,10 @@ def clogIn(conf,inputs,outputs):
     if len(a)>0:
         # Set all the Session environment variables using the users 
         # table content.
-        print >> sys.stderr,a
+        print(a, file=sys.stderr)
         cid="MM"+conf["lenv"]["usid"]
         conf["lenv"]["cookie"]="MMID="+cid+"; path=/"
-        if conf.keys().count("senv")==0:
+        if list(conf.keys()).count("senv")==0:
             cid="MM"+conf["lenv"]["usid"]
             conf["lenv"]["cookie"]="MMID="+cid+"; path=/"
             conf["lenv"]["cookieArray"]="MMID="+cid+"; path=/"
@@ -328,7 +328,7 @@ def clogIn(conf,inputs,outputs):
     return zoo.SERVICE_FAILED
 
 def clogOut(conf,inputs,outputs):
-    if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
+    if list(conf.keys()).count("senv")>0 and list(conf["senv"].keys()).count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
         outputs["Result"]["value"]=zoo._("User disconnected")
         conf["senv"]["loggedin"]="false"
         conf["senv"]["login"]="anonymous"
@@ -344,7 +344,7 @@ def clogOut(conf,inputs,outputs):
     return zoo.SERVICE_FAILED
 
 def logOut(conf,inputs,outputs):
-    if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
+    if list(conf.keys()).count("senv")>0 and list(conf["senv"].keys()).count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
         outputs["Result"]["value"]=zoo._("User disconnected")
         conf["senv"]["loggedin"]="false"
         conf["senv"]["login"]="anonymous"
@@ -389,7 +389,7 @@ def isSadm(conf):
 	return a[0][0]
 	
 def logIn(conf,inputs,outputs):
-    if conf.keys().count("senv") > 0 and conf["senv"] and conf["senv"]["loggedin"]=="true":
+    if list(conf.keys()).count("senv") > 0 and conf["senv"] and conf["senv"]["loggedin"]=="true":
         conf["lenv"]["message"]=zoo._("No need to authenticate")
         return zoo.SERVICE_FAILED
     con=getCon(conf)
