@@ -234,7 +234,8 @@ def registerUser(conf,inputs,outputs):
 	return zoo.SERVICE_SUCCEEDED
 
 def clogIn(conf,inputs,outputs):
-    if list(conf.keys()).count("senv") > 0 and "loggedin" in conf["senv"] and conf["senv"]["loggedin"]=="true":
+    # TODO: confirm assumption: conf is Python dictionary
+    if "senv" in conf and "loggedin" in conf["senv"] and conf["senv"]["loggedin"]=="true":
         conf["lenv"]["message"]=zoo._("No need to authenticate")
         return zoo.SERVICE_FAILED
     con=getCon(conf)
@@ -256,7 +257,7 @@ def clogIn(conf,inputs,outputs):
         print(a, file=sys.stderr)
         cid="MM"+conf["lenv"]["usid"]
         conf["lenv"]["cookie"]="MMID="+cid+"; path=/"
-        if list(conf.keys()).count("senv")==0:
+        if "senv" not in conf:
             cid="MM"+conf["lenv"]["usid"]
             conf["lenv"]["cookie"]="MMID="+cid+"; path=/"
             conf["lenv"]["cookieArray"]="MMID="+cid+"; path=/"
@@ -328,7 +329,9 @@ def clogIn(conf,inputs,outputs):
     return zoo.SERVICE_FAILED
 
 def clogOut(conf,inputs,outputs):
-    if list(conf.keys()).count("senv")>0 and list(conf["senv"].keys()).count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
+    # TODO: confirm assumption: conf is Python dictionary
+    # TODO: confirm assumption: conf["senv"] is Python dictionary
+    if "senv" in conf and "loggedin" in conf["senv"] and conf["senv"]["loggedin"]=="true":
         outputs["Result"]["value"]=zoo._("User disconnected")
         conf["senv"]["loggedin"]="false"
         conf["senv"]["login"]="anonymous"
@@ -344,7 +347,9 @@ def clogOut(conf,inputs,outputs):
     return zoo.SERVICE_FAILED
 
 def logOut(conf,inputs,outputs):
-    if list(conf.keys()).count("senv")>0 and list(conf["senv"].keys()).count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
+    # TODO: confirm assumption: conf is Python dictionary
+    # TODO: confirm assumption: conf["senv"] is Python dictionary
+    if "senv" in conf and "loggedin" in conf["senv"] and conf["senv"]["loggedin"]=="true":
         outputs["Result"]["value"]=zoo._("User disconnected")
         conf["senv"]["loggedin"]="false"
         conf["senv"]["login"]="anonymous"
@@ -389,7 +394,8 @@ def isSadm(conf):
 	return a[0][0]
 	
 def logIn(conf,inputs,outputs):
-    if list(conf.keys()).count("senv") > 0 and conf["senv"] and conf["senv"]["loggedin"]=="true":
+    # TODO: confirm assumption: conf is Python dictionary
+    if "senv" in conf and conf["senv"] and conf["senv"]["loggedin"]=="true":
         conf["lenv"]["message"]=zoo._("No need to authenticate")
         return zoo.SERVICE_FAILED
     con=getCon(conf)
