@@ -38,24 +38,24 @@ except:
 
 def loginFlux(conf,h):
     import requests
-    print >>  sys.stderr," ***************** TEST 1 **************"
+    print(" ***************** TEST 1 **************", file=sys.stderr)
     dataParam = {'mp': h.hexdigest(), 'email': conf["senv"]["mail"]}
-    print >>  sys.stderr,str(dataParam)
+    print(str(dataParam), file=sys.stderr)
     urlCon ="http://sigcod.geolabs.fr/flux/Services/service_connect"
     try:
-        print >>  sys.stderr," ***************** TEST 2 **************"
+        print(" ***************** TEST 2 **************", file=sys.stderr)
         myRequest = requests.post(urlCon, data=dataParam)         
-        print >>  sys.stderr," ***************** TEST 3 **************"
-        print >>  sys.stderr,myRequest.headers["set-cookie"].split(";")[2].split(",")[1]
+        print(" ***************** TEST 3 **************", file=sys.stderr)
+        print(myRequest.headers["set-cookie"].split(";")[2].split(",")[1], file=sys.stderr)
         conf["senv"]["ecookie"]=myRequest.headers["set-cookie"].split(";")[2].split(",")[1]+"; path=/"
         conf["senv"]["ecookie_length"]=str(1)
-        print >>  sys.stderr,dir(myRequest)
+        print(dir(myRequest), file=sys.stderr)
         conf["lenv"]["ecookie"]=myRequest.headers["set-cookie"].split(";")[2].split(",")[1]+"; path=/"
         conf["lenv"]["ecookie_length"]=str(1)
-        print >>  sys.stderr," ***************** TEST 4 **************"
+        print(" ***************** TEST 4 **************", file=sys.stderr)
         return zoo.SERVICE_SUCCEEDED
     except:
-        print >>  sys.stderr," ***************** EXCEPT **************"
+        print(" ***************** EXCEPT **************", file=sys.stderr)
         conf["lenv"]["message"]=zoo._("Unable to connect to flux")
         return zoo.SERVICE_FAILED
     
@@ -71,7 +71,7 @@ def parseDb(db):
 	for i in db:
 		if i!="schema":
 			dbstr+=" "+i+"="+db[i]
-	print >> sys.stderr,dbstr
+	print(dbstr, file=sys.stderr)
 	return dbstr
 
 def is_ftable(value):
@@ -86,16 +86,16 @@ def is_ftable(value):
                 return False
 
 def getCon(conf):
-	if conf["main"].has_key(conf["main"]["dbuser"]) and conf["main"]["dbuser"]=="dblink":
+	if conf["main"]["dbuser"] in conf["main"] and conf["main"]["dbuser"]=="dblink":
 		con=manage_users(conf["main"][conf["main"]["dbuser"]])
 	else:
-		if conf.has_key(conf["main"]["dbuser"]):
+		if conf["main"]["dbuser"] in conf:
 			con=manage_users(parseDb(conf[conf["main"]["dbuser"]]))
 	con.connect(conf)
 	return con
 
 def getPrefix(conf):
-	if conf.has_key(conf["main"]["dbuser"]) and conf[conf["main"]["dbuser"]].has_key("schema"):
+	if conf["main"]["dbuser"] in conf and "schema" in conf[conf["main"]["dbuser"]]:
 		prefix=conf[conf["main"]["dbuser"]]["schema"]+"."
 	else:
 		prefix=""
@@ -109,20 +109,20 @@ def sendMail(conf,typ,dest,login,passwd):
 	msg=MIMEText(msgTxt,_charset='utf-8')
 	f1=open(conf["smtp"][typ+"_subject"])
 	msg['Subject'] = zoo._(f1.read()).replace('\n','').encode("utf-8")
-	if conf["smtp"].has_key('ufrom'):
+	if 'ufrom' in conf["smtp"]:
 		msg["From"]="<"+conf["smtp"]["from"]+"> "+zoo._(conf["smtp"]["ufrom"])
 	else:
 		msg["From"]=conf["smtp"]["from"]
 	msg["To"]=dest
 	serv=smtplib.SMTP(conf["smtp"]["host"],conf["smtp"]["port"])
-	if conf["smtp"].has_key("login"):
+	if "login" in conf["smtp"]:
 		serv.login(conf["smtp"]["login"],conf["smtp"]["passwd"])
 	serv.sendmail(conf["smtp"]["from"], [dest], msg.as_string())
 	
 	
 def getLostPassword(conf,inputs,outputs):
 	import random,string
-	if not(conf.has_key("smtp")):
+	if not("smtp" in conf):
 		conf["lenv"]["message"]=zoo._("SMTP is not properly configured on your instance, please follow instructions from the official documentation.")
 		return zoo.SERVICE_FAILED
 	passwd = ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(8))
@@ -141,7 +141,7 @@ def getLostPassword(conf,inputs,outputs):
 			conn.cur.pexecute_req(['update '+prefix+'users set passwd=[_password_] where login=[_login_]',{"password": {"value":h.hexdigest(),"format":"s"},"login":{"value":a[0][0],"format":"s"}}])
 			conn.commit()
 			sendMail(conf,"recovery",a[0][1],a[0][0],passwd)
-		except Exception,e:
+		except Exception as e:
 			conf["lenv"]["message"]=zoo._("Unable to send the mail containing your new password: ")+str(e)
 			return zoo.SERVICE_FAILED
 	else:
@@ -157,7 +157,7 @@ def saveUserPreferences(conf,inputs,outputs):
 	prefix=getPrefix(conf)
 	j=0
 	sqlStr=""
-	if inputs["fields"].has_key("length"):
+	if "length" in inputs["fields"]:
 		for i in inputs["fields"]["value"]:
 			if i!="login" and inputs["values"]["value"][j]!="NULL":
 				if sqlStr!="":
@@ -171,13 +171,13 @@ def saveUserPreferences(conf,inputs,outputs):
 			j+=1
 	else:
 		sqlStr+=inputs["fields"]["value"]+"='"+inputs["values"]["value"]+"'"		
-	print >> sys.stderr,sqlStr
+	print(sqlStr, file=sys.stderr)
 	cur=conn.cursor()
 	try:
 		sql="UPDATE "+prefix+"users set "+sqlStr+" where login=[_login_]"
 		con.pexecute_req([sql,{"login":{"value":conf["senv"]["login"],"format":"s"}}])
 		conn.commit()
-	except Exception,e:
+	except Exception as e:
 		conf["lenv"]["message"]=zoo._("Unable to update user preferences: ")+str(e)
 		return zoo.SERVICE_FAILED
 	outputs["Result"]["value"]=zoo._("User preferences saved.")
@@ -280,30 +280,30 @@ def clogIn(conf,inputs,outputs):
         
         for i in desc:
             if i[1]=='login':
-                print >>  sys.stderr," ***************** TEST **************"
+                print(" ***************** TEST **************", file=sys.stderr)
                 #conf["senv"]["login"]=a[0][i[0]].encode('utf-8')
                 dataParam = {'mp': h.hexdigest(), 'email': conf["senv"]["mail"]}
-                print >>  sys.stderr,str(dataParam)
+                print(str(dataParam), file=sys.stderr)
                 urlCon ="http://sigcod.geolabs.fr/flux/Services/service_connect"
                 try:
-                    print >>  sys.stderr," ***************** TEST **************"
+                    print(" ***************** TEST **************", file=sys.stderr)
                     myRequest = requests.post(urlCon, data=dataParam)
                     
-                    print >>  sys.stderr," ***************** TEST **************"
-                    print >>  sys.stderr,myRequest.headers["set-cookie"].split(";")[2].split(",")[1]
+                    print(" ***************** TEST **************", file=sys.stderr)
+                    print(myRequest.headers["set-cookie"].split(";")[2].split(",")[1], file=sys.stderr)
                     conf["senv"]["ecookie"]=myRequest.headers["set-cookie"].split(";")[2].split(",")[1]+"; path=/"
                     conf["senv"]["ecookie_length"]=str(1)
-                    print >>  sys.stderr,dir(myRequest)
+                    print(dir(myRequest), file=sys.stderr)
                     conf["lenv"]["ecookie"]=myRequest.headers["set-cookie"].split(";")[2].split(",")[1]+"; path=/"
                     conf["lenv"]["ecookie_length"]=str(1)
-                    print >>  sys.stderr," ***************** TEST **************"
+                    print(" ***************** TEST **************", file=sys.stderr)
                 except:
                     conf["lenv"]["message"]=zoo._("Unable to connect to flux")
                     return zoo.SERVICE_FAILED
                 
                 break
         conf["senv"]["loggedin"]="true"
-        if conf["main"].has_key("isTrial") and conf["main"]["isTrial"]=="true":
+        if "isTrial" in conf["main"] and conf["main"]["isTrial"]=="true":
             conf["senv"]["isTrial"]="true"
         else:
             conf["senv"]["isTrial"]="false"
@@ -376,7 +376,7 @@ def getGroup(conf,con,login):
 				res+=a[i][j]
 		return res
 	except Exception as e:
-		print >> sys.stderr,zoo._("Error when processing SQL query: ")+str(e)
+		print(zoo._("Error when processing SQL query: ")+str(e), file=sys.stderr)
 		return None
 
 def isSadm(conf):
@@ -448,7 +448,7 @@ def logIn(conf,inputs,outputs):
         conf["senv"]["loggedin"]="true"
         conf["senv"]["isAdmin"]="true"
 
-        if conf["main"].has_key("isTrial") and conf["main"]["isTrial"]=="true":
+        if "isTrial" in conf["main"] and conf["main"]["isTrial"]=="true":
             conf["senv"]["isTrial"]="true"
         else:
             conf["senv"]["isTrial"]="false"
