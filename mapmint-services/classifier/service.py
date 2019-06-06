@@ -50,7 +50,8 @@ def write_png_in_mem(outputs, width, height, rgb_func):
             for x in range(width):
                 fx = float(x)
                 data.extend([int(v * 255) for v in rgb_func(fx / fw, fy / fh)])
-                if list(outputs.keys()).count("Result1") == 0:
+                # TODO: confirm assumption: outputs is Python dictionary object
+                if "Result1" not in outputs:
                     outputs["Result1"] = {"value": []}
                 outputs["Result1"]["value"] += [[int(v * 255) for v in rgb_func(fx / fw, fy / fh)]]
                 # print >> sys.stderr,outputs["Result1"]["value"]
