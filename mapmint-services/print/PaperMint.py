@@ -92,7 +92,8 @@ class LOClient:
         @param name Document filename
         """
         # get the file name of the document
-        if list(self.docList.keys()).count(name) > 0:
+        # TODO: confirm assumption: self.docList is Python dictionary object
+        if name in self.docList:
             self.doc = self.docList[name][0]
             self.format = self.docList[name][1]
         else:
