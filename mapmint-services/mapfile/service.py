@@ -123,14 +123,14 @@ def saveFlyAddress(conf,inputs,outputs):
 	return zoo.SERVICE_SUCCEEDED
 
 def saveComplexSearch(conf,inputs,outputs):
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
 	import mapscript
 	m = mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+conf["senv"]["last_map"]+".map")
 	l=m.getLayerByName(inputs["layer"]["value"])
 	setMetadata(l,"mmCS","true")    
 	tmp=["colonne_class","alias_class","ids_class","sessions_class","values_class","deps_class","orders_class","multiples_class","subscription","legend"]
-	tmp0=list(inputs.keys())
 	for i in tmp:
-		if tmp0.count(i)>0:
+		if i in inputs:
 			setMetadata(l,"mmCS_"+i,inputs[i]["value"])
 		else:
 			try:
@@ -246,7 +246,8 @@ def options(conf,inputs,outputs):
 def openInManager(conf,inputs,outputs):
     import mm_access
     
-    if list(inputs["dson"].keys()).count('length')==0:
+    # TODO: confirm assumption: inputs["dson"] is a Python 3 dictionary object
+    if 'length' not in inputs["dson"] :
         if not(mm_access.checkDataSourcePriv(conf,None,inputs["dstn"]["value"],inputs["dson"]["value"],"r")):
             conf["lenv"]["message"]=zoo._("You're not allowed to access the ressource")
             return zoo.SERVICE_FAILED
@@ -283,7 +284,8 @@ def openInManager(conf,inputs,outputs):
     while i >= 0:
         l=m.getLayer(i)
         print(l.name, file=sys.stderr)
-        if (list(inputs["dson"].keys()).count('length')==0 and l.name!=inputs["dson"]["value"]) or (inputs["dson"]["value"].count(l.name)==0):
+        # TODO: confirm assumption: inputs["dson"] is a Python 3 dictionary object
+        if ( ('length' not in inputs["dson"]) and l.name!=inputs["dson"]["value"]) or ( l.name not in inputs["dson"]["value"] ):
             m.removeLayer(i)
         else:
             setMetadata(l,"ows_srs","EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
@@ -618,7 +620,8 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
                                                     fName=conf["main"]["tmpPath"]+'/'+inputs["dataStore"]["value"].replace("WMS:","")+"_layer_"+str(i)+"_"+str(j)+".vrt"
                                                     f=open(fName,"w")
                                                     content='<GDAL_WMS><Service name="WMS"><Version>1.3.0</Version><ServerUrl>'+o.scheme+'://'+o.netloc+'/'+o.path+'?time='+dimension[j]+'&reference_time='+dimension[j]+'</ServerUrl><ImageFormat>image/png</ImageFormat><Layers>'+str(params['LAYERS'][0])+'</Layers>'
-                                                    if list(params.keys()).count("BBOXORDER")>0:
+                                                    # TODO: confirm assumption: "params" is a Python dictionary object
+                                                    if "BBOXORDER" in params :
                                                         content+='<BBoxOrder>'+str(params['BBOXORDER'][0])+'</BBoxOrder>'
                                                     content+='<CRS>'+str(params['CRS'][0])+'</CRS><Transparent>TRUE</Transparent></Service><DataWindow><SizeX>'+str(ds.RasterXSize)+'</SizeX><SizeY>'+str(ds.RasterYSize)+'</SizeY></DataWindow><ClampRequests>false</ClampRequests><Timeout>600</Timeout><BandsCount>4</BandsCount><MaxConnections>10</MaxConnections></GDAL_WMS>'
                                                     f.write(content)
@@ -641,7 +644,8 @@ def mmVectorInfo2MapPy(conf,inputs,outputs):
                                     fName=conf["main"]["tmpPath"]+'/'+inputs["dataStore"]["value"].replace("WMS:","")+"_layer_"+str(i)+".vrt"
                                     f=open(fName,"w")
                                     content='<GDAL_WMS><Service name="WMS"><Version>1.3.0</Version><ServerUrl>'+o.scheme+'://'+o.netloc+'/'+o.path+'</ServerUrl><ImageFormat>image/png</ImageFormat><Layers>'+str(params['LAYERS'][0])+'</Layers>'
-                                    if list(params.keys()).count("BBOXORDER"):
+                                    # TODO: confirm assumption: "params" is a Python 3 dictionary object
+                                    if "BBOXORDER" in params :
                                         content+='<BBoxOrder>'+str(params['BBOXORDER'][0])+'</BBoxOrder>'
                                     content+='<CRS>'+str(params['CRS'][0])+'</CRS><Transparent>TRUE</Transparent></Service><DataWindow><SizeX>'+str(ds.RasterXSize)+'</SizeX><SizeY>'+str(ds.RasterYSize)+'</SizeY></DataWindow><ClampRequests>false</ClampRequests><Timeout>600</Timeout><BandsCount>4</BandsCount><MaxConnections>100</MaxConnections></GDAL_WMS>'
                                     print(content, file=sys.stderr)
@@ -728,7 +732,9 @@ def loadMapForDs(conf,inputs,outputs):
     outputs1=outputs
     if isinstance(inputs["dsoName"]["value"], (list, tuple)):
         inputs1={}
-        for i in list(inputs.keys()):
+        # TODO: confirm optimization
+        # for i in list(inputs.keys()):
+        for i in inputs.keys():
             if(i!="dsoName"):
                 inputs1[i]=inputs[i]
         for i in range(0,len(inputs["dsoName"]["value"])):
@@ -1152,10 +1158,13 @@ def createLegend0(conf,inputs,outputs):
     outColor=""
     oldM=m.clone()
     mmClass=0
-    if list(inputs.keys()).count("mmClass")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmClass")>0:
+    if "mmClass" in inputs :
         mmClass=int(inputs["mmClass"]["value"])
     mmStyle=0
-    if list(inputs.keys()).count("mmStyle")>0:
+    # if list(inputs.keys()).count("mmStyle")>0:
+    if "mmStyle" in inputs :
         mmStyle=int(inputs["mmStyle"]["value"])
     i=m.numlayers-1
     layers=[]
@@ -1521,7 +1530,9 @@ def createLegend0(conf,inputs,outputs):
         "labelMax": "mmLabelMaxScale",
         "tiled": "mmTiled",
         }
-    for i in list(metadataKeys.keys()):
+    # TODO: confirm assumption: "metadataKeys" is a Python dictionary object
+    # for i in list(metadataKeys.keys()):
+    for i in metadataKeys.keys():
         nameSpace[i]=layer.metadata.get(metadataKeys[i])
     metadataKeys={
         "gfi_fields": "mmGFIFields",
@@ -1529,14 +1540,16 @@ def createLegend0(conf,inputs,outputs):
         "gfi_aliases": "mmGFIFieldsAliases",
         "exp_fields": "mmEFields",
         }
-    for i in list(metadataKeys.keys()):
+    # TODO: confirm assumption: "metadataKeys" is a Python 3 dictionary object
+    for i in metadataKeys.keys():
         if layer.metadata.get(metadataKeys[i]) is not None:
             nameSpace[i]=layer.metadata.get(metadataKeys[i]).split(",")
 
     metadataKeys={
         "bands": "ows_bandnames",
         }
-    for i in list(metadataKeys.keys()):
+    # TODO: confirm assumption: "metadataKeys" is a Python 3 dictionary object
+    for i in metadataKeys.keys():
         if layer.metadata.get(metadataKeys[i]) is not None:
             nameSpace[i]=layer.metadata.get(metadataKeys[i]).split(" ")
             
@@ -1550,7 +1563,8 @@ def createLegend0(conf,inputs,outputs):
         "Band6_interval": "band6",
         "Band7_interval": "band7",
         }
-    for i in list(metadataKeys.keys()):
+    # TODO: confirm assumption: "metadataKeys" is a Python 3 dictionary object
+    for i in metadataKeys.keys():
         if layer.metadata.get(i) is not None:
             tmpv=layer.metadata.get(i).split(" ")
             nameSpace[metadataKeys[i]]=[float(tmpv[0]),float(tmpv[1])]
@@ -1593,7 +1607,9 @@ def createLegend(conf,inputs,outputs):
             m=mapscript.mapObj(mapPath+"/timeline_Index"+conf["senv"]["last_index"]+"_indexes_view_idx"+conf["senv"]["last_index"]+"_step"+inputs["mmStep"]["value"]+".map")
         inputs["isStep"]={"value": "true"}
     else:
-        if list(inputs.keys()).count("map")>0 and inputs["map"]["value"].count(conf["main"]["dataPath"])>0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("map")>0 and inputs["map"]["value"].count(conf["main"]["dataPath"])>0:
+        if "map" in inputs and inputs["map"]["value"].count(conf["main"]["dataPath"])>0:
             m=mapscript.mapObj(inputs["map"]["value"])
         else:
             m=mapscript.mapObj(mapPath+"/project_"+inputs["name"]["value"]+".map")
@@ -1607,10 +1623,14 @@ def createLegend(conf,inputs,outputs):
     outColor=""
     oldM=m.clone()
     mmClass=0
-    if list(inputs.keys()).count("mmClass")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmClass")>0:
+    if "mmClass" in inputs:
         mmClass=int(inputs["mmClass"]["value"])
     mmStyle=0
-    if list(inputs.keys()).count("mmStyle")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmStyle")>0:
+    if "mmStyle" in inputs:
         mmStyle=int(inputs["mmStyle"]["value"])
     i=m.numlayers-1
     layers=[]
@@ -1810,7 +1830,9 @@ def createLegend(conf,inputs,outputs):
 	    else:
 		    t = Template(file=conf["main"]["templatesPath"]+"/Manager/Styler/ClassLegend.tmpl",searchList=nameSpace)
     else:
-	    if list(inputs.keys()).count("mmClass")==0:
+	    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+	    # if list(inputs.keys()).count("mmClass")==0:
+	    if "mmClass" not in inputs:
 		    t = Template(file=conf["main"]["templatesPath"]+"/Manager/Styler.tmpl",searchList=nameSpace)
 	    else:
 		    t = Template(file=conf["main"]["templatesPath"]+"/Manager/Styler/UniqSymb.tmpl",searchList=nameSpace)
@@ -1832,11 +1854,15 @@ def listMap(conf,inputs,outputs):
     import json
     res=[]
     prefix="";
-    if list(inputs.keys()).count("prefix")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("prefix")>0:
+    if "prefix" in inputs:
         prefix=inputs["prefix"]["value"]
     files = list(filter(os.path.isfile, glob.glob(conf["main"]["dataPath"]+"/"+prefix+"maps/" + "project_*.map")))
 
-    if list(inputs.keys()).count('orderList'):
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count('orderList'):
+    if 'orderList' in inputs:
         files.sort(key=lambda x: -os.path.getmtime(x))
     else:
         files.sort()
@@ -1976,7 +2002,9 @@ def saveLayerStyle0(conf,inputs,outputs):
     except:
         noColor=True
 
-    if list(inputs.keys()).count("mmClass"):
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmClass"):
+    if "mmClass" in inputs:
         nClass=int(inputs["mmClass"]["value"])
     else:
         nClass=0
@@ -1984,7 +2012,9 @@ def saveLayerStyle0(conf,inputs,outputs):
 
     print("Edit the "+str(nClass)+" classe ", file=sys.stderr)
     mmStyle=0
-    if list(inputs.keys()).count("mmStyle")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmStyle")>0:
+    if "mmStyle" in inputs:
         mmStyle=int(inputs["mmStyle"]["value"])
         if layer.getClass(nClass).numstyles<=2:
             print("Create new style for symbol fill", file=sys.stderr)
@@ -1992,9 +2022,13 @@ def saveLayerStyle0(conf,inputs,outputs):
             layer.getClass(nClass).getStyle(2).angle=0
 
     if layer is not None and layer.type==mapscript.MS_LAYER_POLYGON:
-        if list(inputs.keys()).count('mmSymbolFill')==0 and \
-            list(inputs.keys()).count("mmStyle")==0 and \
-            list(inputs.keys()).count('mmHatchWidth')==0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count('mmSymbolFill')==0 and \
+        #     list(inputs.keys()).count("mmStyle")==0 and \
+        #     list(inputs.keys()).count('mmHatchWidth')==0:
+        if "mmSymbolFill" in inputs and \
+            "mmStyle" in inputs and \
+            "mmHatchWidth" in inputs:
             if layer.getClass(nClass).numstyles>1:
                 lStyle=layer.getClass(nClass).getStyle(0)
                 lStyle.angle=0
@@ -2003,13 +2037,17 @@ def saveLayerStyle0(conf,inputs,outputs):
                 lStyle.symbolname=None
                 lStyle.width=layer.getClass(nClass).getStyle(1).width
                                         
-    if list(inputs.keys()).count('mmSymbolFill')>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count('mmSymbolFill')>0:
+    if "mmSymbolFill" in inputs:
         if layer.getClass(nClass).numstyles<=2:
             layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
             layer.getClass(nClass).getStyle(layer.getClass(nClass).numstyles-1).angle=0
     else:
         if layer is not None and layer.type==mapscript.MS_LAYER_POLYGON:
-            if list(inputs.keys()).count("mmStyle")==0:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("mmStyle")==0:
+            if "mmStyle" not in inputs:
                 if layer.getClass(nClass).numstyles>2:
                     layer.getClass(nClass).removeStyle(layer.getClass(nClass).numstyles-1)
     if "mmClassName" in inputs and layer is not None and layer is not None and layer.getClass(nClass) is not None:
@@ -2022,46 +2060,66 @@ def saveLayerStyle0(conf,inputs,outputs):
     print("Edit the "+str(nClass)+" classe "+str(not(noColor)), file=sys.stderr)
     if not(noColor) and layer is not None:
         layer.getClass(nClass).getStyle(mmStyle).opacity=int(inputs["mmOpacity"]["value"])
-        if list(inputs.keys()).count('noFill') > 0 or list(inputs.keys()).count('mmFill')==0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count('noFill') > 0 or list(inputs.keys()).count('mmFill')==0:
+        if ("noFill" in inputs) or ("mmFill" not in inputs):
             layer.getClass(nClass).getStyle(mmStyle).color.setRGB(-1,-1,-1)
         else:
             setRGB(layer.getClass(nClass).getStyle(mmStyle).color,fillColor)
             print("Fill  "+str(fillColor), file=sys.stderr)
 
-        if list(inputs.keys()).count('noStroke') > 0 or list(inputs.keys()).count('mmStroke')==0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count('noStroke') > 0 or list(inputs.keys()).count('mmStroke')==0:
+        if 'noStroke' in inputs or ('mmStroke' not in inputs):
             layer.getClass(nClass).getStyle(mmStyle).outlinecolor.setRGB(-1,-1,-1)
         else:
             setRGB(layer.getClass(nClass).getStyle(mmStyle).outlinecolor,strokeColor)
             print("Stroke "+str(strokeColor), file=sys.stderr)
-    if list(inputs.keys()).count("mmStrokeWidth") > 0  and list(inputs.keys()).count('mmStroke')>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmStrokeWidth") > 0  and list(inputs.keys()).count('mmStroke')>0:
+    if "mmStrokeWidth" in inputs and 'mmStroke' in inputs:
         layer.getClass(nClass).getStyle(mmStyle).outlinewidth=float(inputs["mmStrokeWidth"]["value"])
 
-    if list(inputs.keys()).count("force")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("force")>0:
+    if "force" in inputs:
         setMetadata(layer,"mmClass","us")
         j=layer.numclasses-1
         while j >= 0:
             if j!=0:
                 layer.removeClass(j)
             else:
-                if list(inputs.keys()).count("mmExpr")==0:
+                # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+                # if list(inputs.keys()).count("mmExpr")==0:
+                if "mmExpr" not in inputs:
 			layer.getClass(j).setExpression(None)
-		if list(inputs.keys()).count('noFill')>0 or list(inputs.keys()).count('mmFill')==0:
+		# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+		# if list(inputs.keys()).count('noFill')>0 or list(inputs.keys()).count('mmFill')==0:
+		if 'noFill' in inputs or ('mmFill' not in inputs):
                         layer.getClass(j).getStyle(mmStyle).color.setRGB(-1,-1,-1)
 		else:
                         setRGB(layer.getClass(j).getStyle(mmStyle).color,fillColor)
-		if list(inputs.keys()).count('noStroke') or list(inputs.keys()).count('mmStroke')==0:
+		# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+		# if list(inputs.keys()).count('noStroke') or list(inputs.keys()).count('mmStroke')==0:
+		if 'noStroke' in inputs or ('mmStroke' not in inputs):
                         layer.getClass(j).getStyle(mmStyle).outlinecolor.setRGB(-1,-1,-1)
 		else:
                         setRGB(layer.getClass(j).getStyle(mmStyle).outlinecolor,strokeColor)
             j-=1
-    if list(inputs.keys()).count("mmSize"):
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmSize"):
+    if "mmSize" in inputs:
         layer.getClass(nClass).getStyle(mmStyle).size=float(inputs["mmSize"]["value"])
-    if list(inputs.keys()).count("mmAngle"):
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmAngle"):
+    if "mmAngle" in inputs:
 	try:
 		layer.getClass(nClass).getStyle(mmStyle).angle=float(inputs["mmAngle"]["value"])
 	except:
 		layer.getClass(nClass).getStyle(mmStyle).angle=inputs["mmAngle"]["value"]
-    if list(inputs.keys()).count("mmSymb") > 0 and inputs["mmSymb"]["value"]!="":
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmSymb") > 0 and inputs["mmSymb"]["value"]!="":
+    if "mmSymb" in inputs and inputs["mmSymb"]["value"]!="":
         layer.getClass(nClass).getStyle(mmStyle).symbolname=inputs["mmSymb"]["value"].replace("Symbol_","")
         if inputs["mmSymb"]["value"]=="polygon_hatch":
             print("layer.getClass(nClass).numstyles 1 - "+str(layer.getClass(nClass).numstyles), file=sys.stderr)
@@ -2082,12 +2140,16 @@ def saveLayerStyle0(conf,inputs,outputs):
             style=layer.getClass(nClass).getStyle(1)
             setRGB(style.outlinecolor,strokeColor)
     else:
-        if list(inputs.keys()).count("mmSymb") > 0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("mmSymb") > 0:
+        if "mmSymb" in inputs:
             layer.getClass(nClass).getStyle(mmStyle).symbol=0
             layer.getClass(nClass).getStyle(mmStyle).symbolname=None
 
     if layer.type != mapscript.MS_LAYER_RASTER:
-        if list(inputs.keys()).count('mmSymbolFill'):
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count('mmSymbolFill'):
+        if 'mmSymbolFill' in inputs:
             myStyle=layer.getClass(nClass).getStyle(layer.getClass(nClass).numstyles-1)
             myStyle.symbolname=inputs["mmSymbolFill"]["value"]
             myStyle.size=float(inputs["mmSymbolSize"]["value"])
@@ -2097,8 +2159,12 @@ def saveLayerStyle0(conf,inputs,outputs):
             setRGB(myStyle.color,fColor)
             setRGB(myStyle.outlinecolor,sColor)
             myStyle.gap=float(inputs["mmSymbolGap"]["value"])
-        if list(inputs.keys()).count("mmStyle")==0:
-            if list(inputs.keys()).count("pattern") > 0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("mmStyle")==0:
+        if "mmStyle" not in inputs:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("pattern") > 0:
+            if "pattern" in inputs:
                 print("PATTERN (" +inputs["pattern"]["value"]+")", file=sys.stderr)
                 try:
                     layer.getClass(nClass).getStyle(0).patternlength=0
@@ -2157,26 +2223,38 @@ def saveLayerStyle0(conf,inputs,outputs):
             updateProcessing(layer,inputs["resm"])
         if layer.numclasses==0:
             layer.opacity=int(inputs["mmOpacity"]["value"])
-	if list(inputs.keys()).count("mmOffsite")>0:
+	# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+	# if list(inputs.keys()).count("mmOffsite")>0:
+	if "mmOffsite" in inputs:
             layer.offsite.setHex("#"+inputs["mmOffsite"]["value"])
 	else:
             layer.offsite.setRGB(-1,-1,-1)
 
     if "mmOpacity" in inputs:
 	layer.opacity=int(inputs["mmOpacity"]["value"])
-    if list(inputs.keys()).count("mmGap") > 0 :
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmGap") > 0 :
+    if "mmGap" in inputs:
         layer.getClass(nClass).getStyle(mmStyle).gap=float(inputs["mmGap"]["value"])
-    if list(inputs.keys()).count("mmWidth") > 0 :
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmWidth") > 0 :
+    if "mmWidth" in inputs :
         layer.getClass(nClass).getStyle(mmStyle).width=float(inputs["mmWidth"]["value"])
         if layer.getClass(nClass).numstyles>1:
             layer.getClass(nClass).getStyle(1).width=float(inputs["mmWidth"]["value"])
-            if list(inputs.keys()).count("mmHatchWidth")>0:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("mmHatchWidth")>0:
+            if "mmHatchWidth" in inputs:
                 layer.getClass(nClass).getStyle(0).width=float(inputs["mmHatchWidth"]["value"])
 
-    if ( list(inputs.keys()).count('noStroke') or list(inputs.keys()).count('mmStroke')==0 ) and layer.getClass(nClass).numstyles > 1:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if ( list(inputs.keys()).count('noStroke') or list(inputs.keys()).count('mmStroke')==0 ) and layer.getClass(nClass).numstyles > 1:
+    if ( 'noStroke' in inputs or ('mmStroke' not in inputs) ) and layer.getClass(nClass).numstyles > 1:
         layer.getClass(nClass).removeStyle(1)
 
-    if list(inputs.keys()).count("noSymbolFill")>0 or list(inputs.keys()).count('mmSymbolFill')==0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("noSymbolFill")>0 or list(inputs.keys()).count('mmSymbolFill')==0:
+    if "noSymbolFill" in inputs or ('mmSymbolFill' not in inputs):
         if layer.getClass(nClass).numstyles>2:
             layer.getClass(nClass).removeStyle(2)
 
@@ -2248,7 +2326,9 @@ def saveLayerStyle(conf,inputs,outputs):
     except:
         noColor=True
 
-    if list(inputs.keys()).count("mmClass"):
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmClass"):
+    if "mmClass" in inputs:
         nClass=int(inputs["mmClass"]["value"])
     else:
         nClass=0
@@ -2256,7 +2336,9 @@ def saveLayerStyle(conf,inputs,outputs):
 
     print("Edit the "+str(nClass)+" classe ", file=sys.stderr)
     mmStyle=0
-    if list(inputs.keys()).count("mmStyle")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmStyle")>0:
+    if "mmStyle" in inputs:
         mmStyle=int(inputs["mmStyle"]["value"])
         if layer.getClass(nClass).numstyles<=2:
             print("Create new style for symbol fill", file=sys.stderr)
@@ -2264,9 +2346,13 @@ def saveLayerStyle(conf,inputs,outputs):
             layer.getClass(nClass).getStyle(2).angle=0
 
     if layer.type==mapscript.MS_LAYER_POLYGON:
-        if list(inputs.keys()).count('mmSymbolFill')==0 and \
-            list(inputs.keys()).count("mmStyle")==0 and \
-            list(inputs.keys()).count('mmHatchWidth')==0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count('mmSymbolFill')==0 and \
+        #     list(inputs.keys()).count("mmStyle")==0 and \
+        #     list(inputs.keys()).count('mmHatchWidth')==0:
+        if ('mmSymbolFill' not in inputs) and \
+            ("mmStyle" not in inputs) and \
+            ('mmHatchWidth' not in inputs):
             if layer.getClass(nClass).numstyles>1:
                 lStyle=layer.getClass(nClass).getStyle(0)
                 lStyle.angle=0
@@ -2275,13 +2361,17 @@ def saveLayerStyle(conf,inputs,outputs):
                 lStyle.symbolname=None
                 lStyle.width=layer.getClass(nClass).getStyle(1).width
                                         
-    if list(inputs.keys()).count('mmSymbolFill')>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count('mmSymbolFill')>0:
+    if 'mmSymbolFill' in inputs:
         if layer.getClass(nClass).numstyles<=2:
             layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
             layer.getClass(nClass).getStyle(layer.getClass(nClass).numstyles-1).angle=0
     else:
         if layer.type==mapscript.MS_LAYER_POLYGON:
-            if list(inputs.keys()).count("mmStyle")==0:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("mmStyle")==0:
+            if "mmStyle" not in inputs:
                 if layer.getClass(nClass).numstyles>2:
                     layer.getClass(nClass).removeStyle(layer.getClass(nClass).numstyles-1)
     if "mmClassName" in inputs and layer.getClass(nClass) is not None:
@@ -2294,46 +2384,66 @@ def saveLayerStyle(conf,inputs,outputs):
     print("Edit the "+str(nClass)+" classe "+str(not(noColor)), file=sys.stderr)
     if not(noColor):
         layer.getClass(nClass).getStyle(mmStyle).opacity=int(inputs["mmOpacity"]["value"])
-        if list(inputs.keys()).count('noFill') > 0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count('noFill') > 0:
+        if 'noFill' in inputs:
             layer.getClass(nClass).getStyle(mmStyle).color.setRGB(-1,-1,-1)
         else:
             setRGB(layer.getClass(nClass).getStyle(mmStyle).color,fillColor)
             print("Fill  "+str(fillColor), file=sys.stderr)
 
-        if list(inputs.keys()).count('noStroke') > 0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count('noStroke') > 0:
+        if 'noStroke' in inputs:
             layer.getClass(nClass).getStyle(mmStyle).outlinecolor.setRGB(-1,-1,-1)
         else:
             setRGB(layer.getClass(nClass).getStyle(mmStyle).outlinecolor,strokeColor)
             print("Stroke "+str(strokeColor), file=sys.stderr)
-    if list(inputs.keys()).count("mmStrokeWidth") > 0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmStrokeWidth") > 0:
+    if "mmStrokeWidth" in inputs:
         layer.getClass(nClass).getStyle(mmStyle).outlinewidth=float(inputs["mmStrokeWidth"]["value"])
 
-    if list(inputs.keys()).count("force")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("force")>0:
+    if "force" in inputs:
         setMetadata(layer,"mmClass","us")
         j=layer.numclasses-1
         while j >= 0:
             if j!=0:
                 layer.removeClass(j)
             else:
-                if list(inputs.keys()).count("mmExpr")==0:
+                # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+                # if list(inputs.keys()).count("mmExpr")==0:
+                if "mmExpr" not in inputs:
 			layer.getClass(j).setExpression(None)
-		if list(inputs.keys()).count('noFill'):
+		# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+		# if list(inputs.keys()).count('noFill'):
+		if 'noFill' in inputs:
                         layer.getClass(j).getStyle(mmStyle).color.setRGB(-1,-1,-1)
 		else:
                         setRGB(layer.getClass(j).getStyle(mmStyle).color,fillColor)
-		if list(inputs.keys()).count('noStroke'):
+		# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+		# if list(inputs.keys()).count('noStroke'):
+		if 'noStroke' in inputs:
                         layer.getClass(j).getStyle(mmStyle).outlinecolor.setRGB(-1,-1,-1)
 		else:
                         setRGB(layer.getClass(j).getStyle(mmStyle).outlinecolor,strokeColor)
             j-=1
-    if list(inputs.keys()).count("mmSize"):
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmSize"):
+    if "mmSize" in inputs:
         layer.getClass(nClass).getStyle(mmStyle).size=float(inputs["mmSize"]["value"])
-    if list(inputs.keys()).count("mmAngle"):
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmAngle"):
+    if "mmAngle" in inputs:
 	try:
 		layer.getClass(nClass).getStyle(mmStyle).angle=float(inputs["mmAngle"]["value"])
 	except:
 		layer.getClass(nClass).getStyle(mmStyle).angle=inputs["mmAngle"]["value"]
-    if list(inputs.keys()).count("mmSymb") > 0 and inputs["mmSymb"]["value"]!="":
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmSymb") > 0 and inputs["mmSymb"]["value"]!="":
+    if "mmSymb" in inputs and inputs["mmSymb"]["value"]!="":
         layer.getClass(nClass).getStyle(mmStyle).symbolname=inputs["mmSymb"]["value"].replace("Symbol_","")
         if inputs["mmSymb"]["value"]=="polygon_hatch":
             print("layer.getClass(nClass).numstyles 1 - "+str(layer.getClass(nClass).numstyles), file=sys.stderr)
@@ -2351,12 +2461,16 @@ def saveLayerStyle(conf,inputs,outputs):
             style=layer.getClass(nClass).getStyle(1)
             setRGB(style.outlinecolor,strokeColor)
     else:
-        if list(inputs.keys()).count("mmSymb") > 0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("mmSymb") > 0:
+        if "mmSymb" in inputs:
             layer.getClass(nClass).getStyle(mmStyle).symbol=0
             layer.getClass(nClass).getStyle(mmStyle).symbolname=None
 
     if layer.type != mapscript.MS_LAYER_RASTER:
-        if list(inputs.keys()).count('mmSymbolFill'):
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count('mmSymbolFill'):
+        if 'mmSymbolFill' in inputs:
             myStyle=layer.getClass(nClass).getStyle(layer.getClass(nClass).numstyles-1)
             myStyle.symbolname=inputs["mmSymbolFill"]["value"]
             myStyle.size=float(inputs["mmSymbolSize"]["value"])
@@ -2366,8 +2480,12 @@ def saveLayerStyle(conf,inputs,outputs):
             setRGB(myStyle.color,fColor)
             setRGB(myStyle.outlinecolor,sColor)
             myStyle.gap=float(inputs["mmSymbolGap"]["value"])
-        if list(inputs.keys()).count("mmStyle")==0:
-            if list(inputs.keys()).count("pattern") > 0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("mmStyle")==0:
+        if "mmStyle" not in inputs:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("pattern") > 0:
+            if "pattern" in inputs:
                 print("PATTERN (" +inputs["pattern"]["value"]+")", file=sys.stderr)
                 layer.getClass(nClass).getStyle(0).patternlength=0
                 layer.getClass(nClass).getStyle(0).linecap=mapscript.MS_CJC_BUTT
@@ -2403,8 +2521,12 @@ def saveLayerStyle(conf,inputs,outputs):
         if "resm" in inputs:
             updateProcessing(layer,inputs["resm"])
             print(inputs["processing"], file=sys.stderr)
-            if list(inputs.keys()).count("processing")>0:
-                if list(inputs["processing"].keys()).count("isArray")>0:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("processing")>0:
+            if "processing" in inputs:
+                # TODO: confirm assumption: inputs["processing"] is a Python 3 dictionary object
+                # if list(inputs["processing"].keys()).count("isArray")>0:
+                if "isArray" in inputs["processing"]:
                     for kk in range(0,len(inputs["processing"]["value"])):            
                         print(" *********** OK "+str(inputs["processing"]["value"][kk]), file=sys.stderr)
                         layer.addProcessing(inputs["processing"]["value"][kk])
@@ -2425,26 +2547,38 @@ def saveLayerStyle(conf,inputs,outputs):
 
         if layer.numclasses==0:
             layer.opacity=int(inputs["mmOpacity"]["value"])
-	if list(inputs.keys()).count("mmOffsite")>0:
+	# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+	# if list(inputs.keys()).count("mmOffsite")>0:
+	if "mmOffsite" in inputs:
             layer.offsite.setHex("#"+inputs["mmOffsite"]["value"])
 	else:
             layer.offsite.setRGB(-1,-1,-1)
 
     if "mmOpacity" in inputs:
 	layer.opacity=int(inputs["mmOpacity"]["value"])
-    if list(inputs.keys()).count("mmGap") > 0 :
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmGap") > 0 :
+    if "mmGap" in inputs :
         layer.getClass(nClass).getStyle(mmStyle).gap=float(inputs["mmGap"]["value"])
-    if list(inputs.keys()).count("mmWidth") > 0 :
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmWidth") > 0 :
+    if "mmWidth" in inputs :
         layer.getClass(nClass).getStyle(mmStyle).width=float(inputs["mmWidth"]["value"])
         if layer.getClass(nClass).numstyles>1:
             layer.getClass(nClass).getStyle(1).width=float(inputs["mmWidth"]["value"])
-            if list(inputs.keys()).count("mmHatchWidth")>0:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("mmHatchWidth")>0:
+            if "mmHatchWidth" in inputs:
                 layer.getClass(nClass).getStyle(0).width=float(inputs["mmHatchWidth"]["value"])
 
-    if list(inputs.keys()).count('noStroke') and layer.getClass(nClass).numstyles > 1:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count('noStroke') and layer.getClass(nClass).numstyles > 1:
+    if 'noStroke' in inputs and layer.getClass(nClass).numstyles > 1:
         layer.getClass(nClass).removeStyle(1)
 
-    if list(inputs.keys()).count("noSymbolFill")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("noSymbolFill")>0:
+    if "noSymbolFill" in inputs:
         if layer.getClass(nClass).numstyles>2:
             layer.getClass(nClass).removeStyle(2)
 
@@ -2709,7 +2843,9 @@ def classifyMap0(conf,inputs,outputs):
     import json
     import sys
     import classifier.service as cs
-    if list(conf["lenv"].keys()).count("statusHandled")==0:
+    # TODO: confirm assumption: conf["lenv"] is a Python 3 dictionary object
+    # if list(conf["lenv"].keys()).count("statusHandled")==0:
+    if "statusHandled" not in conf["lenv"]:
         conf["lenv"]["message"]=zoo._("Starting classification...")
         zoo.update_status(conf,10)
     mapPath=conf["main"]["dataPath"]+"/maps"
@@ -2735,7 +2871,9 @@ def classifyMap0(conf,inputs,outputs):
     layer=m.getLayerByName(inputs["layer"]["value"])
     #print >> sys.stderr,layer
     print(inputs, file=sys.stderr)
-    if list(inputs.keys()).count("stepField")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("stepField")>0:
+    if "stepField" in inputs:
         #layer=m.getLayerByName(inputs["layer"]["value"])
         lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["stepField"]["value"]+" as c FROM "+layer.data+" ORDER BY "+inputs["stepField"]["value"]+" ASC"}}
         #lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT "+inputs["stepField"]["value"]+" as c, ('||count(*)||' items)' as nb FROM "+layer.data+" GROUP BY inputs["stepField"]["value"] ORDER BY "+inputs["stepField"]["value"]+" ASC"},"dialect":{"value":"sqlite"}}
@@ -2783,7 +2921,9 @@ def classifyMap0(conf,inputs,outputs):
         return zoo.SERVICE_SUCCEEDED
 
 
-    if list(inputs.keys()).count("field")==0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("field")==0:
+    if "field" not in inputs:
         inputs0=inputs
         if layer.type==mapscript.MS_LAYER_RASTER:
             try:
@@ -2792,7 +2932,9 @@ def classifyMap0(conf,inputs,outputs):
                     inputs0["mmType"]["value"]="greyScale"
             except:
                 pass
-            if list(inputs.keys()).count("nodata"):
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("nodata"):
+            if "nodata" in inputs:
                 inputs0["mmOffsite"]={"value": inputs["nodata"]["value"]}
             inputs0["mmFill"]={"value": "000000"}
             inputs0["mmStroke"]={"value": "000000"}
@@ -2803,7 +2945,9 @@ def classifyMap0(conf,inputs,outputs):
         inputs0["force"]={"value": "true"}
         outputs1={"Result":{"value":""}}
         layer.clearProcessing()
-        if list(inputs.keys()).count("processing")>0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("processing")>0:
+        if "processing" in inputs:
             if isinstance(inputs["processing"]["value"], (list, tuple)):
                 for kk in range(0,len(inputs["processing"]["value"])):            
                     print(" *********** OK "+str(inputs["processing"]["value"][kk]), file=sys.stderr)
@@ -2869,7 +3013,9 @@ def classifyMap0(conf,inputs,outputs):
         con.conn.commit()
 
     cond=""
-    if layer.type!=mapscript.MS_LAYER_RASTER and list(inputs.keys()).count("mmMExpr")>0 and inputs["mmMExpr"]["value"]!="":
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if layer.type!=mapscript.MS_LAYER_RASTER and list(inputs.keys()).count("mmMExpr")>0 and inputs["mmMExpr"]["value"]!="":
+    if layer.type!=mapscript.MS_LAYER_RASTER and "mmMExpr" in inputs and inputs["mmMExpr"]["value"]!="":
 	    cond=" WHERE "+inputs["mmMExpr"]["value"].replace("\"[","").replace("]\"","")
 	    cond=cond.replace("[","").replace("]","")
     #lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layer.data+" "+cond+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
@@ -2881,8 +3027,10 @@ def classifyMap0(conf,inputs,outputs):
 	    layer.metadata.remove("mmMethod")
         except:
             layer.metadata.pop("mmMethod",None)
-    #if inputs.keys().count("mmType") and inputs["mmType"]["value"]=="gradSymb":
-    if layer.type!=mapscript.MS_LAYER_RASTER and list(inputs.keys()).count("method")>0 and "Rpy2" in conf["main"] and conf["main"]["Rpy2"]=="true":
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if "mmType" in inputs and inputs["mmType"]["value"]=="gradSymb":
+    # if layer.type!=mapscript.MS_LAYER_RASTER and list(inputs.keys()).count("method")>0 and "Rpy2" in conf["main"] and conf["main"]["Rpy2"]=="true":
+    if layer.type!=mapscript.MS_LAYER_RASTER and "method" in inputs and "Rpy2" in conf["main"] and conf["main"]["Rpy2"]=="true":
         lInputs1={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT "+inputs["field"]["value"]+" as val FROM "+layerName}}
         vt.vectInfo(conf,lInputs,outputs)
         ll=json.loads(outputs["Result"]["value"])
@@ -2913,11 +3061,15 @@ def classifyMap0(conf,inputs,outputs):
             print("-- OK", file=sys.stderr)
             print(lInputs, file=sys.stderr)
             print("OK --", file=sys.stderr)
-            if list(conf["lenv"].keys()).count("statusHandled")==0:
+            # TODO: confirm assumption: conf["lenv"] is a Python 3 dictionary object
+            # if list(conf["lenv"].keys()).count("statusHandled")==0:
+            if "statusHandled" not in conf["lenv"]:
                 conf["lenv"]["message"]=zoo._("Executing SQL Statement ...")
                 zoo.update_status(conf,25)
             res=vt.vectInfo(conf,lInputs,outputs)
-            if list(conf["lenv"].keys()).count("statusHandled")==0:
+            # TODO: confirm assumption: conf["lenv"] is a Python 3 dictionary object
+            # if list(conf["lenv"].keys()).count("statusHandled")==0:
+            if "statusHandled" not in conf["lenv"]:
                 conf["lenv"]["message"]=zoo._("SQL Statement succeeded.")
                 zoo.update_status(conf,35)
             print("-- OK", file=sys.stderr)
@@ -2980,7 +3132,9 @@ def classifyMap0(conf,inputs,outputs):
 					    tmp+=[{"pixel": cell_value}]
 		    sorted(tmp, key=lambda x: x["pixel"])
 		    #layer.clearProcessing()
-            if list(inputs.keys()).count("processing")==0:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("processing")==0:
+            if "processing" not in inputs:
                 layer.setProcessing("BAND="+inputs["field"]["value"])
             #else:
             #    for kk in range(0,len(inputs["processing"]["value"])):
@@ -2998,7 +3152,9 @@ def classifyMap0(conf,inputs,outputs):
     if "resm" in inputs:
         layer.clearProcessing()
         updateProcessing(layer,inputs["resm"])
-        if list(inputs.keys()).count("processing")>0 and isinstance(inputs["processing"]["value"], (list, tuple)):
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("processing")>0 and isinstance(inputs["processing"]["value"], (list, tuple)):
+        if "processing" in inputs and isinstance(inputs["processing"]["value"], (list, tuple)):
             for kk in range(0,len(inputs["processing"]["value"])):            
                 print(" *********** OK", file=sys.stderr)
                 layer.setProcessing(inputs["processing"]["value"][kk])
@@ -3012,7 +3168,9 @@ def classifyMap0(conf,inputs,outputs):
         i-=1
 
     i=0
-    if list(inputs.keys()).count("mmType")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmType")>0:
+    if "mmType" in inputs:
         if inputs["mmType"]["value"]=="uniqVal":
             setMetadata(layer,"mmClass","uv")
         elif inputs["mmType"]["value"]=="gradSymb":
@@ -3040,7 +3198,9 @@ def classifyMap0(conf,inputs,outputs):
     except:
 	    pass
     colspan=0
-    if list(inputs.keys()).count("nbClasses")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("nbClasses")>0:
+    if "nbClasses" in inputs:
         nbClasses=int(inputs["nbClasses"]["value"])
         #print >> sys.stderr,"Colspan: "+str(tmp[0])
 	try:
@@ -3065,7 +3225,9 @@ def classifyMap0(conf,inputs,outputs):
 
     #if l.type==mapscript.MS_LAYER_RASTER and nbClasses>1:
     #	    color_file=open(conf["main"]["tmpPath"]+"/color_"+conf["senv"]["last_map"]+"_"+layer.name+".clr","w+")
-    if list(conf["lenv"].keys()).count("statusHandled")==0:
+    # TODO: confirm assumption: conf["lenv"] is a Python 3 dictionary object
+    # if list(conf["lenv"].keys()).count("statusHandled")==0:
+    if "statusHandled" not in conf["lenv"]:
         conf["lenv"]["message"]=zoo._("Create classes ...")
         zoo.update_status(conf,45)
 
@@ -3101,7 +3263,9 @@ def classifyMap0(conf,inputs,outputs):
                     pass
 
             precond=""
-            if list(inputs.keys()).count("mmMExpr") > 0:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("mmMExpr") > 0:
+            if "mmMExpr" in inputs:
                 precond=" AND "+inputs["mmMExpr"]["value"]+" "
                 setMetadata(layer,"mmMExpr",inputs["mmMExpr"]["value"])
             else:
@@ -3110,7 +3274,9 @@ def classifyMap0(conf,inputs,outputs):
                 except:
                     pass
             
-            if list(inputs.keys()).count("nbClasses")>0:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("nbClasses")>0:
+            if "nbClasses" in inputs:
                 if rClass:
                     if i==0:
                         tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) '+precond+' )')
@@ -3173,7 +3339,7 @@ def classifyMap0(conf,inputs,outputs):
                             tmpClass.name+=" ("+str(tmp[i][j])+" "+zoo._("item")+")"
 
         except Exception as e:
-            #print >> sys.stderr,e
+            # print(e, file=sys.stderr)
             pass
         i+=1
 
@@ -3181,7 +3347,9 @@ def classifyMap0(conf,inputs,outputs):
     if l.type==mapscript.MS_LAYER_RASTER  and nbClasses>1:
         conf["lenv"]["message"]=zoo._("Producing color ramp using Gdal_Dem...")
         zoo.update_status(conf,45)
-        if list(inputs.keys()).count("tiled"):
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("tiled"):
+        if "tiled" in inputs:
             setMetadata(l,"mmTiled",inputs["tiled"]["value"])
             createColorRamp(conf,m,l,int(inputs["tiled"]["value"]));
         else:
@@ -3193,10 +3361,14 @@ def classifyMap0(conf,inputs,outputs):
         conf["lenv"]["message"]=zoo._("Color ramp produced.")
         zoo.update_status(conf,65)
     inputs["name"]=inputs["map"]
-    if list(conf["lenv"].keys()).count("statusHandled")==0:
+    # TODO: confirm assumption: conf["lenv"] is a Python 3 dictionary object
+    # if list(conf["lenv"].keys()).count("statusHandled")==0:
+    if "statusHandled" not in conf["lenv"]:
         conf["lenv"]["message"]=zoo._("Classes created.")
         zoo.update_status(conf,75)
-    if list(inputs.keys()).count("mmType")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmType")>0:
+    if "mmType" in inputs:
         nameSpace={"conf": conf, "inputs": inputs, "outputs": outputs, "m": m, "mmType": inputs["mmType"]["value"]}
     else:
         nameSpace={"conf": conf, "inputs": inputs, "outputs": outputs, "m": m, "mmType": "uniqVal"}
@@ -3213,18 +3385,24 @@ def classifyMap0(conf,inputs,outputs):
     inputs1=inputs
     inputs1["name"]=inputs["map"]
     outputs1={"Result": {"value": ""}}
-    if list(conf["lenv"].keys()).count("statusHandled")==0:
+    # TODO: confirm assumption: conf["lenv"] is a Python 3 dictionary object
+    # if list(conf["lenv"].keys()).count("statusHandled")==0:
+    if "statusHandled" not in conf["lenv"]:
         conf["lenv"]["message"]=zoo._("Create legend ...")
         zoo.update_status(conf,85)
     createLegend0(conf,inputs1,outputs)
-    if list(inputs.keys()).count("noRecurs")==0 and l.type==mapscript.MS_LAYER_RASTER and nbClasses>1 and m.web.metadata.get('mmRT') and m.web.metadata.get('mmRT').count('timeline')>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("noRecurs")==0 and l.type==mapscript.MS_LAYER_RASTER and nbClasses>1 and m.web.metadata.get('mmRT') and m.web.metadata.get('mmRT').count('timeline')>0:
+    if ("noRecurs" not in inputs) and l.type==mapscript.MS_LAYER_RASTER and nbClasses>1 and m.web.metadata.get('mmRT') and m.web.metadata.get('mmRT').count('timeline')>0:
         for i in range(m.numlayers):
             ll=m.getLayer(i)
             if l.name!=ll.name and ll is not None and ll.type==mapscript.MS_LAYER_RASTER and ll.metadata.get('mm_group')==l.metadata.get('mm_group'):
                 inputs["noRecurs"]={"value":"true"}
                 inputs["layer"]["value"]=ll.name
                 classifyMap0(conf,inputs,outputs)
-    if list(inputs.keys()).count("mmMEField")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmMEField")>0:
+    if "mmMEField" in inputs:
         layer.data="SELECT * FROM "+layer.data+" WHERE "+inputs["mmMEField"]["value"]+"='"+inputs["mmMEValue"]["value"]+"'"
         m.save(mapfile)
     inputs0={"mmProjectName":{"value":inputs["map"]["value"]+"_"+layer.name},"mmActivatedLayers":{"value":layer.name}}
@@ -3295,7 +3473,9 @@ def classifyMap(conf,inputs,outputs):
 	con.conn.commit()
 
     cond=""
-    if list(inputs.keys()).count("mmMExpr")>0 and inputs["mmMExpr"]["value"]!="":
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmMExpr")>0 and inputs["mmMExpr"]["value"]!="":
+    if "mmMExpr" in inputs and inputs["mmMExpr"]["value"]!="":
 	    cond=" WHERE "+inputs["mmMExpr"]["value"].replace("\"[","").replace("]\"","")
 	    cond=cond.replace("[","").replace("]","")
     lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layerName+" "+cond+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
@@ -3404,7 +3584,9 @@ def classifyMap(conf,inputs,outputs):
         i-=1
 
     i=0
-    if list(inputs.keys()).count("mmType")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmType")>0:
+    if "mmType" in inputs:
         if inputs["mmType"]["value"]=="uniqVal":
             setMetadata(layer,"mmClass","uv")
         elif inputs["mmType"]["value"]=="gradSymb":
@@ -3430,7 +3612,9 @@ def classifyMap(conf,inputs,outputs):
     except:
 	    pass
     colspan=0
-    if list(inputs.keys()).count("nbClasses")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("nbClasses")>0:
+    if "nbClasses" in inputs:
         nbClasses=int(inputs["nbClasses"]["value"])
         #print >> sys.stderr,"Colspan: "+str(tmp[0])
 	try:
@@ -3489,7 +3673,9 @@ def classifyMap(conf,inputs,outputs):
 				pass
 
 		precond=""
-		if list(inputs.keys()).count("mmMExpr") > 0:
+		# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+		# if list(inputs.keys()).count("mmMExpr") > 0:
+		if "mmMExpr" in inputs:
 			precond=" AND "+inputs["mmMExpr"]["value"]+" "
 			setMetadata(layer,"mmMExpr",inputs["mmMExpr"]["value"])
 		else:
@@ -3497,7 +3683,9 @@ def classifyMap(conf,inputs,outputs):
 				layer.metadata.remove("mmMExpr")
 			except:
 				pass
-		if list(inputs.keys()).count("nbClasses")>0:
+		# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+		# if list(inputs.keys()).count("nbClasses")>0:
+		if "nbClasses" in inputs:
 			if rClass:
 				if i==0:
 					tmpClass.setExpression('( ( ['+inputs["field"]["value"]+'] >= '+str(classif[i][0])+' ) AND ( ['+inputs["field"]["value"]+'] <= '+str(classif[i][1])+' ) '+precond+' )')
@@ -3544,7 +3732,9 @@ def classifyMap(conf,inputs,outputs):
 		pass
         i+=1
     if l.type==mapscript.MS_LAYER_RASTER  and nbClasses>1:
-	    if list(inputs.keys()).count("tiled"):
+	    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+	    # if list(inputs.keys()).count("tiled"):
+	    if "tiled" in inputs:
 		    setMetadata(l,"mmTiled",inputs["tiled"]["value"])
 		    createColorRamp(conf,m,l,int(inputs["tiled"]["value"]));
 	    else:
@@ -3554,7 +3744,9 @@ def classifyMap(conf,inputs,outputs):
 			    pass
 		    createColorRamp(conf,m,l);
     inputs["name"]=inputs["map"]
-    if list(inputs.keys()).count("mmType")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmType")>0:
+    if "mmType" in inputs:
         nameSpace={"conf": conf, "inputs": inputs, "outputs": outputs, "m": m, "mmType": inputs["mmType"]["value"]}
     else:
         nameSpace={"conf": conf, "inputs": inputs, "outputs": outputs, "m": m, "mmType": "uniqVal"}
@@ -3614,7 +3806,9 @@ def saveOpacity(conf,inputs,outputs):
 		pass
         i+=1
     inputs["map"]=inputs["name"]
-    if list(inputs.keys()).count("mmType")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("mmType")>0:
+    if "mmType" in inputs:
         nameSpace={"conf": conf, "inputs": inputs, "outputs": outputs, "m": m, "mmType": inputs["mmType"]["value"]}
     else:
         nameSpace={"conf": conf, "inputs": inputs, "outputs": outputs, "m": m, "mmType": "uniqVal"}
@@ -3639,7 +3833,9 @@ def saveLabel(conf,inputs,outputs):
         hasLabel=("label" in inputs and "value" in inputs["label"] and inputs["label"]["value"]!="")
     except:
         hasLabel=False
-    if list(inputs.keys()).count("label") == 0: 
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("label") == 0: 
+    if "label" not in inputs: 
         layer.labelitem=None
         j=layer.numclasses-1
         while j>=0:
@@ -3689,7 +3885,9 @@ def saveLabel(conf,inputs,outputs):
             l.force=False
         
             # Set the default outline color and the buffer size
-            if list(inputs.keys()).count("lbs")>0:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("lbs")>0:
+            if "lbs" in inputs:
                 setRGB(l.outlinecolor,[int(n, 16) for n in (inputs["mmOut"]["value"][:2],inputs["mmOut"]["value"][2:4],inputs["mmOut"]["value"][4:6])])
                 l.outlinewidth=int(inputs["lbs"]["value"])
             else:
@@ -3722,7 +3920,9 @@ def saveLabel(conf,inputs,outputs):
                 l.position=eval("mapscript.MS_"+inputs["pos"]["value"].upper())
             else:
                 l.position=mapscript.MS_AUTO
-            if list(inputs.keys()).count("text")>0:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("text")>0:
+            if "text" in inputs:
                 l.setText(inputs["text"]["value"])
             else:
                 l.setText(None)
@@ -3940,14 +4140,18 @@ def setMapLayerProperties(conf,inputs,outputs):
 		    except:
 			    pass
     setMetadata(l,"mmSpatialQuery",inputs["sq"]["value"])
-    if list(inputs.keys()).count("sqf")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("sqf")>0:
+    if "sqf" in inputs:
         setMetadata(l,"mmSpatialQueryType",inputs["sqf"]["value"])
     else:
         setMetadata(l,"mmSpatialQueryType",inputs["sqt"]["value"])
     cor=["ows_abstract","ows_keywordlist","ows_fees"]
     i=0
     for a in ["ab","kl","f"]:
-        if list(inputs[a].keys()).count("value")>0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs[a].keys()).count("value")>0:
+        if "value" in inputs[a]:
             setMetadata(l,cor[i],urllib.parse.unquote(inputs[a]["value"]))
         i+=1
             
@@ -4105,7 +4309,9 @@ def removeLayer(conf,inputs,outputs):
     return 3
 
 def setLayerScale(conf,inputs,outputs):
-    if list(inputs["st"].keys()).count("isArray"):        
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs["st"].keys()).count("isArray"):        
+    if "isArray" in inputs["st"]:        
         for i in range(0,len(inputs["st"]["value"])):
             input0={}
             for j in inputs:
@@ -4191,7 +4397,9 @@ def saveLayerFields(conf,inputs,outputs):
     labels=""
     widths=""
     aliases=""
-    if list(inputs["display"].keys()).count("isArray"):
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs["display"].keys()).count("isArray"):
+    if "isArray" in inputs["display"]:
         for i in range(0,len(inputs["display"]["value"])):
             if inputs["display"]["value"][i]=="true":
                 displays+=inputs["oname"]["value"][i]+","
@@ -4224,9 +4432,13 @@ def saveMapFor(conf,inputs,outputs):
         setMetadata(m.getLayerByName(inputs["layers"]["value"]),"gml_exclude_items","all")
         setMetadata(m.getLayerByName(inputs["layers"]["value"]),"wms_include_items",inputs["fields"]["value"])
         setMetadata(m.getLayerByName(inputs["layers"]["value"]),"wms_exclude_items","all")
-    if list(inputs.keys()).count("fwidth") > 0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("fwidth") > 0:
+    if "fwidth" in inputs:
         setMetadata(m.getLayerByName(inputs["layers"]["value"]),"mm"+inputs["type"]["value"]+"FieldsWidth",inputs["fwidth"]["value"])
-    if list(inputs.keys()).count("faliases") > 0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("faliases") > 0:
+    if "faliases" in inputs:
         #print >> sys.stderr,inputs["faliases"]["value"]
         setMetadata(m.getLayerByName(inputs["layers"]["value"]),"mm"+inputs["type"]["value"]+"FieldsAliases",urllib.parse.unquote(inputs["faliases"]["value"]))
     saveProjectMap(m,conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
@@ -4237,7 +4449,9 @@ def doGroupLists0(mmGroups,layers,groups,i):
     print("groups", file=sys.stderr)
     print(groups, file=sys.stderr)
     print("groups", file=sys.stderr)
-    if list(groups.keys()).count("children") > 0:
+    # TODO: confirm assumption: "groups" is a Python 3 dictionary object
+    # if list(groups.keys()).count("children") > 0:
+    if "children" in groups:
         if mmGroups[i]=='':
             mmGroups[i]=groups["id"]
         else:
@@ -4288,7 +4502,9 @@ def doGroupLists(mmGroups,layers,groups,i):
     print("groups", file=sys.stderr)
     print(groups, file=sys.stderr)
     print("groups", file=sys.stderr)
-    if list(groups.keys()).count("children") > 0:
+    # TODO: confirm assumption: "groups" is a Python 3 dictionary object
+    # if list(groups.keys()).count("children") > 0:
+    if "children" in groups:
         if mmGroups[i]=='':
             mmGroups[i]=groups["id"]
         else:
@@ -4502,7 +4718,9 @@ def saveLayerPrivileges(conf,inputs,outputs):
     layer=m.getLayerByName(inputs["layer"]["value"])
     print(inputs["group"], file=sys.stderr)
     print(list(inputs["group"].keys()).count("length")>0, file=sys.stderr)
-    if list(inputs["group"].keys()).count("length")>0:
+    # TODO: confirm assumption: inputs["group"] is a Python 3 dictionary object
+    # if list(inputs["group"].keys()).count("length")>0:
+    if "length" in inputs["group"]:
         print(list(inputs["group"].keys()).count("length")>0, file=sys.stderr)
         for i in range(0,len(inputs["group"]["value"])):
             if tmpS!="":
@@ -4641,9 +4859,15 @@ def savePublishMap(conf,inputs,outputs):
     args=["mmPopupList","mmWindowList","mmProjectName","mmTitle","mmKeywords","mmAuthor","mmCopyright","mmRestricted","mmMBaseLayers","mmWMTSBaseLayers","mmWMTSBLURL","mmPBaseLayers","mmProprietaryBaseLayers","mmOSMBaseLayers","mmActivatedBaseLayers","mmBAK","mmOT","mmVT","mmRT","mmNav","mmBProject","mmRenderer","default_minx","default_maxx","default_miny","default_maxy","max_minx","max_miny","max_maxx","max_maxy","mmActivatedLayers","layout_t","mmProjectName","vectorLayers","rasterLayers","mmLayoutColor","base_osm","tuom","tprj","fsize","ffamily","font-colorpicker","mmLSPos","mmLSAct","mmIPRestriction"]
     isPassed=-1
     for i in args:
-        if list(inputs.keys()).count(i)>0:
-            if list(inputs.keys()).count(i)>0 and list(inputs[i].keys()).count("value")>0:
-                if list(inputs[i].keys()).count("value")>0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count(i)>0:
+        if i in inputs:
+            # TODO: confirm assumption: "inputs" and "inputs[i]" are Python 3 dictionary objects
+            # if list(inputs.keys()).count(i)>0 and list(inputs[i].keys()).count("value")>0:
+            if i in inputs and "value" in inputs[i]:
+                # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+                # if list(inputs[i].keys()).count("value")>0:
+                if "value" in inputs[i]:
                     setMetadata(m.web,i,inputs[i]["value"])
                 else:
                     setMetadata(m.web,i,"")
@@ -4664,7 +4888,9 @@ def savePublishMap(conf,inputs,outputs):
                 pass
     argf=["default_minx","default_maxx","default_miny","default_maxy","max_minx","max_miny","max_maxx","max_maxy"]
     for i in argf:
-        if list(inputs.keys()).count(i)==0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count(i)==0:
+        if i not in inputs:
             try:
                 m.web.metadata.remove(i)
             except:
@@ -4710,19 +4936,27 @@ def savePublishMap(conf,inputs,outputs):
 	    else:
 		    setMetadata(m.web,"mm_themes_class",inputs["mm_themes_class"]["value"])
 
-    if list(inputs["minScales"].keys()).count("value")>0:
+    # TODO: confirm assumption: inputs["minScales"] is a Python 3 dictionary object
+    # if list(inputs["minScales"].keys()).count("value")>0:
+    if "value" in inputs["minScales"]:
         minScales=inputs["minScales"]["value"].split(',')
     else:
         minScales=[]
-    if list(inputs["maxScales"].keys()).count("value")>0:
+    # TODO: confirm assumption: inputs["maxScales"] is a Python 3 dictionary object
+    # if list(inputs["maxScales"].keys()).count("value")>0:
+    if "value" in inputs["maxScales"]:
         maxScales=inputs["maxScales"]["value"].split(',')
     else:
         maxScales=[]
-    if list(inputs["lminScales"].keys()).count("value")>0:
+    # TODO: confirm assumption: inputs["lminScales"] is a Python 3 dictionary object
+    # if list(inputs["lminScales"].keys()).count("value")>0:
+    if "value" in inputs["lminScales"]:
         lminScales=inputs["lminScales"]["value"].split(',')
     else:
         lminScales=[]
-    if list(inputs["lmaxScales"].keys()).count("value")>0:
+    # TODO: confirm assumption: inputs["lmaxScales"] is a Python 3 dictionary object
+    # if list(inputs["lmaxScales"].keys()).count("value")>0:
+    if "value" in inputs["lmaxScales"]:
         lmaxScales=inputs["lmaxScales"]["value"].split(',')
     else:
         lmaxScales=[]
@@ -4843,7 +5077,9 @@ def savePublishPreview(conf,inputs,outputs):
 
 def readTemplate(conf,inputs,outputs):
     ext=inputs["ext"]["value"]
-    if list(inputs.keys()).count("click") and inputs["click"]["value"]=="true":
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("click") and inputs["click"]["value"]=="true":
+    if "click" in inputs and inputs["click"]["value"]=="true":
         try:
             f=open(conf["main"]["dataPath"]+"/templates/click_"+inputs["layer"]["value"]+"_"+inputs["map"]["value"]+"_"+ext+".html","r")
         except:
@@ -4856,9 +5092,13 @@ def readTemplate(conf,inputs,outputs):
 def saveTemplate(conf,inputs,outputs):
     import mapscript
     ext="tmpl"
-    if list(inputs.keys()).count("name")>0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("name")>0:
+    if "name" in inputs:
         ext=inputs["name"]["value"]
-    if list(inputs.keys()).count("click") and inputs["click"]["value"]=="true":
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("click") and inputs["click"]["value"]=="true":
+    if "click" in inputs and inputs["click"]["value"]=="true":
         f=open(conf["main"]["dataPath"]+"/templates/click_"+inputs["layer"]["value"]+"_"+inputs["map"]["value"]+"_"+ext+".html","w")
         m=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
         setMetadata(m.getLayerByName(inputs["layer"]["value"]),"mmClick","true")
@@ -5001,7 +5241,9 @@ def createGridString(inputs,layer):
     gridParams=('mmminArcs','mmmaxArcs','mmminInterval','mmmaxInterval','mmminSubdivide','mmmaxSubdivide','mmLabelFormat')
     gridStr="LAYER\n GRID\n"
     for i in gridParams:
-        if list(inputs.keys()).count(i) and inputs[i]["value"]!="-1":
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count(i) and inputs[i]["value"]!="-1":
+        if i in inputs and inputs[i]["value"]!="-1":
             setMetadata(layer,i,inputs[i]["value"])
             if i=="mmLabelFormat":
                 gridStr+=i.upper().replace("MM","")+" '"+inputs[i]["value"]+"'\n"
@@ -5018,7 +5260,9 @@ def saveLayerGrid(conf,inputs,outputs):
     gridParams=('mmminArcs','mmmaxArcs','mmminInterval','mmmaxInterval','mmminSubdivide','mmmaxSubdivide','mmLabelFormat')
     gridStr="LAYER\n GRID\n"
     for i in gridParams:
-        if list(inputs.keys()).count(i) and inputs[i]["value"]!="-1":
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count(i) and inputs[i]["value"]!="-1":
+        if i in inputs and inputs[i]["value"]!="-1":
             setMetadata(layer,i,inputs[i]["value"])
             if i=="mmLabelFormat":
                 gridStr+=i.upper().replace("MM","")+" '"+inputs[i]["value"]+"'\n"
@@ -5222,7 +5466,9 @@ def getFullLayerProperties(conf,inputs,outputs):
         "labelMin": "mmLabelMinScale",
         "labelMax": "mmLabelMaxScale",
         }
-    for i in list(metadataKeys.keys()):
+    # TODO: confirm assumption: "metadataKeys" is a Python 3 dictionary object
+    # for i in list(metadataKeys.keys()):
+    for i in metadataKeys.keys():
         res[i]=layer.metadata.get(metadataKeys[i])
     res["type"]=layer.type
     res["connection"]=layer.connection
