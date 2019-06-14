@@ -3,7 +3,7 @@ import sys
 mmatypes=["r","w","x"]
 
 def getGroup(conf):
-    if conf["senv"].has_key("group"):
+    if "group" in conf["senv"]:
         group=conf["senv"]["group"]
     else:
         group="public"
@@ -45,7 +45,7 @@ def checkMapPriv(conf,map):
         return False
 
 def checkLayerPriv(conf,map,layer,typ):
-    print >> sys.stderr,"LAYER "+str(layer)
+    print("LAYER "+str(layer), file=sys.stderr)
     if len(typ)>1:
         ctypes=[]
         for i in range(0,len(typ)):
@@ -118,7 +118,7 @@ def checkDataSourcePriv(conf,m,dst,ds,priv):
         path=dss.getPath(conf,dst)
         try:
             m=mapscript.mapObj(path+"ds_ows.map")
-        except Exception, e:
+        except Exception as e:
             conf["lenv"]["message"]=zoo._("Unalbe to open the map ")+str(e)
             return False
     if priv.count("w")==0:
@@ -127,7 +127,7 @@ def checkDataSourcePriv(conf,m,dst,ds,priv):
                 return checkLayerPriv(conf,m,ds,priv)
             else:
                 return False
-        except Exception, e:
+        except Exception as e:
             conf["lenv"]["message"]=zoo._("Unalbe to check datastore privileges ")+str(e)
             return False
     else:
@@ -136,7 +136,7 @@ def checkDataSourcePriv(conf,m,dst,ds,priv):
                 return checkLayerPriv(conf,m,ds,priv)
             else:
                 return False
-        except Exception, e:
+        except Exception as e:
             conf["lenv"]["message"]=zoo._("Unalbe to check datastore privileges ")+str(e)
             return False
         

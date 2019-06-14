@@ -4,7 +4,7 @@ def save(conf):
     try:
         _save(conf)
         fname="sess_"+conf["senv"]["MMID"]+".cfg"
-        if conf["main"].keys().count("sessPath")>0:
+        if list(conf["main"].keys()).count("sessPath")>0:
             fullName=conf["main"]["sessPath"]+"/"+fname
         else:
             fullName=conf["main"]["tmpPath"]+"/"+fname
@@ -21,7 +21,7 @@ def save(conf):
 def _save(conf):
     try:
         fname="sess_"+conf["senv"]["MMID"]+"_1.cfg"
-        if conf["main"].keys().count("sessPath")>0:
+        if list(conf["main"].keys()).count("sessPath")>0:
             fullName=conf["main"]["sessPath"]+"/"+fname
         else:
             fullName=conf["main"]["tmpPath"]+"/"+fname

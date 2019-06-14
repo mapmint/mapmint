@@ -8,8 +8,8 @@ from twisted.web import server, resource
 from twisted.web.client import Agent
 from twisted.web.http_headers import Headers
 
-import sys,json,urlparse
-import urllib2
+import sys,json,urllib.parse
+import urllib.request, urllib.error, urllib.parse
 import cgi
 
 class HelloResource(resource.Resource):
@@ -69,7 +69,7 @@ class HelloResource(resource.Resource):
         request.setHeader('X-Fowarded-By', 'MapMint OWS-Security')
 
     def reparse(self,parsed_path):
-        for i in parsed_path.keys():
+        for i in list(parsed_path.keys()):
             if i.lower()!=i:
                 parsed_path[i.lower()]=parsed_path[i]
         
@@ -77,17 +77,17 @@ class HelloResource(resource.Resource):
         self.setDefaultHeaders(request)
         import json
         #ip, port = self.transport.socket.getpeername()
-        print >> sys.stderr,dir(request)#protocol.transport.getPeer()
-        print >> sys.stderr,request.getHeader("x-real-ip")
-        print >> sys.stderr,request.path
-        print >> sys.stderr,request.transport.getPeer().host
-        print >> sys.stderr,request.getUser()
-        print >> sys.stderr,request.getPassword()
+        print(dir(request), file=sys.stderr)#protocol.transport.getPeer()
+        print(request.getHeader("x-real-ip"), file=sys.stderr)
+        print(request.path, file=sys.stderr)
+        print(request.transport.getPeer().host, file=sys.stderr)
+        print(request.getUser(), file=sys.stderr)
+        print(request.getPassword(), file=sys.stderr)
         rcontent=request.path.split('/')
-        print >> sys.stderr,rcontent
+        print(rcontent, file=sys.stderr)
         parsed_path = request.args
         self.reparse(parsed_path)
-        if parsed_path.keys().count("token") > 0 and parsed_path.keys().count("server"):
+        if list(parsed_path.keys()).count("token") > 0 and list(parsed_path.keys()).count("server"):
             params=[parsed_path["server"][0],parsed_path["token"][0]]
         else:
             params=[rcontent[3],rcontent[2]]
@@ -95,30 +95,30 @@ class HelloResource(resource.Resource):
         clientIp=request.getHeader("x-real-ip")
         if clientIp is None:
             clientIp=request.transport.getPeer().host
-        if parsed_path.keys().count('token')==0:
+        if list(parsed_path.keys()).count('token')==0:
             parsed_path["token"]="-1"
-        if parsed_path.keys().count('request')>0:
+        if list(parsed_path.keys()).count('request')>0:
             query={}
-            for i in parsed_path.keys():
+            for i in list(parsed_path.keys()):
                 if i!="server" and i!="token":
                     query[i]=parsed_path[i][0]
             res=self.req_tmpl.replace("[server]",params[0]).replace("[token]",params[1]).replace("[query]",'<wps:ComplexData mimeType="application/json">'+json.dumps(query)+'</wps:ComplexData>').replace("[ip_address]","<wps:LiteralData>"+clientIp+"</wps:LiteralData>").replace("[user]",request.getUser()).replace("[password]",request.getPassword())
             log.msg(res)
-            req=urllib2.Request(url=self.SecureAccessUrl,
+            req=urllib.request.Request(url=self.SecureAccessUrl,
                             data=res,
                             headers={'Content-Type': 'application/xml'})
             try:
-                response = urllib2.urlopen(req)
-            except Exception,e:
+                response = urllib.request.urlopen(req)
+            except Exception as e:
                 request.setResponseCode(e.code)
                 request.setHeader("WWW-Authenticate",'Basic realm="MapMint OWS-Security", charset="UTF-8"')
                 request.setHeader("content-type", "text/xml")
                 return e.read()
             log.msg(response.info())
-            lkeys=response.headers.keys()
-            lvalues=response.headers.values()
-            print >> sys.stderr,lkeys
-            print >> sys.stderr,lvalues
+            lkeys=list(response.headers.keys())
+            lvalues=list(response.headers.values())
+            print(lkeys, file=sys.stderr)
+            print(lvalues, file=sys.stderr)
             for i in range(0,len(lkeys)):
                 if "transfer-encoding"!=lkeys[i]: 
                     request.setHeader(lkeys[i],lvalues[i])
@@ -135,7 +135,7 @@ class HelloResource(resource.Resource):
             log.msg(request.args)
             pquery=request.content.read()
             log.msg(pquery)
-            if request.args.keys().count("token") > 0 and request.args.keys().count("server"):
+            if list(request.args.keys()).count("token") > 0 and list(request.args.keys()).count("server"):
                 params=[request.args["server"][0],request.args["token"][0]]
             else:
                 params=[rcontent[3],rcontent[2]]
@@ -143,17 +143,17 @@ class HelloResource(resource.Resource):
             if clientIp is None:
                 clientIp=request.transport.getPeer().host
             res=self.req_tmpl.replace("[server]",rcontent[3]).replace("[token]",rcontent[2]).replace("[query]",'<wps:ComplexData mimeType="text/xml">'+pquery+'</wps:ComplexData>').replace("[ip_address]","<wps:LiteralData>"+clientIp+"</wps:LiteralData>").replace("[user]",request.getUser()).replace("[password]",request.getPassword())
-            req=urllib2.Request(url=self.SecureAccessUrl,
+            req=urllib.request.Request(url=self.SecureAccessUrl,
                             data=res,
                             headers={'Content-Type': 'text/xml'})
-            print >> sys.stderr,res
-            response = urllib2.urlopen(req)
-            print >> sys.stderr,request.headers
+            print(res, file=sys.stderr)
+            response = urllib.request.urlopen(req)
+            print(request.headers, file=sys.stderr)
             log.msg(response.info())
             log.msg(res)
             return response.read()
-        except Exception,e:
-            print >> sys.stderr,"ERROR: "+str(e)
+        except Exception as e:
+            print("ERROR: "+str(e), file=sys.stderr)
             log.msg(req)
             return '<html><body>You submitted the following request which is not supported: %s</body></html>\n' % (pquery,)
 
