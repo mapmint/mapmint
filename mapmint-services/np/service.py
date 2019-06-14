@@ -84,7 +84,7 @@ def getIndexQuote(conf, inputs, outputs):
     tprefix = auth.getPrefix(conf)
     clause = "("
     params = {}
-    if inputs["id"].has_key("length"):
+    if "length" in inputs["id"]:
         for i in range(int(inputs["id"]["length"])):
             if clause != "(":
                 clause += " or "
@@ -100,7 +100,7 @@ def getIndexQuote(conf, inputs, outputs):
         req = "SELECT i_id,note,false from " + tprefix + "indicators_favoris WHERE " + clause + " and u_id=(SELECT id from " + tprefix + "users WHERE login='" + conf["senv"]["login"] + "')"
     res = con.pexecute_req([req, params])
     vals = con.cur.fetchall()
-    if inputs["id"].has_key("length"):
+    if "length" in inputs["id"]:
         res = []
         for j in range(len(vals)):
             for i in range(int(inputs["id"]["length"])):
@@ -108,12 +108,12 @@ def getIndexQuote(conf, inputs, outputs):
                     if inputs["id"]["value"].count(str(vals[j][0])) > 0:
                         res += [{"id": str(vals[j][0]), "val": str(vals[j][1]), "ro": str(vals[j][2]).lower()}]
                         break
-                except Exception, e:
-                    print >> sys.stderr, i
-                    print >> sys.stderr, e
-                    print >> sys.stderr, inputs["id"]["value"][i]
+                except Exception as e:
+                    print(i, file=sys.stderr)
+                    print(e, file=sys.stderr)
+                    print(inputs["id"]["value"][i], file=sys.stderr)
                     # res+=[{"id": inputs["id"]["value"][i],"val": str(0)}]
-                print >> sys.stderr, res
+                print(res, file=sys.stderr)
         for i in range(int(inputs["id"]["length"])):
             isIn = False
             for j in range(len(res)):
@@ -125,7 +125,7 @@ def getIndexQuote(conf, inputs, outputs):
         import json
         outputs["Result"]["value"] = json.dumps(res)
         return zoo.SERVICE_SUCCEEDED
-    print >> sys.stderr, vals
+    print(vals, file=sys.stderr)
     if vals is not None and len(vals) > 0:
         outputs["Result"]["value"] = str(vals[0][1])
     else:
@@ -181,9 +181,9 @@ def searchByName(conf, inputs, outputs):
     suffix0 = " where "
     suffix01 = ""
     suffix10 = ""
-    if inputs.has_key("t_id") and inputs["t_id"]["value"] != "NULL":
+    if "t_id" in inputs and inputs["t_id"]["value"] != "NULL":
         suffix10 = " and t_id=" + inputs["t_id"]["value"]
-    if inputs.has_key("tid") and inputs["tid"]["value"] != "NULL":
+    if "tid" in inputs and inputs["tid"]["value"] != "NULL":
         if inputs["tid"]["value"] != "fav":
             suffix0 = ", " + inputs["tbl"]["value"] + "_themes WHERE " + inputs["tbl"]["value"] + ".id=" + inputs["tbl"]["value"] + "_themes.i_id and t_id=" + inputs["tid"]["value"] + " and "
         else:
@@ -202,16 +202,16 @@ def searchByName(conf, inputs, outputs):
     suffix2 = " and " + tprefix + "indicators.id in " + suffix20 + " and "
     suffix0 = ", " + inputs["tbl"]["value"] + "_groups " + suffix0 + " " + inputs["tbl"]["value"] + "_groups.i_id=" + inputs["tbl"]["value"] + ".id " + suffix2 + inputs["tbl"]["value"] + "_groups.g_id in " + suffix1 + " and "
     req = " SELECT DISTINCT ON (" + prefix + "id) " + prefix + "id," + prefix + "name from " + inputs["tbl"]["value"] + suffix0 + " name like '%" + inputs["val"]["value"] + "%' "
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     cur.execute(req)
     vals = cur.fetchall()
     rpath = conf["main"]["dataPath"] + "/indexes_maps/project_PIndex"
     for i in vals:
-        if inputs.has_key("public") and inputs["public"]["value"] == "true":
+        if "public" in inputs and inputs["public"]["value"] == "true":
             try:
                 f = open(rpath + str(i[0]) + ".map", "r")
                 res += [{"id": i[0], "label": i[1], "value": i[1]}]
-            except Exception, e:
+            except Exception as e:
                 pass
         else:
             res += [{"id": i[0], "label": i[1], "value": i[1]}]
@@ -223,7 +223,7 @@ def parseDocAttr(conf, inputs, outputs):
     import json
     res = []
     import zipfile
-    if inputs.has_key("fullpath"):
+    if "fullpath" in inputs:
         if inputs["fullpath"]["value"] == "true":
             fh = open(inputs["template"]["value"], "rb")
         else:
@@ -249,7 +249,7 @@ def setCurrentIndex(conf, inputs, outputs):
     import mapscript
     conf["senv"]["last_index"] = inputs["id"]["value"]
     inputs0 = {"table": {"value": "indicators"}, "id": inputs["id"]}
-    if inputs.has_key('tid'):
+    if 'tid' in inputs:
         inputs0["tid"] = inputs["tid"]
     inputs0["public"] = {"value": "true"}
     details(conf, inputs0, outputs)
@@ -316,23 +316,23 @@ def getIndexDisplayJs(conf, inputs, outputs):
     prefix = auth.getPrefix(conf)
     id = inputs["id"]["value"]
     id0 = ""
-    if inputs.has_key("tid") and inputs["tid"]["value"] != "null":
+    if "tid" in inputs and inputs["tid"]["value"] != "null":
         id += " and agregation and t_id=" + inputs["tid"]["value"]
-        if inputs.has_key("step"):
+        if "step" in inputs:
             id0 += " and step = " + inputs["step"]["value"]
         else:
             id0 += " and step is null"
     else:
-        if inputs.has_key("step"):
+        if "step" in inputs:
             id += " and (not(agregation) or agregation is null) and step = " + inputs["step"]["value"]
             id0 += " and step = " + inputs["step"]["value"]
         else:
             id += " and (not(agregation) or agregation is null) and step is null"
             id0 += " and step is null"
     req0 = "select name,order_by from " + prefix + "d_table where i_id=" + inputs["id"]["value"] + id0 + ""
-    print >> sys.stderr, req0
+    print(req0, file=sys.stderr)
     req = "select var,label,width from " + prefix + "dtable where it_id=(select id from " + tprefix + "indicators_territories where i_id=" + id + ") " + id0 + " order by pos"
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     import authenticate.service as auth
     con = auth.getCon(conf)
     cur = con.conn.cursor()
@@ -349,13 +349,13 @@ def getIndexDisplayJs(conf, inputs, outputs):
     val = cur.fetchall()
     res = []
     for i in range(0, len(val)):
-        print >> sys.stderr, str(val[i][1].encode("utf-8"))
+        print(str(val[i][1].encode("utf-8")), file=sys.stderr)
         res += [{"name": val[i][0], "display": str(val[i][1].encode('utf-8')).decode('utf-8'), "width": val[i][2], "sortable": 'true', "align": 'center'}]
         if order_by is None:
             order_by = res[0]["name"]
     import json
 
-    if inputs.has_key("tid"):
+    if "tid" in inputs:
         outputs["Result"]["value"] = json.dumps({"title": title, "ord": res[0]["name"], "values": res}, ensure_ascii=False).encode("utf-8")
     else:
         outputs["Result"]["value"] = json.dumps({"title": title, "ord": order_by, "values": res}, ensure_ascii=False).encode("utf-8")
@@ -369,30 +369,30 @@ def getIndexRequest(conf, inputs, outputs):
     id = inputs["id"]["value"]
     reqSuffix = ""
     tablePrefix = "indexes.view_idx"
-    if inputs.has_key("tid"):
+    if "tid" in inputs:
         tablePrefix = "indexes.agregate_t" + inputs["tid"]["value"] + "_idx_"
         reqSuffix += " and agregation and t_id=" + inputs["tid"]["value"]
     else:
         reqSuffix += " and (not(agregation) or agregation is null)"
     clause = ""
-    if inputs.has_key("query") and inputs["query"]["value"][0] != '<':
+    if "query" in inputs and inputs["query"]["value"][0] != '<':
         clause = inputs["qtype"]["value"] + " LIKE " + str(adapt(inputs["query"]["value"].replace("*", "%")))
     reqSuffix0 = ""
     dtableSuffix = " and step is null"
     tableName = tablePrefix + id
-    if inputs.has_key("step"):
+    if "step" in inputs:
         dtableSuffix = " and step = " + inputs["step"]["value"]
-        if inputs.has_key("tid"):
+        if "tid" in inputs:
             tableName += "_step" + inputs["step"]["value"]
     endReq = " order by " + inputs["sortname"]["value"] + " " + inputs["sortorder"]["value"]
-    if inputs.has_key("_id"):
+    if "_id" in inputs:
         reqSuffix0 += " WHERE " + inputs["_id"]["value"]
         endReq = ""
     req = "select value,var,label from dtable where it_id=(select id from " + tprefix + "indicators_territories where i_id=" + id + reqSuffix + ") " + dtableSuffix + " order by pos"
     import authenticate.service as auth
     con = auth.getCon(conf)
     cur = con.conn.cursor()
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     cur.execute(req)
     vals = cur.fetchall()
     field_to_display = ""
@@ -401,20 +401,20 @@ def getIndexRequest(conf, inputs, outputs):
         if field_to_display != "":
             field_to_display += ","
         field_to_display += vals[i][0].encode('utf-8') + ' AS "' + vals[i][2].encode('utf-8') + '"'
-        print >> sys.stderr, vals[i][2].encode('utf-8')
+        print(vals[i][2].encode('utf-8'), file=sys.stderr)
         fields += [vals[i][1]]
         fields_to_display += [vals[i][0]]
     if clause != "":
         req = "select count(*) from " + tablePrefix + id + " WHERE " + clause
     else:
         req = "select count(*) from " + tablePrefix + id + " " + clause
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     cur.execute(req)
     val = cur.fetchone()
-    if inputs.has_key("sortorder"):
+    if "sortorder" in inputs:
         for j in range(0, len(fields)):
-            print >> sys.stderr, fields[j]
-            print >> sys.stderr, inputs["sortname"]["value"]
+            print(fields[j], file=sys.stderr)
+            print(inputs["sortname"]["value"], file=sys.stderr)
             if fields[j] == inputs["sortname"]["value"]:
                 sortN = fields_to_display[j]
                 break
@@ -436,30 +436,30 @@ def _getIndexValues(conf, inputs, fields):
     id = inputs["id"]["value"]
     reqSuffix = ""
     tablePrefix = "indexes.view_idx"
-    if inputs.has_key("tid") and inputs["tid"]["value"] != "null":
+    if "tid" in inputs and inputs["tid"]["value"] != "null":
         tablePrefix = "indexes.agregate_t" + inputs["tid"]["value"] + "_idx_"
         reqSuffix += " and agregation and t_id=" + inputs["tid"]["value"]
     else:
         reqSuffix += " and (not(agregation) or agregation is null)"
     clause = ""
-    if inputs.has_key("query") and inputs["query"]["value"] != "":
+    if "query" in inputs and inputs["query"]["value"] != "":
         clause = inputs["qtype"]["value"] + " LIKE " + str(adapt(inputs["query"]["value"].replace("*", "%")))
     reqSuffix0 = ""
     dtableSuffix = " and step is null"
     tableName = tablePrefix + id
-    if inputs.has_key("step"):
+    if "step" in inputs:
         dtableSuffix = " and step = " + inputs["step"]["value"]
         # if inputs.has_key("tid"):
         #    tableName+="_step"+inputs["step"]["value"]
     endReq = " order by " + inputs["sortname"]["value"] + " " + inputs["sortorder"]["value"] + " limit " + inputs["limit"]["value"] + " offset " + str(int(inputs["limit"]["value"]) * (int(inputs["page"]["value"]) - 1))
-    if inputs.has_key("_id"):
+    if "_id" in inputs:
         reqSuffix0 += " WHERE " + inputs["_id"]["value"]
         endReq = ""
     req = "select value,var from dtable where it_id=(select id from " + tprefix + "indicators_territories where i_id=" + id + reqSuffix + ") " + dtableSuffix + " order by pos"
     import authenticate.service as auth
     con = auth.getCon(conf)
     cur = con.conn.cursor()
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     cur.execute(req)
     vals = cur.fetchall()
     field_to_display = ""
@@ -475,13 +475,13 @@ def _getIndexValues(conf, inputs, fields):
         req = "select count(*) from " + tablePrefix + id + " WHERE " + clause
     else:
         req = "select count(*) from " + tablePrefix + id + " " + clause
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     cur.execute(req)
     val = cur.fetchone()
-    if inputs.has_key("sortorder"):
+    if "sortorder" in inputs:
         for j in range(0, len(fields)):
-            print >> sys.stderr, fields[j]
-            print >> sys.stderr, inputs["sortname"]["value"]
+            print(fields[j], file=sys.stderr)
+            print(inputs["sortname"]["value"], file=sys.stderr)
             if fields[j] == inputs["sortname"]["value"]:
                 sortN = fields_to_display[j]
                 break
@@ -495,7 +495,7 @@ def _getIndexValues(conf, inputs, fields):
             req = "select " + field_to_display + " from " + tableName + reqSuffix0 + " WHERE " + clause + endReq
     else:
         req = "select " + field_to_display + " from " + tableName + reqSuffix0 + endReq
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     cur.execute(req.encode("utf-8"))
     val = cur.fetchall()
     return [cnt, val]
@@ -511,12 +511,12 @@ def getIndexValues(conf, inputs, outputs):
         for j in range(0, len(fields)):
             try:
                 res += ("<" + fields[j] + ">").encode("utf-8") + val[i][j].encode("utf-8") + ("</" + fields[j] + ">").encode("utf-8")
-            except Exception, e:
+            except Exception as e:
                 try:
                     res += ("<" + fields[j] + ">").encode("utf-8") + str(val[i][j]).encode("utf-8") + ("</" + fields[j] + ">").encode("utf-8")
                 except:
                     res += ("<" + fields[j] + ">").encode("utf-8") + str(val[i][j]) + ("</" + fields[j] + ">").encode("utf-8")
-                print >> sys.stderr, e
+                print(e, file=sys.stderr)
         res += "</featureMember>"
     res += "</FeatureCollection>"
     outputs["Result"]["value"] = res
@@ -537,7 +537,7 @@ def getIndex(conf, inputs, outputs):
         import time, os
         immap = conf["main"]["dataPath"] + "/indexes_maps/project_PIndex" + str(vals[0][0]) + ".map"
         res["pdate"] = time.strftime(conf["mm"]["dateFormat"], time.localtime(os.path.getmtime(immap)))
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("Error occur whenre trying to access the index map") + str(e)
         return zoo.SERVICE_FAILED
     import mapscript
@@ -565,9 +565,9 @@ def publishIndex(conf, inputs, outputs):
             m.web.metadata.set('cache_file', "TEMP_" + conf["senv"]["MMID"] + "-" + inputs["id"]["value"] + "")
             if not (passed):
                 inputs0 = {"file": {"value": "TEMP_" + conf["senv"]["MMID"] + "-" + inputs["id"]["value"] + ""}}
-                print >> sys.stderr, "START"
+                print("START", file=sys.stderr)
                 csv2ods(conf, inputs0, outputs)
-                print >> sys.stderr, "END"
+                print("END", file=sys.stderr)
                 passed = True
             m.save(name.replace("Index", "PIndex"))
         for name in glob.glob(rpath + "/*_GIndex" + inputs["id"]["value"] + "*.map"):
@@ -575,7 +575,7 @@ def publishIndex(conf, inputs, outputs):
         outputs["Result"]["value"] = zoo._("Index successfully published")
         sys.stderr.close()
         return zoo.SERVICE_SUCCEEDED
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("Unable to access any index file")
         return zoo.SERVICE_FAILED
     return zoo.SERVICE_FAILED
@@ -591,7 +591,7 @@ def unpublishIndex(conf, inputs, outputs):
             os.unlink(name)
         outputs["Result"]["value"] = zoo._("Index successfully unpublished")
         return zoo.SERVICE_SUCCEEDED
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("Unable to access any index file")
         return zoo.SERVICE_FAILED
     return zoo.SERVICE_FAILED
@@ -604,7 +604,7 @@ def getIndexStyle(conf, inputs, outputs):
     import mapscript, json
     m = mapscript.mapObj(conf["main"]["dataPath"] + "/indexes_maps/project_Index" + inputs["id"]["value"] + ".map")
     l = m.getLayer(0);
-    print >> sys.stderr, dir(l)
+    print(dir(l), file=sys.stderr)
     try:
         tmp = l.metadata.get("mmColor").split(" ")
         icol = '%02x%02x%02x' % (int(tmp[0]), int(tmp[1]), int(tmp[2]))
@@ -615,9 +615,9 @@ def getIndexStyle(conf, inputs, outputs):
         ocol = '%02x%02x%02x' % (int(tmp[0]), int(tmp[1]), int(tmp[2]))
     except:
         ocol = '777777'
-    print >> sys.stderr, (l.metadata.get("mmClass") == "tl")
+    print((l.metadata.get("mmClass") == "tl"), file=sys.stderr)
     if l.metadata.get("mmClass") == "tl":
-        if inputs.has_key("step"):
+        if "step" in inputs:
             idx = inputs["step"]["value"]
             m1 = mapscript.mapObj(conf["main"]["dataPath"] + "/indexes_maps/timeline_Index" + inputs["id"]["value"] + "_indexes_view_idx" + inputs["id"]["value"] + "_step" + inputs["step"]["value"] + ".map")
         else:
@@ -652,9 +652,9 @@ def saveIndexTable(conf, inputs, outputs):
         "name": inputs["name"],
         "i_id": inputs["i_id"],
     }
-    if inputs.keys().count("id") > 0:
+    if list(inputs.keys()).count("id") > 0:
         inputs0["id"] = inputs["id"]
-    if inputs.keys().count("id") == 0:
+    if list(inputs.keys()).count("id") == 0:
         insertElem(conf, inputs0, outputs)
         # obj=detailsIndicateurs(conf,inputs,cur,inputs["i_id"]["value"],"table",prefix)
     else:
@@ -676,43 +676,43 @@ def saveIndexDisplaySettings(conf, inputs, outputs):
     ofields = ""
     ovals = ""
     oSuffix = ""
-    if inputs.has_key("step"):
+    if "step" in inputs:
         ofields = ",step"
         ovals = "," + inputs["step"]["value"]
         oSuffix = " and step=" + inputs["step"]["value"]
     reqSuffix = " and (not(agregation) or agregation is null)"
-    if inputs.has_key("tid"):
+    if "tid" in inputs:
         reqSuffix = " and t_id=" + inputs["tid"]["value"] + " and agregation"
     req = "delete from " + prefix + "dtable where it_id=(select id from " + prefix + "indicators_territories where i_id=" + inputs["id"]["value"] + reqSuffix + ")" + oSuffix
     cur.execute(req)
     con.conn.commit()
 
     for i in range(0, len(inputs["tuple"]["value"])):
-        print >> sys.stderr, inputs["tuple"]["value"][i]
+        print(inputs["tuple"]["value"][i], file=sys.stderr)
         tmp = json.loads(inputs["tuple"]["value"][i])
-        print >> sys.stderr, tmp
+        print(tmp, file=sys.stderr)
         tmp = eval(inputs["tuple"]["value"][i])
-        print >> sys.stderr, tmp
+        print(tmp, file=sys.stderr)
         try:
-            print >> sys.stderr, tmp["label"]
+            print(tmp["label"], file=sys.stderr)
             tmp0 = "%s" % adapt(tmp["value"])
             tmp["value"] = str(tmp0)
             tmp0 = "%s" % adapt(tmp["label"])
-            print >> sys.stderr, tmp0
+            print(tmp0, file=sys.stderr)
             tmp["label"] = str(tmp0)
             tmp0 = "%s" % adapt(tmp["var"])
             tmp["var"] = str(tmp0)
             if tmp["pos"] == "":
                 tmp["pos"] = "(select count(*) from " + prefix + "dtable where it_id=(select id from " + prefix + "indicators_territories where i_id=" + inputs["id"]["value"] + reqSuffix + "))" + oSuffix
-            print >> sys.stderr, tmp["value"]
+            print(tmp["value"], file=sys.stderr)
             req = "INSERT INTO " + prefix + "dtable (it_id,display,search,pos,var,label,value,width" + ofields + ") VALUES ((select id from " + prefix + "indicators_territories where i_id=" + inputs["id"]["value"] + reqSuffix + ")," + tmp["display"] + "," + tmp["search"] + "," + tmp["pos"] + "," + tmp["var"] + "," + \
                   tmp["label"] + "," + tmp["value"] + "," + tmp["width"] + "" + ovals + ")"
-            print >> sys.stderr, req
+            print(req, file=sys.stderr)
             cur.execute(req)
             con.conn.commit()
-        except Exception, e:
+        except Exception as e:
             con.conn.commit()
-            print >> sys.stderr, e
+            print(e, file=sys.stderr)
             pass
     outputs["Result"]["value"] = zoo._("Index display settings saved")
     return zoo.SERVICE_SUCCEEDED
@@ -757,9 +757,9 @@ def saveRepportSettings(conf, inputs, outputs):
     reqSuffix0 = " and step is null"
     fields0 = ""
     values0 = ""
-    if inputs.has_key("tid"):
+    if "tid" in inputs:
         reqSuffix = " and t_id=" + inputs["tid"]["value"]
-    if inputs.has_key("step"):
+    if "step" in inputs:
         reqSuffix0 = " and step=" + inputs["step"]["value"]
         fields0 = ",step"
         values0 = "," + inputs["step"]["value"]
@@ -777,13 +777,13 @@ def saveRepportSettings(conf, inputs, outputs):
             tmp["display"] = str(tmp0)
             tmp0 = "%s" % adapt(tmp["var"])
             tmp["var"] = str(tmp0)
-            if not (tmp.has_key("pos")):
+            if not ("pos" in tmp):
                 tmp["pos"] = "(select id from " + prefix + "indicators_territories where i_id=" + inputs["id"]["value"] + reqSuffix + ")"
             req = "INSERT INTO " + prefix + "rtable (it_id,display,var,typ,value" + fields0 + ") VALUES (" + tmp["pos"] + "," + tmp["display"] + "," + tmp["var"] + "," + str(tmp["type"]) + "," + tmp["value"] + "" + values0 + ")"
             cur.execute(req)
             con.conn.commit()
-        except Exception, e:
-            print >> sys.stderr, "ERROR !!" + str(e)
+        except Exception as e:
+            print("ERROR !!" + str(e), file=sys.stderr)
             con.conn.commit()
             pass
     outputs["Result"]["value"] = zoo._("Repport settings saved")
@@ -823,7 +823,7 @@ def createAgregate(conf, inputs, outputs):
     cfield = None
     geomc = None
     for i in range(0, len(vals)):
-        print >> sys.stderr, vals[i]
+        print(vals[i], file=sys.stderr)
         if vals[i][3] == "PRI":
             cfield = vals[i][1]
         if vals[i][2] == "geometry":
@@ -841,7 +841,7 @@ def createAgregate(conf, inputs, outputs):
     fields0 = ""
     values0 = ""
     field0 = inputs["field"]["value"]
-    if inputs.has_key("step"):
+    if "step" in inputs:
         # tbl0Name="indexes.view_idx_"+inputs["id"]["value"]+"_"+inputs["step"]["value"]
         mapSuffix = "_step" + inputs["step"]["value"]
         aTblName += "_step" + inputs["step"]["value"]
@@ -858,27 +858,27 @@ def createAgregate(conf, inputs, outputs):
     try:
         cur.execute(req)
         con.conn.commit()
-    except Exception, e:
-        print >> sys.stderr, e
+    except Exception as e:
+        print(e, file=sys.stderr)
         con.conn.commit()
     req = "CREATE TABLE " + aTblName + " as (SELECT min(" + tblName + "." + cfield + ") as " + cfield + ", " + formula + " as " + field0 + " from " + tblName + "," + tbl0Name + " WHERE ST_Within(" + tbl0Name + ".wkb_geometry," + tblName + ".wkb_geometry) group by " + tblName + "." + cfield + "); ALTER TABLE " + aTblName + " add constraint " + aTblName.replace(
         ".", "_") + "_pkey primary key(" + cfield + "); CREATE VIEW " + aVName + " AS (select " + tblName + ".*," + field0 + " from " + tblName + ", " + aTblName + " where " + tblName + "." + cfield + "=" + aTblName + "." + cfield + ");"
     try:
-        print >> sys.stderr, req
+        print(req, file=sys.stderr)
         cur.execute(req)
         con.conn.commit()
-    except Exception, e:
+    except Exception as e:
         con.conn.commit()
         conf["lenv"]["message"] = zoo._("Issue occurs: " + str(e))
         return zoo.SERVICE_FAILED
 
     req = "DELETE FROM " + tprefix + "indicators_territories WHERE i_id=" + inputs["id"]["value"] + " and t_id=" + inputs["tid"]["value"] + reqSuffix0 + ";INSERT INTO " + tprefix + "indicators_territories (i_id,t_id,agregation) VALUES (" + inputs["id"]["value"] + "," + inputs["tid"]["value"] + ",true)";
     try:
-        print >> sys.stderr, req
+        print(req, file=sys.stderr)
         cur.execute(req)
         con.conn.commit()
         addLayerForIndex(conf, inputs, outputs)
-    except Exception, e:
+    except Exception as e:
         con.conn.commit()
         conf["lenv"]["message"] = zoo._("Issue occurs: " + str(e))
         return zoo.SERVICE_FAILED
@@ -888,7 +888,7 @@ def createAgregate(conf, inputs, outputs):
     cur.execute(req)
     con.conn.commit()
 
-    if inputs.has_key("step"):
+    if "step" in inputs:
         m = mapscript.mapObj(conf["main"]["dataPath"] + "/indexes_maps/timeline_Index" + inputs["id"]["value"] + "_indexes_view_idx" + inputs["id"]["value"] + "_step" + inputs["step"]["value"] + ".map")
     else:
         m = mapscript.mapObj(conf["main"]["dataPath"] + "/indexes_maps/project_Index" + inputs["id"]["value"] + ".map")
@@ -896,13 +896,13 @@ def createAgregate(conf, inputs, outputs):
     m.getLayer(0).data = aVName
     m.getLayer(0).metadata.set("ows_name", aVName)
     m.getLayer(0).metadata.set("ows_title", aVName)
-    if inputs.has_key("step"):
+    if "step" in inputs:
         m.save(conf["main"]["dataPath"] + "/indexes_maps/project_A" + inputs["tid"]["value"] + "_Index" + inputs["id"]["value"] + "_step" + inputs["step"]["value"] + ".map")
     else:
         m.save(conf["main"]["dataPath"] + "/indexes_maps/project_A" + inputs["tid"]["value"] + "_Index" + inputs["id"]["value"] + ".map")
     l = m.getLayer(0)
     import mapfile.service as mapfile
-    print >> sys.stderr, dir(l.getClass(0))
+    print(dir(l.getClass(0)), file=sys.stderr)
     form = l.metadata.get('mmColor').split(" ")
     for i in range(0, len(form)):
         if form[i] != "":
@@ -913,8 +913,8 @@ def createAgregate(conf, inputs, outputs):
             to[i] = int(to[i])
     form.pop(len(form) - 1)
     to.pop(len(to) - 1)
-    print >> sys.stderr, form
-    print >> sys.stderr, to
+    print(form, file=sys.stderr)
+    print(to, file=sys.stderr)
     inputs1 = {
         "prefix": {"value": "indexes"},
         "orig": {"value": conf["main"]["dbuserName"]},
@@ -931,7 +931,7 @@ def createAgregate(conf, inputs, outputs):
     }
     if l.metadata.get("mmMethod") is not None:
         inputs1["method"] = {"value": l.metadata.get("mmMethod")}
-    print >> sys.stderr, inputs1
+    print(inputs1, file=sys.stderr)
     outputs1 = {"Result": {"value": ""}}
     mapfile.classifyMap(conf, inputs1, outputs)
 
@@ -945,18 +945,18 @@ def joinIndexTable(conf, inputs, outputs):
     cur = con.conn.cursor()
     prefix = auth.getPrefix(conf)
     tblName = "indexes.idx_table_" + inputs["id"]["value"]
-    print >> sys.stderr, inputs
+    print(inputs, file=sys.stderr)
     req = "select datasource from " + prefix + "territories where id='" + inputs["territory"]["value"] + "'"
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     cur.execute(req)
     vals = cur.fetchall()
-    print >> sys.stderr, vals
+    print(vals, file=sys.stderr)
 
     fields = ""
-    print >> sys.stderr, inputs["rcol"].keys()
-    print >> sys.stderr, inputs["rcol"]["value"][0]
+    print(list(inputs["rcol"].keys()), file=sys.stderr)
+    print(inputs["rcol"]["value"][0], file=sys.stderr)
     for i in ["rcol", "field"]:
-        if inputs[i].keys().count("length") == 0:
+        if list(inputs[i].keys()).count("length") == 0:
             inputs[i]["value"] = inputs[i]["value"].split(",")
 
     for i in inputs["rcol"]["value"]:
@@ -964,20 +964,20 @@ def joinIndexTable(conf, inputs, outputs):
             fields += ","
         fields += tblName + "." + i + " AS o" + i
 
-    print >> sys.stderr, inputs["field"]["value"]
+    print(inputs["field"]["value"], file=sys.stderr)
 
     try:
         import os
         os.unlink(conf["main"]["dataPath"] + "/indexes_maps/project_Index" + inputs["id"]["value"] + ".map")
     except Exception as e:
-        print >> sys.stderr, str(e)
+        print(str(e), file=sys.stderr)
         pass
     req = "CREATE view indexes.view_idx" + inputs["id"]["value"] + " AS (SELECT foo.*," + fields + " FROM " \
           + tblName + "," \
           + "(" \
           + "SELECT * FROM " + vals[0][0] \
           + ") as foo where foo." + inputs["field"]["value"][1] + "=" + tblName + "." + inputs["field"]["value"][0] + "::varchar(255))"
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     cur.execute(req)
     con.conn.commit()
 
@@ -991,17 +991,17 @@ def joinIndexTable(conf, inputs, outputs):
     con.conn.commit()
 
     filename = "NULL"
-    if inputs.has_key("filename") and inputs["filename"]["value"] != "NULL":
+    if "filename" in inputs and inputs["filename"]["value"] != "NULL":
         filename = "%s" % adapt(inputs["filename"]["value"]).getquoted()
     query = "NULL"
-    if inputs.has_key("query") and inputs["query"]["value"] != "":
+    if "query" in inputs and inputs["query"]["value"] != "":
         query = "%s" % adapt(inputs["query"]["value"]).getquoted()
     ds = "NULL"
-    if inputs.has_key("dbname") and inputs["dbname"]["value"] != "-1":
+    if "dbname" in inputs and inputs["dbname"]["value"] != "-1":
         ds = "%s" % adapt(inputs["dbname"]["value"]).getquoted()
     req = "insert into " + prefix + "indicators_territories (i_id,o_key_link,t_id,filename,tbl_link,tbl_key_link,fields,query,ds) VALUES (" + inputs["id"]["value"] + ",'" + inputs["field"]["value"][1] + "'," + inputs["territory"]["value"] + "," + filename + ",'" + inputs["layer"]["value"] + "','" + \
           inputs["field"]["value"][0] + "','" + "indexes.idx_table_" + inputs["id"]["value"] + "." + inputs["field"]["value"][0] + "," + fields + "'," + query + "," + ds + ")"
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     cur.execute(req)
     con.conn.commit()
 
@@ -1013,8 +1013,8 @@ def dropTempFile(conf, inputs, outputs):
     import os
     try:
         os.unlink(conf["main"]["tmpPath"] + "/temporary_index.csv")
-    except Exception, e:
-        print >> sys.stderr, str(e)
+    except Exception as e:
+        print(str(e), file=sys.stderr)
     outputs["Result"]["value"] = zoo._("Table was successfully removed.")
     return zoo.SERVICE_SUCCEEDED
 
@@ -1027,23 +1027,23 @@ def dropTable(conf, inputs, outputs):
         req = "DROP VIEW indexes.view_idx" + inputs["id"]["value"] + " CASCADE"
         cur.execute(req)
         con.conn.commit()
-    except Exception, e:
-        print >> sys.stderr, e
+    except Exception as e:
+        print(e, file=sys.stderr)
         pass
     try:
         con.conn.commit()
         req = "DROP TABLE indexes.idx_table_" + inputs["id"]["value"] + "  CASCADE"
         cur.execute(req)
         con.conn.commit()
-    except Exception, e:
-        print >> sys.stderr, e
+    except Exception as e:
+        print(e, file=sys.stderr)
         pass
     outputs["Result"]["value"] = zoo._("Index was successfully removed.")
     return zoo.SERVICE_SUCCEEDED
 
 
 def getLastFile(conf, inputs, outputs):
-    if conf["senv"].has_key("last_file"):
+    if "last_file" in conf["senv"]:
         outputs["Result"]["value"] = conf["senv"]["last_file"]
     else:
         outputs["Result"]["value"] = "None"
@@ -1053,14 +1053,14 @@ def getLastFile(conf, inputs, outputs):
 def setLastFile(conf, inputs, outputs):
     import mmsession
     import sys
-    print >> sys.stderr, "OK DEBUG " + str(conf["senv"])
-    print >> sys.stderr, "OK DEBUG " + str(inputs)
+    print("OK DEBUG " + str(conf["senv"]), file=sys.stderr)
+    print("OK DEBUG " + str(inputs), file=sys.stderr)
     conf["senv"]["last_file"] = conf["main"]["tmpPath"] + "/" + inputs["last_file"]["value"]
-    print >> sys.stderr, str(conf["senv"])
-    print >> sys.stderr, conf["senv"]["last_file"]
+    print(str(conf["senv"]), file=sys.stderr)
+    print(conf["senv"]["last_file"], file=sys.stderr)
     if mmsession.save(conf) == zoo.SERVICE_SUCCEEDED:
         outputs["Result"]["value"] = conf["senv"]["last_file"]
-        print >> sys.stderr, "SAVED CONF !!!!"
+        print("SAVED CONF !!!!", file=sys.stderr)
         return zoo.SERVICE_SUCCEEDED
     else:
         return zoo.SERVICE_FAILED
@@ -1074,7 +1074,7 @@ def testQuery(conf, inputs, outputs):
     import json
     tmp = inputs["dbname"]["value"].split(':')
     pg.load(conf, {"name": {"value": tmp[1]}, "type": {"value": tmp[0]}}, outputs)
-    print >> sys.stderr, outputs["Result"]["value"]
+    print(outputs["Result"]["value"], file=sys.stderr)
     v = json.loads(outputs["Result"]["value"])
     dbs = ""
     notAllowed = ['stype', 'name']
@@ -1091,7 +1091,7 @@ def testQuery(conf, inputs, outputs):
             styledoc = libxml2.parseFile(conf["main"]["dataPath"] + "/" + tmp[0] + "/conn.xsl")
             style = libxslt.parseStylesheetDoc(styledoc)
             result = style.applyStylesheet(doc, None)
-            print >> sys.stderr, result.content
+            print(result.content, file=sys.stderr)
             ds = ogr.Open(result.content)
             res = ds.ExecuteSQL(inputs["query"]["value"], None, None)
             n = res.GetFeatureCount()
@@ -1101,7 +1101,7 @@ def testQuery(conf, inputs, outputs):
                 outputs["Result"]["value"] = zoo._("Your query sounds correct but didn't return any result")
                 # con=mdb.connect(dbs)
             return zoo.SERVICE_SUCCEEDED
-        except Exception, e:
+        except Exception as e:
             conf["lenv"]["message"] = zoo._("Unable to access the database") + str(e)
             return zoo.SERVICE_FAILED
     try:
@@ -1113,7 +1113,7 @@ def testQuery(conf, inputs, outputs):
         else:
             outputs["Result"]["value"] = zoo._("Your query sounds correct but didn't return any result")
         con.close()
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("Unable to run your query for the following reason: ") + str(e)
         return zoo.SERVICE_FAILED
     return zoo.SERVICE_SUCCEEDED
@@ -1139,7 +1139,7 @@ def getMapRequest(conf, inputs, outputs):
         l = m.getLayer(i)
         if l.data == dsn:
             outputs["Result"]["value"] = conf["main"]["mapserverAddress"] + "?map=" + conf["main"]["dataPath"] + "/PostGIS/" + conf["main"]["dbuserName"] + "ds_ows.map"
-            if inputs.has_key("preview") and inputs["preview"]["inRequest"] == "true":
+            if "preview" in inputs and inputs["preview"]["inRequest"] == "true":
                 ext = l.getExtent()
                 ext.project(mapscript.projectionObj(l.getProjection()), mapscript.projectionObj("EPSG:4326"))
                 minw = 300
@@ -1154,7 +1154,7 @@ def getMapRequest(conf, inputs, outputs):
                     h = (300 * diffY) / diffX
                 outputs["Result"]["value"] += "&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=" + str(ext.minx) + "," + str(ext.miny) + "," + str(ext.maxx) + "," + str(ext.maxy) + "&SRS=EPSG:4326&WIDTH=" + str(w) + "&HEIGHT=" + str(h) + "&LAYERS=" + dsn
             else:
-                if inputs.has_key("layer"):
+                if "layer" in inputs:
                     dsn = inputs["layer"]["value"]
                 outputs["Result"]["value"] += "&SERVICE=WFS&VERSION=1.0.0&REQUEST=DescribeFeatureType&typename=" + dsn
             break
@@ -1163,8 +1163,8 @@ def getMapRequest(conf, inputs, outputs):
 
 def getMapRequest0(conf, inputs, outputs):
     getMapRequest(conf, inputs, outputs)
-    import urllib2
-    u = urllib2.urlopen(outputs["Result"]["value"])
+    import urllib.request, urllib.error, urllib.parse
+    u = urllib.request.urlopen(outputs["Result"]["value"])
     outputs["Result"]["value"] = u.read()
     return zoo.SERVICE_SUCCEEDED
 
@@ -1183,7 +1183,7 @@ def listDefault(tbl, cur, clause=None):
 
 
 def listThemes(cur, prefix, group='public', clause=None, clause1=None):
-    print >> sys.stderr, "GROUPS :" + group
+    print("GROUPS :" + group, file=sys.stderr)
     req0 = "select * from " + prefix + "themes where "
     if clause is not None:
         req0 += clause
@@ -1200,7 +1200,7 @@ def listThemes(cur, prefix, group='public', clause=None, clause1=None):
     if clause1 is not None:
         req0 += " AND " + clause1
     req0 += " order by ord"
-    print >> sys.stderr, "\n+++++++REQ0 === " + req0
+    print("\n+++++++REQ0 === " + req0, file=sys.stderr)
     res = cur.execute(req0)
     vals = cur.fetchall()
     elems = []
@@ -1217,7 +1217,7 @@ def listExtent(conf, cur, tbl):
     import datastores.directories.service as ds
     import os
     req0 = "select id, title as text, replace(replace(replace(ST_Extent(ST_transform(wkb_geometry,3857))::text,' ',','),'BOX(',''),')','') as ext from " + tbl + " group by id order by id desc"
-    print >> sys.stderr, "\n+++++++REQ0 === " + req0
+    print("\n+++++++REQ0 === " + req0, file=sys.stderr)
     res = cur.execute(req0)
     vals = cur.fetchall()
     elems = []
@@ -1226,7 +1226,7 @@ def listExtent(conf, cur, tbl):
         try:
             elems += [{"id": vals[i][0], "text": vals[i][1], "ext": vals[i][2],
                        "size": ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"] + "/tiles/mmTiles-g-" + str(vals[i][0]) + ".db"))}]  # elems[len(elems)-1]["size"]=ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+str(vals[i][0])+".db")
-        except Exception, e:
+        except Exception as e:
             elems += [{"id": vals[i][0], "text": vals[i][1], "ext": vals[i][2], "size": "0Mb"}]
         # try:
         #    elems[len(elems)-1]["size"]=ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+str(vals[i][0])+".db")
@@ -1239,14 +1239,14 @@ def listExtent(conf, cur, tbl):
 def flatElements(l, res):
     for i in range(0, len(l)):
         res["id_" + str(l[i]["id"])] = l[i]["text"]
-        if l[i].has_key("children"):
+        if "children" in l[i]:
             flatElements(l[i]["children"], res)
 
 
 def flatTerritoires(l, res):
     for i in range(0, len(l)):
         res["id_" + str(l[i]["id"])] = l[i]["text"]
-        if l[i].has_key("children"):
+        if "children" in l[i]:
             flatTerritoires(l[i]["children"], res)
 
 
@@ -1314,7 +1314,7 @@ def list(conf, inputs, outputs):
                 res = listDefault(prefix + inputs["table"]["value"], cur, " order by ord")
             else:
                 if inputs["table"]["value"].count('.') > 0:
-                    if inputs.keys().count("cond"):
+                    if list(inputs.keys()).count("cond"):
                         res = listDefault(inputs["table"]["value"], cur, inputs["cond"]["value"])
                     else:
                         res = listDefault(inputs["table"]["value"], cur)
@@ -1335,7 +1335,7 @@ def orderElement(conf, inputs, outputs):
     con = auth.getCon(conf)
     con.connect()
     cur = con.conn.cursor()
-    if inputs["node"].has_key("length"):
+    if "length" in inputs["node"]:
         for i in range(0, int(inputs["node"]["length"])):
             cur.execute("UPDATE " + inputs["table"]["value"] + " set ord=" + str(i + 1) + " WHERE id=" + inputs["node"]["value"][i])
     else:
@@ -1358,22 +1358,22 @@ def insertElement(conf, inputs, outputs):
         val_sufix = ""
         if inputs["table"]["value"].count(".") > 0:
             prefix = ""
-            inputsKeys = inputs.keys()
+            inputsKeys = list(inputs.keys())
             if inputsKeys.count('title'):
                 col_sufix = ",title"
                 val_sufix = "," + str(adapt(inputs["title"]["value"]))
             if len(inputsKeys) > 2:
                 for i in inputsKeys:
-                    print >> sys.stderr, i
+                    print(i, file=sys.stderr)
                     if i != "table" and i != "name" and i != "title":
                         col_sufix += "," + i
                         val_sufix += "," + str(adapt(inputs[i]["value"]))
         else:
             prefix = auth.getPrefix(conf)
-        print >> sys.stderr, "INSERT INTO " + prefix + inputs["table"]["value"] + " (name" + col_sufix + ") VALUES (" + str(adapt(inputs["name"]["value"])) + "" + val_sufix + ")"
+        print("INSERT INTO " + prefix + inputs["table"]["value"] + " (name" + col_sufix + ") VALUES (" + str(adapt(inputs["name"]["value"])) + "" + val_sufix + ")", file=sys.stderr)
         cur.execute("INSERT INTO " + prefix + inputs["table"]["value"] + " (name" + col_sufix + ") VALUES (" + str(adapt(inputs["name"]["value"])) + "" + val_sufix + ")")
         outputs["Result"]["value"] = zoo._("Done")
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("An error occured when processing your request: ") + str(e)
         return zoo.SERVICE_FAILED
     con.conn.commit()
@@ -1389,19 +1389,19 @@ def createGraphView(conf, inputs, con, cur):
     id = str(vals[0])
     tblName = "indexes.view_idx_g_" + id + ""
     otblName = "indexes.view_idx" + id
-    if inputs.has_key("tid"):
+    if "tid" in inputs:
         tblName = "indexes.view_idx_g_" + id + "_t_" + inputs["tid"]["value"]
         otblName = "indexes.agregate_t" + inputs["tid"]["value"] + "_idx_" + id
 
     import mapscript
-    if inputs.has_key("tid"):
+    if "tid" in inputs:
         omapfile = conf["main"]["dataPath"] + "/indexes_maps/project_A" + inputs["tid"]["value"] + "_Index" + id + ".map"
     else:
         omapfile = conf["main"]["dataPath"] + "/indexes_maps/project_Index" + id + ".map"
     m = mapscript.mapObj(omapfile)
     ext = m.getLayer(0).extent
     m.setExtent(ext.minx, ext.miny, ext.maxx, ext.maxy);
-    if inputs.has_key("step"):
+    if "step" in inputs:
         tmp = m.getLayer(0).metadata.get("mmSteps").split(",")
         # if tmp.count(inputs["step"]["value"])>0:
         #    tblName+="_"+str(tmp.index(inputs["step"]["value"]))
@@ -1410,25 +1410,25 @@ def createGraphView(conf, inputs, con, cur):
     try:
         cur.execute(req)
         con.commit()
-    except Exception, e:
-        print >> sys.stderr, e
+    except Exception as e:
+        print(e, file=sys.stderr)
         con.commit()
     formula = inputs["formula"]["value"]
     vx = inputs["vx"]["value"]
     vy = inputs["vy"]["value"]
     req = "CREATE VIEW " + tblName + " AS (SELECT ogc_fid,wkb_geometry," + vx + "," + (formula.replace("[_X_]", inputs["vy"]["value"])) + " as " + vy + " FROM " + otblName + ") "
-    if inputs.has_key("tid"):
+    if "tid" in inputs:
         req = "CREATE VIEW " + tblName + " AS (SELECT ogc_fid,wkb_geometry," + vx + "," + ("[_X_]".replace("[_X_]", inputs["vy"]["value"])) + " as " + vy + " FROM " + otblName + ") "
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     try:
         cur.execute(req)
         con.commit()
-    except Exception, e:
-        print >> sys.stderr, e
+    except Exception as e:
+        print(e, file=sys.stderr)
         con.commit()
-    if inputs.has_key("step"):
+    if "step" in inputs:
         tmp = m.getLayer(0).metadata.get("mmSteps").split(",")
-        if inputs.has_key("tid"):
+        if "tid" in inputs:
             omapfile = conf["main"]["dataPath"] + "/indexes_maps/project_A" + inputs["tid"]["value"] + "_Index" + id + ".map"
         else:
             omapfile = conf["main"]["dataPath"] + "/indexes_maps/timeline_Index" + id + "_indexes_view_idx" + id + "_step" + str(inputs["step"]["value"]) + ".map"
@@ -1436,11 +1436,11 @@ def createGraphView(conf, inputs, con, cur):
         m = mapscript.mapObj(omapfile)
     m.getLayer(0).data = tblName
     m.setExtent(ext.minx, ext.miny, ext.maxx, ext.maxy);
-    if inputs.has_key("tid"):
+    if "tid" in inputs:
         m.save(conf["main"]["dataPath"] + "/indexes_maps/project_A" + inputs["tid"]["value"] + "_GIndex" + id + ".map")
     else:
-        if inputs.has_key("step"):
-            print >> sys.stderr, (conf["main"]["dataPath"] + "/indexes_maps/project_GIndex" + id + ".map")
+        if "step" in inputs:
+            print((conf["main"]["dataPath"] + "/indexes_maps/project_GIndex" + id + ".map"), file=sys.stderr)
             m.save(conf["main"]["dataPath"] + "/indexes_maps/project_GIndex" + id + ".map")  # "_step"+inputs["step"]["value"]+".map")
         else:
             m.save(conf["main"]["dataPath"] + "/indexes_maps/project_GIndex" + id + ".map")
@@ -1457,7 +1457,7 @@ def insertElem(conf, inputs, outputs):
     try:
         fields = ""
         values = ""
-        for i in inputs.keys():
+        for i in list(inputs.keys()):
             if i != "table" and i != "tid" and inputs[i]["value"] != "":
                 if not (auth.is_ftable(inputs["table"]["value"])):
                     conf["lenv"]["message"] = zoo._("Unable to identify your parameter as table or field name")
@@ -1474,7 +1474,7 @@ def insertElem(conf, inputs, outputs):
                     values += str(tmp)
 
         req = "INSERT INTO " + prefix + inputs["table"]["value"] + " (" + fields + ") VALUES (" + values + ")"
-        print >> sys.stderr, req
+        print(req, file=sys.stderr)
         cur.execute(req)
         con.conn.commit()
         if inputs["table"]["value"] == "graphs":
@@ -1482,7 +1482,7 @@ def insertElem(conf, inputs, outputs):
             createGraphView(conf, inputs, con.conn, cur)
         else:
             outputs["Result"]["value"] = zoo._("Done")
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("An error occured when processing your request: ") + str(e)
         return zoo.SERVICE_FAILED
     con.conn.close()
@@ -1500,7 +1500,7 @@ def updateElem(conf, inputs, outputs):
     try:
         fields = ""
         values = ""
-        for i in inputs.keys():
+        for i in list(inputs.keys()):
             if i != "table" and i != "id" and i != "tid" and inputs[i]["value"] != "":
                 if fields != "":
                     fields += ","
@@ -1512,13 +1512,13 @@ def updateElem(conf, inputs, outputs):
                     fields += str(tmp)
 
         clause = ""
-        if inputs.has_key('tid'):
-            print >> sys.stderr, ""
+        if 'tid' in inputs:
+            print("", file=sys.stderr)
         tableName = prefix + inputs["table"]["value"]
         if inputs["table"]["value"].count('.') > 0:
             tableName = inputs["table"]["value"]
         req = "UPDATE " + tableName + " set " + fields + " where id=" + inputs["id"]["value"]
-        print >> sys.stderr, req
+        print(req, file=sys.stderr)
         cur.execute(req)
         con.conn.commit()
         if inputs["table"]["value"] == "graphs":
@@ -1526,7 +1526,7 @@ def updateElem(conf, inputs, outputs):
             createGraphView(conf, inputs, con.conn, cur)
         else:
             outputs["Result"]["value"] = zoo._("Done")
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("An error occured when processing your request: ") + str(e)
         return zoo.SERVICE_FAILED
     con.conn.close()
@@ -1558,10 +1558,10 @@ def updateKeywords(conf, cur, nom, i_id, k):
 
 def updateElement(conf, inputs, outputs):
     import json
-    print >> sys.stderr, inputs["tuple"]["value"]
+    print(inputs["tuple"]["value"], file=sys.stderr)
     obj = json.loads(inputs["tuple"]["value"].replace("\n", "").replace("\t", ""))
 
-    if not (obj.has_key("id")):
+    if not ("id" in obj):
         conf["lenv"]["message"] = zoo._("Please provide an id for the tuple to update")
         return zoo.SERVICE_FAILED
 
@@ -1570,21 +1570,21 @@ def updateElement(conf, inputs, outputs):
     cur = con.conn.cursor()
 
     li_id = str(obj["id"])
-    print >> sys.stderr, "li_d"
-    print >> sys.stderr, li_id
-    print >> sys.stderr, obj
-    print >> sys.stderr, "li_d"
+    print("li_d", file=sys.stderr)
+    print(li_id, file=sys.stderr)
+    print(obj, file=sys.stderr)
+    print("li_d", file=sys.stderr)
 
-    if inputs.has_key("keywords"):
+    if "keywords" in inputs:
         tmp0 = inputs["keywords"]["value"].split(',')
         if len(tmp0) == 1:
             tmp0 = inputs["keywords"]["value"].split(';')
         for k in range(0, len(tmp0)):
-            print >> sys.stderr, "li_d"
+            print("li_d", file=sys.stderr)
             updateKeywords(conf, cur, tmp0[k], li_id, k)
-            print >> sys.stderr, "li_d"
+            print("li_d", file=sys.stderr)
             con.conn.commit()
-            print >> sys.stderr, "li_d"
+            print("li_d", file=sys.stderr)
 
     prefix = auth.getPrefix(conf)
     tableName = prefix + inputs["table"]["value"]
@@ -1593,7 +1593,7 @@ def updateElement(conf, inputs, outputs):
     req0 = "UPDATE " + tableName + " set "
     clause = "id=[_id_]"
     # clause="id="+str(obj["id"])
-    keys = obj.keys()
+    keys = list(obj.keys())
     cnt = 0
     req1 = None
     req2 = None
@@ -1615,8 +1615,8 @@ def updateElement(conf, inputs, outputs):
                     # req0+= i +" = "+str(tmp).decode("utf-8")
                 else:
                     req0 += " " + i + "=NULL"
-            except Exception, e:
-                print >> sys.stderr, e
+            except Exception as e:
+                print(e, file=sys.stderr)
                 req0 += " " + i + "=[_" + i + "_]"
                 params[i] = {"value": obj[i], "format": "s"}
                 # req0+=" "+i+"="+obj[i]
@@ -1628,7 +1628,7 @@ def updateElement(conf, inputs, outputs):
                 if not (avoidReq1):
                     req1 = "DELETE FROM " + ntname + " WHERE " + inputs[i + "_in"]["value"] + "=" + str(obj["id"])
                     cur.execute(req1)
-                    print >> sys.stderr, req1
+                    print(req1, file=sys.stderr)
                     req1 = None
                     avoidReq1 = True
                 if obj[i][j] != "-1":
@@ -1643,7 +1643,7 @@ def updateElement(conf, inputs, outputs):
     req0 += " WHERE " + clause
     params["id"] = {"value": obj["id"], "format": "s"}
 
-    print >> sys.stderr, req0.encode("utf-8")
+    print(req0.encode("utf-8"), file=sys.stderr)
 
     try:
         con.pexecute_req([req0, params])
@@ -1656,7 +1656,7 @@ def updateElement(conf, inputs, outputs):
         # cur.execute(req2)
         con.conn.commit()
         con.conn.close()
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("Unable to run the SQL request: ") + str(e)
         return zoo.SERVICE_FAILED
 
@@ -1664,8 +1664,8 @@ def updateElement(conf, inputs, outputs):
         if ["documents", "indicators"].count(inputs["table"]["value"]) > 0:
             import shutil
             shutil.copy(conf["main"]["tmpPath"] + "/data_tmp_1111" + conf["senv"]["MMID"] + "/" + obj['filename'], conf["main"]["publicationPath"] + "/" + inputs["table"]["value"] + "/" + obj['filename'])
-    except Exception, e:
-        print >> sys.stderr, zoo._("Unable to copy uploaded file: ") + str(e)
+    except Exception as e:
+        print(zoo._("Unable to copy uploaded file: ") + str(e), file=sys.stderr)
         pass
     outputs["Result"]["value"] = zoo._("Done")
     return zoo.SERVICE_SUCCEEDED
@@ -1679,7 +1679,7 @@ def deleteElement(conf, inputs, outputs):
     if not (auth.is_ftable(inputs["table"]["value"])):
         conf["lenv"]["message"] = zoo._("Unable to identify your parameter as table or field name")
         return zoo.SERVICE_FAILED
-    if inputs.has_key("atable") and inputs["atable"]["value"] != "NULL":
+    if "atable" in inputs and inputs["atable"]["value"] != "NULL":
         if inputs["table"]["value"].count('.') > 0:
             prefix = ""
         if inputs["atable"]["value"].__class__.__name__ in ('list', 'tuple'):
@@ -1716,7 +1716,7 @@ def deleteElement(conf, inputs, outputs):
                 except:
                     pass
         outputs["Result"]["value"] = zoo._("Element deleted")
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("An error occured when processing your request: ") + str(e)
         return zoo.SERVICE_FAILED
     con.conn.commit()
@@ -1778,8 +1778,8 @@ def detailsThemes(con, val, prefix):
             for i in range(0, len(vals)):
                 res["indicators_themes"] += [vals[i][0]]
     except Exception as e:
-        print >> sys.stderr, dir(con.cur)
-        print >> sys.stderr, e
+        print(dir(con.cur), file=sys.stderr)
+        print(e, file=sys.stderr)
         con.cur.connection.commit()
         pass
     req2 = "select * from " + prefix + "groups where id in (select g_id from " + prefix + "themes_groups where t_id=[_t_id_])"
@@ -1836,12 +1836,12 @@ def detailsIndicateurs(conf, inputs, cur, val, tab, prefix):
 
         suffix = " and (not(agregation) or agregation is null)"
         req1 = "select count(*) from " + prefix + "indicators_territories where i_id=" + val + suffix
-        print >> sys.stderr, req1
+        print(req1, file=sys.stderr)
         cur.execute(req1)
         vals = cur.fetchall()
         if len(vals) > 0 and vals[0][0] > 0:
             req2 = "SELECT t_id, o_key_link, filename, tbl_link, tbl_key_link, query, ds, id from " + prefix + "indicators_territories where i_id=" + val + suffix
-            print >> sys.stderr, req2
+            print(req2, file=sys.stderr)
             cur.execute(req2)
             vals = cur.fetchall()
             if len(vals) > 0:
@@ -1858,17 +1858,17 @@ def detailsIndicateurs(conf, inputs, cur, val, tab, prefix):
                 res["it_id"] = vals[0][7]
 
         req0 = "select count(*) from " + prefix + "indicators_keywords where i_id=" + val
-        print >> sys.stderr, req0
+        print(req0, file=sys.stderr)
         cur.execute(req0)
         vals = cur.fetchall()
         if len(vals) > 0 and vals[0][0] > 0:
             req2 = "SELECT nom from " + prefix + "keywords where id in (SELECT k_id from " + prefix + "indicators_keywords where i_id=" + val + ")"
-            print >> sys.stderr, req2
+            print(req2, file=sys.stderr)
             cur.execute(req2)
             vals = cur.fetchall()
             if len(vals) > 0:
                 for k in range(0, len(vals)):
-                    if res.has_key("indicators_keywords"):
+                    if "indicators_keywords" in res:
                         res["indicators_keywords"] += "," + str(vals[k][0].encode("utf-8")).decode('utf-8')
                     else:
                         res["indicators_keywords"] = str(vals[k][0].encode("utf-8")).decode('utf-8')
@@ -1881,10 +1881,10 @@ def detailsIndicateurs(conf, inputs, cur, val, tab, prefix):
             for i in range(0, len(vals)):
                 res["indicators_groups"] += [vals[i][0]]
 
-        print >> sys.stderr, inputs
-        if inputs.has_key("public"):
+        print(inputs, file=sys.stderr)
+        if "public" in inputs:
             req22 = 'select t_id from ' + prefix + 'indicators_territories,' + prefix + 'territories where "+tprefix+"indicators_territories.t_id=territories.id and "+tprefix+"indicators_territories.i_id=' + str(res["id"]) + ' and agregation;'
-            print >> sys.stderr, req22
+            print(req22, file=sys.stderr)
             cur.execute(req22)
             vals = cur.fetchall()
             res["agregation"] = []
@@ -1916,12 +1916,12 @@ def detailsIndicateurs(conf, inputs, cur, val, tab, prefix):
         tab0 = tab.split("_")
         suffix = " and (not(agregation) or agregation is null)"
         reqSuffix1 = " and step is null"
-        if inputs.has_key("tid"):
+        if "tid" in inputs:
             suffix = " and t_id=" + inputs["tid"]["value"]
-        if inputs.has_key("step"):
+        if "step" in inputs:
             reqSuffix1 = " and step=" + inputs["step"]["value"]
         if tab == "graph":
-            print >> sys.stderr, "Load graph !!"
+            print("Load graph !!", file=sys.stderr)
             req0 = "SELECT name, type, lx, vx, ly, vy, tooltip, id, formula,step from " + prefix + "graphs where it_id=(SELECT id from " + prefix + "indicators_territories where i_id=" + val + " " + suffix + ")" + reqSuffix1
             cur.execute(req0)
             vals = cur.fetchall()
@@ -1937,9 +1937,9 @@ def detailsIndicateurs(conf, inputs, cur, val, tab, prefix):
                 res["formula"] = vals[0][8]
                 res["step"] = vals[0][9]
         elif tab == "table":
-            print >> sys.stderr, "Load table !!"
+            print("Load table !!", file=sys.stderr)
             req0 = "SELECT name, id, order_by, step,(select t_id from " + prefix + "indicators_territories where i_id=" + val + " " + suffix + ") from " + prefix + "d_table where i_id=" + val + reqSuffix1
-            print >> sys.stderr, req0 + " !!"
+            print(req0 + " !!", file=sys.stderr)
 
             cur.execute(req0)
             vals = cur.fetchall()
@@ -1954,7 +1954,7 @@ def detailsIndicateurs(conf, inputs, cur, val, tab, prefix):
                 myStr = ",".join(fields)
                 req1 = "SELECT " + myStr + " from " + prefix + "dtable where it_id=(select id from " + prefix + "indicators_territories where i_id=" + val + " " + suffix + ")"
                 cur.execute(req1)
-                print >> sys.stderr, req1
+                print(req1, file=sys.stderr)
                 vals1 = cur.fetchall()
                 if len(vals1) > 0:
                     res["fields"] = []
@@ -1965,18 +1965,18 @@ def detailsIndicateurs(conf, inputs, cur, val, tab, prefix):
                         res["fields"] += [cobj]
 
         elif tab0[0] == "agregation":
-            print >> sys.stderr, "Load agregate !!"
+            print("Load agregate !!", file=sys.stderr)
             req0 = "SELECT formula FROM " + prefix + "agregation where it_id=(SELECT id from " + prefix + "indicators_territories where i_id=" + val + suffix + " order by id limit 1) and t_id=" + tab0[1]
-            print >> sys.stderr, req0 + " !!"
+            print(req0 + " !!", file=sys.stderr)
 
             cur.execute(req0)
             vals = cur.fetchall()
             if len(vals) > 0:
                 res["formula"] = vals[0][0]
         elif tab0[0] == "repport":
-            print >> sys.stderr, "Load repport !!"
+            print("Load repport !!", file=sys.stderr)
             req0 = "SELECT doc FROM " + prefix + "r_table where i_id=" + val + reqSuffix1
-            print >> sys.stderr, req0 + " !!"
+            print(req0 + " !!", file=sys.stderr)
 
             cur.execute(req0)
             vals = cur.fetchall()
@@ -1991,7 +1991,7 @@ def detailsIndicateurs(conf, inputs, cur, val, tab, prefix):
                 myStr = ",".join(fields)
                 req1 = "SELECT " + myStr + " from " + prefix + "rtable where it_id=(select id from " + prefix + "indicators_territories where i_id=" + val + " " + suffix + ")"
                 cur.execute(req1)
-                print >> sys.stderr, req1
+                print(req1, file=sys.stderr)
                 vals1 = cur.fetchall()
                 if len(vals1) > 0:
                     res["fields"] = []
@@ -2033,9 +2033,9 @@ def getTableElements(conf, con, cur, res, att, tbl, col):
         values = []
         vals = cur.fetchall()
         values1 = {}
-        print >> sys.stderr, tres1
+        print(tres1, file=sys.stderr)
         for k in range(len(tres2)):
-            print >> sys.stderr, tres2[k][2]
+            print(tres2[k][2], file=sys.stderr)
             if tres2[k][2] == "bytea":
                 try:
                     obj = unpackFile(conf, tmp[k])
@@ -2079,9 +2079,9 @@ def details(conf, inputs, outputs):
         if inputs["table"]["value"] == "themes":
             res = detailsThemes(con, inputs["id"]["value"], prefix)
         if inputs["table"]["value"] == "indicators":
-            if inputs.has_key("tab"):
+            if "tab" in inputs:
                 res = detailsIndicateurs(conf, inputs, cur, inputs["id"]["value"], inputs["tab"]["value"], prefix)
-                if res.has_key("doc"):
+                if "doc" in res:
                     res["doc_url"] = conf["main"]["publicationUrl"] + "/idx_templates/" + res["doc"]
             else:
                 res = detailsIndicateurs(conf, inputs, cur, inputs["id"]["value"], "metadata", prefix)
@@ -2103,9 +2103,9 @@ def details(conf, inputs, outputs):
                     mapfile.createLegend0(conf, inputs0, outputs0)
                     res["_style"] = json.loads(outputs0["Result"]["value"])
                 except Exception as e:
-                    print >> sys.stderr, " ********************************** "
-                    print >> sys.stderr, str(e)
-                    print >> sys.stderr, " ********************************** "
+                    print(" ********************************** ", file=sys.stderr)
+                    print(str(e), file=sys.stderr)
+                    print(" ********************************** ", file=sys.stderr)
                     res["_style"] = {}
                 try:
                     mpath = conf["main"]["dataPath"] + '/indexes_maps/project_PIndex' + str(res["id"]) + ".map"
@@ -2113,9 +2113,9 @@ def details(conf, inputs, outputs):
                     res["published"] = "true"
                     import locale
                     oloc = locale.setlocale(locale.LC_ALL, None)
-                    print >> sys.stderr, conf["main"]["language"]
+                    print(conf["main"]["language"], file=sys.stderr)
                     locale.setlocale(locale.LC_ALL, conf["main"]["language"].replace("-", "_") + ".utf-8")
-                    res["pdate"] = unicode(time.strftime(conf["mm"]["dateFormat"], time.localtime(os.path.getmtime(mpath))).decode('utf-8'))
+                    res["pdate"] = str(time.strftime(conf["mm"]["dateFormat"], time.localtime(os.path.getmtime(mpath))).decode('utf-8'))
                     import mapscript
                     m = mapscript.mapObj(mpath)
                     res["cache_file"] = m.web.metadata.get('cache_file')
@@ -2123,7 +2123,7 @@ def details(conf, inputs, outputs):
                     res["published"] = "false"
             conf["senv"]["last_index"] = inputs["id"]["value"]
         if inputs["table"]["value"] == "documents":
-            print >> sys.stderr, "*** OK TREAT DOCUMENTS !!"
+            print("*** OK TREAT DOCUMENTS !!", file=sys.stderr)
             res = detailsDocuments(con, inputs["id"]["value"], prefix)
         if inputs["table"]["value"].count("."):
             import datastores.postgis.pgConnection as pg
@@ -2135,11 +2135,11 @@ def details(conf, inputs, outputs):
             res = {}
             for i in range(0, len(desc)):
                 res[str(desc[i][1]).encode("utf-8")] = content["rows"][0]["cell"][i]
-                print >> sys.stderr, desc[i][1]
+                print(desc[i][1], file=sys.stderr)
             if inputs["table"]["value"] == '"mm_tables"."importers"':
 
                 req = "select template,ARRAY((select tid from mm_tables.importer_themes where mm_tables.importers.id=mm_tables.importer_themes.iid)),ARRAY((select gid from mm_tables.importer_groups where mm_tables.importers.id=mm_tables.importer_groups.iid)),tid from mm_tables.importers where id=" + res["id"] + ";"
-                print >> sys.stderr, " --------- " + str(req) + " --------- "
+                print(" --------- " + str(req) + " --------- ", file=sys.stderr)
                 cur.execute(req)
                 res1 = cur.fetchall()
                 for j in range(len(res1)):
@@ -2169,10 +2169,10 @@ def details(conf, inputs, outputs):
                         lobj[str(ldesc[l][1]).encode("utf-8")] = res1[j][l]
 
                     tres = pg.getTableDescription(conf, {"dataStore": {"value": conf["main"]["dbuserName"]}, "table": {"value": "mm_tables.page_fields"}, "clause": {"value": "pid='" + str(res1[j][0]) + "'"}}, outputs0[3])
-                    print >> sys.stderr, "******** -- " + str(outputs0[3]) + " -- **************"
+                    print("******** -- " + str(outputs0[3]) + " -- **************", file=sys.stderr)
                     ldesc1 = json.loads(outputs0[3]["Result"]["value"])
                     req = "select * from mm_tables.page_fields where pid=" + str(res1[j][0]) + ";"
-                    print >> sys.stderr, "******** -- " + str(req) + " -- **************"
+                    print("******** -- " + str(req) + " -- **************", file=sys.stderr)
                     cur.execute(req)
                     res2 = cur.fetchall()
                     lfields = []
@@ -2185,13 +2185,13 @@ def details(conf, inputs, outputs):
                     lobj["fields"] = lfields
 
                     tres = pg.getTableDescription(conf, {"dataStore": {"value": conf["main"]["dbuserName"]}, "table": {"value": "mm_tables.page_geom"}, "clause": {"value": "pid='" + str(res1[j][0]) + "'"}}, outputs0[3])
-                    print >> sys.stderr, "******** -- " + str(outputs0[3]) + " -- **************"
+                    print("******** -- " + str(outputs0[3]) + " -- **************", file=sys.stderr)
                     ldesc2 = json.loads(outputs0[3]["Result"]["value"])
                     req = "select * from mm_tables.page_geom where pid=" + str(res1[j][0]) + ";"
-                    print >> sys.stderr, "******** -- " + str(req) + " -- **************"
+                    print("******** -- " + str(req) + " -- **************", file=sys.stderr)
                     cur.execute(req)
                     res3 = cur.fetchall()
-                    print >> sys.stderr, "******** -- " + str(res3) + " -- **************"
+                    print("******** -- " + str(res3) + " -- **************", file=sys.stderr)
                     lfields = []
                     for k in range(len(res3)):
                         lobj1 = {}
@@ -2201,7 +2201,7 @@ def details(conf, inputs, outputs):
                         tres = pg.getTableDescription(conf, {"dataStore": {"value": conf["main"]["dbuserName"]}, "table": {"value": "mm_tables.page_geom_fields"}, "clause": {"value": "pid='" + str(res3[k][0]) + "'"}}, outputs0[4])
                         ldesc3 = json.loads(outputs0[4]["Result"]["value"])
                         req = "select * from mm_tables.page_geom_fields where pid=" + str(res3[k][0]) + ";"
-                        print >> sys.stderr, req
+                        print(req, file=sys.stderr)
                         cur.execute(req)
                         res4 = cur.fetchall()
                         lfields1 = []
@@ -2236,7 +2236,7 @@ def details(conf, inputs, outputs):
                     values = []
                     vals = cur.fetchall()
                     values1 = {}
-                    print >> sys.stderr, tres1
+                    print(tres1, file=sys.stderr)
                     for k in range(len(tres2)):
                         try:
                             values1[tres2[k][1]] = str(tmp[k].encode('utf-8'))
@@ -2254,10 +2254,10 @@ def details(conf, inputs, outputs):
                         values += [lfields]
                     res["mmViews"] += [{"fields": values, "view": values1}]
                 res["mmDesc"] = json.loads(outputs0[2]["Result"]["value"])
-    if res.has_key("file_link"):
+    if "file_link" in res:
         conf["senv"]["last_file"] = res["file_link"]
     if res is not None:
-        print >> sys.stderr, res
+        print(res, file=sys.stderr)
         # outputs["Result"]["value"]=json.dumps(res,ensure_ascii=False).encode('utf-8')
         outputs["Result"]["value"] = json.dumps(res)
     else:
@@ -2296,7 +2296,7 @@ def csv2ods(conf, inputs, outputs):
         conf["lenv"]["message"] = str(process.stdout.readline())
         outputs["Result"]["value"] = conf["main"]["tmpUrl"] + inputs["file"]["value"] + '.ods'
         return zoo.SERVICE_SUCCEEDED
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = e
         return zoo.SERVICE_FAILED
 
@@ -2312,9 +2312,9 @@ def previewDoc(conf, inputs, outputs):
     table1Prefix = "indexes.view_idx_"
     graphPrefix = "indexes.view_idx_g_"
     graphSuffix = ""
-    if inputs.has_key("step"):
+    if "step" in inputs:
         graphSuffix = "_" + inputs["step"]["value"]
-    if inputs.has_key("tid"):
+    if "tid" in inputs:
         tablePrefix = "indexes.agregate_t" + inputs["tid"]["value"] + "_idx_"
         table1Prefix = "indexes.agregate_t" + inputs["tid"]["value"] + "_idx_"
         graphPrefix = "indexes.view_idx_g_"
@@ -2324,12 +2324,12 @@ def previewDoc(conf, inputs, outputs):
     all_ids = "(SELECT ogc_fid FROM " + tablePrefix + inputs["id"]["value"] + " WHERE ST_Touches(wkb_geometry," + oid + "))"
     req = "SELECT * FROM " + graphPrefix + inputs["id"]["value"] + graphSuffix + " WHERE ogc_fid=" + _oid + " OR ogc_fid in " + all_ids
     req1 = "SELECT * FROM " + table1Prefix + inputs["id"]["value"] + " WHERE ogc_fid=" + _oid + " OR ogc_fid in " + all_ids
-    if inputs.has_key("step"):
-        if inputs.has_key("tid"):
+    if "step" in inputs:
+        if "tid" in inputs:
             req1 = "SELECT * FROM " + table1Prefix + inputs["id"]["value"] + "_step" + inputs["step"]["value"] + " WHERE ogc_fid=" + _oid + " OR ogc_fid in " + all_ids
         else:
             req1 = "SELECT * FROM " + table1Prefix + inputs["id"]["value"] + "_" + inputs["step"]["value"] + " WHERE ogc_fid=" + _oid + " OR ogc_fid in " + all_ids
-    print >> sys.stderr, req1
+    print(req1, file=sys.stderr)
     res = cur.execute(req)
     vals = cur.fetchall()
     rvals = [[""], [], []]
@@ -2340,11 +2340,11 @@ def previewDoc(conf, inputs, outputs):
     # Load the map
     import mapscript
     mapfile = conf["main"]["dataPath"] + "/indexes_maps/project_Index" + inputs["id"]["value"] + ".map"
-    if inputs.has_key("step"):
+    if "step" in inputs:
         mapfile = conf["main"]["dataPath"] + "/indexes_maps/timeline_Index" + inputs["id"]["value"] + "_indexes_view_idx" + inputs["id"]["value"] + "_step" + inputs["step"]["value"] + ".map"
-    print >> sys.stderr, mapfile
+    print(mapfile, file=sys.stderr)
     m = mapscript.mapObj(mapfile)
-    print >> sys.stderr, mapfile
+    print(mapfile, file=sys.stderr)
     for i in range(m.numlayers):
         m.getLayer(i).status = mapscript.MS_ON
     m.setProjection("init=epsg:900913")
@@ -2352,11 +2352,11 @@ def previewDoc(conf, inputs, outputs):
         "value"] + " WHERE ogc_fid=" + _oid + " OR ogc_fid in " + all_ids + ") as foo) As foo1"
     res = cur.execute(req)
     vals0 = cur.fetchall()
-    print >> sys.stderr, vals0
+    print(vals0, file=sys.stderr)
     ext = vals0[0][0].split(' ')
     m.setExtent(float(ext[0]), float(ext[1]), float(ext[2]), float(ext[3]))
     m.setSize(1024 * 3, 768 * 3)
-    print >> sys.stderr, req1
+    print(req1, file=sys.stderr)
     m.getLayer(0).data = req1
     for i in range(0, m.getLayer(0).numclasses):
         m.getLayer(0).getClass(i).getStyle(0).updateFromString("STYLE OUTLINECOLOR 255 0 0 WIDTH 1.2 END")
@@ -2369,11 +2369,11 @@ def previewDoc(conf, inputs, outputs):
         pass
     i.save(savedImage)
 
-    print >> sys.stderr, vals0
+    print(vals0, file=sys.stderr)
     inputs0 = inputs
     outputs0 = {"Result": {"value": ""}}
     getIndexDisplayJs(conf, inputs, outputs0)
-    print >> sys.stderr, outputs0
+    print(outputs0, file=sys.stderr)
     tmp = json.loads(outputs0["Result"]["value"]);
     tmp = tmp["values"]
     lfields = []
@@ -2385,11 +2385,11 @@ def previewDoc(conf, inputs, outputs):
     inputs0["limit"] = {"value": "10"}
     inputs0["page"] = {"value": "1"}
     inputs0["_id"] = {"value": "ogc_fid=" + _oid + " OR ogc_fid in " + all_ids}
-    print >> sys.stderr, str(inputs0)
+    print(str(inputs0), file=sys.stderr)
     tvals = _getIndexValues(conf, inputs0, fields)
-    print >> sys.stderr, tvals
+    print(tvals, file=sys.stderr)
     from subprocess import Popen, PIPE
-    if conf.has_key("oo") and conf["oo"].has_key("external") and conf["oo"]["external"] == "true":
+    if "oo" in conf and "external" in conf["oo"] and conf["oo"]["external"] == "true":
         sys.stderr.flush()
         err_log = file(conf["main"]["tmpPath"] + '/tmp_err_log_file', 'w', 0)
         os.dup2(err_log.fileno(), sys.stderr.fileno())
@@ -2403,13 +2403,13 @@ def previewDoc(conf, inputs, outputs):
         script += "pm.statThis(\"[_diag_]\"," + json.dumps(rvals) + ")\n"
 
         reqSuffix = ""
-        if inputs.has_key("tid"):
+        if "tid" in inputs:
             reqSuffix += " and agregation and t_id=" + inputs["tid"]["value"]
         else:
             reqSuffix += " and (not(agregation) or agregation is null)"
 
         reqSuffix1 = ""
-        if inputs.has_key("step"):
+        if "step" in inputs:
             reqSuffix1 += " and step=" + inputs["step"]["value"]
         else:
             reqSuffix1 += " and step is null"
@@ -2420,7 +2420,7 @@ def previewDoc(conf, inputs, outputs):
         # print >> sys.stderr,vals1
         for i in range(0, len(vals1)):
             req0 = ("select ").encode("utf-8") + vals1[i][1] + (" as ").encode("utf-8") + vals1[i][0] + (" from " + tablePrefix + inputs["id"]["value"] + " WHERE ogc_fid=" + _oid).encode("utf-8")
-            print >> sys.stderr, req0.encode('utf-8')
+            print(req0.encode('utf-8'), file=sys.stderr)
             cur.execute(req0)
             vals2 = cur.fetchone()
             # print >> sys.stderr,vals2
@@ -2432,7 +2432,7 @@ def previewDoc(conf, inputs, outputs):
         # print >> sys.stderr,vals1
         for i in range(0, len(vals2)):
             req0 = "SELECT sources FROM " + tprefix + "indicators WHERE id=" + inputs["id"]["value"]
-            print >> sys.stderr, req0.encode('utf-8')
+            print(req0.encode('utf-8'), file=sys.stderr)
             cur.execute(req0)
             vals3 = cur.fetchone()
             # print >> sys.stderr,vals2
@@ -2460,7 +2460,7 @@ def previewDoc(conf, inputs, outputs):
         import os
         os.unlink(docPath)
         return zoo.SERVICE_SUCCEEDED
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] += str(e)
         pass
     return zoo.SERVICE_FAILED
@@ -2470,16 +2470,16 @@ def addLayerForIndex(conf, inputs, outputs):
     import mapscript
     lName = "indexes.view_idx" + inputs["id"]["value"]
     reqSuffix = " and (not(agregation) or agregation is null)"
-    if inputs.has_key("tid"):
+    if "tid" in inputs:
         lName = "indexes.agregate_t" + inputs["tid"]["value"] + "_idx_" + inputs["id"]["value"]
         reqSuffix = " and (agregation and t_id = " + inputs["tid"]["value"] + ")"
-    if inputs.has_key("step"):
+    if "step" in inputs:
         lName += "_step" + inputs["step"]["value"]
     m = mapscript.mapObj(conf["main"]["dataPath"] + "/PostGIS/" + conf["main"]["dbuserName"] + "ds_ows.map")
     if m.getLayerByName(lName) is not None:
         m.removeLayer(m.getLayerByName(lName).index)
-    print >> sys.stderr, dir(m)
-    print >> sys.stderr, lName
+    print(dir(m), file=sys.stderr)
+    print(lName, file=sys.stderr)
     con = auth.getCon(conf)
     prefix = auth.getPrefix(conf)
     con.connect()
@@ -2487,15 +2487,15 @@ def addLayerForIndex(conf, inputs, outputs):
     cur.execute("select datasource from " + prefix + "territories where id in (select t_id from " + prefix + "indicators_territories where i_id=" + inputs["id"]["value"] + reqSuffix + ")")
     vals = cur.fetchone()
     l = m.getLayerByName(vals[0].replace("public.", ""))
-    print >> sys.stderr, dir(l)
+    print(dir(l), file=sys.stderr)
     l1 = l.clone()
-    print >> sys.stderr, dir(l1)
+    print(dir(l1), file=sys.stderr)
     l1.name = lName
     l1.data = lName
-    print >> sys.stderr, m.insertLayer(l1)
+    print(m.insertLayer(l1), file=sys.stderr)
     m.save(conf["main"]["dataPath"] + "/PostGIS/" + conf["main"]["dbuserName"] + "ds_ows.map")
     outputs["Result"]["value"] = "The mapfile was successfully updated"
-    print >> sys.stderr, outputs["Result"]["value"]
+    print(outputs["Result"]["value"], file=sys.stderr)
     return zoo.SERVICE_SUCCEEDED
 
 
@@ -2531,8 +2531,8 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
         else:
             req1 = "SELECT * FROM " + table1Prefix + idx + "_" + str(step) + " WHERE ogc_fid in " + all_ids
 
-    print >> sys.stderr, req1
-    print >> sys.stderr, req0
+    print(req1, file=sys.stderr)
+    print(req0, file=sys.stderr)
     res = cur.execute(req0)
     vals = cur.fetchall()
     rvals = [[""], [], []]
@@ -2554,16 +2554,16 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
     req = "SELECT * FROM (SELECT st_xmin(wkb_geometry)||' '||st_ymin(wkb_geometry)||' '||st_xmax(wkb_geometry)||' '||st_ymax(wkb_geometry) as wkb_geometry FROM (SELECT ST_Transform(ST_Union(wkb_geometry),900913) as wkb_geometry FROM " + table1Prefix + idx + " WHERE ogc_fid in " + all_ids + ") as foo) As foo1"
     res = cur.execute(req)
     vals0 = cur.fetchall()
-    print >> sys.stderr, vals0
+    print(vals0, file=sys.stderr)
     ext = vals0[0][0].split(' ')
     m.setExtent(float(ext[0]), float(ext[1]), float(ext[2]), float(ext[3]))
     m.setSize(1024 * 1.5, 768 * 1.5)
-    print >> sys.stderr, req1
+    print(req1, file=sys.stderr)
     m.getLayer(0).data = req1
     mLocation = m.clone()
-    print >> sys.stderr, "*************************"
-    print >> sys.stderr, mLocation
-    print >> sys.stderr, "*************************"
+    print("*************************", file=sys.stderr)
+    print(mLocation, file=sys.stderr)
+    print("*************************", file=sys.stderr)
     coeff = 1;
     size = (1024 * coeff, 768 * coeff)
     import math
@@ -2584,25 +2584,25 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
         reqSuffix += " and (not(agregation) or agregation is null)"
 
     lreq0 = "SELECT value from rtable where var='classes' and it_id=(SELECT id from " + tprefix + "indicators_territories where i_id=" + idx + reqSuffix + ")"
-    print >> sys.stderr, lreq0 + "\n\n*******"
+    print(lreq0 + "\n\n*******", file=sys.stderr)
     cur.execute(lreq0)
     lvals0 = cur.fetchone()
     if lvals0 is not None:
         lvals0 = lvals0[0]
     else:
         lvals0 = ""
-    print >> sys.stderr, lvals0
-    print >> sys.stderr, "\n\n*******"
+    print(lvals0, file=sys.stderr)
+    print("\n\n*******", file=sys.stderr)
     mmName = m.getLayer(0).metadata.get("mmName")
     for i in range(0, m.getLayer(0).numclasses):
         m.getLayer(0).getClass(i).getStyle(0).updateFromString("STYLE OUTLINECOLOR 255 255 255 WIDTH 1.2 END")
         lreq = "SELECT COUNT(*) FROM (" + req1 + ") as foo WHERE " + m.getLayer(0).getClass(i).getExpressionString().replace("[", '"').replace("]", '"' + lvals0)
-        print >> sys.stderr, lreq + "\n\n*******"
+        print(lreq + "\n\n*******", file=sys.stderr)
         cur.execute(lreq)
         lvals = cur.fetchone()
         mmClasses[1] += [m.getLayer(0).getClass(i).name]
         mmClasses[2] += [[str(lvals[0])]]
-    print >> sys.stderr, mmClasses
+    print(mmClasses, file=sys.stderr)
 
     i = m.draw()
     import time
@@ -2613,7 +2613,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
         pass
     i.save(savedImage)
 
-    print >> sys.stderr, vals0
+    print(vals0, file=sys.stderr)
     if tid is not None:
         inputs0 = {"id": {"value": idx}, "tid": {"value": tid}}
     else:
@@ -2622,11 +2622,11 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
         inputs0["step"] = {"value": step}
     outputs0 = {"Result": {"value": ""}}
     getIndexDisplayJs(conf, inputs0, outputs0)
-    print >> sys.stderr, outputs0["Result"]["value"]
+    print(outputs0["Result"]["value"], file=sys.stderr)
     tmp = json.loads(outputs0["Result"]["value"])
     lfields = []
     tmp = tmp["values"]
-    print >> sys.stderr, tmp
+    print(tmp, file=sys.stderr)
     for i in range(0, len(tmp)):
         lfields += [tmp[i]["display"]]
     inputs0["sortname"] = {"value": tmp[0]["name"]}
@@ -2638,7 +2638,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
     tvals = _getIndexValues(conf, inputs0, fields)
     # print >> sys.stderr,tvals
 
-    if conf.has_key("oo") and conf["oo"].has_key("external") and conf["oo"]["external"] == "true":
+    if "oo" in conf and "external" in conf["oo"] and conf["oo"]["external"] == "true":
         # script+="pm.loadDoc('"+conf["main"]["publicationPath"]+"/idx_templates/"+inputs["oDoc"]["value"]+"')\n"
         rreq = "select doc from " + prefix + "r_table where i_id=" + idx
         cur.execute(rreq)
@@ -2666,7 +2666,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
             script += "pm.exportStatAsImage(\"diag\",\"[_diag_]\"," + json.dumps(rvals) + ")\n"
 
         outputs1 = {"Result": {"value": ""}}
-        print >> sys.stderr, "parseDocAttr " + saveDocPath
+        print("parseDocAttr " + saveDocPath, file=sys.stderr)
         if typ is None:
             res = parseDocAttr(conf, {"fullpath": {"value": "true"}, "template": {"value": saveDocPath}}, outputs1)
             tmp = json.loads(outputs1["Result"]["value"])
@@ -2681,7 +2681,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
                         if lvals is not None:
                             if lvals[1] == 0:
                                 req0 = lvals[0].encode('utf-8')
-                                print >> sys.stderr, req0
+                                print(req0, file=sys.stderr)
                                 try:
                                     con.conn.commit()
                                     cur.execute(req0)
@@ -2695,15 +2695,15 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
                                     script += "pm.searchAndReplace('[_" + i + "_]','')\n"
                             if lvals[1] == 3:
                                 req0 = lvals[0].replace("[_X_]", mmName).replace("[_T_]", tablePrefix + idx).replace("[_F_in_]", all_ids).replace("[_F_out_]", f_out)
-                                print >> sys.stderr, req0
+                                print(req0, file=sys.stderr)
                                 cur.execute(req0)
                                 lvals1 = cur.fetchall()
                                 if lvals1 is not None:
                                     script += "pm.addTable(\"[_" + i + "_]\"," + json.dumps(lvals1).replace("null", zoo._("None")) + ")\n"
                             if lvals[1] == 4:
                                 req0 = lvals[0].replace("[_X_]", mmName).replace("[_T_]", tablePrefix + idx).replace("[_F_in_]", all_ids).replace("[_F_out_]", f_out)
-                                print >> sys.stderr, req0
-                                print >> sys.stderr, i
+                                print(req0, file=sys.stderr)
+                                print(i, file=sys.stderr)
                                 cur.execute(req0)
                                 lvals1 = cur.fetchall()
                                 if lvals1 is not None:
@@ -2724,7 +2724,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
                                     script += "pm.searchAndReplace('[_" + i + "_]',\"\")\n"
                             if lvals[1] == 6:
                                 req0 = "SELECT sources FROM " + tprefix + "indicators WHERE id=" + idx
-                                print >> sys.stderr, req0
+                                print(req0, file=sys.stderr)
                                 cur.execute(req0)
                                 lvals1 = cur.fetchone()
                                 if lvals1 is not None and lvals1[0] is not None:
@@ -2742,7 +2742,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
                                 l0.getClass(0).setExpression(None)
                                 l1 = l0.clone()
                                 req = "SELECT datasource FROM territories where id = (SELECT t_id from " + tprefix + "indicators_territories where i_id=" + idx + reqSuffix + ")"
-                                print >> sys.stderr, req
+                                print(req, file=sys.stderr)
                                 cur.execute(req)
                                 vals = cur.fetchone()
                                 req11 = "SELECT ogc_fid FROM " + vals[0] + " WHERE " + f_out
@@ -2755,7 +2755,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
                                 l1.status = mapscript.MS_ON
                                 mLocation.insertLayer(l1)
                                 req = "SELECT * FROM (SELECT st_xmin(wkb_geometry),st_ymin(wkb_geometry),st_xmax(wkb_geometry),st_ymax(wkb_geometry) FROM (SELECT ST_Transform(ST_Union(wkb_geometry),900913) as wkb_geometry FROM " + table1Prefix + idx + " WHERE ogc_fid in (" + req11 + ") OR ogc_fid in " + all_ids + " ) as foo) As foo1"
-                                print >> sys.stderr, req
+                                print(req, file=sys.stderr)
                                 res = cur.execute(req)
                                 vals0 = cur.fetchone()
                                 mLocation.setExtent(vals0[0], vals0[1], vals0[2], vals0[3])
@@ -2783,8 +2783,8 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
                                 script += 'pm.searchAndReplaceImage("[_' + i + '_]","' + savedImage + '")\n'
 
         # rreq="select doc from rtable where i_id="+idx
-        print >> sys.stderr, tmp
-        print >> sys.stderr, "\n\n--------------"
+        print(tmp, file=sys.stderr)
+        print("\n\n--------------", file=sys.stderr)
 
         req = "select var,value from rtable where it_id=(SELECT id from " + tprefix + "indicators_territories where i_id=" + idx + reqSuffix + ") and step is null and typ=0"
         # if inputs.has_key("step"):
@@ -2813,10 +2813,10 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
         script += "print('OK FINISHED',file=sys.stderr)\n"
         # script+="pm.unloadDoc('"+conf["main"]["publicationPath"]+"/idx_templates/"+inputs["oDoc"]["value"]+"')\n"
         script = script.encode("utf-8")
-        print >> sys.stderr, "OK start"
-        print >> sys.stderr, "--------------------------------------------"
-        print >> sys.stderr, script
-        print >> sys.stderr, "--------------------------------------------"
+        print("OK start", file=sys.stderr)
+        print("--------------------------------------------", file=sys.stderr)
+        print(script, file=sys.stderr)
+        print("--------------------------------------------", file=sys.stderr)
         from subprocess import Popen, PIPE
         process1 = Popen([conf["oo"]["path"]], stdin=PIPE, stdout=PIPE)
         process1.stdin.write(script)
@@ -2826,10 +2826,10 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
         #
 
         # print >> sys.stderr,process.stdin.read()
-        print >> sys.stderr, "OK finished"
+        print("OK finished", file=sys.stderr)
         return docPath.replace(".odt", "_final.odt")
 
-    print >> sys.stderr, "OK finished"
+    print("OK finished", file=sys.stderr)
     return zoo.SERVICE_FAILED
 
 
@@ -2846,7 +2846,7 @@ def viewRepport(conf, inputs, outputs):
     field = inputs["field"]["value"]
     clause0 = ""
     clause = ""
-    if inputs["in_val"].has_key("length"):
+    if "length" in inputs["in_val"]:
         for i in range(0, int(inputs["in_val"]["length"])):
             tmp0 = "%s" % adapt(inputs["in_val"]["value"][i]).getquoted()
             if clause != "":
@@ -2858,8 +2858,8 @@ def viewRepport(conf, inputs, outputs):
 
     clause_out = ""
     clause_out0 = ""
-    if inputs.has_key("out_val"):
-        if inputs["out_val"].has_key("length"):
+    if "out_val" in inputs:
+        if "length" in inputs["out_val"]:
             for i in range(0, int(inputs["out_val"]["length"])):
                 tmp0 = "%s" % adapt(inputs["out_val"]["value"][i]).getquoted()
                 if clause_out != "":
@@ -2889,7 +2889,7 @@ def viewRepport(conf, inputs, outputs):
     script += "pm=PaperMint.LOClient()\n"
     process.stdin.write(script)
     # Check for agregation
-    if inputs["idx"].has_key('length'):
+    if 'length' in inputs["idx"]:
         clause = "("
         for i in range(0, int(inputs["idx"]["length"])):
             if clause != "(":
@@ -2904,7 +2904,7 @@ def viewRepport(conf, inputs, outputs):
     agregation = lres[0]
     if agregation is None:
         agregation = False
-    print >> sys.stderr, "AGREGATION: " + str(agregation)
+    print("AGREGATION: " + str(agregation), file=sys.stderr)
 
     # Treate Context Indexes
     nreq = "select " + tprefix + "indicators_territories.i_id from " + tprefix + "indicators_groups, " + tprefix + "indicators_territories, velo.groups where " + tprefix + "indicators_groups.i_id=" + tprefix + "indicators_territories.i_id and " + tprefix + "indicators_groups.g_id=velo.groups.id and name='context' and t_id=" + \
@@ -2913,7 +2913,7 @@ def viewRepport(conf, inputs, outputs):
     idxs = cur.fetchall()
     if len(idxs) > 0:
         cval = inputs["idx"]["value"]
-        if inputs["idx"].has_key("length"):
+        if "length" in inputs["idx"]:
             inputs["idx"]["length"] = str(int(inputs["idx"]["length"]) + len(idxs))
         else:
             inputs["idx"]["length"] = str(1 + len(idxs))
@@ -2928,16 +2928,16 @@ def viewRepport(conf, inputs, outputs):
     final_doc = ""
     import shutil
     for i in range(0, len(vals)):
-        print >> sys.stderr, vals[i][0]
-        if inputs["idx"].has_key("length"):
+        print(vals[i][0], file=sys.stderr)
+        if "length" in inputs["idx"]:
             for j in range(0, int(inputs["idx"]["length"])):
-                print >> sys.stderr, inputs["idx"]["value"][j]
+                print(inputs["idx"]["value"][j], file=sys.stderr)
                 conf["lenv"]["message"] = zoo._("Producing document ") + str(j + 1) + zoo._(" on ") + inputs["idx"]["length"]
                 zoo.update_status(conf, 12 + (((j + 1) * 60) / int(inputs["idx"]["length"])))
                 if agregation:
                     doc_tmp = printOdt(conf, script, process, inputs["idx"]["value"][j], vals[i][0], saveReq, clause_out, tid=inputs["tid"]["value"])
                 else:
-                    if inputs.has_key("step"):
+                    if "step" in inputs:
                         lstep = inputs["step"]["value"]
                     else:
                         lstep = None
@@ -2950,7 +2950,7 @@ def viewRepport(conf, inputs, outputs):
                         tmp1 = mapscript.mapObj(mapfile)
                         tmp0 = tmp1.getLayer(0).metadata.get("mmSteps")
                         tmp2 = tmp1.getLayer(0).metadata.get("mmClass")
-                    except Exception, e:
+                    except Exception as e:
                         tmp0 = None
                         tmp1 = None
                         tmp2 = None
@@ -2972,9 +2972,9 @@ def viewRepport(conf, inputs, outputs):
                 doc += [final_doc]
                 # shutil.copy(doc[len(doc)-1],doc[len(doc)-1].replace(".odt",str(i+j)+"_00.odt"))
         else:
-            print >> sys.stderr, inputs["idx"]["value"]
-            print >> sys.stderr, vals[i][0]
-            print >> sys.stderr, req
+            print(inputs["idx"]["value"], file=sys.stderr)
+            print(vals[i][0], file=sys.stderr)
+            print(req, file=sys.stderr)
             conf["lenv"]["message"] = zoo._("Producing document")
             zoo.update_status(conf, 52)
             if agregation:
@@ -2983,18 +2983,18 @@ def viewRepport(conf, inputs, outputs):
                 doc += [printOdt(conf, script, process, inputs["idx"]["value"], vals[i][0], saveReq, clause_out)]
             # shutil.copy(doc[len(doc)-1],doc[len(doc)-1].replace(".odt",str(i)+"_00.odt"))
         break
-    print >> sys.stderr, doc
+    print(doc, file=sys.stderr)
     conf["lenv"]["message"] = zoo._("Compiling documents in PDF format")
     zoo.update_status(conf, 92)
     if (len(doc) >= 2):
         for i in range(len(doc)):
-            print >> sys.stderr, "Append doc !"
+            print("Append doc !", file=sys.stderr)
             if i == 0:
                 final_doc = doc[i].replace(".odt", "_" + str(i) + ".odt")
                 shutil.copy(doc[i], final_doc)
                 script += "pm.loadDoc('" + final_doc + "')\n"
             else:
-                print >> sys.stderr, doc[i]
+                print(doc[i], file=sys.stderr)
                 script += "pm.appendDoc('" + doc[i] + "')\n"
         final_doc = final_doc.replace(".odt", ".pdf")
         script += "pm.saveDoc('" + final_doc + "')\nsys.exit(0)\n"
@@ -3004,8 +3004,8 @@ def viewRepport(conf, inputs, outputs):
         script += "pm.saveDoc('" + final_doc + "')\n"
         script += "pm.unloadDoc('" + doc[0] + "')\n"
 
-    print >> sys.stderr, "OK Start\n\n-------------------------------------------"
-    print >> sys.stderr, script
+    print("OK Start\n\n-------------------------------------------", file=sys.stderr)
+    print(script, file=sys.stderr)
     process.stdin.write(script)
     process.stdin.close()
     conf["lenv"]["message"] = str(process.stdout.readline())
@@ -3020,7 +3020,7 @@ def viewRepport(conf, inputs, outputs):
         import os
         os.unlink(final_doc)
         return zoo.SERVICE_SUCCEEDED
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = str(e)
         return zoo.SERVICE_FAILED
 
@@ -3037,7 +3037,7 @@ def viewStatOnly(conf, inputs, outputs):
     zoo.update_status(conf, 10)
 
     reqSuffix = ""
-    if inputs.has_key("tid"):
+    if "tid" in inputs:
         reqSuffix += " and agregation and t_id=" + inputs["tid"]["value"]
     else:
         reqSuffix += " and (not(agregation) or agregation is null)"
@@ -3047,8 +3047,8 @@ def viewStatOnly(conf, inputs, outputs):
     req = "select vx,vy,name from graphs where it_id in (" + clause + ")"
     cur.execute(req)
     vals = cur.fetchone()
-    print >> sys.stderr, req
-    print >> sys.stderr, vals
+    print(req, file=sys.stderr)
+    print(vals, file=sys.stderr)
 
     import vector_tools.service as vt
     elems = vt.readFileFromBuffer(inputs["elem"]["value"], "xml")
@@ -3063,7 +3063,7 @@ def viewStatOnly(conf, inputs, outputs):
 
     idx = inputs["id"]["value"]
     req = "select doc from " + prefix + "r_table where i_id=" + idx
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     cur.execute(req)
     vals = cur.fetchone()
 
@@ -3091,7 +3091,7 @@ def viewStatOnly(conf, inputs, outputs):
     os.dup2(err_log.fileno(), sys.stderr.fileno())
     process = Popen([conf["oo"]["path"]], stdin=PIPE, stdout=PIPE)
 
-    print >> sys.stderr, "START ---"
+    print("START ---", file=sys.stderr)
     script = "import sys\nimport shutil\n"
     script += "import print.PaperMint as PaperMint\n"
     script += "pm=PaperMint.LOClient()\n"
@@ -3101,12 +3101,12 @@ def viewStatOnly(conf, inputs, outputs):
     script += "pm.exportStatAsImage(\"" + fdocPath1 + "\",'[_diag_]'," + json.dumps(rvals) + ")\n"
     script += "pm.saveDoc('" + final_doc + "')\n"
     script += "pm.unloadDoc('" + fdocPath + "')\n"
-    print >> sys.stderr, script
-    print >> sys.stderr, "--- END"
+    print(script, file=sys.stderr)
+    print("--- END", file=sys.stderr)
     process.stdin.write(script)
     process.stdin.close()
     conf["lenv"]["message"] = str(process.stdout.readline())
-    print >> sys.stderr, rvals
+    print(rvals, file=sys.stderr)
     sys.stderr.flush()
     # err_log=file(conf["main"]["tmpPath"]+'/tmp_err_log_file', 'r', 0)
     # conf["lenv"]["message"]=str(err_log.readl())
@@ -3121,7 +3121,7 @@ def viewStatOnly(conf, inputs, outputs):
         os.unlink(fdocPath)
         os.unlink(fdocPath1)
         return zoo.SERVICE_SUCCEEDED
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = str(e)
         return zoo.SERVICE_FAILED
 
@@ -3142,8 +3142,8 @@ def insert(conf, inputs, outputs):
             tbl = vals[0]
             try:
                 res = cur.execute("ALTER TABLE " + tbl + " ADD COLUMN uid int4 references mm.users(id);")
-            except Exception, e:
-                print >> sys.stderr, e
+            except Exception as e:
+                print(e, file=sys.stderr)
                 pass
             con.conn.commit()
             if tbl.count("mm_ghosts.") == 0:
@@ -3158,15 +3158,15 @@ def insert(conf, inputs, outputs):
                 try:
                     req = "DROP TRIGGER mm_tables_" + tbl.replace(".", "_") + "_update_history on " + tbl + ";"
                     res = cur.execute(req)
-                except Exception, e:
-                    print >> sys.stderr, e
+                except Exception as e:
+                    print(e, file=sys.stderr)
                     pass
                 con.conn.commit()
                 try:
                     req = "CREATE TRIGGER mm_tables_" + tbl.replace(".", "_") + "_update_history BEFORE UPDATE OR DELETE OR INSERT ON " + tbl + " FOR EACH ROW EXECUTE PROCEDURE update_ghosts()"
                     res = cur.execute(req)
-                except Exception, e:
-                    print >> sys.stderr, e
+                except Exception as e:
+                    print(e, file=sys.stderr)
                     pass
                 con.conn.commit()
         col_sufix = ""
@@ -3174,15 +3174,15 @@ def insert(conf, inputs, outputs):
         columns = json.loads(inputs["columns"]["value"])
         for i in range(len(columns)):
             content = None
-            print >> sys.stderr, "COLUMN i: " + columns[i]
+            print("COLUMN i: " + columns[i], file=sys.stderr)
             if i > 0:
                 col_sufix += ","
                 val_sufix += ","
-            if inputs.keys().count("id") == 0:
-                print >> sys.stderr, "OK "
+            if list(inputs.keys()).count("id") == 0:
+                print("OK ", file=sys.stderr)
                 col_sufix += columns[i]
-                print >> sys.stderr, "OK "
-                print >> sys.stderr, str(inputs[columns[i]]["value"])
+                print("OK ", file=sys.stderr)
+                print(str(inputs[columns[i]]["value"]), file=sys.stderr)
                 if columns[i] == "file":
                     content = packFile(conf, conf["main"]["tmpPath"] + "/data_tmp_1111" + conf["senv"]["MMID"] + "/" + inputs[columns[i]]["value"], columns[i])
                     val_sufix += "%s"
@@ -3204,11 +3204,11 @@ def insert(conf, inputs, outputs):
                             col_sufix += columns[i] + "=NULL"
                         else:
                             col_sufix += columns[i] + "=" + str(adapt(str(inputs[columns[i]]["value"])))
-            print >> sys.stderr, val_sufix.encode('utf-8')
+            print(val_sufix.encode('utf-8'), file=sys.stderr)
         if len(columns) > 0:
-            if inputs.keys().count("id") == 0:
+            if list(inputs.keys()).count("id") == 0:
                 req = "INSERT INTO " + inputs["table"]["value"] + " (" + col_sufix + ") VALUES (" + (val_sufix) + ") RETURNING id"
-                print >> sys.stderr, req.encode('utf-8')
+                print(req.encode('utf-8'), file=sys.stderr)
                 if content is not None:
                     cur.execute(req, (psycopg2.Binary(content),))
                 else:
@@ -3217,7 +3217,7 @@ def insert(conf, inputs, outputs):
             else:
                 val_sufix = "id=" + inputs["id"]["value"]
                 req = "UPDATE " + inputs["table"]["value"] + " set " + col_sufix + " WHERE " + val_sufix
-                print >> sys.stderr, req.encode('utf-8')
+                print(req.encode('utf-8'), file=sys.stderr)
                 if content is not None:
                     cur.execute(req, (psycopg2.Binary(content),))
                 else:
@@ -3225,45 +3225,45 @@ def insert(conf, inputs, outputs):
                 cid = inputs["id"]["value"]
             outputs["id"]["value"] = json.dumps(cid)
         else:
-            if inputs.keys().count("id") > 0:
+            if list(inputs.keys()).count("id") > 0:
                 outputs["id"]["value"] = inputs["id"]["value"]
             else:
                 outputs["id"]["value"] = "-1"
             cid = outputs["id"]["value"]
-        if inputs.keys().count("links") > 0:
+        if list(inputs.keys()).count("links") > 0:
             links = json.loads(inputs["links"]["value"])
-            lkeys = links.keys()
+            lkeys = list(links.keys())
             for j in range(len(lkeys)):
                 obj = json.loads(inputs[lkeys[j]]["value"])
                 req = "DELETE FROM " + links[lkeys[j]]["table"] + " where " + links[lkeys[j]]["ocol"] + "=" + cid + ";"
                 try:
                     cur.execute(req)
-                    print >> sys.stderr, req
+                    print(req, file=sys.stderr)
                     con.conn.commit()
                     req = ""
                 except:
                     con.conn.commit()
                     req = ""
-                print >> sys.stderr, req
+                print(req, file=sys.stderr)
                 for k in range(len(obj)):
                     if links[lkeys[j]]["ocol"] != links[lkeys[j]]["tid"]:
                         req = "INSERT INTO " + links[lkeys[j]]["table"] + " (" + links[lkeys[j]]["ocol"] + "," + links[lkeys[j]]["tid"] + ") VALUES (" + cid + "," + obj[k] + ");"
                     else:
-                        lcols = obj[k].keys()
+                        lcols = list(obj[k].keys())
                         col_sufix = links[lkeys[j]]["ocol"]
                         val_sufix = cid
                         for i in range(len(lcols)):
-                            print >> sys.stderr, obj[k][lcols[i]].encode('utf-8')
+                            print(obj[k][lcols[i]].encode('utf-8'), file=sys.stderr)
                             col_sufix += "," + lcols[i]
                             val_sufix += "," + str(adapt(str(obj[k][lcols[i]].encode('utf-8')))).decode('utf-8')
                         req = "INSERT INTO " + links[lkeys[j]]["table"] + " (" + col_sufix + ") VALUES (" + val_sufix + ");"
-                    print >> sys.stderr, req.encode('utf-8')
+                    print(req.encode('utf-8'), file=sys.stderr)
                     cur.execute(req)
                     con.conn.commit()
         outputs["Result"]["value"] = zoo._("Done")
-    except Exception, e:
+    except Exception as e:
         import traceback
-        print >> sys.stderr, traceback.format_exc()
+        print(traceback.format_exc(), file=sys.stderr)
         conf["lenv"]["message"] = zoo._("An error occured when processing your request: ") + str(e) + " \n" + str(traceback.format_exc())
         return zoo.SERVICE_FAILED
     con.conn.commit()
@@ -3310,11 +3310,11 @@ def clientDelete(conf, inputs, outputs):
             req = "DELETE FROM " + val[0] + " WHERE " + cid + "=" + inputs["tupleId"]["value"]
             try:
                 cur.execute(req)
-            except Exception, e:
+            except Exception as e:
                 conf["lenv"]["message"] = zoo._("Unable to delete element: " + str(e))
                 return zoo.SERVICE_FAILED
             con.conn.commit()
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("Unable to delete element: " + str(e))
         return zoo.SERVICE_FAILED
     outputs["Result"]["value"] = zoo._('Done')
@@ -3326,7 +3326,7 @@ def recoverFileFromHexInDb(conf, inputs, outputs):
     res = vectSql.vectInfo(conf, inputs, outputs)
     import json
     jsObj = json.loads(outputs["Result"]["value"])
-    print >> sys.stderr, jsObj[0][inputs["field"]["value"]]
+    print(jsObj[0][inputs["field"]["value"]], file=sys.stderr)
     lInputs = {"table": inputs["tableName"], "field": inputs["field"], "binaryString": {"value": jsObj[0][inputs["field"]["value"]]}, "id": inputs["id"]}
     return recoverFileFromHex(conf, lInputs, outputs)
     # return zoo.SERVICE_SUCCEEDED
@@ -3345,8 +3345,8 @@ def recoverFileFromHex(conf, inputs, outputs):
         binary_file.close()
         inputs["file"] = {"value": fileName}
         return saveUploadedFile(conf, inputs, outputs)
-    except Exception, e:
-        print >> sys.stderr, "ERROR 1 " + str(e)
+    except Exception as e:
+        print("ERROR 1 " + str(e), file=sys.stderr)
         con = auth.getCon(conf)
         con.connect()
         try:
@@ -3355,9 +3355,9 @@ def recoverFileFromHex(conf, inputs, outputs):
             cur.execute("UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=ST_SetSRID(ST_GeometryFromText('" + bin_string.encode('utf-8') + "'),4326) WHERE id=" + inputs["id"]["value"])
             con.conn.commit()
             return zoo.SERVICE_SUCCEEDED
-        except Exception, e:
-            print >> sys.stderr, "ERROR 2 " + str(e)
-            print >> sys.stderr, e
+        except Exception as e:
+            print("ERROR 2 " + str(e), file=sys.stderr)
+            print(e, file=sys.stderr)
             con.conn.commit()
             return zoo.SERVICE_FAILED
 
@@ -3381,7 +3381,7 @@ def saveUploadedFile(conf, inputs, outputs):
         tables = table_names.split(" ")
         sys.stdout.flush()
         for table in tables:
-            print >> sys.stderr, " <-> ----> " + str(table)
+            print(" <-> ----> " + str(table), file=sys.stderr)
             if table != '':
                 csv_content = subprocess.Popen(["/usr/local/bin/mdb-export", inputs["file"]["value"], table],
                                                stdout=subprocess.PIPE).communicate()[0]
@@ -3401,7 +3401,7 @@ def clientImportDataset(conf, inputs, outputs):
         req = "SELECT name from mm_tables.p_tables where id=" + inputs["tableId"]["value"]
         res = cur.execute(req)
         vals = cur.fetchone()
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("Unable to identify your parameter as a tableId: ") + req + str(e)
         return zoo.SERVICE_FAILED
     tableName = vals[0]
@@ -3429,10 +3429,10 @@ def clientImportDataset(conf, inputs, outputs):
         req1 += ") (" + req + ")"
         res = cur.execute(req1)
         con.conn.commit()
-        print >> sys.stderr, originalColumns
-        print >> sys.stderr, req1
-    except Exception, e:
-        print >> sys.stderr, e
+        print(originalColumns, file=sys.stderr)
+        print(req1, file=sys.stderr)
+    except Exception as e:
+        print(e, file=sys.stderr)
         return zoo.SERVICE_FAILED
     return zoo.SERVICE_SUCCEEDED
 
@@ -3446,7 +3446,7 @@ def clientInsert(conf, inputs, outputs):
         req = "SELECT name from mm_tables.p_tables where id=" + inputs["tableId"]["value"]
         res = cur.execute(req)
         vals = cur.fetchone()
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("Unable to identify your parameter as a tableId: ") + req + str(e)
         return zoo.SERVICE_FAILED
     tableName = vals[0]
@@ -3457,64 +3457,64 @@ def clientInsert(conf, inputs, outputs):
     try:
         req = "SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.ftypes,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_edition_fields.ftype=mm_tables.ftypes.id and not(mm_tables.ftypes.basic) and mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=" + \
               inputs["editId"]["value"] + " and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + inputs["tableId"]["value"] + " and mm.groups.id in (SELECT id from mm.groups where " + splitGroup(conf) + ")) as a ORDER BY a.id"
-        print >> sys.stderr, req
+        print(req, file=sys.stderr)
         res = cur.execute(req)
         originalColumns = cur.fetchall()
-        print >> sys.stderr, "originalColumns"
-        print >> sys.stderr, originalColumns
+        print("originalColumns", file=sys.stderr)
+        print(originalColumns, file=sys.stderr)
         dcols = []
         dvals = []
         specialFields = []
         for i in range(len(originalColumns)):
             dcols += [{"name": originalColumns[i][2], "type": originalColumns[i][3], "value": originalColumns[i][4]}]  # name type
             specialFields += [originalColumns[i][2]]
-        print >> sys.stderr, "DCOLS"
-        print >> sys.stderr, dcols
+        print("DCOLS", file=sys.stderr)
+        print(dcols, file=sys.stderr)
         col_sufix = ""
         val_sufix = ""
         tuple = json.loads(inputs["tuple"]["value"])
         tupleReal = json.loads(inputs["tupleReal"]["value"])
-        realKeys = tupleReal.keys()
-        keys = tuple.keys()
+        realKeys = list(tupleReal.keys())
+        keys = list(tuple.keys())
         columns = realKeys + keys
-        print >> sys.stderr, columns
+        print(columns, file=sys.stderr)
         cnt = 0
         for i in range(len(columns)):
             if specialFields.count(columns[i]) == 0:
-                print >> sys.stderr, columns[i]
+                print(columns[i], file=sys.stderr)
                 if cnt > 0:
                     col_sufix += ","
                     val_sufix += ","
-                if inputs.keys().count("id") == 0:
-                    print >> sys.stderr, "TUPLE " + str(i)
+                if list(inputs.keys()).count("id") == 0:
+                    print("TUPLE " + str(i), file=sys.stderr)
                     col_sufix += columns[i]
                     if i >= len(realKeys):
                         try:
-                            print >> sys.stderr, " * " + str(tuple[columns[i]].encode("utf-8"))
+                            print(" * " + str(tuple[columns[i]].encode("utf-8")), file=sys.stderr)
                             val_sufix += str(adapt(str(tuple[columns[i]].encode("utf-8"))))
                         except:
-                            print >> sys.stderr, " * " + str(tuple[columns[i]])
+                            print(" * " + str(tuple[columns[i]]), file=sys.stderr)
                             val_sufix += str(adapt(str(tuple[columns[i]])))
                     else:
-                        print >> sys.stderr, " * " + str(tupleReal[columns[i]])
+                        print(" * " + str(tupleReal[columns[i]]), file=sys.stderr)
                         val_sufix += str(tupleReal[columns[i]])
                 else:
-                    print >> sys.stderr, "TUPLE " + str(i)
+                    print("TUPLE " + str(i), file=sys.stderr)
                     if i >= len(realKeys):
-                        print >> sys.stderr, "TUPLE "
+                        print("TUPLE ", file=sys.stderr)
                         try:
-                            print >> sys.stderr, " * " + str(tuple[columns[i]].encode("utf-8"))
-                            print >> sys.stderr, " * " + str(adapt(str(tuple[columns[i]].encode("utf-8"))))
+                            print(" * " + str(tuple[columns[i]].encode("utf-8")), file=sys.stderr)
+                            print(" * " + str(adapt(str(tuple[columns[i]].encode("utf-8")))), file=sys.stderr)
                             if len(str(adapt(str(tuple[columns[i]].encode("utf-8"))))) == 2:
                                 col_sufix += columns[i] + "=NULL"
                             else:
                                 col_sufix += columns[i] + "=" + str(adapt(str(tuple[columns[i]].encode("utf-8")))).decode('utf-8')
-                            print >> sys.stderr, " * " + str(adapt(str(tuple[columns[i]].encode("utf-8"))))
+                            print(" * " + str(adapt(str(tuple[columns[i]].encode("utf-8")))), file=sys.stderr)
                         except:
                             col_sufix += columns[i] + "=" + str(tuple[columns[i]])
                     else:
-                        print >> sys.stderr, "TUPLE "
-                        print >> sys.stderr, tupleReal[columns[i]].decode("utf-8")
+                        print("TUPLE ", file=sys.stderr)
+                        print(tupleReal[columns[i]].decode("utf-8"), file=sys.stderr)
                         col_sufix += columns[i] + "=" + str(tupleReal[columns[i]])
                 cnt += 1
             else:
@@ -3523,7 +3523,7 @@ def clientInsert(conf, inputs, outputs):
                     if cnt > 0:
                         col_sufix += ","
                         val_sufix += ","
-                    if inputs.keys().count("id") == 0:
+                    if list(inputs.keys()).count("id") == 0:
                         col_sufix += columns[i]
                         val_sufix += str(adapt(str(tuple[columns[i]])))
                     else:
@@ -3543,10 +3543,10 @@ def clientInsert(conf, inputs, outputs):
                         if dcols[specialFields.index(columns[i])]["type"] == "varchar(32)":
                             import manage_users.manage_users as mu
                             if i >= len(realKeys):
-                                print >> sys.stderr, str(adapt(mu.mm_md5(tuple[columns[i]])))
+                                print(str(adapt(mu.mm_md5(tuple[columns[i]]))), file=sys.stderr)
                                 dvals += [str(adapt(mu.mm_md5(tuple[columns[i]])))]
                             else:
-                                print >> sys.stderr, str(adapt(mu.mm_md5(tupleReal[columns[i]])))
+                                print(str(adapt(mu.mm_md5(tupleReal[columns[i]]))), file=sys.stderr)
                                 dvals += [str(adapt(mu.mm_md5(tupleReal[columns[i]])))]
                         else:
                             if i >= len(realKeys):
@@ -3554,39 +3554,39 @@ def clientInsert(conf, inputs, outputs):
                             else:
                                 dvals += [tupleReal[columns[i]]]
 
-        if inputs.keys().count("id") == 0:
-            print >> sys.stderr, "COLS"
-            print >> sys.stderr, col_sufix
-            print >> sys.stderr, "VALS"
+        if list(inputs.keys()).count("id") == 0:
+            print("COLS", file=sys.stderr)
+            print(col_sufix, file=sys.stderr)
+            print("VALS", file=sys.stderr)
             val_sufix = val_sufix.replace("'NULL'", "NULL")
-            print >> sys.stderr, val_sufix
+            print(val_sufix, file=sys.stderr)
             req = "INSERT INTO " + tableName + " (" + col_sufix + ") VALUES (" + val_sufix.decode("'utf-8") + ") RETURNING " + str(pkey)
-            print >> sys.stderr, "VALS"
-            print >> sys.stderr, req.encode("utf-8")
+            print("VALS", file=sys.stderr)
+            print(req.encode("utf-8"), file=sys.stderr)
             cur.execute(req)
-            print >> sys.stderr, "VALS"
+            print("VALS", file=sys.stderr)
             cid = str(cur.fetchone()[0])
-            print >> sys.stderr, "VALS"
+            print("VALS", file=sys.stderr)
         else:
             f = fetchPrimaryKey(cur, tableName)
             val_sufix = f + "=" + inputs["id"]["value"]
-            print >> sys.stderr, tableName
-            print >> sys.stderr, col_sufix.encode("utf-8")
-            print >> sys.stderr, val_sufix
+            print(tableName, file=sys.stderr)
+            print(col_sufix.encode("utf-8"), file=sys.stderr)
+            print(val_sufix, file=sys.stderr)
             col_sufix = col_sufix.replace("'NULL'", "NULL")
             req = "UPDATE " + tableName + " set " + col_sufix + " WHERE " + val_sufix
-            print >> sys.stderr, str(req.encode("utf-8"))
+            print(str(req.encode("utf-8")), file=sys.stderr)
             cur.execute(req)
             cid = inputs["id"]["value"]
         for i in range(len(dcols)):
-            print >> sys.stderr, "+++++" + str(dcols[i])
+            print("+++++" + str(dcols[i]), file=sys.stderr)
             # print >> sys.stderr,"+++++"+str(dvals[i])
             if dcols[i]["type"] == "geometry":
                 # cur.execute("UPDATE "+tableName+" set "+dcols[i]["name"]+"=%s WHERE "+pkey+"="+cid,(psycopg2.Integer(),))
-                print >> sys.stderr, "+++++ OM +++++" + str(dvals)
+                print("+++++ OM +++++" + str(dvals), file=sys.stderr)
                 import osgeo
                 import osgeo.gdal
-                if inputs.keys().count("InputGeometry") > 0:
+                if list(inputs.keys()).count("InputGeometry") > 0:
                     try:
                         ds = osgeo.ogr.Open(inputs["InputGeometry"]["cache_file"])
                         layer = ds.GetLayerByIndex(0)
@@ -3598,48 +3598,48 @@ def clientInsert(conf, inputs, outputs):
                             feat = layer.GetNextFeature()
                     except:
                         geometry = inputs["InputGeometry"]["value"]
-                    print >> sys.stderr, "+++++ OM +++++" + str(geometry)
+                    print("+++++ OM +++++" + str(geometry), file=sys.stderr)
                     cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_SetSRID(ST_Multi(ST_GeometryFromText('" + str(geometry) + "')),4326) WHERE " + pkey + "=" + cid, ())
 
             if dcols[i]["type"] == "varchar(32)":
-                print >> sys.stderr, dcols[i]
-                print >> sys.stderr, "+++++ OM +++++" + str(dvals)
+                print(dcols[i], file=sys.stderr)
+                print("+++++ OM +++++" + str(dvals), file=sys.stderr)
                 cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=" + dvals[0] + " WHERE " + pkey + "=" + cid)
 
             if dcols[i]["type"] == "bytea":
-                print >> sys.stderr, dcols[i]
-                if inputs.keys().count("id"):
+                print(dcols[i], file=sys.stderr)
+                if list(inputs.keys()).count("id"):
                     cid = inputs["id"]["value"]
                 # try:
                 content = packFile(conf, tuple[dcols[i]["name"]], dcols[i]["name"])
-                print >> sys.stderr, content
+                print(content, file=sys.stderr)
                 cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=%s WHERE " + pkey + "=" + cid, (psycopg2.Binary(content),))
                 # except Exception,e:
                 #    print >> sys.stderr,e
 
             if dcols[i]["type"] == "tbl_linked":
                 lcomponents = dcols[i]["value"].split(';')
-                if inputs.keys().count("id"):
+                if list(inputs.keys()).count("id"):
                     cid = inputs["id"]["value"]
                 # Remove possible previous tuple refering this element
                 try:
                     req = "DELETE FROM " + lcomponents[2] + " where " + lcomponents[0] + " = " + cid
-                    print >> sys.stderr, req
+                    print(req, file=sys.stderr)
                     cur.execute(req)
                 except:
                     con.conn.commit()
-                print >> sys.stderr, "-------" + str(tuple[dcols[i]["name"]])
+                print("-------" + str(tuple[dcols[i]["name"]]), file=sys.stderr)
                 for j in range(len(tuple[dcols[i]["name"]])):
                     try:
                         req = "INSERT INTO " + lcomponents[2] + " (" + lcomponents[0] + "," + lcomponents[1] + ") VALUES (" + cid + "," + str(tuple[dcols[i]["name"]][j]) + ")"
-                        print >> sys.stderr, req
+                        print(req, file=sys.stderr)
                         cur.execute(req)
                     except:
                         con.conn.commit()
             con.conn.commit()
 
         outputs["Result"]["value"] = zoo._("Done")
-    except Exception, e:
+    except Exception as e:
         import traceback
         conf["lenv"]["message"] = zoo._("An error occured when processing your request: ") + str(e) + "\n" + str(traceback.format_exc())
         return zoo.SERVICE_FAILED
@@ -3654,7 +3654,7 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
         req = "SELECT name from mm_tables.p_tables where id=" + tableId
         res = cur.execute(req)
         vals = cur.fetchone()
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("Unable to identify your parameter as a tableId: ") + req + str(e)
         return None
     tableName = vals[0]
@@ -3668,32 +3668,32 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
     else:
         req = "SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
               conf["senv"]["id"] + "') and mm_tables.p_reports.name=" + str(adapt(str(rName))) + " order by mm_tables.p_reports.id asc"
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     res = cur.execute(req)
     ovals0 = cur.fetchall()
-    print >> sys.stderr, ovals0
+    print(ovals0, file=sys.stderr)
     if len(ovals0) == 0:
         conf["lenv"]["message"] = zoo._("Unable to find any report for the current element")
         return None
     req = "SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_report_fields.name) mm_tables.p_report_fields.rid as rid,mm_tables.p_report_fields.id,mm_tables.p_report_fields.name,(select code from mm_tables.ftypes where mm_tables.ftypes.id=mm_tables.p_report_fields.ftype),mm_tables.p_report_fields.value FROM mm_tables.p_reports,mm_tables.p_report_fields,mm.groups,mm_tables.p_report_groups where mm_tables.p_reports.id=mm_tables.p_report_fields.rid and mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
           conf["senv"]["id"] + "') and mm_tables.p_reports.id=" + str(ovals0[0][0]) + ") as a ORDER BY a.id"
-    print >> sys.stderr, req
+    print(req, file=sys.stderr)
     res = cur.execute(req)
     vals0 = cur.fetchall()
     rcolumns = []
     postDocuments = []
     for i in range(len(vals0)):
-        print >> sys.stderr, vals0[i][3]
-        print >> sys.stderr, str(vals0[i])
+        print(vals0[i][3], file=sys.stderr)
+        print(str(vals0[i]), file=sys.stderr)
         if vals0[i][3] != "multiple_doc":
             rcolumns += [vals0[i][4]]
         else:
             postDocuments += [vals0[i][4]]
     rfields = (",".join(rcolumns))
     # print >> sys.stderr,rfields
-    print >> sys.stderr, "*********** [" + str(postDocuments) + "] ***********"
-    print >> sys.stderr, "*********** [" + str(ovals0) + "] ***********"
-    print >> sys.stderr, "*********** [" + str(rcolumns) + "] ***********"
+    print("*********** [" + str(postDocuments) + "] ***********", file=sys.stderr)
+    print("*********** [" + str(ovals0) + "] ***********", file=sys.stderr)
+    print("*********** [" + str(rcolumns) + "] ***********", file=sys.stderr)
 
     if not (ovals0[0][4]):
         clause = ovals0[0][3]
@@ -3710,8 +3710,8 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
             clause = buildClause(filters)
         rfields = rfields.replace("[_CLAUSE_]", clause)
         rreq = "SELECT " + rfields + " from " + tableName + " where id=" + cid + " AND " + ovals0[0][3] + " AND " + clause
-    print >> sys.stderr, rreq.encode('utf-8')
-    print >> sys.stderr, vals0
+    print(rreq.encode('utf-8'), file=sys.stderr)
+    print(vals0, file=sys.stderr)
     res = cur.execute(rreq)
     rrvals = None
     if ovals0[0][4]:
@@ -3719,8 +3719,8 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
         rvals = rrvals[0]
     else:
         rvals = cur.fetchone()
-    print >> sys.stderr, "*********** [" + str(rvals) + "] ***********"
-    if inputs.keys().count("noPrint") > 0 and inputs["noPrint"]["value"] == "true":
+    print("*********** [" + str(rvals) + "] ***********", file=sys.stderr)
+    if list(inputs.keys()).count("noPrint") > 0 and inputs["noPrint"]["value"] == "true":
         return rvals
     lfile = unpackFile(conf, ovals0[0][2])
     # fres[ovals[i][0]][cvals[j][1]]={"type":"bytes","filename":file["name"],"fileurl":file["name"].replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])}
@@ -3767,37 +3767,37 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
             else:
                 if vals0[i][3] == "paragraph_sql_array":
                     # print >> sys.stderr,str(rvals[i]).replace("'{","[").replace("}'","]")
-                    script += "pm.addParagraph('[_" + vals0[i][2] + "_]'," + json.dumps(eval(unicode(str(rvals[rcnt]), "utf-8").replace("'{", "[").replace("}'", "]"))) + ")\n"
+                    script += "pm.addParagraph('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(str(rvals[rcnt]), "utf-8").replace("'{", "[").replace("}'", "]"))) + ")\n"
                     rcnt += 1
                 else:
                     if vals0[i][3] == "sql_array":
-                        print >> sys.stderr, "*** 0 ***" + unicode(str(rvals[rcnt]), "utf-8")
-                        print >> sys.stderr, "*** 1 ***" + unicode(str(rvals[rcnt]), "utf-8").replace("'{", "[").replace("}'", "]")
-                        script += "pm.addTable('[_" + vals0[i][2] + "_]'," + json.dumps(eval(unicode(str(rvals[rcnt]), "utf-8").replace("'{", "[").replace("}'", "]"))).replace(", null", "") + ")\n"
+                        print("*** 0 ***" + str(str(rvals[rcnt]), "utf-8"), file=sys.stderr)
+                        print("*** 1 ***" + str(str(rvals[rcnt]), "utf-8").replace("'{", "[").replace("}'", "]"), file=sys.stderr)
+                        script += "pm.addTable('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(str(rvals[rcnt]), "utf-8").replace("'{", "[").replace("}'", "]"))).replace(", null", "") + ")\n"
                         rcnt += 1
                     else:
                         if vals0[i][3] == "diagram":
                             try:
                                 # script+="pm.statThis('[_"+vals0[i][2]+"_]',"+json.dumps(eval(unicode(str(rvals[rcnt]),"utf-8").replace("'{","[").replace("}'","]")),ensure_ascii=False)+")\ntime.sleep(0.01)\n"
-                                script += "pm.statThis('[_" + vals0[i][2] + "_]'," + unicode(str(rvals[rcnt]), "utf-8").replace("'{", "[").replace("}'", "]") + ")\ntime.sleep(1)\n"
+                                script += "pm.statThis('[_" + vals0[i][2] + "_]'," + str(str(rvals[rcnt]), "utf-8").replace("'{", "[").replace("}'", "]") + ")\ntime.sleep(1)\n"
                                 script += "print('" + vals0[i][2] + "',file=sys.stderr)\nsys.stderr.flush()\ntime.sleep(1)\n"
-                            except Exception, e:
-                                print >> sys.stderr, "ERROR 0 !"
-                                print >> sys.stderr, e
+                            except Exception as e:
+                                print("ERROR 0 !", file=sys.stderr)
+                                print(e, file=sys.stderr)
                                 # sys.setdefaultencoding('utf8')
                                 # print >> sys.stderr,rvals[rcnt].encode('utf-8')
                                 try:
                                     script += "pm.statThis('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(rvals[rcnt].encode('utf-8')).replace("'{", "[").replace("}'", "]"))) + ")\ntime.sleep(0.01)\n"
                                     script += "print('" + vals0[i][2] + "',file=sys.stderr)\nsys.stderr.flush()\n"
-                                except Exception, e:
-                                    print >> sys.stderr, "ERROR 1 !"
-                                    print >> sys.stderr, e
+                                except Exception as e:
+                                    print("ERROR 1 !", file=sys.stderr)
+                                    print(e, file=sys.stderr)
 
                             rcnt += 1
                         else:
                             if vals0[i][3] == "multiple_doc":
                                 tmp = postDocuments[pcnt].split(';')
-                                print >> sys.stderr, tmp
+                                print(tmp, file=sys.stderr)
                                 f = fetchPrimaryKey(cur, tableName)
                                 f1 = fetchPrimaryKey(cur, tmp[1])
                                 req1 = "(SELECT id from mm_tables.p_tables where name=" + str(adapt(tmp[1])) + ")"
@@ -3808,8 +3808,8 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
                                 lvals = cur.fetchall()
                                 for j in range(len(lvals)):
                                     ldocs = _clientPrint(conf, inputs, cur, req1, lvals[j][0], rid, tmp[2])
-                                    print >> sys.stderr, ldocs
-                                    print >> sys.stderr, conf["lenv"]["message"]
+                                    print(ldocs, file=sys.stderr)
+                                    print(conf["lenv"]["message"], file=sys.stderr)
                                     # if j==0:
                                     script += "pm.goToWord('[_" + vals0[i][2] + "_]')\n"
                                     script += "from com.sun.star.text.ControlCharacter import PARAGRAPH_BREAK, LINE_BREAK\n"
@@ -3825,7 +3825,7 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
     if rName is None:
         for i in range(len(lexts)):
             script += "pm.saveDoc('" + tDocPath[i] + "')\n"
-    print >> sys.stderr, script
+    print(script, file=sys.stderr)
     script += "pm.unloadDoc('" + docPath + "')\nquit()\n"
     conf["lenv"]["message"] = "Start PaperMint client"
     zoo.update_status(conf, 50)
@@ -3866,12 +3866,12 @@ def clientPrint(conf, inputs, outputs):
     con.connect()
     cur = con.conn.cursor()
     fres = {}
-    if inputs.keys().count("rid") > 0:
+    if list(inputs.keys()).count("rid") > 0:
         docs = _clientPrint(conf, inputs, cur, inputs["tableId"]["value"], inputs["id"]["value"], filters=json.loads(inputs["filters"]["value"]), rid=inputs["rid"]["value"])
     else:
         docs = _clientPrint(conf, inputs, cur, inputs["tableId"]["value"], inputs["id"]["value"], filters=json.loads(inputs["filters"]["value"]))
 
-    if inputs.keys().count("noPrint") > 0 and inputs["noPrint"]["value"] == "true":
+    if list(inputs.keys()).count("noPrint") > 0 and inputs["noPrint"]["value"] == "true":
         outputs["Result"]["value"] = json.dumps(docs)
         return zoo.SERVICE_SUCCEEDED
 
@@ -3891,34 +3891,34 @@ def clientView(conf, inputs, outputs):
         req = "SELECT name from mm_tables.p_tables where id=" + inputs["tableId"]["value"]
         res = cur.execute(req)
         vals = cur.fetchone()
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("Unable to identify your parameter as a tableId: ") + req + str(e)
         return zoo.SERVICE_FAILED
     tableName = vals[0]
     # clientPrint(conf,inputs,outputs)
     req = "SELECT mm_tables.p_editions.id,mm_tables.p_editions.name FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + inputs["tableId"][
         "value"] + " and mm.groups.id in (SELECT id from mm.groups where " + splitGroup(conf) + ") and (mm_tables.p_editions.step=-2 or mm_tables.p_editions.step=-10 or mm_tables.p_editions.step>=0 ) order by mm_tables.p_editions.step asc"
-    print >> sys.stderr, " -------- 0 -------- "
-    print >> sys.stderr, req
-    print >> sys.stderr, " -------- 0 -------- "
+    print(" -------- 0 -------- ", file=sys.stderr)
+    print(req, file=sys.stderr)
+    print(" -------- 0 -------- ", file=sys.stderr)
     res = cur.execute(req)
     ovals = cur.fetchall()
     tableId = ovals[0][0]
-    print >> sys.stderr, ovals
+    print(ovals, file=sys.stderr)
     req = "SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where mm_tables.ftypes.id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.value,mm_tables.p_edition_fields.edition FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + \
           inputs["tableId"]["value"] + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + conf["senv"]["id"] + "') and (mm_tables.p_editions.step=-2 or mm_tables.p_editions.step>=0 )) as a ORDER BY a.id"
-    print >> sys.stderr, " -------- 1 -------- "
-    print >> sys.stderr, req
-    print >> sys.stderr, " -------- 1 -------- "
+    print(" -------- 1 -------- ", file=sys.stderr)
+    print(req, file=sys.stderr)
+    print(" -------- 1 -------- ", file=sys.stderr)
     res = cur.execute(req)
     vals = cur.fetchall()
-    print >> sys.stderr, vals
+    print(vals, file=sys.stderr)
     columns = []
     fcolumns = []
     rcolumns = []
     files = {}
     for i in range(len(vals)):
-        print >> sys.stderr, vals[i][3]
+        print(vals[i][3], file=sys.stderr)
         if vals[i][2].count("unamed") == 0 or (vals[i][3] == "tbl_linked" and vals[i][3] != "link"):
             columns += [vals[i][2]]
         else:
@@ -3926,7 +3926,7 @@ def clientView(conf, inputs, outputs):
             fcolumns += [vals[i][2]]
         if vals[i][3] == "tbl_linked":
             components = vals[i][4].split(';')
-            print >> sys.stderr, components
+            print(components, file=sys.stderr)
             rcolumns += ["(SELECT ARRAY(SELECT " + components[1] + " FROM " + components[2] + " WHERE " + components[0] + "=" + tableName + ".id)) as " + vals[i][2]]
         else:
             if vals[i][3] == "bytea":
@@ -3953,14 +3953,14 @@ def clientView(conf, inputs, outputs):
                             rcolumns += [vals[i][2]]
     rfields = (",".join(rcolumns))
     columns += fcolumns
-    print >> sys.stderr, rfields
+    print(rfields, file=sys.stderr)
     f = fetchPrimaryKey(cur, tableName)
     if rfields == "":
         rfields = "'None'"
     rreq = "SELECT " + rfields + " from " + tableName + " where " + f + "=" + inputs["id"]["value"]
-    print >> sys.stderr, " --------2 -------- "
-    print >> sys.stderr, rreq
-    print >> sys.stderr, " ------- 2 --------- "
+    print(" --------2 -------- ", file=sys.stderr)
+    print(rreq, file=sys.stderr)
+    print(" ------- 2 --------- ", file=sys.stderr)
     res = cur.execute(rreq)
     rvals = cur.fetchone()
     restrictedTypes = ["Date", "Boolean", "Reference"]
@@ -3968,13 +3968,13 @@ def clientView(conf, inputs, outputs):
         fres[ovals[i][0]] = {}
         req = "SELECT * FROM (SELECT mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select name from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.dependencies, mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=" + str(
             ovals[i][0]) + " and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + inputs["tableId"]["value"] + " and mm.groups.id in (SELECT id from mm.groups where " + splitGroup(conf) + ")) as a ORDER BY a.id"
-        print >> sys.stderr, " ------- 3 --------- "
-        print >> sys.stderr, req
-        print >> sys.stderr, " ------- 3 --------- "
+        print(" ------- 3 --------- ", file=sys.stderr)
+        print(req, file=sys.stderr)
+        print(" ------- 3 --------- ", file=sys.stderr)
         res = cur.execute(req)
         cvals = cur.fetchall()
         for j in range(len(cvals)):
-            if files.keys().count(cvals[j][2]) > 0:
+            if list(files.keys()).count(cvals[j][2]) > 0:
                 if rvals[rcolumns.index(cvals[j][2])] is not None:
                     file = unpackFile(conf, rvals[rcolumns.index(cvals[j][2])])
                     fres[ovals[i][0]][cvals[j][1]] = {"type": "bytes", "filename": file["name"], "fileurl": file["name"].replace(conf["main"]["tmpPath"], conf["main"]["tmpUrl"])}
@@ -3985,12 +3985,12 @@ def clientView(conf, inputs, outputs):
                             try:
                                 import json
                                 myObj = json.loads(cvals[j][4])
-                                if myObj[0].keys().count("myself") > 0:
+                                if list(myObj[0].keys()).count("myself") > 0:
                                     myObj[0]["myself"]
-                                    print >> sys.stderr, " **** MYSELF: " + str(myObj[0]["myself"])
-                                    print >> sys.stderr, " **** MYSELF: " + str(cvals[j][5])
-                                    print >> sys.stderr, " **** MYSELF: " + str(len(myObj[0]["myself"]))
-                                    print >> sys.stderr, " **** MYSELF: " + str(myObj[0]["myself"][0].keys())
+                                    print(" **** MYSELF: " + str(myObj[0]["myself"]), file=sys.stderr)
+                                    print(" **** MYSELF: " + str(cvals[j][5]), file=sys.stderr)
+                                    print(" **** MYSELF: " + str(len(myObj[0]["myself"])), file=sys.stderr)
+                                    print(" **** MYSELF: " + str(list(myObj[0]["myself"][0].keys())), file=sys.stderr)
                                     alphabet = "abcdefghijklmnopqrstuvwxxyz"
                                     tmpCnt = 0
                                     tmpReq = ""
@@ -4000,10 +4000,10 @@ def clientView(conf, inputs, outputs):
                                     initialReq = cvals[j][5]
                                     if len(myObj[0]["myself"]) >= 1:
                                         for uv in range(len(myObj[0]["myself"])):
-                                            print >> sys.stderr, str(myObj[0]["myself"][uv])
+                                            print(str(myObj[0]["myself"][uv]), file=sys.stderr)
                                             for uv1 in (myObj[0]["myself"][uv]):
-                                                print >> sys.stderr, str(myObj[0]["myself"][uv][uv1])
-                                                print >> sys.stderr, str(myObj[0]["myself"][uv][uv1]["sql_query"]) + " AS " + alphabet[tmpCnt]
+                                                print(str(myObj[0]["myself"][uv][uv1]), file=sys.stderr)
+                                                print(str(myObj[0]["myself"][uv][uv1]["sql_query"]) + " AS " + alphabet[tmpCnt], file=sys.stderr)
                                                 if tmpParams != "":
                                                     tmpParams += ", "
                                                     tmpReq += ", "
@@ -4012,10 +4012,10 @@ def clientView(conf, inputs, outputs):
                                                 initialReq = initialReq.replace("from", ", " + myObj[0]["myself"][uv][uv1]["tfield"] + " from")
                                                 # tmpParams+=alphabet[tmpCnt]+"."+ myObj[0]["myself"][uv][uv1]["tfield"] +"=="
                                                 tmpCnt = tmpCnt + 1
-                                                if myObj[0]["myself"][uv][uv1].keys().count("dependents") > 0:
+                                                if list(myObj[0]["myself"][uv][uv1].keys()).count("dependents") > 0:
                                                     for uw in range(len(myObj[0]["myself"][uv][uv1]["dependents"])):
                                                         for uw1 in myObj[0]["myself"][uv][uv1]["dependents"][uw]:
-                                                            print >> sys.stderr, str(myObj[0]["myself"][uv][uv1]["dependents"][uw][uw1]["sql_query"].replace("from", ", " + myObj[0]["myself"][uv][uv1]["tfield"] + " from")) + " AS " + alphabet[tmpCnt]
+                                                            print(str(myObj[0]["myself"][uv][uv1]["dependents"][uw][uw1]["sql_query"].replace("from", ", " + myObj[0]["myself"][uv][uv1]["tfield"] + " from")) + " AS " + alphabet[tmpCnt], file=sys.stderr)
                                                             if tmpParams != "":
                                                                 tmpParams += ", "
                                                             if tmpReq != "":
@@ -4028,11 +4028,11 @@ def clientView(conf, inputs, outputs):
                                                             tmpClause += " AND " + alphabet[tmpCnt - 1] + "." + myObj[0]["myself"][uv][uv1]["dependents"][uw][uw1]["tfieldf"] + "=" + alphabet[tmpCnt] + "." + myObj[0]["myself"][uv][uv1]["dependents"][uw][uw1]["tfieldf"];
                                                             tmpClause += " AND " + alphabet[tmpCnt] + ".id=" + str(rvals[columns.index(cvals[j][2])])
                                                             hasDep = True
-                                        print >> sys.stderr, tmpParams
+                                        print(tmpParams, file=sys.stderr)
                                         tmpRes = []
                                         if not (hasDep):
                                             fres[ovals[i][0]][str(cvals[j][1]) + "_bind"] = []
-                                            print >> sys.stderr, tmpClause
+                                            print(tmpClause, file=sys.stderr)
                                             tmpReq += ", (" + initialReq + ") AS a1"
                                             for uv2 in range(len(myObj[0]["myself"])):
                                                 for uv3 in myObj[0]["myself"][uv2]:
@@ -4041,12 +4041,12 @@ def clientView(conf, inputs, outputs):
                                                     tmpClause += alphabet[uv2] + "." + myObj[0]["myself"][uv2][uv3]["tfield"] + "=a1." + myObj[0]["myself"][uv2][uv3]["tfield"]
                                                     tmpRes += [uv3]
                                             tmpClause += " AND a1.id=" + str(rvals[columns.index(cvals[j][2])])
-                                        print >> sys.stderr, tmpReq
-                                        print >> sys.stderr, tmpParams
-                                        print >> sys.stderr, tmpClause
+                                        print(tmpReq, file=sys.stderr)
+                                        print(tmpParams, file=sys.stderr)
+                                        print(tmpClause, file=sys.stderr)
                                         if tmpClause != "":
                                             tmpReq = "SELECT " + tmpParams + " FROM " + tmpReq + " WHERE " + tmpClause
-                                            print >> sys.stderr, tmpReq
+                                            print(tmpReq, file=sys.stderr)
                                             res10 = cur.execute(tmpReq)
                                             res10 = cur.fetchone()
                                             fres[ovals[i][0]][str(cvals[j][1]) + "_mdep"] = []
@@ -4054,22 +4054,22 @@ def clientView(conf, inputs, outputs):
                                                 fres[ovals[i][0]][str(cvals[j][1]) + "_mdep"] += [str(res10[uv0])]
                                         if len(tmpRes) > 0:
                                             fres[ovals[i][0]][str(cvals[j][1]) + "_bind"] += [str(tmpRes)]
-                                        print >> sys.stderr, tmpReq
+                                        print(tmpReq, file=sys.stderr)
 
                                     demoBug
-                            except Exception, e:
-                                print >> sys.stderr, str(e)
+                            except Exception as e:
+                                print(str(e), file=sys.stderr)
                                 con.conn.commit()
                                 fres[ovals[i][0]][cvals[j][1]] = str(rvals[columns.index(cvals[j][2])])
                     else:
                         fres[ovals[i][0]][cvals[j][1]] = rvals[columns.index(cvals[j][2])]
                     # print>> sys.stderr,"+++ 0 +++ "+str(rvals)
                     # print>> sys.stderr,"+++ 0 +++ "+str(columns)
-                    print >> sys.stderr, "+++ 0 +++ " + str(cvals[j])
+                    print("+++ 0 +++ " + str(cvals[j]), file=sys.stderr)
                     # print>> sys.stderr,"+++ 0 +++ "+str(rvals[columns.index(cvals[j][2])])
                     # print>> sys.stderr,"+++ 0 +++ "+str(ovals[i])
                 else:
-                    print >> sys.stderr, "+++ 1 +++ " + str(cvals[j])
+                    print("+++ 1 +++ " + str(cvals[j]), file=sys.stderr)
                     try:
                         import json
                         tmpObj = json.loads(cvals[j][4])
@@ -4081,14 +4081,14 @@ def clientView(conf, inputs, outputs):
                         tmpReq += " -1 "
                         for vv in range(len(tmpObj)):
                             tmpReq += " END "
-                        print >> sys.stderr, "+++ 1 +++ " + str(tmpReq)
+                        print("+++ 1 +++ " + str(tmpReq), file=sys.stderr)
                         tmpReq = "SELECT " + tmpReq + " as v FROM " + tableName + " WHERE " + f + "=" + inputs["id"]["value"]
                         res0 = cur.execute(tmpReq)
                         res0 = cur.fetchone()
-                        print >> sys.stderr, "+++ 1 +++ " + str(res0)
+                        print("+++ 1 +++ " + str(res0), file=sys.stderr)
                         fres[ovals[i][0]][cvals[j][1]] = res0[0]
-                    except Exception, e:
-                        print >> sys.stderr, "+++ 999999 +++ " + str(e)
+                    except Exception as e:
+                        print("+++ 999999 +++ " + str(e), file=sys.stderr)
                         fres[ovals[i][0]][cvals[j][1]] = "Not found"
                     # print>> sys.stderr,"+++ 1 +++ "+str(ovals[i])
                     # print >> sys.stderr,columns.index(cvals[j][2])
@@ -4109,11 +4109,11 @@ def buildClause(filters):
     for i in range(len(filters)):
         if res != "":
             res += " " + filters[i]["linkClause"] + " "
-        lkeys = filters[i].keys()
-        print >> sys.stderr, lkeys
+        lkeys = list(filters[i].keys())
+        print(lkeys, file=sys.stderr)
         tres = ""
         for k in range(len(lkeys)):
-            print >> sys.stderr, lkeys[k]
+            print(lkeys[k], file=sys.stderr)
             if lkeys[k] != "linkClause":
                 if tres != "":
                     tres += " AND "
@@ -4122,12 +4122,12 @@ def buildClause(filters):
                     tres += "( " + lkeys[k] + " = " + str(int(filters[i][lkeys[k]])) + " ) "
                 except:
                     tres += "( " + lkeys[k] + "::varchar LIKE " + str(adapt(str(filters[i][lkeys[k]].replace("*", "%").encode('utf-8')))) + " ) "
-            print >> sys.stderr, tres
+            print(tres, file=sys.stderr)
         res += " ( " + tres + " ) "
-    print >> sys.stderr, res
+    print(res, file=sys.stderr)
     if res != "":
         res = " ( " + res + " ) "
-    print >> sys.stderr, res
+    print(res, file=sys.stderr)
     return res
 
 
@@ -4148,7 +4148,7 @@ def clientViewTable(conf, inputs, outputs):
         cur.execute(pg.getDesc(cur, table))
         defs = cur.fetchall()
 
-    except Exception, e:
+    except Exception as e:
         conf["lenv"]["message"] = zoo._("Unable to identify your parameter as a View Id: ") + req + str(e)
         return zoo.SERVICE_FAILED
     req = "SELECT mm_tables.p_view_fields.id,mm_tables.p_view_fields.alias,mm_tables.p_view_fields.value,mm_tables.p_view_fields.view,mm_tables.p_view_fields.search,mm_tables.p_view_fields.class,mm_tables.p_view_fields.name FROM mm_tables.p_views,mm_tables.p_view_fields where mm_tables.p_views.id=mm_tables.p_view_fields.vid and mm_tables.p_view_fields.view and mm_tables.p_views.id=" + \
@@ -4162,11 +4162,11 @@ def clientViewTable(conf, inputs, outputs):
         values += [vals[i][2]]
         if vals[i][5] is not None:
             classifier = table + "." + vals[i][6] + " " + classifiers[(vals[i][5] - 1)]
-    if inputs.keys().count("sortname") > 0 and inputs.keys().count("sortname") != "":
+    if list(inputs.keys()).count("sortname") > 0 and list(inputs.keys()).count("sortname") != "":
         for i in range(len(vals)):
             if vals[i][6] == inputs["sortname"]["value"]:
                 classifier = table + "." + vals[i][6] + " " + inputs["sortorder"]["value"]
-    if inputs.keys().count("filters") > 0:
+    if list(inputs.keys()).count("filters") > 0:
         filters = json.loads(inputs["filters"]["value"])
         if len(filters) > 0:
             if clause != "":
@@ -4176,22 +4176,22 @@ def clientViewTable(conf, inputs, outputs):
     req1 = "SELECT count(*) FROM " + table + " WHERE " + clause
     res = cur.execute(req1)
     fres["total"] = cur.fetchone()[0]
-    if inputs.keys().count("page") > 0:
+    if list(inputs.keys()).count("page") > 0:
         fres["page"] = inputs["page"]["value"]
     else:
         fres["page"] = "1"
     con.conn.commit()
     cid = fetchPrimaryKey(cur, table)
-    print >> sys.stderr, "***** " + str(values)
-    print >> sys.stderr, "****** " + str(cid)
-    print >> sys.stderr, "******* " + str(clause)
-    print >> sys.stderr, "******* " + str(classifier)
+    print("***** " + str(values), file=sys.stderr)
+    print("****** " + str(cid), file=sys.stderr)
+    print("******* " + str(clause), file=sys.stderr)
+    print("******* " + str(classifier), file=sys.stderr)
     req1 = "SELECT " + (",".join(values + [cid])) + " FROM " + table + " WHERE " + clause + " ORDER BY " + classifier + " LIMIT " + inputs["limit"]["value"] + " OFFSET " + inputs["offset"]["value"]
     # print >> sys.stderr,req1
     res = cur.execute(req1)
     vals = cur.fetchall()
     fres["rows"] = []
-    print >> sys.stderr, defs
+    print(defs, file=sys.stderr)
     for i in range(len(vals)):
         lobj = {"cell": [], "id": vals[i][len(vals[i]) - 1]}
         for j in range(len(vals[i])):
@@ -4209,7 +4209,7 @@ def clientViewTable(conf, inputs, outputs):
                             file = unpackFile(conf, vals[i][j])
                             displayName = file["name"].split("/")
                             lobj["cell"] += [displayName[len(displayName) - 1]]
-                        except Exception, e:
+                        except Exception as e:
                             lobj["cell"] += [zoo._("No file found")]
         fres["rows"] += [lobj]
     con.conn.commit()
@@ -4241,15 +4241,15 @@ def massiveImport(conf, inputs, outputs):
         res2 = cur.execute(req2)
         vals2 = cur.fetchall()
         try:
-            print >> sys.stderr, str(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '').encode('utf-8'))
+            print(str(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '').encode('utf-8')), file=sys.stderr)
         except:
-            print >> sys.stderr, ('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '')
+            print(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + ''), file=sys.stderr)
         res = vectSql.vectInfo(conf, {"q": {"value": str(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '').encode('utf-8'))}, "dstName": {"value": inputs["dstName"]["value"]}}, outputs)
         res = json.loads(outputs["Result"]["value"])
         try:
-            print >> sys.stderr, str(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '').encode('utf-8'))
+            print(str(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '').encode('utf-8')), file=sys.stderr)
         except:
-            print >> sys.stderr, ('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '')
+            print(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + ''), file=sys.stderr)
         tname = "imports.\"tmp_" + vals[i][4].replace(".", "___") + "_" + conf["lenv"]["usid"] + "\""
         tname_1 = vals[i][4]
         # reqTemp0="CREATE TEMPORARY TABLE "+tname+" ("
@@ -4308,8 +4308,8 @@ def massiveImport(conf, inputs, outputs):
                 try:
                     cur.execute("SELECT " + str(adapt(value)).replace(",", ".") + "::" + j[2])
                     reqInsertTemp += str(adapt(value)).replace(",", ".") + "::" + j[2]
-                except Exception, e:
-                    print >> sys.stderr, e
+                except Exception as e:
+                    print(e, file=sys.stderr)
                     con.conn.commit()
                     reqInsertTemp += "NULL"
             reqTemp += ")"
@@ -4355,33 +4355,33 @@ def massiveImport(conf, inputs, outputs):
                                 fieldName = "Field" + str(ref[0] + 1)
                         else:
                             fieldName = str(j[3].encode("utf-8"))
-                        print >> sys.stderr, vals[i][2].count("Field")
+                        print(vals[i][2].count("Field"), file=sys.stderr)
                         # print >> sys.stderr,fieldName
-                        print >> sys.stderr, res[k]
+                        print(res[k], file=sys.stderr)
                         value += res[k][fieldName]  # .decode('utf-8')]
                         valueX += "(null)"
                     try:
-                        print >> sys.stderr, "+++++++++++----- 0 -------=++++++++++++++++"
-                        print >> sys.stderr, adapt(value)
-                        print >> sys.stderr, "+++++++++++----- 1 -------=++++++++++++++++"
-                        if isinstance(value, unicode):
-                            print >> sys.stderr, "+++++++++++----- 11 -------=++++++++++++++++"
+                        print("+++++++++++----- 0 -------=++++++++++++++++", file=sys.stderr)
+                        print(adapt(value), file=sys.stderr)
+                        print("+++++++++++----- 1 -------=++++++++++++++++", file=sys.stderr)
+                        if isinstance(value, str):
+                            print("+++++++++++----- 11 -------=++++++++++++++++", file=sys.stderr)
                             value = value.encode("utf-8")
-                            print >> sys.stderr, value
+                            print(value, file=sys.stderr)
                         # toto=adapt(value.encode("utf-8"))
                         # print >> sys.stderr,unicode(str(adapt(value.encode("utf-8"))),"utf-8")
-                        print >> sys.stderr, "+++++++++++----- 2 -------=++++++++++++++++"
+                        print("+++++++++++----- 2 -------=++++++++++++++++", file=sys.stderr)
                         req = ("SELECT " + str(adapt(value)).decode("utf-8").replace(",", ".") + "::" + j[2])
-                        print >> sys.stderr, "+++++++++++----- 3 -------=++++++++++++++++"
+                        print("+++++++++++----- 3 -------=++++++++++++++++", file=sys.stderr)
                         # print >> sys.stderr,req.encode("utf-8")
                         cur.execute(req.encode("utf-8"))
-                        print >> sys.stderr, "+++++++++++----- 4 -------=++++++++++++++++"
+                        print("+++++++++++----- 4 -------=++++++++++++++++", file=sys.stderr)
                         reqIS += str(adapt(value)).decode("utf-8").replace(",", ".") + "::" + j[2]
-                        print >> sys.stderr, "+++++++++++----- 5 -------=++++++++++++++++"
-                    except Exception, e:
-                        print >> sys.stderr, "+++++++++++----- XXXXXXXXXXXXX -------=++++++++++++++++"
-                        print >> sys.stderr, e
-                        print >> sys.stderr, "+++++++++++----- XXXXXXXXXXXXX -------=++++++++++++++++"
+                        print("+++++++++++----- 5 -------=++++++++++++++++", file=sys.stderr)
+                    except Exception as e:
+                        print("+++++++++++----- XXXXXXXXXXXXX -------=++++++++++++++++", file=sys.stderr)
+                        print(e, file=sys.stderr)
+                        print("+++++++++++----- XXXXXXXXXXXXX -------=++++++++++++++++", file=sys.stderr)
                         con.conn.commit()
                         reqIS += "NULL"
                     try:
@@ -4391,7 +4391,7 @@ def massiveImport(conf, inputs, outputs):
                         con.conn.commit()
                         reqIS1 += "NULL"
                 if reqIS1 != reqIS:
-                    print >> sys.stderr, reqIS.encode("utf-8")
+                    print(reqIS.encode("utf-8"), file=sys.stderr)
                     reqs += [reqIS]
             # reqInsertTemp+=",".join(reqs)+")"
         # isReference ?
@@ -4402,27 +4402,27 @@ def massiveImport(conf, inputs, outputs):
             reqInsertTemp_1 += ") (SELECT * from " + tname + ")"
         if vals[i][6]:
             reqInsertTemp_1 += " RETURNING id"
-        print >> sys.stderr, "******* 0 *********"
+        print("******* 0 *********", file=sys.stderr)
         # print >> sys.stderr,reqTemp
-        print >> sys.stderr, "******* 1 *********"
+        print("******* 1 *********", file=sys.stderr)
         # print >> sys.stderr,reqTemp_1
-        print >> sys.stderr, "******* 2 *********"
+        print("******* 2 *********", file=sys.stderr)
         # print >> sys.stderr,reqInsertTemp
-        print >> sys.stderr, "******* 3 *********"
+        print("******* 3 *********", file=sys.stderr)
         # print >> sys.stderr,reqInsertTemp_1
-        print >> sys.stderr, "******* 4 *********"
+        print("******* 4 *********", file=sys.stderr)
         con.pexecute_req([reqTemp, {}])
         con.pexecute_req([reqTemp_1, {}])
         if len(reqs) == 0:
-            print >> sys.stderr, "******* 5 *********"
-            print >> sys.stderr, reqInsertTemp
-            print >> sys.stderr, "****************"
+            print("******* 5 *********", file=sys.stderr)
+            print(reqInsertTemp, file=sys.stderr)
+            print("****************", file=sys.stderr)
             con.pexecute_req([reqInsertTemp, {}])
         for j in range(len(reqs)):
             reqInsertTemp1 = reqInsertTemp + reqs[j] + ")"
-            print >> sys.stderr, "******* 6 *********"
-            print >> sys.stderr, reqInsertTemp1.encode("utf-8")
-            print >> sys.stderr, "******* 7 *********"
+            print("******* 6 *********", file=sys.stderr)
+            print(reqInsertTemp1.encode("utf-8"), file=sys.stderr)
+            print("******* 7 *********", file=sys.stderr)
             con.pexecute_req([reqInsertTemp1.encode("utf-8"), {}])
         con.pexecute_req([reqInsertTemp_1, {}])
         if vals[i][6]:
@@ -4434,23 +4434,23 @@ def massiveImport(conf, inputs, outputs):
             for kk in range(len(vals4)):
                 for jj in range(4):
                     try:
-                        print >> sys.stderr, "OK 1"
+                        print("OK 1", file=sys.stderr)
                         obj = geocoder.geocode(vals4[kk][1].encode('utf-8'))
-                        print >> sys.stderr, "OK 2"
+                        print("OK 2", file=sys.stderr)
                         # print >> sys.stderr,obj
-                        print >> sys.stderr, "OK 3"
-                        print >> sys.stderr, dir(obj)
-                        print >> sys.stderr, "OK 4"
+                        print("OK 3", file=sys.stderr)
+                        print(dir(obj), file=sys.stderr)
+                        print("OK 4", file=sys.stderr)
                         if len(vals3) > 2:
                             srid = 4326
                         else:
                             srid = vlas2[0][1]
                         reqTemp0_1_suffix += "UPDATE " + tname_1 + " set wkb_geometry=ST_SetSRID(ST_GeometryFromText('POINT(" + str(obj.longitude) + " " + str(obj.latitude) + ")')," + str(srid) + ") where id = " + str(vals4[kk][0]) + ";"
-                        print >> sys.stderr, "OK 5"
+                        print("OK 5", file=sys.stderr)
                         break
-                    except Exception, e:
-                        print >> sys.stderr, "Cannot find coordinates for address (" + str(jj) + "): " + vals4[kk][1].encode('utf-8')
-                        print >> sys.stderr, str(e)
+                    except Exception as e:
+                        print("Cannot find coordinates for address (" + str(jj) + "): " + vals4[kk][1].encode('utf-8'), file=sys.stderr)
+                        print(str(e), file=sys.stderr)
             con.pexecute_req([reqTemp0_1_suffix, {}])
 
     outputs["Result"]["value"] = zoo._("File imported successfully")
@@ -4458,30 +4458,30 @@ def massiveImport(conf, inputs, outputs):
 
 
 def recursflo(obj):
-    if obj.keys().count("dependents"):
+    if list(obj.keys()).count("dependents"):
         return recursflo(obj["dependents"][0])
     else:
         return obj
 
 
 def findLatestOptions(obj):
-    objKeys = obj.keys()
-    print >> sys.stderr, " *****-----***** " + str(obj)
-    print >> sys.stderr, " *****-----***** " + str(objKeys)
+    objKeys = list(obj.keys())
+    print(" *****-----***** " + str(obj), file=sys.stderr)
+    print(" *****-----***** " + str(objKeys), file=sys.stderr)
     for k in range(len(objKeys)):
         for j in range(len(obj[objKeys[k]])):
-            print >> sys.stderr, " *****-----***** " + str(objKeys[k])
-            print >> sys.stderr, " *****-----***** " + str(j)
-            print >> sys.stderr, " *****-----***** " + str(obj[objKeys[k]][j])
+            print(" *****-----***** " + str(objKeys[k]), file=sys.stderr)
+            print(" *****-----***** " + str(j), file=sys.stderr)
+            print(" *****-----***** " + str(obj[objKeys[k]][j]), file=sys.stderr)
             hasDependents = False
             for l in obj[objKeys[k]][j]:
-                print >> sys.stderr, " *****----- INNERL ***** " + str(l)
+                print(" *****----- INNERL ***** " + str(l), file=sys.stderr)
                 hasDependents = True
-                if obj[objKeys[k]][j][l].keys().count("dependents"):
+                if list(obj[objKeys[k]][j][l].keys()).count("dependents"):
                     for k1 in range(len(obj[objKeys[k]][j][l]["dependents"])):
                         return recursflo(obj[objKeys[k]][j][l])
                 else:
                     return obj[objKeys[k]][j]
-            print >> sys.stderr, " *****----- DEPENDENTS ***** " + str(hasDependents)
+            print(" *****----- DEPENDENTS ***** " + str(hasDependents), file=sys.stderr)
 
     return None
