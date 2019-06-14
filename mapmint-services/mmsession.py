@@ -5,7 +5,9 @@ def save(conf):
     try:
         _save(conf)
         fname = "sess_" + conf["senv"]["MMID"] + ".cfg"
-        if list(conf["main"].keys()).count("sessPath") > 0:
+        # TODO: confirm assumption: conf["main"] is a Python 3 dictionary object
+        # if list(conf["main"].keys()).count("sessPath") > 0:
+        if "sessPath" in conf["main"]:
             fullName = conf["main"]["sessPath"] + "/" + fname
         else:
             fullName = conf["main"]["tmpPath"] + "/" + fname
@@ -23,7 +25,9 @@ def save(conf):
 def _save(conf):
     try:
         fname = "sess_" + conf["senv"]["MMID"] + "_1.cfg"
-        if list(conf["main"].keys()).count("sessPath") > 0:
+        # TODO: confirm assumption: conf["main"] is a Python 3 dictionary object
+        # if list(conf["main"].keys()).count("sessPath") > 0:
+        if "sessPath" in conf["main"]:
             fullName = conf["main"]["sessPath"] + "/" + fname
         else:
             fullName = conf["main"]["tmpPath"] + "/" + fname

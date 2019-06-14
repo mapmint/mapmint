@@ -70,7 +70,9 @@ class HelloResource(resource.Resource):
         request.setHeader('X-Fowarded-By', 'MapMint OWS-Security')
 
     def reparse(self, parsed_path):
-        for i in list(parsed_path.keys()):
+        # TODO: confirm assumption: "parsed_path" is a Python 3 dictionary object
+        # for i in list(parsed_path.keys()):
+        for i in parsed_path.keys():
             if i.lower() != i:
                 parsed_path[i.lower()] = parsed_path[i]
 
@@ -88,7 +90,9 @@ class HelloResource(resource.Resource):
         print(rcontent, file=sys.stderr)
         parsed_path = request.args
         self.reparse(parsed_path)
-        if list(parsed_path.keys()).count("token") > 0 and list(parsed_path.keys()).count("server"):
+        # TODO: confirm assumption: "parsed_path" is a Python 3 dictionary object
+        # if list(parsed_path.keys()).count("token") > 0 and list(parsed_path.keys()).count("server"):
+        if "token" in parsed_path > 0 and "server" in parsed_path:
             params = [parsed_path["server"][0], parsed_path["token"][0]]
         else:
             params = [rcontent[3], rcontent[2]]
@@ -96,11 +100,17 @@ class HelloResource(resource.Resource):
         clientIp = request.getHeader("x-real-ip")
         if clientIp is None:
             clientIp = request.transport.getPeer().host
-        if list(parsed_path.keys()).count('token') == 0:
+        # TODO: confirm assumption: "parsed_path" is a Python 3 dictionary object
+        # if list(parsed_path.keys()).count('token') == 0:
+        if 'token' not in parsed_path:
             parsed_path["token"] = "-1"
-        if list(parsed_path.keys()).count('request') > 0:
+        # TODO: confirm assumption: "parsed_path" is a Python 3 dictionary object
+        # if list(parsed_path.keys()).count('request') > 0:
+        if 'request' in parsed_path:
             query = {}
-            for i in list(parsed_path.keys()):
+            # TODO: confirm assumption: "parsed_path" is a Python 3 dictionary object
+            # for i in list(parsed_path.keys()):
+            for i in parsed_path.keys():
                 if i != "server" and i != "token":
                     query[i] = parsed_path[i][0]
             res = self.req_tmpl.replace("[server]", params[0]).replace("[token]", params[1]).replace("[query]", '<wps:ComplexData mimeType="application/json">' + json.dumps(query) + '</wps:ComplexData>').replace("[ip_address]", "<wps:LiteralData>" + clientIp + "</wps:LiteralData>").replace("[user]",
@@ -138,7 +148,9 @@ class HelloResource(resource.Resource):
             log.msg(request.args)
             pquery = request.content.read()
             log.msg(pquery)
-            if list(request.args.keys()).count("token") > 0 and list(request.args.keys()).count("server"):
+            # TODO: confirm assumption: "request.args" is a Python 3 dictionary object
+            # if list(request.args.keys()).count("token") > 0 and list(request.args.keys()).count("server"):
+            if "token" in request.args and "server" in request.args:
                 params = [request.args["server"][0], request.args["token"][0]]
             else:
                 params = [rcontent[3], rcontent[2]]
