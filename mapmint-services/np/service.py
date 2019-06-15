@@ -652,9 +652,13 @@ def saveIndexTable(conf, inputs, outputs):
         "name": inputs["name"],
         "i_id": inputs["i_id"],
     }
-    if list(inputs.keys()).count("id") > 0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("id") > 0:
+    if "id" in inputs:
         inputs0["id"] = inputs["id"]
-    if list(inputs.keys()).count("id") == 0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("id") == 0:
+    if "id" not in inputs:
         insertElem(conf, inputs0, outputs)
         # obj=detailsIndicateurs(conf,inputs,cur,inputs["i_id"]["value"],"table",prefix)
     else:
@@ -953,10 +957,14 @@ def joinIndexTable(conf, inputs, outputs):
     print(vals, file=sys.stderr)
 
     fields = ""
+    # TODO: possible optimization: assume inputs["rcol"] is a Python 3 dictionary object
+    # print(list(inputs["rcol"].keys()), file=sys.stderr)    ->    print(inputs["rcol"].keys(), file=sys.stderr)
     print(list(inputs["rcol"].keys()), file=sys.stderr)
     print(inputs["rcol"]["value"][0], file=sys.stderr)
     for i in ["rcol", "field"]:
-        if list(inputs[i].keys()).count("length") == 0:
+    	# TODO: confirm assumption: inputs[i] is a Python 3 dictionary object
+        # if list(inputs[i].keys()).count("length") == 0:
+        if "length" not in inputs[i]:
             inputs[i]["value"] = inputs[i]["value"].split(",")
 
     for i in inputs["rcol"]["value"]:
@@ -1314,7 +1322,9 @@ def list(conf, inputs, outputs):
                 res = listDefault(prefix + inputs["table"]["value"], cur, " order by ord")
             else:
                 if inputs["table"]["value"].count('.') > 0:
-                    if list(inputs.keys()).count("cond"):
+                	# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+                    # if list(inputs.keys()).count("cond"):
+                    if "cond" in inputs:
                         res = listDefault(inputs["table"]["value"], cur, inputs["cond"]["value"])
                     else:
                         res = listDefault(inputs["table"]["value"], cur)
@@ -1358,12 +1368,15 @@ def insertElement(conf, inputs, outputs):
         val_sufix = ""
         if inputs["table"]["value"].count(".") > 0:
             prefix = ""
-            inputsKeys = list(inputs.keys())
-            if inputsKeys.count('title'):
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # inputsKeys = list(inputs.keys())
+            inputsKeys = inputs.keys()
+            # if inputsKeys.count('title'):
+            if 'title' in inputsKeys:
                 col_sufix = ",title"
                 val_sufix = "," + str(adapt(inputs["title"]["value"]))
-            if len(inputsKeys) > 2:
-                for i in inputsKeys:
+            if len(inputsKeys) > 2: # maybe affected
+                for i in inputsKeys: # maybe affected
                     print(i, file=sys.stderr)
                     if i != "table" and i != "name" and i != "title":
                         col_sufix += "," + i
@@ -1457,7 +1470,9 @@ def insertElem(conf, inputs, outputs):
     try:
         fields = ""
         values = ""
-        for i in list(inputs.keys()):
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # for i in list(inputs.keys():
+        for i in inputs.keys():
             if i != "table" and i != "tid" and inputs[i]["value"] != "":
                 if not (auth.is_ftable(inputs["table"]["value"])):
                     conf["lenv"]["message"] = zoo._("Unable to identify your parameter as table or field name")
@@ -1500,7 +1515,9 @@ def updateElem(conf, inputs, outputs):
     try:
         fields = ""
         values = ""
-        for i in list(inputs.keys()):
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # for i in list(inputs.keys()):
+        for i in inputs.keys():
             if i != "table" and i != "id" and i != "tid" and inputs[i]["value"] != "":
                 if fields != "":
                     fields += ","
@@ -1593,13 +1610,15 @@ def updateElement(conf, inputs, outputs):
     req0 = "UPDATE " + tableName + " set "
     clause = "id=[_id_]"
     # clause="id="+str(obj["id"])
-    keys = list(obj.keys())
+    # TODO: confirm assumption: "obj" is a Python 3 dictionary object
+    # keys = list(obj.keys())
+    keys = obj.keys()
     cnt = 0
     req1 = None
     req2 = None
     avoidReq1 = False
     params = {}
-    for i in keys:
+    for i in keys: # maybe affected
         if i is None or obj[i] == "":
             continue
         if i == "id":
@@ -3178,7 +3197,9 @@ def insert(conf, inputs, outputs):
             if i > 0:
                 col_sufix += ","
                 val_sufix += ","
-            if list(inputs.keys()).count("id") == 0:
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("id") == 0:
+            if "id" not in inputs:
                 print("OK ", file=sys.stderr)
                 col_sufix += columns[i]
                 print("OK ", file=sys.stderr)
@@ -3206,7 +3227,9 @@ def insert(conf, inputs, outputs):
                             col_sufix += columns[i] + "=" + str(adapt(str(inputs[columns[i]]["value"])))
             print(val_sufix.encode('utf-8'), file=sys.stderr)
         if len(columns) > 0:
-            if list(inputs.keys()).count("id") == 0:
+        	# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("id") == 0:
+            if "id" not in inputs:
                 req = "INSERT INTO " + inputs["table"]["value"] + " (" + col_sufix + ") VALUES (" + (val_sufix) + ") RETURNING id"
                 print(req.encode('utf-8'), file=sys.stderr)
                 if content is not None:
@@ -3225,12 +3248,16 @@ def insert(conf, inputs, outputs):
                 cid = inputs["id"]["value"]
             outputs["id"]["value"] = json.dumps(cid)
         else:
-            if list(inputs.keys()).count("id") > 0:
+        	# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # if list(inputs.keys()).count("id") > 0:
+            if "id" in inputs:
                 outputs["id"]["value"] = inputs["id"]["value"]
             else:
                 outputs["id"]["value"] = "-1"
             cid = outputs["id"]["value"]
-        if list(inputs.keys()).count("links") > 0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("links") > 0:
+        if "links" in inputs:
             links = json.loads(inputs["links"]["value"])
             lkeys = list(links.keys())
             for j in range(len(lkeys)):
@@ -3485,7 +3512,9 @@ def clientInsert(conf, inputs, outputs):
                 if cnt > 0:
                     col_sufix += ","
                     val_sufix += ","
-                if list(inputs.keys()).count("id") == 0:
+                # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+                # if list(inputs.keys()).count("id") == 0:
+                if "id" not in inputs:
                     print("TUPLE " + str(i), file=sys.stderr)
                     col_sufix += columns[i]
                     if i >= len(realKeys):
@@ -3523,7 +3552,9 @@ def clientInsert(conf, inputs, outputs):
                     if cnt > 0:
                         col_sufix += ","
                         val_sufix += ","
-                    if list(inputs.keys()).count("id") == 0:
+                    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+                    # if list(inputs.keys()).count("id") == 0:
+                    if "id" not in inputs:
                         col_sufix += columns[i]
                         val_sufix += str(adapt(str(tuple[columns[i]])))
                     else:
@@ -3554,7 +3585,9 @@ def clientInsert(conf, inputs, outputs):
                             else:
                                 dvals += [tupleReal[columns[i]]]
 
-        if list(inputs.keys()).count("id") == 0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("id") == 0:
+        if "id" not in inputs:
             print("COLS", file=sys.stderr)
             print(col_sufix, file=sys.stderr)
             print("VALS", file=sys.stderr)
@@ -3586,7 +3619,9 @@ def clientInsert(conf, inputs, outputs):
                 print("+++++ OM +++++" + str(dvals), file=sys.stderr)
                 import osgeo
                 import osgeo.gdal
-                if list(inputs.keys()).count("InputGeometry") > 0:
+                # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+                # if list(inputs.keys()).count("InputGeometry") > 0:
+                if "InputGeometry" in inputs:
                     try:
                         ds = osgeo.ogr.Open(inputs["InputGeometry"]["cache_file"])
                         layer = ds.GetLayerByIndex(0)
@@ -3608,7 +3643,9 @@ def clientInsert(conf, inputs, outputs):
 
             if dcols[i]["type"] == "bytea":
                 print(dcols[i], file=sys.stderr)
-                if list(inputs.keys()).count("id"):
+                # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+                # if list(inputs.keys()).count("id"):
+                if "id" in inputs:
                     cid = inputs["id"]["value"]
                 # try:
                 content = packFile(conf, tuple[dcols[i]["name"]], dcols[i]["name"])
@@ -3619,7 +3656,9 @@ def clientInsert(conf, inputs, outputs):
 
             if dcols[i]["type"] == "tbl_linked":
                 lcomponents = dcols[i]["value"].split(';')
-                if list(inputs.keys()).count("id"):
+                # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+                # if list(inputs.keys()).count("id"):
+                if "id" in inputs:
                     cid = inputs["id"]["value"]
                 # Remove possible previous tuple refering this element
                 try:
@@ -3720,7 +3759,9 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
     else:
         rvals = cur.fetchone()
     print("*********** [" + str(rvals) + "] ***********", file=sys.stderr)
-    if list(inputs.keys()).count("noPrint") > 0 and inputs["noPrint"]["value"] == "true":
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("noPrint") > 0 and inputs["noPrint"]["value"] == "true":
+    if "noPrint" in inputs and inputs["noPrint"]["value"] == "true":
         return rvals
     lfile = unpackFile(conf, ovals0[0][2])
     # fres[ovals[i][0]][cvals[j][1]]={"type":"bytes","filename":file["name"],"fileurl":file["name"].replace(conf["main"]["tmpPath"],conf["main"]["tmpUrl"])}
@@ -3974,7 +4015,9 @@ def clientView(conf, inputs, outputs):
         res = cur.execute(req)
         cvals = cur.fetchall()
         for j in range(len(cvals)):
-            if list(files.keys()).count(cvals[j][2]) > 0:
+        	# TODO: confirm assumption: "files" is a Python 3 dictionary object
+            # if list(files.keys()).count(cvals[j][2]) > 0:
+            if cvals[j][2] in files:
                 if rvals[rcolumns.index(cvals[j][2])] is not None:
                     file = unpackFile(conf, rvals[rcolumns.index(cvals[j][2])])
                     fres[ovals[i][0]][cvals[j][1]] = {"type": "bytes", "filename": file["name"], "fileurl": file["name"].replace(conf["main"]["tmpPath"], conf["main"]["tmpUrl"])}
@@ -3985,7 +4028,9 @@ def clientView(conf, inputs, outputs):
                             try:
                                 import json
                                 myObj = json.loads(cvals[j][4])
-                                if list(myObj[0].keys()).count("myself") > 0:
+                                # TODO: confirm assumption: myObj[0] is a Python 3 dictionary object
+                                # if list(myObj[0].keys()).count("myself") > 0:
+                                if "myself" in myObj[0]:
                                     myObj[0]["myself"]
                                     print(" **** MYSELF: " + str(myObj[0]["myself"]), file=sys.stderr)
                                     print(" **** MYSELF: " + str(cvals[j][5]), file=sys.stderr)
@@ -4012,7 +4057,9 @@ def clientView(conf, inputs, outputs):
                                                 initialReq = initialReq.replace("from", ", " + myObj[0]["myself"][uv][uv1]["tfield"] + " from")
                                                 # tmpParams+=alphabet[tmpCnt]+"."+ myObj[0]["myself"][uv][uv1]["tfield"] +"=="
                                                 tmpCnt = tmpCnt + 1
-                                                if list(myObj[0]["myself"][uv][uv1].keys()).count("dependents") > 0:
+                                                # TODO: confirm assumption:  is a Python 3 dictionary object
+                                                # if list(myObj[0]["myself"][uv][uv1].keys()).count("dependents") > 0:
+                                                if "dependents" in myObj[0]["myself"][uv][uv1]:
                                                     for uw in range(len(myObj[0]["myself"][uv][uv1]["dependents"])):
                                                         for uw1 in myObj[0]["myself"][uv][uv1]["dependents"][uw]:
                                                             print(str(myObj[0]["myself"][uv][uv1]["dependents"][uw][uw1]["sql_query"].replace("from", ", " + myObj[0]["myself"][uv][uv1]["tfield"] + " from")) + " AS " + alphabet[tmpCnt], file=sys.stderr)
@@ -4162,11 +4209,15 @@ def clientViewTable(conf, inputs, outputs):
         values += [vals[i][2]]
         if vals[i][5] is not None:
             classifier = table + "." + vals[i][6] + " " + classifiers[(vals[i][5] - 1)]
-    if list(inputs.keys()).count("sortname") > 0 and list(inputs.keys()).count("sortname") != "":
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("sortname") > 0 and list(inputs.keys()).count("sortname") != "":
+    if "sortname" in inputs and list(inputs.keys()).count("sortname") != "":
         for i in range(len(vals)):
             if vals[i][6] == inputs["sortname"]["value"]:
                 classifier = table + "." + vals[i][6] + " " + inputs["sortorder"]["value"]
-    if list(inputs.keys()).count("filters") > 0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("filters") > 0:
+    if "filters" in inputs:
         filters = json.loads(inputs["filters"]["value"])
         if len(filters) > 0:
             if clause != "":
@@ -4176,7 +4227,9 @@ def clientViewTable(conf, inputs, outputs):
     req1 = "SELECT count(*) FROM " + table + " WHERE " + clause
     res = cur.execute(req1)
     fres["total"] = cur.fetchone()[0]
-    if list(inputs.keys()).count("page") > 0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("page") > 0:
+    if "page" in inputs:
         fres["page"] = inputs["page"]["value"]
     else:
         fres["page"] = "1"
@@ -4458,7 +4511,9 @@ def massiveImport(conf, inputs, outputs):
 
 
 def recursflo(obj):
-    if list(obj.keys()).count("dependents"):
+	# TODO: confirm assumption: "obj" is a Python 3 dictionary object
+    # if list(obj.keys()).count("dependents"):
+    if "dependents" in obj:
         return recursflo(obj["dependents"][0])
     else:
         return obj
@@ -4477,7 +4532,9 @@ def findLatestOptions(obj):
             for l in obj[objKeys[k]][j]:
                 print(" *****----- INNERL ***** " + str(l), file=sys.stderr)
                 hasDependents = True
-                if list(obj[objKeys[k]][j][l].keys()).count("dependents"):
+                # TODO: confirm assumption: obj[objKeys[k]][j][l] is a Python 3 dictionary object
+                # if list(obj[objKeys[k]][j][l].keys()).count("dependents"):
+                if "dependents" in obj[objKeys[k]][j][l]:
                     for k1 in range(len(obj[objKeys[k]][j][l]["dependents"])):
                         return recursflo(obj[objKeys[k]][j][l])
                 else:
