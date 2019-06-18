@@ -37,7 +37,7 @@ def display(conf,inputs,outputs):
 	toLoad=None
 	if tmpName[0]=="load":
 		tmpName[0]="public"
-		print >> sys.stderr,"TMPNAME: "+str(tmpName)+str(len(tmpName)==3)
+		print("TMPNAME: "+str(tmpName)+str(len(tmpName)==3), file=sys.stderr)
 		if len(tmpName)==2:
 			tmpName.remove(tmpName[0])
 			inputs["tmpl"]["value"]=tmpName[0]
@@ -48,24 +48,24 @@ def display(conf,inputs,outputs):
 					a=int(shortInteger.unShortURL(conf,tmpName[2]))
 					toLoad=str(shortInteger.unShortURL(conf,tmpName[2]))
 					tmpName.remove(tmpName[2])
-				except Exception,e:
-					print >> sys.stderr,str(e)
+				except Exception as e:
+					print(str(e), file=sys.stderr)
 					tmpName.remove(tmpName[1])
 					pass
 			else:
 				for i in range(1,len(tmpName)-1):
 					tmpName.remove(tmpName[1])
-				print >> sys.stderr,"TMPNAME: "+str(tmpName)
-		print >> sys.stderr,"TMPNAME: "+str(tmpName)+str(len(tmpName)==3)
+				print("TMPNAME: "+str(tmpName), file=sys.stderr)
+		print("TMPNAME: "+str(tmpName)+str(len(tmpName)==3), file=sys.stderr)
 	if tmpName[0]=="public":
 		import time
-		if (conf.keys().count('senv')>0 and conf['senv'].keys().count('project')==0) or conf.keys().count('senv')==0:
+		if (list(conf.keys()).count('senv')>0 and list(conf['senv'].keys()).count('project')==0) or list(conf.keys()).count('senv')==0:
 			if len(tmpName)>1:
 				nameSpace["project"]=tmpName[1]
 			else:
 				nameSpace["project"]=""
 		else:
-			print >> sys.stderr,conf["senv"]
+			print(conf["senv"], file=sys.stderr)
 			hasValue=False
 			for j in range(1,len(tmpName)):
 				if tmpName[1]!="":
@@ -85,8 +85,8 @@ def display(conf,inputs,outputs):
 			if os.path.islink(mapfile):
 				mapfile=os.readlink(mapfile)
 			lastMap=mapfile.replace(conf["main"]["dataPath"],"").replace("/public_maps/project_","").replace(".map","").replace("\\??\\","")
-			verif=not(conf.has_key("senv"))
-			print >> sys.stderr,verif
+			verif=not("senv" in conf)
+			print(verif, file=sys.stderr)
 			if verif:
 				conf["senv"]={}
 				conf["senv"]["MMID"]="MM"+str(time.time()).split(".")[0]
@@ -104,13 +104,13 @@ def display(conf,inputs,outputs):
 			conf["senv"]["tmpl"]=inputs["tmpl"]["value"]
 			if verif:
 				conf["lenv"]["cookie"]="MMID="+conf["senv"]["MMID"]+"; path=/"
-			print >> sys.stderr,"+++++++++++++++++++++++"
-			print >> sys.stderr,conf["senv"]["last_map"]
+			print("+++++++++++++++++++++++", file=sys.stderr)
+			print(conf["senv"]["last_map"], file=sys.stderr)
 
-		except Exception, e:
-			print >> sys.stderr,"+++++++++++++++++++++++"
-			print >> sys.stderr,e
-			if conf.keys().count('senv')>0:
+		except Exception as e:
+			print("+++++++++++++++++++++++", file=sys.stderr)
+			print(e, file=sys.stderr)
+			if list(conf.keys()).count('senv')>0:
 				lastMap=conf['senv']['last_map']
 				if toLoad is not None:
 					conf["senv"]["toLoad"]=toLoad
@@ -131,7 +131,7 @@ def display(conf,inputs,outputs):
 			else:
 				conf["lenv"]["message"]=zoo._("Error loading your template file ")+conf["main"]["templatesPath"]+"/preview/"+tmplName+".tmpl"
 				return zoo.SERVICE_SUCCEEDED
-			verif=not(conf.has_key("senv"))
+			verif=not("senv" in conf)
 			if verif:
 				conf["senv"]={}
 				conf["senv"]["MMID"]="MM"+str(time.time()).split(".")[0]
@@ -152,12 +152,12 @@ def display(conf,inputs,outputs):
 
 		outputs["Result"]["value"]=t.__str__()
 		if inputs["tmpl"]["value"].count('_css'):
-			if conf["main"].has_key('cssCache') and conf["main"]["cssCache"]=="prod":
+			if 'cssCache' in conf["main"] and conf["main"]["cssCache"]=="prod":
 				import cssmin
 				outputs["Result"]["value"]=cssmin.cssmin(outputs["Result"]["value"])
 			outputs["Result"]["mimeType"]="text/css"
 		if inputs["tmpl"]["value"].count('_js')>0 or inputs["tmpl"]["value"].count('.js')>0:
-			if conf["main"].has_key('jsCache') and conf["main"]["jsCache"]=="prod":
+			if 'jsCache' in conf["main"] and conf["main"]["jsCache"]=="prod":
 				try:
 					from slimit import minify
 					outputs["Result"]["value"]=minify(outputs["Result"]["value"], mangle=False, mangle_toplevel=False)
@@ -172,8 +172,8 @@ def display(conf,inputs,outputs):
 			outputs["Result"]["mimeType"]="text/xml"
 		
 		return zoo.SERVICE_SUCCEEDED
-	if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true" and conf["senv"].keys().count("isAdmin")>0:
-		if inputs.keys().count("force")==0:
+	if list(conf.keys()).count("senv")>0 and list(conf["senv"].keys()).count("loggedin")>0 and conf["senv"]["loggedin"]=="true" and list(conf["senv"].keys()).count("isAdmin")>0:
+		if list(inputs.keys()).count("force")==0:
 			try:
 				tmpl=__import__(inputs["tmpl"]["value"].lower()+".service")
 				#print >> sys.stderr,dir(tmpl)
@@ -183,15 +183,15 @@ def display(conf,inputs,outputs):
 				pass
 			try:
 				t = Template(file=conf["main"]["templatesPath"]+"/"+inputs["tmpl"]["value"]+".tmpl",searchList=nameSpace)
-			except Exception,e:
-				print >> sys.stderr,"ERROR => "+str(e)
+			except Exception as e:
+				print("ERROR => "+str(e), file=sys.stderr)
 				page="/error_bs.tmpl"
 				nameSpace["errorMsg"]=e
 				t = Template(file=conf["main"]["templatesPath"]+page,searchList=nameSpace)
 				
 		else:
 			t = Template(file=conf["main"]["templatesPath"]+"/"+inputs["tmpl"]["value"]+".tmpl",searchList=nameSpace)
-		if conf and conf.keys().count('senv') and conf["senv"].keys().count("MMID") > 0:
+		if conf and list(conf.keys()).count('senv') and list(conf["senv"].keys()).count("MMID") > 0:
 			conf["lenv"]["cookie"]="MMID="+conf["senv"]["MMID"]+"; path=/"
 	else:
 		if inputs["tmpl"]["value"].count("_bs")>0:
@@ -201,7 +201,7 @@ def display(conf,inputs,outputs):
 		if inputs["tmpl"]["value"].count("_js")>0 or inputs["tmpl"]["value"].count('.js')>0:
 			page="/"+inputs["tmpl"]["value"]+".tmpl"
 		t = Template(file=conf["main"]["templatesPath"]+page,searchList=nameSpace)
-		if not(conf.has_key("senv")):
+		if not("senv" in conf):
 			import time
 			conf["lenv"]["cookie"]="MMID=deleted; expires="+time.strftime("%a, %d-%b-%Y %H:%M:%S GMT",time.gmtime())+"; path=/"
 
@@ -210,8 +210,8 @@ def display(conf,inputs,outputs):
 	try:
 		#from htmlmin.minify import html_minify
 		outputs["Result"]["value"]=t.__str__()
-	except Exception,e:
-		if conf.keys().count('senv')>0 and conf["senv"].keys().count('lastname')>0:
+	except Exception as e:
+		if list(conf.keys()).count('senv')>0 and list(conf["senv"].keys()).count('lastname')>0:
 			page="/error_bs.tmpl"
 			import traceback
 			nameSpace["errorMsg"]=str(e)+"\n"+str(traceback.format_exc())
@@ -230,12 +230,12 @@ def display(conf,inputs,outputs):
 		import cssmin
 		outputs["Result"]["value"]=cssmin.cssmin(outputs["Result"]["value"])
 	if inputs["tmpl"]["value"].count('_js')>0 or inputs["tmpl"]["value"].count('.js')>0:
-		if conf["main"].has_key('jsCache') and conf["main"]["jsCache"]=="prod":
+		if 'jsCache' in conf["main"] and conf["main"]["jsCache"]=="prod":
 			try:
 				from slimit import minify
 				tmp=minify(outputs["Result"]["value"], mangle=False, mangle_toplevel=False)
 				outputs["Result"]["value"]=tmp
-			except Exception,e:
+			except Exception as e:
 				outputs["Result"]["value"]="/* Failed to shrink with message "+str(e)+" */\n"+outputs["Result"]["value"]
 				pass
 		outputs["Result"]["mimeType"]="application/javascript"
@@ -256,13 +256,13 @@ def docss(conf,inputs,outputs):
 		f = open(conf["main"]["mmPath"]+'/new-themes/themes/'+inputs['color']['value']+'/'+a, 'r')
 		outputs["Result"]["value"]+=f.read()
 		f.close()
-	if conf["main"].has_key('cssCache') and conf["main"]["cssCache"]=="prod":
+	if 'cssCache' in conf["main"] and conf["main"]["cssCache"]=="prod":
 		import cssmin
 		outputs["Result"]["value"]=cssmin.cssmin(outputs["Result"]["value"])		
 	return zoo.SERVICE_SUCCEEDED
 
 def compress(conf,inputs,outputs):
-	if inputs.has_key("filename") and inputs["filename"]["value"]!="NULL":
+	if "filename" in inputs and inputs["filename"]["value"]!="NULL":
 		filenames=inputs["filename"]["value"].split(",")
 		inputs["file"]["value"]=""
 			
@@ -276,7 +276,7 @@ def compress(conf,inputs,outputs):
 						try:
 							from slimit import minify
 							inputs["file"]["value"]+=minify(open(conf["main"]["publicationPath"]+"/"+filenames[i]).read(), mangle=False, mangle_toplevel=False)
-						except Exception,e:
+						except Exception as e:
 							try:
 								inputs["file"]["value"]+="/* Failed to parse "+str(e)+"*/"+open(conf["main"]["publicationPath"]+"/"+inputs["type"]["value"].lower()+"/"+filenames[i]).read()+"/*Failed to parse*/\n"
 							except:
@@ -300,8 +300,8 @@ def compress(conf,inputs,outputs):
 				except:
 					try:
 						inputs["file"]["value"]+=open(conf["main"]["publicationPath"]+"/"+filenames[i]).read()+"\n"
-					except Exception,e:
-						print >> sys.stderr,e
+					except Exception as e:
+						print(e, file=sys.stderr)
 						pass
 			
 		
