@@ -199,12 +199,16 @@ def printMap(conf, inputs, outputs):
     # We should use a BoundingBoxData here rather than simple string.
     ext = inputs["ext"]["value"].split(',')
 
-    if list(inputs.keys()).count("profile") > 0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("profile") > 0:
+    if "profile" in inputs:
         import json
         tmp = json.loads(inputs["profile"]["value"])
         # print >> sys.stderr,tmp
         # print >> sys.stderr,tmp["features"][0]["geometry"]["coordinates"]
-        if list(inputs.keys()).count("profileLayer") > 0:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("profileLayer") > 0:
+        if "profileLayer" in inputs:
             layer = m.getLayerByName(inputs["profileLayer"]["value"])
             title = layer.metadata.get('mmQueryTitle')
             rvals = [[title], [], []]
