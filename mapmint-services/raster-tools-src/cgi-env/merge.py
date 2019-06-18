@@ -61,9 +61,9 @@ def raster_copy( s_fh, s_xoff, s_yoff, s_xsize, s_ysize, s_band_n,
             nodata )
 
     if verbose != 0:
-        print('Copy %d,%d,%d,%d to %d,%d,%d,%d.' \
+        print(('Copy %d,%d,%d,%d to %d,%d,%d,%d.' \
               % (s_xoff, s_yoff, s_xsize, s_ysize,
-             t_xoff, t_yoff, t_xsize, t_ysize ))
+             t_xoff, t_yoff, t_xsize, t_ysize )))
 
     s_band = s_fh.GetRasterBand( s_band_n )
     t_band = t_fh.GetRasterBand( t_band_n )
@@ -86,9 +86,9 @@ def raster_copy_with_nodata( s_fh, s_xoff, s_yoff, s_xsize, s_ysize, s_band_n,
         import Numeric
     
     if verbose != 0:
-        print('Copy %d,%d,%d,%d to %d,%d,%d,%d.' \
+        print(('Copy %d,%d,%d,%d to %d,%d,%d,%d.' \
               % (s_xoff, s_yoff, s_xsize, s_ysize,
-             t_xoff, t_yoff, t_xsize, t_ysize ))
+             t_xoff, t_yoff, t_xsize, t_ysize )))
 
     s_band = s_fh.GetRasterBand( s_band_n )
     t_band = t_fh.GetRasterBand( t_band_n )
@@ -160,13 +160,13 @@ class file_info:
         return 1
 
     def report( self ):
-        print('Filename: '+ self.filename)
-        print('File Size: %dx%dx%d' \
-              % (self.xsize, self.ysize, self.bands))
-        print('Pixel Size: %f x %f' \
-              % (self.geotransform[1],self.geotransform[5]))
-        print('UL:(%f,%f)   LR:(%f,%f)' \
-              % (self.ulx,self.uly,self.lrx,self.lry))
+        print(('Filename: '+ self.filename))
+        print(('File Size: %dx%dx%d' \
+              % (self.xsize, self.ysize, self.bands)))
+        print(('Pixel Size: %f x %f' \
+              % (self.geotransform[1],self.geotransform[5])))
+        print(('UL:(%f,%f)   LR:(%f,%f)' \
+              % (self.ulx,self.uly,self.lrx,self.lry)))
 
     def copy_into( self, t_fh, s_band = 1, t_band = 1, nodata_arg=None ):
         """
@@ -278,17 +278,17 @@ def Gdal_Merge( conf,inputs,outputs ):
     bTargetAlignedPixels = False
     
     gdal.AllRegister()
-    if len(inputs.keys())==0:
+    if len(list(inputs.keys()))==0:
         conf["lenv"]["message"]=zoo._("Unable to fetch any parameters")
         return zoo.SERVICE_FAILED
 
     # Parse arguments.
     i = 1
     out_file = conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/"+inputs["iname"]["value"]+".tif"
-    if inputs.has_key("OutputDSN") and inputs["OutputDSN"]["value"]!="NULL":
+    if "OutputDSN" in inputs and inputs["OutputDSN"]["value"]!="NULL":
         out_file = inputs["OutputDSN"]["value"]
     quiet = 1
-    if inputs.keys().count("dir") and inputs["dir"]["value"]!="NULL":
+    if list(inputs.keys()).count("dir") and inputs["dir"]["value"]!="NULL":
         import glob
         listing = glob.glob(inputs["dir"]["value"]+"/*."+inputs["ext"]["value"])
         for filename in listing:
@@ -296,13 +296,13 @@ def Gdal_Merge( conf,inputs,outputs ):
     else:
         import mapscript
         m=mapscript.mapObj(conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/ds_ows.map")
-        print >> sys.stderr,inputs["dso"]["value"]
+        print(inputs["dso"]["value"], file=sys.stderr)
         for i in range(0,len(inputs["dso"]["value"])):
             l=m.getLayerByName(inputs["dso"]["value"][i])
             if l is not None:
                 names.append(l.data)
-    print >> sys.stderr,out_file
-    print >> sys.stderr,str(names)
+    print(out_file, file=sys.stderr)
+    print(str(names), file=sys.stderr)
     
     '''
     while i < len(argv):
@@ -503,9 +503,9 @@ def Gdal_Merge( conf,inputs,outputs ):
         
         if verbose != 0:
             print("")
-            print("Processing file %5d of %5d, %6.3f%% completed." \
+            print(("Processing file %5d of %5d, %6.3f%% completed." \
                   % (fi_processed+1,len(file_infos),
-                     fi_processed * 100.0 / len(file_infos)) )
+                     fi_processed * 100.0 / len(file_infos)) ))
             fi.report()
 
         if separate == 0 :
