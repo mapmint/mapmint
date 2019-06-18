@@ -60,7 +60,9 @@ def display(conf, inputs, outputs):
         print("TMPNAME: " + str(tmpName) + str(len(tmpName) == 3), file=sys.stderr)
     if tmpName[0] == "public":
         import time
-        if (list(conf.keys()).count('senv') > 0 and list(conf['senv'].keys()).count('project') == 0) or list(conf.keys()).count('senv') == 0:
+        # TODO: confirm assumption: "conf" and conf['senv'] are Python 3 dictionary objects
+        # if (list(conf.keys()).count('senv') > 0 and list(conf['senv'].keys()).count('project') == 0) or list(conf.keys()).count('senv') == 0:
+        if ('senv' in conf and ('project' not in conf['senv'])) or ('senv' not in conf):
             if len(tmpName) > 1:
                 nameSpace["project"] = tmpName[1]
             else:
@@ -111,7 +113,9 @@ def display(conf, inputs, outputs):
         except Exception as e:
             print("+++++++++++++++++++++++", file=sys.stderr)
             print(e, file=sys.stderr)
-            if list(conf.keys()).count('senv') > 0:
+            # TODO: confirm assumption: "conf" is a Python 3 dictionary object
+            # if list(conf.keys()).count('senv') > 0:
+            if 'senv' in conf:
                 lastMap = conf['senv']['last_map']
                 if toLoad is not None:
                     conf["senv"]["toLoad"] = toLoad
@@ -172,8 +176,12 @@ def display(conf, inputs, outputs):
             outputs["Result"]["mimeType"] = "text/xml"
 
         return zoo.SERVICE_SUCCEEDED
-    if list(conf.keys()).count("senv") > 0 and list(conf["senv"].keys()).count("loggedin") > 0 and conf["senv"]["loggedin"] == "true" and list(conf["senv"].keys()).count("isAdmin") > 0:
-        if list(inputs.keys()).count("force") == 0:
+    # TODO: confirm assumption: "conf" and conf["senv"] are Python 3 dictionary objects
+    # if list(conf.keys()).count("senv") > 0 and list(conf["senv"].keys()).count("loggedin") > 0 and conf["senv"]["loggedin"] == "true" and list(conf["senv"].keys()).count("isAdmin") > 0:
+    if "senv" in conf and "loggedin" in conf["senv"] and conf["senv"]["loggedin"] == "true" and "isAdmin" in conf["senv"]:
+        # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+        # if list(inputs.keys()).count("force") == 0:
+        if "force" not in inputs:
             try:
                 tmpl = __import__(inputs["tmpl"]["value"].lower() + ".service")
                 # print >> sys.stderr,dir(tmpl)
@@ -191,7 +199,9 @@ def display(conf, inputs, outputs):
 
         else:
             t = Template(file=conf["main"]["templatesPath"] + "/" + inputs["tmpl"]["value"] + ".tmpl", searchList=nameSpace)
-        if conf and list(conf.keys()).count('senv') and list(conf["senv"].keys()).count("MMID") > 0:
+        # TODO: confirm assumption: "conf" and conf["senv"] are Python 3 dictionary objects
+        # if conf and list(conf.keys()).count('senv') and list(conf["senv"].keys()).count("MMID") > 0:
+        if conf and 'senv' in conf and "MMID" in conf["senv"]:
             conf["lenv"]["cookie"] = "MMID=" + conf["senv"]["MMID"] + "; path=/"
     else:
         if inputs["tmpl"]["value"].count("_bs") > 0:
@@ -211,7 +221,9 @@ def display(conf, inputs, outputs):
         # from htmlmin.minify import html_minify
         outputs["Result"]["value"] = t.__str__()
     except Exception as e:
-        if list(conf.keys()).count('senv') > 0 and list(conf["senv"].keys()).count('lastname') > 0:
+        # TODO: confirm assumption: "conf" and conf["senv"] are Python 3 dictionary objects
+        # if list(conf.keys()).count('senv') > 0 and list(conf["senv"].keys()).count('lastname') > 0:
+        if 'senv' in conf and 'lastname' in conf["senv"]:
             page = "/error_bs.tmpl"
             import traceback
             nameSpace["errorMsg"] = str(e) + "\n" + str(traceback.format_exc())
