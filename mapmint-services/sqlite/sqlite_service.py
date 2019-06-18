@@ -35,7 +35,7 @@ def mm_md5( c):
 dict_func = {'md5': mm_md5 }
 
 def Get(conf,inputs,outputs):
-	if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
+	if list(conf.keys()).count("senv")>0 and list(conf["senv"].keys()).count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
 		if re.match(r"(^\w+\Z)",inputs["table"]["value"]):
 			limit = ""
 			clause = ""
@@ -48,17 +48,17 @@ def Get(conf,inputs,outputs):
 			if inputs["search"]["value"] != "NULL":
 				try:
 					m = json.loads(inputs["search"]["value"])
-				except Exception,e:
-					print >> sys.stderr,e
+				except Exception as e:
+					print(e, file=sys.stderr)
 					conf["lenv"]["message"] = "invalid search parameter :"+inputs["search"]["value"]
                                         return 4
 				try:
 					p = m.popitem()
 					clause  = 'where %s="%s"'%(p[0],p[1])
-					for k in m.keys():
+					for k in list(m.keys()):
 						clause = clause+' and %s="%s"'%(m[k])
-				except Exception,e:
-					print >> sys.stderr,e
+				except Exception as e:
+					print(e, file=sys.stderr)
 					conf["lenv"]["message"] = "invalid sql clause request :"+inputs["search"]["value"]
                                         return 4
 				
@@ -67,14 +67,14 @@ def Get(conf,inputs,outputs):
 			try:
 				conn = sqlite3.connect(conf['main']['dblink'])
 				cur = conn.cursor()
-			except Exception,e:
-				print >> sys.stderr,e
+			except Exception as e:
+				print(e, file=sys.stderr)
 				conf["lenv"]["message"] = 'SQLITE Error : '+repr(e)
                         	return 4
 			try:
 				cur.execute(req)
-			except Exception,e:
-				print >> sys.stderr,e
+			except Exception as e:
+				print(e, file=sys.stderr)
 				conf["lenv"]["message"] = 'SQL Error'
 				return 4
 			outputs["Result"]["value"] = json.dumps(cur.fetchall())
@@ -93,33 +93,33 @@ def Get(conf,inputs,outputs):
 
 
 def Add(conf,inputs,outputs):
-	if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
+	if list(conf.keys()).count("senv")>0 and list(conf["senv"].keys()).count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
 		if re.match(r"(^\w+\Z)",inputs["table"]["value"]):
 			try:
 				row = json.loads(inputs["row"]["value"])
-			except Exception,e:
-				print >> sys.stderr,e
+			except Exception as e:
+				print(e, file=sys.stderr)
 				conf["lenv"]["message"] = "invalid row parameter :"+inputs["row"]["value"]
                         	return 4
 			try:
 				conn = sqlite3.connect(conf['main']['dblink'])
 				cur = conn.cursor()
-			except Exception,e:
-				print >> sys.stderr,e
+			except Exception as e:
+				print(e, file=sys.stderr)
 				conf["lenv"]["message"] = 'SQLITE Error'
                         	return 4
 			l  = row.popitem()
 			champs = '%s'%(l[0])
 			valeurs = '"%s"'%(l[1])	
-			for r in row.keys():
+			for r in list(row.keys()):
 				champs = champs+',%s'%(r)
 				valeurs = valeurs+',"%s"'%(row[r])
 			req = 'insert into %s (%s) values (%s)'%(inputs["table"]["value"],champs,valeurs)
 			try:
 				cur.execute(req)
 				conn.commit()
-			except Exception ,e:
-				print >> sys.stderr,e
+			except Exception as e:
+				print(e, file=sys.stderr)
 				conf["lenv"]["message"] = 'SQLITE Error : '+repr(e)
 				return 4
 			
@@ -134,41 +134,41 @@ def Add(conf,inputs,outputs):
         	return 4
 
 def Update(conf,inputs,outputs):	
-	if conf.keys().count("senv")>0 and conf["senv"].keys().count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
+	if list(conf.keys()).count("senv")>0 and list(conf["senv"].keys()).count("loggedin")>0 and conf["senv"]["loggedin"]=="true":
 		if re.match(r"(^\w+\Z)",inputs["table"]["value"]):
 			try:
 				set_arg = json.loads(inputs["set"]["value"])
-			except Exception,e:
-				print >> sys.stderr,e
+			except Exception as e:
+				print(e, file=sys.stderr)
 				conf["lenv"]["message"] = "invalid set parameter :"+inputs["set"]["value"]
                         	return 4
 			try:
 				search_arg = json.loads(inputs["search"]["value"])
-			except Exception,e:
-				print >> sys.stderr,e
+			except Exception as e:
+				print(e, file=sys.stderr)
 				conf["lenv"]["message"] = "invalid search parameter :"+inputs["search"]["value"]
                         	return 4
 			try:
 				conn = sqlite3.connect(conf['main']['dblink'])
 				cur = conn.cursor()
-			except Exception,e:
-				print >> sys.stderr,e
+			except Exception as e:
+				print(e, file=sys.stderr)
 				conf["lenv"]["message"] = 'SQLITE Error'
                         	return 4
 			l  = set_arg.popitem()
 			req  = 'update %s set %s = "%s"'%(inputs["table"]["value"],l[0],l[1])
-			for r in set_arg.keys():
+			for r in list(set_arg.keys()):
 				req = req + ', %s = "%s"'%(r,set_arg[r])
 			 
 			ll = search_arg.popitem()
 			req = req + ' where %s = "%s"'%(ll[0],ll[1])
-			for rr in search_arg.keys():
+			for rr in list(search_arg.keys()):
 				req = req + ' and %s = "%s"'%(rr,search_arg[rr])
 			try:
 				cur.execute(req)
 				conn.commit()
-			except Exception ,e:
-				print >> sys.stderr,e
+			except Exception as e:
+				print(e, file=sys.stderr)
 				conf["lenv"]["message"] = 'SQLITE Error : '+repr(e)
 				return 4
 			tc = conn.total_changes	
