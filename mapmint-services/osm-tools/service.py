@@ -37,19 +37,19 @@ def createShpFromOSMP(conf, inputs, outputs):
     fields = {}
     for i in range(len(nodes)):
         cc = nodes[i].xpathEval('@k')[0].getContent()
-        if fields.keys().count(cc) == 0:
+        if list(fields.keys()).count(cc) == 0:
             fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
         else:
             if len(nodes[i].xpathEval('@v')[0].getContent()) > fields[cc]:
                 fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
-    print >> sys.stderr, fields
+    print(fields, file=sys.stderr)
 
     # Create Datasource
     drv = osgeo.ogr.GetDriverByName("ESRI Shapefile")
-    print >> sys.stderr, dir(drv)
+    print(dir(drv), file=sys.stderr)
     ds = drv.CreateDataSource(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp")
 
-    print >> sys.stderr, conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp"
+    print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp", file=sys.stderr)
     lyr = ds.CreateLayer(inputs["dson"]["value"], None, osgeo.ogr.wkbPoint)
 
     # Create Fields
@@ -58,7 +58,7 @@ def createShpFromOSMP(conf, inputs, outputs):
         conf["lenv"]["message"] = "Creating MMID field failed."
         return 4
 
-    for i in fields.keys():
+    for i in list(fields.keys()):
         field_defn = osgeo.ogr.FieldDefn(i.replace(":", "_"), osgeo.ogr.OFTString)
         field_defn.SetWidth(fields[i])
         if lyr.CreateField(field_defn) != 0:
@@ -70,11 +70,11 @@ def createShpFromOSMP(conf, inputs, outputs):
     for i in range(len(nodes)):
         feat = osgeo.ogr.Feature(lyr.GetLayerDefn())
         feat.SetField("MMID", nodes[i].xpathEval('@id')[0].getContent())
-        for j in fields.keys():
+        for j in list(fields.keys()):
             tmp = nodes[i].xpathEval('tag[@k=\'' + j + '\']')
-            print >> sys.stderr, tmp
+            print(tmp, file=sys.stderr)
             if len(tmp) > 0:
-                print >> sys.stderr, tmp[0].xpathEval('@v')[0].getContent()
+                print(tmp[0].xpathEval('@v')[0].getContent(), file=sys.stderr)
                 feat.SetField(j.replace(":", "_")[:10], tmp[0].xpathEval('@v')[0].getContent())
         pt = osgeo.ogr.Geometry(osgeo.ogr.wkbPoint)
         pt.SetPoint_2D(0, float(nodes[i].xpathEval('@lon')[0].getContent()), float(nodes[i].xpathEval('@lat')[0].getContent()))
@@ -86,7 +86,7 @@ def createShpFromOSMP(conf, inputs, outputs):
     ds = None
 
     try:
-        print >> sys.stderr, conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map"
+        print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map", file=sys.stderr)
         os.unlink(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map")
     except:
         pass
@@ -104,21 +104,21 @@ def createShpFromOSML(conf, inputs, outputs):
     fields = {}
     for i in range(len(nodes)):
         cc = nodes[i].xpathEval('@k')
-        print >> sys.stderr, cc
+        print(cc, file=sys.stderr)
         if cc is not None and len(cc) > 0:
             cc = cc[0].getContent()
-            if fields.keys().count(cc) == 0:
+            if list(fields.keys()).count(cc) == 0:
                 fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
             else:
                 if len(nodes[i].xpathEval('@v')[0].getContent()) > fields[cc]:
                     fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
-    print >> sys.stderr, fields
+    print(fields, file=sys.stderr)
 
     # Create Datasource
     drv = osgeo.ogr.GetDriverByName("ESRI Shapefile")
     ds = drv.CreateDataSource(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp")
 
-    print >> sys.stderr, conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp"
+    print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp", file=sys.stderr)
     lyr = ds.CreateLayer(inputs["dson"]["value"], None, osgeo.ogr.wkbLineString)
 
     # Create Fields
@@ -127,7 +127,7 @@ def createShpFromOSML(conf, inputs, outputs):
         conf["lenv"]["message"] = zoo._("Creating MMID field failed.")
         return zoo.SERVICE_FAILED
 
-    for i in fields.keys():
+    for i in list(fields.keys()):
         field_defn = osgeo.ogr.FieldDefn(i.replace(":", "_"), osgeo.ogr.OFTString)
         field_defn.SetWidth(fields[i])
         if lyr.CreateField(field_defn) != 0:
@@ -139,18 +139,18 @@ def createShpFromOSML(conf, inputs, outputs):
     for i in range(len(nodes)):
         feat = osgeo.ogr.Feature(lyr.GetLayerDefn())
         feat.SetField("MMID", nodes[i].xpathEval('@id')[0].getContent())
-        for j in fields.keys():
+        for j in list(fields.keys()):
             tmp = nodes[i].xpathEval('tag[@k=\'' + j + '\']')
-            print >> sys.stderr, tmp
+            print(tmp, file=sys.stderr)
             if len(tmp) > 0:
-                print >> sys.stderr, tmp[0].xpathEval('@v')[0].getContent()
+                print(tmp[0].xpathEval('@v')[0].getContent(), file=sys.stderr)
                 feat.SetField(j.replace(":", "_")[:10], tmp[0].xpathEval('@v')[0].getContent())
         line = osgeo.ogr.Geometry(osgeo.ogr.wkbLineString)
         nodes1 = nodes[i].xpathEval('./nd')
         for j in nodes1:
             ref = j.xpathEval('@ref')[0].getContent()
             nd = doc.xpathEval("/osm/node[@id='" + ref + "']")
-            print >> sys.stderr, ref + " " + str(nd)
+            print(ref + " " + str(nd), file=sys.stderr)
             if len(nd) > 0:
                 line.AddPoint_2D(float(nd[0].xpathEval('@lon')[0].getContent()), float(nd[0].xpathEval('@lat')[0].getContent()))
         feat.SetGeometry(line)
@@ -161,7 +161,7 @@ def createShpFromOSML(conf, inputs, outputs):
     ds = None
 
     try:
-        print >> sys.stderr, conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map"
+        print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map", file=sys.stderr)
         os.unlink(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map")
     except:
         pass
