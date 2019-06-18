@@ -48,7 +48,9 @@ def getForm(conf, inputs, outputs):
 def saveOnServer(conf, inputs, outputs):
     import shutil
     print("************ ok1 " + str(inputs), file=sys.stderr)
-    if list(conf.keys()).count("senv") > 0:
+    # TODO: confirm assumption: "conf" is a Python 3 dictionary object
+    # if list(conf.keys()).count("senv") > 0:
+    if "senv" in conf:
         dir = conf["main"]["tmpPath"] + "/data_tmp_1111" + conf["senv"]["MMID"]
     else:
         dir = conf["main"]["tmpPath"] + "/data_tmp_1111" + conf["lenv"]["usid"]
@@ -66,7 +68,9 @@ def saveOnServer(conf, inputs, outputs):
     outFileName = dir + "/" + tmp[len(tmp) - 1]
     print("************ ok4 " + str(inputs), file=sys.stderr)
     shutil.move(inputs[field]["lref"], outFileName);
-    if list(conf.keys()).count("senv") > 0:
+    # TODO: confirm assumption: "conf" is a Python 3 dictionary object
+    # if list(conf.keys()).count("senv") > 0:
+    if "senv" in conf:
         conf["senv"]["last_file"] = outFileName
         conf["senv"]["last_ufile"] = outFileName
         # import mmsession
