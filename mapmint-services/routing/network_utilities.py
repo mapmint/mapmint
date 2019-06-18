@@ -25,7 +25,7 @@ def createNetwork(conf,inputs,outputs):
     import shapely
     import shapely.wkt
 
-    print >> sys.stderr,"Extract geometries"
+    print("Extract geometries", file=sys.stderr)
     geometry1=[]
     ds = osgeo.ogr.Open(inputs["InputEntity1"]["value"])
     lyr = ds.GetLayer(0)
@@ -36,7 +36,7 @@ def createNetwork(conf,inputs,outputs):
         feat = lyr.GetNextFeature()
     ds.Destroy()
 
-    print >> sys.stderr,"Extract geometries"
+    print("Extract geometries", file=sys.stderr)
     geometry2=[]
     ds = osgeo.ogr.Open(inputs["InputEntity2"]["value"])
     lyr = ds.GetLayer(0)
@@ -51,13 +51,13 @@ def createNetwork(conf,inputs,outputs):
     #print >> sys.stderr,inputs["InputEntity2"]["value"][len(inputs["InputEntity2"]["value"])-100:len(inputs["InputEntity2"]["value"])-1]
     #geometry2=extractInputs(conf,inputs["InputEntity2"])
 
-    print >> sys.stderr,"Extracted geometries"
+    print("Extracted geometries", file=sys.stderr)
 
     i=0
-    if inputs.has_key("offset"):
+    if "offset" in inputs:
         i=int(inputs["offset"]["value"])
     oriLen=len(geometry1)
-    if inputs.has_key("limit"):
+    if "limit" in inputs:
         oriLen=int(inputs["limit"]["value"])+i
 
     #
@@ -101,7 +101,7 @@ def createNetwork(conf,inputs,outputs):
             nb=toto.GetGeometryCount()
             for k in range(0,nb):
                 tmp=toto.GetGeometryRef(k)
-                print >> sys.stderr,str(i)+' '+str(k)+' '+' '+tmp.ExportToWkt()
+                print(str(i)+' '+str(k)+' '+' '+tmp.ExportToWkt(), file=sys.stderr)
                 current+=[tmp.Clone()]
         else:
             current=[toto]
@@ -132,20 +132,20 @@ def createNetwork(conf,inputs,outputs):
                     current1=[]
                     if intersection.GetGeometryType() == 4:
                         nb=intersection.GetGeometryCount()
-                        print >> sys.stderr, "NB POINTS: "+str(nb)
+                        print("NB POINTS: "+str(nb), file=sys.stderr)
                         #tmp0=intersection.Clone()
                         for k in range(0,nb):
                             current1+=[intersection.GetGeometryRef(k).Clone()]
                     else:
                         if intersection.GetGeometryName()=="LINESTRING":
-                            print >> sys.stderr,ecurrent1
+                            print(ecurrent1, file=sys.stderr)
                             current1+=[intersection.GetPoint_2D(),intersection.GetPoint_2D(intersection.GetPointCount()-1)]
                         else:
                             if intersection.GetGeometryName()=="MULTILINESTRING":
                                 nb=intersection.GetGeometryCount()
                                 for k in range(0,nb):
                                     tmp=intersection.GetGeometryRef(k)
-                                    print >> sys.stderr,str(i)+' '+str(k)+' '+' '+tmp.ExportToWkt()
+                                    print(str(i)+' '+str(k)+' '+' '+tmp.ExportToWkt(), file=sys.stderr)
                                     current1+=[tmp.StartPoint(),tmp.EndPoint()]
                             else:
                                 current1+=[intersection.Clone()]
@@ -154,7 +154,7 @@ def createNetwork(conf,inputs,outputs):
                     # CREATE SET OF SPLITTED LINES
                     length1=len(current1)
                     for q in range(0,length1):
-                        print >> sys.stderr,str(q)+" current0 length: "+str(len(current0))
+                        print(str(q)+" current0 length: "+str(len(current0)), file=sys.stderr)
                         for r in range(0,len(current0)):
                             #print >> sys.stderr,str(q)+" "+str(r)+" "+str(q)
                             #print >> sys.stderr,str(r)+" "+str(q)+" Intersection "+str(current0[r].Intersection(current1[q]))+" "+str(current0[r].Intersects(current1[q]))+" "+str(current0[r].Touches(current1[q]))
@@ -164,7 +164,7 @@ def createNetwork(conf,inputs,outputs):
                             point=shapely.wkt.loads(current1[q].ExportToWkt())
                             #print >> sys.stderr," LINE INTERSECTS POINT " + str(line.intersects(point))
                             #print >> sys.stderr," POINT INTERSECTS LINE " + str(point.intersects(line))
-                            print >> sys.stderr," POINT Distance LINE " + str(point.distance(line))
+                            print(" POINT Distance LINE " + str(point.distance(line)), file=sys.stderr)
                             if point.distance(line)>0.000001:
                                 continue
                             else:
@@ -173,20 +173,20 @@ def createNetwork(conf,inputs,outputs):
                                     try:
                                         current0[r]=osgeo.ogr.CreateGeometryFromWkt(titi[0].wkt)
                                         current0+=[osgeo.ogr.CreateGeometryFromWkt(titi[1].wkt)]
-                                    except Exception,e:
-                                        print >> sys.stderr,"Error occurs: "+str(e)
-                                    print >> sys.stderr,"Line splited"
+                                    except Exception as e:
+                                        print("Error occurs: "+str(e), file=sys.stderr)
+                                    print("Line splited", file=sys.stderr)
                                     break
-                                except Exception,e:
-                                    print >> sys.stderr,"Unable to split thie line: "+str(e)
+                                except Exception as e:
+                                    print("Unable to split thie line: "+str(e), file=sys.stderr)
                                     pass
-                    print >> sys.stderr,"Current0: "+str(len(current0))
+                    print("Current0: "+str(len(current0)), file=sys.stderr)
                     current[o]=current0[0].Clone()
                     current0[0].Destroy()
                     for oo in range(1,len(current0)):
                         current+=[current0[oo].Clone()]
                         current0[oo].Destroy()
-                    print >> sys.stderr,"Current: "+str(len(current))
+                    print("Current: "+str(len(current)), file=sys.stderr)
                     rgeometries+=[tmp]
                     
                 o+=1
@@ -199,10 +199,10 @@ def createNetwork(conf,inputs,outputs):
                 feat.SetGeometryDirectly(current[m].Clone())
                 #tmpStr+="\n********\n"+feat.ExportToJson()
                 lyr.CreateFeature(feat)
-            print >> sys.stderr,"\n********\nFeature "+str(i)+" was splitted in "+str(len(current))
+            print("\n********\nFeature "+str(i)+" was splitted in "+str(len(current)), file=sys.stderr)
             #print >> sys.stderr,str(i)+" "+str(m)+" LINE : "+tmpStr
         if not(hasValue):
-            print >> sys.stderr,str(i)+" not intersecting"
+            print(str(i)+" not intersecting", file=sys.stderr)
             rgeometries1+=[geometry1[i].Clone()]
             lyr.CreateFeature(geometry1[i].Clone())
         geometry1[i].Destroy()
@@ -213,5 +213,5 @@ def createNetwork(conf,inputs,outputs):
         i+=1
     ds.Destroy()
     #outputResult(conf,outputs["Result"],rgeometries)
-    print >> sys.stderr,"/outputResult"
+    print("/outputResult", file=sys.stderr)
     return 3
