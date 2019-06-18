@@ -279,7 +279,9 @@ def Gdal_Merge(conf, inputs, outputs):
     bTargetAlignedPixels = False
 
     gdal.AllRegister()
-    if len(list(inputs.keys())) == 0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if len(list(inputs.keys())) == 0:
+    if len(inputs.keys()) == 0:
         conf["lenv"]["message"] = zoo._("Unable to fetch any parameters")
         return zoo.SERVICE_FAILED
 
@@ -289,7 +291,9 @@ def Gdal_Merge(conf, inputs, outputs):
     if "OutputDSN" in inputs and inputs["OutputDSN"]["value"] != "NULL":
         out_file = inputs["OutputDSN"]["value"]
     quiet = 1
-    if list(inputs.keys()).count("dir") and inputs["dir"]["value"] != "NULL":
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("dir") and inputs["dir"]["value"] != "NULL":
+    if "dir" in inputs and inputs["dir"]["value"] != "NULL":
         import glob
         listing = glob.glob(inputs["dir"]["value"] + "/*." + inputs["ext"]["value"])
         for filename in listing:
