@@ -962,7 +962,7 @@ def joinIndexTable(conf, inputs, outputs):
     print(list(inputs["rcol"].keys()), file=sys.stderr)
     print(inputs["rcol"]["value"][0], file=sys.stderr)
     for i in ["rcol", "field"]:
-    	# TODO: confirm assumption: inputs[i] is a Python 3 dictionary object
+        # TODO: confirm assumption: inputs[i] is a Python 3 dictionary object
         # if list(inputs[i].keys()).count("length") == 0:
         if "length" not in inputs[i]:
             inputs[i]["value"] = inputs[i]["value"].split(",")
@@ -1322,7 +1322,7 @@ def list(conf, inputs, outputs):
                 res = listDefault(prefix + inputs["table"]["value"], cur, " order by ord")
             else:
                 if inputs["table"]["value"].count('.') > 0:
-                	# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+                    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
                     # if list(inputs.keys()).count("cond"):
                     if "cond" in inputs:
                         res = listDefault(inputs["table"]["value"], cur, inputs["cond"]["value"])
@@ -1375,8 +1375,8 @@ def insertElement(conf, inputs, outputs):
             if 'title' in inputsKeys:
                 col_sufix = ",title"
                 val_sufix = "," + str(adapt(inputs["title"]["value"]))
-            if len(inputsKeys) > 2: # maybe affected
-                for i in inputsKeys: # maybe affected
+            if len(inputsKeys) > 2:  # maybe affected
+                for i in inputsKeys:  # maybe affected
                     print(i, file=sys.stderr)
                     if i != "table" and i != "name" and i != "title":
                         col_sufix += "," + i
@@ -1618,7 +1618,7 @@ def updateElement(conf, inputs, outputs):
     req2 = None
     avoidReq1 = False
     params = {}
-    for i in keys: # maybe affected
+    for i in keys:  # maybe affected
         if i is None or obj[i] == "":
             continue
         if i == "id":
@@ -3227,7 +3227,7 @@ def insert(conf, inputs, outputs):
                             col_sufix += columns[i] + "=" + str(adapt(str(inputs[columns[i]]["value"])))
             print(val_sufix.encode('utf-8'), file=sys.stderr)
         if len(columns) > 0:
-        	# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
             # if list(inputs.keys()).count("id") == 0:
             if "id" not in inputs:
                 req = "INSERT INTO " + inputs["table"]["value"] + " (" + col_sufix + ") VALUES (" + (val_sufix) + ") RETURNING id"
@@ -3248,7 +3248,7 @@ def insert(conf, inputs, outputs):
                 cid = inputs["id"]["value"]
             outputs["id"]["value"] = json.dumps(cid)
         else:
-        	# TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
             # if list(inputs.keys()).count("id") > 0:
             if "id" in inputs:
                 outputs["id"]["value"] = inputs["id"]["value"]
@@ -4015,7 +4015,7 @@ def clientView(conf, inputs, outputs):
         res = cur.execute(req)
         cvals = cur.fetchall()
         for j in range(len(cvals)):
-        	# TODO: confirm assumption: "files" is a Python 3 dictionary object
+            # TODO: confirm assumption: "files" is a Python 3 dictionary object
             # if list(files.keys()).count(cvals[j][2]) > 0:
             if cvals[j][2] in files:
                 if rvals[rcolumns.index(cvals[j][2])] is not None:
@@ -4511,7 +4511,7 @@ def massiveImport(conf, inputs, outputs):
 
 
 def recursflo(obj):
-	# TODO: confirm assumption: "obj" is a Python 3 dictionary object
+    # TODO: confirm assumption: "obj" is a Python 3 dictionary object
     # if list(obj.keys()).count("dependents"):
     if "dependents" in obj:
         return recursflo(obj["dependents"][0])
