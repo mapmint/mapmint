@@ -37,7 +37,9 @@ def createShpFromOSMP(conf, inputs, outputs):
     fields = {}
     for i in range(len(nodes)):
         cc = nodes[i].xpathEval('@k')[0].getContent()
-        if list(fields.keys()).count(cc) == 0:
+        # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+        # if list(fields.keys()).count(cc) == 0:
+        if cc not in fields:
             fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
         else:
             if len(nodes[i].xpathEval('@v')[0].getContent()) > fields[cc]:
@@ -58,7 +60,9 @@ def createShpFromOSMP(conf, inputs, outputs):
         conf["lenv"]["message"] = "Creating MMID field failed."
         return 4
 
-    for i in list(fields.keys()):
+    # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+    # for i in list(fields.keys()):
+    for i in fields.keys():
         field_defn = osgeo.ogr.FieldDefn(i.replace(":", "_"), osgeo.ogr.OFTString)
         field_defn.SetWidth(fields[i])
         if lyr.CreateField(field_defn) != 0:
@@ -70,7 +74,9 @@ def createShpFromOSMP(conf, inputs, outputs):
     for i in range(len(nodes)):
         feat = osgeo.ogr.Feature(lyr.GetLayerDefn())
         feat.SetField("MMID", nodes[i].xpathEval('@id')[0].getContent())
-        for j in list(fields.keys()):
+        # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+        # for j in list(fields.keys()):
+        for j in fields.keys():
             tmp = nodes[i].xpathEval('tag[@k=\'' + j + '\']')
             print(tmp, file=sys.stderr)
             if len(tmp) > 0:
@@ -107,7 +113,9 @@ def createShpFromOSML(conf, inputs, outputs):
         print(cc, file=sys.stderr)
         if cc is not None and len(cc) > 0:
             cc = cc[0].getContent()
-            if list(fields.keys()).count(cc) == 0:
+            # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+            # if list(fields.keys()).count(cc) == 0:
+            if cc not in fields:
                 fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
             else:
                 if len(nodes[i].xpathEval('@v')[0].getContent()) > fields[cc]:
@@ -127,7 +135,9 @@ def createShpFromOSML(conf, inputs, outputs):
         conf["lenv"]["message"] = zoo._("Creating MMID field failed.")
         return zoo.SERVICE_FAILED
 
-    for i in list(fields.keys()):
+    # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+    # for i in list(fields.keys()):
+    for i in fields.keys():
         field_defn = osgeo.ogr.FieldDefn(i.replace(":", "_"), osgeo.ogr.OFTString)
         field_defn.SetWidth(fields[i])
         if lyr.CreateField(field_defn) != 0:
@@ -139,7 +149,9 @@ def createShpFromOSML(conf, inputs, outputs):
     for i in range(len(nodes)):
         feat = osgeo.ogr.Feature(lyr.GetLayerDefn())
         feat.SetField("MMID", nodes[i].xpathEval('@id')[0].getContent())
-        for j in list(fields.keys()):
+        # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+        # for j in list(fields.keys()):
+        for j in fields.keys():
             tmp = nodes[i].xpathEval('tag[@k=\'' + j + '\']')
             print(tmp, file=sys.stderr)
             if len(tmp) > 0:
