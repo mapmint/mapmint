@@ -20,10 +20,10 @@ context = etree.iterparse(infile, events=('end',), tag='{*}Layer')
 
 for event, elem in context:
     try:
-        print '%s <=> %s\n' % (elem.tag, elem.text.encode('utf-8'))
-    except Exception,e:
-        print '%s <=> %s\n' % (elem.tag, elem.text)
-        print e
+        print('%s <=> %s\n' % (elem.tag, elem.text.encode('utf-8')))
+    except Exception as e:
+        print('%s <=> %s\n' % (elem.tag, elem.text))
+        print(e)
     elem.clear()
     while elem.getprevious() is not None:
         del elem.getparent()[0]
