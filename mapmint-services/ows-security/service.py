@@ -104,9 +104,13 @@ def getEntities(c, prefix, service, request):
 
 
 def BasicRewrite(conf, inputs, outputs):
-    if list(inputs["Query"].keys()).count("fmimeType") == 0 and list(inputs["Query"].keys()).count("mimeType") > 0:
+    # TODO: confirm assumption: inputs["Query"] is a Python 3 dictionary object
+    # if list(inputs["Query"].keys()).count("fmimeType") == 0 and list(inputs["Query"].keys()).count("mimeType") > 0:
+    if ("fmimeType" not in inputs["Query"]) and ("mimeType" in inputs["Query"]):
         inputs["Query"]["fmimeType"] = inputs["Query"]["mimeType"]
-    if list(inputs["Query"].keys()).count("fmimeType") > 0 and inputs["Query"]["fmimeType"].count("text/") == 0:
+    # TODO: confirm assumption: inputs["Query"] is a Python 3 dictionary object
+    # if list(inputs["Query"].keys()).count("fmimeType") > 0 and inputs["Query"]["fmimeType"].count("text/") == 0:
+    if "fmimeType" in inputs["Query"] and ("text/" not in inputs["Query"]["fmimeType"]):
         outputs["Result"]["value"] = inputs["Query"]["value"]
         outputs["Result"]["mimeType"] = inputs["Query"]["fmimeType"]
         res = outputs["Result"].pop("encoding")
@@ -177,7 +181,9 @@ def addWSSCSParam(conf, inputs, outputs):
     currentRequest = json.loads(inputs["original"]["value"])
     print(currentRequest, file=sys.stderr)
     request = {}
-    for i in list(currentRequest.keys()):
+    # TODO: confirm assumption: "currentRequest" is a Python 3 dictionary object
+    # for i in list(currentRequest.keys()):
+    for i in currentRequest.keys():
         if i.lower() == "service":
             request["service"] = currentRequest[i]
         else:
@@ -186,9 +192,13 @@ def addWSSCSParam(conf, inputs, outputs):
             elif i.lower() == "version":
                 request["version"] = currentRequest[i]
     if request["service"].upper() == "WMS":
-        if list(request.keys()).count('version') == 0:
+        # TODO: confirm assumption: "request" is a Python 3 dictionary object
+        # if list(request.keys()).count('version') == 0:
+        if 'version' not in request:
             request["version"] = "1.3.0"
-        if list(request.keys()).count('version') > 0 and request["version"] == "1.3.0":
+        # TODO: confirm assumption: "request" is a Python 3 dictionary object
+        # if list(request.keys()).count('version') > 0 and request["version"] == "1.3.0":
+        if ('version' in request) and request["version"] == "1.3.0":
             schemas = ' xmlns:wms="http://www.opengis.net/wms" xmlns:ows="http://www.opengis.net/ows/1.1"'
             outputs["Result"]["value"] = outputs["Result"]["value"].replace('<AccessConstraints>none</AccessConstraints>',
                                                                             '<wms:AccessConstraints xmlns:wms="http://www.opengis.net/wms" xmlns:ows_security="http://www.opengis.net/security/1.0" xmlns:ows="http://www.opengis.net/ows/1.1">https://www.opengis.net/def/security/1.0/cc/wms130</wms:AccessConstraints>')
@@ -210,7 +220,9 @@ def addWSSCSParam(conf, inputs, outputs):
                 strToReplace += '<ows:Operation name="' + name + '"><ows:DCP><ows:HTTP><ows:Get xlink:type="simple" xlink:href="' + conf["main"]["owsSecurityUrl"] + inputs["token"]["value"] + "/" + inputs["server"][
                     "value"] + "/" + '"><ows:Constraint name="urn:ogc:def:security:1.0:https"><ows:NoValues/></ows:Constraint><ows:Constraint name="urn:ogc:def:security:1.0:cors"><ows:NoValues/></ows:Constraint><ows:Constraint name="urn:ogc:def:security:1.0:exception-handling"><ows:NoValues/></ows:Constraint></ows:Get></ows:HTTP></ows:DCP></ows:Operation>'
         toReplaceFinal = '<ows_security:ExtendedSecurityCapabilities xmlns:ows_security="http://www.opengis.net/security/1.0"' + schemas + '><ows:OperationsMetadata>' + strToReplace + '</ows:OperationsMetadata></ows_security:ExtendedSecurityCapabilities>'
-        if list(request.keys()).count('version') == 0 or request["version"] != "1.3.0":
+        # TODO: confirm assumption: "request" is a Python 3 dictionary object
+        # if list(request.keys()).count('version') == 0 or request["version"] != "1.3.0":
+        if ("version" not in request) or request["version"] != "1.3.0":
             toReplaceFinal = '<VendorSpecificCapabilities>' + toReplaceFinal + '</VendorSpecificCapabilities>'
 
         outputs["Result"]["value"] = outputs["Result"]["value"].replace('</Exception>', '</Exception>' + toReplaceFinal)
@@ -276,7 +288,9 @@ def SecureResponse(conf, inputs, outputs):
     if sUrl is None:
         conf["lenv"]["message"] = zoo._("No server found.")
         return zoo.SERVICE_FAILED
-    if list(inputs["Query"].keys()).count("fmimeType") == 0 and list(inputs["Query"].keys()).count("mimeType") > 0:
+    # TODO: confirm assumption: inputs["Query"] is a Python 3 dictionary object
+    # if list(inputs["Query"].keys()).count("fmimeType") == 0 and list(inputs["Query"].keys()).count("mimeType") > 0:
+    if ("fmimeType" not in inputs["Query"]) and ("mimeType" in inputs["Query"]):
         inputs["Query"]["fmimeType"] = inputs["Query"]["mimeType"]
         outputs["Result"]["mimeType"] = inputs["Query"]["fmimeType"]
         if inputs["Query"]["fmimeType"] != "text/xml":
@@ -327,7 +341,9 @@ def SecureResponse(conf, inputs, outputs):
     # outputs["Result"]["value"]=etree.tostring(doc).replace(sUrl,conf["main"]["owsSecurityUrl"]+"?server="+inputs["server"]["value"]+"&amp;token="+inputs["token"]["value"])
     outputs["Result"]["value"] = etree.tostring(doc).replace(sUrl + "&amp;", conf["main"]["owsSecurityUrl"] + inputs["token"]["value"] + "/" + inputs["server"]["value"] + "/?")
     addWSSCSParam(conf, inputs, outputs)
-    if list(inputs["Query"].keys()).count("fmimeType") == 0 and list(inputs["Query"].keys()).count("mimeType") > 0:
+    # TODO: confirm assumption: inputs["Query"] is a Python 3 dictionary object
+    # if list(inputs["Query"].keys()).count("fmimeType") == 0 and list(inputs["Query"].keys()).count("mimeType") > 0:
+    if ("fmimeType" not in inputs["Query"]) and ("mimeType" in inputs["Query"]):
         inputs["Query"]["fmimeType"] = inputs["Query"]["mimeType"]
     if inputs["Query"]["fmimeType"].count('application/vnd.ogc.wms_xml') > 0:
         outputs["Result"]["mimeType"] = "text/xml"
@@ -408,7 +424,9 @@ def SecureAccess(conf, inputs, outputs):
         conf["lenv"]["status_code"] = "401 Unauthorized"
         print(conf["lenv"], file=sys.stderr)
         return zoo.SERVICE_FAILED
-    if list(conf.keys()).count("senv") == 0:
+    # TODO: confirm assumption: "conf" is a Python 3 dictionary object
+    # if list(conf.keys()).count("senv") == 0:
+    if "senv" not in conf:
         conf["senv"] = {"group": getGroupFromToken(c, prefix, inputs["token"]["value"])}
     else:
         print(conf["senv"], file=sys.stderr)
@@ -493,10 +511,14 @@ def SecureAccess(conf, inputs, outputs):
         for i in range(0, len(lkeys)):
             if lkeys[i].lower() != lkeys[i]:
                 q[lkeys[i].lower()] = q[lkeys[i]]
-        if list(q.keys()).count("request") == 0:
+        # TODO: confirm assumption: "conf" is a Python 3 dictionary object
+        # if list(q.keys()).count("request") == 0:
+        if "request" not in q:
             conf["lenv"]["message"] = zoo._("Parameter &lt;request&gt; was missing")
             return zoo.SERVICE_FAILED
-        if list(q.keys()).count("service") == 0:
+        # TODO: confirm assumption: "q" is a Python 3 dictionary object
+        # if list(q.keys()).count("service") == 0:
+        if "service" not in q:
             if q["request"].upper() == "GETMAP" or q["request"].upper() == "GETFEATUREINFO":
                 q["service"] = "WMS"
             else:
@@ -509,7 +531,9 @@ def SecureAccess(conf, inputs, outputs):
 
         if vals is None or (vals is not None and vals[1] >= 0):
             sUrl1 = ""
-            for i in list(q.keys()):
+            # TODO: confirm assumption: "q" is a Python 3 dictionary object
+            # for i in list(q.keys()):
+            for i in q.keys():
                 if sUrl1 != "":
                     sUrl1 += "&amp;"
                 sUrl1 += i + "=" + q[i]
@@ -552,14 +576,18 @@ def SecureAccess(conf, inputs, outputs):
             # print >> sys.stderr,dir(response)
             # outputs["Result"]["mimeType"]="text/xml"
             response.close()
-            if list(conf.keys()).count("senv") > 0:
+            # TODO: confirm assumption: "conf" is a Python 3 dictionary object
+            # if list(conf.keys()).count("senv") > 0:
+            if "senv" in conf:
                 conf.pop("senv", None)
             return zoo.SERVICE_SUCCEEDED
         else:
             if vals[1] < 0:
                 print("Should treat before requesting the server", file=sys.stderr)
                 sUrl1 = ""
-                for i in list(q.keys()):
+                # TODO: confirm assumption: "q" is a Python 3 dictionary object
+                # for i in list(q.keys()):
+                for i in q.keys():
                     if sUrl1 != "":
                         sUrl1 += "&amp;"
                     if i.upper().count(vals[0].upper()) == 0:
@@ -612,7 +640,9 @@ def SecureAccess(conf, inputs, outputs):
                 if useDefault:
                     outputs["Result"]["mimeType"] = "text/xml"
                 response.close()
-                if list(conf.keys()).count("senv") > 0:
+                # TODO: confirm assumption: "conf" is a Python 3 dictionary object
+                # if list(conf.keys()).count("senv") > 0:
+                if "senv" in conf:
                     conf.pop("senv", None)
 
                 return zoo.SERVICE_SUCCEEDED
@@ -654,7 +684,9 @@ def SecureAccess(conf, inputs, outputs):
                 outputs["Result"]["mimeType"] = "text/xml"
             # outputs["Result"]["mimeType"]="text/xml"
             response.close()
-            if list(conf.keys()).count("senv") > 0:
+            # TODO: confirm assumption: "conf" is a Python 3 dictionary object
+            # if list(conf.keys()).count("senv") > 0:
+            if "senv" in conf:
                 conf.pop("senv", None)
             return zoo.SERVICE_SUCCEEDED
         else:
@@ -722,7 +754,9 @@ def SecureAccess(conf, inputs, outputs):
                 if useDefault:
                     outputs["Result"]["mimeType"] = "text/xml"
                 response.close()
-                if list(conf.keys()).count("senv") > 0:
+                # TODO: confirm assumption: "conf" is a Python 3 dictionary object
+                # if list(conf.keys()).count("senv") > 0:
+                if "senv" in conf:
                     conf.pop("senv", None)
                 return zoo.SERVICE_SUCCEEDED
         conf["lenv"]["message"] = "Not yet implemented"
