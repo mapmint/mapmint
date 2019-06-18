@@ -38,7 +38,9 @@ dict_func = {'md5': mm_md5}
 
 
 def Get(conf, inputs, outputs):
-    if list(conf.keys()).count("senv") > 0 and list(conf["senv"].keys()).count("loggedin") > 0 and conf["senv"]["loggedin"] == "true":
+    # TODO: confirm assumption: "conf" and conf["senv"] are Python 3 dictionary objects
+    # if list(conf.keys()).count("senv") > 0 and list(conf["senv"].keys()).count("loggedin") > 0 and conf["senv"]["loggedin"] == "true":
+    if "senv" in conf and "loggedin" in conf["senv"] and conf["senv"]["loggedin"] == "true":
         if re.match(r"(^\w+\Z)", inputs["table"]["value"]):
             limit = ""
             clause = ""
@@ -58,7 +60,9 @@ def Get(conf, inputs, outputs):
                 try:
                     p = m.popitem()
                     clause = 'where %s="%s"' % (p[0], p[1])
-                    for k in list(m.keys()):
+                    # TODO: confirm assumption: "m" is a Python 3 dictionary object
+                    # for k in list(m.keys()):
+                    for k in m.keys():
                         clause = clause + ' and %s="%s"' % (m[k])
                 except Exception as e:
                     print(e, file=sys.stderr)
@@ -94,7 +98,9 @@ def Get(conf, inputs, outputs):
 
 
 def Add(conf, inputs, outputs):
-    if list(conf.keys()).count("senv") > 0 and list(conf["senv"].keys()).count("loggedin") > 0 and conf["senv"]["loggedin"] == "true":
+    # TODO: confirm assumption: "conf" and conf["senv"] are Python 3 dictionary objects
+    # if list(conf.keys()).count("senv") > 0 and list(conf["senv"].keys()).count("loggedin") > 0 and conf["senv"]["loggedin"] == "true":
+    if "senv" in conf and "loggedin" in conf["senv"] and conf["senv"]["loggedin"] == "true":
         if re.match(r"(^\w+\Z)", inputs["table"]["value"]):
             try:
                 row = json.loads(inputs["row"]["value"])
@@ -112,7 +118,9 @@ def Add(conf, inputs, outputs):
             l = row.popitem()
             champs = '%s' % (l[0])
             valeurs = '"%s"' % (l[1])
-            for r in list(row.keys()):
+            # TODO: confirm assumption: "row" is a Python 3 dictionary object
+            # for r in list(row.keys()):
+            for r in row.keys():
                 champs = champs + ',%s' % (r)
                 valeurs = valeurs + ',"%s"' % (row[r])
             req = 'insert into %s (%s) values (%s)' % (inputs["table"]["value"], champs, valeurs)
@@ -136,7 +144,9 @@ def Add(conf, inputs, outputs):
 
 
 def Update(conf, inputs, outputs):
-    if list(conf.keys()).count("senv") > 0 and list(conf["senv"].keys()).count("loggedin") > 0 and conf["senv"]["loggedin"] == "true":
+    # TODO: confirm assumption: "conf" and conf["senv"] are Python 3 dictionary objects
+    # if list(conf.keys()).count("senv") > 0 and list(conf["senv"].keys()).count("loggedin") > 0 and conf["senv"]["loggedin"] == "true":
+    if "senv" in conf and "loggedin" in conf["senv"] and conf["senv"]["loggedin"] == "true":
         if re.match(r"(^\w+\Z)", inputs["table"]["value"]):
             try:
                 set_arg = json.loads(inputs["set"]["value"])
@@ -159,12 +169,16 @@ def Update(conf, inputs, outputs):
                 return 4
             l = set_arg.popitem()
             req = 'update %s set %s = "%s"' % (inputs["table"]["value"], l[0], l[1])
-            for r in list(set_arg.keys()):
+            # TODO: confirm assumption: "set_arg" is a Python 3 dictionary object
+            # for r in list(set_arg.keys()):
+            for r in set_arg.keys():
                 req = req + ', %s = "%s"' % (r, set_arg[r])
 
             ll = search_arg.popitem()
             req = req + ' where %s = "%s"' % (ll[0], ll[1])
-            for rr in list(search_arg.keys()):
+            # TODO: confirm assumption: "search_arg" is a Python 3 dictionary object
+            # for rr in list(search_arg.keys()):
+            for rr in search_arg.keys():
                 req = req + ' and %s = "%s"' % (rr, search_arg[rr])
             try:
                 cur.execute(req)
