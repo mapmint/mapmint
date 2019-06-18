@@ -491,7 +491,9 @@ def computeRoute(table, cur, startEdge, endEdge, method, conf, inputs):
                     startEdge['source']) + "," + str(endEdge['target']) + ",false,false)) as rt WHERE " + table + ".ogc_fid=edge_id "
 
     tblName = "tmp_route" + str(time.time()).split(".")[0]
-    if list(inputs.keys()).count('cnt') > 0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count('cnt') > 0:
+    if 'cnt' in inputs:
         tblName += inputs["cnt"]["value"]
 
     sql = "CREATE TEMPORARY TABLE " + tblName + "1 AS (" + _sql + ");"
