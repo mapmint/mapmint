@@ -32,7 +32,7 @@ def getForm(conf,inputs,outputs):
     dirs=[]
     j=0
     for i in range(0,len(elements["Directories"])):
-        print >> sys.stderr,elements["Directories"][i]["name"]+" rwx"
+        print(elements["Directories"][i]["name"]+" rwx", file=sys.stderr)
         if mm_access.checkDataStorePriv(conf,elements["Directories"][i]["name"],"rwx"):
             dirs+=[elements["Directories"][i]["name"]]
         j+=1
@@ -45,50 +45,50 @@ def getForm(conf,inputs,outputs):
 
 def saveOnServer(conf,inputs,outputs):
     import shutil
-    print >> sys.stderr,"************ ok1 "+str(inputs)
-    if conf.keys().count("senv")>0:
+    print("************ ok1 "+str(inputs), file=sys.stderr)
+    if list(conf.keys()).count("senv")>0:
         dir=conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["senv"]["MMID"]
     else:
         dir=conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["lenv"]["usid"]
     try:
         shutil.os.mkdir(dir)
-    except Exception,e:
-        print >> sys.stderr,str(e)
+    except Exception as e:
+        print(str(e), file=sys.stderr)
         pass
     field="file"
-    if inputs.has_key("filename"):
+    if "filename" in inputs:
         field=inputs["filename"]["value"]
-    print >> sys.stderr,"************ ok2 "+str(inputs)
+    print("************ ok2 "+str(inputs), file=sys.stderr)
     tmp=inputs[field]["lref"].split("/")
-    print >> sys.stderr,"************ ok3 "+str(inputs)
+    print("************ ok3 "+str(inputs), file=sys.stderr)
     outFileName=dir+"/"+tmp[len(tmp)-1]
-    print >> sys.stderr,"************ ok4 "+str(inputs)
+    print("************ ok4 "+str(inputs), file=sys.stderr)
     shutil.move(inputs[field]["lref"],outFileName);
-    if conf.keys().count("senv")>0:
+    if list(conf.keys()).count("senv")>0:
         conf["senv"]["last_file"]=outFileName
         conf["senv"]["last_ufile"]=outFileName
         #import mmsession
         #mmsession.save(conf)
         #conf["lenv"]["cookie"]="MMID=MM"+conf["senv"]["MMID"]+"; path=/"
-        print >> sys.stderr,"************ XXX "+str(conf["senv"])
-    print >> sys.stderr,"************ ok5 "+str(outFileName)
+        print("************ XXX "+str(conf["senv"]), file=sys.stderr)
+    print("************ ok5 "+str(outFileName), file=sys.stderr)
     outputs["Result"]["value"]="Your "+tmp[len(tmp)-1]+" file was uploaded on the server"
-    print >> sys.stderr,"************ ok6 "+str(inputs)
+    print("************ ok6 "+str(inputs), file=sys.stderr)
     return 3
 
 def saveOnServer0(conf,inputs,outputs):
     import shutil,json
-    print >> sys.stderr,"ok1 INPUTS "+str(inputs)
-    print >> sys.stderr,"ok1 "+str(conf)
+    print("ok1 INPUTS "+str(inputs), file=sys.stderr)
+    print("ok1 "+str(conf), file=sys.stderr)
     dir=conf["main"]["tmpPath"]+"/data_tmp_1111"+conf["senv"]["MMID"]
     try:
         shutil.os.mkdir(dir)
-    except Exception,e:
-        print >> sys.stderr,str(e)
+    except Exception as e:
+        print(str(e), file=sys.stderr)
         pass
     field="file"
-    print >> sys.stderr,inputs
-    if inputs.has_key("filename"):
+    print(inputs, file=sys.stderr)
+    if "filename" in inputs:
         field=inputs["filename"]["value"]
     tmp=inputs[field]["lref"].split("/")
     outFileName=dir+"/"+tmp[len(tmp)-1]
@@ -116,11 +116,11 @@ def checkFile(conf,inputs,outputs):
         tmp1=tmp[i].split(".")
         t=None
         for j in range(0,len(accepted)):
-            print >> sys.stderr,"Accepted / tmp1"
-            print >> sys.stderr,anames
-            print >> sys.stderr,tmp1
+            print("Accepted / tmp1", file=sys.stderr)
+            print(anames, file=sys.stderr)
+            print(tmp1, file=sys.stderr)
             if tmp1[0] == anames[j].split(".")[0]:
-                print >> sys.stderr,"OK"
+                print("OK", file=sys.stderr)
                 t="OK"
                 break
         if t is None:
@@ -140,7 +140,7 @@ def checkFile(conf,inputs,outputs):
 
     k=0
     i=len(deleted)-1
-    print >> sys.stderr,str(deleted)+" "+str(dnames)
+    print(str(deleted)+" "+str(dnames), file=sys.stderr)
     while i>=0:
         for j in range(0,len(accepted)):
             if len(dnames)>i and anames[j].split(".")[0] == dnames[i].split(".")[0]:
@@ -160,7 +160,7 @@ def checkFile(conf,inputs,outputs):
 
     acceptedList=[]
     for i in range(0,len(accepted)):
-        print >> sys.stderr,i
+        print(i, file=sys.stderr)
         #try:
         shutil.move(dir+"/"+tmp[accepted[i]],conf["main"]["dataPath"]+"/dirs/"+inputs["dest"]["value"]+"/"+tmp[accepted[i]])
         acceptedList+=[tmp[accepted[i]]]
