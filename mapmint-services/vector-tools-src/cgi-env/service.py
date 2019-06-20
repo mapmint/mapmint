@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
 #  Author:   Gérald Fenoy, gerald.fenoy@cartoworks.com
-#  Copyright (c) 2010-2014, Cartoworks Inc. 
-############################################################################### 
+#  Copyright (c) 2010-2014, Cartoworks Inc.
+###############################################################################
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
 #  to deal in the Software without restriction, including without limitation
 #  the rights to use, copy, modify, merge, publish, distribute, sublicense,
 #  and/or sell copies of the Software, and to permit persons to whom the
 #  Software is furnished to do so, subject to the following conditions:
-# 
+#
 #  The above copyright notice and this permission notice shall be included
 #  in all copies or substantial portions of the Software.
-# 
+#
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 #  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 #  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
@@ -146,7 +146,9 @@ def createLayerFromJson(conf, obj, sql=None):
 
 
 def extractInputs(conf, obj, sql=None):
-    if list(obj.keys()).count("cache_file"):
+    # TODO: confirm assumption: "obj" is a Python 3 dictionary object
+    # if list(obj.keys()).count("cache_file"):
+    if "cache_file" in obj:
         print(obj, file=sys.stderr)
         geometry = []
         ds = osgeo.ogr.Open(obj["cache_file"])
@@ -176,12 +178,14 @@ def outputResult(conf, obj, geom):
     if obj["mimeType"] == "application/json":
         driverName = "GeoJSON"
         extension = [".js"]
-    if list(obj.keys()).count("schema") > 0 and \
+    # TODO: confirm assumption: "obj" is a Python 3 dictionary object
+    # if list(obj.keys()).count("schema") > 0 and \
+    if "schema" in obj and \
             obj["schema"] == "http://schemas.opengis.net/kml/2.2.0/ogckml22.xsd":
         driverName = "KML"
         extension = [".kml"]
     drv = osgeo.ogr.GetDriverByName(driverName)
-    # Create virtual file 
+    # Create virtual file
     ds = drv.CreateDataSource("/vsimem/store" + conf["lenv"]["sid"] + extension[0])
     lyr = ds.CreateLayer("Result", None, osgeo.ogr.wkbUnknown)
     i = 0
@@ -273,7 +277,9 @@ def access(conf, inputs, outputs):
     displayCnt = 0
     geometry = []
     sqlResults = []
-    if list(inputs["sql"].keys()).count("value") > 0:
+    # TODO: confirm assumption: inputs["sql"] is a Python 3 dictionary object
+    # if list(inputs["sql"].keys()).count("value") > 0:
+    if "value" in inputs["sql"]:
         lyr = ds.ExecuteSQL(inputs["sql"]["value"], None, 'SQLITE')
         if lyr is None:
             conf["lenv"]["message"] = zoo._("Unable to execute your request: " + inputs["sql"]["value"])
@@ -578,7 +584,7 @@ def UnionOnePy1(conf, inputs, outputs):
     # print >> sys.stderr,"DEUBG"
     multi = osgeo.ogr.Geometry(osgeo.ogr.wkbMultiPolygon)
     # for g in geometries:
-    #    
+    #
     # return multi.UnionCascaded()
     geometryRes = geometry1[0].Clone()
     while i < len(geometry1):
@@ -625,7 +631,7 @@ def UnionOnePy0(conf, inputs, outputs):
     # print >> sys.stderr,"DEUBG"
     multi = osgeo.ogr.Geometry(osgeo.ogr.wkbMultiPolygon)
     # for g in geometries:
-    #    
+    #
     # return multi.UnionCascaded()
     geometryRes = geometry1[0].Clone()
     while i < len(geometry1):
