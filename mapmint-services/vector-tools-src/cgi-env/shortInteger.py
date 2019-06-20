@@ -1,16 +1,16 @@
 import random
 import psycopg2
 
-
 # generate a random bit order
 # you'll need to save this mapping permanently, perhaps just hardcode it
 # map how ever many bits you need to represent your integer space
-mapping = range(38)
+mapping = list(range(38))
 mapping.reverse()
-#random.shuffle(mapping)
+# random.shuffle(mapping)
 
 # alphabet for changing from base 10
 chars = 'abcdefghijklmnopqrstuvwxyz0123456789_-'
+
 
 # shuffle the bits
 def encode(n):
@@ -22,6 +22,7 @@ def encode(n):
             result |= b2
     return result
 
+
 # unshuffle the bits
 def decode(n):
     result = 0
@@ -32,39 +33,43 @@ def decode(n):
             result |= b1
     return result
 
+
 # change the base
 def enbase(x):
     n = len(chars)
     if x < n:
         return chars[x]
-    return enbase(x/n) + chars[x%n]
+    return enbase(x / n) + chars[x % n]
+
 
 # go back to base 10
 def debase(x):
     n = len(chars)
     result = 0
     for i, c in enumerate(reversed(x)):
-        result += chars.index(c) * (n**i)
+        result += chars.index(c) * (n ** i)
     return result
 
-def unShortURL(conf,c):
-    dbstr=""
+
+def unShortURL(conf, c):
+    dbstr = ""
     for i in conf["velodb"]:
-        dbstr+=" "+i+"="+conf["velodb"][i]
-    con=psycopg2.connect(dbstr)
-    cur=con.cursor()
+        dbstr += " " + i + "=" + conf["velodb"][i]
+    con = psycopg2.connect(dbstr)
+    cur = con.cursor()
     try:
         import sys
-        cur.execute("SELECT * from velo.savedpath where trace='"+c+"'")
-        res=cur.fetchall()
-        if len(res)==0:
+        cur.execute("SELECT * from velo.savedpath where trace='" + c + "'")
+        res = cur.fetchall()
+        if len(res) == 0:
             raise
-    except Exception, e:
-        print >> sys.stderr,str(e)
+    except Exception as e:
+        print(str(e), file=sys.stderr)
         raise
     d = debase(c)
     e = decode(d)
     return e
+
 
 def shortURL(a):
     b = encode(a)
@@ -72,7 +77,7 @@ def shortURL(a):
     return c
 
 # test it out
-#for a in range(400):
+# for a in range(400):
 #    b = encode(a)
 #    c = enbase(b)
 #    d = debase(c)
