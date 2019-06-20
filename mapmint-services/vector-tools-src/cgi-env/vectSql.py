@@ -75,7 +75,7 @@ def vectInfo(conf,inputs,outputs):
 
     pszSQLStatement = inputs["q"]["value"]
     pszDataSource = inputs["dstName"]["value"]
-    if inputs.keys().count("dialect")>0 and pszDataSource.count("dbname")==0:
+    if list(inputs.keys()).count("dialect")>0 and pszDataSource.count("dbname")==0:
         pszDialect = inputs["dialect"]["value"]
 
     #papszLayers.append(inputs["dsoName"]["value"])
@@ -96,8 +96,8 @@ def vectInfo(conf,inputs,outputs):
 #/*      Report failure                                                  */
 #/* -------------------------------------------------------------------- */
     if poDS is None:
-        print >>sys.stderr, "FAILURE:\n"\
-            "Unable to open datasource `%s' with the following drivers." % pszDataSource 
+        print("FAILURE:\n"\
+            "Unable to open datasource `%s' with the following drivers." % pszDataSource, file=sys.stderr) 
         conf["lenv"]["message"]="FAILURE:\n"\
             "Unable to open datasource `%s' with the following drivers." % pszDataSource 
         for iDriver in range(ogr.GetDriverCount()):
@@ -109,7 +109,7 @@ def vectInfo(conf,inputs,outputs):
 
     poDS_Name = poDS.GetName()
     if str(type(pszDataSource)) == "<type 'unicode'>" and str(type(poDS_Name)) == "<type 'str'>":
-        poDS_Name = unicode(poDS_Name, "utf8")
+        poDS_Name = str(poDS_Name, "utf8")
 
 #/* -------------------------------------------------------------------- */
 #/*      Special case for -sql clause.  No source layers required.       */
@@ -120,13 +120,13 @@ def vectInfo(conf,inputs,outputs):
         nRepeatCount = 0  #// skip layer reporting.
 
         if papszLayers is not None:
-            print >> sys.stderr, "layer names ignored in combination with -sql."
+            print("layer names ignored in combination with -sql.", file=sys.stderr)
 
         poResultSet = poDS.ExecuteSQL( pszSQLStatement, poSpatialFilter, 
                                         pszDialect )
         
         if poResultSet is None:
-            print >> sys.stderr, (( "failed to run the following SQL statement: %s!") % pszSQLStatement )
+            print((( "failed to run the following SQL statement: %s!") % pszSQLStatement ), file=sys.stderr)
             return 4
         
         if poResultSet is not None:
@@ -147,7 +147,7 @@ def vectInfo(conf,inputs,outputs):
                     poLayer = poDS.GetLayer(iLayer)
 
                     if poLayer is None:
-                        print( "FAILURE: Couldn't fetch advertised layer %d!" % iLayer )
+                        print(( "FAILURE: Couldn't fetch advertised layer %d!" % iLayer ))
                         return 1
 
                     if not bAllLayers:
@@ -172,7 +172,7 @@ def vectInfo(conf,inputs,outputs):
                     poLayer = poDS.GetLayerByName(papszIter)
 
                     if poLayer is None:
-                        print( "FAILURE: Couldn't fetch requested layer %s!" % papszIter )
+                        print(( "FAILURE: Couldn't fetch requested layer %s!" % papszIter ))
                         return 1
 
                     if iRepeat != 0:
@@ -236,7 +236,7 @@ def ReportOnLayer( inputs, res, poLayer, pszWHERE, poSpatialFilter, options ):
 
         poFeature = poLayer.GetFeature( nFetchFID )
         if poFeature is None:
-            print( "Unable to locate feature id %d on this layer." % nFetchFID )
+            print(( "Unable to locate feature id %d on this layer." % nFetchFID ))
 
         else:
             DumpReadableFeature(inputs, res,poFeature, options)
@@ -272,7 +272,7 @@ def DumpReadableFeature( inputs, res, poFeature, options = None ):
     if poFeature.GetStyleString() is not None:
 
         if 'DISPLAY_STYLE' not in options or EQUAL(options['DISPLAY_STYLE'], 'yes'):
-            print >> sys.stderr,"  Style = %s" % GetStyleString() 
+            print("  Style = %s" % GetStyleString(), file=sys.stderr) 
 
     poGeometry = poFeature.GetGeometryRef()
     if poGeometry is not None:
@@ -336,7 +336,7 @@ def DumpReadableGeometry( poGeometry, pszPrefix, options ):
     elif 'DISPLAY_GEOMETRY' not in options or EQUAL(options['DISPLAY_GEOMETRY'], 'yes') \
             or EQUAL(options['DISPLAY_GEOMETRY'], 'WKT'):
 
-        print("%s%s" % (pszPrefix, poGeometry.ExportToWkt() ))
+        print(("%s%s" % (pszPrefix, poGeometry.ExportToWkt() )))
 
     return
 
