@@ -77,7 +77,9 @@ def vectInfo(conf, inputs, outputs):
 
     pszSQLStatement = inputs["q"]["value"]
     pszDataSource = inputs["dstName"]["value"]
-    if list(inputs.keys()).count("dialect") > 0 and pszDataSource.count("dbname") == 0:
+    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+    # if list(inputs.keys()).count("dialect") > 0 and pszDataSource.count("dbname") == 0:
+    if "dialect" in inputs and pszDataSource.count("dbname") == 0:
         pszDialect = inputs["dialect"]["value"]
 
     # papszLayers.append(inputs["dsoName"]["value"])
