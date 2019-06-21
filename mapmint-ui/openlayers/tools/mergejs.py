@@ -43,7 +43,9 @@ import sys
 
 SUFFIX_JAVASCRIPT = ".js"
 
-RE_REQUIRE = "@requires:? (.*)\n" # TODO: Ensure in comment?
+RE_REQUIRE = "@requires:? (.*)\n"  # TODO: Ensure in comment?
+
+
 class SourceFile:
     """
     Represents a Javascript source code file.
@@ -57,7 +59,6 @@ class SourceFile:
 
         self.requiredBy = []
 
-
     def _getRequirements(self):
         """
         Extracts the dependencies specified in the source code and returns
@@ -67,7 +68,6 @@ class SourceFile:
         return re.findall(RE_REQUIRE, self.source)
 
     requires = property(fget=_getRequirements, doc="")
-
 
 
 def usage(filename):
@@ -112,17 +112,18 @@ class Config:
         """
         Parses the content of the named file and stores the values.
         """
-        lines = [re.sub("#.*?$", "", line).strip() # Assumes end-of-line character is present
+        lines = [re.sub("#.*?$", "", line).strip()  # Assumes end-of-line character is present
                  for line in open(filename)
-                 if line.strip() and not line.strip().startswith("#")] # Skip blank lines and comments
+                 if line.strip() and not line.strip().startswith("#")]  # Skip blank lines and comments
 
         self.forceFirst = lines[lines.index("[first]") + 1:lines.index("[last]")]
 
         self.forceLast = lines[lines.index("[last]") + 1:lines.index("[include]")]
-        self.include =  lines[lines.index("[include]") + 1:lines.index("[exclude]")]
-        self.exclude =  lines[lines.index("[exclude]") + 1:]
+        self.include = lines[lines.index("[include]") + 1:lines.index("[exclude]")]
+        self.exclude = lines[lines.index("[exclude]") + 1:]
 
-def run (sourceDirectory, outputFilename = None, configFile = None):
+
+def run(sourceDirectory, outputFilename=None, configFile=None):
     cfg = None
     if configFile:
         cfg = Config(configFile)
@@ -133,7 +134,7 @@ def run (sourceDirectory, outputFilename = None, configFile = None):
     for root, dirs, files in os.walk(sourceDirectory):
         for filename in files:
             if filename.endswith(SUFFIX_JAVASCRIPT) and not filename.startswith("."):
-                filepath = os.path.join(root, filename)[len(sourceDirectory)+1:]
+                filepath = os.path.join(root, filename)[len(sourceDirectory) + 1:]
                 filepath = filepath.replace("\\", "/")
                 if cfg and cfg.include:
                     if filepath in cfg.include or filepath in cfg.forceFirst:
@@ -146,15 +147,15 @@ def run (sourceDirectory, outputFilename = None, configFile = None):
 
     files = {}
 
-    order = [] # List of filepaths to output, in a dependency satisfying order 
+    order = []  # List of filepaths to output, in a dependency satisfying order
 
     ## Import file source code
     ## TODO: Do import when we walk the directories above?
     for filepath in allFiles:
         print("Importing: %s" % filepath)
         fullpath = os.path.join(sourceDirectory, filepath).strip()
-        content = open(fullpath, "U").read() # TODO: Ensure end of line @ EOF?
-        files[filepath] = SourceFile(filepath, content) # TODO: Chop path?
+        content = open(fullpath, "U").read()  # TODO: Ensure end of line @ EOF?
+        files[filepath] = SourceFile(filepath, content)  # TODO: Chop path?
 
     print()
 
@@ -164,12 +165,12 @@ def run (sourceDirectory, outputFilename = None, configFile = None):
     resolution_pass = 1
 
     while not complete:
-        order = [] # List of filepaths to output, in a dependency satisfying order 
+        order = []  # List of filepaths to output, in a dependency satisfying order
         nodes = []
         routes = []
         ## Resolve the dependencies
         print("Resolution pass %s... " % resolution_pass)
-        resolution_pass += 1 
+        resolution_pass += 1
 
         for filepath, info in list(files.items()):
             nodes.append(filepath)
@@ -182,10 +183,8 @@ def run (sourceDirectory, outputFilename = None, configFile = None):
                 if filepath not in files:
                     print("Importing: %s" % filepath)
                     fullpath = os.path.join(sourceDirectory, filepath).strip()
-                    content = open(fullpath, "U").read() # TODO: Ensure end of line @ EOF?
-                    files[filepath] = SourceFile(filepath, content) # TODO: Chop path?
-        
-
+                    content = open(fullpath, "U").read()  # TODO: Ensure end of line @ EOF?
+                    files[filepath] = SourceFile(filepath, content)  # TODO: Chop path?
 
         # Double check all dependencies have been met
         complete = True
@@ -196,18 +195,17 @@ def run (sourceDirectory, outputFilename = None, configFile = None):
                     complete = False
         except:
             complete = False
-        
-        print()    
 
+        print()
 
-    ## Move forced first and last files to the required position
+        ## Move forced first and last files to the required position
     if cfg:
         print("Re-ordering files...")
         order = cfg.forceFirst + [item
-                     for item in order
-                     if ((item not in cfg.forceFirst) and
-                         (item not in cfg.forceLast))] + cfg.forceLast
-    
+                                  for item in order
+                                  if ((item not in cfg.forceFirst) and
+                                      (item not in cfg.forceLast))] + cfg.forceLast
+
     print()
     ## Output the files in the determined order
     result = []
@@ -228,11 +226,12 @@ def run (sourceDirectory, outputFilename = None, configFile = None):
         open(outputFilename, "w").write("".join(result))
     return "".join(result)
 
+
 if __name__ == "__main__":
     import getopt
 
     options, args = getopt.getopt(sys.argv[1:], "-c:")
-    
+
     try:
         outputFilename = args[0]
     except IndexError:
@@ -249,4 +248,4 @@ if __name__ == "__main__":
         configFile = options[0][1]
         print("Parsing configuration file: %s" % filename)
 
-    run( sourceDirectory, outputFilename, configFile )
+    run(sourceDirectory, outputFilename, configFile)
