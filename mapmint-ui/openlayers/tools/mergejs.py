@@ -74,7 +74,7 @@ def usage(filename):
     """
     Displays a usage message.
     """
-    print "%s [-c <config file>] <output.js> <directory> [...]" % filename
+    print("%s [-c <config file>] <output.js> <directory> [...]" % filename)
 
 
 class Config:
@@ -151,12 +151,12 @@ def run (sourceDirectory, outputFilename = None, configFile = None):
     ## Import file source code
     ## TODO: Do import when we walk the directories above?
     for filepath in allFiles:
-        print "Importing: %s" % filepath
+        print("Importing: %s" % filepath)
         fullpath = os.path.join(sourceDirectory, filepath).strip()
         content = open(fullpath, "U").read() # TODO: Ensure end of line @ EOF?
         files[filepath] = SourceFile(filepath, content) # TODO: Chop path?
 
-    print
+    print()
 
     from toposort import toposort
 
@@ -168,10 +168,10 @@ def run (sourceDirectory, outputFilename = None, configFile = None):
         nodes = []
         routes = []
         ## Resolve the dependencies
-        print "Resolution pass %s... " % resolution_pass
+        print("Resolution pass %s... " % resolution_pass)
         resolution_pass += 1 
 
-        for filepath, info in files.items():
+        for filepath, info in list(files.items()):
             nodes.append(filepath)
             for neededFilePath in info.requires:
                 routes.append((neededFilePath, filepath))
@@ -179,8 +179,8 @@ def run (sourceDirectory, outputFilename = None, configFile = None):
         for dependencyLevel in toposort(nodes, routes):
             for filepath in dependencyLevel:
                 order.append(filepath)
-                if not files.has_key(filepath):
-                    print "Importing: %s" % filepath
+                if filepath not in files:
+                    print("Importing: %s" % filepath)
                     fullpath = os.path.join(sourceDirectory, filepath).strip()
                     content = open(fullpath, "U").read() # TODO: Ensure end of line @ EOF?
                     files[filepath] = SourceFile(filepath, content) # TODO: Chop path?
@@ -197,34 +197,34 @@ def run (sourceDirectory, outputFilename = None, configFile = None):
         except:
             complete = False
         
-        print    
+        print()    
 
 
     ## Move forced first and last files to the required position
     if cfg:
-        print "Re-ordering files..."
+        print("Re-ordering files...")
         order = cfg.forceFirst + [item
                      for item in order
                      if ((item not in cfg.forceFirst) and
                          (item not in cfg.forceLast))] + cfg.forceLast
     
-    print
+    print()
     ## Output the files in the determined order
     result = []
 
     for fp in order:
         f = files[fp]
-        print "Exporting: ", f.filepath
+        print("Exporting: ", f.filepath)
         result.append(HEADER % f.filepath)
         source = f.source
         result.append(source)
         if not source.endswith("\n"):
             result.append("\n")
 
-    print "\nTotal files merged: %d " % len(files)
+    print("\nTotal files merged: %d " % len(files))
 
     if outputFilename:
-        print "\nGenerating: %s" % (outputFilename)
+        print("\nGenerating: %s" % (outputFilename))
         open(outputFilename, "w").write("".join(result))
     return "".join(result)
 
@@ -247,6 +247,6 @@ if __name__ == "__main__":
     configFile = None
     if options and options[0][0] == "-c":
         configFile = options[0][1]
-        print "Parsing configuration file: %s" % filename
+        print("Parsing configuration file: %s" % filename)
 
     run( sourceDirectory, outputFilename, configFile )
