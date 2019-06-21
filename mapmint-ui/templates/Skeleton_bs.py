@@ -62,7 +62,9 @@ class Skeleton_bs(Template):
         if not self._CHEETAH__instanceInitialized:
             cheetahKWArgs = {}
             allowedKWs = 'searchList namespaces filter filtersLib errorCatcher'.split()
-            for k, v in list(KWs.items()):
+            # TODO: confirm asumption: "KWs" is a Python 3 dictionary object
+            # for k, v in list(KWs.items()):
+            for k, v in KWs.items():
                 if k in allowedKWs: cheetahKWArgs[k] = v
             self._initCheetahInstance(**cheetahKWArgs)
 
