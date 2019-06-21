@@ -1,11 +1,12 @@
 import sys
 import warnings
-warnings.simplefilter("ignore",DeprecationWarning)
 
-gradiens_registred=[]
+warnings.simplefilter("ignore", DeprecationWarning)
+
+gradiens_registred = []
+
 
 def write_png(filename, width, height, rgb_func):
-
     import zlib
     import struct
     import array
@@ -15,7 +16,7 @@ def write_png(filename, width, height, rgb_func):
         out.write(chunk_type)
         out.write(data)
         checksum = zlib.crc32(data, zlib.crc32(chunk_type))
-	out.write(struct.pack("!I", checksum))
+        out.write(struct.pack("!I", checksum))
 
     def get_data(width, height, rgb_func):
         fw = float(width)
@@ -39,8 +40,10 @@ def write_png(filename, width, height, rgb_func):
     output_chunk(out, "IEND", "")
     out.close()
 
+
 def linear_gradient(start_value, stop_value, start_offset=0.0, stop_offset=1.0):
     return lambda offset: (start_value + ((offset - start_offset) / (stop_offset - start_offset) * (stop_value - start_value))) / 255.0
+
 
 def gradient(DATA):
     def gradient_function(x, y):
@@ -51,10 +54,12 @@ def gradient(DATA):
                 r = linear_gradient(start[0], end[0], initial_offset, offset)(x)
                 g = linear_gradient(start[1], end[1], initial_offset, offset)(x)
                 b = linear_gradient(start[2], end[2], initial_offset, offset)(x)
-		gradiens_registred+=[str(int(r*255.0)) + ' '+ str(int(g*255.0)) + ' '+ str(int(b*255.0))]
+                gradiens_registred += [str(int(r * 255.0)) + ' ' + str(int(g * 255.0)) + ' ' + str(int(b * 255.0))]
                 return r, g, b
             initial_offset = offset
+
     return gradient_function
+
 
 ### EXAMPLES
 
@@ -63,8 +68,8 @@ write_png("test1.png", 5, 1, gradient([
 ]))
 
 unlink("test1.png")
-print gradiens_registred
-gradiens_registred=[]
+print(gradiens_registred)
+gradiens_registred = []
 
 # body background from jtauber.com and quisition.com
 write_png("test2.png", 100, 1, gradient([
