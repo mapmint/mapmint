@@ -172,7 +172,9 @@ def run(sourceDirectory, outputFilename=None, configFile=None):
         print("Resolution pass %s... " % resolution_pass)
         resolution_pass += 1
 
-        for filepath, info in list(files.items()):
+        # TODO: confirm assumption: "files" is a Python 3 dictionary object
+        # for filepath, info in list(files.items()):
+        for filepath, info in files.items():
             nodes.append(filepath)
             for neededFilePath in info.requires:
                 routes.append((neededFilePath, filepath))
