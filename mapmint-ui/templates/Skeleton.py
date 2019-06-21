@@ -12,7 +12,7 @@ import os.path
 try:
     import builtins as builtin
 except ImportError:
-    import __builtin__ as builtin
+    import builtins as builtin
 from os.path import getmtime, exists
 import time
 import types
@@ -63,7 +63,7 @@ class Skeleton(Template):
         if not self._CHEETAH__instanceInitialized:
             cheetahKWArgs = {}
             allowedKWs = 'searchList namespaces filter filtersLib errorCatcher'.split()
-            for k,v in KWs.items():
+            for k,v in list(KWs.items()):
                 if k in allowedKWs: cheetahKWArgs[k] = v
             self._initCheetahInstance(**cheetahKWArgs)
         
@@ -86,7 +86,7 @@ class Skeleton(Template):
         ########################################
         ## START - generated method body
         
-        write(u'''<!DOCTYPE html> 
+        write('''<!DOCTYPE html> 
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -94,89 +94,89 @@ class Skeleton(Template):
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="description" content="''')
         _v = VFN(VFFSL(SL,"zoo",True),"_",False)("MapMint: Professional SDI manager") # u'$zoo._("MapMint: Professional SDI manager")' on line 13, col 35
-        if _v is not None: write(_filter(_v, rawExpr=u'$zoo._("MapMint: Professional SDI manager")')) # from line 13, col 35.
-        write(u'''">
+        if _v is not None: write(_filter(_v, rawExpr='$zoo._("MapMint: Professional SDI manager")')) # from line 13, col 35.
+        write('''">
 <meta name="keywords" content="MapMint, SDI, Geospatial, Web GIS, GIS, WPS, WMS, WFS, WCS, ZOO-Project, ZOO, ZOO WPS, MapServer, GDAL, OSGeo, FOSS4G, OGC, OWS">
 <meta name="copyright" content="''')
         _v = VFFSL(SL,"conf",True)["provider"]["providerName"] # u'$conf["provider"]["providerName"]' on line 15, col 33
-        if _v is not None: write(_filter(_v, rawExpr=u'$conf["provider"]["providerName"]')) # from line 15, col 33.
-        write(u'''">
+        if _v is not None: write(_filter(_v, rawExpr='$conf["provider"]["providerName"]')) # from line 15, col 33.
+        write('''">
 <meta name="author" content="''')
         _v = VFFSL(SL,"conf",True)["provider"]["providerName"] # u'$conf["provider"]["providerName"]' on line 16, col 30
-        if _v is not None: write(_filter(_v, rawExpr=u'$conf["provider"]["providerName"]')) # from line 16, col 30.
-        write(u'''">
+        if _v is not None: write(_filter(_v, rawExpr='$conf["provider"]["providerName"]')) # from line 16, col 30.
+        write('''">
 <link rel="shortcut icon" href="''')
         _v = VFFSL(SL,"conf",True)["main"]["mmAddress"] # u'$conf["main"]["mmAddress"]' on line 17, col 33
-        if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["mmAddress"]')) # from line 17, col 33.
-        write(u'''/favicon.ico" />
+        if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["mmAddress"]')) # from line 17, col 33.
+        write('''/favicon.ico" />
 <link rel="alternate" type="application/rss+xml" title="MapMint RSS Feed" href="''')
         _v = VFFSL(SL,"conf",True)["main"]["applicationAddress"] # u'$(conf["main"]["applicationAddress"])' on line 18, col 81
-        if _v is not None: write(_filter(_v, rawExpr=u'$(conf["main"]["applicationAddress"])')) # from line 18, col 81.
-        write(u'''public/rss" />
+        if _v is not None: write(_filter(_v, rawExpr='$(conf["main"]["applicationAddress"])')) # from line 18, col 81.
+        write('''public/rss" />
 <title>''')
         _v = VFFSL(SL,"page_title",True) # u'$page_title' on line 19, col 8
-        if _v is not None: write(_filter(_v, rawExpr=u'$page_title')) # from line 19, col 8.
-        write(u'''</title>
+        if _v is not None: write(_filter(_v, rawExpr='$page_title')) # from line 19, col 8.
+        write('''</title>
 ''')
         for f in VFFSL(SL,"ocss",True): # generated from line 20, col 1
-            write(u'''<link type="text/css" rel="stylesheet" href="''')
+            write('''<link type="text/css" rel="stylesheet" href="''')
             if VFFSL(SL,"f",True)[0:7]=='http://': # generated from line 21, col 46
                 _v = VFFSL(SL,"f",True) # u'$f' on line 21, col 69
-                if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 21, col 69.
+                if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 21, col 69.
             else: # generated from line 21, col 71
                 _v = VFFSL(SL,"conf",True)["main"]["mmAddress"] # u'$conf["main"]["mmAddress"]' on line 21, col 77
-                if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["mmAddress"]')) # from line 21, col 77.
-                write(u'''/css/''')
+                if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["mmAddress"]')) # from line 21, col 77.
+                write('''/css/''')
                 _v = VFFSL(SL,"f",True) # u'$f' on line 21, col 108
-                if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 21, col 108.
-            write(u'''" />
+                if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 21, col 108.
+            write('''" />
 ''')
-        write(u'''
+        write('''
 
 ''')
         for f in VFFSL(SL,"css",True): # generated from line 26, col 1
-            write(u'''<link type="text/css" rel="stylesheet" ''')
+            write('''<link type="text/css" rel="stylesheet" ''')
             if (VFN(VFN(VFFSL(SL,"conf",True),"keys",False)(),"count",False)("senv")>0 and VFN(VFN(VFFSL(SL,"conf",True)["senv"],"keys",False)(),"count",False)("loggedin")>0 and VFFSL(SL,"conf",True)["senv"]["loggedin"]): # generated from line 27, col 40
-                write(u'''media="screen" title="''')
+                write('''media="screen" title="''')
                 if VFN(VFFSL(SL,"conf",True)["mm"],"has_key",False)("adminTheme"): # generated from line 27, col 172
                     _v = VFFSL(SL,"conf",True)["mm"]["adminTheme"] # u'$conf["mm"]["adminTheme"]' on line 27, col 210
-                    if _v is not None: write(_filter(_v, rawExpr=u'$conf["mm"]["adminTheme"]')) # from line 27, col 210.
+                    if _v is not None: write(_filter(_v, rawExpr='$conf["mm"]["adminTheme"]')) # from line 27, col 210.
                 else: # generated from line 27, col 235
                     _v = VFFSL(SL,"f",True) # u'$f' on line 27, col 241
-                    if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 27, col 241.
-                write(u'''"''')
-            write(u''' href="''')
+                    if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 27, col 241.
+                write('''"''')
+            write(''' href="''')
             if VFFSL(SL,"f",True)[0:7]=='http://': # generated from line 27, col 267
                 _v = VFFSL(SL,"f",True) # u'$f' on line 27, col 290
-                if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 27, col 290.
+                if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 27, col 290.
             else: # generated from line 27, col 292
                 _v = VFFSL(SL,"conf",True)["main"]["mmAddress"] # u'$conf["main"]["mmAddress"]' on line 27, col 298
-                if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["mmAddress"]')) # from line 27, col 298.
-                write(u'''/css/''')
+                if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["mmAddress"]')) # from line 27, col 298.
+                write('''/css/''')
                 if VFN(VFFSL(SL,"conf",True)["mm"],"has_key",False)("adminTheme"): # generated from line 27, col 329
                     _v = VFFSL(SL,"conf",True)["mm"]["adminTheme"] # u'$conf["mm"]["adminTheme"]' on line 27, col 367
-                    if _v is not None: write(_filter(_v, rawExpr=u'$conf["mm"]["adminTheme"]')) # from line 27, col 367.
+                    if _v is not None: write(_filter(_v, rawExpr='$conf["mm"]["adminTheme"]')) # from line 27, col 367.
                 else: # generated from line 27, col 392
                     _v = VFFSL(SL,"f",True) # u'$f' on line 27, col 398
-                    if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 27, col 398.
-            write(u'''" id="''')
+                    if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 27, col 398.
+            write('''" id="''')
             if VFN(VFFSL(SL,"conf",True)["mm"],"has_key",False)("adminTheme"): # generated from line 27, col 422
                 _v = VFFSL(SL,"conf",True)["mm"]["adminTheme"] # u'$conf["mm"]["adminTheme"]' on line 27, col 460
-                if _v is not None: write(_filter(_v, rawExpr=u'$conf["mm"]["adminTheme"]')) # from line 27, col 460.
+                if _v is not None: write(_filter(_v, rawExpr='$conf["mm"]["adminTheme"]')) # from line 27, col 460.
             else: # generated from line 27, col 485
                 _v = VFFSL(SL,"f",True) # u'$f' on line 27, col 491
-                if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 27, col 491.
-            write(u'''" />
+                if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 27, col 491.
+            write('''" />
 ''')
-        write(u'''<link type="text/css" rel="stylesheet" href="''')
+        write('''<link type="text/css" rel="stylesheet" href="''')
         _v = VFFSL(SL,"conf",True)["main"]["mmAddress"] # u'$conf["main"]["mmAddress"]' on line 29, col 46
-        if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["mmAddress"]')) # from line 29, col 46.
-        write(u'''/new-themes/themes/default/loader.css" /> 
+        if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["mmAddress"]')) # from line 29, col 46.
+        write('''/new-themes/themes/default/loader.css" /> 
 <!--[if IE]>
         <link rel="stylesheet" type="text/css" href="''')
         _v = VFFSL(SL,"conf",True)["main"]["mmAddress"] # u'$conf["main"]["mmAddress"]' on line 31, col 54
-        if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["mmAddress"]')) # from line 31, col 54.
-        write(u'''/css/all-ie-only.css" />
+        if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["mmAddress"]')) # from line 31, col 54.
+        write('''/css/all-ie-only.css" />
 <![endif]-->
 
 ''')
@@ -186,136 +186,136 @@ class Skeleton(Template):
             else: # generated from line 37, col 1
                 finalJS = ""
             ljs = ['flexigrid.js']+VFFSL(SL,"js",True)+['MLayout.js']
-            write(u'''<script type="text/javascript" src="''')
+            write('''<script type="text/javascript" src="''')
             _v = VFFSL(SL,"conf",True)["main"]["mmAddress"] # u'$conf["main"]["mmAddress"]' on line 41, col 37
-            if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["mmAddress"]')) # from line 41, col 37.
-            write(u'''/js/''')
+            if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["mmAddress"]')) # from line 41, col 37.
+            write('''/js/''')
             for f in ["modernizr.custom","jquery-2.0.3.min","jquery-ui-1.10.3",'jquery.notifyBar','jquery.easyui.min','jquery.layout-latest']: # generated from line 41, col 67
                 _v = VFFSL(SL,"f",True) # u'${f}' on line 41, col 199
-                if _v is not None: write(_filter(_v, rawExpr=u'${f}')) # from line 41, col 199.
-                write(u'''.js,''')
-            write(u'''"></script>
+                if _v is not None: write(_filter(_v, rawExpr='${f}')) # from line 41, col 199.
+                write('''.js,''')
+            write('''"></script>
 
 ''')
             if len(VFFSL(SL,"ljs",True))>0: # generated from line 43, col 1
-                write(u'''<script type="text/javascript" src="''')
+                write('''<script type="text/javascript" src="''')
                 _v = VFFSL(SL,"conf",True)["main"]["mmAddress"] # u'$conf["main"]["mmAddress"]' on line 44, col 37
-                if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["mmAddress"]')) # from line 44, col 37.
-                write(u'''/js/''')
+                if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["mmAddress"]')) # from line 44, col 37.
+                write('''/js/''')
                 for f in VFFSL(SL,"ljs",True): # generated from line 44, col 67
                     if VFFSL(SL,"finalJS",True)!=VFFSL(SL,"f",True): # generated from line 44, col 83
                         _v = VFFSL(SL,"f",True) # u'$f' on line 44, col 100
-                        if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 44, col 100.
-                        write(u''',''')
-                write(u'''"></script>
+                        if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 44, col 100.
+                        write(''',''')
+                write('''"></script>
 ''')
                 if VFFSL(SL,"finalJS",True)!="": # generated from line 45, col 1
-                    write(u'''<script src="''')
+                    write('''<script src="''')
                     _v = VFFSL(SL,"conf",True)["main"]["mmAddress"] # u'$conf["main"]["mmAddress"]' on line 46, col 14
-                    if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["mmAddress"]')) # from line 46, col 14.
-                    write(u'''/js/''')
+                    if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["mmAddress"]')) # from line 46, col 14.
+                    write('''/js/''')
                     _v = VFFSL(SL,"finalJS",True) # u'$finalJS' on line 46, col 44
-                    if _v is not None: write(_filter(_v, rawExpr=u'$finalJS')) # from line 46, col 44.
-                    write(u'''"></script>
+                    if _v is not None: write(_filter(_v, rawExpr='$finalJS')) # from line 46, col 44.
+                    write('''"></script>
 ''')
-            write(u'''
+            write('''
 
 ''')
             for f in VFFSL(SL,"js1",True): # generated from line 51, col 1
-                write(u'''<script type="text/javascript" src="''')
+                write('''<script type="text/javascript" src="''')
                 _v = VFFSL(SL,"conf",True)['main']['serverAddress'] # u"$conf['main']['serverAddress']" on line 52, col 37
-                if _v is not None: write(_filter(_v, rawExpr=u"$conf['main']['serverAddress']")) # from line 52, col 37.
-                write(u'''?request=Execute&service=WPS&version=1.0.0&Identifier=template.display&DataInputs=tmpl=''')
+                if _v is not None: write(_filter(_v, rawExpr="$conf['main']['serverAddress']")) # from line 52, col 37.
+                write('''?request=Execute&service=WPS&version=1.0.0&Identifier=template.display&DataInputs=tmpl=''')
                 _v = VFFSL(SL,"f",True) # u'$f' on line 52, col 154
-                if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 52, col 154.
-                write(u''';module=''')
+                if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 52, col 154.
+                write(''';module=''')
                 _v = VFFSL(SL,"mmodule",True) # u'$mmodule' on line 52, col 164
-                if _v is not None: write(_filter(_v, rawExpr=u'$mmodule')) # from line 52, col 164.
-                write(u'''&RawDataOutput=Result@mimeType=text/plain"></script>
+                if _v is not None: write(_filter(_v, rawExpr='$mmodule')) # from line 52, col 164.
+                write('''&RawDataOutput=Result@mimeType=text/plain"></script>
 ''')
-            write(u'''
+            write('''
 
 ''')
             for f in VFFSL(SL,"js2",True): # generated from line 57, col 1
-                write(u'''<script type="text/javascript" src="''')
+                write('''<script type="text/javascript" src="''')
                 _v = VFFSL(SL,"f",True) # u'$f' on line 58, col 37
-                if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 58, col 37.
-                write(u'''"></script>
+                if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 58, col 37.
+                write('''"></script>
 ''')
-            write(u'''
+            write('''
 
 ''')
             if len(VFFSL(SL,"js3",True))>0: # generated from line 62, col 1
                 for f in VFFSL(SL,"js3",True): # generated from line 63, col 1
-                    write(u'''<script type="text/javascript" src="''')
+                    write('''<script type="text/javascript" src="''')
                     _v = VFFSL(SL,"conf",True)["main"]["publicationUrl"] # u'$conf["main"]["publicationUrl"]' on line 64, col 37
-                    if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["publicationUrl"]')) # from line 64, col 37.
-                    write(u'''/''')
+                    if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["publicationUrl"]')) # from line 64, col 37.
+                    write('''/''')
                     _v = VFFSL(SL,"f",True) # u'$f' on line 64, col 69
-                    if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 64, col 69.
-                    write(u'''"></script>
+                    if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 64, col 69.
+                    write('''"></script>
 ''')
-            write(u'''
+            write('''
 ''')
         else: # generated from line 68, col 1
             for f in ["jquery-2.0.3.min","jquery-ui-1.10.3",'jquery.notifyBar','jquery.easyui.min','jquery.layout-latest']: # generated from line 69, col 1
-                write(u'''<script type="text/javascript" src="''')
+                write('''<script type="text/javascript" src="''')
                 _v = VFFSL(SL,"conf",True)["main"]["mmAddress"] # u'$conf["main"]["mmAddress"]' on line 70, col 37
-                if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["mmAddress"]')) # from line 70, col 37.
-                write(u'''/js/''')
+                if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["mmAddress"]')) # from line 70, col 37.
+                write('''/js/''')
                 _v = VFFSL(SL,"f",True) # u'${f}' on line 70, col 67
-                if _v is not None: write(_filter(_v, rawExpr=u'${f}')) # from line 70, col 67.
-                write(u'''.js"></script>
+                if _v is not None: write(_filter(_v, rawExpr='${f}')) # from line 70, col 67.
+                write('''.js"></script>
 ''')
-            write(u'''
+            write('''
 ''')
             ljs = ['flexigrid.js']+VFFSL(SL,"js",True)+['MLayout.js']
             for f in VFFSL(SL,"ljs",True): # generated from line 74, col 1
-                write(u'''<script type="text/javascript" src="''')
+                write('''<script type="text/javascript" src="''')
                 _v = VFFSL(SL,"conf",True)["main"]["mmAddress"] # u'$conf["main"]["mmAddress"]' on line 75, col 37
-                if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["mmAddress"]')) # from line 75, col 37.
-                write(u'''/js/''')
+                if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["mmAddress"]')) # from line 75, col 37.
+                write('''/js/''')
                 _v = VFFSL(SL,"f",True) # u'$f' on line 75, col 67
-                if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 75, col 67.
-                write(u'''"></script>
+                if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 75, col 67.
+                write('''"></script>
 ''')
-            write(u'''
+            write('''
 ''')
             for f in VFFSL(SL,"js1",True): # generated from line 78, col 1
-                write(u'''<script type="text/javascript" src="''')
+                write('''<script type="text/javascript" src="''')
                 _v = VFFSL(SL,"conf",True)['main']['serverAddress'] # u"$conf['main']['serverAddress']" on line 79, col 37
-                if _v is not None: write(_filter(_v, rawExpr=u"$conf['main']['serverAddress']")) # from line 79, col 37.
-                write(u'''?request=Execute&service=WPS&version=1.0.0&Identifier=template.display&DataInputs=tmpl=''')
+                if _v is not None: write(_filter(_v, rawExpr="$conf['main']['serverAddress']")) # from line 79, col 37.
+                write('''?request=Execute&service=WPS&version=1.0.0&Identifier=template.display&DataInputs=tmpl=''')
                 _v = VFFSL(SL,"f",True) # u'$f' on line 79, col 154
-                if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 79, col 154.
-                write(u''';module=''')
+                if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 79, col 154.
+                write(''';module=''')
                 _v = VFFSL(SL,"mmodule",True) # u'$mmodule' on line 79, col 164
-                if _v is not None: write(_filter(_v, rawExpr=u'$mmodule')) # from line 79, col 164.
-                write(u'''&RawDataOutput=Result@mimeType=text/plain"></script>
+                if _v is not None: write(_filter(_v, rawExpr='$mmodule')) # from line 79, col 164.
+                write('''&RawDataOutput=Result@mimeType=text/plain"></script>
 ''')
-            write(u'''
+            write('''
 
 ''')
             for f in VFFSL(SL,"js2",True): # generated from line 84, col 1
-                write(u'''<script type="text/javascript" src="''')
+                write('''<script type="text/javascript" src="''')
                 _v = VFFSL(SL,"f",True) # u'$f' on line 85, col 37
-                if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 85, col 37.
-                write(u'''"></script>
+                if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 85, col 37.
+                write('''"></script>
 ''')
-            write(u'''
+            write('''
 ''')
             for f in VFFSL(SL,"js3",True): # generated from line 88, col 1
-                write(u'''<script type="text/javascript" src="''')
+                write('''<script type="text/javascript" src="''')
                 _v = VFFSL(SL,"conf",True)["main"]["publicationUrl"] # u'$conf["main"]["publicationUrl"]' on line 89, col 37
-                if _v is not None: write(_filter(_v, rawExpr=u'$conf["main"]["publicationUrl"]')) # from line 89, col 37.
-                write(u'''/''')
+                if _v is not None: write(_filter(_v, rawExpr='$conf["main"]["publicationUrl"]')) # from line 89, col 37.
+                write('''/''')
                 _v = VFFSL(SL,"f",True) # u'$f' on line 89, col 69
-                if _v is not None: write(_filter(_v, rawExpr=u'$f')) # from line 89, col 69.
-                write(u'''"></script>
+                if _v is not None: write(_filter(_v, rawExpr='$f')) # from line 89, col 69.
+                write('''"></script>
 ''')
-            write(u'''
+            write('''
 ''')
-        write(u'''
+        write('''
 </head>
 <body>
 
@@ -325,14 +325,14 @@ class Skeleton(Template):
         except: # generated from line 99, col 1
             verr = None
         if VFFSL(SL,"mmodule",True)!="public": # generated from line 102, col 1
-            write(u'''<div class="loader-container"> 
+            write('''<div class="loader-container"> 
 <div id="loader"> 
 </div> 
 </div> 
 
 ''')
             if (VFN(VFN(VFFSL(SL,"conf",True),"keys",False)(),"count",False)("senv")>0 and VFN(VFN(VFFSL(SL,"conf",True)["senv"],"keys",False)(),"count",False)("loggedin")>0 and VFN(VFN(VFFSL(SL,"conf",True)["senv"],"keys",False)(),"count",False)("lastname")>0 and VFFSL(SL,"conf",True)["senv"]["loggedin"]!="false") and not(VFFSL(SL,"verr",True)): # generated from line 108, col 1
-                write(u'''<div class="ui-layout-north">
+                write('''<div class="ui-layout-north">
 
 <h1 class="ttitle"><span class="logo"></span>Map<span class="mint">Mint</span></h1>
 
@@ -346,36 +346,36 @@ class Skeleton(Template):
                         menu = ['Dashboard','Distiller','Manager','Themes','Documents','Publisher']
                     else: # generated from line 120, col 1
                         menu = ['Dashboard','Distiller','Manager','Themes','Publisher']
-                write(u'''
+                write('''
 ''')
                 for a in VFFSL(SL,"menu",True): # generated from line 125, col 1
-                    write(u'''    <li class="current">
+                    write('''    <li class="current">
 ''')
                     if VFFSL(SL,"inputs",True)['tmpl']['value']==VFFSL(SL,"a",True): # generated from line 127, col 1
-                        write(u'''      <a href="''')
+                        write('''      <a href="''')
                         _v = VFFSL(SL,"a",True) # u'$a' on line 128, col 16
-                        if _v is not None: write(_filter(_v, rawExpr=u'$a')) # from line 128, col 16.
-                        write(u'''" id="''')
+                        if _v is not None: write(_filter(_v, rawExpr='$a')) # from line 128, col 16.
+                        write('''" id="''')
                         _v = VFFSL(SL,"a",True) # u'${a}' on line 128, col 24
-                        if _v is not None: write(_filter(_v, rawExpr=u'${a}')) # from line 128, col 24.
-                        write(u'''_button" class="ui-state-active">
+                        if _v is not None: write(_filter(_v, rawExpr='${a}')) # from line 128, col 24.
+                        write('''_button" class="ui-state-active">
 ''')
                     else: # generated from line 129, col 1
-                        write(u'''      <a href="''')
+                        write('''      <a href="''')
                         _v = VFFSL(SL,"a",True) # u'$a' on line 130, col 16
-                        if _v is not None: write(_filter(_v, rawExpr=u'$a')) # from line 130, col 16.
-                        write(u'''" id="''')
+                        if _v is not None: write(_filter(_v, rawExpr='$a')) # from line 130, col 16.
+                        write('''" id="''')
                         _v = VFFSL(SL,"a",True) # u'${a}' on line 130, col 24
-                        if _v is not None: write(_filter(_v, rawExpr=u'${a}')) # from line 130, col 24.
-                        write(u'''_button">
+                        if _v is not None: write(_filter(_v, rawExpr='${a}')) # from line 130, col 24.
+                        write('''_button">
 ''')
-                    write(u'''    ''')
+                    write('''    ''')
                     _v = VFN(VFFSL(SL,"zoo",True),"_",False)(VFFSL(SL,"a",True)) # u'$zoo._($a)' on line 132, col 5
-                    if _v is not None: write(_filter(_v, rawExpr=u'$zoo._($a)')) # from line 132, col 5.
-                    write(u'''</a>
+                    if _v is not None: write(_filter(_v, rawExpr='$zoo._($a)')) # from line 132, col 5.
+                    write('''</a>
     </li>
 ''')
-                write(u'''
+                write('''
   </ul>
 
 </div>
@@ -383,49 +383,49 @@ class Skeleton(Template):
 <div class="admin">
     <h2 class="ad">''')
                 _v = VFFSL(SL,"conf",True)["senv"]["firstname"] # u'$conf["senv"]["firstname"]' on line 141, col 20
-                if _v is not None: write(_filter(_v, rawExpr=u'$conf["senv"]["firstname"]')) # from line 141, col 20.
-                write(u''' ''')
+                if _v is not None: write(_filter(_v, rawExpr='$conf["senv"]["firstname"]')) # from line 141, col 20.
+                write(''' ''')
                 _v = VFFSL(SL,"conf",True)["senv"]["lastname"] # u'$conf["senv"]["lastname"]' on line 141, col 47
-                if _v is not None: write(_filter(_v, rawExpr=u'$conf["senv"]["lastname"]')) # from line 141, col 47.
-                write(u'''</h2>
+                if _v is not None: write(_filter(_v, rawExpr='$conf["senv"]["lastname"]')) # from line 141, col 47.
+                write('''</h2>
 <ul class="sets">
                 <li class="sett"><a href="#" id="users_admin" title="" onclick="System.UserPreferences()">''')
                 _v = VFN(VFFSL(SL,"zoo",True),"_",False)("Preferences") # u'$zoo._("Preferences")' on line 143, col 107
-                if _v is not None: write(_filter(_v, rawExpr=u'$zoo._("Preferences")')) # from line 143, col 107.
-                write(u'''</a></li>
+                if _v is not None: write(_filter(_v, rawExpr='$zoo._("Preferences")')) # from line 143, col 107.
+                write('''</a></li>
 ''')
                 groups = mm_access.getGroup(VFFSL(SL,"conf",True))
                 if VFN(VFFSL(SL,"groups",True),"count",False)("admin")>0: # generated from line 146, col 1
-                    write(u'''                <li class="user"><a href="#" id="user_management" title="" onclick="System.UserManagement()">''')
+                    write('''                <li class="user"><a href="#" id="user_management" title="" onclick="System.UserManagement()">''')
                     _v = VFN(VFFSL(SL,"zoo",True),"_",False)("Users management") # u'$zoo._("Users management")' on line 147, col 110
-                    if _v is not None: write(_filter(_v, rawExpr=u'$zoo._("Users management")')) # from line 147, col 110.
-                    write(u'''</a></li>
+                    if _v is not None: write(_filter(_v, rawExpr='$zoo._("Users management")')) # from line 147, col 110.
+                    write('''</a></li>
 ''')
-                write(u'''                <li class="logt"><a href="#" id="logout" title="">''')
+                write('''                <li class="logt"><a href="#" id="logout" title="">''')
                 _v = VFN(VFFSL(SL,"zoo",True),"_",False)("Log out") # u'$zoo._("Log out")' on line 149, col 67
-                if _v is not None: write(_filter(_v, rawExpr=u'$zoo._("Log out")')) # from line 149, col 67.
-                write(u'''</a></li>
+                if _v is not None: write(_filter(_v, rawExpr='$zoo._("Log out")')) # from line 149, col 67.
+                write('''</a></li>
         </ul>
         
 </div>
 
 ''')
-        write(u'''
+        write('''
 ''')
         _v = VFFSL(SL,"body",True) # u'$body' on line 157, col 1
-        if _v is not None: write(_filter(_v, rawExpr=u'$body')) # from line 157, col 1.
-        write(u'''
+        if _v is not None: write(_filter(_v, rawExpr='$body')) # from line 157, col 1.
+        write('''
 
 ''')
         if VFFSL(SL,"mmodule",True)!="public" and (VFN(VFN(VFFSL(SL,"conf",True),"keys",False)(),"count",False)("senv")>0 and VFFSL(SL,"conf",True)["senv"]["loggedin"]!="false" and VFN(VFN(VFFSL(SL,"conf",True)["senv"],"keys",False)(),"count",False)("firstname")>0) and not(VFFSL(SL,"verr",True)): # generated from line 159, col 1
-            write(u'''<div class="ui-layout-south"> 
+            write('''<div class="ui-layout-south"> 
   <p class="credits">&copy; copyright <a href="''')
             _v = VFFSL(SL,"conf",True)["provider"]["providerSite"] # u'$conf["provider"]["providerSite"]' on line 161, col 48
-            if _v is not None: write(_filter(_v, rawExpr=u'$conf["provider"]["providerSite"]')) # from line 161, col 48.
-            write(u'''">''')
+            if _v is not None: write(_filter(_v, rawExpr='$conf["provider"]["providerSite"]')) # from line 161, col 48.
+            write('''">''')
             _v = VFFSL(SL,"conf",True)["provider"]["providerName"] # u'$conf["provider"]["providerName"]' on line 161, col 83
-            if _v is not None: write(_filter(_v, rawExpr=u'$conf["provider"]["providerName"]')) # from line 161, col 83.
-            write(u'''</a></p>
+            if _v is not None: write(_filter(_v, rawExpr='$conf["provider"]["providerName"]')) # from line 161, col 83.
+            write('''</a></p>
 <!--<div class="progress_box_call"></div>-->\t
 <div id="progress_bar" class="ui-progress-bar ui-container">
 <div class="ui-progress" style="width: 79%;">
@@ -435,20 +435,20 @@ class Skeleton(Template):
 ''')
         else: # generated from line 168, col 1
             if VFN(VFN(VFFSL(SL,"conf",True)["mm"],"keys",False)(),"count",False)("nofooter")==0 or (VFFSL(SL,"conf",True)["mm"]["nofooter"]!="true" and VFN(VFN(VFFSL(SL,"conf",True)["mm"],"keys",False)(),"count",False)("nofooter")>0): # generated from line 169, col 1
-                write(u'''<ul class="credits">
+                write('''<ul class="credits">
 <li>&copy; copyright <a href="''')
                 _v = VFFSL(SL,"conf",True)["provider"]["providerSite"] # u'$conf["provider"]["providerSite"]' on line 171, col 31
-                if _v is not None: write(_filter(_v, rawExpr=u'$conf["provider"]["providerSite"]')) # from line 171, col 31.
-                write(u'''">''')
+                if _v is not None: write(_filter(_v, rawExpr='$conf["provider"]["providerSite"]')) # from line 171, col 31.
+                write('''">''')
                 _v = VFFSL(SL,"conf",True)["provider"]["providerName"] # u'$conf["provider"]["providerName"]' on line 171, col 66
-                if _v is not None: write(_filter(_v, rawExpr=u'$conf["provider"]["providerName"]')) # from line 171, col 66.
-                write(u'''</a></li>|&#160;&#160;<li><a href="http://www.mapmint.com">''')
+                if _v is not None: write(_filter(_v, rawExpr='$conf["provider"]["providerName"]')) # from line 171, col 66.
+                write('''</a></li>|&#160;&#160;<li><a href="http://www.mapmint.com">''')
                 _v = VFN(VFFSL(SL,"zoo",True),"_",False)("Terms of use") # u'$zoo._("Terms of use")' on line 171, col 158
-                if _v is not None: write(_filter(_v, rawExpr=u'$zoo._("Terms of use")')) # from line 171, col 158.
-                write(u'''</a></li>
+                if _v is not None: write(_filter(_v, rawExpr='$zoo._("Terms of use")')) # from line 171, col 158.
+                write('''</a></li>
 </ul>
 ''')
-        write(u'''
+        write('''
 </div>
 </body>
 </html>
