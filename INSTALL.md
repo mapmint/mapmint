@@ -8,7 +8,7 @@ as a basic UNIX user, not root.
 ```sh
 sudo apt-get install flex bison libfcgi-dev libxml2 libxml2-dev curl
 openssl autoconf apache2 python-software-properties subversion git
-libmozjs185-dev python-dev build-essential libfreetype6-dev
+libmozjs185-dev python3-dev build-essential libfreetype6-dev
 libproj-dev libgdal1-dev libcairo2-dev apache2-dev libxslt1-dev
 python-cheetah cssmin python-psycopg2 python-gdal python-libxslt1
 postgresql-9.3  r-base cmake gdal-bin libapache2-mod-fcgid ghostscript
@@ -41,7 +41,7 @@ wget http://download.osgeo.org/mapserver/mapserver-6.2.0.tar.gz
 tar -xvf mapserver-6.2.0.tar.gz
 
 cd mapserver-6.2.0
-./configure --with-wfs --with-python --with-freetype=/usr/ --with-ogr --with-gdal --with-proj --with-geos --with-cairo --with-kml --with-wmsclient --with-wfsclient --with-wcs --with-sos --with-python=/usr/bin/python2.7 --without-gif --with-apache-module --with-apxs=/usr/bin/apxs2 --with-apr-config=/usr/bin/apr-1-config --enable-python-mapscript --with-zlib --prefix=/usr/
+./configure --with-wfs --with-python --with-freetype=/usr/ --with-ogr --with-gdal --with-proj --with-geos --with-cairo --with-kml --with-wmsclient --with-wfsclient --with-wcs --with-sos --with-python=/usr/bin/python3.6 --without-gif --with-apache-module --with-apxs=/usr/bin/apxs2 --with-apr-config=/usr/bin/apr-1-config --enable-python-mapscript --with-zlib --prefix=/usr/
 sed "s:mapserver-6.2.0-mm/::g;s:mapserver-6.2.0/::g" -i ../mapmint/thirds/ms-6.2.0-full.patch
 patch -p0 < $SRC/mapmint/thirds/ms-6.2.0-full.patch 
 
@@ -78,7 +78,7 @@ sed "s:lib64:lib:g" -i Makefile
 make
 cd $SRC/zoo/zoo-project/zoo-kernel
 autoconf
-./configure ./configure --with-mapserver=$SRC/mapserver-6.2.0/ --with-python --with-pyvers=2.7 --with-js=/usr/ --with-xsltconfig=/usr/bin/xslt-config
+./configure ./configure --with-mapserver=$SRC/mapserver-6.2.0/ --with-python --with-pyvers=3.6 --with-js=/usr/ --with-xsltconfig=/usr/bin/xslt-config
 sed "s:/usr/lib/x86_64-linux-gnu/libapr-1.la::g" -i ZOOMakefile.opts
 make
 make install
