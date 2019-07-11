@@ -237,10 +237,10 @@ def parseDocAttr(conf, inputs, outputs):
             tmp = z.read(name).split("[_")
             for i in range(0, len(tmp)):
                 if tmp[i].count("_]") > 0:
-                    # print >> sys.stderr,tmp[i]
+                    # print(tmp[i], file=sys.stderr)
                     if res.count(tmp[i].split("_]")[0]) == 0:
                         res += [tmp[i].split("_]")[0]]
-                        # print >> sys.stderr,res
+                        # print(res, file=sys.stderr)
     outputs["Result"]["value"] = json.dumps(res)
     return zoo.SERVICE_SUCCEEDED
 
@@ -360,7 +360,7 @@ def getIndexDisplayJs(conf, inputs, outputs):
     else:
         outputs["Result"]["value"] = json.dumps({"title": title, "ord": order_by, "values": res}, ensure_ascii=False).encode("utf-8")
 
-    # print >> sys.stderr,outputs["Result"]["value"]
+    # print(outputs["Result"]["value"], file=sys.stderr)
     return zoo.SERVICE_SUCCEEDED
 
 
@@ -2235,7 +2235,7 @@ def details(conf, inputs, outputs):
                     res["pages"][lobj["name"]] = lobj
 
             if inputs["table"]["value"] == '"mm_tables"."p_tables"':
-                # print >> sys.stderr,res['name']
+                # print(res['name'], file=sys.stderr)
                 getTableElements(conf, con, cur, res, "mmEdits", "edition", "eid")
                 getTableElements(conf, con, cur, res, "mmReports", "report", "rid")
                 tres = pg.getTableDescription(conf, {"dataStore": {"value": conf["main"]["dbuserName"]}, "table": {"value": res["name"]}}, outputs0[2])
@@ -2416,7 +2416,7 @@ def previewDoc(conf, inputs, outputs):
         script = "import print.PaperMint as PaperMint\n"
         script += "pm=PaperMint.LOClient()\n"
         script += "pm.loadDoc('" + conf["main"]["publicationPath"] + "/idx_templates/" + inputs["oDoc"]["value"] + "')\n"
-        # print >> sys.stderr,"fields: \n"+json.dumps([lfields]+tvals[1])
+        # print("fields: \n"+json.dumps([lfields]+tvals[1]), file=sys.stderr)
         script += "pm.addTable(\"[_table_]\"," + json.dumps([lfields] + tvals[1]) + ")\n"
         script += 'pm.searchAndReplaceImage("[_map_]","' + savedImage + '")\n'
         script += "pm.statThis(\"[_diag_]\"," + json.dumps(rvals) + ")\n"
@@ -2436,25 +2436,25 @@ def previewDoc(conf, inputs, outputs):
 
         res = cur.execute(req)
         vals1 = cur.fetchall()
-        # print >> sys.stderr,vals1
+        # print(vals1, file=sys.stderr)
         for i in range(0, len(vals1)):
             req0 = ("select ").encode("utf-8") + vals1[i][1] + (" as ").encode("utf-8") + vals1[i][0] + (" from " + tablePrefix + inputs["id"]["value"] + " WHERE ogc_fid=" + _oid).encode("utf-8")
             print(req0.encode('utf-8'), file=sys.stderr)
             cur.execute(req0)
             vals2 = cur.fetchone()
-            # print >> sys.stderr,vals2
+            # print(vals2, file=sys.stderr)
             script += "pm.searchAndReplace('[_" + vals1[i][0] + "_]'," + json.dumps(vals2[0]) + ")\n"
 
         req1 = "select var,value from rtable where it_id=(SELECT id from " + tprefix + "indicators_territories where i_id=" + inputs["id"]["value"] + reqSuffix + ") " + reqSuffix1 + " and typ=6"
         res1 = cur.execute(req1)
         vals2 = cur.fetchall()
-        # print >> sys.stderr,vals1
+        # print(vals1, file=sys.stderr)
         for i in range(0, len(vals2)):
             req0 = "SELECT sources FROM " + tprefix + "indicators WHERE id=" + inputs["id"]["value"]
             print(req0.encode('utf-8'), file=sys.stderr)
             cur.execute(req0)
             vals3 = cur.fetchone()
-            # print >> sys.stderr,vals2
+            # print(vals2, file=sys.stderr)
             if vals3[0] is not None:
                 script += "pm.searchAndReplace('[_" + vals2[i][0] + "_]'," + json.dumps(vals3[0]) + ")\n"
             else:
@@ -2653,9 +2653,9 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
     inputs0["limit"] = {"value": "10"}
     inputs0["page"] = {"value": "1"}
     inputs0["_id"] = {"value": "ogc_fid in " + all_ids}
-    # print >> sys.stderr,str(inputs0)
+    # print(str(inputs0), file=sys.stderr)
     tvals = _getIndexValues(conf, inputs0, fields)
-    # print >> sys.stderr,tvals
+    # print(tvals, file=sys.stderr)
 
     if "oo" in conf and "external" in conf["oo"] and conf["oo"]["external"] == "true":
         # script+="pm.loadDoc('"+conf["main"]["publicationPath"]+"/idx_templates/"+inputs["oDoc"]["value"]+"')\n"
@@ -2676,7 +2676,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
         docPath = docPath.replace(".odt", "_" + _oid + "_init.odt").replace(conf["main"]["publicationPath"] + "/idx_templates/", conf["main"]["tmpPath"] + "/")
         script += "pm.loadDoc('" + docPath + "')\n"
         saveDocPath = docPath
-        # print >> sys.stderr,"fields: \n"+json.dumps([lfields]+tvals[1])
+        # print("fields: \n"+json.dumps([lfields]+tvals[1]), file=sys.stderr)
         if typ is None:
             script += "pm.addTable(\"[_table_]\"," + json.dumps([lfields] + tvals[1]) + ")\n"
             script += 'pm.searchAndReplaceImage("[_map_]","' + savedImage + '")\n'
@@ -2808,11 +2808,11 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
         req = "select var,value from rtable where it_id=(SELECT id from " + tprefix + "indicators_territories where i_id=" + idx + reqSuffix + ") and step is null and typ=0"
         # if inputs.has_key("step"):
         #    req="select var,value from rtable where it_id=(SELECT id from "+tprefix+"indicators_territories where i_id="+idx+reqSuffix+") and step = "+inputs["step"]["value"]+" and typ=0"
-        # print >> sys.stderr,req
+        # print(req, file=sys.stderr)
         res = cur.execute(req)
         saveReq = req
         vals1 = cur.fetchall()
-        # print >> sys.stderr,vals1
+        # print(vals1, file=sys.stderr)
         # for i in range(0,len(vals1)):
         #    req0=("select ").encode("utf-8")+vals1[i][1]+(" as ").encode("utf-8")+vals1[i][0]+(" from "+tablePrefix+idx+" WHERE ogc_fid="+_oid).encode("utf-8")
         #    print >> sys.stderr,req0.encode('utf-8')
@@ -2844,7 +2844,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
         # shutil.copy(docPath,docPath.replace(".odt","_final.odt"))
         #
 
-        # print >> sys.stderr,process.stdin.read()
+        # print(process.stdin.read(), file=sys.stderr)
         print("OK finished", file=sys.stderr)
         return docPath.replace(".odt", "_final.odt")
 
@@ -3212,7 +3212,7 @@ def insert(conf, inputs, outputs):
             else:
                 if columns[i] == "file":
                     content = packFile(conf, conf["main"]["tmpPath"] + "/data_tmp_1111" + conf["senv"]["MMID"] + "/" + inputs[columns[i]]["value"], columns[i])
-                    # print >> sys.stderr,content
+                    # print(content, file=sys.stderr)
                     col_sufix += columns[i] + "=%s"
                 else:
                     try:
@@ -3361,7 +3361,7 @@ def recoverFileFromHexInDb(conf, inputs, outputs):
 
 def recoverFileFromHex(conf, inputs, outputs):
     # dec_string = int(inputs["binaryString"]["value"], 16)
-    # print >> sys.stderr,inputs["binaryString"]["value"]
+    # print(inputs["binaryString"]["value"], file=sys.stderr)
     bin_ostring = inputs["binaryString"]["value"]
     bin_string = bin_ostring[2:len(bin_ostring) - 1].decode('hex')  # bin(int(bin_ostring[2:len(bin_ostring)-1],16))
     try:
@@ -3377,7 +3377,7 @@ def recoverFileFromHex(conf, inputs, outputs):
         con = auth.getCon(conf)
         con.connect()
         try:
-            # print >> sys.stderr,bin_string.encode('utf-8')
+            # print(bin_string.encode('utf-8'), file=sys.stderr)
             cur = con.conn.cursor()
             cur.execute("UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=ST_SetSRID(ST_GeometryFromText('" + bin_string.encode('utf-8') + "'),4326) WHERE id=" + inputs["id"]["value"])
             con.conn.commit()
@@ -3613,7 +3613,7 @@ def clientInsert(conf, inputs, outputs):
             cid = inputs["id"]["value"]
         for i in range(len(dcols)):
             print("+++++" + str(dcols[i]), file=sys.stderr)
-            # print >> sys.stderr,"+++++"+str(dvals[i])
+            # print("+++++"+str(dvals[i]), file=sys.stderr)
             if dcols[i]["type"] == "geometry":
                 # cur.execute("UPDATE "+tableName+" set "+dcols[i]["name"]+"=%s WHERE "+pkey+"="+cid,(psycopg2.Integer(),))
                 print("+++++ OM +++++" + str(dvals), file=sys.stderr)
@@ -3729,7 +3729,7 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
         else:
             postDocuments += [vals0[i][4]]
     rfields = (",".join(rcolumns))
-    # print >> sys.stderr,rfields
+    # print(rfields, file=sys.stderr)
     print("*********** [" + str(postDocuments) + "] ***********", file=sys.stderr)
     print("*********** [" + str(ovals0) + "] ***********", file=sys.stderr)
     print("*********** [" + str(rcolumns) + "] ***********", file=sys.stderr)
@@ -3807,7 +3807,7 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
                 rcnt += 1
             else:
                 if vals0[i][3] == "paragraph_sql_array":
-                    # print >> sys.stderr,str(rvals[i]).replace("'{","[").replace("}'","]")
+                    # print(str(rvals[i]).replace("'{","[").replace("}'","]"), file=sys.stderr)
                     script += "pm.addParagraph('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(str(rvals[rcnt]), "utf-8").replace("'{", "[").replace("}'", "]"))) + ")\n"
                     rcnt += 1
                 else:
@@ -3826,7 +3826,7 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
                                 print("ERROR 0 !", file=sys.stderr)
                                 print(e, file=sys.stderr)
                                 # sys.setdefaultencoding('utf8')
-                                # print >> sys.stderr,rvals[rcnt].encode('utf-8')
+                                # print(rvals[rcnt].encode('utf-8'), file=sys.stderr)
                                 try:
                                     script += "pm.statThis('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(rvals[rcnt].encode('utf-8')).replace("'{", "[").replace("}'", "]"))) + ")\ntime.sleep(0.01)\n"
                                     script += "print('" + vals0[i][2] + "',file=sys.stderr)\nsys.stderr.flush()\n"
@@ -4110,11 +4110,11 @@ def clientView(conf, inputs, outputs):
                                 fres[ovals[i][0]][cvals[j][1]] = str(rvals[columns.index(cvals[j][2])])
                     else:
                         fres[ovals[i][0]][cvals[j][1]] = rvals[columns.index(cvals[j][2])]
-                    # print>> sys.stderr,"+++ 0 +++ "+str(rvals)
-                    # print>> sys.stderr,"+++ 0 +++ "+str(columns)
+                    # print("+++ 0 +++ "+str(rvals), file=sys.stderr)
+                    # print("+++ 0 +++ "+str(columns), file=sys.stderr)
                     print("+++ 0 +++ " + str(cvals[j]), file=sys.stderr)
-                    # print>> sys.stderr,"+++ 0 +++ "+str(rvals[columns.index(cvals[j][2])])
-                    # print>> sys.stderr,"+++ 0 +++ "+str(ovals[i])
+                    # print("+++ 0 +++ "+str(rvals[columns.index(cvals[j][2])]), file=sys.stderr)
+                    # print("+++ 0 +++ "+str(ovals[i]), file=sys.stderr)
                 else:
                     print("+++ 1 +++ " + str(cvals[j]), file=sys.stderr)
                     try:
@@ -4137,14 +4137,14 @@ def clientView(conf, inputs, outputs):
                     except Exception as e:
                         print("+++ 999999 +++ " + str(e), file=sys.stderr)
                         fres[ovals[i][0]][cvals[j][1]] = "Not found"
-                    # print>> sys.stderr,"+++ 1 +++ "+str(ovals[i])
-                    # print >> sys.stderr,columns.index(cvals[j][2])
-                    # print >> sys.stderr,rvals
-                    # print>> sys.stderr,"+++++ "+str(columns)
-            # print >> sys.stderr,cvals[j]
+                    # print("+++ 1 +++ "+str(ovals[i]), file=sys.stderr)
+                    # print(columns.index(cvals[j][2]), file=sys.stderr)
+                    # print(rvals, file=sys.stderr)
+                    # print("+++++ "+str(columns), file=sys.stderr)
+            # print(cvals[j], file=sys.stderr)
         # fres["ref"]=inputs["id"]["value"]
 
-    # print >> sys.stderr,rvals
+    # print(rvals, file=sys.stderr)
     outputs["Result"]["value"] = json.dumps(fres)
     con.conn.commit()
     con.conn.close()
@@ -4240,7 +4240,7 @@ def clientViewTable(conf, inputs, outputs):
     print("******* " + str(clause), file=sys.stderr)
     print("******* " + str(classifier), file=sys.stderr)
     req1 = "SELECT " + (",".join(values + [cid])) + " FROM " + table + " WHERE " + clause + " ORDER BY " + classifier + " LIMIT " + inputs["limit"]["value"] + " OFFSET " + inputs["offset"]["value"]
-    # print >> sys.stderr,req1
+    # print(req1, file=sys.stderr)
     res = cur.execute(req1)
     vals = cur.fetchall()
     fres["rows"] = []
@@ -4409,7 +4409,7 @@ def massiveImport(conf, inputs, outputs):
                         else:
                             fieldName = str(j[3].encode("utf-8"))
                         print(vals[i][2].count("Field"), file=sys.stderr)
-                        # print >> sys.stderr,fieldName
+                        # print(fieldName, file=sys.stderr)
                         print(res[k], file=sys.stderr)
                         value += res[k][fieldName]  # .decode('utf-8')]
                         valueX += "(null)"
@@ -4422,11 +4422,11 @@ def massiveImport(conf, inputs, outputs):
                             value = value.encode("utf-8")
                             print(value, file=sys.stderr)
                         # toto=adapt(value.encode("utf-8"))
-                        # print >> sys.stderr,unicode(str(adapt(value.encode("utf-8"))),"utf-8")
+                        # print(unicode(str(adapt(value.encode("utf-8"))),"utf-8"), file=sys.stderr)
                         print("+++++++++++----- 2 -------=++++++++++++++++", file=sys.stderr)
                         req = ("SELECT " + str(adapt(value)).decode("utf-8").replace(",", ".") + "::" + j[2])
                         print("+++++++++++----- 3 -------=++++++++++++++++", file=sys.stderr)
-                        # print >> sys.stderr,req.encode("utf-8")
+                        # print(req.encode("utf-8"), file=sys.stderr)
                         cur.execute(req.encode("utf-8"))
                         print("+++++++++++----- 4 -------=++++++++++++++++", file=sys.stderr)
                         reqIS += str(adapt(value)).decode("utf-8").replace(",", ".") + "::" + j[2]
@@ -4456,13 +4456,13 @@ def massiveImport(conf, inputs, outputs):
         if vals[i][6]:
             reqInsertTemp_1 += " RETURNING id"
         print("******* 0 *********", file=sys.stderr)
-        # print >> sys.stderr,reqTemp
+        # print(reqTemp, file=sys.stderr)
         print("******* 1 *********", file=sys.stderr)
-        # print >> sys.stderr,reqTemp_1
+        # print(reqTemp_1, file=sys.stderr)
         print("******* 2 *********", file=sys.stderr)
-        # print >> sys.stderr,reqInsertTemp
+        # print(reqInsertTemp, file=sys.stderr)
         print("******* 3 *********", file=sys.stderr)
-        # print >> sys.stderr,reqInsertTemp_1
+        # print(reqInsertTemp_1, file=sys.stderr)
         print("******* 4 *********", file=sys.stderr)
         con.pexecute_req([reqTemp, {}])
         con.pexecute_req([reqTemp_1, {}])
@@ -4490,7 +4490,7 @@ def massiveImport(conf, inputs, outputs):
                         print("OK 1", file=sys.stderr)
                         obj = geocoder.geocode(vals4[kk][1].encode('utf-8'))
                         print("OK 2", file=sys.stderr)
-                        # print >> sys.stderr,obj
+                        # print(obj, file=sys.stderr)
                         print("OK 3", file=sys.stderr)
                         print(dir(obj), file=sys.stderr)
                         print("OK 4", file=sys.stderr)

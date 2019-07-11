@@ -84,4 +84,4 @@ def shortURL(a):
 #    e = decode(d)
 #    while len(c) < 7:
 #        c = ' ' + c
-#    print '%6d %6d %s %6d %6d' % (a, b, c, d, e)
+#    print('%6d %6d %s %6d %6d' % (a, b, c, d, e))
