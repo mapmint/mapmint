@@ -42,7 +42,7 @@ MapMint: Dashboard
 #set sections=['main','provider','identification']
 #set aliases=['main','provider','identification']
 #set icons=["laptop","user","lock"]
-#if $conf.keys().count($conf["main"]["dbuser"])>0
+#if $conf["main"]["dbuser"] in $conf.keys()
 #set sections+=[$conf["main"]["dbuser"]]
 #set icons+=["database"]
 #set aliases+=["database"]
@@ -229,7 +229,7 @@ MapMint: Dashboard
 #end if
 #try
 #set a=$mm.getLayer(0).getExtent()
-#except Exception,e
+#except Exception as e
 $e
 #end try
 
