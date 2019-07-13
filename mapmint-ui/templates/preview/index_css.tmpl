@@ -57,10 +57,10 @@ div#header{
 #for j0 in range(0,$l.numclasses)##if $cn>0#,#end if#.tree_layer$(i)_class$(j0)#set $cn+=1##end for#{
     background:	url(data:image/png;base64,$fc) no-repeat;
 }
-#end if
-#except Exception,e
+#except Exception as e
  /* $e */
 #end try
+#end if
 #for j in range(0,$l.numclasses)
 .tree_layer$(i)_class$(j){
 #if $l.metadata.get('mmSprite') is None
@@ -93,7 +93,7 @@ div#header{
 #for j0 in range(0,$layer.numclasses)##if $cn>0#,#end if#.tree_layer$(i)_step$(cnt)_class$(j0)#set $cn+=1##end for#{
     background:	url(data:image/png;base64,$fc) no-repeat;
 }
-#except Exception,e
+#except Exception as e
  /* $e */
 #end try
 #end if
@@ -136,8 +136,8 @@ div#header{
 /* BaseLayer */
 #end try
 #end if
-#set x=(($a.maxx-$a.minx)/2)+$a.minx
-#set y=(($a.maxy-$a.miny)/2)+$a.miny
+#set x=(($a.maxx-$a.minx)//2)+$a.minx
+#set y=(($a.maxy-$a.miny)//2)+$a.miny
 #base_layer_${i}{
     background:url('$conf["main"]["mapserverAddress"]?map=${p}&LAYERS=$(ll)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$x,$y,$(x+0.01),$(y+0.01)&SRS=EPSG:4326&WIDTH=30&HEIGHT=30&r=1315253453.18') no-repeat scroll 0 0 transparent;
 }
