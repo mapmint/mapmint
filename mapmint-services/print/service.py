@@ -16,7 +16,7 @@ def convert(conf, inputs, outputs):
         process.stdin.write(script)
         process.stdin.close()
     else:
-        from . import PaperMint
+        import PaperMint
         pm = PaperMint.LOClient()
         pm.loadDoc(inputs["oDoc"]["value"])
         docPath = conf["main"]["tmpPath"] + "/" + inputs["tDoc"]["value"]
@@ -100,7 +100,7 @@ def printMap(conf, inputs, outputs):
         script += "import pp.PaperMint as PaperMint\n"
         print("PaperMint) imported", file=sys.stderr)
     else:
-        from . import PaperMint
+        import PaperMint
 
     coeff = 1;
     sizes = {

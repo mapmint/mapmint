@@ -1,5 +1,5 @@
 import zoo
-from . import manage_users
+import manage_users
 import sys
 import re
 import json

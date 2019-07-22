@@ -50,7 +50,7 @@ def displayHTML(conf, inputs, outputs):
     dirs.display(conf, inputs, outputs)
     dirStr = outputs["Result"]["value"]
     # print >> sys.stderr,outputs
-    from . import postgis.service as dbs
+    import postgis.service as dbs
     # Hard coded supported dbs !
     suported_dbs = ["PostGIS", "MySQL"]
     dbStrs = {}

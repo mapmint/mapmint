@@ -4879,7 +4879,7 @@ def saveLegendIconsForLayer(conf, m, lm, layer, i, step=None):
             setMetadata(layer, "mmIcon_" + str(k), lsavedImage.replace(conf["main"]["tmpPath"], conf["main"]["tmpUrl"]))
             files += [lsavedImage]
         lsavedSprite = conf["main"]["tmpPath"] + "/print_" + conf["senv"]["MMID"] + "_" + str(i) + "_" + str(time.clock()).split(".")[1] + "_sprite.png"
-        from . import mmSprites
+        import mmSprites
         mmSprites.combine(files, lsavedSprite)
         setMetadata(layer, "mmSprite", lsavedSprite.replace(conf["main"]["tmpPath"], conf["main"]["tmpUrl"]))
         print(lsavedSprite, file=sys.stderr)
