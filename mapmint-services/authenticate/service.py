@@ -436,7 +436,7 @@ def logIn(conf, inputs, outputs):
         conf["lenv"]["message"] = zoo._("Unable to connect to the User Database.")
         return zoo.SERVICE_FAILED
     h = hashlib.new('ripemd160')
-    h.update(inputs['password']['value'])
+    h.update(inputs['password']['value'].encode())
     h.hexdigest()
     c = conn.cursor()
     try:
@@ -496,7 +496,7 @@ def logIn(conf, inputs, outputs):
             loginFlux(conf, h)
         except:
             pass
-        # print >> sys.stderr, str(conf["senv"])
+        # print(str(conf["senv"]), file=sys.stderr)
         return zoo.SERVICE_SUCCEEDED
     else:
         conf["lenv"]["message"] = zoo._("Unable to connect with the provided login and password")
