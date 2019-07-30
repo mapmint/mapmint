@@ -9,7 +9,8 @@ except:
     pass
 import libxml2
 import osgeo.ogr
-import libxslt
+# import libxslt
+from lxml import etree
 
 
 def test(conf, inputs, outputs):
@@ -19,8 +20,8 @@ def test(conf, inputs, outputs):
                    "value"] + '</host><port>' + inputs["port"]["value"] + '</port></connection>'
     doc = libxml2.parseMemory(xcontent, len(xcontent))
     styledoc = libxml2.parseFile(conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/conn.xsl")
-    style = libxslt.parseStylesheetDoc(styledoc)
-    result = style.applyStylesheet(doc, None)
+    style = etree.XSLT(styledoc)
+    result = style(doc)
     ds = osgeo.ogr.Open(result.content)
     if ds is None:
         conf["lenv"]["message"] = zoo._("Unable to connect to ") + inputs["name"]["value"]

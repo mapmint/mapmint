@@ -1,6 +1,7 @@
 import psycopg2
 import libxml2
-import libxslt
+# import libxslt
+from lxml import etree
 import osgeo.ogr
 import sys
 import zoo
@@ -21,8 +22,8 @@ class pgConnection:
         libxml2.initParser()
         doc = libxml2.parseFile(self.conf["main"]["dataPath"] + "/PostGIS/" + self.dbfile + ".xml")
         styledoc = libxml2.parseFile(self.conf["main"]["dataPath"] + "/PostGIS/conn.xsl")
-        style = libxslt.parseStylesheetDoc(styledoc)
-        res = style.applyStylesheet(doc, None)
+        style = etree.XSLT(styledoc)
+        res = style(doc)
         self.db_string = res.content.replace("PG: ", "")
 
     def connect(self):

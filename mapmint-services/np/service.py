@@ -1093,12 +1093,13 @@ def testQuery(conf, inputs, outputs):
         con = psycopg2.connect(dbs)
     except:
         try:
-            import libxml2, libxslt
+            import libxml2 # , libxslt
+            from lxml import etree
             import osgeo.ogr as ogr
             doc = libxml2.parseFile(conf["main"]["dataPath"] + "/" + tmp[0] + "/" + tmp[1] + ".xml")
             styledoc = libxml2.parseFile(conf["main"]["dataPath"] + "/" + tmp[0] + "/conn.xsl")
-            style = libxslt.parseStylesheetDoc(styledoc)
-            result = style.applyStylesheet(doc, None)
+            style = etree.XSLT(styledoc)
+            result = style(doc)
             print(result.content, file=sys.stderr)
             ds = ogr.Open(result.content)
             res = ds.ExecuteSQL(inputs["query"]["value"], None, None)
