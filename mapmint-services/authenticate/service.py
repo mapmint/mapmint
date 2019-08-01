@@ -488,7 +488,7 @@ def logIn(conf, inputs, outputs):
         else:
             conf["senv"]["isTrial"] = "false"
 
-        outputs["Result"]["value"] = zoo._("User ") + conf["senv"]["login"] + zoo._(" authenticated")
+        outputs["Result"]["value"] = zoo._("User ") + str(conf["senv"]["login"]) + zoo._(" authenticated")
         sql = " UPDATE " + prefix + "users set last_con=" + con.now + " WHERE login=[_login_]"
         con.pexecute_req([sql, {"login": {"value": inputs["login"]["value"], "format": "s"}}])
         conn.commit()
