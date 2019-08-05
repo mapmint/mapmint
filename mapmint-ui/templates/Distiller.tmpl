@@ -64,7 +64,7 @@ MapMint: Distiller
       </li>
       <li id="mainDirectoriesList">
 	<span>$zoo._("Directories")</span>
-#if $inputs.has_key('dirs')
+#if 'dirs' in $inputs.keys()
 	  $inputs["dirs"]["value"]
 #end if
       </li>

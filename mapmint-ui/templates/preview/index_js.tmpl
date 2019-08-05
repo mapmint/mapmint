@@ -19,7 +19,7 @@ var processResultLayer;
 #include($conf["main"]["templatesPath"]+"/preview/modules/indexes/_init.js")
 #end if
 
-#if $inputs.has_key("filter")
+#if "filter" in $inputs.keys()
 System.iniFilterValue="$inputs["filter"]["value"]";
 #end if
 
@@ -31,7 +31,7 @@ var pmapfiles={
 #if $cnt >0
     ,
 #end if
-     "$m.getLayer($l).name":[ "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($mms.getMetadata($m.getLayer($l),'mmFilterField') or $mms.getMetadata($m.getLayer($l),'mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map","$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map","$mms.getMetadata($m.getLayer($l),"mmTitle")",#if $mms.getMetadata($m.getLayer($l),'mmMaxScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMaxScale')#else#100000000000000#end if#,#if $mms.getMetadata($m.getLayer($l),'mmMinScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMinScale')#else#0#end if#,#if $mms.getMetadata($m.getLayer($l),'mmExport')=="true"#true#else#false#end if#,#if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $mms.getMetadata($m.getLayer($l),'mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#]
+     "$m.getLayer($l).name":[ "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($mms.getMetadata($m.getLayer($l),'mmFilterField') or $mms.getMetadata($m.getLayer($l),'mmZFilterField')) and 'filter' in $inputs.keys()#_"+System.iniFilterValue+"#end if##end if#.map","$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map","$mms.getMetadata($m.getLayer($l),"mmTitle")",#if $mms.getMetadata($m.getLayer($l),'mmMaxScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMaxScale')#else#100000000000000#end if#,#if $mms.getMetadata($m.getLayer($l),'mmMinScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMinScale')#else#0#end if#,#if $mms.getMetadata($m.getLayer($l),'mmExport')=="true"#true#else#false#end if#,#if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $mms.getMetadata($m.getLayer($l),'mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#]
 #set $cnt+=1
 #end if
 #end for
@@ -486,7 +486,7 @@ System.postMap[System.postMap.length]={
 	\$.ajax({
 	    type: "GET",
 	    localID: this.length,
-	    url: "$conf["main"]["publicationUrl"]/styles/${lname}_#if $mms.getMetadata($m.getLayerByName($l.name),'mmFilterField') and $inputs.has_key('filter')#"+System.iniFilterValue+"_#end if#${conf["senv"]["last_map"]}_sld.xml?timestamp="+d.getTime(),
+	    url: "$conf["main"]["publicationUrl"]/styles/${lname}_#if $mms.getMetadata($m.getLayerByName($l.name),'mmFilterField') and 'filter' in $inputs.keys()#"+System.iniFilterValue+"_#end if#${conf["senv"]["last_map"]}_sld.xml?timestamp="+d.getTime(),
 	    complete: function(xml,status){
 		var format = new OpenLayers.Format.SLD();
 		var obj = format.read(xml.responseText);
@@ -563,7 +563,7 @@ System.postMap[System.postMap.length]={
 			    tmpFeature.localName="$lname";
 			    System.hover.addFeatures(tmpFeature);
 			}
-#if $mms.getMetadata(m.getLayerByName(lname),'mmZFilterField') and $inputs.has_key('filter')
+#if $mms.getMetadata(m.getLayerByName(lname),'mmZFilterField') and 'filter' in $inputs.keys()
     			map.zoomToExtent(this.getDataExtent());
 #if "previous_map" in $conf["senv"].keys() and $conf["senv"]["previous_map"]!="Default"
     			\$('.fg-toolbar').find(".fg-button").first().attr("href",\$('.fg-toolbar').find(".fg-button").first().attr("href")+"$conf["senv"]["previous_map"]");
@@ -649,7 +649,7 @@ System.postMap[System.postMap.length]={
 		    tselect[tselect.length-1].activate();
 		}
 #else
-#if $mms.getMetadata(m.getLayerByName(lname),'mmZFilterField') and $inputs.has_key('filter')
+#if $mms.getMetadata(m.getLayerByName(lname),'mmZFilterField') and 'filter' in $inputs.keys()
 		layersList[this.localID].localID=this.localID;
 		layersList[this.localID].events.register('loadend', layersList[this.localID], function(){
 		    if(this.localID>=0){
@@ -673,7 +673,7 @@ System.postMap[System.postMap.length]={
 #if $mm_access.checkLayerPriv($conf,$m,$l.name,"r")
     var tmpLayer = new OpenLayers.Layer.WMS(
 	"$lname",
-	"$conf["main"]["mapserverAddress"]?map="+#if $mms.getMetadata($l,'mmFilterField') and $inputs.has_key('filter')#pmapfiles["$(lname)"][0]#else##if $l.type==mapscript.MS_LAYER_RASTER and $l.numclasses>1#pmapfiles["$(lname)"][0]#else#pmapfile#end if##end if#+"",
+	"$conf["main"]["mapserverAddress"]?map="+#if $mms.getMetadata($l,'mmFilterField') and 'filter' in $inputs.keys()#pmapfiles["$(lname)"][0]#else##if $l.type==mapscript.MS_LAYER_RASTER and $l.numclasses>1#pmapfiles["$(lname)"][0]#else#pmapfile#end if##end if#+"",
 	{layers: "$(l.name)",format: "image/png"},
 	{useCanvas: System.useCanvas,isBaseLayer: false, #if $l.type==mapscript.MS_SHAPE_POINT or $lname.count("grid_")>0#width: 1024, height: 1024,#end if# singleTile: false#if $mms.getMetadata($l,'mmLabelFormat') is not None#, ratio: 1#end if#,transitionEffect: null}
 	
@@ -718,7 +718,7 @@ System.postMap[System.postMap.length]={
 
 
 #end if
-#if $mms.getMetadata(m.getLayerByName(lname),'mmZFilterField') and $inputs.has_key('filter')
+#if $mms.getMetadata(m.getLayerByName(lname),'mmZFilterField') and 'filter' in $inputs.keys()
     url="$conf["main"]["mapserverAddress"]?map="+pmapfiles["$(lname)"][0]+"&SERVICE=WFS&typename=$(lname)&VERSION=1.0.0&REQUEST=GetFeature";
     \$.ajax({
 	type: "GET",
@@ -960,7 +960,7 @@ if(layersList[layersList.length-1] && (!layersList[layersList.length-1].value ||
 	);
     map.addLayer(processResultLayer);
 
-#if $conf["senv"].has_key("toLoad")
+#if "toLoad" in $conf["senv"].keys()
     route_layer=new OpenLayers.Layer.WMS("Result",
 					 "$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/Paths/Saved_Result_$(conf["senv"]["toLoad"]).map",
 					 {layers: "Result",format: "image/png"},

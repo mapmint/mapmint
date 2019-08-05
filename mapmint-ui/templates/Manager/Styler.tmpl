@@ -30,15 +30,15 @@
 	    
 	    <select id="dropdown" name="dropdown" class="select-window">
 	      <option value="uniqSymb">$zoo._("Unique Symbol")</option>
-	      <option value="gradSymb" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="gs" and not($inputs.has_key('isStep'))#selected="true"#end if#>$zoo._("Graduated Symbol")</option>
-	      <option value="contCol" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="cc" and not($inputs.has_key('isStep'))#selected="true"#end if#>$zoo._("Continuous Color")</option>
-	      <option value="uniqVal" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="uv" and not($inputs.has_key('isStep'))#selected="true"#end if#>$zoo._("Unique Value")</option>
-	      <option value="timeline" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="tl" or $inputs.has_key('isStep')#selected="true"#end if#>$zoo._("Time line")</option>
+	      <option value="gradSymb" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="gs" and not('isStep' in $inputs.keys())#selected="true"#end if#>$zoo._("Graduated Symbol")</option>
+	      <option value="contCol" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="cc" and not('isStep' in $inputs.keys())#selected="true"#end if#>$zoo._("Continuous Color")</option>
+	      <option value="uniqVal" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="uv" and not('isStep' in $inputs.keys())#selected="true"#end if#>$zoo._("Unique Value")</option>
+	      <option value="timeline" #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mmClass")=="tl" or 'isStep' in $inputs.keys()#selected="true"#end if#>$zoo._("Time line")</option>
 	    </select>
 	  </form>
 	</td>
       </tr>
-      <tr class="tl" #if not($inputs.has_key('isStep'))#style="display: none"#end if#>
+      <tr class="tl" #if not('isStep' in $inputs.keys())#style="display: none"#end if#>
 	<td class="title">$zoo._("Steps:")</td>
 	<td>
 	  #try
@@ -59,7 +59,7 @@
 	    #set j=0
 	    #for i in $opts
 	    #if $i!=""
-	    <option value="$i" #if $j==0 and not($inputs.has_key('mmStep'))#selected="true"#else##if $inputs.has_key('mmStep') and $inputs["mmStep"]["value"]==str($j)#selected="true"#end if##end if#>$i</option>
+	    <option value="$i" #if $j==0 and not('mmStep' in $inputs.keys())#selected="true"#else##if 'mmStep' in $inputs.keys() and $inputs["mmStep"]["value"]==str($j)#selected="true"#end if##end if#>$i</option>
 	    #set $j=$j+1
 	    #end if
 	    #end for
@@ -67,7 +67,7 @@
 	  <input id="mmDeleteStep" type="submit" value="$zoo._("Delete")" onclick="try{MMStyler.Timeline.deleteStep();}catch(e){}return false;" />	
 	</td>
       </tr>
-      <tr class="tl" #if not($inputs.has_key('isStep'))#style="display: none"#end if#>
+      <tr class="tl" #if not('isStep' in $inputs.keys())#style="display: none"#end if#>
       <td class="title">$zoo._("Legend Type for this step:")</td>
       <td>
 	<form>

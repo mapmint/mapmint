@@ -7,7 +7,7 @@
 	  <li iconCls="tree_group" closed="true"><span>$elem[$i]["children"][$k]["text"].decode('raw_unicode_escape')</span>
 	    <ul>	    
 #for mm in range(0,len($elem[$i]["children"][$k]["children"]))
-#if $elem[$i]["children"][$k]["children"][$mm].has_key("mmType")
+#if "mmType" in $elem[$i]["children"][$k]["children"][$mm].keys()
 #if $mm_access.checkLayerPriv($conf,$m,$elem[$i]["children"][$k]["children"][$mm]["id"],"r")
 $Template(file=$conf['main']['templatesPath']+"/preview/modules/layer_fees/list.tmpl",searchList={"m": $m,"elem": $elem[$i]["children"][$k]["children"],"i": $mm,"conf": $conf})
 #end if

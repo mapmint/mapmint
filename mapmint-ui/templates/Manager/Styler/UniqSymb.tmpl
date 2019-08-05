@@ -56,7 +56,7 @@ toRunAfter=Array();
 $(Template(file=$conf["main"]["templatesPath"]+"/Manager/Styler/ExprSettings.tmpl",searchList=$searchList))
 
 
-#if $inputs.has_key('prefix') and $inputs["prefix"]["value"]=="indexes"
+#if 'prefix' in $inputs.keys() and $inputs["prefix"]["value"]=="indexes"
 <tr>
 <td>$zoo._("Opacity: ")</td>
 <td>

@@ -13,7 +13,7 @@
     <li class="list-group-item"><input type="checkbox" /><label class="tree-toggle tree-parent"><span class="fa fa-caret-square-o-down tree-node text-center ud"></span>$elem[$i]["children"][$k]["text"].decode('raw_unicode_escape').replace("-_-"," ").replace("-__-","(").replace("-___-",")") </label>
     	<ul class="list-group tree">
 #for mm in range(0,len($elem[$i]["children"][$k]["children"]))
-#if $elem[$i]["children"][$k]["children"][$mm].has_key("mmType")
+#if "mmType" in $elem[$i]["children"][$k]["children"][$mm].keys()
 #if $mm_access.checkLayerPriv($conf,$m,$elem[$i]["children"][$k]["children"][$mm]["id"],"r")
 $Template(file=$conf['main']['templatesPath']+"layer_tree_bs.tmpl",searchList={"m": $m,"elem": $elem[$i]["children"][$k]["children"],"i": $mm,"conf": $conf,"prefix":$pprefix})
 #end if

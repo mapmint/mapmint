@@ -4,7 +4,7 @@
 <label for="relogin">$zoo._("Please, fill in the following your login or your email address:")</label>
 <input type="text" name="relogin" id="relogin" style="background-color: #FFFFFF;" />
 <input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Ask for a new password")" onclick="try{recoverPassword();}catch(e){}return false;" />
-#if $inputs.has_key('pcancel')
+#if 'pcancel' in $inputs.keys()
 <input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Cancel")" onclick="try{pcancel();}catch(e){}return false;" />
 #end if
 </form>

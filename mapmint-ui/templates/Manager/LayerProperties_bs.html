@@ -77,7 +77,7 @@
 <form class="form-horizontal mtpp" method="get" >
 #set obj={"name":"name","title": $zoo._("Name"),"placeholder":$zoo._("Sample Name")}
 $printText($obj)
-#if $conf["main"].has_key("3D") and $conf["main"]["3D"]=="true"
+#if "3D" in $conf["main"].keys() and $conf["main"]["3D"]=="true"
 #set obj={"name":"fly","title": $zoo._("TE Fly URL"),"placeholder":$zoo._("Sample.fly")}
 $printText($obj)
 #end if

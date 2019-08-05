@@ -4,7 +4,7 @@
 #set sprefix=$auth.getPrefix($conf)
 #set con=$auth.getCon($conf)
 
-#if $inputs.has_key("prefix")
+#if "prefix" in $inputs.keys()
 #set prefix=$inputs["prefix"]["value"]
 #else
 #set prefix=""
@@ -20,7 +20,7 @@
 #set cnt=$cnt[0][0]
 #set res=cur.execute("SELECT id,name from "+$sprefix+"themes "+$suffix1)
 #set q0=cur.fetchall()
-#if $inputs.has_key("clause")
+#if "clause" in $inputs.keys()
 #if $inputs["clause"]["value"]=="id="
 #set q1=[[""]]
 #else
@@ -41,7 +41,7 @@
 #end for
 #end if
 #end if
-<legend>$zoo._("Themes") #if len(q0)>1#<input type="submit" value="$zoo._("Add")" onclick="var tmp=(\$('.$(prefix)tselect').length);#if $inputs.has_key("layer") or $inputs.has_key("dataStore")#\$('#$(prefix)tm_ttr_0').clone().attr('id', '$(prefix)tm_ttr_'+tmp).appendTo('#$(prefix)tm_table');#else#\$('select#$(prefix)tm_themes_0').clone().attr('id', '$(prefix)tm_themes_'+tmp).appendTo('.$(prefix)tm_themes_f');#end if# if(tmp+1>1) \$('#$(prefix)tm_tdelete').show();return false;" /><input id="$(prefix)tm_tdelete" type="submit" value="$zoo._("Delete")" onclick="var tmp=(\$('.$(prefix)tselect').length-1);if(tmp>0){\$('select#$(prefix)tm_themes_'+tmp).remove();#if $inputs.has_key("layer") or $inputs.has_key("dataStore")#\$('#$(prefix)tm_ttr_'+tmp).remove();#end if#}else {alert('$zoo._("You should keep at least one group linked to a user")');\$('#$(prefix)tm_tdelete').toggle();}if(tmp-1==0) \$('#$(prefix)tm_tdelete').toggle();return false;" #if len($q1)==1#style="display:none"#end if#/>#end if#</legend>
+<legend>$zoo._("Themes") #if len(q0)>1#<input type="submit" value="$zoo._("Add")" onclick="var tmp=(\$('.$(prefix)tselect').length);#if "layer" in $inputs.keys() or "dataStore" in $inputs.keys()#\$('#$(prefix)tm_ttr_0').clone().attr('id', '$(prefix)tm_ttr_'+tmp).appendTo('#$(prefix)tm_table');#else#\$('select#$(prefix)tm_themes_0').clone().attr('id', '$(prefix)tm_themes_'+tmp).appendTo('.$(prefix)tm_themes_f');#end if# if(tmp+1>1) \$('#$(prefix)tm_tdelete').show();return false;" /><input id="$(prefix)tm_tdelete" type="submit" value="$zoo._("Delete")" onclick="var tmp=(\$('.$(prefix)tselect').length-1);if(tmp>0){\$('select#$(prefix)tm_themes_'+tmp).remove();#if "layer" in $inputs.keys() or "dataStore" in $inputs.keys()#\$('#$(prefix)tm_ttr_'+tmp).remove();#end if#}else {alert('$zoo._("You should keep at least one group linked to a user")');\$('#$(prefix)tm_tdelete').toggle();}if(tmp-1==0) \$('#$(prefix)tm_tdelete').toggle();return false;" #if len($q1)==1#style="display:none"#end if#/>#end if#</legend>
 
 #try
 #set themes=$mms.getMetadata($m.web,'mm_themes_class').split(',')

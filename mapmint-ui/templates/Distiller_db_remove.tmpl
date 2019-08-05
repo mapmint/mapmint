@@ -8,8 +8,8 @@ $zoo._("Please, confirm that you want to remove the following DataStore:")
 <tbody>
  <tr>
   <td>$zoo._("Name:")</td>
-  <td><input id="Distiller.pgisrform.name" class="rounded" type="text" #if $inputs.has_key("name") and $inputs["name"].hasKey("value")#value="$inputs["name"]["value"]"#end if#/>
-   <input id="Distiller.pgisrform.stype" class="rounded" type="hidden" #if $inputs.has_key("ttype") and $inputs["type"].hasKey("value")#value="$inputs["type"]["value"]"#end if#/>
+  <td><input id="Distiller.pgisrform.name" class="rounded" type="text" #if "name" in $inputs.keys() and $inputs["name"].hasKey("value")#value="$inputs["name"]["value"]"#end if#/>
+   <input id="Distiller.pgisrform.stype" class="rounded" type="hidden" #if "ttype" in $inputs.keys() and $inputs["type"].hasKey("value")#value="$inputs["type"]["value"]"#end if#/>
   </td>
  </tr>
 

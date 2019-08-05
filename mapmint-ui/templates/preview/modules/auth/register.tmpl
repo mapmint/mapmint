@@ -29,7 +29,7 @@
 </table>
   <div style="margin:0 0 0 15px;">
     <input type="submit" id="bt_submit" name="bt_submit" value="$zoo._("Register")" onclick="try{registerUser()}catch(e){}return false;" style="cursor: pointer;"/>
-    <input type="submit" id="bt_submit" name="bt_submit" value="$zoo._("Cancel")" onclick="try{#if not($inputs.has_key('pcancel'))#cancelUserPreferences#else#pcancel#end if#();}catch(e){}return false;" style="cursor: pointer;"/>
+    <input type="submit" id="bt_submit" name="bt_submit" value="$zoo._("Cancel")" onclick="try{#if not('pcancel' in $inputs.keys())#cancelUserPreferences#else#pcancel#end if#();}catch(e){}return false;" style="cursor: pointer;"/>
   </div>
   
 </form>

@@ -13,12 +13,12 @@
 #set res=$cur.fetchall()
 #set defaultTypes=["map","table","diag"]
 #try
-#if $inputs.has_key("step")
+#if "step" in $inputs.keys()
 #set suffixReq=" and step="+$inputs["step"]["value"]
 #else
 #set suffixReq=" and step is null"
 #end if
-#if $inputs.has_key("tid")
+#if "tid" in $inputs.keys()
 #set res0=$cur.execute("select display,var,value,typ from rtable where it_id=(SELECT id from  indicateurs_territoires where i_id="+$inputs["id"]["value"]+" and t_id="+$inputs["tid"]["value"]+")"+suffixReq)
 #else
 #set res0=$cur.execute("select display,var,value,typ from rtable where it_id=(SELECT id from  indicateurs_territoires where i_id="+$inputs["id"]["value"]+" and (not(agregation) or agregation is null))"+suffixReq)
@@ -28,7 +28,7 @@
 #end try
 #set res0=$cur.fetchall()
 #try
-#if $inputs.has_key("tid")
+#if "tid" in $inputs.keys()
 #set sprefix="agregate_"
 #else
 #set sprefix=""
@@ -64,7 +64,7 @@
     </tbody>
   </table>
 
-  <a href="#" class="wbutton ui-corner-all al" onclick="saveRepport(#if $inputs.has_key("tid")#'agregate_'#end if#);">$zoo._("Save")</a>
-  <a href="#" class="wbutton ui-corner-all al" onclick="previewRepport(#if $inputs.has_key("tid")#'agregate_'#end if#);">$zoo._("Preview")</a>
+  <a href="#" class="wbutton ui-corner-all al" onclick="saveRepport(#if "tid" in $inputs.keys()#'agregate_'#end if#);">$zoo._("Save")</a>
+  <a href="#" class="wbutton ui-corner-all al" onclick="previewRepport(#if "tid" in $inputs.keys()#'agregate_'#end if#);">$zoo._("Preview")</a>
 
 </div>

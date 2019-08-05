@@ -449,7 +449,7 @@ def _getIndexValues(conf, inputs, fields):
     tableName = tablePrefix + id
     if "step" in inputs:
         dtableSuffix = " and step = " + inputs["step"]["value"]
-        # if inputs.has_key("tid"):
+        # if "tid" in inputs.keys():
         #    tableName+="_step"+inputs["step"]["value"]
     endReq = " order by " + inputs["sortname"]["value"] + " " + inputs["sortorder"]["value"] + " limit " + inputs["limit"]["value"] + " offset " + str(int(inputs["limit"]["value"]) * (int(inputs["page"]["value"]) - 1))
     if "_id" in inputs:
@@ -2807,7 +2807,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
         print("\n\n--------------", file=sys.stderr)
 
         req = "select var,value from rtable where it_id=(SELECT id from " + tprefix + "indicators_territories where i_id=" + idx + reqSuffix + ") and step is null and typ=0"
-        # if inputs.has_key("step"):
+        # if "step" in inputs.keys():
         #    req="select var,value from rtable where it_id=(SELECT id from "+tprefix+"indicators_territories where i_id="+idx+reqSuffix+") and step = "+inputs["step"]["value"]+" and typ=0"
         # print(req, file=sys.stderr)
         res = cur.execute(req)

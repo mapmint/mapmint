@@ -36,7 +36,7 @@
 
 #set steps=$l.metadata.get("mmSteps").split(',')
 
-#if $inputs.has_key('limit')
+#if 'limit' in $inputs.keys()
 #set ll=int($inputs["limit"]["value"])
 #else
 #set ll=0

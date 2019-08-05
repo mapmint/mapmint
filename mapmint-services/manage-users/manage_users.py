@@ -213,7 +213,7 @@ class manage_users:
             prefix = auth.getPrefix(self.conf)
         else:
             prefix = ""
-        if 'id' in d_user:  # or d_user.has_key('login'):
+        if 'id' in d_user:  # or 'login' in d_user.keys():
             return False
         if 'passwd' in d_user:
             d_user['passwd'] = mm_md5(d_user['passwd'])
