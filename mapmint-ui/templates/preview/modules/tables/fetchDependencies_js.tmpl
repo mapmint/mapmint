@@ -10,7 +10,7 @@
 *#
 #try
 #set obj=$json.loads($inputs["elements"]["value"])
-#except Exception,e
+#except Exception as e
 <h1>$e</h1>
 #end try
 #try
@@ -91,7 +91,7 @@ $con.cur.execute($req)
 #end for
 #end for
 $json.dumps($fres)
-#except Exception,e
+#except Exception as e
 #if "sql_query" in $obj[0].keys()
 #try
 #if len($obj[0]["options"])>0
@@ -120,7 +120,7 @@ $json.dumps($results)
 #set vals=$con.cur.fetchall()
 $json.dumps($vals)
 #end if
-#except Exception,e1
+#except Exception as e1
 <h2> $e1 </h2>
 #end try
 #else

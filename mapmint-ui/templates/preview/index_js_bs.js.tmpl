@@ -24,7 +24,7 @@ var processResultLayer;
 var _MMID="MMID=$conf["senv"]["MMID"]";
 #try
 #set val=open($mms.getMetadata($m.web,"mmWMTSAttribution").replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"])).read()
-#except Exception,e
+#except Exception as e
 #set val=$mms.getMetadata($m.web,"mmWMTSAttribution")
 #end try
 var attributionsWMTS='$val';

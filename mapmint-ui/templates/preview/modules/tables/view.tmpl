@@ -118,7 +118,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 #end for
      </tr>
 #end for
-#except Exception,e
+#except Exception as e
      <tr>
        <td class="alert alert-danger" colspan="$(len($vals))">$(zoo._("Configuration error: ")+str($e))</td>
      </tr>

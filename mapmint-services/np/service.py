@@ -1239,7 +1239,7 @@ def listExtent(conf, cur, tbl):
             elems += [{"id": vals[i][0], "text": vals[i][1], "ext": vals[i][2], "size": "0Mb"}]
         # try:
         #    elems[len(elems)-1]["size"]=ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+str(vals[i][0])+".db")
-        # except Exception,e:
+        # except Exception as e:
         #    elems[len(elems)-1]["size"]=0
 
     return elems
@@ -3652,7 +3652,7 @@ def clientInsert(conf, inputs, outputs):
                 content = packFile(conf, tuple[dcols[i]["name"]], dcols[i]["name"])
                 print(content, file=sys.stderr)
                 cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=%s WHERE " + pkey + "=" + cid, (psycopg2.Binary(content),))
-                # except Exception,e:
+                # except Exception as e:
                 #    print >> sys.stderr,e
 
             if dcols[i]["type"] == "tbl_linked":

@@ -311,7 +311,7 @@ $appendMenu($lmenu,$res)
 #try
 #set vals=$cur.fetchone()
 $(Template($vals[0],searchList={"conf": $conf,"inputs": $inputs,"outputs":$outputs,"cur":$cur,"con":$con}))
-#except Exception,e
+#except Exception as e
 <!-- $e -->
 $getAbstract()
 #from Cheetah.Template import Template
@@ -342,7 +342,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/pages/view.tmpl
 *#
 #try
 $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/list.tmpl",searchList={"conf": $conf,"cur":$cur,"con":$con,"qComponents":$qComponents}))
-#except Exception,e
+#except Exception as e
 $getAbstract()
 <div class="alert alert-danger">
 #import traceback
@@ -375,7 +375,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 #if vals is not None
 #try
 $(Template($vals[0],searchList={"conf": $conf,"inputs": $inputs,"outputs":$outputs,"cur":$cur,"con":$con}))
-#except Exception,e
+#except Exception as e
 $e
 #end try
 #else
