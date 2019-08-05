@@ -93,7 +93,7 @@ $conf["identification"]["title"]
 #end for
 
 
-#if $inputs.keys().count("page")>0
+#if "page" in $inputs.keys()
 #set qComponents=["p"]+$inputs["page"]["value"].split('/')
 
 #try 
@@ -261,7 +261,7 @@ $mfiles1.sort(key=lambda x: 1/os.path.getmtime(os.path.join(x[0])))
 <h4 class="text-center">$mms.getMetadata($mm.web,'mmTitle')</h4>
  </div>
 
-#except Exception,e
+#except Exception as e
 <div class="col-sm-6 col-md-3">
 <div class="thumbnail">
  $zoo._("Error occured:") $e

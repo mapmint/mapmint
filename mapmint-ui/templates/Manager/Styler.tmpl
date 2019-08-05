@@ -318,7 +318,7 @@ $m.getLayerByName($inputs["layer"]["value"]).addProcessing("RESAMPLE=NEAREST")
 
 #import osgeo.gdal
 
-#if $inputs.keys().count("field") > 0 
+#if "field" in $inputs.keys()
 #set field=$inputs["field"]["value"]
 #else
 #set field="1"

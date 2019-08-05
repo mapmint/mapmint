@@ -6,11 +6,11 @@ toRunAfter=Array();
 <table>
 
 #set mmStyle=0
-#if $inputs.keys().count("mmClass") > 0
+#if "mmClass" in $inputs.keys()
 #set prefix="class_"
 #set prefix1="class-"
 #set mmClass=int($inputs["mmClass"]["value"])
-#if $inputs.keys().count("mmStyle") > 0
+#if "mmStyle" in $inputs.keys()
 #set prefix="class_style_"
 #set prefix1="class-style-"
 #set mmStyle=int($inputs["mmStyle"]["value"])
@@ -32,7 +32,7 @@ toRunAfter=Array();
 #set styleStroke=1
 #set mmStyle=1
 
-#if $inputs.keys().count("mmStyle")>0
+#if "mmStyle" in $inputs.keys()
 #set styleSymbol=2
 #set mmStyle=2
 #set selectedStyle=2
@@ -191,5 +191,5 @@ toRunAfter[toRunAfter.length]=function(){
 </table>
 
 <ul class="style-tabs-nav1">
-		<li><a class="ui-state-default ui-button-text-only ui-corner-all" onclick="System.isGrid=#if $inputs["layer"]["value"].count("grid_")>0#true#else#false#end if#;saveLayerStyle(#if $inputs.keys().count("mmClass") > 0#$inputs["mmClass"]["value"]#end if##if $inputs.keys().count("mmStyle") > 0#,$inputs["mmStyle"]["value"]#end if##if $inputs.keys().count("mmStep") > 0#,null,$inputs["mmStep"]["value"]#end if#)" href="#first">$zoo._("Apply")</a></li>
+		<li><a class="ui-state-default ui-button-text-only ui-corner-all" onclick="System.isGrid=#if $inputs["layer"]["value"].count("grid_")>0#true#else#false#end if#;saveLayerStyle(#if "mmClass" in $inputs.keys()#$inputs["mmClass"]["value"]#end if##if "mmStyle" in $inputs.keys()#,$inputs["mmStyle"]["value"]#end if##if "mmStep" in $inputs.keys()#,null,$inputs["mmStep"]["value"]#end if#)" href="#first">$zoo._("Apply")</a></li>
 </ul>

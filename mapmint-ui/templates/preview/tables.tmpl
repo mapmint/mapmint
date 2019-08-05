@@ -10,7 +10,7 @@
 #attr $ocss = []
 
 #def istyles
-#if $conf.keys().count("senv")==0 or $conf["senv"]["loggedin"]!="true"
+#if not("senv" in $conf.keys()) or $conf["senv"]["loggedin"]!="true"
     <link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/loginc.css"/>
     <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
@@ -20,7 +20,7 @@
     <![endif]-->
 #end if
 <link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/font-mfizz.css"/>
-#if $conf["mm"].keys().count("useCdn")>0 and $conf["mm"]["useCdn"]=="true"
+#if "useCdn" in $conf["mm"].keys() and $conf["mm"]["useCdn"]=="true"
 <!-- CDN DEPENDENCIES -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>
@@ -165,8 +165,8 @@ $conf["identification"]["title"]: $zoo._("Tables management")
 
 #def findTheme(menu,id)
 #for i in range(len(menu))
-#if menu[i].keys().count("id")>0 and menu[i]["id"]==$id
-#if menu[i].keys().count("children")==0
+#if "id" in menu[i].keys() and menu[i]["id"]==$id
+#if not("children" in menu[i].keys())
 #set menu1=$menu
 #set $menu1[i]["children"]=[]
 #return $menu1[i]
@@ -174,7 +174,7 @@ $conf["identification"]["title"]: $zoo._("Tables management")
 #return $menu[i]
 #end if
 #end if
-#if menu[i].keys().count("children")>0
+#if "children" in menu[i].keys()
 #set menu1=$menu[$i]
 #set themeFound=findTheme(menu1["children"],id)
 #if $themeFound is not None
@@ -213,8 +213,8 @@ $appendMenu($lmenu,$res)
 #set levels=["first","second","third","forth"]
  <ul class="nav nav-$(levels[level])-level collapse in">
   <li>
-   <a id="#if obj.keys().count("id")>0#$(obj["id"])#end if#" href="#if $obj.keys().count("link")>0#$(lurl)/$(obj["link"])#else#\##end if#" role="tab" data-toggle="tab" class="#if $obj.keys().count("link")>0#mmdatastore#end if#"> $obj["text"]</a>
-#if $obj.keys().count("children")
+   <a id="#if "id" in obj.keys()#$(obj["id"])#end if#" href="#if "link" in $obj.keys()#$(lurl)/$(obj["link"])#else#\##end if#" role="tab" data-toggle="tab" class="#if "link" in $obj.keys()#mmdatastore#end if#"> $obj["text"]</a>
+#if "children" in $obj.keys()
 #for i in range(len($obj["children"]))
     $printLine(lurl,level+1,$obj["children"][i])
 #end for
@@ -225,7 +225,7 @@ $appendMenu($lmenu,$res)
 
 #def printLine4(lurl,level,obj)
 #set levels=["first","second","third","forth"]
-#if obj.keys().count("children")>0 and len($obj["children"])>0
+#if "children" in obj.keys() and len($obj["children"])>0
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink$obj["id"]" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
            $obj["text"]
 	</a>
@@ -235,13 +235,13 @@ $appendMenu($lmenu,$res)
 #end for
         </div>
 #else
-        <a class="dropdown-item" href="#if $obj.keys().count("link")>0#$(lurl)/$(obj["link"])#else#\##end if#"> $obj["text"]</a>
+        <a class="dropdown-item" href="#if "link" in $obj.keys()#$(lurl)/$(obj["link"])#else#\##end if#"> $obj["text"]</a>
 #end if
 #*
  <ul class="nav nav-$(levels[level])-level collapse in">
   <li>
-   <a id="#if obj.keys().count("id")>0#$(obj["id"])#end if#" href="#if $obj.keys().count("link")>0#$(lurl)/$(obj["link"])#else#\##end if#" role="tab" data-toggle="tab" class="#if $obj.keys().count("link")>0#mmdatastore#end if#"> $obj["text"]</a>
-#if $obj.keys().count("children")
+   <a id="#if "id" in obj.keys()#$(obj["id"])#end if#" href="#if "link" in $obj.keys()#$(lurl)/$(obj["link"])#else#\##end if#" role="tab" data-toggle="tab" class="#if "link" in $obj.keys()#mmdatastore#end if#"> $obj["text"]</a>
+#if "children" in $obj.keys()
 #for i in range(len($obj["children"]))
     $printLine(lurl,level+1,$obj["children"][i])
 #end for
@@ -253,7 +253,7 @@ $appendMenu($lmenu,$res)
 
 #def printLine(lurl,level,obj)
 #set levels=["first","second","third","forth"]
-#if obj.keys().count("children")>0 and len($obj["children"])>0
+#if "children" in obj.keys() and len($obj["children"])>0
     <li class="dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink$obj["id"]" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
            $obj["text"] <span class="caret"></span>
@@ -266,14 +266,14 @@ $appendMenu($lmenu,$res)
 	</li>
 #else
 	<li>
-        <a class="dropdown-item" href="#if $obj.keys().count("link")>0#$(lurl)/$(obj["link"])#else#\##end if#"> $obj["text"]</a>
+        <a class="dropdown-item" href="#if "link" in $obj.keys()#$(lurl)/$(obj["link"])#else#\##end if#"> $obj["text"]</a>
 	</li>
 #end if
 #end def
 
 #for i in range(len($lmenu))
 #if $lmenu[i]['text']=="Menu"
-#if $lmenu[i].keys().count("children")
+#if "children" in $lmenu[i].keys()
 #for j in range(len($lmenu[i]["children"]))
       <li class="nav-item dropdown">
      $printLine($conf["main"]["rootUrl"]+"tables",0,$lmenu[i]["children"][j])
@@ -301,11 +301,11 @@ $appendMenu($lmenu,$res)
 #set cur=con.conn.cursor()
 #set prefix=auth.getPrefix($conf)
 
-#if $conf.keys().count("senv")==0 or $conf["senv"]["loggedin"]!="true"
+#if not("senv" in $conf.keys()) or $conf["senv"]["loggedin"]!="true"
 <div class='notifications top-right'></div>
 
 
-#if $conf.keys().count("senv")==0 or $conf["senv"]["loggedin"]!="true"
+#if not("senv" in $conf.keys()) or $conf["senv"]["loggedin"]!="true"
 #set req="SELECT content from mm.pages where title='login_index'"
 #set res=$cur.execute($req)
 #try
@@ -319,7 +319,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/login_bs_body.html",searchList=
 #end try
 #end if
 #else
-#if $inputs.keys().count('query')>0 and $inputs["query"]["value"]!=""
+#if 'query' in $inputs.keys() and $inputs["query"]["value"]!=""
 
 #from Cheetah.Template import Template
 
@@ -384,7 +384,7 @@ $getAbstract()
 #except
 $getAbstract()
 #end try
-#if $conf.keys().count("senv")==0 or $conf["senv"]["loggedin"]!="true"
+#if not("senv" in $conf.keys()) or $conf["senv"]["loggedin"]!="true"
 #from Cheetah.Template import Template
 $(Template(file=$conf["main"]["templatesPath"]+"/login_bs_body.html",searchList={"title":$zoo._("Tables management"),"hasHeader": False}))
 #end if

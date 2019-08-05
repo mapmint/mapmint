@@ -10,7 +10,7 @@
 #attr $isError=True
 
 #def istyles
-#if $conf.keys().count("senv")==0 or $conf["senv"]["loggedin"]!="true"
+#if not("senv" in $conf.keys()) or $conf["senv"]["loggedin"]!="true"
     <link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/loginc.css"/>
     <link href="http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
@@ -20,7 +20,7 @@
     <![endif]-->
 #end if
 <link rel="stylesheet" type="text/css" href="$conf["main"]["publicationUrl"]/assets/css/font-mfizz.css"/>
-#if $conf["mm"].keys().count("useCdn")>0 and $conf["mm"]["useCdn"]=="true"
+#if "useCdn" in $conf["mm"].keys() and $conf["mm"]["useCdn"]=="true"
 <!-- CDN DEPENDENCIES -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.8/css/jquery.dataTables.min.css"/>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.0.0/css/buttons.dataTables.min.css"/>

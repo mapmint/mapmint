@@ -33,7 +33,7 @@
 #set c=$inputs
 #set $c["basic"]={"value":""}
 #end try
-#if $inputs.keys().count("basic")==0
+#if not("basic" in $inputs.keys())
 #set d1=$p2.x-$p1.x
 #set d2=$p2.x-$p1.x
 #try

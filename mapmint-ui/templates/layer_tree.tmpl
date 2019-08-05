@@ -4,11 +4,11 @@
 #except
 #set pprefix=""
 #end try
-#if $elem[$i].keys().count("children") > 0 
+#if "children" in $elem[$i].keys()
 	  <li iconCls="tree_group" closed="true"><span>$elem[$i]["text"].decode('raw_unicode_escape')</span>
 	    <ul>
 #for k in range(0,len($elem[$i]["children"]))
-#if $elem[$i]["children"][$k].keys().count("children") > 0
+#if "children" in $elem[$i]["children"][$k].keys()
 	  <li iconCls="tree_group" closed="true"><span>$elem[$i]["children"][$k]["text"].decode('raw_unicode_escape')</span>
 	    <ul>	    
 #for mm in range(0,len($elem[$i]["children"][$k]["children"]))

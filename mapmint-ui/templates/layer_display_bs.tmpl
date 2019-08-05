@@ -35,7 +35,7 @@
 #end if
 
 #set c=$conf["lenv"]
-#if c.keys().count("lindex")==0
+#if not("lindex" in c.keys())
 #set $c["lindex"]=0
 #end if
 

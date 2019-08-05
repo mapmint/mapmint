@@ -565,7 +565,7 @@ System.postMap[System.postMap.length]={
 			}
 #if $mms.getMetadata(m.getLayerByName(lname),'mmZFilterField') and $inputs.has_key('filter')
     			map.zoomToExtent(this.getDataExtent());
-#if $conf["senv"].keys().count("previous_map")>0 and $conf["senv"]["previous_map"]!="Default"
+#if "previous_map" in $conf["senv"].keys() and $conf["senv"]["previous_map"]!="Default"
     			\$('.fg-toolbar').find(".fg-button").first().attr("href",\$('.fg-toolbar').find(".fg-button").first().attr("href")+"$conf["senv"]["previous_map"]");
 #end if
 
@@ -654,7 +654,7 @@ System.postMap[System.postMap.length]={
 		layersList[this.localID].events.register('loadend', layersList[this.localID], function(){
 		    if(this.localID>=0){
 			map.zoomToExtent(this.getDataExtent());
-#if $conf["senv"].keys().count("previous_map")>0 and $conf["senv"]["previous_map"]!="Default"
+#if "previous_map" in $conf["senv"].keys() and $conf["senv"]["previous_map"]!="Default"
 			\$('.fg-toolbar').find(".fg-button").first().attr("href",\$('.fg-toolbar').find(".fg-button").first().attr("href")+"$conf["senv"]["previous_map"]");
 #end if
 		    }
@@ -734,7 +734,7 @@ System.postMap[System.postMap.length]={
 			});
 		features=gmlr.read(xml.responseText);
 		map.zoomToExtent(features[0].geometry.getBounds());
-#if $conf["senv"].keys().count("previous_map")>0 and $conf["senv"]["previous_map"]!="Default"
+#if "previous_map" in $conf["senv"].keys() and $conf["senv"]["previous_map"]!="Default"
 		\$('.fg-toolbar').find(".fg-button").first().attr("href",\$('.fg-toolbar').find(".fg-button").first().attr("href")+"$conf["senv"]["previous_map"]");
 #end if
 	    }catch(e){alert(e);}

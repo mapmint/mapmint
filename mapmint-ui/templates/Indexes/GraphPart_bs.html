@@ -34,7 +34,7 @@
   $ftmpl.printLine({"rid":"documents_"+$prefix+"graphs_formula","id":$prefix+"graphs_formula","name":$zoo._("Formula"),"type":"textarea"})
   $ftmpl.printLine({"rid":"documents_"+$prefix+"graphs_tooltip","id":$prefix+"graphs_tooltip","name":$zoo._("Tooltip"),"type":"textarea"})
 
-#if $inputs.keys().count("prefix")==0
+#if not("prefix" in $inputs.keys())
   $ftmpl.printButton({"id":"preview","name":$zoo._("Preview")})
   $ftmpl.printButton({"id":"save","name":$zoo._("Save")})
 #end if
