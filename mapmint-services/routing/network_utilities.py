@@ -50,7 +50,7 @@ def createNetwork(conf, inputs, outputs):
     ds.Destroy()
 
     # geometry1=extractInputs(conf,inputs["InputEntity1"])
-    # print >> sys.stderr,inputs["InputEntity2"]["value"][len(inputs["InputEntity2"]["value"])-100:len(inputs["InputEntity2"]["value"])-1]
+    # print(inputs["InputEntity2"]["value"][len(inputs["InputEntity2"]["value"])-100:len(inputs["InputEntity2"]["value"])-1], file=sys.stderr)
     # geometry2=extractInputs(conf,inputs["InputEntity2"])
 
     print("Extracted geometries", file=sys.stderr)
@@ -122,12 +122,12 @@ def createNetwork(conf, inputs, outputs):
                     current0[0].Destroy()
                 if intersection is not None and not (intersection.IsEmpty()):
 
-                    # print >> sys.stderr,current0[0]
-                    # print >> sys.stderr,intersection
-                    # print >> sys.stderr,current0[0].Intersection(intersection)
-                    # print >> sys.stderr,intersection.Intersection(current0[0])
+                    # print(current0[0], file=sys.stderr)
+                    # print(intersection, file=sys.stderr)
+                    # print(current0[0].Intersection(intersection), file=sys.stderr)
+                    # print(intersection.Intersection(current0[0]), file=sys.stderr)
                     hasValue = True
-                    # print >> sys.stderr,str(i)+' '+str(j)+' '+str(o)+' '+intersection.GetGeometryName()
+                    # print(str(i)+' '+str(j)+' '+str(o)+' '+intersection.GetGeometryName(), file=sys.stderr)
 
                     # CREATE SET OF INTERSECTING GEOMETRIES
                     current1 = []
@@ -156,14 +156,14 @@ def createNetwork(conf, inputs, outputs):
                     for q in range(0, length1):
                         print(str(q) + " current0 length: " + str(len(current0)), file=sys.stderr)
                         for r in range(0, len(current0)):
-                            # print >> sys.stderr,str(q)+" "+str(r)+" "+str(q)
-                            # print >> sys.stderr,str(r)+" "+str(q)+" Intersection "+str(current0[r].Intersection(current1[q]))+" "+str(current0[r].Intersects(current1[q]))+" "+str(current0[r].Touches(current1[q]))
-                            # print >>  sys.stderr,current0[r]
-                            # print >>  sys.stderr,current1[q]
+                            # print(str(q)+" "+str(r)+" "+str(q), file=sys.stderr)
+                            # print(str(r)+" "+str(q)+" Intersection "+str(current0[r].Intersection(current1[q]))+" "+str(current0[r].Intersects(current1[q]))+" "+str(current0[r].Touches(current1[q])), file=sys.stderr)
+                            # print(current0[r], file=sys.stderr)
+                            # print(current1[q], file=sys.stderr)
                             line = shapely.wkt.loads(current0[r].ExportToWkt())
                             point = shapely.wkt.loads(current1[q].ExportToWkt())
-                            # print >> sys.stderr," LINE INTERSECTS POINT " + str(line.intersects(point))
-                            # print >> sys.stderr," POINT INTERSECTS LINE " + str(point.intersects(line))
+                            # print(" LINE INTERSECTS POINT " + str(line.intersects(point)), file=sys.stderr)
+                            # print(" POINT INTERSECTS LINE " + str(point.intersects(line)), file=sys.stderr)
                             print(" POINT Distance LINE " + str(point.distance(line)), file=sys.stderr)
                             if point.distance(line) > 0.000001:
                                 continue
@@ -200,7 +200,7 @@ def createNetwork(conf, inputs, outputs):
                 # tmpStr+="\n********\n"+feat.ExportToJson()
                 lyr.CreateFeature(feat)
             print("\n********\nFeature " + str(i) + " was splitted in " + str(len(current)), file=sys.stderr)
-            # print >> sys.stderr,str(i)+" "+str(m)+" LINE : "+tmpStr
+            # print(str(i)+" "+str(m)+" LINE : "+tmpStr, file=sys.stderr)
         if not (hasValue):
             print(str(i) + " not intersecting", file=sys.stderr)
             rgeometries1 += [geometry1[i].Clone()]

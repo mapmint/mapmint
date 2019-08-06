@@ -339,7 +339,7 @@ def clogIn(conf, inputs, outputs):
         sql = " UPDATE " + prefix + "users set last_con=" + con.now + " WHERE login=[_login_]"
         con.pexecute_req([sql, {"login": {"value": inputs['login']['value'], "format": "s"}}])
         conn.commit()
-        # print >> sys.stderr, str(conf["senv"])
+        # print( str(conf["senv"]), file=sys.stderr)
         return zoo.SERVICE_SUCCEEDED
     else:
         conf["lenv"]["message"] = zoo._("Unable to connect with the provided login and password")
@@ -464,7 +464,7 @@ def logIn(conf, inputs, outputs):
         conf["senv"]["MMID"] = "MM" + cid
         # Set all the Session environment variables using the users 
         # table content.
-        # print >> sys.stderr,con.desc
+        # print(con.desc, file=sys.stderr)
         c.execute(con.desc)
         desc = c.fetchall()
         for i in desc:

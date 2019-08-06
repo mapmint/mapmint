@@ -194,7 +194,7 @@ class manage_users:
         cle_s = ",".join(cle)
         val_s = ",".join(['\'%s\'' % (i) for i in val])
         req = 'insert into ' + self.prefix + 'users (%s) values (%s)' % (cle_s, val_s)
-        # print >> sys.stderr,req
+        # print(req, file=sys.stderr)
         return self.execute_req(req)
 
     def update_user_by_id(self, d_user, id_user):

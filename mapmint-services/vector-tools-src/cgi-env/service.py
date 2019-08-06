@@ -77,8 +77,8 @@ def test(conf, inputs, outputs):
 def readFileFromBuffer(data, ext, sql=None):
     try:
         geometry = []
-        # print >> sys.stderr,'/vsimem//temp1'+ext
-        # print >> sys.stderr,data
+        # print('/vsimem//temp1'+ext, file=sys.stderr)
+        # print(data, file=sys.stderr)
         osgeo.gdal.FileFromMemBuffer('/vsimem//temp1' + ext, data)
         ds = osgeo.ogr.Open('/vsimem//temp1' + ext)
         if sql is not None:
@@ -100,7 +100,7 @@ def readFileFromBuffer(data, ext, sql=None):
         osgeo.gdal.Unlink('/vsimem//temp1' + ext)
         return geometry
     except Exception as e:
-        # print >> sys.stderr,e
+        # print(e, file=sys.stderr)
         return []
 
 
@@ -254,7 +254,7 @@ def orderPoiAlongLine(conf, inputs, outputs):
 
 
 def orderedIntersection(conf, inputs, outputs):
-    # print >> sys.stderr,"START !!"
+    # print("START !!", file=sys.stderr)
     Intersection(conf, inputs, outputs)
     inputs2 = inputs
     inputs2["points"] = outputs["Result"]
@@ -268,7 +268,7 @@ def demo(conf, inputs, outputs):
 
 
 def access(conf, inputs, outputs):
-    # print >> sys.stderr,str(inputs);
+    # print(str(inputs), file=sys.stderr)
     osgeo.gdal.FileFromMemBuffer('/vsimem//temp1', inputs["InputData"]["value"])
     ds = osgeo.ogr.Open('/vsimem//temp1')
     print(ds, file=sys.stderr)
@@ -334,13 +334,13 @@ def BufferPy(conf, inputs, outputs):
 
 
 def Buffer(conf, inputs, outputs):
-    # print >> sys.stderr, "Starting service ..."
+    # print( "Starting service ...", file=sys.stderr)
     try:
         bdist = float(inputs["BufferDistance"]["value"])
     except:
         bdist = 1
-    # print >> sys.stderr, bdist
-    # print >> sys.stderr, inputs["InputPolygon"]
+    # print( bdist, file=sys.stderr)
+    # print( inputs["InputPolygon"], file=sys.stderr)
     geometry = extractInputs(conf, inputs["InputPolygon"])
     i = 0
     rgeometries = []
@@ -389,7 +389,7 @@ def PointOnSurface(conf, inputs, outputs):
         if resg.GetGeometryType() != 3:
             resg = resg.ConvexHull()
         resg0 = resg.PointOnSurface()
-        # print >> sys.stderr,"GEO "+str(resg.ExportToWkt())
+        # print("GEO "+str(resg.ExportToWkt()), file=sys.stderr)
         if resg0 is None:
             resg0 = resg.Centroid()
         tmp.SetGeometryDirectly(resg0)
@@ -460,7 +460,7 @@ def ConvexHullPy(conf, inputs, outputs):
 
 
 def EnvelopePy(conf, inputs, outputs):
-    # print >> sys.stderr, inputs
+    # print( inputs, file=sys.stderr)
     try:
         bdist = float(inputs["BufferDistance"]["value"])
     except:
@@ -468,7 +468,7 @@ def EnvelopePy(conf, inputs, outputs):
     geometry = extractInputs(conf, inputs["InputPolygon"])
     tmp = geometry[0].GetGeometryRef().GetEnvelope()
     outputs["Result"]["value"] = str(tmp[0]) + ',' + str(tmp[2]) + ',' + str(tmp[1]) + ',' + str(tmp[3]) + ',' + 'urn:ogc:def:crs:OGC:1.3:CRS84'
-    # print >> sys.stderr,outputs["Result"]
+    # print(outputs["Result"], file=sys.stderr)
     return 3
 
 
@@ -495,29 +495,29 @@ def UnionPy(conf, inputs, outputs):
 
 
 def BufferUnion(conf, inputs, outputs):
-    # print >> sys.stderr,"OK 0"
+    # print("OK 0", file=sys.stderr)
     Buffer(conf, inputs, outputs)
-    # print >> sys.stderr,"OK 1"
+    # print("OK 1", file=sys.stderr)
     inputs1 = {
         "InputEntity": {
             "value": outputs["Result"]["value"],
             "mimeType": "application/json"
         }
     }
-    # print >> sys.stderr,"OK 2"
+    # print("OK 2", file=sys.stderr)
     UnionOne(conf, inputs1, outputs)
-    # print >> sys.stderr,"OK 3"
+    # print("OK 3", file=sys.stderr)
     return zoo.SERVICE_SUCCEEDED
 
 
 def UnionOne(conf, inputs, outputs):
     import sys
-    # print >> sys.stderr,"DEBG"
+    # print("DEBG", file=sys.stderr)
     geometry1 = extractInputs(conf, inputs["InputEntity"])
-    # print >> sys.stderr,"DEUBG"
+    # print("DEUBG", file=sys.stderr)
     i = 0
     geometryRes = None
-    # print >> sys.stderr,"DEUBG"
+    # print("DEUBG", file=sys.stderr)
     while i < len(geometry1):
         j = 0
         if i == 0:
@@ -581,7 +581,7 @@ def UnionOnePy1(conf, inputs, outputs):
     print("DEUBG / LOAD", file=sys.stderr)
     i = 0
     geometryRes = None
-    # print >> sys.stderr,"DEUBG"
+    # print("DEUBG", file=sys.stderr)
     multi = osgeo.ogr.Geometry(osgeo.ogr.wkbMultiPolygon)
     # for g in geometries:
     #
@@ -623,12 +623,12 @@ def UnionOnePy1(conf, inputs, outputs):
 
 def UnionOnePy0(conf, inputs, outputs):
     import sys
-    # print >> sys.stderr,"DEBG"
+    # print("DEBG", file=sys.stderr)
     geometry1 = extractInputs(conf, inputs["InputPolygon"])
-    # print >> sys.stderr,"DEUBG"
+    # print("DEUBG", file=sys.stderr)
     i = 0
     geometryRes = None
-    # print >> sys.stderr,"DEUBG"
+    # print("DEUBG", file=sys.stderr)
     multi = osgeo.ogr.Geometry(osgeo.ogr.wkbMultiPolygon)
     # for g in geometries:
     #
@@ -675,12 +675,12 @@ def UnionOnePy0(conf, inputs, outputs):
 
 def UnionOneBis(conf, inputs):
     import sys
-    # print >> sys.stderr,"DEBG"
+    # print("DEBG", file=sys.stderr)
     geometry1 = extractInputs(conf, inputs["InputEntity"])
-    # print >> sys.stderr,"DEUBG"
+    # print("DEUBG", file=sys.stderr)
     i = 0
     geometryRes = None
-    # print >> sys.stderr,"DEUBG"
+    # print("DEUBG", file=sys.stderr)
     multi = osgeo.ogr.Geometry(osgeo.ogr.wkbMultiPolygon)
     while i < len(geometry1):
         j = 0
@@ -711,18 +711,18 @@ class Classifier:
         self.origin = origin
 
     def getClass(self, x):
-        # print >> sys.stderr,self.origin[self.cnt]
+        # print(self.origin[self.cnt], file=sys.stderr)
         if x[0] == self.origin[self.cnt][0] and x[1] == self.origin[self.cnt][1]:
             return 0
-        # print >> sys.stderr,x
+        # print(x, file=sys.stderr)
         geometryRes = osgeo.ogr.Geometry(osgeo.ogr.wkbPoint)
         geometryRes.AddPoint_2D(x[0], x[1])
         geometryResO = osgeo.ogr.Geometry(osgeo.ogr.wkbPoint)
         geometryResO.AddPoint_2D(self.origin[self.cnt][0], self.origin[self.cnt][1])
         val = geometryResO.Distance(geometryRes)
         self.cnt += 1
-        # print >> sys.stderr,self.cnt
-        # print >> sys.stderr,val
+        # print(self.cnt, file=sys.stderr)
+        # print(val, file=sys.stderr)
         return val
 
 
@@ -745,16 +745,16 @@ def UnionOneGeom(conf, inputs, outputs):
         if tpoints is not None:
             if i == 0:
                 end0 = tmp.GetPoint(tmp.GetPointCount() - 1)
-                # print >> sys.stderr,"END 0 "+str(end0)
+                # print("END 0 "+str(end0), file=sys.stderr)
                 end0G = osgeo.ogr.Geometry(osgeo.ogr.wkbPoint)
                 end0G.AddPoint_2D(end0[0], end0[1])
             else:
                 start = tmp.GetPoint(0)
                 end = tmp.GetPoint(tmp.GetPointCount() - 1)
-                # print >> sys.stderr,"START "+str(start)
-                # print >> sys.stderr,"END "+str(end)
-                # print >> sys.stderr,"END "+str(end)
-                # print >> sys.stderr,"LINE "+str(tpoints)
+                # print("START "+str(start), file=sys.stderr)
+                # print("END "+str(end), file=sys.stderr)
+                # print("END "+str(end), file=sys.stderr)
+                # print("LINE "+str(tpoints), file=sys.stderr)
                 startG = osgeo.ogr.Geometry(osgeo.ogr.wkbPoint)
                 startG.AddPoint_2D(start[0], start[1])
                 endG = osgeo.ogr.Geometry(osgeo.ogr.wkbPoint)
@@ -763,7 +763,7 @@ def UnionOneGeom(conf, inputs, outputs):
                     tpoints.sort(key=lambda x: line.project(shapely.wkt.loads('POINT(' + str(x[0]) + ' ' + str(x[1]) + ')')))
                 else:
                     dist = line.project(shapely.wkt.loads(endG.ExportToWkt()))
-                    # print >> sys.stderr,endG.ExportToWkt()
+                    # print(endG.ExportToWkt(), file=sys.stderr)
                     tpoints.sort(key=lambda x: dist - line.project(shapely.wkt.loads('POINT(' + str(x[0]) + ' ' + str(x[1]) + ')')))
                 end0G = endG
             points += tpoints
@@ -869,7 +869,7 @@ def Intersection(conf, inputs, outputs):
             tmp = geometry2[j].Clone()
             # resg=validateGeom(geometry2[j].GetGeometryRef())
             resg = geometry2[j].GetGeometryRef()
-            # print >> sys.stderr," ***** 1 : "+str(resg)
+            # print(" ***** 1 : "+str(resg), file=sys.stderr)
             # resg=resg.Intersection(geometry1[i].GetGeometryRef())
             if len(geometry1) == 1:
                 conf["lenv"]["message"] = "(" + str(j) + "/" + str(len(geometry2)) + ") " + zoo._("Run intersection process...")
@@ -881,7 +881,7 @@ def Intersection(conf, inputs, outputs):
                         tmpGeom = geometry1[i].GetGeometryRef().GetGeometryRef(k)
                         if tmpGeom.Intersects(resg):
                             tmp1 = geometry2[j].Clone()
-                            # print >> sys.stderr," ***** 2 : "+str(resg)
+                            # print(" ***** 2 : "+str(resg), file=sys.stderr)
                             resg1 = tmpGeom.Intersection(resg)
                             # tmp1.SetGeometryDirectly(validateGeom(resg1))
                             tmp1.SetGeometryDirectly(resg1)
@@ -896,11 +896,11 @@ def Intersection(conf, inputs, outputs):
                         print(e, file=sys.stderr)
                 tmp.Destroy()
             else:
-                # print >> sys.stderr," ***** 2 : "+str(geometry1[i].GetGeometryRef())
+                # print(" ***** 2 : "+str(geometry1[i].GetGeometryRef()), file=sys.stderr)
                 # resg=validateGeom(geometry1[i].GetGeometryRef()).Intersection(validateGeom(resg))
                 # resg=validateGeom(geometry1[i].GetGeometryRef()).Intersection(resg)
                 resg = geometry1[i].GetGeometryRef().Intersection(resg)
-                # print >> sys.stderr," ***** 3 : "+str(resg)
+                # print(" ***** 3 : "+str(resg), file=sys.stderr)
                 try:
                     # tmp.SetGeometryDirectly(validateGeom(resg))
                     tmp.SetGeometryDirectly(resg)
@@ -929,14 +929,14 @@ def IntersectionPy(conf, inputs, outputs):
 def Intersection0(conf, inputs, outputs):
     print("Starting service ...", file=sys.stderr)
     geometry1 = extractInputs(conf, inputs["InputEntity1"])
-    # print >> sys.stderr, "Starting 1 ... "+inputs["InputEntity1"]["mimeType"]
+    # print( "Starting 1 ... "+inputs["InputEntity1"]["mimeType"], file=sys.stderr)
     geometry2 = extractInputs(conf, inputs["InputEntity2"], "select gml_id as fid0,* ")
-    # print >> sys.stderr, "Starting 2 ... "+inputs["InputEntity2"]["mimeType"]
+    # print( "Starting 2 ... "+inputs["InputEntity2"]["mimeType"], file=sys.stderr)
 
     if "InputEntity3" in inputs and inputs["InputEntity3"]["value"]:
         geometry3 = extractInputs(conf, inputs["InputEntity3"])
 
-    # print >> sys.stderr,str(len(geometry1))+" "+str(len(geometry2))
+    # print(str(len(geometry1))+" "+str(len(geometry2)), file=sys.stderr)
 
     rgeometries = []
     fids = []
@@ -949,16 +949,16 @@ def Intersection0(conf, inputs, outputs):
             # resg=resg.Intersection(geometry1[i].GetGeometryRef())
             # resg=geometry1[i].GetGeometryRef().Intersection(resg)
             # tmp.SetGeometryDirectly(resg)
-            # print >> sys.stderr, dir(tmp)
-            # print >> sys.stderr,dir(resg)
+            # print( dir(tmp), file=sys.stderr)
+            # print(dir(resg), file=sys.stderr)
             if geometry1[i].GetGeometryRef().Intersects(resg):
                 if "InputEntity3" in inputs and inputs["InputEntity3"]["value"]:
                     k = 0
                     hasVal = False
                     while k < len(geometry3):
                         # resg=geometry3[k].GetGeometryRef().Intersection(resg)
-                        # print >> sys.stderr,"*******\n"+str(resg.GetGeometryType())
-                        # print >> sys.stderr,geometry3[k].GetGeometryRef().Intersects(resg)
+                        # print("*******\n"+str(resg.GetGeometryType()), file=sys.stderr)
+                        # print(geometry3[k].GetGeometryRef().Intersects(resg), file=sys.stderr)
                         if geometry3[k].GetGeometryRef().Equals(resg):
                             hasVal = True
                             break
@@ -967,7 +967,7 @@ def Intersection0(conf, inputs, outputs):
                         rgeometries += [tmp]
                         fids += [tmp.GetFID()]
                 else:
-                    # print >> sys.stderr,dir(resg)
+                    # print(dir(resg), file=sys.stderr)
                     # tmp.SetGeometryDirectly(resg.Empty())
                     rgeometries += [tmp]
                     fids += [tmp.GetFID()]
@@ -1154,7 +1154,7 @@ def DifferencePy(conf, inputs, outputs):
 
 
 def SymDifferencePy(conf, inputs, outputs):
-    # print >> sys.stderr,inputs
+    # print(inputs, file=sys.stderr)
     geometry1 = extractInputs(conf, inputs["InputEntity1"])
     # geometry2=extractInputs(conf,inputs["InputEntity2"])
     outputs1 = {"Result": {"mimeType": "application/json"}}
@@ -1184,7 +1184,7 @@ def SymDifferencePy(conf, inputs, outputs):
 
 
 def ExteriorRingPy(conf, inputs, outputs):
-    # print >> sys.stderr,inputs
+    # print(inputs, file=sys.stderr)
     geometry1 = extractInputs(conf, inputs["InputPolygon"])
     outputs1 = {"Result": {"mimeType": "application/json"}}
     rgeometries = []

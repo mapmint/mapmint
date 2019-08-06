@@ -35,7 +35,7 @@ def test(conf, inputs, outputs):
 
 
 def load(conf, inputs, outputs):
-    # print >> sys.stderr, conf
+    # print( conf, file=sys.stderr)
     # To define
     dbParams = ['dbname', 'user', 'password', 'host', 'port']
     values = "{"
@@ -48,11 +48,11 @@ def load(conf, inputs, outputs):
         cnt = 0
         for j in dbParams:
             print(j, file=sys.stderr)
-            # print >> sys.stderr, j
+            # print( j, file=sys.stderr)
             try:
                 items = xqf.xpathEval("/connection/" + j)
                 for i in items:
-                    # print >> sys.stderr, cnt
+                    # print( cnt, file=sys.stderr)
                     if cnt > 0:
                         values += ', '
                     values += '"' + i.name + '": "' + str(i.children.get_content()) + '"'
@@ -83,7 +83,7 @@ def details(conf, inputs, outputs):
         cnt = 0
         for j in dbParams:
             print(j, file=sys.stderr)
-            # print >> sys.stderr, j
+            # print( j, file=sys.stderr)
             try:
                 items = xqf.xpathEval("/connection/" + j)
                 for i in items:
@@ -101,7 +101,7 @@ def details(conf, inputs, outputs):
 
 def delete(conf, inputs, outputs):
     try:
-        # print >> sys.stderr, conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"+inputs["name"]["value"]+".xml"
+        # print( conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"+inputs["name"]["value"]+".xml", file=sys.stderr)
         os.unlink(conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/" + inputs["name"]["value"] + ".xml")
         os.unlink(
             conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/" + inputs["name"]["value"] + "ds_ows.map")
@@ -172,9 +172,9 @@ def display(conf, inputs, outputs):
     default_dir = conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/"
     original_dir = conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/"
     label_dir = ""
-    # print >> sys.stderr, conf["main"]["dataPath"]+"/PostGIS/"
-    # print >> sys.stderr, original_dir
-    # print >> sys.stderr, inputs["dir"]["value"]
+    # print( conf["main"]["dataPath"]+"/PostGIS/", file=sys.stderr)
+    # print( original_dir, file=sys.stderr)
+    # print( inputs["dir"]["value"], file=sys.stderr)
     try:
         tmp = os.listdir(original_dir)
     except:

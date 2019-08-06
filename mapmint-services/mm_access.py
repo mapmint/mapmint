@@ -97,7 +97,7 @@ def checkDataStorePriv(conf, ds, priv):
         priv0 = f.read()
         f.close()
     except:
-        # print >> sys.stderr,"Unable to load the following file "+str(path)+".mmpriv"
+        # print("Unable to load the following file "+str(path)+".mmpriv", file=sys.stderr)
         return True
     privs = priv0.split("\n")
     privf = []

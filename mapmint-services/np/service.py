@@ -1656,7 +1656,7 @@ def updateElement(conf, inputs, outputs):
                         req2 = []
                     req2 += ["INSERT INTO " + ntname + " (" + inputs[i + "_in"]["value"] + "," + inputs[i + "_out"]["value"] + ") VALUES (" + str(obj["id"]) + "," + obj[i][j] + ")"]
                     # if req2 is not None:
-                #    print >> sys.stderr,req2
+                #    print(req2, file=sys.stderr)
                 #    cur.execute(req2)
                 #    req2=None
             avoidReq1 = False
@@ -2816,10 +2816,10 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
         # print(vals1, file=sys.stderr)
         # for i in range(0,len(vals1)):
         #    req0=("select ").encode("utf-8")+vals1[i][1]+(" as ").encode("utf-8")+vals1[i][0]+(" from "+tablePrefix+idx+" WHERE ogc_fid="+_oid).encode("utf-8")
-        #    print >> sys.stderr,req0.encode('utf-8')
+        #    print(req0.encode('utf-8'), file=sys.stderr)
         #    cur.execute(req0)
         #    vals2=cur.fetchone()
-        #    #print >> sys.stderr,vals2
+        #    #print(vals2, file=sys.stderr)
         #    try:
         #        script+="pm.searchAndReplace('[_"+vals1[i][0]+"_]',"+json.dumps(vals2[0])+")\n"
         #    except:
@@ -3653,7 +3653,7 @@ def clientInsert(conf, inputs, outputs):
                 print(content, file=sys.stderr)
                 cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=%s WHERE " + pkey + "=" + cid, (psycopg2.Binary(content),))
                 # except Exception as e:
-                #    print >> sys.stderr,e
+                #    print(e, file=sys.stderr)
 
             if dcols[i]["type"] == "tbl_linked":
                 lcomponents = dcols[i]["value"].split(';')

@@ -88,8 +88,8 @@ def issue(conf, inputs, outputs):
         # myMap=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
         myMap = mapscript.mapObj("/tmp/toto1.map")
         myMap.save("/tmp/toto.map")
-        # print >> sys.stderr,dir(myMap)
-        # print >> sys.stderr,myMap.save(conf["main"]["dataPath"]+"/maps/debug_issue_project_"+inputs["map"]["value"]+".map")
+        # print(dir(myMap), file=sys.stderr)
+        # print(myMap.save(conf["main"]["dataPath"]+"/maps/debug_issue_project_"+inputs["map"]["value"]+".map"), file=sys.stderr)
     outputs["Result"]["value"] = conf["main"]["dataPath"] + "/maps/debug_issue_project_" + inputs["map"]["value"] + ".map"
     return zoo.SERVICE_SUCCEEDED
 
@@ -240,7 +240,7 @@ def removeAllLayers(m, lname):
 
 def options(conf, inputs, outputs):
     import datastores.service as ds
-    # print >> sys.stderr,ds
+    # print(ds, file=sys.stderr)
     ds.list(conf, inputs, outputs)
     elements = eval(outputs["Result"]["value"])
     li = []
@@ -551,7 +551,7 @@ def mmVectorInfo2MapPy(conf, inputs, outputs):
                 print(m.getLayer(0).connectiontype, file=sys.stderr)
                 if m.getLayer(0).connectiontype == mapscript.MS_WMS:
                     print(m.web.metadata.get("ows_srs"), file=sys.stderr)
-                    # print >> sys.stderr,dir(m)
+                    # print(dir(m), file=sys.stderr)
                     try:
                         srs = m.web.metadata.get("ows_srs")
                         setMetadata(m.web, "ows_srs", srs + " EPSG:3857")
@@ -741,7 +741,7 @@ def mmVectorInfo2MapPy(conf, inputs, outputs):
 
 def redrawDsList(conf, inputs, outputs):
     listDataSource(conf, inputs, outputs)
-    # print >> sys.stderr,outputs
+    # print(outputs, file=sys.stderr)
     tmp = eval(outputs["Result"]["value"])
     for a in range(0, len(tmp)):
         if not ("value" in tmp[a]):
@@ -838,13 +838,13 @@ def _loadMapForDs(conf, inputs, outputs):
 
 def refreshLayersList(conf, inputs, outputs):
     mapfile = conf["main"]["dataPath"] + "/maps/project_" + inputs["name"]["value"] + ".map"
-    # print >> sys.stderr,mapfile
+    # print(mapfile, file=sys.stderr)
     try:
         ll = getLayersList(conf, mapfile)
         int(ll)
         return zoo.SERVICE_FAILED
     except:
-        # print >> sys.stderr,ll
+        # print(ll, file=sys.stderr)
         outputs["Result"]["value"] = ll
         return zoo.SERVICE_SUCCEEDED
     return zoo.SERVICE_SUCCEEDED
@@ -872,7 +872,7 @@ def getGroupList(conf, mapfile, raster=None):
     print("************** DEBUG: " + str(mapfile), file=sys.stderr)
     try:
         m = mapscript.mapObj(mapfile)
-        # print >> sys.stderr,m
+        # print(m, file=sys.stderr)
         # conf["main"]["m"]=m
     except:
         if conf is not None:
@@ -889,11 +889,11 @@ def getGroupList(conf, mapfile, raster=None):
             continue
         print("mm_group_" + str(i) + " = " + str(groups), file=sys.stderr)
         if i == 0:
-            # print >> sys.stderr,groups
+            # print(groups, file=sys.stderr)
             resGroups[groups] = []
-            # print >> sys.stderr,resGroups
+            # print(resGroups, file=sys.stderr)
             allGroups += [groups]
-            # print >> sys.stderr,allGroups
+            # print(allGroups, file=sys.stderr)
         elif i == 1:
             for j in groups.split(","):
                 print("JJ " + j, file=sys.stderr)
@@ -949,13 +949,13 @@ def getGroupList(conf, mapfile, raster=None):
 
 def getThemArray(obj, search):
     for k in obj:
-        # print >> sys.stderr, " Compare "+k+" "+search
+        # print( " Compare "+k+" "+search, file=sys.stderr)
         if k == search:
             return obj[k]
     for k in obj:
         for l in range(0, len(obj[k])):
             for m in obj[k][l]:
-                # print >> sys.stderr, " Compare "+m+" "+search
+                # print( " Compare "+m+" "+search, file=sys.stderr)
                 if m == search:
                     return obj[k][l][m]
     for k in obj:
@@ -963,16 +963,16 @@ def getThemArray(obj, search):
             for m in obj[k][l]:
                 for n in range(0, len(obj[k][l][m])):
                     for o in obj[k][l][m][n]:
-                        # print >> sys.stderr, " Compare "+o+" "+search
+                        # print( " Compare "+o+" "+search, file=sys.stderr)
                         if o == search:
                             return obj[k][l][m][n][o]
     return None
 
 
 def addLayerToThem(obj, search, value):
-    # print >> sys.stderr,obj
+    # print(obj, file=sys.stderr)
     for k in obj:
-        # print >> sys.stderr, " Compare "+k+" "+search
+        # print( " Compare "+k+" "+search, file=sys.stderr)
         if k == search:
             if obj[k].count(value) == 0:
                 obj[k] += [value]
@@ -988,12 +988,12 @@ def addLayerToThem(obj, search, value):
 
 def recursMapList(conf, group, allreadyInTimeline):
     res = []
-    # print >> sys.stderr,str(group)
-    # print >> sys.stderr,str(allreadyInTimeline)
+    # print(str(group), file=sys.stderr)
+    # print(str(allreadyInTimeline), file=sys.stderr)
     for i in group:
-        # print >> sys.stderr,"****** GROUP III "
-        # print >> sys.stderr,str(group[i])
-        # print >> sys.stderr,type(group[i]).__name__
+        # print("****** GROUP III ", file=sys.stderr)
+        # print(str(group[i]), file=sys.stderr)
+        # print(type(group[i]).__name__, file=sys.stderr)
         if type(group[i]).__name__ == "str":
             import mapscript
             m = mapscript.mapObj(conf["main"]["dataPath"] + "/maps/project_" + conf["senv"]["last_map"] + ".map")
@@ -1021,7 +1021,7 @@ def recursMapList(conf, group, allreadyInTimeline):
             if len(group[i]) >= 0:
                 res1 = []
                 for j in range(0, len(group[i])):
-                    # print >> sys.stderr,"recursMap "+str(group[i][j])
+                    # print("recursMap "+str(group[i][j]), file=sys.stderr)
                     res1 += recursMapList(conf, group[i][j], allreadyInTimeline)
                 res += [{"id": i, "text": i, "children": res1}]
             else:
@@ -1063,7 +1063,7 @@ def getMapList(conf, inputs, outputs):
     else:
         d = getGroupList(conf, conf["main"]["dataPath"] + "/maps/project_" + inputs["name"]["value"] + ".map")
     import sys
-    # print >> sys.stderr,conf["main"]
+    # print(conf["main"], file=sys.stderr)
     import json
     # outputs["Result"]["value"]=json.dumps([res])
     print("GROUPS " + str(d), file=sys.stderr)
@@ -1075,12 +1075,12 @@ def recursGroupList1(group, pref):
     res = []
     for i in group:
         res += [{"value": i, "text": pref + i}]
-        # print >> sys.stderr,type(group[i]).__name__
+        # print(type(group[i]).__name__, file=sys.stderr)
         if type(group[i]).__name__ == "str":
             return []
         else:
             for j in range(0, len(group[i])):
-                # print >> sys.stderr,group[i][j]
+                # print(group[i][j], file=sys.stderr)
                 res += recursGroupList1(group[i][j], i + " / ")
     return res
 
@@ -1088,7 +1088,7 @@ def recursGroupList1(group, pref):
 def getGroupList1(conf, inputs, outputs):
     import json
     d = getGroupList(conf, conf["main"]["dataPath"] + "/maps/project_" + inputs["name"]["value"] + ".map", True)
-    # print >> sys.stderr, recursGroupList1(d,"")
+    # print( recursGroupList1(d,""), file=sys.stderr)
     outputs["Result"]["value"] = json.dumps(d)
     return zoo.SERVICE_SUCCEEDED
 
@@ -1263,7 +1263,7 @@ def createLegend0(conf, inputs, outputs):
                     else:
                         j.getClass(l).setExpression(None)
                     l -= 1
-                # print >> sys.stderr,"INSERT Layer: "+j.name
+                # print("INSERT Layer: "+j.name, file=sys.stderr)
                 oldM.insertLayer(j)
                 k += 1
         i -= 1
@@ -1295,7 +1295,7 @@ def createLegend0(conf, inputs, outputs):
     if numClasses > 1:
         i = numClasses
         while i > 0:
-            # print >> sys.stderr,"Produce layer "+layer.name+"_"+str(i)
+            # print("Produce layer "+layer.name+"_"+str(i), file=sys.stderr)
             l = oldM.getLayerByName(layer.name + "_" + str(i))
             l.connection = None
             l.data = None
@@ -1311,7 +1311,7 @@ def createLegend0(conf, inputs, outputs):
 
     while index >= 0:
         l = oldM.getLayer(index)
-        # print >> sys.stderr,"LNAME 11 "+l.name+" == "+layer.name
+        # print("LNAME 11 "+l.name+" == "+layer.name, file=sys.stderr)
         if l is not None and l.name.count(layer.name) > 0:
             l.setExtent(-1, -1, 1, 1)
             l.minscaledenom = -1
@@ -1364,17 +1364,17 @@ def createLegend0(conf, inputs, outputs):
                 images += [
                     {"id": layer.name, "value": conf["main"]["mapserverAddress"] + "?map=" + mapfile1 + "&LAYERS=" + layer.name + "&SRS=EPSG%3A4326&amp;FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&BBOX=0,0,0.002,0.002&WIDTH=24&HEIGHT=24&format=png"}]
                 tmpImage = tmpClass.createLegendIcon(m, layer, 24, 24)
-                # print >> sys.stderr,tmpImage
-                # print >> sys.stderr,conf["main"]["dataPath"]+"/maps/"+img_name
-                # print >> sys.stderr,"Try to save"
+                # print(tmpImage, file=sys.stderr)
+                # print(conf["main"]["dataPath"]+"/maps/"+img_name, file=sys.stderr)
+                # print("Try to save", file=sys.stderr)
                 tmpImage.write(mapPath + "/" + img_name)
             i += 1
 
     try:
         inColor1 = oldM.getLayerByName(inputs["layer"]["value"]).metadata.get("mmColor").split(" ")
-        # print >> sys.stderr,"InColor: "+str(inColor1)
+        # print("InColor: "+str(inColor1), file=sys.stderr)
         outColor1 = oldM.getLayerByName(inputs["layer"]["value"]).metadata.get("mmOutColor").split(" ")
-        # print >> sys.stderr,outColor1
+        # print(outColor1, file=sys.stderr)
         inColor1 = '#%02x%02x%02x' % (int(inColor1[0]), int(inColor1[1]), int(inColor1[2]))
         outColor1 = '#%02x%02x%02x' % (int(outColor1[0]), int(outColor1[1]), int(outColor1[2]))
     except:
@@ -1605,7 +1605,7 @@ def createLegend0(conf, inputs, outputs):
     nameSpace["data"] = layer.data
     nameSpace["mmSteps"] = mySteps
 
-    # print >> sys.stderr,nameSpace
+    # print(nameSpace, file=sys.stderr)
     # nameSpace["properties"]=json.loads(outputs1["Result"]["value"])
     saveProjectMap(m, mapfile1)
     outputs["Result"]["value"] = json.dumps(nameSpace)
@@ -1728,7 +1728,7 @@ def createLegend(conf, inputs, outputs):
                     else:
                         j.getClass(l).setExpression(None)
                     l -= 1
-                # print >> sys.stderr,"INSERT Layer: "+j.name
+                # print("INSERT Layer: "+j.name, file=sys.stderr)
                 oldM.insertLayer(j)
                 k += 1
         i -= 1
@@ -1755,7 +1755,7 @@ def createLegend(conf, inputs, outputs):
     if numClasses > 1:
         i = numClasses
         while i > 0:
-            # print >> sys.stderr,"Produce layer "+layer.name+"_"+str(i)
+            # print("Produce layer "+layer.name+"_"+str(i), file=sys.stderr)
             l = oldM.getLayerByName(layer.name + "_" + str(i))
             l.connection = None
             l.data = None
@@ -1768,7 +1768,7 @@ def createLegend(conf, inputs, outputs):
 
     while index >= 0:
         l = oldM.getLayer(index)
-        # print >> sys.stderr,"LNAME 11 "+l.name+" == "+layer.name
+        # print("LNAME 11 "+l.name+" == "+layer.name, file=sys.stderr)
         if l is not None and l.name.count(layer.name) > 0:
             l.setExtent(-1, -1, -1, -1)
             l.minscaledenom = -1
@@ -1829,17 +1829,17 @@ def createLegend(conf, inputs, outputs):
                 images += [
                     {"id": layer.name, "value": conf["main"]["mapserverAddress"] + "?map=" + mapfile1 + "&LAYERS=" + layer.name + "&SRS=EPSG%3A4326&amp;FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&BBOX=0,0,0.002,0.002&WIDTH=24&HEIGHT=24&format=png"}]
                 tmpImage = tmpClass.createLegendIcon(m, layer, 24, 24)
-                # print >> sys.stderr,tmpImage
-                # print >> sys.stderr,conf["main"]["dataPath"]+"/maps/"+img_name
-                # print >> sys.stderr,"Try to save"
+                # print(tmpImage, file=sys.stderr)
+                # print(conf["main"]["dataPath"]+"/maps/"+img_name, file=sys.stderr)
+                # print("Try to save", file=sys.stderr)
                 tmpImage.write(mapPath + "/" + img_name)
             i += 1
 
     try:
         inColor1 = oldM.getLayerByName(inputs["layer"]["value"]).metadata.get("mmColor").split(" ")
-        # print >> sys.stderr,"InColor: "+str(inColor1)
+        # print("InColor: "+str(inColor1), file=sys.stderr)
         outColor1 = oldM.getLayerByName(inputs["layer"]["value"]).metadata.get("mmOutColor").split(" ")
-        # print >> sys.stderr,outColor1
+        # print(outColor1, file=sys.stderr)
         inColor1 = '#%02x%02x%02x' % (int(inColor1[0]), int(inColor1[1]), int(inColor1[2]))
         outColor1 = '#%02x%02x%02x' % (int(outColor1[0]), int(outColor1[1]), int(outColor1[2]))
     except:
@@ -1849,13 +1849,13 @@ def createLegend(conf, inputs, outputs):
     nameSpace = {'conf': conf, 'inputs': inputs, 'outputs': outputs, 'images': images, 'colors': [inColor, outColor, img_url, inColor1, outColor1], "m": m}
     # outputs1={"Result":{"value":""}}
     # res=createLegend0(conf,inputs,outputs1)
-    # print >> sys.stderr,str(json.loads(outputs1["Result"]["value"]))
-    # print >> sys.stderr,nameSpace
+    # print(str(json.loads(outputs1["Result"]["value"])), file=sys.stderr)
+    # print(nameSpace, file=sys.stderr)
     # nameSpace=json.loads(outputs1["Result"]["value"])
-    # print >> sys.stderr,m
+    # print(m, file=sys.stderr)
     # myMap=loadLegendMapfile(conf,inputs)
-    # print >> sys.stderr,nameSpace
-    # print >> sys.stderr,myMap
+    # print(nameSpace, file=sys.stderr)
+    # print(myMap, file=sys.stderr)
     # nameSpace["m"]=myMap
     if "prefix" in inputs:
         if "mmClass" in inputs:
@@ -2747,7 +2747,7 @@ def createColorRamp(conf, m, layer, useTile=0):
     # saveProjectMap(m,conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+"TOTO.map")
     # myMap.save(conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+".map")
     # myMap.save(conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+"TOTO.map")
-    # print >> sys.stderr,conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+"TOTO.map"
+    # print(conf["main"]["dataPath"]+"/maps/color_ramp_"+conf["senv"]["last_map"]+"_"+layer.name+"TOTO.map", file=sys.stderr)
     m2 = mapscript.mapObj(conf["main"]["dataPath"] + "/maps/project_" + conf["senv"]["last_map"] + ".map")
     removeAllLayers(m2, layer.name)
     l = m2.getLayerByName(layer.name)
@@ -2909,10 +2909,10 @@ def classifyMap0(conf, inputs, outputs):
     m = mapscript.mapObj(mapfile)
     m1 = m.clone()
     # sys.path+=["../"]
-    # print >> sys.stderr,sys.path
+    # print(sys.path, file=sys.stderr)
     import vector_tools.vectSql as vt
     layer = m.getLayerByName(inputs["layer"]["value"])
-    # print >> sys.stderr,layer
+    # print(layer, file=sys.stderr)
     print(inputs, file=sys.stderr)
     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
     # if list(inputs.keys()).count("stepField")>0:
@@ -3094,7 +3094,7 @@ def classifyMap0(conf, inputs, outputs):
     if inputs["mmType"]["value"] == "contCol" or inputs["mmType"]["value"] == "gradSymb":
         lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": "SELECT MIN(" + inputs["field"]["value"] + ") as min, MAX(" + inputs["field"]["value"] + ") as max FROM " + layerName}}
 
-    # print >> sys.stderr,lInputs
+    # print(lInputs, file=sys.stderr)
     output1 = {"Result": {"value": ""}}
     outputs1 = {"Result": {"value": ""}}
     isRaster = -1
@@ -3183,7 +3183,7 @@ def classifyMap0(conf, inputs, outputs):
             #        layer.setProcessing(inputs["processing"]["value"][kk])
 
             # tmp=[{"min": b.GetMinimum(),"max": b.GetMaximum()}]
-            # print >> sys.stderr,tmp
+            # print(tmp, file=sys.stderr)
 
             inputs["field"]["value"] = "pixel"
             isRaster = 1
@@ -3225,7 +3225,7 @@ def classifyMap0(conf, inputs, outputs):
         setMetadata(layer, "mmClass", "uv")
 
     lOutputs = {"Result": {"value": ""}}
-    # print >> sys.stderr,inputs
+    # print(inputs, file=sys.stderr)
     sr = eval('0x' + inputs["from"]["value"][:2])
     sg = eval('0x' + inputs["from"]["value"][2:4])
     sb = eval('0x' + inputs["from"]["value"][4:6])
@@ -3243,7 +3243,7 @@ def classifyMap0(conf, inputs, outputs):
     # if list(inputs.keys()).count("nbClasses")>0:
     if "nbClasses" in inputs:
         nbClasses = int(inputs["nbClasses"]["value"])
-        # print >> sys.stderr,"Colspan: "+str(tmp[0])
+        # print("Colspan: "+str(tmp[0]), file=sys.stderr)
         try:
             colspan = (float(tmp[0]["max"]) - float(tmp[0]["min"])) / float(nbClasses)
         except Exception as e:
@@ -3257,7 +3257,7 @@ def classifyMap0(conf, inputs, outputs):
     ]))
     # cs._discretise()
     print(lOutputs, file=sys.stderr)
-    # print >> sys.stderr, lOutputs["Result1"]["value"]
+    # print( lOutputs["Result1"]["value"], file=sys.stderr)
 
     tmpColor = lOutputs["Result1"]["value"]
     l = m.getLayerByName(layer.name)
@@ -3290,7 +3290,7 @@ def classifyMap0(conf, inputs, outputs):
             if layer.type == mapscript.MS_LAYER_POINT:
                 style.size = 15
                 style.symbolname = "circle"
-                # print >> sys.stderr,"Keys: "+str(inputs.keys().count("nbClasses"))
+                # print("Keys: "+str(inputs.keys().count("nbClasses")), file=sys.stderr)
 
             setMetadata(layer, "mmName", inputs["field"]["value"])
             try:
@@ -3474,10 +3474,10 @@ def classifyMap(conf, inputs, outputs):
     m = mapscript.mapObj(mapfile)
     m1 = m.clone()
     # sys.path+=["../"]
-    # print >> sys.stderr,sys.path
+    # print(sys.path, file=sys.stderr)
     import vector_tools.vectSql as vt
     layer = m.getLayerByName(inputs["layer"]["value"])
-    # print >> sys.stderr,layer
+    # print(layer, file=sys.stderr)
 
     if layer.encoding is None:
         layer.encoding = "utf-8"
@@ -3543,7 +3543,7 @@ def classifyMap(conf, inputs, outputs):
         if inputs["type"]["value"] == "gs":
             lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": "SELECT MIN(" + inputs["field"]["value"] + ") as min, MAX(" + inputs["field"]["value"] + ") as max FROM " + layerName}}
 
-    # print >> sys.stderr,lInputs
+    # print(lInputs, file=sys.stderr)
     output1 = {"Result": {"value": ""}}
     outputs1 = {"Result": {"value": ""}}
     isRaster = -1
@@ -3603,7 +3603,7 @@ def classifyMap(conf, inputs, outputs):
                 layer.clearProcessing()
                 layer.addProcessing("BAND=" + inputs["field"]["value"])
             # tmp=[{"min": b.GetMinimum(),"max": b.GetMaximum()}]
-            # print >> sys.stderr,tmp
+            # print(tmp, file=sys.stderr)
 
             inputs["field"]["value"] = "pixel"
             isRaster = 1
@@ -3651,7 +3651,7 @@ def classifyMap(conf, inputs, outputs):
     # if list(inputs.keys()).count("nbClasses")>0:
     if "nbClasses" in inputs:
         nbClasses = int(inputs["nbClasses"]["value"])
-        # print >> sys.stderr,"Colspan: "+str(tmp[0])
+        # print("Colspan: "+str(tmp[0]), file=sys.stderr)
         try:
             colspan = (float(tmp[0]["max"]) - float(tmp[0]["min"])) / float(nbClasses)
         except:
@@ -3663,8 +3663,8 @@ def classifyMap(conf, inputs, outputs):
         (1.0, (sr, sg, sb), (er, eg, eb)),
     ]))
     # cs._discretise()
-    # print >> sys.stderr, lOutputs
-    # print >> sys.stderr, lOutputs["Result1"]["value"]
+    # print( lOutputs, file=sys.stderr)
+    # print( lOutputs["Result1"]["value"], file=sys.stderr)
 
     tmpColor = lOutputs["Result1"]["value"]
     l = m.getLayerByName(layer.name)
@@ -3693,7 +3693,7 @@ def classifyMap(conf, inputs, outputs):
                 style.size = 15
                 style.symbolname = "circle"
 
-            # print >> sys.stderr,"Keys: "+str(inputs.keys().count("nbClasses"))
+            # print("Keys: "+str(inputs.keys().count("nbClasses")), file=sys.stderr)
 
             setMetadata(layer, "mmName", inputs["field"]["value"])
             try:
@@ -4119,7 +4119,7 @@ def getMapLayersInfo(conf, inputs, outputs):
         data = ""
         tmpA = l.data.split("/")
         j = 0
-        # print >> sys.stderr, tmpA
+        # print( tmpA, file=sys.stderr)
         for i in tmpA:
             if i != "" and j + 1 != len(tmpA):
 
@@ -4481,7 +4481,7 @@ def saveMapFor(conf, inputs, outputs):
     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
     # if list(inputs.keys()).count("faliases") > 0:
     if "faliases" in inputs:
-        # print >> sys.stderr,inputs["faliases"]["value"]
+        # print(inputs["faliases"]["value"], file=sys.stderr)
         setMetadata(m.getLayerByName(inputs["layers"]["value"]), "mm" + inputs["type"]["value"] + "FieldsAliases", urllib.parse.unquote(inputs["faliases"]["value"]))
     saveProjectMap(m, conf["main"]["dataPath"] + "/maps/project_" + inputs["map"]["value"] + ".map")
     outputs["Result"]["value"] = zoo._("Map saved")
@@ -4603,11 +4603,11 @@ def updateLayersOrder(conf, inputs, outputs):
     myLayers = mapscript.intarray(len(layers))
     m = mapscript.mapObj(conf["main"]["dataPath"] + "/maps/project_" + inputs["map"]["value"] + ".map")
     while i < len(layers):
-        # print >> sys.stderr,layers[i]
+        # print(layers[i], file=sys.stderr)
         layer = m.getLayerByName(layers[i])
         myLayers[i] = layer.index
         i += 1
-    # print >> sys.stderr,myLayers
+    # print(myLayers, file=sys.stderr)
     m.setLayersDrawingOrder(myLayers)
     saveProjectMap(m, conf["main"]["dataPath"] + "/maps/project_" + inputs["map"]["value"] + ".map")
     outputs["Result"]["value"] = zoo._("Map saved")
@@ -4700,7 +4700,7 @@ def updateMapcacheCfg0(conf, inputs, outputs):
     searchList = {"conf": conf, "inputs": inputs, "outputs": outputs, "layers": fL}
     xmlSection = Template(file=conf["main"]["templatesPath"] + "/mapcacheLayer1.tmpl", searchList=searchList).__str__()
 
-    # print >> sys.stderr,xmlSection
+    # print(xmlSection, file=sys.stderr)
     doc1 = libxml2.parseMemory(xmlSection, len(xmlSection))
     aNodes = doc1.xpathEval('/mapcache/*')
 
@@ -4712,7 +4712,7 @@ def updateMapcacheCfg0(conf, inputs, outputs):
         nodes = doc.xpathEval('/mapcache/tileset[@name="' + inputs["mmProjectName"]["value"] + 'Tile"]')
         nodes[0].replaceNode(aNodes[1])
     f = open(conf["mm"]["mapcacheCfg"], 'w')
-    # print >> sys.stderr, doc
+    # print( doc, file=sys.stderr)
     doc.saveTo(f)
     f.close
     return 3
@@ -4741,7 +4741,7 @@ def updateMapcacheCfg(conf, inputs, outputs):
     searchList = {"conf": conf, "inputs": inputs, "outputs": outputs, "layers": fL}
     xmlSection = Template(file=conf["main"]["templatesPath"] + "/mapcacheLayer.tmpl", searchList=searchList).__str__()
 
-    # print >> sys.stderr,xmlSection
+    # print(xmlSection, file=sys.stderr)
     doc1 = libxml2.parseMemory(xmlSection, len(xmlSection))
     aNodes = doc1.xpathEval('/mapcache/*')
 
@@ -4753,7 +4753,7 @@ def updateMapcacheCfg(conf, inputs, outputs):
         nodes = doc.xpathEval('/mapcache/tileset[@name="' + inputs["mmProjectName"]["value"] + 'Tile"]')
         nodes[0].replaceNode(aNodes[1])
     f = open(conf["mm"]["mapcacheCfg"], 'w')
-    # print >> sys.stderr, doc
+    # print( doc, file=sys.stderr)
     doc.saveTo(f)
     f.close
     return 3
@@ -4845,7 +4845,7 @@ def saveLegendIconsForLayer(conf, m, lm, layer, i, step=None):
     if layer.numclasses == 1:
         lm.getLayer(0).status = mapscript.MS_ON
         lsavedImage = conf["main"]["tmpPath"] + "/print_" + conf["senv"]["MMID"] + "_" + str(i) + "_" + str(time.clock()).split(".")[1] + ".png"
-        # print >> sys.stderr,"OK 1"
+        # print("OK 1", file=sys.stderr)
         try:
             os.unlink(lsavedImage)
         except:
@@ -5505,7 +5505,7 @@ def generatePreview(conf, m):
     filename = outputs1["Result"]["generated_file"]
     # outputs["Result"]["generated_file"]=outputs1["Result"]["generated_file"]
     setMetadata(m.web, "previewUrl", filename.replace(conf["main"]["tmpPath"], conf["main"]["tmpUrl"]))
-    # print >> sys.stderr,outputs1
+    # print(outputs1, file=sys.stderr)
     conf["senv"].pop("prescr")
 
 

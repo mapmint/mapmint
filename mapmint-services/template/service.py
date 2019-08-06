@@ -184,7 +184,7 @@ def display(conf, inputs, outputs):
         if "force" not in inputs:
             try:
                 tmpl = __import__(inputs["tmpl"]["value"].lower() + ".service")
-                # print >> sys.stderr,dir(tmpl)
+                # print(dir(tmpl), file=sys.stderr)
                 tmpl.service.displayHTML(conf, inputs, outputs)
                 t = outputs["Result"]["value"]
             except:

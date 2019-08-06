@@ -82,12 +82,12 @@ def checkEntityPriv(conf, con, prefix, server, service, entity, priv, token):
         fields += tmp[i]
     try:
         req = "SELECT " + fields + " from " + prefix + "servers," + prefix + "layer_privileges, " + prefix + "tokens WHERE tokens.id_group=layer_privileges.id_group AND id_protocol=(SELECT id from " + prefix + "protocols where name='" + service.upper() + "') AND layer_privileges.entity='" + entity + "' AND layer_privileges.id_server=servers.id and name='" + server + "' AND value='" + token + "';"
-        # print >> sys.stderr,req
+        # print(req, file=sys.stderr)
         con.cur.execute(req)
         vals = con.cur.fetchone()
-        # print >> sys.stderr,vals
+        # print(vals, file=sys.stderr)
         if vals is not None:
-            # print >> sys.stderr,vals[0]
+            # print(vals[0], file=sys.stderr)
             return vals[0]
     except Exception as e:
         print(e, file=sys.stderr)
@@ -281,9 +281,9 @@ def SecureResponse(conf, inputs, outputs):
     c = auth.getCon(conf)
     prefix = auth.getPrefix(conf)
     sUrl = getUrl(conf, c, prefix, inputs["server"]["value"])
-    # print >> sys.stderr," ** "
-    # print >> sys.stderr,inputs
-    # print >> sys.stderr," ** "
+    # print(" ** ", file=sys.stderr)
+    # print(inputs, file=sys.stderr)
+    # print(" ** ", file=sys.stderr)
 
     if sUrl is None:
         conf["lenv"]["message"] = zoo._("No server found.")
@@ -565,7 +565,7 @@ def SecureAccess(conf, inputs, outputs):
             lvalues = list(response.headers.values())
             useDefault = True
             for i in range(0, len(lkeys)):
-                # print >> sys.stderr," --------- KEY : "+lkeys[i]
+                # print(" --------- KEY : "+lkeys[i], file=sys.stderr)
                 if "content-type" == lkeys[i]:  # and lvalues[i].count("text/")==0:
                     useDefault = False
                     outputs["Result"]["mimeType"] = lvalues[i]
@@ -573,7 +573,7 @@ def SecureAccess(conf, inputs, outputs):
                     break
             if useDefault:
                 outputs["Result"]["mimeType"] = "text/xml"
-            # print >> sys.stderr,dir(response)
+            # print(dir(response), file=sys.stderr)
             # outputs["Result"]["mimeType"]="text/xml"
             response.close()
             # TODO: confirm assumption: "conf" is a Python 3 dictionary object
@@ -631,7 +631,7 @@ def SecureAccess(conf, inputs, outputs):
                 lvalues = list(response.headers.values())
                 useDefault = True
                 for i in range(0, len(lkeys)):
-                    # print >> sys.stderr," --------- KEY : "+lkeys[i]+" "+lvalues[i]
+                    # print(" --------- KEY : "+lkeys[i]+" "+lvalues[i], file=sys.stderr)
                     if "content-type" == lkeys[i]:  # and lvalues[i].count("text/")==0:
                         useDefault = False
                         outputs["Result"]["mimeType"] = lvalues[i]

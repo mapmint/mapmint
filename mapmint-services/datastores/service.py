@@ -43,13 +43,13 @@ def removeDS(conf, inputs, outputs):
 
 
 def displayHTML(conf, inputs, outputs):
-    # print >> sys.stderr,conf
+    # print(conf, file=sys.stderr)
     import datastores.directories.service as dirs
-    # print >> sys.stderr,dir(dirs)
+    # print(dir(dirs), file=sys.stderr)
     inputs["state"] = {"value": "open"}
     dirs.display(conf, inputs, outputs)
     dirStr = outputs["Result"]["value"]
-    # print >> sys.stderr,outputs
+    # print(outputs, file=sys.stderr)
     import postgis.service as dbs
     # Hard coded supported dbs !
     suported_dbs = ["PostGIS", "MySQL"]
@@ -152,7 +152,7 @@ def options1(conf, inputs, outputs):
     dstnStr = ""
     for a in elements:
         if a == "Directories":
-            # print >> sys.stderr,"ELEMENTS A 0 "+str(elements[a][0])
+            # print("ELEMENTS A 0 "+str(elements[a][0]), file=sys.stderr)
             for j in range(0, len(elements[a])):
                 if mm_access.checkDataStorePriv(conf, elements[a][j]["name"], "rx"):
                     dstnStr = elements[a][j]["name"]
@@ -161,12 +161,12 @@ def options1(conf, inputs, outputs):
                     ds.listDataSource(conf, {"dstn": {"value": elements[a][j]["name"] + "/"}}, outputs)
                     dsList = eval(outputs["Result"]["value"])
                     break
-            # print >> sys.stderr,str(dsList)
+            # print(str(dsList), file=sys.stderr)
         li += [{"name": a}]
 
     import template.service as tmpl
 
-    # print >> sys.stderr,conf
+    # print(conf, file=sys.stderr)
     mapfile = conf["main"]["dataPath"] + "/maps/project_" + conf["senv"]["last_map"] + ".map"
     import mapscript
     m = mapscript.mapObj(mapfile)
@@ -204,7 +204,7 @@ def options(conf, inputs, outputs):
     dstnStr = ""
     for a in elements:
         if a == "Directories":
-            # print >> sys.stderr,"ELEMENTS A 0 "+str(elements[a][0])
+            # print("ELEMENTS A 0 "+str(elements[a][0]), file=sys.stderr)
             for j in range(0, len(elements[a])):
                 if mm_access.checkDataStorePriv(conf, elements[a][j]["name"], "rx"):
                     dstnStr = elements[a][j]["name"]
@@ -213,12 +213,12 @@ def options(conf, inputs, outputs):
                     ds.listDataSource(conf, {"dstn": {"value": elements[a][j]["name"] + "/"}}, outputs)
                     dsList = eval(outputs["Result"]["value"])
                     break
-            # print >> sys.stderr,str(dsList)
+            # print(str(dsList), file=sys.stderr)
         li += [{"name": a}]
 
     import template.service as tmpl
 
-    # print >> sys.stderr,conf
+    # print(conf, file=sys.stderr)
     mapfile = conf["main"]["dataPath"] + "/maps/project_" + conf["senv"]["last_map"] + ".map"
     import mapscript
     m = mapscript.mapObj(mapfile)
@@ -256,10 +256,9 @@ def options(conf, inputs, outputs):
 def listDataSource(conf, inputs, outputs):
     import mapscript
     import mm_access
-    # print >> sys.stderr,inputs["dstn"]["value"].replace(conf["main"]["dataPath"]+"/dirs/","")
-    mapfile = conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"].replace(conf["main"]["dataPath"] + "/dirs/",
-                                                                                    "") + "/ds_ows.map"
-    # print >> sys.stderr,mapfile
+    # print(inputs["dstn"]["value"].replace(conf["main"]["dataPath"]+"/dirs/",""), file=sys.stderr)
+    mapfile = conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"].replace(conf["main"]["dataPath"] + "/dirs/", "") + "/ds_ows.map"
+    # print(mapfile, file=sys.stderr)
     m = None
     try:
         print(mapfile, file=sys.stderr)
@@ -269,7 +268,7 @@ def listDataSource(conf, inputs, outputs):
         for i in ["PostGIS", "MySQL"]:
             try:
                 mapfile = conf["main"]["dataPath"] + "/" + i + "/" + inputs["dstn"]["value"] + "ds_ows.map"
-                # print >> sys.stderr,mapfile
+                # print(mapfile, file=sys.stderr)
                 m = mapscript.mapObj(mapfile)
             except Exception as e:
                 print(e, file=sys.stderr)

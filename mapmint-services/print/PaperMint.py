@@ -75,8 +75,7 @@ class LOClient:
             self.table = None
             self.filterOptions = None
         except Exception as e:
-            print('Unable to connect to the MapMint Document Server for the following reasons:\n' + str(e),
-                  file=sys.stderr)
+            print('Unable to connect to the MapMint Document Server for the following reasons:\n' + str(e), file=sys.stderr)
 
     def createDoc(self, name):
         print(name, file=sys.stderr)
@@ -372,7 +371,7 @@ class LOClient:
         try:
             image_url = self.loadImage(image_name, image_file)
         except:
-            print >> sys.stderr, image_name
+            print( image_name, file=sys.stderr)
             return -1
         self.imin = 0
         self.jmin = 0
@@ -590,7 +589,7 @@ class LOClient:
         if self.cursor is None:
             self.getCursor()
         tmp = self.goToWord(name)
-        # print >>sys.stderr,tmp
+        # print(tmp, file=sys.stderr)
         # self.cursor=tmp
         for i in elem:
             # self.cursor.NumberingType=CIRCLE_NUMBER

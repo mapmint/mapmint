@@ -89,7 +89,7 @@ def getAllSymbolsForTTF(conf, inputs, outputs):
                 cnt += 1
                 # tmpImage=tmpClass.createLegendIcon(m,layer,32,32)
                 # tmpImage.write(conf["main"]["dataPath"]+"/maps/"+img_name)
-                # print >> sys.stderr,conf["main"]["dataPath"]+"/maps/"+img_name
+                # print(conf["main"]["dataPath"]+"/maps/"+img_name, file=sys.stderr)
         i += 1
     m.save(mapfile)
 

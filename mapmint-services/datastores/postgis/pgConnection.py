@@ -44,7 +44,7 @@ class pgConnection:
                 return True
         except Exception as e:
             self.conf["lenv"]["message"] = "Unable to execute " + req.encode('utf-8') + " due to: " + str(e)
-            # print >> sys.stderr,"Unable to execute "+req+str(e)
+            # print("Unable to execute "+req+str(e), file=sys.stderr)
             return False
 
 
@@ -134,7 +134,7 @@ def getDesc(cur, table):
                tmp[1] + "' and t.relnamespace=(select oid from pg_namespace where nspname='" + tmp[
                    0] + "') AND at2.attrelid=t.oid) AS foreigns ON foreigns.myid=a.\"Pos\")) As foo) as foo1 ORDER BY \"Pos\",\"Key\""
     else:
-        # print >> sys.stderr,"SELECT DISTINCT on (\"Pos\") \"Pos\"-1 as \"Pos\",\"Field\",\"Type\",\"Key\", \"Ref\", \"RefCol\", \"RefCols\",array_upper(\"RefCols\",1) from (SELECT attnum AS \"Pos\", attname AS \"Field\",CASE WHEN atttypmod >0 THEN b.typname || '(' || atttypmod-4 || ')' ELSE b.typname END AS \"Type\" FROM pg_catalog.pg_attribute a, pg_catalog.pg_type b WHERE  a.atttypid=b.oid AND a.attrelid = (SELECT pg_class.oid FROM pg_class, pg_namespace WHERE relname='"+tmp[1]+"' AND pg_namespace.oid=relnamespace AND nspname='"+tmp[0]+"') AND a.attnum > 0 AND NOT a.attisdropped ORDER BY attnum) a LEFT JOIN (SELECT conkey,c.conname AS constraint_name, CASE c.contype WHEN 'c' THEN 'CHECK' WHEN 'f' THEN 'FOR' WHEN 'p' THEN 'PRI' WHEN 'u' THEN 'UNIQUE' END AS \"Key\", t3.nspname||'.'||t2.relname AS \"Ref\", (SELECT attname from pg_catalog.pg_attribute WHERE attrelid=c.confrelid AND confkey[1] = attnum) AS \"RefCol\"  FROM pg_constraint c LEFT JOIN pg_class t ON c.conrelid = t.oid LEFT JOIN pg_class t2 ON c.confrelid = t2.oid LEFT JOIN pg_namespace t3 ON t2.relnamespace=t3.oid WHERE t.relname = '"+tmp[1]+"'  and t.relnamespace=(select oid from pg_namespace where nspname='"+tmp[0]+"')) b ON get_nb_of(conkey,\"Pos\")>0 LEFT JOIN (SELECT DISTINCT ON (at2.attnum) c.*, at2.attnum AS \"myid\", ARRAY(SELECT attname  AS \"RefCol\"  FROM pg_constraint AS c, pg_catalog.pg_attribute, pg_class t, pg_class t2 WHERE c.conrelid = t.oid AND c.confrelid = t2.oid AND t.relname = '"+tmp[1]+"' AND attrelid=confrelid AND get_nb_of(confkey,attnum) > 0  and t.relnamespace=(select oid from pg_namespace where nspname='"+tmp[0]+"')) AS \"RefCols\", at2.attnum, at2.attname AS atn, get_index_of(conkey,at2.attnum) AS \"RealOrigColNum\", at1.attnum, at1.attname, get_index_of(confkey,at1.attnum) AS \"RealRefColNum\",  t.relname as orig, t2.relname as ref FROM pg_constraint AS c, pg_catalog.pg_attribute AS at1, pg_catalog.pg_attribute AS at2, pg_class t, pg_class t2 WHERE c.conrelid = t.oid AND c.confrelid = t2.oid AND t.relname = '"+tmp[1]+"' AND at1.attrelid=confrelid AND get_nb_of(conkey,at2.attnum) > 0 AND get_nb_of(confkey,at1.attnum) > 0 AND t.relname='"+tmp[1]+"' AND at2.attrelid=t.oid  and t.relnamespace=(select oid from pg_namespace where nspname='"+tmp[0]+"')) AS foreigns ON foreigns.myid=a.\"Pos\""
+        # print("SELECT DISTINCT on (\"Pos\") \"Pos\"-1 as \"Pos\",\"Field\",\"Type\",\"Key\", \"Ref\", \"RefCol\", \"RefCols\",array_upper(\"RefCols\",1) from (SELECT attnum AS \"Pos\", attname AS \"Field\",CASE WHEN atttypmod >0 THEN b.typname || '(' || atttypmod-4 || ')' ELSE b.typname END AS \"Type\" FROM pg_catalog.pg_attribute a, pg_catalog.pg_type b WHERE  a.atttypid=b.oid AND a.attrelid = (SELECT pg_class.oid FROM pg_class, pg_namespace WHERE relname='"+tmp[1]+"' AND pg_namespace.oid=relnamespace AND nspname='"+tmp[0]+"') AND a.attnum > 0 AND NOT a.attisdropped ORDER BY attnum) a LEFT JOIN (SELECT conkey,c.conname AS constraint_name, CASE c.contype WHEN 'c' THEN 'CHECK' WHEN 'f' THEN 'FOR' WHEN 'p' THEN 'PRI' WHEN 'u' THEN 'UNIQUE' END AS \"Key\", t3.nspname||'.'||t2.relname AS \"Ref\", (SELECT attname from pg_catalog.pg_attribute WHERE attrelid=c.confrelid AND confkey[1] = attnum) AS \"RefCol\"  FROM pg_constraint c LEFT JOIN pg_class t ON c.conrelid = t.oid LEFT JOIN pg_class t2 ON c.confrelid = t2.oid LEFT JOIN pg_namespace t3 ON t2.relnamespace=t3.oid WHERE t.relname = '"+tmp[1]+"'  and t.relnamespace=(select oid from pg_namespace where nspname='"+tmp[0]+"')) b ON get_nb_of(conkey,\"Pos\")>0 LEFT JOIN (SELECT DISTINCT ON (at2.attnum) c.*, at2.attnum AS \"myid\", ARRAY(SELECT attname  AS \"RefCol\"  FROM pg_constraint AS c, pg_catalog.pg_attribute, pg_class t, pg_class t2 WHERE c.conrelid = t.oid AND c.confrelid = t2.oid AND t.relname = '"+tmp[1]+"' AND attrelid=confrelid AND get_nb_of(confkey,attnum) > 0  and t.relnamespace=(select oid from pg_namespace where nspname='"+tmp[0]+"')) AS \"RefCols\", at2.attnum, at2.attname AS atn, get_index_of(conkey,at2.attnum) AS \"RealOrigColNum\", at1.attnum, at1.attname, get_index_of(confkey,at1.attnum) AS \"RealRefColNum\",  t.relname as orig, t2.relname as ref FROM pg_constraint AS c, pg_catalog.pg_attribute AS at1, pg_catalog.pg_attribute AS at2, pg_class t, pg_class t2 WHERE c.conrelid = t.oid AND c.confrelid = t2.oid AND t.relname = '"+tmp[1]+"' AND at1.attrelid=confrelid AND get_nb_of(conkey,at2.attnum) > 0 AND get_nb_of(confkey,at1.attnum) > 0 AND t.relname='"+tmp[1]+"' AND at2.attrelid=t.oid  and t.relnamespace=(select oid from pg_namespace where nspname='"+tmp[0]+"')) AS foreigns ON foreigns.myid=a.\"Pos\"", file=sys.stderr)
         return "SELECT DISTINCT on (\"Pos\") \"Pos\"-1 as \"Pos\",\"Field\",\"Type\",\"Key\", \"Ref\", \"RefCol\", \"RefCols\",array_upper(\"RefCols\",1) from (SELECT * FROM (SELECT attnum AS \"Pos\", attname AS \"Field\",CASE WHEN atttypmod >0 THEN b.typname || '(' || atttypmod-4 || ')' ELSE b.typname END AS \"Type\" FROM pg_catalog.pg_attribute a, pg_catalog.pg_type b WHERE  a.atttypid=b.oid AND a.attrelid = (SELECT pg_class.oid FROM pg_class, pg_namespace WHERE relname='" + \
                tmp[1] + "' AND pg_namespace.oid=relnamespace AND nspname='" + tmp[
                    0] + "') AND a.attnum > 0 AND NOT a.attisdropped ORDER BY attnum) a LEFT JOIN (SELECT conkey,c.conname AS constraint_name, CASE c.contype WHEN 'c' THEN 'CHECK' WHEN 'f' THEN 'FOR' WHEN 'p' THEN 'PRI' WHEN 'u' THEN 'UNIQUE' END AS \"Key\", t3.nspname||'.'||t2.relname AS \"Ref\", (SELECT attname from pg_catalog.pg_attribute WHERE attrelid=c.confrelid AND confkey[1] = attnum) AS \"RefCol\"  FROM pg_constraint c LEFT JOIN pg_class t ON c.conrelid = t.oid LEFT JOIN pg_class t2 ON c.confrelid = t2.oid LEFT JOIN pg_namespace t3 ON t2.relnamespace=t3.oid WHERE t.relname = '" + \
@@ -160,7 +160,7 @@ def getTableDescription(conf, inputs, outputs):
     if db.connect():
         tmp = inputs["table"]["value"].split('.')
         req = getDesc(db.cur, inputs["table"]["value"])
-        # print >> sys.stderr,req
+        # print(req, file=sys.stderr)
         res = db.execute(req)
         if res != False and len(res) > 0:
             outputs["Result"]["value"] = json.dumps(res)
@@ -412,9 +412,9 @@ def getTableContent1(conf, inputs, outputs):
                 for k in range(0, len(res[i])):
                     try:
                         tmp = res[i][k].encode('utf-8')
-                        # print >> sys.stderr,dir(tmp)
+                        # print(dir(tmp), file=sys.stderr)
                     except Exception as e:
-                        # print >> sys.stderr,e
+                        # print(e, file=sys.stderr)
                         tmp = str(res[i][k])
                     res0 += [str(tmp)]
                     if len(geom) > 0:
@@ -527,7 +527,7 @@ def editTuple(conf, inputs, outputs):
                 conf["lenv"]["message"] = db.conf["lenv"]["message"]
                 return zoo.SERVICE_FAILED
             db.conn.commit()
-            # print >> sys.stderr,res
+            # print(res, file=sys.stderr)
             return zoo.SERVICE_SUCCEEDED
         except Exception as e:
             conf["lenv"]["message"] = "Unable to run the request " + str(e)

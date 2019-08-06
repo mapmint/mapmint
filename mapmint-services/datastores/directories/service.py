@@ -55,7 +55,7 @@ def saveDir(conf, inputs, outputs):
             inputs["path"]["value"] = conf["main"]["dataPath"] + "/ftp/" + inputs["name"]["value"]
         except:
             er = sys.exc_info()
-            # print >> sys.stderr, er
+            # print( er, file=sys.stderr)
             conf["lenv"]["message"] = "Unable to create directory: " + er[1][1]
             return 4
     os.symlink(inputs["path"]["value"], conf["main"]["dataPath"] + "/dirs/" + inputs["name"]["value"])
@@ -106,9 +106,9 @@ def display(conf, inputs, outputs):
     status = "closed"
     if 'state' in inputs and 'value' in inputs["state"]:
         status = inputs["state"]["value"]
-    # print >> sys.stderr, conf["main"]["dataPath"]+"/dirs/"
-    # print >> sys.stderr, original_dir
-    # print >> sys.stderr, inputs["dir"]["value"]
+    # print( conf["main"]["dataPath"]+"/dirs/", file=sys.stderr)
+    # print( original_dir, file=sys.stderr)
+    # print( inputs["dir"]["value"], file=sys.stderr)
     try:
         tmp = mmListDir(original_dir)
     except:
@@ -137,7 +137,7 @@ def display(conf, inputs, outputs):
         suffix = ""
     for t in tmp:
         try:
-            # print >> sys.stderr,original_dir+t
+            # print(original_dir+t, file=sys.stderr)
             open(original_dir + t)
             hasValue = False
         except:
@@ -300,8 +300,8 @@ def load(conf, inputs, outputs):
     a = inputs["name"]["value"]
     a = a.replace("__", "/")
     b = a[1:len(a) - 1].split("/")
-    # print >> sys.stderr, a[0:len(a)-1]
-    # print >> sys.stderr, b[len(b)-1]
+    # print( a[0:len(a)-1], file=sys.stderr)
+    # print( b[len(b)-1], file=sys.stderr)
     outputs["Result"]["value"] = json.dumps({"name": b[len(b) - 1], "link": os.readlink(a[0:len(a) - 1])})
     return 3
 
@@ -316,8 +316,8 @@ def details(conf, inputs, outputs):
     a = inputs["name"]["value"]
     a = a.replace("__", "/")
     b = a[1:len(a)].split("/")
-    # print >> sys.stderr, a[0:len(a)-1]
-    # print >> sys.stderr, b[len(b)-1]
+    # print( a[0:len(a)-1], file=sys.stderr)
+    # print( b[len(b)-1], file=sys.stderr)
     link = os.readlink(a).replace("//", "/")
     if link[len(link) - 1] == "/":
         link = link[0:len(link) - 1]

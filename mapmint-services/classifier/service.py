@@ -54,7 +54,7 @@ def write_png_in_mem(outputs, width, height, rgb_func):
                 if "Result1" not in outputs:
                     outputs["Result1"] = {"value": []}
                 outputs["Result1"]["value"] += [[int(v * 255) for v in rgb_func(fx / fw, fy / fh)]]
-                # print >> sys.stderr,outputs["Result1"]["value"]
+                # print(outputs["Result1"]["value"], file=sys.stderr)
         compressed = compressor.compress(data.tostring())
         flushed = compressor.flush()
         return compressed + flushed
@@ -78,7 +78,7 @@ def gradient(DATA):
                 r = linear_gradient(start[0], end[0], initial_offset, offset)(y)
                 g = linear_gradient(start[1], end[1], initial_offset, offset)(y)
                 b = linear_gradient(start[2], end[2], initial_offset, offset)(y)
-                # print str(r) + ' '+ str(g) + ' '+ str(b)
+                # print(str(r) + ' '+ str(g) + ' '+ str(b))
                 return r, g, b
             initial_offset = offset
 

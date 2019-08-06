@@ -204,8 +204,8 @@ def printMap(conf, inputs, outputs):
     if "profile" in inputs:
         import json
         tmp = json.loads(inputs["profile"]["value"])
-        # print >> sys.stderr,tmp
-        # print >> sys.stderr,tmp["features"][0]["geometry"]["coordinates"]
+        # print(tmp, file=sys.stderr)
+        # print(tmp["features"][0]["geometry"]["coordinates"], file=sys.stderr)
         # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
         # if list(inputs.keys()).count("profileLayer") > 0:
         if "profileLayer" in inputs:
@@ -262,7 +262,7 @@ def printMap(conf, inputs, outputs):
         else:
             zl = m0
             print(m0, file=sys.stderr)
-            # print >> sys.stderr,inputs["zoom"]["value"]
+            # print(inputs["zoom"]["value"], file=sys.stderr)
         print("+++++++++++++++++++++++++++++++++++++", file=sys.stderr)
     else:
         zl = int(float(inputs["zoom"]["value"]))
@@ -435,7 +435,7 @@ def printOnlyMap(conf, inputs, outputs):
         else:
             zl = m0
             print(m0, file=sys.stderr)
-            # print >> sys.stderr,inputs["zoom"]["value"]
+            # print(inputs["zoom"]["value"], file=sys.stderr)
         print("+++++++++++++++++++++++++++++++++++++", file=sys.stderr)
     else:
         zl = int(float(inputs["zoom"]["value"]))

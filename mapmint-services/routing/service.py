@@ -212,7 +212,7 @@ def savePOIUser(conf, inputs, outputs):
                 "value"] + "," + inputs["type_incident"]["value"] + ")")
     conn.commit()
     print("DEBUG", file=sys.stderr)
-    # print >> sys.stderr,inputs["point"]["value"]
+    # print(inputs["point"]["value"], file=sys.stderr)
 
     outputs["Result"]["value"] = zoo._("Your news was successfully inserted.")
     return zoo.SERVICE_SUCCEEDED
@@ -518,12 +518,12 @@ def computeRoute(table, cur, startEdge, endEdge, method, conf, inputs):
     # Update all other tuples to correct order
     sqlUpdateAll = sqlUpdateEnd + sqlUpdateFirst + "UPDATE " + tblName + " set length=st_length(geojson) WHERE gid!=" + str(startEdge['gid']) + ";"
 
-    # print >> sys.stderr,sql
+    # print(sql, file=sys.stderr)
     cur.execute(sql)
     cur.execute(sqlUpdateFirst)
     cur.execute(sqlUpdateEnd)
-    # print >> sys.stderr,sqlUpdateFirst
-    # print >> sys.stderr,sqlUpdateEnd
+    # print(sqlUpdateFirst, file=sys.stderr)
+    # print(sqlUpdateEnd, file=sys.stderr)
 
     # Build the first segment from the starting point to the first edge
     sql1 = "select 0 as gid, ST_AsGeoJSON(st_geometryFromText('LINESTRING(' || " + str(inputs["startPoint"]["value"][0]) + " || ' ' || " + str(
@@ -531,7 +531,7 @@ def computeRoute(table, cur, startEdge, endEdge, method, conf, inputs):
         inputs["startPoint"]["value"][0]) + " || ' '|| " + str(inputs["startPoint"]["value"][
                                                                    1]) + " || ', '||st_x(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||' '||st_y(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||')')),'Inconnu','Inconnu',0 from (SELECT *, ST_line_locate_point(st_linemerge(geojson), st_setsrid(st_geometryFromText('POINT('|| " + str(
         inputs["startPoint"]["value"][0]) + " ||' '|| " + str(inputs["startPoint"]["value"][1]) + " || ')'),4326)) as location from " + tblName + " WHERE gid=" + str(startEdge['gid']) + ") As initialLocation limit 1"
-    # print >> sys.stderr,sql1
+    # print(sql1, file=sys.stderr)
 
     # Build the last segment from last edge to the end point
     sql2 = "select 100000000000 as gid, ST_AsGeoJSON(st_geometryFromText('LINESTRING( ' || " + str(inputs["endPoint"]["value"][0]) + " || ' '|| " + str(
@@ -539,7 +539,7 @@ def computeRoute(table, cur, startEdge, endEdge, method, conf, inputs):
         inputs["endPoint"]["value"][0]) + " || ' '|| " + str(inputs["endPoint"]["value"][
                                                                  1]) + " || ', '||st_x(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||' '||st_y(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||')')),'Inconnu','Inconnu',100000000000 from (SELECT *, ST_line_locate_point(st_linemerge(geojson), st_setsrid(st_geometryFromText('POINT('|| " + str(
         inputs["endPoint"]["value"][0]) + " ||' '|| " + str(inputs["endPoint"]["value"][1]) + " || ')'),4326)) as location from " + tblName + " WHERE gid=" + str(endEdge['gid']) + " ) As finalLocation"
-    # print >> sys.stderr,sql2
+    # print(sql2, file=sys.stderr)
 
     # Build the final query as conmbinaison of the previous ones
     # sql+="SELECT * FROM ("+sql1+") as foo0;";
@@ -551,7 +551,7 @@ def computeRoute(table, cur, startEdge, endEdge, method, conf, inputs):
     # sql+=""+sql2+";"
     # sql+="SELECT * FROM ("+sql1+") as foo0 UNION (SELECT row_number, oldtable.* FROM (select foo.* from (SELECT gid,ST_AsGeoJSON(st_linemerge(geojson)), name, length FROM tmp_route"+conf["senv"]["MMID"]+") as foo) AS oldtable CROSS JOIN generate_series(1, (SELECT COUNT(*) FROM tmp_route"+conf["senv"]["MMID"]+")) AS row_number) UNION ("+sql2+")"
 
-    # print >> sys.stderr,sql
+    # print(sql, file=sys.stderr)
 
     result = {"type": "FeatureCollection", "features": []}
     cnt = 1
@@ -900,7 +900,7 @@ END''')
         import json
         tmp = json.loads(inputs["profile"]["value"])
         distances = json.loads(tmp["features"][0]["properties"]["distance"])
-        # print >> sys.stderr,tmp["features"][0]["geometry"]["coordinates"]
+        # print(tmp["features"][0]["geometry"]["coordinates"], file=sys.stderr)
         rvals = [[zoo._("Profile")], [], []]
         totald = 0
         for i in range(0, len(distances)):

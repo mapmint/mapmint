@@ -364,7 +364,7 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
                 if version_info >= (3, 0, 0):
                     exec('print("", end=" ")')
                 else:
-                    exec('print "", ')
+                    exec('print("",)')
                 DumpReadableGeometry(subgeom, pszPrefix, options)
         else:
             print(line)
