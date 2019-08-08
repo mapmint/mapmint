@@ -8,7 +8,7 @@ from os.path import abspath
 from os.path import isfile
 from os.path import splitext
 import sys, os
-# from StringIO import StringIO
+# from io import StringIO
 
 import uno
 import sys
