@@ -165,7 +165,7 @@ $istyles
 #end if	      
 	      </li>
 #end for
-#if $menu.count($inputs['tmpl']['value'].replace("_bs",""))==0
+#if $inputs['tmpl']['value'].replace("_bs","") not in $menu
 	      $mmenu
 #end if
 
