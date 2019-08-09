@@ -1910,16 +1910,16 @@ def listMap(conf, inputs, outputs):
             except:
                 pass
             try:
-                mTime = time.strftime(conf["mm"]["dateFormat"].encode('utf-8'), time.localtime(os.path.getmtime(conf["main"]["dataPath"] + "/" + prefix + "maps/" + i))).decode('utf-8', 'replace')
+                mTime = time.strftime(str(conf["mm"]["dateFormat"].encode('utf-8')), time.localtime(os.path.getmtime(conf["main"]["dataPath"] + "/" + prefix + "maps/" + i)))
             except Exception as e:
                 print(e, file=sys.stderr)
-                mTime = time.strftime(conf["mm"]["dateFormat"].encode("utf-8"), time.localtime(os.path.getmtime(conf["main"]["dataPath"] + "/" + prefix + "maps/" + i))).decode('utf-8', 'replace')
+                mTime = time.strftime(str(conf["mm"]["dateFormat"].encode("utf-8")), time.localtime(os.path.getmtime(conf["main"]["dataPath"] + "/" + prefix + "maps/" + i)))
             try:
                 locale.setlocale(locale.LC_ALL, oloc)
             except:
                 pass
             res += [{"id": i.replace("project_", "").replace(".map", ""), "value": i, "mTime": mTime.encode('utf-8')}]
-    outputs["Result"]["value"] = json.dumps(res, ensure_ascii=False)
+    outputs["Result"]["value"] = json.dumps(str(res), ensure_ascii=False)
     return 3
 
 
