@@ -73,6 +73,7 @@ def preview(conf,inputs,outputs):
         pass
     try:
         outputs["Result"]["value"]=open(filename,"rb").read()
+	outputs["Result"]["generated_file"]=filename
         return zoo.SERVICE_SUCCEEDED
     except Exception,e:
         conf["lenv"]["message"]=error_msg+"\nUnable to open to generated preview: "+str(e)
