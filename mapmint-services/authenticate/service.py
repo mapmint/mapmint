@@ -262,7 +262,6 @@ def clogIn(conf,inputs,outputs):
             conf["lenv"]["cookieArray"]="MMID="+cid+"; path=/"
             conf["senv"]={}
             conf["senv"]["MMID"]=cid
-        import requests
         c.execute(con.desc)
         desc=c.fetchall()
         for i in desc:
@@ -286,6 +285,7 @@ def clogIn(conf,inputs,outputs):
                 print >>  sys.stderr,str(dataParam)
                 urlCon ="http://sigcod.geolabs.fr/flux/Services/service_connect"
                 try:
+                    import requests
                     print >>  sys.stderr," ***************** TEST **************"
                     myRequest = requests.post(urlCon, data=dataParam)
                     
@@ -297,9 +297,9 @@ def clogIn(conf,inputs,outputs):
                     conf["lenv"]["ecookie"]=myRequest.headers["set-cookie"].split(";")[2].split(",")[1]+"; path=/"
                     conf["lenv"]["ecookie_length"]=str(1)
                     print >>  sys.stderr," ***************** TEST **************"
-                except:
-                    conf["lenv"]["message"]=zoo._("Unable to connect to flux")
-                    return zoo.SERVICE_FAILED
+                except Exception,e:
+                    conf["lenv"]["message"]=zoo._("Unable to connect to flux "+str(e))
+                    #return zoo.SERVICE_FAILED
                 
                 break
         conf["senv"]["loggedin"]="true"
