@@ -221,7 +221,6 @@ define([
 	    var id = this.id+"";
 	    console.log("CURRENT ID: "+id);
 	    var reg0=new RegExp(ltype+'_',"g");
-	    var reg1=new RegExp(ltype+'_h_',"g");
 	    var index = $.inArray(id, CRowSelected);
 	    if ( index == -1 ) {
 		if(CRowSelected.length>0){
@@ -250,17 +249,16 @@ define([
 		    console.log("NAME: "+$(this).val()+' _');
 		    var attribute=null;
 		    if($(this).attr("name")){
-			if($(this).attr("name").indexOf("up_h_")<0)
-			    attribute=$(this).attr("name").replace(reg0,'');
-			else
-			    attribute=$(this).attr("name").replace(reg1,'');
+			attribute=$(this).attr("name").replace(reg0,'');
 			if(attribute=="id")
 			    attribute="fid";
 			    console.log(CFeaturesSelected[0][attribute]+'_');
 			console.log("RNAME: "+attribute+'_');
 		    }
-		    if($(this).attr("type")=="checkbox")
-			$(this).prop("checked",false);
+		    if($(this).attr("type")=="checkbox"){
+			if($(this).prop("checked"))
+			$(this).prop("checked",false).change().click().click();
+		    }
 		    if($(this).attr("name"))
 			console.log($(this).attr("name"));
 
@@ -335,9 +333,6 @@ define([
 	    var reg0=new RegExp(ltype+'_',"g");
 	    var reg1=new RegExp(ltype+'s_',"g");
 
-	    if(ltype=="user" && rType!="insert")
-		params.push({identifier: "login",value: CFeaturesSelected[0]["login"],dataType: "string"});
-	    
 	    $(this).parent().find("input").each(function(){
 		if($(this).attr('id')=="um_utype"){
 		    rType=$(this).val();
@@ -377,6 +372,8 @@ define([
 	    });
 	    params.push({identifier: attId,value: JSON.stringify(set),mimeType: "application/json"});
 	    //if(rType!="insert")
+	    if(ltype=="user" && rType!="insert")
+		params.push({identifier: "login",value: set.login,dataType: "string"});
 
 	    
 	    console.log(CRowSelected[0]);
@@ -790,7 +787,6 @@ define([
 	    "name,description,adm,sadm"
 	);
 
-	$(".btn").tooltip();
     };
 
     function displaySymbols(){
