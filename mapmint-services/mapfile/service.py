@@ -54,6 +54,35 @@ def setMetadata(layer,field,value):
         except Exception,e:
             layer.metadata.set(field,value)
 
+
+def updateAllExtentForMainDB(conf,inputs,outputs):
+    import os,glob,time
+    prefix="";
+    if inputs.keys().count("prefix")>0:
+        prefix=inputs["prefix"]["value"]
+    files = filter(os.path.isfile, glob.glob(conf["main"]["dataPath"]+"/"+prefix+"maps/project_*.map"))
+    res=[]
+    for i in range(len(files)):
+        try:
+            myMap=mapscript.mapObj(files[i])
+            res+=[{"map":files[i]}]
+            for j in range(myMap.numlayers):
+                l=myMap.getLayer(j)
+                if getMetadata(l,"mmDSTN")==conf["main"]["dbuser"]:
+                    print >> sys.stderr,"Should invoke refreshLayerInfo "+l.name
+                    if res[len(res)-1].keys().count("layers")==0:
+                        res[len(res)-1]["layer"]=[l.name]
+                    else:
+                        res[len(res)-1]["layer"]+=[l.name]
+                    tmp=refreshLayerInfo(conf,{"map":{"value":files[i].replace(conf["main"]["dataPath"],"").replace("project_","").replace(".map","")},"layer":{"value":l.name}},outputs)
+        except Exception,e:
+            print >> sys.stderr,files[i]
+            print >> sys.stderr,e
+            continue
+    import json
+    outputs["Result"]["value"]=json.dumps(res)
+    return zoo.SERVICE_SUCCEEDED
+
 def sample(conf,inputs,outputs):
     import mappyfile,io
     myMap=mappyfile.load(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
@@ -4680,12 +4709,25 @@ def savePublishMap(conf,inputs,outputs):
 	    cid=str(cid).replace(".","_")
 	    open(conf["main"]["tmpPath"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html","w").write(inputs["mmDescription"]["value"].replace("&39;","&#39;"))
 	    setMetadata(m.web,"ows_abstract",conf["main"]["tmpUrl"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html")
-    if inputs.has_key("mmWMTSAttribution"):
+    if inputs.has_key("mmWMTSAttribution")  and not(inputs["mmWMTSAttribution"].has_key("isArray")):
 	    import time,random
 	    cid=time.clock()+random.randrange(100000)
 	    cid=str(cid).split(".")[0]
 	    open(conf["main"]["tmpPath"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html","w").write(inputs["mmWMTSAttribution"]["value"].replace("&39;","&#39;"))
 	    setMetadata(m.web,"mmWMTSAttribution",conf["main"]["tmpUrl"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html")
+    bt={"layers":"","url":"","attribution":""};
+    if inputs.keys().count("mmWMTSBLURL")>0 and inputs["mmWMTSBLURL"].keys().count("length")>0:
+        for ii in range(int(inputs["mmWMTSBLURL"]["length"])):
+            bt["layers"]+=inputs["mmWMTSBaseLayers"]["value"][ii]+";"
+            bt["url"]+=inputs["mmWMTSBLURL"]["value"][ii]+";"
+            import time,random
+            cid=time.clock()+random.randrange(100000)
+            cid=str(cid).split(".")[0]
+            open(conf["main"]["tmpPath"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html","w").write(inputs["mmWMTSAttribution"]["value"][ii].replace("&39;","&#39;"))
+            bt["attribution"]+=conf["main"]["tmpUrl"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html"+";"
+        setMetadata(m.web,"mmWMTSAttribution",bt["attribution"])
+        setMetadata(m.web,"mmWMTSBLURL",bt["url"])
+        setMetadata(m.web,"mmWMTSBaseLayers",bt["layers"])
     print >> sys.stderr,"OK "
     setMetadata(m.web,"mmEditor",conf["senv"]["login"])
     setMetadata(m.web,"tile_map_edge_buffer","32")
