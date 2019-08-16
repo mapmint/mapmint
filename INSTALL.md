@@ -6,13 +6,22 @@ as a basic UNIX user, not root.
 <h3>Install all the dependencies (Ubuntu 14.04 LTS)</h3>
 
 ```sh
-sudo apt-get install flex bison libfcgi-dev libxml2 libxml2-dev curl
-openssl autoconf apache2 python-software-properties subversion git
+# NOTE: if you encounter an error saying "Unable to locate package" or "Package '...' has no installation candidate", then remove them from the list and repeat the step.
+sudo apt-get update
+INSTALL_PACKAGE_LIST='flex bison libfcgi-dev libxml2 libxml2-dev curl
+openssl autoconf apache2 software-properties-common subversion git
 libmozjs185-dev python3-dev build-essential libfreetype6-dev
 libproj-dev libgdal1-dev libcairo2-dev apache2-dev libxslt1-dev
-python-cheetah cssmin python-psycopg2 python-gdal python-libxslt1
-postgresql-9.3  r-base cmake gdal-bin libapache2-mod-fcgid ghostscript
-xvfb
+python3-cheetah cssmin python3-psycopg2 python-gdal python-libxslt1
+postgresql-9.3 r-base cmake gdal-bin libapache2-mod-fcgid ghostscript
+xvfb net-tools libreoffice libreoffice-common'
+for pkg in $INSTALL_PACKAGE_LIST
+do
+	# echo $pkg
+    sudo apt-get install -m $pkg
+done
+
+pip3 install Cheetah3
 ```
 
 <h3>Initial settings</h3>
@@ -21,13 +30,13 @@ We will refer to the ```$SRC``` variable in all step of this short documentation
 
 ```sh
 export SRC=/home/djay/src
-mkdir $SRC
+mkdir -p $SRC
 ```
 
 <h3>Download ZOO-Project and MapMint</h3>
 
 ```sh
-cd $SRC/
+cd $SRC
 svn checkout http://www.zoo-project.org/svn/trunk zoo
 git clone https://github.com/mapmint/mapmint.git
 ```
@@ -36,7 +45,7 @@ git clone https://github.com/mapmint/mapmint.git
 <h3>Install MapServer</h3>
 
 ```sh
-cd $SRC/
+cd $SRC
 wget http://download.osgeo.org/mapserver/mapserver-6.2.0.tar.gz
 tar -xvf mapserver-6.2.0.tar.gz
 
@@ -44,6 +53,14 @@ cd mapserver-6.2.0
 ./configure --with-wfs --with-python --with-freetype=/usr/ --with-ogr --with-gdal --with-proj --with-geos --with-cairo --with-kml --with-wmsclient --with-wfsclient --with-wcs --with-sos --with-python=/usr/bin/python3.6 --without-gif --with-apache-module --with-apxs=/usr/bin/apxs2 --with-apr-config=/usr/bin/apr-1-config --enable-python-mapscript --with-zlib --prefix=/usr/
 sed "s:mapserver-6.2.0-mm/::g;s:mapserver-6.2.0/::g" -i ../mapmint/thirds/ms-6.2.0-full.patch
 patch -p0 < $SRC/mapmint/thirds/ms-6.2.0-full.patch 
+patch mapscript/python/Makefile <<< '26,27c
+PYLIBDIR=`$(PYTHON) -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))"`
+PYINCDIR=`$(PYTHON) -c "from distutils.sysconfig import get_python_inc; print(get_python_inc(1))"`
+.'
+patch mapscript/python/Makefile.in <<< '26,27c
+PYLIBDIR=`$(PYTHON) -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))"`
+PYINCDIR=`$(PYTHON) -c "from distutils.sysconfig import get_python_inc; print(get_python_inc(1))"`
+.'
 
 make
 sudo make install
@@ -63,7 +80,11 @@ wget http://geolabs.fr/dl/mapcache.xml
 sudo cp mapcache.xml /usr/lib/cgi-bin/
 ```
 
-Create or edit the ```/etc/ld.so.conf.d/zoo.conf``` and add ```/usr/local/lib```
+Create or edit the ```/etc/ld.so.conf.d/zoo.conf``` and add the line ```/usr/local/lib``` manually or run the following line:
+```sh
+sudo echo "/usr/local/lib" > /etc/ld.so.conf.d/zoo.conf
+```
+
 then run the following command:
 
 ```sh
