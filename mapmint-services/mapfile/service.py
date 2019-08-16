@@ -4530,14 +4530,18 @@ def saveNavPrivileges(conf,inputs,outputs):
 def getDescription(conf,m):
 	description=""
 	try:
-		description=open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"],conf["main"]["tmpPath"])).read()
+		import HTMLParser
+		parser = HTMLParser.HTMLParser()
+		description=parser.unescape(open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"],conf["main"]["tmpPath"])).read())
 	except:
 		description=m.web.metadata.get("ows_abstract")
 	return description
 
 def getShortDescription(conf,m):
 	try:
-		description=open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"],conf["main"]["tmpPath"])).read().replace("\t","")
+		import HTMLParser
+                parser = HTMLParser.HTMLParser()
+		description=parser.unescape(open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"],conf["main"]["tmpPath"])).read().replace("\t",""))
 		# Extract text content from HTML (supposed to be welel formed
 		# XML file)
 		from xml.sax.handler import ContentHandler

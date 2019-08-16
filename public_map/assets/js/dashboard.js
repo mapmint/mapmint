@@ -1,4 +1,4 @@
-// Filename: login.js
+// Filename: dashboard.js
 
 
 define([
