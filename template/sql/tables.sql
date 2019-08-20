@@ -76,6 +76,8 @@ CREATE TABLE mm_tables.p_views (
     name character varying(255),
     description text,
     clause text,
+    icon text,
+    menu_order int,
     visible boolean DEFAULT true
 );
 
@@ -111,6 +113,7 @@ CREATE TABLE mm_tables.p_editions (
     id serial PRIMARY KEY,
     ptid integer REFERENCES mm_tables.p_tables(id) ON DELETE CASCADE,
     name character varying(255),
+    description text,
     step integer
 );
 
