@@ -145,9 +145,7 @@ $inputs["page"]
             <div class="post phome">
 #if $conf["identification"]["abstract"].count($conf["main"]["tmpUrl"])>0
 #set f=open($conf["identification"]["abstract"].replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
-#import HTMLParser
-#set parser = HTMLParser.HTMLParser()
-              $parser.unescape(f.read())
+              $(f.read())
 #else
               $conf["identification"]["abstract"].replace("[BR]","</p><p>")
 #end if

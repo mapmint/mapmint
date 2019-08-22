@@ -1520,7 +1520,7 @@ def createLegend0(conf,inputs,outputs):
             tmpl=conf["main"]["dataPath"]+"/templates/click_"+inputs["layer"]["value"]+"_"+inputs["name"]["value"]+"_tmpl.html"
         try:
             f=open(tmpl,"r")
-            nameSpace[i+"_tmpl"]=f.read().replace("<!-- MapServer Template -->\n","")
+            nameSpace[i+"_tmpl"]=(f.read().replace("<!-- MapServer Template -->\n",""))
         except:
             nameSpace[i+"_tmpl"]=""
     
@@ -4559,9 +4559,7 @@ def saveNavPrivileges(conf,inputs,outputs):
 def getDescription(conf,m):
 	description=""
 	try:
-		import HTMLParser
-		parser = HTMLParser.HTMLParser()
-		description=parser.unescape(open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"],conf["main"]["tmpPath"])).read())
+		description=(open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"],conf["main"]["tmpPath"])).read())
 	except:
 		description=m.web.metadata.get("ows_abstract")
 	return description
@@ -4675,12 +4673,15 @@ def savePublishMap(conf,inputs,outputs):
     isPassed=-1
     for i in args:
         if inputs.keys().count(i)>0:
-            if inputs.keys().count(i)>0 and inputs[i].keys().count("value")>0:
+            if inputs[i].keys().count("value")>0:
                 if inputs[i].keys().count("value")>0:
-                    setMetadata(m.web,i,inputs[i]["value"])
+                    if inputs[i]["value"]!="NULL":
+                        setMetadata(m.web,i,inputs[i]["value"])
+                    else:
+                        setMetadata(m.web,i,"")
                 else:
                     setMetadata(m.web,i,"")
-            setMetadata(m.web,i,inputs[i]["value"]);
+            #setMetadata(m.web,i,inputs[i]["value"]);
             if i=="mmProjectName" and isPassed<0:
                 import os
                 try:
