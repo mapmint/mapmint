@@ -1,5 +1,7 @@
 ## Steps to install and get Administration interface
 1. Install OSGeo Live 12.0
+	- Download link: https://live.osgeo.org/en/download.html
+	- Instructions on setting up OSGeo Live Virtual Machine: https://live.osgeo.org/en/quickstart/virtualization_quickstart.html
 2. Open terminal and execute the following commands sequentially.
 
 ```sh
