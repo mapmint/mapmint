@@ -16,7 +16,7 @@ apt-get install ansible git openssh-server python3-setuptools python-pip python3
 
 git clone --branch "GSoC-2019-python3-support" https://github.com/fenilgmehta/ansible-roles.git
 cd ansible-roles
-git reset --hard a34fb36a3927ae29a9a6812cb3d8ea0b166ae4cd
+git reset --hard 40593998795ef94d37e8063dae7c3565f4ab4329
 
 cd osgeolive
 sed --in-place 's#hosts: all#hosts: localhost#g' server.yml
