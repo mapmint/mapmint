@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the MapMint package.
 # 
 # Translators:
+# 林博文 <pica.hayashi@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: User Interface\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-22 15:35+0100\n"
-"PO-Revision-Date: 2015-11-23 09:04+0000\n"
-"Last-Translator: Gérald FENOY <gerald.fenoy@geolabs.fr>\n"
+"PO-Revision-Date: 2018-12-07 09:05+0000\n"
+"Last-Translator: 林博文 <pica.hayashi@gmail.com>\n"
 "Language-Team: Japanese (Japan) (http://www.transifex.com/mapmint/user-interface/language/ja_JP/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,77 +21,77 @@ msgstr ""
 #: /mapmint-services/authenticate/service.py:42
 #: /mapmint-services/mapfile/service.py:4475
 msgid "Default extent set."
-msgstr ""
+msgstr "デフォルト範囲の設定。"
 
 #: /mapmint-services/authenticate/service.py:104
 msgid ""
 "SMTP is not properly configured on your instance, please follow instructions"
 " from the official documentation."
-msgstr ""
+msgstr "インスタンスにSMTPが正しく設定されていません、公式ドキュメントの指示に従ってください。"
 
 #: /mapmint-services/authenticate/service.py:123
 msgid "Unable to send the mail containing your new password: "
-msgstr ""
+msgstr "新しいパスワードを含むメールを送信できません："
 
 #: /mapmint-services/authenticate/service.py:126
 msgid "Nor login nor email address correspond to the value provided"
-msgstr ""
+msgstr "指定された値に対応するログインや電子メールアドレスはありません"
 
 #: /mapmint-services/authenticate/service.py:128
 msgid "You will receive an email containing your new password"
-msgstr ""
+msgstr "新しいパスワードを記載したメールが届きます"
 
 #: /mapmint-services/authenticate/service.py:159
 msgid "Unable to update user preferences: "
-msgstr ""
+msgstr "ユーザ情報をアップデートできません:"
 
 #: /mapmint-services/authenticate/service.py:161
 msgid "User preferences saved."
-msgstr ""
+msgstr "ユーザ情報が保存されました。"
 
 #: /mapmint-services/authenticate/service.py:209
 msgid "Unable to register the user: "
-msgstr ""
+msgstr "ユーザを登録できません。"
 
 #: /mapmint-services/authenticate/service.py:211
 msgid "User have been successfully registered."
-msgstr ""
+msgstr "ユーザは正しく登録できました。"
 
 #: /mapmint-services/authenticate/service.py:216
 #: /mapmint-services/authenticate/service.py:303
 msgid "No need to authenticate"
-msgstr ""
+msgstr "認証の必要なし"
 
 #: /mapmint-services/authenticate/service.py:229
 #: /mapmint-services/authenticate/service.py:298
 #: /mapmint-services/authenticate/service.py:323
 msgid "Error when processing SQL query: "
-msgstr ""
+msgstr "SQLクエリの処理中にエラー発生:"
 
 #: /mapmint-services/authenticate/service.py:246
 #: /mapmint-services/authenticate/service.py:362
 msgid "User "
-msgstr ""
+msgstr "ユーザ"
 
 #: /mapmint-services/authenticate/service.py:246
 #: /mapmint-services/authenticate/service.py:362
 msgid " authenticated"
-msgstr ""
+msgstr "認証済み"
 
 #: /mapmint-services/authenticate/service.py:252
 #: /mapmint-services/authenticate/service.py:368
 msgid "Unable to connect with the provided login and password"
-msgstr ""
+msgstr "指定されたログインとパスワードで接続ができません"
 
 #: /mapmint-services/authenticate/service.py:256
 #: /mapmint-services/authenticate/service.py:372
 msgid "Should never occur"
-msgstr ""
+msgstr "Should never occur"
 
 #: /mapmint-services/authenticate/service.py:261
 #: /mapmint-services/authenticate/service.py:273
 msgid "User disconnected"
-msgstr ""
+msgstr "ユーザ接続が切断されました"
 
 #: /mapmint-services/authenticate/service.py:266
 #: /mapmint-services/authenticate/service.py:268
@@ -105,28 +106,28 @@ msgstr ""
 #: /mapmint-services/manage-users/service_users.py:373
 #: /mapmint-services/manage-users/service_users.py:501
 msgid "User not authenticated"
-msgstr ""
+msgstr "ユーザーは認証されていません"
 
 #: /mapmint-services/authenticate/service.py:312
 msgid "Unable to connect to the User Database."
-msgstr ""
+msgstr "ユーザーデータベースに接続できません"
 
 #: /mapmint-services/configuration/service.py:46
 #: /mapmint-services/configuration/service.py:112
 msgid "Error occurs when trying to parse the "
-msgstr ""
+msgstr "パース中にエラーが発生しました"
 
 #: /mapmint-services/configuration/service.py:46
 msgid "section"
-msgstr ""
+msgstr "セクション"
 
 #: /mapmint-services/configuration/service.py:105
 msgid "done"
-msgstr ""
+msgstr "完了"
 
 #: /mapmint-services/configuration/service.py:112
 msgid " section: "
-msgstr ""
+msgstr "セクション:"
 
 #: /mapmint-services/datastores/postgis/pgConnection.py:63
 #: /mapmint-services/datastores/postgis/pgConnection.py:112
@@ -137,42 +138,42 @@ msgstr ""
 #: /mapmint-services/np/service.py:1566 /mapmint-services/np/service.py:1573
 #: /mapmint-services/np/service.py:1883
 msgid "Unable to identify your parameter as table or field name"
-msgstr ""
+msgstr "テーブルまたはフィールド名のパラメータを識別できません"
 
 #: /mapmint-services/datastores/postgis/service.py:22
 msgid "Unable to connect to "
-msgstr ""
+msgstr "接続できません"
 
 #: /mapmint-services/datastores/postgis/service.py:26
 msgid "Connection to "
-msgstr ""
+msgstr "接続しました"
 
 #: /mapmint-services/datastores/postgis/service.py:26
 msgid " successfull"
-msgstr ""
+msgstr "成功"
 
 #: /mapmint-services/datastores/postgis/service.py:57
 #: /mapmint-services/datastores/wfs/service.py:22
 #: /mapmint-services/datastores/wfs/service.py:39
 msgid "Unable to parse the file"
-msgstr ""
+msgstr "ファイルをパースできません"
 
 #: /mapmint-services/datastores/postgis/service.py:82
 msgid "Unable to parse the file: "
-msgstr ""
+msgstr "パースできないファイル:"
 
 #: /mapmint-services/datastores/postgis/service.py:94
 msgid "Unable to access the database configuration file to remove"
-msgstr ""
+msgstr "削除するデータベース設定ファイルにアクセスができません"
 
 #: /mapmint-services/datastores/postgis/service.py:96
 #: /mapmint-services/datastores/wfs/service.py:56
 msgid "Database "
-msgstr ""
+msgstr "データベース"
 
 #: /mapmint-services/datastores/postgis/service.py:96
 msgid " was successfully removed from the Datastores"
-msgstr ""
+msgstr "は正常にデータストアから削除されました"
 
 #: /mapmint-services/datastores/service.py:269
 #: /mapmint-services/mapfile/service.py:219
@@ -185,96 +186,96 @@ msgstr ""
 #: /mapmint-services/mapfile/service.py:636
 #: /mapmint-services/mapfile/service.py:782
 msgid "Unable to open the mapfile"
-msgstr ""
+msgstr "マップファイルのオープンができません"
 
 #: /mapmint-services/datastores/service.py:342
 #: /mapmint-services/mapfile/service.py:3865
 msgid "Privileges saved"
-msgstr ""
+msgstr "特権が保存されました"
 
 #: /mapmint-services/datastores/service.py:379
 #: /mapmint-services/manage-users/service_users.py:513
 msgid "Error occured: "
-msgstr ""
+msgstr "エラー発生:"
 
 #: /mapmint-services/datastores/wfs/service.py:49
 msgid "Unable to access the Data Store configuration file to remove"
-msgstr ""
+msgstr "削除するデータストア設定ファイルにアクセスできません"
 
 #: /mapmint-services/datastores/wfs/service.py:56
 msgid " was successfully removed from the Data Stores"
-msgstr ""
+msgstr "は正常にデータストアから削除されました"
 
 #: /mapmint-services/datastores/wfs/service.py:68
 msgid "Data Store "
-msgstr ""
+msgstr "データストア"
 
 #: /mapmint-services/datastores/wfs/service.py:68
 #: /mapmint-services/georeferencer/service.js:137
 #: /mapmint-services/georeferencer/service.js:212
 msgid " created"
-msgstr ""
+msgstr "生成されました"
 
 #: /mapmint-services/datastores/wfs/service.py:82
 msgid "Test connecting the Data Store "
-msgstr ""
+msgstr "データストア接続テスト"
 
 #: /mapmint-services/datastores/wfs/service.py:82
 msgid " run successfully"
-msgstr ""
+msgstr "正常に開始されました"
 
 #: /mapmint-services/datastores/wfs/service.py:85
 msgid "Unable to access the Data Store:"
-msgstr ""
+msgstr "データストアにアクセスできません:"
 
 #: /mapmint-services/georeferencer/service.py:56
 msgid "Layer copied"
-msgstr ""
+msgstr "レイヤがコピーされました"
 
 #: /mapmint-services/georeferencer/service.py:81
 msgid " deleted"
-msgstr ""
+msgstr "削除されました"
 
 #: /mapmint-services/georeferencer/service.py:124
 msgid "Unable to find any CSV files associated with the file."
-msgstr ""
+msgstr "ファイルに関連付けられたCSVファイルを見つけることができません。"
 
 #: /mapmint-services/georeferencer/service.py:164
 #: /mapmint-services/georeferencer/service.py:199
 msgid "Georeference Project saved"
-msgstr ""
+msgstr "ジオリファレンスプロジェクトを保存しました"
 
 #: /mapmint-services/georeferencer/service.py:224
 msgid "CSV file saved."
-msgstr ""
+msgstr "CSVファイルを保存しました"
 
 #: /mapmint-services/manage-users/service_users.py:209
 msgid "Group succcessfully updated"
-msgstr ""
+msgstr "グループは正常にアップロードされました"
 
 #: /mapmint-services/manage-users/service_users.py:217
 msgid "Action not allowed"
-msgstr ""
+msgstr "アクションは許可されません"
 
 #: /mapmint-services/manage-users/service_users.py:220
 #: /mapmint-services/manage-users/service_users.py:249
 msgid "Parameter order invalid"
-msgstr ""
+msgstr "パラメータ オーダー が無効です"
 
 #: /mapmint-services/manage-users/service_users.py:223
 #: /mapmint-services/manage-users/service_users.py:252
 msgid "Parameter sort invalid"
-msgstr ""
+msgstr "パラメータ ソート が無効です。"
 
 #: /mapmint-services/manage-users/service_users.py:226
 #: /mapmint-services/manage-users/service_users.py:255
 msgid "Parameter offset invalid"
-msgstr ""
+msgstr "パラメータ オフセット が無効です"
 
 #: /mapmint-services/manage-users/service_users.py:229
 #: /mapmint-services/manage-users/service_users.py:258
 msgid "Parameter number invalid"
-msgstr ""
+msgstr "パラメータ 数値 が無効です"
 
 #: /mapmint-services/manage-users/service_users.py:246
 #: /mapmint-services/manage-users/service_users.py:301
@@ -282,66 +283,66 @@ msgstr ""
 #: /mapmint-services/manage-users/service_users.py:370
 #: /mapmint-services/manage-users/service_users.py:495
 msgid "Action not permited"
-msgstr ""
+msgstr "アクションが許可されていません"
 
 #: /mapmint-services/manage-users/service_users.py:275
 #: /mapmint-services/manage-users/service_users.py:498
 msgid "Parameter id invalid"
-msgstr ""
+msgstr "パラメータ id が無効です"
 
 #: /mapmint-services/manage-users/service_users.py:295
 msgid "Parametre id incorrect"
-msgstr ""
+msgstr "パラメータ id が間違っています"
 
 #: /mapmint-services/manage-users/service_users.py:328
 msgid "invalid user parameter: "
-msgstr ""
+msgstr "無効なユーザパラメータ:"
 
 #: /mapmint-services/manage-users/service_users.py:335
 #: /mapmint-services/manage-users/service_users.py:364
 msgid "User successfully inserted"
-msgstr ""
+msgstr "ユーザが正常に追加されました"
 
 #: /mapmint-services/manage-users/service_users.py:345
 msgid "SQL Error"
-msgstr ""
+msgstr "SQLエラー"
 
 #: /mapmint-services/manage-users/service_users.py:360
 #, python-format
 msgid "%s value is not acceptable"
-msgstr ""
+msgstr "%s 値は承認されません"
 
 #: /mapmint-services/manage-users/service_users.py:393
 msgid "Invalid set parameter: "
-msgstr ""
+msgstr "無効な設定パラメータ: "
 
 #: /mapmint-services/manage-users/service_users.py:415
 #: /mapmint-services/manage-users/service_users.py:455
 #, python-format
 msgid "Group succcessfully %s"
-msgstr ""
+msgstr "グループは正常に %s"
 
 #: /mapmint-services/manage-users/service_users.py:420
 msgid "Not allowed to access this information"
-msgstr ""
+msgstr "この情報にアクセスすることはできません"
 
 #: /mapmint-services/manage-users/service_users.py:434
 msgid "invalid set parameter :"
-msgstr ""
+msgstr "無効な設定パラメータ: "
 
 #: /mapmint-services/manage-users/service_users.py:464
 #, python-format
 msgid "User succcessfully %s"
-msgstr ""
+msgstr "ユーザは正常に %s"
 
 #: /mapmint-services/manage-users/service_users.py:482
 #: /mapmint-services/manage-users/service_users.py:492
 msgid "Update failed"
-msgstr ""
+msgstr "更新に失敗しました"
 
 #: /mapmint-services/mapfile/service.py:58
 msgid "Gometry Type Updated"
-msgstr ""
+msgstr "ジオメトリタイプがアップロードされました"
 
 #: /mapmint-services/mapfile/service.py:66
 #: /mapmint-services/mapfile/service.py:1619
@@ -358,239 +359,239 @@ msgstr ""
 #: /mapmint-services/mapfile/service.py:3712
 #: /mapmint-services/mapfile/service.py:3730
 msgid "Map saved"
-msgstr ""
+msgstr "マップが保存されました"
 
 #: /mapmint-services/mapfile/service.py:85
 msgid "Complex Search parameters saved."
-msgstr ""
+msgstr "複雑な検索パラメータが保存されました。"
 
 #: /mapmint-services/mapfile/service.py:130
 msgid "Project cannot be removed because it is the last one available."
-msgstr ""
+msgstr "プロジェクトは最後の一つであるためは削除できません。"
 
 #: /mapmint-services/mapfile/service.py:195
 #: /mapmint-services/mapfile/service.py:200
 msgid "You're not allowed to access the ressource"
-msgstr ""
+msgstr "リソースにアクセスすることができません"
 
 #: /mapmint-services/mapfile/service.py:254
 #, python-format
 msgid "Project %s is now available in your Manager."
-msgstr ""
+msgstr "プロジェクト %s は現在あなたの管理下にあります。"
 
 #: /mapmint-services/mapfile/service.py:300
 #, python-format
 msgid "Layer %s is now up-to-date in your %s project."
-msgstr ""
+msgstr "レイヤ %s はプロジェクト %s で更新されました。"
 
 #: /mapmint-services/mapfile/service.py:516
 msgid "Layer added to the Map."
-msgstr ""
+msgstr "マップにレイヤーが追加されました。"
 
 #: /mapmint-services/mapfile/service.py:1535
 msgid "An error occured ("
-msgstr ""
+msgstr "エラーが発生しました ("
 
 #: /mapmint-services/mapfile/service.py:1622
 msgid "An error occured when trying to save the map: "
-msgstr ""
+msgstr "マップを保存中にエラーが発生しました:"
 
 #: /mapmint-services/mapfile/service.py:1872
 #: /mapmint-services/mapfile/service.py:2104
 msgid "Layer Style saved."
-msgstr ""
+msgstr "レイヤスタイルは保存されました。"
 
 #: /mapmint-services/mapfile/service.py:2506
 #: /mapmint-services/mapfile/service.py:2844
 msgid "Unable to classify using this raster band."
-msgstr ""
+msgstr "このラスタバンドを使用して分類できません。"
 
 #: /mapmint-services/mapfile/service.py:2677
 msgid "Layer classified"
-msgstr ""
+msgstr "分類 レイヤ"
 
 #: /mapmint-services/mapfile/service.py:3753
 msgid "Directory added."
-msgstr ""
+msgstr "ディレクトリが追加されました。"
 
 #: /mapmint-services/mapfile/service.py:3768
 msgid "Directory renamed."
-msgstr ""
+msgstr "ディレクトリが削除されました。"
 
 #: /mapmint-services/mapfile/service.py:3779
 #: /mapmint-services/mapfile/service.py:3784
 msgid "Unable to remove the group as it is the only one remaining."
-msgstr ""
+msgstr "グループが1つだけ残っているため、グループを削除できません。"
 
 #: /mapmint-services/mapfile/service.py:3792
 msgid "Directory deleted."
-msgstr ""
+msgstr "ディレクトリが削除されました。"
 
 #: /mapmint-services/mapfile/service.py:3856
 msgid "Layer privileges saved."
-msgstr ""
+msgstr "レイヤ特権が保存されました。"
 
 #: /mapmint-services/mapfile/service.py:4120
 msgid "Project saved"
-msgstr ""
+msgstr "プロジェクトが保存されました"
 
 #: /mapmint-services/mapfile/service.py:4131
 msgid "Project preview generated"
-msgstr ""
+msgstr "プロジェクトプレビューが生成されました。"
 
 #: /mapmint-services/mapfile/service.py:4160
 msgid "Template saved"
-msgstr ""
+msgstr "テンプレートが保存されました"
 
 #: /mapmint-services/mapfile/service.py:4176
 msgid "Resampling method saved."
-msgstr ""
+msgstr "リサンプリング方法が保存されました。"
 
 #: /mapmint-services/mapfile/service.py:4211
 msgid "The step "
-msgstr ""
+msgstr "ステップ"
 
 #: /mapmint-services/mapfile/service.py:4211
 msgid " already exists."
-msgstr ""
+msgstr "既に存在します。"
 
 #: /mapmint-services/mapfile/service.py:4225
 msgid "Step added to existsing steps."
-msgstr ""
+msgstr "既存のステップにステップを追加しました。"
 
 #: /mapmint-services/mapfile/service.py:4268
 msgid "Step "
-msgstr ""
+msgstr "ステップ"
 
 #: /mapmint-services/mapfile/service.py:4268
 msgid " removed successfully"
-msgstr ""
+msgstr "正常に削除されました"
 
 #: /mapmint-services/mapfile/service.py:4329
 msgid "Grid configuration saved."
-msgstr ""
+msgstr "グリッド設定が保存されました。"
 
 #: /mapmint-services/mapfile/service.py:4375
 msgid "Grid Layer was successfully added to the project."
-msgstr ""
+msgstr "グリッドレイヤは正常にプロジェクトに追加されました。"
 
 #: /mapmint-services/mapfile/service.py:4483
 msgid "You're not allowed to access this layer"
-msgstr ""
+msgstr "このレイヤにアクセスすることはできません"
 
 #: /mapmint-services/np/service.py:47 /mapmint-services/np/service.py:136
 msgid "Unable to use this service when you're not logued in"
-msgstr ""
+msgstr "ログインせずにこのサービスを使用することはできません"
 
 #: /mapmint-services/np/service.py:59
 msgid "Index quote updated."
-msgstr ""
+msgstr "インデックス参照が更新されました。"
 
 #: /mapmint-services/np/service.py:63
 msgid "Index quote saved."
-msgstr ""
+msgstr "インデックス参照が保存されました。"
 
 #: /mapmint-services/np/service.py:147
 msgid "Map removed from your favorite list."
-msgstr ""
+msgstr "お気に入りリストからマップが削除されました。"
 
 #: /mapmint-services/np/service.py:150
 msgid "Map added to your favorite list."
-msgstr ""
+msgstr "お気に入りリストにマップが追加されました。"
 
 #: /mapmint-services/np/service.py:522
 msgid "Error occur whenre trying to access the index map"
-msgstr ""
+msgstr "インデックスマップにアクセス中にエラーが発生しました。"
 
 #: /mapmint-services/np/service.py:555
 msgid "Index successfully published"
-msgstr ""
+msgstr "インデックスは正常に公開されました。"
 
 #: /mapmint-services/np/service.py:559 /mapmint-services/np/service.py:574
 msgid "Unable to access any index file"
-msgstr ""
+msgstr "インデックスファイルにアクセスできません"
 
 #: /mapmint-services/np/service.py:571
 msgid "Index successfully unpublished"
-msgstr ""
+msgstr "インデックスは正常に非公開になりました"
 
 #: /mapmint-services/np/service.py:692
 msgid "Index display settings saved"
-msgstr ""
+msgstr "インデックス表示設定が保存されました"
 
 #: /mapmint-services/np/service.py:762
 msgid "Repport settings saved"
-msgstr ""
+msgstr "レポート設定が保存されました"
 
 #: /mapmint-services/np/service.py:829 /mapmint-services/np/service.py:841
 msgid "Issue occurs: "
-msgstr ""
+msgstr "発生した問題:"
 
 #: /mapmint-services/np/service.py:960
 msgid "View was successfully created, index is ready to use."
-msgstr ""
+msgstr "ビューは正常に作成され、インデックスは使用できる状態になりました。"
 
 #: /mapmint-services/np/service.py:969
 msgid "Table was successfully removed."
-msgstr ""
+msgstr "テーブルは正常に削除されました。"
 
 #: /mapmint-services/np/service.py:991
 msgid "Index was successfully removed."
-msgstr ""
+msgstr "インデックスは正常に削除されました。"
 
 #: /mapmint-services/np/service.py:1046 /mapmint-services/np/service.py:1059
 msgid "Number of fetched elements from your query: "
-msgstr ""
+msgstr "クエリーにより取得された要素数:"
 
 #: /mapmint-services/np/service.py:1048 /mapmint-services/np/service.py:1061
 msgid "Your query sounds correct but didn't return any result"
-msgstr ""
+msgstr "クエリーは正常に受け付けられましたが結果はありません"
 
 #: /mapmint-services/np/service.py:1052
 msgid "Unable to access the database"
-msgstr ""
+msgstr "データベースにアクセスできません:"
 
 #: /mapmint-services/np/service.py:1064
 msgid "Unable to run your query for the following reason: "
-msgstr ""
+msgstr "次の理由によりクエリー実行ができません:"
 
 #: /mapmint-services/np/service.py:1081
 msgid "No territory found for the id provided"
-msgstr ""
+msgstr "指定されたIDのテリトリーはありません"
 
 #: /mapmint-services/np/service.py:1253
 msgid "Elements were ordered successfully"
-msgstr ""
+msgstr "要素が正常に順序付けられました"
 
 #: /mapmint-services/np/service.py:1266 /mapmint-services/np/service.py:1373
 #: /mapmint-services/np/service.py:1413 /mapmint-services/np/service.py:1551
 msgid "Done"
-msgstr ""
+msgstr "完了"
 
 #: /mapmint-services/np/service.py:1268 /mapmint-services/np/service.py:1375
 #: /mapmint-services/np/service.py:1415 /mapmint-services/np/service.py:1592
 msgid "An error occured when processing your request: "
-msgstr ""
+msgstr "リクエスト処理中にエラーが発生しました:"
 
 #: /mapmint-services/np/service.py:1370 /mapmint-services/np/service.py:1410
 msgid "Done (with graph view creation)"
-msgstr ""
+msgstr "完了(グラフ生成付き)"
 
 #: /mapmint-services/np/service.py:1448
 msgid "Please provide an id for the tuple to update"
-msgstr ""
+msgstr "更新するタプルのIDを指定してください"
 
 #: /mapmint-services/np/service.py:1541
 msgid "Unable to run the SQL request: "
-msgstr ""
+msgstr "SQLリクエストを実行できません:"
 
 #: /mapmint-services/np/service.py:1549
 msgid "Unable to copy uploaded file: "
-msgstr ""
+msgstr "アップロードされたファイルのコピーができません"
 
 #: /mapmint-services/np/service.py:1590
 msgid "Element deleted"
-msgstr ""
+msgstr "要素は削除されました"
 
 #: /mapmint-services/np/service.py:2379 /mapmint-services/np/service.py:2387
 #: /mapmint-ui/templates/Distiller/PgEditorWindow.tmpl:64
@@ -602,97 +603,97 @@ msgstr ""
 #: /mapmint-ui/templates/Publisher/Layers.html:57
 #: /mapmint-ui/templates/Publisher/Layers.html:118
 msgid "None"
-msgstr ""
+msgstr "なし"
 
 #: /mapmint-services/np/service.py:2610
 msgid "Producing document "
-msgstr ""
+msgstr "ドキュメント生成中"
 
 #: /mapmint-services/np/service.py:2610
 msgid " on "
-msgstr ""
+msgstr " on "
 
 #: /mapmint-services/np/service.py:2653
 msgid "Producing document"
-msgstr ""
+msgstr "ドキュメント生成中"
 
 #: /mapmint-services/np/service.py:2662
 msgid "Compiling documents in PDF format"
-msgstr ""
+msgstr "ドキュメントをPDFにコンパイル中"
 
 #: /mapmint-services/osm-tools/service.py:64
 #: /mapmint-services/osm-tools/service.py:132
 msgid "Creating "
-msgstr ""
+msgstr "生成中"
 
 #: /mapmint-services/osm-tools/service.py:64
 #: /mapmint-services/osm-tools/service.py:132
 msgid " field failed."
-msgstr ""
+msgstr "フィールドが失敗しました。"
 
 #: /mapmint-services/osm-tools/service.py:82
 #: /mapmint-services/osm-tools/service.py:156
 msgid "Failed to create feature in shapefile."
-msgstr ""
+msgstr "シェイプファイルにフィーチャを作成できませんでした。"
 
 #: /mapmint-services/osm-tools/service.py:125
 msgid "Creating MMID field failed."
-msgstr ""
+msgstr "MMIDフィールドの作成に失敗しました。"
 
 #: /mapmint-services/osm-tools/service.py:166
 msgid "Shapefile created"
-msgstr ""
+msgstr "シェイプファイルが作成されました"
 
 #: /mapmint-services/raster-tools-src/cgi-env/merge.py:282
 msgid "Unable to fetch any parameters"
-msgstr ""
+msgstr "パラメータを取得できません"
 
 #: /mapmint-services/raster-tools-src/cgi-env/service.py:43
 msgid "Tile Index moved"
-msgstr ""
+msgstr "タイルインデックスが移動されました"
 
 #: /mapmint-services/routing/service.py:67
 #: /mapmint-services/routing/service.py:82
 msgid "Unable to find reliable GeoCoder"
-msgstr ""
+msgstr "信頼性の高いGeoCoderを見つけることができません"
 
 #: /mapmint-services/routing/service.py:75
 msgid "Unable to find any address for this locatiton"
-msgstr ""
+msgstr "この位置のアドレスを見つけることができません"
 
 #: /mapmint-services/routing/service.py:90
 msgid "Unable to find any location for this address"
-msgstr ""
+msgstr "この位置のアドレスを見つけることができません"
 
 #: /mapmint-services/routing/service.py:180
 msgid "Map updated"
-msgstr ""
+msgstr "マップがアップロードされました"
 
 #: /mapmint-services/routing/service.py:198
 msgid "Your news was successfully inserted."
-msgstr ""
+msgstr "お知らせが正常に追加されました。"
 
 #: /mapmint-services/routing/service.py:852
 #: /mapmint-ui/templates/preview/modules/routing/view.html:43
 msgid "Profile"
-msgstr ""
+msgstr "プロファイル"
 
 #: /mapmint-services/routing/service.py:867
 #: /mapmint-ui/templates/Indexes/GraphPart_bs.html:28
 #: /mapmint-ui/templates/preview/modules/routing/view.html:32
 msgid "Step"
-msgstr ""
+msgstr "ステップ"
 
 #: /mapmint-services/routing/service.py:867
 #: /mapmint-ui/templates/Distiller/dirs/display_bs.html:55
 #: /mapmint-ui/templates/Distiller/dirs/display_bs.html:57
 msgid "Path"
-msgstr ""
+msgstr "パス"
 
 #: /mapmint-services/routing/service.py:867
 #: /mapmint-ui/templates/preview/modules/routing/view.html:28
 msgid "Distance"
-msgstr ""
+msgstr "距離"
 
 #: /mapmint-services/routing/service.py:867
 #: /mapmint-ui/templates/Distiller/wfs/display_bs.tmpl:13
@@ -703,64 +704,64 @@ msgstr ""
 #: /mapmint-ui/templates/Indexes/DocPart_bs.html:42
 #: /mapmint-ui/templates/Indexes/GraphPart_bs.html:29
 msgid "Type"
-msgstr ""
+msgstr "タイプ"
 
 #: /mapmint-services/symbol-tools-src/cgi-env/service.py:122
 msgid "Symbol added."
-msgstr ""
+msgstr "シンボルは追加されました。"
 
 #: /mapmint-services/symbol-tools-src/cgi-env/service.py:155
 msgid "Symbol removed."
-msgstr ""
+msgstr "シンボルは削除されました。"
 
 #: /mapmint-services/template/service.py:124
 msgid "Error loading your template file "
-msgstr ""
+msgstr "テンプレートファイルロードエラー"
 
 #: /mapmint-services/upload/service.py:91
 msgid "Your [file] file was uploaded on the server"
-msgstr ""
+msgstr "[file] ファイルはサーバにアップロードされました。"
 
 #: /mapmint-services/vector-converter-src/cgi-env/service.py:61
 msgid "File converted"
-msgstr ""
+msgstr "ファイルはコンバートされました"
 
 #: /mapmint-services/vector-converter-src/cgi-env/service.py:93
 msgid "Cleanup done"
-msgstr ""
+msgstr "クリーンアップ終了"
 
 #: /mapmint-services/vector-tools-src/cgi-env/service.py:597
 msgid "No feature found !"
-msgstr ""
+msgstr "地物がありません。"
 
 #: /mapmint-services/vector-tools-src/service.c:1267
 msgid "The specified path doesn't exist."
-msgstr ""
+msgstr "指定されたパスは存在しません。"
 
 #: /documentation/_static/doctools.js:154
 msgid "Permalink to this headline"
-msgstr ""
+msgstr "このヘッドラインへのパーマリンク"
 
 #: /documentation/_static/doctools.js:160
 msgid "Permalink to this definition"
-msgstr ""
+msgstr "この定義へのパーマリンク"
 
 #: /documentation/_static/doctools.js:189
 msgid "Hide Search Matches"
-msgstr ""
+msgstr "検索結果を非表示にする"
 
 #: /mapmint-services/raster-tools-src/cgi-env/service.js:30
 msgid "TileIndex file created"
-msgstr ""
+msgstr "タイルインデックスファイルが作成されました"
 
 #: /public_map/assets/js/lib/moment-with-locales.min.js:1
 msgid "\n"
-msgstr ""
+msgstr "\n"
 
 #: /mapmint-ui/templates/Configuration.tmpl:3
 #: /mapmint-ui/templates/Configuration_bs.html:34
 msgid "Configuration"
-msgstr ""
+msgstr "構成"
 
 #: /mapmint-ui/templates/Configuration.tmpl:13
 #: /mapmint-ui/templates/Configuration_bs.tmpl:36
@@ -815,90 +816,90 @@ msgstr ""
 #: /mapmint-ui/templates/Themes_bs.html:34
 #: /mapmint-ui/templates/Themes_bs.html:138
 msgid "Save"
-msgstr ""
+msgstr "保存"
 
 #: /mapmint-ui/templates/Configuration_bs.tmpl:20
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:35
 #: /mapmint-ui/templates/Manager/LayerProperties.tmpl:111
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.tmpl:113
 msgid "Settings"
-msgstr ""
+msgstr "設定"
 
 #: /mapmint-ui/templates/Configuration_bs.tmpl:30
 #, c-format
 msgid "%s configuration"
-msgstr ""
+msgstr "%s 構成"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:24
 msgid "At a glance"
-msgstr ""
+msgstr "一見して"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:25
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:128
 msgid "Last connected on "
-msgstr ""
+msgstr "最後の接続"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:31
 msgid "Manage data stores and data sources"
-msgstr ""
+msgstr "データストア・データソース管理"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:52
 msgid "data stores"
-msgstr ""
+msgstr "データストア"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:52
 msgid "data store"
-msgstr ""
+msgstr "データストア"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:88
 msgid "data sources"
-msgstr ""
+msgstr "データソース"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:88
 msgid "data source"
-msgstr ""
+msgstr "データソース"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:95
 msgid "Actives SRS"
-msgstr ""
+msgstr "アクティブ SRS"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:95
 msgid "Active SRS"
-msgstr ""
+msgstr "アクティブ SRS"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:102
 msgid "Edit, style and process data layers"
-msgstr ""
+msgstr "データレイヤの編集、スタイル、処理"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:109
 msgid "maps"
-msgstr ""
+msgstr "マップ"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:109
 msgid "map"
-msgstr ""
+msgstr "マップ"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:117
 msgid "Publish webmapping applications"
-msgstr ""
+msgstr "ウェブマッピングアプリケーションの公開"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:134
 msgid "project"
-msgstr ""
+msgstr "プロジェクト"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:138
 msgid "Server statistics"
-msgstr ""
+msgstr "サーバ統計"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:143
 #: /mapmint-ui/templates/Dashboard.tmpl:146
 msgid "Server IP is"
-msgstr ""
+msgstr "サーバ IP は"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:146
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:250
 msgid "Unknown"
-msgstr ""
+msgstr "不明"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:149
 #: /mapmint-ui/templates/Dashboard.tmpl:151
@@ -907,67 +908,67 @@ msgstr ""
 #: /mapmint-ui/templates/Dashboard.tmpl:158
 #, c-format
 msgid "%s version: %s"
-msgstr ""
+msgstr "%s version: %s"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:153
 #: /mapmint-ui/templates/Dashboard.tmpl:158
 msgid "unknown"
-msgstr ""
+msgstr "不明"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:163
 msgid "Disk usage"
-msgstr ""
+msgstr "ディスク使用状況"
 
 #: /mapmint-ui/templates/Dashboard.tmpl:176
 msgid "Recent Projects"
-msgstr ""
+msgstr "最近のプロジェクト"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:29
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:127
 msgid "Overview"
-msgstr ""
+msgstr "概要"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:32
 #: /mapmint-ui/templates/UsersManagement/MainWindow.tmpl:10
 #: /mapmint-ui/templates/UsersManagement.tmpl:22
 msgid "Users"
-msgstr ""
+msgstr "ユーザ"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:142
 msgid "Data stores"
-msgstr ""
+msgstr "データストア"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:142
 msgid "Data store"
-msgstr ""
+msgstr "データストア"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:149
 #: /mapmint-ui/templates/Distiller.tmpl:66
 msgid "Directories"
-msgstr ""
+msgstr "ディレクトリ"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:154
 msgid "PostGIS databases"
-msgstr ""
+msgstr "PostGIS データベース"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:159
 msgid "MySQL databases"
-msgstr ""
+msgstr "MySQL データベース"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:170
 msgid "Launch the Distiller"
-msgstr ""
+msgstr "Distillerの起動"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:174
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:408
 msgid "View Details"
-msgstr ""
+msgstr "詳細表示"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:190
 #: /mapmint-ui/templates/public-access.tmpl:44
 #: /mapmint-ui/templates/Publisher.tmpl:20
 msgid "Maps"
-msgstr ""
+msgstr "マップ"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:190
 #: /mapmint-ui/templates/Georeferencer.tmpl:140
@@ -988,21 +989,21 @@ msgstr ""
 #: /mapmint-ui/templates/Publisher.tmpl:238
 #: /mapmint-ui/templates/Publisher_bs.tmpl:76
 msgid "Map"
-msgstr ""
+msgstr "マップ"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:260
 msgid "Launch the Manager"
-msgstr ""
+msgstr "マネージャの起動"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:290
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:300
 #, c-format
 msgid "%s version"
-msgstr ""
+msgstr "%s version"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:356
 msgid "Symbols"
-msgstr ""
+msgstr "シンボル"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:356
 #: /mapmint-ui/templates/Manager/Styler/UniqSymb_bs.html:19
@@ -1010,21 +1011,21 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/Styler/UniqSymb_bs.html:72
 #: /mapmint-ui/templates/Manager/Styler/UniqSymb_bs.html:77
 msgid "Symbol"
-msgstr ""
+msgstr "シンボル"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:369
 #: /mapmint-ui/templates/Manager/Styler/SymbolManager.tmpl:7
 msgid "Select a font"
-msgstr ""
+msgstr "フォント選択"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:370
 #: /mapmint-ui/templates/Manager/Styler/SymbolManager.tmpl:8
 msgid "External images"
-msgstr ""
+msgstr "外部画像"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:432
 msgid "Favorite SRS"
-msgstr ""
+msgstr "よく使用する SRS"
 
 #: /mapmint-ui/templates/Dashboard_bs.tmpl:450
 #: /mapmint-ui/templates/Datastore_dirs_display.tmpl:18
@@ -1063,7 +1064,7 @@ msgstr ""
 #: /mapmint-ui/templates/preview/modules/addLayer/display_bs.html:23
 #: /mapmint-ui/templates/preview/modules/routing/view.html:34
 msgid "Add"
-msgstr ""
+msgstr "追加"
 
 #: /mapmint-ui/templates/Datastore_dirs_display.tmpl:4
 #: /mapmint-ui/templates/Distiller/db/display.tmpl:6
@@ -1088,27 +1089,27 @@ msgstr ""
 #: /mapmint-ui/templates/Themes.tmpl:112 /mapmint-ui/templates/Themes.tmpl:125
 #: /mapmint-ui/templates/Documents_bs.html:45
 msgid "Name:"
-msgstr ""
+msgstr "名称:"
 
 #: /mapmint-ui/templates/Datastore_dirs_display.tmpl:7
 #: /mapmint-ui/templates/Distiller/dirs/display.tmpl:7
 #: /mapmint-ui/templates/Distiller/dirs_display.tmpl:7
 #: /mapmint-ui/templates/Distiller/dirs/display_bs.html:48
 msgid "Browse"
-msgstr ""
+msgstr "ブラウズ"
 
 #: /mapmint-ui/templates/Datastore_dirs_display.tmpl:9
 #: /mapmint-ui/templates/Distiller/dirs/display.tmpl:9
 #: /mapmint-ui/templates/Distiller/dirs_display.tmpl:9
 #: /mapmint-ui/templates/Distiller/dirs/display_bs.html:52
 msgid "New"
-msgstr ""
+msgstr "新規"
 
 #: /mapmint-ui/templates/Datastore_dirs_display.tmpl:12
 #: /mapmint-ui/templates/Distiller/dirs/display.tmpl:12
 #: /mapmint-ui/templates/Distiller/dirs_display.tmpl:12
 msgid "Path:"
-msgstr ""
+msgstr "パス:"
 
 #: /mapmint-ui/templates/Datastore_dirs_display.tmpl:17
 #: /mapmint-ui/templates/Distiller/db/display.tmpl:47
@@ -1132,11 +1133,11 @@ msgstr ""
 #: /mapmint-ui/templates/Documents_bs.html:121
 #: /mapmint-ui/templates/Documents_bs.html:134
 msgid "Cancel"
-msgstr ""
+msgstr "キャンセル"
 
 #: /mapmint-ui/templates/default_auth_msg.tmpl:2
 msgid "You're not allowed to access this ressource !"
-msgstr ""
+msgstr "このリソースのアクセスは許可されていません。"
 
 #: /mapmint-ui/templates/demo.tmpl:3
 #: /mapmint-ui/templates/Manager/Styler/Vector.tmpl:32
@@ -1146,7 +1147,7 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/Styler_bs.html:73
 #: /mapmint-ui/templates/Manager/Styler_bs.html:115
 msgid "Unique Symbol"
-msgstr ""
+msgstr "ユニークシンボル"
 
 #: /mapmint-ui/templates/demo.tmpl:4 /mapmint-ui/templates/Indexes.tmpl:272
 #: /mapmint-ui/templates/Indexes.tmpl:295
@@ -1163,7 +1164,7 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/Styler_bs.html:116
 #: /mapmint-ui/templates/Manager/Styler_bs.html:122
 msgid "Graduated Symbol"
-msgstr ""
+msgstr "順序づけシンボル"
 
 #: /mapmint-ui/templates/demo.tmpl:5 /mapmint-ui/templates/Indexes.tmpl:296
 #: /mapmint-ui/templates/Indexes_bs.tmpl:296
@@ -1176,7 +1177,7 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/Styler_bs.html:117
 #: /mapmint-ui/templates/Manager/Styler_bs.html:123
 msgid "Continuous Color"
-msgstr ""
+msgstr "連続カラー"
 
 #: /mapmint-ui/templates/demo.tmpl:6 /mapmint-ui/templates/Indexes.tmpl:271
 #: /mapmint-ui/templates/Indexes.tmpl:297
@@ -1193,7 +1194,7 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/Styler_bs.html:118
 #: /mapmint-ui/templates/Manager/Styler_bs.html:124
 msgid "Unique Value"
-msgstr ""
+msgstr "ユニーク値"
 
 #: /mapmint-ui/templates/demo.tmpl:7 /mapmint-ui/templates/Indexes.tmpl:274
 #: /mapmint-ui/templates/Indexes_bs.tmpl:274
@@ -1202,19 +1203,19 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/Styler_bs.html:77
 #: /mapmint-ui/templates/Manager/Styler_bs.html:85
 msgid "Time line"
-msgstr ""
+msgstr "タイムライン"
 
 #: /mapmint-ui/templates/Distiller/db/display.tmpl:11
 #: /mapmint-ui/templates/Distiller/db_display.tmpl:11
 #: /mapmint-ui/templates/Distiller_db_display.tmpl:11
 msgid "Host:"
-msgstr ""
+msgstr "ホスト:"
 
 #: /mapmint-ui/templates/Distiller/db/display.tmpl:15
 #: /mapmint-ui/templates/Distiller/db_display.tmpl:15
 #: /mapmint-ui/templates/Distiller_db_display.tmpl:15
 msgid "Port:"
-msgstr ""
+msgstr "ポート:"
 
 #: /mapmint-ui/templates/Distiller/db/display.tmpl:20
 #: /mapmint-ui/templates/Distiller/db_display.tmpl:20
@@ -1224,7 +1225,7 @@ msgstr ""
 #: /mapmint-ui/templates/preview/modules/auth/login.html:4
 #: /mapmint-ui/templates/preview/modules/auth/register.html:16
 msgid "Login:"
-msgstr ""
+msgstr "ログイン:"
 
 #: /mapmint-ui/templates/Distiller/db/display.tmpl:24
 #: /mapmint-ui/templates/Distiller/db_display.tmpl:24
@@ -1238,19 +1239,19 @@ msgstr ""
 #: /mapmint-ui/templates/preview/modules/auth/preferences.html:5
 #: /mapmint-ui/templates/preview/modules/auth/register.html:21
 msgid "Password:"
-msgstr ""
+msgstr "パスワード:"
 
 #: /mapmint-ui/templates/Distiller/db/display.tmpl:28
 #: /mapmint-ui/templates/Distiller/db_display.tmpl:28
 #: /mapmint-ui/templates/Distiller_db_display.tmpl:28
 msgid "Type:"
-msgstr ""
+msgstr "タイプ:"
 
 #: /mapmint-ui/templates/Distiller/db/display.tmpl:38
 #: /mapmint-ui/templates/Distiller/db_display.tmpl:38
 #: /mapmint-ui/templates/Distiller_db_display.tmpl:38
 msgid "Database:"
-msgstr ""
+msgstr "データベース:"
 
 #: /mapmint-ui/templates/Distiller/db/display.tmpl:46
 #: /mapmint-ui/templates/Distiller/db_display.tmpl:46
@@ -1263,32 +1264,32 @@ msgstr ""
 #: /mapmint-ui/templates/Distiller/db/display_bs.html:18
 #: /mapmint-ui/templates/Distiller/wfs/display_bs.html:14
 msgid "Test"
-msgstr ""
+msgstr "テスト"
 
 #: /mapmint-ui/templates/Distiller/PgWindow_bs.tmpl:5
 #: /mapmint-ui/templates/Distiller/PgWindow_bs.html:5
 msgid "Database Access"
-msgstr ""
+msgstr "データベースアクセス"
 
 #: /mapmint-ui/templates/Distiller/Projection.tmpl:2
 msgid "Projection System:"
-msgstr ""
+msgstr "投影変換システム:"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:16
 msgid "Data Source:"
-msgstr ""
+msgstr "データソース:"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:19
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:5
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:9
 msgid "Band:"
-msgstr ""
+msgstr "バンド:"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:26
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:8
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:16
 msgid "Method:"
-msgstr ""
+msgstr "メッソッド:"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:28
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:10
@@ -1315,7 +1316,7 @@ msgstr ""
 #: /mapmint-ui/templates/UsersManagement/GroupList.html:97
 #: /mapmint-ui/templates/UsersManagement/GroupList_bs.html:110
 msgid "Choose"
-msgstr ""
+msgstr "選択"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:34
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:16
@@ -1325,7 +1326,7 @@ msgid ""
 " values. You have the option of specifying the type of slope value you want:"
 " degrees or percent slope. In cases where the horizontal units differ from "
 "the vertical units, you can also supply a scaling factor."
-msgstr ""
+msgstr "このモードはDEMラスターを用いて傾斜値の32-bit浮動小数ラスタを出力します。傾斜値の度またはパーセントのタイプ指定オプションがあります。水平単位が垂直単位と異なる場合は、スケーリング係数を指定することもできます。"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:35
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:64
@@ -1334,7 +1335,7 @@ msgstr ""
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:31
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:64
 msgid "Scale"
-msgstr ""
+msgstr "スケール"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:39
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:21
@@ -1345,31 +1346,31 @@ msgid ""
 "azimuth and altitude of the light source, a vertical exaggeration factor and"
 " a scaling factor to account for differences between vertical and horizontal"
 " units."
-msgstr ""
+msgstr "このモードは8ビットのラスタを出力します。地形を視覚化するのに非常に便利です。オプションで、垂直方向と水平方向の単位の違いを考慮して、光源の方位角と高度、垂直方向の強調係数、スケーリング係数を指定することができます。"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:42
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:24
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:42
 msgid "Z-Factor"
-msgstr ""
+msgstr "Z-ファクタ"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:47
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:29
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:47
 msgid "Azimuth / Altitude parameters:"
-msgstr ""
+msgstr "方位角 / 高さパラメータ:"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:53
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:35
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:53
 msgid "Azimuth"
-msgstr ""
+msgstr "方位角"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:60
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:42
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:60
 msgid "Altitude"
-msgstr ""
+msgstr "高さ"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:70
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:52
@@ -1382,19 +1383,19 @@ msgid ""
 "(provided that the top of your input raster is north oriented). The aspect "
 "value -9999 is used as the nodata value to indicate undefined aspect in flat"
 " areas with slope=0."
-msgstr ""
+msgstr "このコマンドは、斜面が向いている方位角を表す0°〜360°の値を持つ32ビット浮動小数点ラスターを出力します。方位角の定義は次のようなものです：0°は、斜面が北に面していることを意味し、90°は東に面し、180°は南に面し、270°は西に面しています（入力ラスタの上端が北向き）。アスペクト値-9999は、スロープ= 0のフラットエリアで未定義アスペクトを示すためにnodata値として使用されます。"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:73
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:55
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:73
 msgid "This command builds vector contour lines from a raster elevation model"
-msgstr ""
+msgstr "このコマンドはラスター高度モデルからベクターコンターを生成します"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:75
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:57
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:75
 msgid "Elevation interval between contours"
-msgstr ""
+msgstr "コンターの高さ間隔"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:79
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:61
@@ -1402,7 +1403,7 @@ msgstr ""
 msgid ""
 "Name for the attribute in which to put the elevation. If not provided no "
 "elevation attribute is attached."
-msgstr ""
+msgstr "高さを入れる属性の名前。指定されていない場合、高さ属性は付加されません。"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:84
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:66
@@ -1411,7 +1412,7 @@ msgid ""
 "Terrain Ruggedness Index, which is defined as the mean difference between a "
 "central pixel and its surrounding cells (see Wilson et al 2007, Marine "
 "Geodesy 30:3-35)."
-msgstr ""
+msgstr "Terrain Ruggedness Index は、中心ピクセルとその周囲のセルの平均差として定義されます（Wilson et al 2007、Marine Geodesy 30：3-35参照）。"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:87
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:69
@@ -1420,7 +1421,7 @@ msgid ""
 "Topographic Position Index, which is defined as the difference between a "
 "central pixel and the mean of its surrounding cells (see Wilson et al 2007, "
 "Marine Geodesy 30:3-35)."
-msgstr ""
+msgstr "Topographic Position Indexは、中央のピクセルと周囲のセルの平均との差として定義されている（Wilson et al 2007、Marine Geodesy 30：3-35を参照）。"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:90
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:72
@@ -1428,17 +1429,17 @@ msgstr ""
 msgid ""
 "Roughness is the largest inter-cell difference of a central pixel and its "
 "surrounding cell, as defined in Wilson et al (2007, Marine Geodesy 30:3-35)."
-msgstr ""
+msgstr "Roughnessは、Wilson et al（2007、Marine Geodesy 30：3-35）で定義されているように、中心ピクセルとその周囲のセルの最大のセル間差です。"
 
 #: /mapmint-ui/templates/Distiller/RasterWindow.tmpl:94
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:76
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:94
 msgid "Filename"
-msgstr ""
+msgstr "ファイル名"
 
 #: /mapmint-ui/templates/Distiller/removeDs.tmpl:6
 msgid "Please, confirm that you want to remove the following DataSource."
-msgstr ""
+msgstr "次のデータソースを削除することを確認してください。"
 
 #: /mapmint-ui/templates/Distiller/removeDs.tmpl:25
 #: /mapmint-ui/templates/Distiller.tmpl:90
@@ -1448,50 +1449,50 @@ msgstr ""
 #: /mapmint-ui/templates/Publisher.tmpl:44
 #: /mapmint-ui/templates/Publisher_bs.tmpl:68
 msgid "Remove"
-msgstr ""
+msgstr "削除"
 
 #: /mapmint-ui/templates/Distiller/SetGeometryType.tmpl:4
 msgid "Geometry Type:"
-msgstr ""
+msgstr "ジオメトリタイプ:"
 
 #: /mapmint-ui/templates/Distiller/TileWindow.tmpl:4
 #: /mapmint-ui/templates/Distiller/TileWindow_bs.html:4
 msgid "TileIndex name:"
-msgstr ""
+msgstr "タイルインデックス名:"
 
 #: /mapmint-ui/templates/Distiller/TileWindow.tmpl:4
 #: /mapmint-ui/templates/Distiller/TileWindow_bs.html:4
 msgid "New file name:"
-msgstr ""
+msgstr "新規ファイル名:"
 
 #: /mapmint-ui/templates/Distiller/TileWindow.tmpl:16
 #: /mapmint-ui/templates/Distiller/TileWindow_bs.html:16
 msgid "Targeted DataStore:"
-msgstr ""
+msgstr "対象データストア:"
 
 #: /mapmint-ui/templates/Distiller/TileWindow.tmpl:27
 #: /mapmint-ui/templates/Distiller/TileWindow_bs.html:27
 msgid "Directories list:"
-msgstr ""
+msgstr "ディレクトリリスト:"
 
 #: /mapmint-ui/templates/Distiller/TileWindow.tmpl:40
 #: /mapmint-ui/templates/Distiller/TileWindow_bs.html:40
 msgid "Filename extension:"
-msgstr ""
+msgstr "ファイ名拡張子:"
 
 #: /mapmint-ui/templates/Distiller/VectorConverter.tmpl:6
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:5
 #: /mapmint-ui/templates/Indicators_bs.tmpl:229
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.html:5
 msgid "Source"
-msgstr ""
+msgstr "ソース"
 
 #: /mapmint-ui/templates/Distiller/VectorConverter.tmpl:18
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:12
 #: /mapmint-ui/templates/Distiller_bs.tmpl:386
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.html:12
 msgid "SRS:"
-msgstr ""
+msgstr "SRS:"
 
 #: /mapmint-ui/templates/Distiller/VectorConverter.tmpl:27
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:21
@@ -1499,7 +1500,7 @@ msgstr ""
 #: /mapmint-ui/templates/preview/modules/routing/ddview.html:9
 #: /mapmint-ui/templates/preview/modules/routing/view.html:12
 msgid "Target"
-msgstr ""
+msgstr "ターゲット"
 
 #: /mapmint-ui/templates/Distiller/VectorConverter.tmpl:34
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:28
@@ -1507,51 +1508,51 @@ msgstr ""
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.html:28
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:34
 msgid "Datastore:"
-msgstr ""
+msgstr "データストア:"
 
 #: /mapmint-ui/templates/Distiller/VectorConverter.tmpl:49
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:43
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.html:43
 msgid "Datasource Name:"
-msgstr ""
+msgstr "データソース名:"
 
 #: /mapmint-ui/templates/Distiller/VectorConverter.tmpl:60
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:54
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.html:54
 msgid "Format:"
-msgstr ""
+msgstr "フォーマット:"
 
 #: /mapmint-ui/templates/Distiller/VectorConverter.tmpl:68
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:62
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.html:63
 msgid "Override:"
-msgstr ""
+msgstr "上書き:"
 
 #: /mapmint-ui/templates/Distiller/VectorConverter.tmpl:69
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:63
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.html:64
 msgid "Append:"
-msgstr ""
+msgstr "追加:"
 
 #: /mapmint-ui/templates/Distiller/VectorConverter.tmpl:73
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:67
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.html:68
 msgid "Simplify"
-msgstr ""
+msgstr "単純化"
 
 #: /mapmint-ui/templates/Distiller/VectorConverter.tmpl:77
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:71
 #: /mapmint-ui/templates/Distiller/VectorConverter_bs.html:72
 msgid "SQL"
-msgstr ""
+msgstr "SQL"
 
 #: /mapmint-ui/templates/Distiller/wfs/display.tmpl:19
 msgid "URL:"
-msgstr ""
+msgstr "URL:"
 
 #: /mapmint-ui/templates/Distiller/wfs/display_bs.tmpl:8
 msgid "Add an OGC Server"
-msgstr ""
+msgstr "OGCサーバの追加"
 
 #: /mapmint-ui/templates/Distiller/wfs/display_bs.tmpl:11
 #: /mapmint-ui/templates/Documents_bs.tmpl:67
@@ -1571,64 +1572,64 @@ msgstr ""
 #: /mapmint-ui/templates/Indexes/DocPart_bs.html:41
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.html:151
 msgid "Name"
-msgstr ""
+msgstr "名称"
 
 #: /mapmint-ui/templates/Distiller/wfs/display_bs.tmpl:12
 #: /mapmint-ui/templates/Documents_bs.tmpl:100
 #: /mapmint-ui/templates/Indicators_bs.tmpl:91
 #: /mapmint-ui/templates/Distiller/wfs/display_bs.html:12
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: /mapmint-ui/templates/Distiller.tmpl:21
 msgid "Data Sources"
-msgstr ""
+msgstr "データソース"
 
 #: /mapmint-ui/templates/Distiller.tmpl:37
 msgid "Data Stores"
-msgstr ""
+msgstr "データストア"
 
 #: /mapmint-ui/templates/Distiller.tmpl:48
 #: /mapmint-ui/templates/Distiller_bs.tmpl:39
 #: /mapmint-ui/templates/Distiller_bs.html:38
 msgid "Databases"
-msgstr ""
+msgstr "データベース"
 
 #: /mapmint-ui/templates/Distiller.tmpl:50
 msgid "MySQL connections"
-msgstr ""
+msgstr "MySQL 接続"
 
 #: /mapmint-ui/templates/Distiller.tmpl:58
 msgid "PostGIS connections"
-msgstr ""
+msgstr "PostGIS 接続"
 
 #: /mapmint-ui/templates/Distiller.tmpl:72
 msgid "WFS Servers"
-msgstr ""
+msgstr "WFS サーバ"
 
 #: /mapmint-ui/templates/Distiller.tmpl:78
 msgid "WMS Servers"
-msgstr ""
+msgstr "WMS サーバ"
 
 #: /mapmint-ui/templates/Distiller.tmpl:86
 #: /mapmint-ui/templates/Distiller.tmpl:96
 #: /mapmint-ui/templates/Distiller.tmpl:107
 msgid "Privileges"
-msgstr ""
+msgstr "特権"
 
 #: /mapmint-ui/templates/Distiller.tmpl:87
 #: /mapmint-ui/templates/Distiller.tmpl:98
 #: /mapmint-ui/templates/Distiller.tmpl:108
 #: /mapmint-ui/templates/Manager.tmpl:42
 msgid "Refresh"
-msgstr ""
+msgstr "更新"
 
 #: /mapmint-ui/templates/Distiller.tmpl:88
 #: /mapmint-ui/templates/Distiller.tmpl:99
 #: /mapmint-ui/templates/Distiller.tmpl:109
 #: /mapmint-ui/templates/Manager.tmpl:39 /mapmint-ui/templates/Manager.tmpl:75
 msgid "Edit"
-msgstr ""
+msgstr "編集"
 
 #: /mapmint-ui/templates/Distiller.tmpl:97
 #: /mapmint-ui/templates/Publisher.tmpl:443
@@ -1637,7 +1638,7 @@ msgstr ""
 #: /mapmint-ui/templates/UsersManagement/GroupList.html:82
 #: /mapmint-ui/templates/UsersManagement/GroupList_bs.html:89
 msgid "Access"
-msgstr ""
+msgstr "アクセス"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:36
 #: /mapmint-ui/templates/Distiller_bs.tmpl:176
@@ -1646,95 +1647,95 @@ msgstr ""
 #: /mapmint-ui/templates/Distiller_bs.html:144
 #: /mapmint-ui/templates/Distiller_bs.html:174
 msgid "Datastores"
-msgstr ""
+msgstr "データストア"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:106
 #: /mapmint-ui/templates/Distiller_bs.html:87
 msgid "OGC Web Services"
-msgstr ""
+msgstr "OGC Web サービス"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:220
 msgid ""
 "Please wait while loading [nb] datasources from the [datastore] datastore..."
-msgstr ""
+msgstr "[datastore] データストアから [nb] データベースをローディングする間お待ちください..."
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:224
 #: /mapmint-ui/templates/Distiller_bs.html:188
 msgid "No data source found"
-msgstr ""
+msgstr "データソースがありません"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:271
 #: /mapmint-ui/templates/Distiller_bs.html:229
 msgid "Loading datastore ..."
-msgstr ""
+msgstr "データストアローディング..."
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:315
 #: /mapmint-ui/templates/Indicators_bs.tmpl:339
 #: /mapmint-ui/templates/Distiller_bs.html:273
 msgid "Loading datasource ..."
-msgstr ""
+msgstr "データソースローディング..."
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:324
 msgid "Table: "
-msgstr ""
+msgstr "テーブル:"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:352
 msgid "Mozaic a set of images"
-msgstr ""
+msgstr "イメージセットのモザイク"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:353
 msgid "Mozaic Name"
-msgstr ""
+msgstr "モザイク名"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:353
 msgid "Mozaic"
-msgstr ""
+msgstr "モザイク化"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:359
 msgid ""
 "You can mozaic only raster data, please change your selection and try again."
-msgstr ""
+msgstr "ラスターデータのみモザイク化ができます。選択を変更したのち再実行してください。"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:365
 msgid "Create a TileIndex"
-msgstr ""
+msgstr "タイルインデックス生成"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:366
 msgid "TileIndex Name"
-msgstr ""
+msgstr "タイルインデックス名"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:366
 msgid "TileIndex"
-msgstr ""
+msgstr "タイルインデックス"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:368
 msgid "Projection System"
-msgstr ""
+msgstr "投影変換システム"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:375
 msgid "Filename extension"
-msgstr ""
+msgstr "ファイル名拡張子"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:388
 msgid "Encoding:"
-msgstr ""
+msgstr "エンコーディング:"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:392
 msgid "Set"
-msgstr ""
+msgstr "セット"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:412
 msgid "Accepted files:"
-msgstr ""
+msgstr "許可済みファイル:"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:420
 msgid "Files not accepted:"
-msgstr ""
+msgstr "ファイルは許可されません:"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:441
 #: /mapmint-ui/templates/Distiller_bs.html:306
 msgid "Do you really want to remove the datasource ?"
-msgstr ""
+msgstr "本当にデータソースの削除を行いますか？"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:444
 #: /mapmint-ui/templates/Distiller_bs.html:309
@@ -1742,7 +1743,7 @@ msgid ""
 "Once removed, you cannot access the datasource anymore. You cannot recover a"
 " removed datasource. Deleting a datasource may destroy important data and "
 "make any project using it unstable."
-msgstr ""
+msgstr "一度削除すると、データソースにアクセスできなくなります。削除されたデータソースは復元できません。データソースを削除すると、重要なデータが破壊され、それを使用するプロジェクトが不安定になる可能性があります。"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:447
 #: /mapmint-ui/templates/Distiller_bs.tmpl:465
@@ -1752,7 +1753,7 @@ msgstr ""
 #: /mapmint-ui/templates/Distiller_bs.html:331
 #: /mapmint-ui/templates/Publisher/confirmRemove.html:7
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:448
 #: /mapmint-ui/templates/Distiller_bs.tmpl:466
@@ -1762,12 +1763,12 @@ msgstr ""
 #: /mapmint-ui/templates/Distiller_bs.html:332
 #: /mapmint-ui/templates/Publisher/confirmRemove.html:6
 msgid "Yes"
-msgstr ""
+msgstr "Yes"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:459
 #: /mapmint-ui/templates/Distiller_bs.html:325
 msgid "Do you really want to remove the datastore ?"
-msgstr ""
+msgstr "本当にデータストアを削除しますか？"
 
 #: /mapmint-ui/templates/Distiller_bs.tmpl:462
 #: /mapmint-ui/templates/Distiller_bs.html:328
@@ -1775,11 +1776,11 @@ msgid ""
 "Once removed, you cannot access the datastore anymore. You cannot recover a "
 "removed datastore. Deleting a datastore may destroy important data and make "
 "any project using it unstable."
-msgstr ""
+msgstr "一度削除すると、データストアにアクセスできなくなります。削除されたデータストアはリカバリできません。データストアを削除すると、重要なデータが破壊され、そのデータストアを使用するプロジェクトが不安定になる可能性があります。"
 
 #: /mapmint-ui/templates/Distiller_db_remove.tmpl:4
 msgid "Please, confirm that you want to remove the following DataStore:"
-msgstr ""
+msgstr "次のデータストアを削除することを確認してください："
 
 #: /mapmint-ui/templates/Documents.tmpl:32
 #: /mapmint-ui/templates/Territories.tmpl:26
@@ -1791,20 +1792,20 @@ msgstr ""
 #: /mapmint-ui/templates/preview/modules/routing/view.html:42
 #: /mapmint-ui/templates/Themes_bs.html:79
 msgid "Informations"
-msgstr ""
+msgstr "情報"
 
 #: /mapmint-ui/templates/Documents.tmpl:32
 #: /mapmint-ui/templates/Documents_bs.tmpl:45
 #: /mapmint-ui/templates/Documents_bs.tmpl:136
 #: /mapmint-ui/templates/Documents_bs.html:39
 msgid "Name of the selected document"
-msgstr ""
+msgstr "選択されたドキュメントの名称"
 
 #: /mapmint-ui/templates/Documents.tmpl:43
 #: /mapmint-ui/templates/Documents_bs.tmpl:147
 #: /mapmint-ui/templates/Documents_bs.html:50
 msgid "Themes:"
-msgstr ""
+msgstr "テーマ:"
 
 #: /mapmint-ui/templates/Documents.tmpl:56
 #: /mapmint-ui/templates/Documents_bs.tmpl:160
@@ -1813,13 +1814,13 @@ msgstr ""
 #: /mapmint-ui/templates/Publisher.tmpl:133
 #: /mapmint-ui/templates/Documents_bs.html:63
 msgid "Description:"
-msgstr ""
+msgstr "概要:"
 
 #: /mapmint-ui/templates/Documents.tmpl:61
 #: /mapmint-ui/templates/Documents_bs.tmpl:165
 #: /mapmint-ui/templates/Documents_bs.html:68
 msgid "File:"
-msgstr ""
+msgstr "ファイル:"
 
 #: /mapmint-ui/templates/Documents.tmpl:74
 #: /mapmint-ui/templates/Documents_bs.tmpl:178
@@ -1827,7 +1828,7 @@ msgstr ""
 #: /mapmint-ui/templates/Documents_bs.html:81
 #: /mapmint-ui/templates/Themes_bs.html:116
 msgid "Groups:"
-msgstr ""
+msgstr "グループ:"
 
 #: /mapmint-ui/templates/Documents.tmpl:90
 #: /mapmint-ui/templates/Documents_bs.tmpl:194
@@ -1835,7 +1836,7 @@ msgstr ""
 #: /mapmint-ui/templates/public-access.tmpl:430
 #: /mapmint-ui/templates/Documents_bs.html:97
 msgid "Documents"
-msgstr ""
+msgstr "ドキュメント"
 
 #: /mapmint-ui/templates/Documents.tmpl:94
 #: /mapmint-ui/templates/Documents_bs.tmpl:198
@@ -1845,7 +1846,7 @@ msgstr ""
 #: /mapmint-ui/templates/Publisher.tmpl:22
 #: /mapmint-ui/templates/Documents_bs.html:101
 msgid "Search:"
-msgstr ""
+msgstr "検索:"
 
 #: /mapmint-ui/templates/Documents.tmpl:126
 #: /mapmint-ui/templates/Documents_bs.tmpl:61
@@ -1866,50 +1867,50 @@ msgstr ""
 #: /mapmint-ui/templates/preview/modules/routing/view.html:35
 #: /mapmint-ui/templates/Themes_bs.html:42
 msgid "Delete"
-msgstr ""
+msgstr "削除"
 
 #: /mapmint-ui/templates/Documents_bs.tmpl:43
 #: /mapmint-ui/templates/Documents_bs.tmpl:136
 msgid "Document"
-msgstr ""
+msgstr "ドキュメント"
 
 #: /mapmint-ui/templates/Documents_bs.tmpl:53
 #: /mapmint-ui/templates/Indicators_bs.tmpl:61
 msgid "Add a document"
-msgstr ""
+msgstr "ドキュメントの追加"
 
 #: /mapmint-ui/templates/Documents_bs.tmpl:54
 #: /mapmint-ui/templates/Indicators_bs.tmpl:62
 msgid "Dele a document"
-msgstr ""
+msgstr "ドキュメントの削除"
 
 #: /mapmint-ui/templates/Documents_bs.tmpl:57
 #: /mapmint-ui/templates/Territories_bs.tmpl:57
 msgid "Document Name"
-msgstr ""
+msgstr "ドキュメント名"
 
 #: /mapmint-ui/templates/Documents_bs.tmpl:60
 #: /mapmint-ui/templates/Indicators_bs.tmpl:68
 msgid "Do you really want to delete the document ?"
-msgstr ""
+msgstr "本当にドキュメントを削除しますか？"
 
 #: /mapmint-ui/templates/Documents_bs.tmpl:66
 #: /mapmint-ui/templates/Indicators_bs.tmpl:74
 #: /mapmint-ui/templates/Territories_bs.tmpl:66
 msgid "Id"
-msgstr ""
+msgstr "Id"
 
 #: /mapmint-ui/templates/Documents_bs.tmpl:86
 #: /mapmint-ui/templates/Indicators_bs.tmpl:248
 msgid "Theme"
-msgstr ""
+msgstr "テーマ"
 
 #: /mapmint-ui/templates/Documents_bs.tmpl:87
 #: /mapmint-ui/templates/Indicators_bs.tmpl:218
 #: /mapmint-ui/templates/UsersManagement/MainWindow.tmpl:40
 #: /mapmint-ui/templates/Publisher/Properties.html:44
 msgid "Description"
-msgstr ""
+msgstr "概要"
 
 #: /mapmint-ui/templates/Documents_bs.tmpl:98
 #: /mapmint-ui/templates/Indexes.tmpl:137
@@ -1917,7 +1918,7 @@ msgstr ""
 #: /mapmint-ui/templates/Indicators_bs.tmpl:89
 #: /mapmint-ui/templates/Indicators_bs.tmpl:108
 msgid "File"
-msgstr ""
+msgstr "ファイル"
 
 #: /mapmint-ui/templates/Documents_bs.tmpl:124
 #: /mapmint-ui/templates/Indexes.tmpl:88
@@ -1931,63 +1932,63 @@ msgstr ""
 #: /mapmint-ui/templates/UsersManagement/GroupList.html:77
 #: /mapmint-ui/templates/UsersManagement/GroupList_bs.html:77
 msgid "Groups"
-msgstr ""
+msgstr "グループ"
 
 #: /mapmint-ui/templates/error.tmpl:13
 msgid "Error occurs"
-msgstr ""
+msgstr "エラー発生"
 
 #: /mapmint-ui/templates/error.tmpl:20
 msgid "Requested page could not be loaded"
-msgstr ""
+msgstr "リクエストされたページがロードできません"
 
 #: /mapmint-ui/templates/Georeferencer/CropeImage_bs.tmpl:4
 #: /mapmint-ui/templates/Georeferencer.tmpl:29
 #: /mapmint-ui/templates/Georeferencer_bs.tmpl:90
 #: /mapmint-ui/templates/Georeferencer/CropeImage_bs.html:4
 msgid "Georeference"
-msgstr ""
+msgstr "ジオリファレンス"
 
 #: /mapmint-ui/templates/Georeferencer/GCPForm_bs.tmpl:5
 #: /mapmint-ui/templates/Georeferencer/SaveGCP.tmpl:4
 msgid "Replace existing files:"
-msgstr ""
+msgstr "既存ファイルの置き換え:"
 
 #: /mapmint-ui/templates/Georeferencer/GCPForm_bs.tmpl:7
 #: /mapmint-ui/templates/Georeferencer/SaveGCP.tmpl:6
 msgid "Filename:"
-msgstr ""
+msgstr "ファイル名:"
 
 #: /mapmint-ui/templates/Georeferencer/GCPList_bs.tmpl:3
 #: /mapmint-ui/templates/Georeferencer/LoadGCP.tmpl:3
 #: /mapmint-ui/templates/Georeferencer/GCPList_bs.html:3
 msgid "CSV File:"
-msgstr ""
+msgstr "CSVファイル:"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:4
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:3
 msgid "Transformation type:"
-msgstr ""
+msgstr "変換タイプ:"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:6
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:7
 msgid "Polynomial one"
-msgstr ""
+msgstr "多項式 1"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:7
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:8
 msgid "Polynomial two"
-msgstr ""
+msgstr "多項式 2"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:8
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:9
 msgid "Polynomial three"
-msgstr ""
+msgstr "多項式 3"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:9
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:10
 msgid "Thin Plate Spline"
-msgstr ""
+msgstr "スプライン平滑化"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:13
 #: /mapmint-ui/templates/Manager/Styler/Vector.tmpl:291
@@ -1996,95 +1997,95 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/Styler.tmpl:487
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:14
 msgid "Resampling method:"
-msgstr ""
+msgstr "リサンプル方法:"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:15
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:16
 msgid "Nearest Neighbour"
-msgstr ""
+msgstr "最近傍法"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:16
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:17
 msgid "Bilinear"
-msgstr ""
+msgstr "Bilinear補間"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:17
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:18
 msgid "Cubic"
-msgstr ""
+msgstr "キュービック法"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:18
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:19
 msgid "Cubic Spline"
-msgstr ""
+msgstr "キュービックスプライン法"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:19
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:20
 msgid "Lanczos"
-msgstr ""
+msgstr "ランチョス法"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:23
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:24
 msgid "Compression:"
-msgstr ""
+msgstr "圧縮:"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:49
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:54
 msgid "Raster filename:"
-msgstr ""
+msgstr "ラスターファイル名:"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:53
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:61
 msgid "Set target resolution"
-msgstr ""
+msgstr "ターゲット解像度の設定"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:56
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:64
 msgid "Horizontal:"
-msgstr ""
+msgstr "水平方向:"
 
 #: /mapmint-ui/templates/Georeferencer/Georeference.tmpl:60
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:68
 msgid "Vertical:"
-msgstr ""
+msgstr "垂直方向:"
 
 #: /mapmint-ui/templates/Georeferencer.tmpl:21
 msgid "Image to georeference:"
-msgstr ""
+msgstr "ジオリファレンスする画像:"
 
 #: /mapmint-ui/templates/Georeferencer.tmpl:28
 msgid "Save Project"
-msgstr ""
+msgstr "プロジェクトの保存"
 
 #: /mapmint-ui/templates/Georeferencer.tmpl:73
 #: /mapmint-ui/templates/Manager.tmpl:84
 msgid "Map Viewer"
-msgstr ""
+msgstr "マップビュアー"
 
 #: /mapmint-ui/templates/Georeferencer.tmpl:121
 msgid "Select Project:"
-msgstr ""
+msgstr "プロジェクトの選択"
 
 #: /mapmint-ui/templates/Georeferencer.tmpl:123
 #: /mapmint-ui/templates/Manager/OpenMap.tmpl:5
 msgid "Select Map"
-msgstr ""
+msgstr "マップ選択"
 
 #: /mapmint-ui/templates/Georeferencer.tmpl:126
 #: /mapmint-ui/templates/Manager/OpenMap.tmpl:8
 #: /mapmint-ui/templates/preview/modules/routing/saveList.tmpl:11
 msgid "Open"
-msgstr ""
+msgstr "開く"
 
 #: /mapmint-ui/templates/Georeferencer.tmpl:133
 #: /mapmint-ui/templates/Georeferencer_bs.tmpl:146
 msgid "Image"
-msgstr ""
+msgstr "イメージ"
 
 #: /mapmint-ui/templates/Georeferencer_bs.tmpl:42
 #: /mapmint-ui/templates/Georeferencer/CropImage_bs.html:5
 msgid "Crop Raster"
-msgstr ""
+msgstr "ラスタークロップ"
 
 #: /mapmint-ui/templates/Georeferencer_bs.tmpl:85
 #: /mapmint-ui/templates/Manager_bs.tmpl:81
@@ -2092,47 +2093,47 @@ msgstr ""
 #: /mapmint-ui/templates/Georeferencer/GCPList_bs.html:19
 #: /mapmint-ui/templates/Manager_bs.html:45
 msgid "Load"
-msgstr ""
+msgstr "ロード"
 
 #: /mapmint-ui/templates/Georeferencer_bs.tmpl:119
 msgid "Image to georeference: "
-msgstr ""
+msgstr "ジオリファレンスする画像:"
 
 #: /mapmint-ui/templates/Georeferencer_bs.tmpl:129
 msgid "Ground Control Points"
-msgstr ""
+msgstr "グラウンドコントロールポイント"
 
 #: /mapmint-ui/templates/help.tmpl:14
 msgid "Tools"
-msgstr ""
+msgstr "ツール"
 
 #: /mapmint-ui/templates/help.tmpl:15
 msgid "Video"
-msgstr ""
+msgstr "ビデオ"
 
 #: /mapmint-ui/templates/help.tmpl:16
 msgid "Contact"
-msgstr ""
+msgstr "コンタクト"
 
 #: /mapmint-ui/templates/help.tmpl:21
 #: /mapmint-ui/templates/public-access.tmpl:40
 #: /mapmint-ui/templates/public-access.tmpl:347
 msgid "Home"
-msgstr ""
+msgstr "ホーム"
 
 #: /mapmint-ui/templates/help.tmpl:24
 msgid "Zoom to max extent"
-msgstr ""
+msgstr "マップ範囲にズーム"
 
 #: /mapmint-ui/templates/help.tmpl:52
 msgid "Manage layers"
-msgstr ""
+msgstr "レイヤ管理"
 
 #: /mapmint-ui/templates/help.tmpl:54
 #: /mapmint-ui/templates/preview/modules/indexes/AddLayer.tmpl:2
 #: /mapmint-ui/templates/preview/modules/addLayer/display.html:8
 msgid "Add layers"
-msgstr ""
+msgstr "レイヤ追加"
 
 #: /mapmint-ui/templates/help.tmpl:56
 #: /mapmint-ui/templates/preview/mobile.tmpl:138
@@ -2144,33 +2145,33 @@ msgstr ""
 #: /mapmint-ui/templates/preview/modules/routing/view.html:14
 #: /mapmint-ui/templates/preview/modules/routing/view.html:39
 msgid "Search"
-msgstr ""
+msgstr "検索"
 
 #: /mapmint-ui/templates/help.tmpl:58
 #: /mapmint-ui/templates/preview/modules/indexes/InfoIdx.tmpl:3
 #: /mapmint-ui/templates/preview/modules/indexes/SelectIdx.tmpl:31
 msgid "Index"
-msgstr ""
+msgstr "インデックス"
 
 #: /mapmint-ui/templates/Indexes/DocPart.tmpl:6
 msgid "Document model:"
-msgstr ""
+msgstr "ドキュメントモデル:"
 
 #: /mapmint-ui/templates/Indexes/DocPart.tmpl:12
 msgid "Send file"
-msgstr ""
+msgstr "ファイル送信"
 
 #: /mapmint-ui/templates/Indexes/DocPart.tmpl:18
 #: /mapmint-ui/templates/Indexes.tmpl:383
 #: /mapmint-ui/templates/Indexes_bs.tmpl:383
 msgid "Step:"
-msgstr ""
+msgstr "ステップ:"
 
 #: /mapmint-ui/templates/Indexes/GraphPart.tmpl:23
 #: /mapmint-ui/templates/Indexes/TablePart.tmpl:19
 #: /mapmint-ui/templates/Indexes/TablePart_bs.html:19
 msgid "Step: "
-msgstr ""
+msgstr "ステップ:"
 
 #: /mapmint-ui/templates/Indexes/GraphPart.tmpl:89
 #: /mapmint-ui/templates/Indexes/repportSettings.tmpl:68
@@ -2186,24 +2187,24 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.html:167
 #: /mapmint-ui/templates/Manager/Styler_bs.html:243
 msgid "Preview"
-msgstr ""
+msgstr "プレビュー"
 
 #: /mapmint-ui/templates/Indexes/repportSettings_bs.tmpl:43
 #: /mapmint-ui/templates/Indexes/DocPart_bs.html:40
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.html:145
 msgid "D."
-msgstr ""
+msgstr "D."
 
 #: /mapmint-ui/templates/Indexes/repportSettings_bs.tmpl:46
 #: /mapmint-ui/templates/Indexes/DocPart_bs.html:43
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.html:154
 msgid "Value"
-msgstr ""
+msgstr "値"
 
 #: /mapmint-ui/templates/Indexes.tmpl:34
 #: /mapmint-ui/templates/Indexes_bs.tmpl:34
 msgid "Informations:"
-msgstr ""
+msgstr "情報:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:43
 #: /mapmint-ui/templates/Indexes_bs.tmpl:43
@@ -2211,37 +2212,37 @@ msgstr ""
 #: /mapmint-ui/templates/Publisher.tmpl:41
 #: /mapmint-ui/templates/Publisher_bs.tmpl:65
 msgid "Publish"
-msgstr ""
+msgstr "公開"
 
 #: /mapmint-ui/templates/Indexes.tmpl:44
 #: /mapmint-ui/templates/Indexes_bs.tmpl:44
 #: /mapmint-ui/templates/Indicators_bs.tmpl:55
 msgid "Unpublish"
-msgstr ""
+msgstr "非公開"
 
 #: /mapmint-ui/templates/Indexes.tmpl:80
 #: /mapmint-ui/templates/Indexes_bs.tmpl:80
 msgid "Sources:"
-msgstr ""
+msgstr "ソース:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:84
 #: /mapmint-ui/templates/Indexes_bs.tmpl:84
 #: /mapmint-ui/templates/Manager/LayerProperties.tmpl:41
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.tmpl:43
 msgid "Keywords:"
-msgstr ""
+msgstr "キーワード:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:119
 #: /mapmint-ui/templates/Indexes_bs.tmpl:119
 #: /mapmint-ui/templates/preview/index_bs.tmpl:286
 #: /mapmint-ui/templates/preview/leftcol_bs.tmpl:86
 msgid "Table:"
-msgstr ""
+msgstr "テーブル:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:122
 #: /mapmint-ui/templates/Indexes_bs.tmpl:122
 msgid "Select a territory"
-msgstr ""
+msgstr "テリトリーの選択"
 
 #: /mapmint-ui/templates/Indexes.tmpl:138
 #: /mapmint-ui/templates/Indexes_bs.tmpl:138
@@ -2255,45 +2256,45 @@ msgstr ""
 #: /mapmint-ui/templates/preview/rightcol.tmpl:70
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.html:69
 msgid "Table"
-msgstr ""
+msgstr "テーブル"
 
 #: /mapmint-ui/templates/Indexes.tmpl:139
 #: /mapmint-ui/templates/Indexes_bs.tmpl:139
 #: /mapmint-ui/templates/Indicators_bs.tmpl:166
 msgid "SQL Query"
-msgstr ""
+msgstr "SQLクエリ"
 
 #: /mapmint-ui/templates/Indexes.tmpl:146
 #: /mapmint-ui/templates/Indexes_bs.tmpl:146
 #: /mapmint-ui/templates/Indicators_bs.tmpl:192
 #: /mapmint-ui/templates/Indexes/DocPart_bs.html:31
 msgid "Import"
-msgstr ""
+msgstr "インポート"
 
 #: /mapmint-ui/templates/Indexes.tmpl:161
 #: /mapmint-ui/templates/Indexes_bs.tmpl:161
 msgid "Schemas:"
-msgstr ""
+msgstr "スキーマ:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:179
 #: /mapmint-ui/templates/Indexes_bs.tmpl:179
 msgid "Tables:"
-msgstr ""
+msgstr "テーブル:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:198
 #: /mapmint-ui/templates/Indexes_bs.tmpl:198
 msgid "Select a connection"
-msgstr ""
+msgstr "コネクション選択"
 
 #: /mapmint-ui/templates/Indexes.tmpl:227
 #: /mapmint-ui/templates/Indexes_bs.tmpl:227
 msgid "SQL Query:"
-msgstr ""
+msgstr "SQL クエリ"
 
 #: /mapmint-ui/templates/Indexes.tmpl:235
 #: /mapmint-ui/templates/Indexes_bs.tmpl:235
 msgid "Launch"
-msgstr ""
+msgstr "起動"
 
 #: /mapmint-ui/templates/Indexes.tmpl:244
 #: /mapmint-ui/templates/Indexes_bs.tmpl:244
@@ -2301,31 +2302,31 @@ msgstr ""
 #: /mapmint-ui/templates/UsersManagement/EditForm.tmpl:46
 #: /mapmint-ui/templates/UsersManagement/UserForm.tmpl:50
 msgid "Confirm"
-msgstr ""
+msgstr "承認"
 
 #: /mapmint-ui/templates/Indexes.tmpl:268
 #: /mapmint-ui/templates/Indexes_bs.tmpl:268
 msgid "Classes"
-msgstr ""
+msgstr "クラス"
 
 #: /mapmint-ui/templates/Indexes.tmpl:273
 #: /mapmint-ui/templates/Indexes_bs.tmpl:273
 msgid "Cotinuous color"
-msgstr ""
+msgstr "連続カラー"
 
 #: /mapmint-ui/templates/Indexes.tmpl:279
 #: /mapmint-ui/templates/Indexes_bs.tmpl:279
 #: /mapmint-ui/templates/Manager/Styler/Vector.tmpl:42
 #: /mapmint-ui/templates/Manager/Styler.tmpl:42
 msgid "Steps:"
-msgstr ""
+msgstr "ステップ:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:283
 #: /mapmint-ui/templates/Indexes_bs.tmpl:283
 #: /mapmint-ui/templates/Manager/Styler/Vector.tmpl:57
 #: /mapmint-ui/templates/Manager/Styler.tmpl:57
 msgid "Select one step"
-msgstr ""
+msgstr "ステップ選択"
 
 #: /mapmint-ui/templates/Indexes.tmpl:284
 #: /mapmint-ui/templates/Indexes_bs.tmpl:284
@@ -2334,36 +2335,36 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/Styler_bs.html:95
 #: /mapmint-ui/templates/preview/modules/routing/display_bs.html:39
 msgid "Add a step"
-msgstr ""
+msgstr "ステップの追加"
 
 #: /mapmint-ui/templates/Indexes.tmpl:290
 #: /mapmint-ui/templates/Indexes_bs.tmpl:290
 #: /mapmint-ui/templates/Manager/Styler/Vector.tmpl:71
 #: /mapmint-ui/templates/Manager/Styler.tmpl:71
 msgid "Legend Type for this step:"
-msgstr ""
+msgstr "ステップの凡例タイプ"
 
 #: /mapmint-ui/templates/Indexes.tmpl:303
 #: /mapmint-ui/templates/Indexes_bs.tmpl:303
 #: /mapmint-ui/templates/Manager/Styler/Vector.tmpl:141
 #: /mapmint-ui/templates/Manager/Styler.tmpl:141
 msgid "Discretization:"
-msgstr ""
+msgstr "離散化:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:316
 #: /mapmint-ui/templates/Indexes_bs.tmpl:316
 msgid "Number of classes:"
-msgstr ""
+msgstr "分類数:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:320
 #: /mapmint-ui/templates/Indexes_bs.tmpl:320
 msgid "Min Color:"
-msgstr ""
+msgstr "最小値カラー:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:333
 #: /mapmint-ui/templates/Indexes_bs.tmpl:333
 msgid "Max Color:"
-msgstr ""
+msgstr "最大値カラー:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:348
 #: /mapmint-ui/templates/Indexes_bs.tmpl:348
@@ -2377,129 +2378,129 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/Styler.tmpl:468
 #: /mapmint-ui/templates/Manager/Styler_bs.html:241
 msgid "Classify"
-msgstr ""
+msgstr "分類"
 
 #: /mapmint-ui/templates/Indexes.tmpl:365
 #: /mapmint-ui/templates/Indexes_bs.tmpl:365
 msgid "Parent territoires:"
-msgstr ""
+msgstr "親テリトリー:"
 
 #: /mapmint-ui/templates/Indexes.tmpl:368
 #: /mapmint-ui/templates/Indexes_bs.tmpl:368
 msgid "Select a parent territory"
-msgstr ""
+msgstr "親テリトリーの選択"
 
 #: /mapmint-ui/templates/Indexes.tmpl:376
 #: /mapmint-ui/templates/Indexes_bs.tmpl:376
 msgid "Generalize by using parent datasource"
-msgstr ""
+msgstr "親データソースを使用して一般化する"
 
 #: /mapmint-ui/templates/Indexes.tmpl:391
 #: /mapmint-ui/templates/Indexes_bs.tmpl:391
 msgid "Agregation formula:"
-msgstr ""
+msgstr "集計式："
 
 #: /mapmint-ui/templates/Indexes.tmpl:417
 #: /mapmint-ui/templates/Indexes_bs.tmpl:417
 msgid "Indicateurs"
-msgstr ""
+msgstr "指標"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:24
 #: /mapmint-ui/templates/public-access.tmpl:42
 #: /mapmint-ui/templates/preview/modules/indexes/list.html:17
 msgid "Indicators"
-msgstr ""
+msgstr "指標"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:46
 msgid "Indicator:"
-msgstr ""
+msgstr "指標:"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:48
 msgid "Name of the selected indicator"
-msgstr ""
+msgstr "選択された指標の名称"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:65
 msgid "Indicator Name"
-msgstr ""
+msgstr "指標の名称"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:112
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.html:89
 msgid "Query"
-msgstr ""
+msgstr "クエリ"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:162
 #: /mapmint-ui/templates/Distiller/db/display_bs.html:17
 msgid "Database"
-msgstr ""
+msgstr "データベース"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:173
 #: /mapmint-ui/templates/Distiller/RasterWindow_bs.html:99
 #: /mapmint-ui/templates/Georeferencer/Georeference_bs.html:76
 msgid "Run"
-msgstr ""
+msgstr "実行"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:181
 msgid "Upload your file"
-msgstr ""
+msgstr "ファイルアップロード"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:197
 msgid "Choose a page"
-msgstr ""
+msgstr "ページ選択"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:204
 msgid "Metadata"
-msgstr ""
+msgstr "メタデータ"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:205
 msgid "Data"
-msgstr ""
+msgstr "データ"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:206
 #: /mapmint-ui/templates/Manager.tmpl:40
 #: /mapmint-ui/templates/Manager_bs.tmpl:190
 #: /mapmint-ui/templates/Manager_bs.html:168
 msgid "Style"
-msgstr ""
+msgstr "スタイル"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:208
 msgid "Graph"
-msgstr ""
+msgstr "グラフ"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:209
 #: /mapmint-ui/templates/preview/modules/indexes/Repport.tmpl:8
 msgid "Repport"
-msgstr ""
+msgstr "レポート"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:210
 msgid "Aggregate"
-msgstr ""
+msgstr "集計"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:231
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.html:87
 #: /mapmint-ui/templates/Publisher/Properties.html:36
 msgid "Keywords"
-msgstr ""
+msgstr "キーワード"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:265
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:186
 #: /mapmint-ui/templates/Manager/TemplateEditor_bs.tmpl:21
 #: /mapmint-ui/templates/Manager/TemplateEditor_bs.html:21
 msgid "Field"
-msgstr ""
+msgstr "フィールド"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:269
 msgid "Join with"
-msgstr ""
+msgstr "結合"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:276
 msgid "Join tables"
-msgstr ""
+msgstr "結合するテーブル"
 
 #: /mapmint-ui/templates/Indicators_bs.tmpl:285
 #: /mapmint-ui/templates/Indexes/GraphPart_bs.html:22
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.html:85
 msgid "Title"
-msgstr ""
+msgstr "タイトル"
 
 #: /mapmint-ui/templates/login.tmpl:9 /mapmint-ui/templates/login_bs.tmpl:9
 #: /mapmint-ui/templates/preview/toolbar_bs.tmpl:160
@@ -2509,52 +2510,52 @@ msgstr ""
 #: /mapmint-ui/templates/login_bs.html:9
 #: /mapmint-ui/templates/UsersManagement/MainWindow.html:10
 msgid "Login"
-msgstr ""
+msgstr "ログイン"
 
 #: /mapmint-ui/templates/login_bs.tmpl:20
 msgid "Please Sign In"
-msgstr ""
+msgstr "サインインしてください"
 
 #: /mapmint-ui/templates/login_bs.tmpl:43
 msgid "Remember Me"
-msgstr ""
+msgstr "ログイン情報を記憶する"
 
 #: /mapmint-ui/templates/Manager/AddDir.tmpl:3
 #: /mapmint-ui/templates/Manager/AddGroup.tmpl:6
 msgid "Group name:"
-msgstr ""
+msgstr "グループ名:"
 
 #: /mapmint-ui/templates/Manager/AddDir.tmpl:7
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 #: /mapmint-ui/templates/Manager/AddGroup.tmpl:14
 #: /mapmint-ui/templates/Themes.tmpl:43
 #: /mapmint-ui/templates/Themes_bs.html:90
 msgid "Parent:"
-msgstr ""
+msgstr "親:"
 
 #: /mapmint-ui/templates/Manager/AddLayer.tmpl:26
 msgid "Select Data Source:"
-msgstr ""
+msgstr "データソース選択:"
 
 #: /mapmint-ui/templates/Manager/AddLayer.tmpl:35
 msgid "Select Group:"
-msgstr ""
+msgstr "グループ選択:"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:49
 msgid "Current table is"
-msgstr ""
+msgstr "カレントテーブルは"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:53
 msgid "Please, fill the fields you would like to use to search on this layer"
-msgstr ""
+msgstr "このレイヤーで検索するために使用したいフィールドを入力してください"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:54
 msgid ""
 "In the first array you can use any table from the database as definition of "
 "a dynamic legend"
-msgstr ""
+msgstr "最初の配列では、データベースの任意のテーブルを動的凡例の定義として使用できます"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:60
 #: /mapmint-ui/templates/Manager/Styler/ClassLegend.tmpl:31
@@ -2562,16 +2563,16 @@ msgstr ""
 #: /mapmint-ui/templates/preview/layerswitcher_bs.tmpl:16
 #: /mapmint-ui/templates/Manager_bs.html:148
 msgid "Legend"
-msgstr ""
+msgstr "凡例"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:78
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:161
 msgid "First choose a schema"
-msgstr ""
+msgstr "最初のスキーマ選択"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:85
 msgid "Link column"
-msgstr ""
+msgstr "リンクするカラム"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:100
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:114
@@ -2579,84 +2580,84 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:136
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:173
 msgid "First choose a table"
-msgstr ""
+msgstr "最初のテーブル選択"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:106
 #: /mapmint-ui/templates/Themes_bs.tmpl:101
 msgid "Color"
-msgstr ""
+msgstr "カラー"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:121
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:191
 msgid "Values"
-msgstr ""
+msgstr "値"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:149
 msgid "Subsciption table"
-msgstr ""
+msgstr "サブスクリプションテーブル:"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:185
 #: /mapmint-ui/templates/Manager.tmpl:59 /mapmint-ui/templates/Manager.tmpl:74
 msgid "Move"
-msgstr ""
+msgstr "移動"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:188
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.html:152
 msgid "Label"
-msgstr ""
+msgstr "ラベル"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:189
 msgid "Identifier"
-msgstr ""
+msgstr "識別子"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:190
 msgid "Filter"
-msgstr ""
+msgstr "フィルター"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:192
 msgid "Dependencies"
-msgstr ""
+msgstr "依存関係"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:193
 msgid "Order"
-msgstr ""
+msgstr "順序"
 
 #: /mapmint-ui/templates/Manager/ComplexSearch.tmpl:194
 msgid "Multiple"
-msgstr ""
+msgstr "複数"
 
 #: /mapmint-ui/templates/Manager/ImportOSMWindow.tmpl:5
 msgid "Choose type:"
-msgstr ""
+msgstr "選択タイプ"
 
 #: /mapmint-ui/templates/Manager/ImportOSMWindow.tmpl:8
 msgid "Point"
-msgstr ""
+msgstr "ポイント"
 
 #: /mapmint-ui/templates/Manager/ImportOSMWindow.tmpl:9
 msgid "Line"
-msgstr ""
+msgstr "ライン"
 
 #: /mapmint-ui/templates/Manager/ImportOSMWindow.tmpl:14
 msgid "Select a DataStore:"
-msgstr ""
+msgstr "データストアの選択:"
 
 #: /mapmint-ui/templates/Manager/ImportOSMWindow.tmpl:36
 msgid "Select a file name:"
-msgstr ""
+msgstr "ファイル名の選択:"
 
 #: /mapmint-ui/templates/Manager/ImportOSMWindow.tmpl:44
 msgid "Data under"
-msgstr ""
+msgstr "Data under"
 
 #: /mapmint-ui/templates/Manager/Label.tmpl:26
 #: /mapmint-ui/templates/Manager/Styler/Label_bs.html:6
 msgid "Show labels"
-msgstr ""
+msgstr "ラベル表示"
 
 #: /mapmint-ui/templates/Manager/Label.tmpl:34
 msgid "Labeling field:"
-msgstr ""
+msgstr "ラベルフィールド:"
 
 #: /mapmint-ui/templates/Manager/Label.tmpl:38
 #: /mapmint-ui/templates/Manager/Label.tmpl:57
@@ -2667,38 +2668,38 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/Styler.tmpl:177
 #: /mapmint-ui/templates/Manager/Styler.tmpl:223
 msgid "Select field"
-msgstr ""
+msgstr "フィールド選択"
 
 #: /mapmint-ui/templates/Manager/Label.tmpl:44
 msgid "Orientation:"
-msgstr ""
+msgstr "方向:"
 
 #: /mapmint-ui/templates/Manager/Label.tmpl:64
 #: /mapmint-ui/templates/Manager/Styler/Label_bs.html:30
 msgid "Clean size"
-msgstr ""
+msgstr "消去するサイズ"
 
 #: /mapmint-ui/templates/Manager/Label.tmpl:74
 msgid "Font:"
-msgstr ""
+msgstr "フォント:"
 
 #: /mapmint-ui/templates/Manager/Label.tmpl:113
 msgid "Buffered label:"
-msgstr ""
+msgstr "バッファ付きラベル;"
 
 #: /mapmint-ui/templates/Manager/Label.tmpl:120
 #: /mapmint-ui/templates/Manager/Styler/UniqSymb.tmpl:89
 #: /mapmint-ui/templates/Manager/Styler/UniqSymb.tmpl:127
 msgid "Size:"
-msgstr ""
+msgstr "サイズ:"
 
 #: /mapmint-ui/templates/Manager/Label.tmpl:131
 msgid "Buffer color:"
-msgstr ""
+msgstr "バッファカラー:"
 
 #: /mapmint-ui/templates/Manager/Label.tmpl:138
 msgid "Position:"
-msgstr ""
+msgstr "位置:"
 
 #: /mapmint-ui/templates/Manager/Label.tmpl:165
 #: /mapmint-ui/templates/Manager/Styler/UniqSymb.tmpl:194
@@ -2712,7 +2713,7 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/Styler/Label_bs.html:101
 #: /mapmint-ui/templates/Manager/Styler/UniqSymb_bs.html:159
 msgid "Apply"
-msgstr ""
+msgstr "適用"
 
 #: /mapmint-ui/templates/Manager/LayerProperties.tmpl:16
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.tmpl:18
@@ -2722,27 +2723,27 @@ msgstr ""
 #: /mapmint-ui/templates/Manager/LayerProperties.tmpl:25
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.tmpl:27
 msgid "Title:"
-msgstr ""
+msgstr "タイトル:"
 
 #: /mapmint-ui/templates/Manager/LayerProperties.tmpl:33
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.tmpl:35
 msgid "Abstract:"
-msgstr ""
+msgstr "概要説明:"
 
 #: /mapmint-ui/templates/Manager/LayerProperties.tmpl:49
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.tmpl:51
 msgid "Fees:"
-msgstr ""
+msgstr "料金:"
 
 #: /mapmint-ui/templates/Manager/LayerProperties.tmpl:57
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.tmpl:59
 msgid "Query:"
-msgstr ""
+msgstr "クエリ"
 
 #: /mapmint-ui/templates/Manager/LayerProperties.tmpl:65
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.tmpl:67
 msgid "Export:"
-msgstr ""
+msgstr "エクスポート:"
 
 #: /mapmint-ui/templates/Manager/LayerProperties.tmpl:73
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.tmpl:75
