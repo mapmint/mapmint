@@ -39,6 +39,7 @@ from xml.sax import ContentHandler
 from xml.sax import make_parser
 from xml.sax import SAXParseException
 
+
 #
 # Common Public Members
 #
@@ -49,8 +50,8 @@ class EPSGLookupError(Exception):
     This exception is thrown when parsing errors occure.
     
     """
-    
-    def __init__(self, message, line = 0, column = 0):
+
+    def __init__(self, message, line=0, column=0):
         """ Lookup exception constructor.
         
         message - error message forwarded from SAXException
@@ -66,12 +67,13 @@ class EPSGLookupError(Exception):
 
 class ProjectionDef:
     """ Structure of attributes of projection."""
-    
+
     def __init__(self):
         """Default constructor."""
         self.id = 0
         self.name = ""
         self.params = []
+
 
 #
 # Standard EPSG related Public Members
@@ -79,7 +81,7 @@ class ProjectionDef:
 
 class ProjectionLookup:
     """Projection lookup class for standard EPSG file."""
-    
+
     def __init__(self, epsg_file):
         """ Constructor.
         
@@ -89,7 +91,7 @@ class ProjectionLookup:
         self.__epsg_file = epsg_file
         self.__epsg_str = open(self.__epsg_file).read()
         self.__proj_def = ProjectionDef()
-    
+
     def __lookup(self, regexp):
         """ Split projection string to list of separate parameters.
         
@@ -101,23 +103,23 @@ class ProjectionLookup:
             rmatch = rpattern.search(self.__epsg_str)
             if rmatch == None:
                 return None
-                    
+
             # Create output object
             self.__proj_def.id = rmatch.group(5).strip()
             self.__proj_def.name = rmatch.group(2).strip()
-               
+
             # Projection parameters list
             self.__proj_def.params = []
             for param in rmatch.group(7).split(" "):
                 if len(param.strip()) > 0:
                     if param[0] != "<" and param[1] != ">":
                         self.__proj_def.params.append(param.lstrip("+"))
-                            
+
             return self.__proj_def
-            
+
         except Exception:
             raise EPSGLookupError("Lookup runtime error!")
-        
+
     def find_by_id(self, epsg_id):
         """ Finds projection definition by EPSG id.
         
@@ -135,8 +137,9 @@ class ProjectionLookup:
         
         """
         # Prepare searching regexp
-        regexp = r"^(#\s)(.*%s.*)(\n)(\<)([0-9]+)(\>)(.+)(\n)" % epsg_name    
+        regexp = r"^(#\s)(.*%s.*)(\n)(\<)([0-9]+)(\>)(.+)(\n)" % epsg_name
         return self.__lookup(regexp)
+
 
 #
 # Custom EPSG in XML format related Public Members
@@ -152,7 +155,7 @@ class ProjectionLookupXML:
     Thic class is based on the SAX parser from Python Standard Library.
     
     """
-    
+
     def __init__(self, epsg_proj_file):
         """ Constructor.
     
@@ -174,10 +177,10 @@ class ProjectionLookupXML:
         self.__xml_parser.setContentHandler(proj_handler)
         try:
             self.__xml_parser.parse(self.__epsg_file)
-        except _StopOnFound, value:
+        except _StopOnFound as value:
             # Found it!
             return proj_handler.get_projection()
-        except SAXParseException, error:
+        except SAXParseException as error:
             # Parsing Error
             raise EPSGLookupError(error.getMessage(),
                                   error.getLineNumber(),
@@ -190,17 +193,17 @@ class ProjectionLookupXML:
         
         """
         # Simple input param validation
-        if isinstance(epsg_id, (int, float, long, )):
+        if isinstance(epsg_id, (int, float)):
             lookup_id = str(epsg_id)
         else:
             lookup_id = epsg_id
-        
+
         if len(lookup_id) <= 0:
             return None
-        
+
         # Find projection
         return self.__lookup("epsg", lookup_id)
-        
+
     def find_by_name(self, epsg_name):
         """ Finds projection definition by EPSG id.
         
@@ -209,12 +212,13 @@ class ProjectionLookupXML:
         """
         # Simple input param validation
         lookup_name = epsg_name
-        
-        if not isinstance(lookup_name, basestring) or len(lookup_name) <= 0:
+
+        if not isinstance(lookup_name, str) or len(lookup_name) <= 0:
             return None
-            
+
         # Find projection
         return self.__lookup("name", lookup_name)
+
 
 #
 # Private Members
@@ -232,7 +236,7 @@ class _StopOnFound(Exception):
 
 class _ProjectionHandler(ContentHandler):
     """Handler to deal with projection definitions."""
-    
+
     def __init__(self, name, value):
         """ Constructor.
         
@@ -246,18 +250,18 @@ class _ProjectionHandler(ContentHandler):
         self.__lookup_name = name
         # Searched parameter value (epsg id or name)
         self.__lookup_value = value
-        #Projection definition
+        # Projection definition
         self.__proj_def = ProjectionDef()
-        
+
         ContentHandler.__init__(self)
-        
+
     def get_projection(self):
         """Returns definition of found projection or None."""
         if len(self.__proj_def.params) > 0:
             return self.__proj_def
         else:
             return None
-        
+
     def startElement(self, name, attrs):
         """ Start element handler. It defines main searching logic.
         
@@ -266,20 +270,19 @@ class _ProjectionHandler(ContentHandler):
         
         """
         if name == "projection":
-            
+
             if attrs.get(self.__lookup_name) == self.__lookup_value:
                 # Found Projection!
                 self.__is_proj = 1
                 self.__proj_def.id = attrs.get("epsg").encode("ascii")
                 self.__proj_def.name = attrs.get("name").encode("ascii")
-                
+
             elif self.__is_proj == 1:
                 # Next <projection> has been encountered
                 # then report found projection 
                 raise _StopOnFound("Projection found!")
-            
+
         elif name == "parameter" and self.__is_proj == 1:
             # Read projection parameters one-by-one
             param = attrs.get("value")
             self.__proj_def.params.append(param.encode("ascii"))
-

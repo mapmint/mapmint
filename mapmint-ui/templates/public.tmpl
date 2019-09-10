@@ -10,7 +10,7 @@
 #set mapfile=os.readlink($mapfile).replace('\\??\\','').replace('\\','/')
 #set lastMap=$mapfile.replace($conf["main"]["dataPath"]+"/public_maps/project_","").replace(".map","")
 #set tmp=$conf
-#if $tmp["senv"].keys().count('last_map')
+#if 'last_map' in $tmp["senv"].keys()
 #set $tmp["senv"]["previous_map"]=$tmp["senv"]["last_map"]
 #end if
 #set $tmp["senv"]["last_map"]=$lastMap

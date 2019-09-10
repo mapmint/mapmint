@@ -1,6 +1,6 @@
 #import zoo
 #try
-#if $inputs.has_key("prefix")
+#if "prefix" in $inputs.keys()
 #set prefix="agregate_"
 #else
 #set prefix=""
@@ -9,7 +9,7 @@
 #set prefix=""
 #end try
 <div style="display:block;" id="$(prefix)chart">
-#if $inputs.has_key("prefix")
+#if "prefix" in $inputs.keys()
   <input id="$(prefix)graphs_id" type="hidden" class="rounded frm" value="-1" />
 #else
   <div class="loader-container">
@@ -18,7 +18,7 @@
 #end if
   <table class="gen">
     <tbody>
-#if not($inputs.has_key("prefix"))
+#if not("prefix" in $inputs.keys())
       <tr id="$(prefix)graphs_steps">
 	<td valign="middle" style="width:200px;">$zoo._("Step: ")</td>
 	<td>
@@ -56,7 +56,7 @@
 	  </select> 
 	</td>
       </tr>	
-#if not($inputs.has_key("prefix"))
+#if not("prefix" in $inputs.keys())
       <tr>
 	<td valign="middle" style="width:200px;">Label Y:</td>
 	<td>
@@ -86,8 +86,8 @@
     </tbody>
   </table>
   
-  <a href="#" class="wbutton ui-corner-all al"onclick="refreshGraph(#if $inputs.has_key("prefix")#'agregate_'#end if#);">$zoo._("Preview")</a>
-  <a href="#" class="wbutton ui-corner-all al" onclick="insertGraph(#if $inputs.has_key("prefix")#'agregate_'#end if#);">$zoo._("Save")</a>
+  <a href="#" class="wbutton ui-corner-all al"onclick="refreshGraph(#if "prefix" in $inputs.keys()#'agregate_'#end if#);">$zoo._("Preview")</a>
+  <a href="#" class="wbutton ui-corner-all al" onclick="insertGraph(#if "prefix" in $inputs.keys()#'agregate_'#end if#);">$zoo._("Save")</a>
   
   <div id="$(prefix)graphDisplay">
   </div>

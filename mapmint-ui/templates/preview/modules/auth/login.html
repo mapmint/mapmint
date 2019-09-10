@@ -11,6 +11,6 @@
 </table>
 <input type="submit" id="auth_validate" class="butt ui-corner-all" value="$zoo._("Log in")" onclick="try{authenticateUser();}catch(e){alert(e);}return false;" />
 <input type="submit" id="auth_register" class="butt ui-corner-all" value="$zoo._("Register")" onclick="try{registerUserWindow();}catch(e){}return false;" />
-#if $conf.has_key("smtp")
+#if "smtp" in $conf.keys()
 <input type="submit" id="auth_recover" class="butt ui-corner-all" value="$zoo._("Lost password")" onclick="try{recoverUserWindow();}catch(e){}return false;" />
 #end if

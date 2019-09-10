@@ -5,7 +5,7 @@
 #set _sp=""
 #end try
 <option value="$t[i]["id"]" #if str($t[i]["id"])==$_sp#selected="true"#end if#>#for j in range($p)#-#end for# $t[i]["text"]</option>
-#if $t[i].has_key("children")
+#if "children" in $t[i].keys()
 $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/themes/list.html",searchList={"conf":$conf,"t":$t[i]["children"],"p":$p+1,'sp':$_sp}))
 #end if
 #end for

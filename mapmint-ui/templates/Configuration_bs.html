@@ -36,7 +36,7 @@
 #set i=0
 #for a in ['main','provider','identification']
 #set i=i+1
-<a class="fg-button maincfg$i" id="maincfg$i" href="#$a" onclick="loadTab('$a');return true;" title="#if $conf[a].has_key(a+'_label')#$conf[a][a+'_label']#else#$a.title()#end if#"></a>
+<a class="fg-button maincfg$i" id="maincfg$i" href="#$a" onclick="loadTab('$a');return true;" title="#if (a+'_label') in $conf[a].keys()#$conf[a][a+'_label']#else#$a.title()#end if#"></a>
 #end for
 #import mm_access
 #set groups=mm_access.getGroup($conf)
@@ -55,7 +55,7 @@
        #if b != "isTrial" and b != "isSoap" 
        <tr>
 	 <td valign="top">
-	   #if $conf[a].has_key(b+"_label")#$conf[a][b+"_label"]#else#$b.title()#end if
+	   #if (b+"_label") in $conf[a].keys()#$conf[a][b+"_label"]#else#$b.title()#end if
 	 </td>
 	 <td>
 	   #if textarea.count(b)>=1#<textarea id="$b" name="$b" rows="3" cols="17" class="maincfg"></textarea>#else#<input id="$b" type="text" class="rounded" />#end if#

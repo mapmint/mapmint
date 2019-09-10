@@ -21,72 +21,75 @@
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
 ################################################################################
-import sys,os,shutil
+import sys, os, shutil
 import zoo
 
-def saveLayer(conf,inputs,outputs):
-    dirs=os.listdir(inputs["InputDSTN"]["value"])
+
+def saveLayer(conf, inputs, outputs):
+    dirs = os.listdir(inputs["InputDSTN"]["value"])
     for i in dirs:
-        ii=i.split('.')
+        ii = i.split('.')
         if ii[0] == inputs["InputDSON"]["value"]:
-            os.unlink(inputs["InputDSTN"]["value"]+"/"+i)
-    dirs=os.listdir(conf["main"]["tmpPath"])
+            os.unlink(inputs["InputDSTN"]["value"] + "/" + i)
+    dirs = os.listdir(conf["main"]["tmpPath"])
     for i in dirs:
-        ii=i.split('.')
-        if ii[0] == "TEMP_"+inputs["MMID"]["value"]+"-1":
-            shutil.move(conf["main"]["tmpPath"]+"/"+i,inputs["InputDSTN"]["value"]+"/"+inputs["InputDSON"]["value"]+"."+ii[1])
-            #shutil.move(conf["main"]["tmpPath"]+"/"+i,inputs["InputDSTN"]["value"]+"/"+inputs["InputDSON"]["value"]+"."+ii[1])
+        ii = i.split('.')
+        if ii[0] == "TEMP_" + inputs["MMID"]["value"] + "-1":
+            shutil.move(conf["main"]["tmpPath"] + "/" + i, inputs["InputDSTN"]["value"] + "/" + inputs["InputDSON"]["value"] + "." + ii[1])
+            # shutil.move(conf["main"]["tmpPath"]+"/"+i,inputs["InputDSTN"]["value"]+"/"+inputs["InputDSON"]["value"]+"."+ii[1])
             try:
-                os.unlink(conf["main"]["tmpPath"]+"/"+i)
-                os.unlink(conf["main"]["tmpPath"]+"/"+i.replace("-1",""))
+                os.unlink(conf["main"]["tmpPath"] + "/" + i)
+                os.unlink(conf["main"]["tmpPath"] + "/" + i.replace("-1", ""))
             except:
                 pass
-    outputs["Result"]["value"]="Demo";
+    outputs["Result"]["value"] = "Demo";
     try:
-        os.unlink(inputs["InputDSTN"]["value"]+"/ds_ows.map")
+        os.unlink(inputs["InputDSTN"]["value"] + "/ds_ows.map")
     except:
         pass
     return 3
 
-def Recode(conf,inputs,outputs):
+
+def Recode(conf, inputs, outputs):
     import shutil
     try:
-        source=open(inputs["file"]["value"])
-        target=open(inputs["file"]["value"]+"1","w")
-        target.write(unicode(source.read(), inputs["sEncoding"]["value"]).encode(inputs["tEncoding"]["value"]))
+        source = open(inputs["file"]["value"])
+        target = open(inputs["file"]["value"] + "1", "w")
+        target.write(str(source.read(), inputs["sEncoding"]["value"]).encode(inputs["tEncoding"]["value"]))
         source.close()
         target.close()
-        shutil.move(inputs["file"]["value"]+"1",inputs["file"]["value"])
-        outputs["Result"]["value"]=zoo._("File converted")
+        shutil.move(inputs["file"]["value"] + "1", inputs["file"]["value"])
+        outputs["Result"]["value"] = zoo._("File converted")
         return zoo.SERVICE_SUCCEEDED
-    except Exception,e:
-        conf["lenv"]["message"]=str(e)
+    except Exception as e:
+        conf["lenv"]["message"] = str(e)
         return zoo.SERVICE_FAILED
 
-def doZip(conf,inputs,outputs):
+
+def doZip(conf, inputs, outputs):
     import zipfile
-    import glob,os
+    import glob, os
     try:
-        os.remove(conf["main"]["tmpPath"]+"/"+inputs["dstn"]["value"])
-    except Exception,e:
-        print >> sys.stderr,e
+        os.remove(conf["main"]["tmpPath"] + "/" + inputs["dstn"]["value"])
+    except Exception as e:
+        print(e, file=sys.stderr)
         pass
-    d=zipfile.ZipFile(conf["main"]["tmpPath"]+"/"+inputs["dstn"]["value"], 'w')
-    rpath=conf["main"]["tmpPath"]
-    if inputs.has_key("dst") and inputs["dst"]["value"]!="NULL":
-        rpath=inputs["dst"]["value"]
-    for name in glob.glob(rpath+"/"+inputs["dso"]["value"]+".*"):
-        if name.count("zip")==0:
-            d.write(name.replace("\\","/"),os.path.basename(name), zipfile.ZIP_DEFLATED)
+    d = zipfile.ZipFile(conf["main"]["tmpPath"] + "/" + inputs["dstn"]["value"], 'w')
+    rpath = conf["main"]["tmpPath"]
+    if "dst" in inputs and inputs["dst"]["value"] != "NULL":
+        rpath = inputs["dst"]["value"]
+    for name in glob.glob(rpath + "/" + inputs["dso"]["value"] + ".*"):
+        if name.count("zip") == 0:
+            d.write(name.replace("\\", "/"), os.path.basename(name), zipfile.ZIP_DEFLATED)
     d.close()
-    outputs["Result"]["value"]=conf["main"]["tmpUrl"]+inputs["dstn"]["value"]
+    outputs["Result"]["value"] = conf["main"]["tmpUrl"] + inputs["dstn"]["value"]
     return 3
 
-def cleanUp(conf,inputs,outputs):
-    import glob,os
-    tmp=inputs["dso"]["value"].split('.')
-    for name in glob.glob(conf["main"]["tmpPath"]+"/"+tmp[0]+".*"):
-        os.remove(name.replace("\\","/"))
-    outputs["Result"]["value"]=zoo._("Cleanup done")
+
+def cleanUp(conf, inputs, outputs):
+    import glob, os
+    tmp = inputs["dso"]["value"].split('.')
+    for name in glob.glob(conf["main"]["tmpPath"] + "/" + tmp[0] + ".*"):
+        os.remove(name.replace("\\", "/"))
+    outputs["Result"]["value"] = zoo._("Cleanup done")
     return 3
-    

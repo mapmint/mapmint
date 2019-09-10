@@ -24,14 +24,14 @@
 #attr $css = ["green"]
 
 #for $f in $css:
-<link type="text/css" rel="stylesheet" #if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"]["loggedin"])#media="screen" title="#if $conf["mm"].has_key("adminTheme")#$conf["mm"]["adminTheme"]#else#$f#end if#"#end if# href="#if $f[0:7]=='http://'#$f#else#$conf["main"]["mmAddress"]/css/#if $conf["mm"].has_key("adminTheme")#$conf["mm"]["adminTheme"]#else#$f#end if##end if#" id="#if $conf["mm"].has_key("adminTheme")#$conf["mm"]["adminTheme"]#else#$f#end if#" />
+<link type="text/css" rel="stylesheet" #if ("senv" in $conf.keys() and "loggedin" in $conf["senv"].keys() and $conf["senv"]["loggedin"])#media="screen" title="#if "adminTheme" in $conf["mm"].keys()#$conf["mm"]["adminTheme"]#else#$f#end if#"#end if# href="#if $f[0:7]=='http://'#$f#else#$conf["main"]["mmAddress"]/css/#if "adminTheme" in $conf["mm"].keys()#$conf["mm"]["adminTheme"]#else#$f#end if##end if#" id="#if "adminTheme" in $conf["mm"].keys()#$conf["mm"]["adminTheme"]#else#$f#end if#" />
 #end for
 <link type="text/css" rel="stylesheet" href="$conf["main"]["mmAddress"]/new-themes/themes/default/loader.css" /> 
 <!--[if IE]>
         <link rel="stylesheet" type="text/css" href="$conf["main"]["mmAddress"]/css/all-ie-only.css" />
 <![endif]-->
 
-#if $conf["main"].has_key("jsCache") and $conf["main"]["jsCache"]=="prod"
+#if "jsCache" in $conf["main"].keys() and $conf["main"]["jsCache"]=="prod"
 #if len($js)>0 and $js[len($js)-1]=="ckeditor.js"
 #set finalJS=$js[len($js)-1]
 #else
@@ -105,7 +105,7 @@
 </div> 
 </div> 
 
-#if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false") and not($verr)
+#if ("senv" in $conf.keys() and "loggedin" in $conf["senv"].keys() and "lastname" in $conf["senv"].keys() and $conf["senv"]["loggedin"]!="false") and not($verr)
 <div class="ui-layout-north">
 
 <h1 class="ttitle"><span class="logo"></span>Map<span class="mint">Mint</span></h1>
@@ -156,7 +156,7 @@
 
 $body
 
-#if $mmodule!="public" and ($conf.keys().count("senv")>0 and $conf["senv"]["loggedin"]!="false" and $conf["senv"].keys().count("firstname")>0) and not($verr)
+#if $mmodule!="public" and ("senv" in $conf.keys() and $conf["senv"]["loggedin"]!="false" and "firstname" in $conf["senv"].keys()) and not($verr)
 <div class="ui-layout-south"> 
   <p class="credits">&copy; copyright <a href="$conf["provider"]["providerSite"]">$conf["provider"]["providerName"]</a></p>
 <!--<div class="progress_box_call"></div>-->	
@@ -166,7 +166,7 @@ $body
 </div>
 </div>
 #else
-#if $conf["mm"].keys().count("nofooter")==0 or ($conf["mm"]["nofooter"]!="true" and $conf["mm"].keys().count("nofooter")>0)
+#if not("nofooter" in $conf["mm"].keys()) or ($conf["mm"]["nofooter"]!="true" and "nofooter" in $conf["mm"].keys())
 <ul class="credits">
 <li>&copy; copyright <a href="$conf["provider"]["providerSite"]">$conf["provider"]["providerName"]</a></li>|&#160;&#160;<li><a href="http://www.mapmint.com">$zoo._("Terms of use")</a></li>
 </ul>

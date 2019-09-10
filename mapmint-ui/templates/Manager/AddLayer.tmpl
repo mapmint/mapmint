@@ -6,7 +6,7 @@
 #set qdefault=""
 #for i in ('WMS','WFS','Directories','MySQL','PostGIS')
 #set li=0
-#if $inputs["elements"] and $inputs["elements"].keys().count($i) > 0
+#if $inputs["elements"] and $i in $inputs["elements"].keys()
 #for j in $inputs["elements"][$i] 
 #if li==0
   <option disabled="true" style="font-weight: bold;color: #111">$i</option>

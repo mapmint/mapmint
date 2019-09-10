@@ -24,7 +24,7 @@ MapMint: $mmodule
 #end def
 
 #def printAdder($obj)
-     <#if $obj.keys().count("ltype")>0#$obj["ltype"]#else#li#end if# class="hide" id="$obj["id"]">
+     <#if "ltype" in $obj.keys()#$obj["ltype"]#else#li#end if# class="hide" id="$obj["id"]">
        <div class="padder">
 	 <h4>$obj["title"]</h4>
 	 <hr />
@@ -35,7 +35,7 @@ MapMint: $mmodule
 	   <button class="btn btn-default" id="$obj["action"]["name"]" onclick="app.basic('$(obj["action"]["name"])',\$(this).parent().prev());" type="button">$obj["action"]["title"]</button>
 	 </span>
        </div>   
-     </#if $obj.keys().count("ltype")>0#$obj["ltype"]#else#li#end if#>
+     </#if "ltype" in $obj.keys()#$obj["ltype"]#else#li#end if#>
 #end def
 
 #def admin_menu
@@ -110,7 +110,7 @@ MapMint: $mmodule
 	   <select id="select-datastore" name="selectDatastore" class="select-window form-control" onchange="app.refreshDatasources()">
 	     <option value="-1">$zoo._("Choose a Data Store")</option>
 #for i in ('WMS','WFS','Directories','MySQL','PostGIS')
-#if $res and $res.keys().count($i) > 0
+#if $res and $i in $res.keys()
 	     <option disabled="true" style="font-weight: bold;color: #111">$zoo._($i)</option>
 #set li=0
 #for j in $res[$i]

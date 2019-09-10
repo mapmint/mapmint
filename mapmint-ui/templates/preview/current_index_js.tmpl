@@ -9,7 +9,7 @@
 #set vals=$cur.fetchall()
 #set res1=$conf["main"]["dataPath"]+"/indexes_maps/project_PIndex"+$inputs["id"]["value"]+".map"
 #set pref=""
-#if $inputs.has_key("tid")
+#if "tid" in $inputs.keys()
 #set pref="A"+$inputs["tid"]["value"]+"_"
 #end if
 #set m=mapscript.mapObj($conf["main"]["dataPath"]+"/indexes_maps/project_"+pref+"PIndex"+$inputs["id"]["value"]+".map")

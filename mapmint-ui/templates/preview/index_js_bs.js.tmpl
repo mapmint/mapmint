@@ -24,7 +24,7 @@ var processResultLayer;
 var _MMID="MMID=$conf["senv"]["MMID"]";
 #try
 #set val=open($mms.getMetadata($m.web,"mmWMTSAttribution").replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"])).read()
-#except Exception,e
+#except Exception as e
 #set val=$mms.getMetadata($m.web,"mmWMTSAttribution")
 #end try
 var attributionsWMTS='$val';
@@ -61,7 +61,7 @@ var zooDictionary={
     "Twitter sharing": "$zoo._("Twitter sharing")",
     "Facebook sharing": "$zoo._("Facebook sharing")",
 }
-#if $inputs.has_key("filter")
+#if "filter" in $inputs.keys()
 System.iniFilterValue="$inputs["filter"]["value"]";
 #end if
 
@@ -156,13 +156,13 @@ var oLayers={
 	],
      	"map": "$conf["main"]["dataPath"]/public_maps/timeline_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)_step0.map",
 #else
-     	"map": "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($mms.getMetadata($m.getLayer($l),'mmFilterField') or $mms.getMetadata($m.getLayer($l),'mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map",
+     	"map": "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($mms.getMetadata($m.getLayer($l),'mmFilterField') or $mms.getMetadata($m.getLayer($l),'mmZFilterField')) and 'filter' in $inputs.keys()#_"+System.iniFilterValue+"#end if##end if#.map",
 #if $mms.getMetadata($m.web,"mmRT") and $mms.getMetadata($m.web,"mmRT").count("timeline")>0 and $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $mms.getMetadata($m.getLayer($l),"mmRasterTimeline") is not None and $mms.getMetadata($m.getLayer($l),"mmRasterTimeline")=="true"
     	"maps":[
 #set cg=$mms.getMetadata($m.getLayer($l),"mm_group")
 #for n in range($m.numlayers)
 #if $mms.getMetadata($m.getLayer($n),"mm_group")==$cg and $mms.getMetadata($m.getLayer($n),"mmRasterTimeline") is not None and $mms.getMetadata($m.getLayer($n),"mmRasterTimeline")=="true"
-	  "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($n).type==mapscript.MS_LAYER_RASTER and $m.getLayer($n).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($n).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($n).name)#if ($mms.getMetadata($m.getLayer($n),'mmFilterField') or $mms.getMetadata($m.getLayer($n),'mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map",
+	  "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($n).type==mapscript.MS_LAYER_RASTER and $m.getLayer($n).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($n).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($n).name)#if ($mms.getMetadata($m.getLayer($n),'mmFilterField') or $mms.getMetadata($m.getLayer($n),'mmZFilterField')) and 'filter' in $inputs.keys()#_"+System.iniFilterValue+"#end if##end if#.map",
 #set $alreadyInTimeline+=[$m.getLayer($n).name]
 #end if
 #end for
@@ -190,7 +190,7 @@ var oLayers={
        ],
 	"display": #if vl.count($m.getLayer($l).name)>0#"vector"#else#"raster"#end if#,
 	"opacity": 1,
-	"filter": #if $mms.getMetadata($m.getLayer($l),'mmFilterField') and $inputs.has_key('filter')#true#else#false#end if#,
+	"filter": #if $mms.getMetadata($m.getLayer($l),'mmFilterField') and 'filter' in $inputs.keys()#true#else#false#end if#,
 	"title": "$mms.getMetadata($m.getLayer($l),"ows_title")",
 	"maxScale": #if $mms.getMetadata($m.getLayer($l),'mmMaxScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMaxScale')#else#100000000000000#end if#,
 	"minScale": #if $mms.getMetadata($m.getLayer($l),'mmMinScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMinScale')#else#0#end if#,
@@ -263,7 +263,7 @@ var pmapfiles={
 #if $cnt >0
     ,
 #end if
-     "$m.getLayer($l).name":[ "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($mms.getMetadata($m.getLayer($l),'mmFilterField') or $mms.getMetadata($m.getLayer($l),'mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map","$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map","$mms.getMetadata($m.getLayer($l),"mmTitle")",#if $mms.getMetadata($m.getLayer($l),'mmMaxScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMaxScale')#else#100000000000000#end if#,#if $mms.getMetadata($m.getLayer($l),'mmMinScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMinScale')#else#0#end if#,#if $mms.getMetadata($m.getLayer($l),'mmExport')=="true"#true#else#false#end if#,#if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $mms.getMetadata($m.getLayer($l),'mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#]
+     "$m.getLayer($l).name":[ "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($mms.getMetadata($m.getLayer($l),'mmFilterField') or $mms.getMetadata($m.getLayer($l),'mmZFilterField')) and 'filter' in $inputs.keys()#_"+System.iniFilterValue+"#end if##end if#.map","$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map","$mms.getMetadata($m.getLayer($l),"mmTitle")",#if $mms.getMetadata($m.getLayer($l),'mmMaxScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMaxScale')#else#100000000000000#end if#,#if $mms.getMetadata($m.getLayer($l),'mmMinScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMinScale')#else#0#end if#,#if $mms.getMetadata($m.getLayer($l),'mmExport')=="true"#true#else#false#end if#,#if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $mms.getMetadata($m.getLayer($l),'mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#]
 #set $cnt+=1
 #end if
 #end for

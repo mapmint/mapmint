@@ -23,8 +23,8 @@
 ################################################################################
 import zoo
 
-def Xml2JSON(conf,inputs,outputs):
-    import xmltodict, json
-    outputs["Result"]["value"]=json.dumps(xmltodict.parse(inputs["xml"]["value"]))
-    return zoo.SERVICE_SUCCEEDED
 
+def Xml2JSON(conf, inputs, outputs):
+    import xmltodict, json
+    outputs["Result"]["value"] = json.dumps(xmltodict.parse(inputs["xml"]["value"]))
+    return zoo.SERVICE_SUCCEEDED

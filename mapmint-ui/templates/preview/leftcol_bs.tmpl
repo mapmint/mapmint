@@ -384,7 +384,7 @@ $(printWrapper())
 
 #include($conf["main"]["templatesPath"]+"/preview/modules/style/templates.html")
 
-#if $inputs.keys().count("filter")>0
+#if "filter" in $inputs.keys()
 <input type="hidden" name="mmIniFilter" value="$inputs["filter"]["value"]" />
 #end if
 

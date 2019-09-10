@@ -1,7 +1,7 @@
 #import zoo
-<div #if $conf["lenv"].has_key("display")# id="csvDisplay" style="display:none"#end if#>
+<div #if "display" in $conf["lenv"].keys()# id="csvDisplay" style="display:none"#end if#>
 <label for="csvfile">$zoo._("CSV File:") </label>
-<select id="csvfile#if $conf["lenv"].has_key("display")#0#end if#">
+<select id="csvfile#if "display" in $conf["lenv"].keys()#0#end if#">
 #import georeferencer.service as gr
 #set inputs={"dso": {"value":$conf["senv"]["mmGeoDSO"]}}
 #set d=gr.listGeoreferencedProject($conf,$inputs,$outputs)
@@ -14,7 +14,7 @@
 $conf["lenv"]["message"]
 #end if
 </select>
-#if not($conf["lenv"].has_key("display"))
+#if not("display" in $conf["lenv"].keys())
 <input type="submit" value="$zoo._("Load")" onclick="try{app.loadGCPFile()}catch(e){alert(e);}return false;" />
 #end if
 </div>

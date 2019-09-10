@@ -59,7 +59,7 @@
 #end if
 #set $lcss+=["window.css","tree.css","mapmint-"+$tmpl+".css"]
 
-#if $conf["main"].has_key("cssCache") and $conf["main"]["cssCache"]=="prod"
+#if "cssCache" in $conf["main"].keys() and $conf["main"]["cssCache"]=="prod"
 <link type="text/css" href="$conf["main"]["publicationUrl"]/#for i in $lcss#$i,#end for#" rel="stylesheet" />
 #else
 #for i in $lcss
@@ -84,7 +84,7 @@
 #end if
 
 #set $ljs+=["Meta.js"]
-#if $conf["main"].has_key("jsCache") and $conf["main"]["jsCache"]=="prod"
+#if "jsCache" in $conf["main"].keys() and $conf["main"]["jsCache"]=="prod"
 <script src="$conf["main"]["mmAddress"]/js/#for i in $ljs#$i,#end for#"></script>
 #else
 #for i in $ljs
@@ -132,7 +132,7 @@
 #set $ljs=$ljs+["/highchart/js/highcharts.min.js"]
 <script src="$conf["main"]["publicationUrl"]/OpenLayers.min.js?language=$conf["main"]["language"]"></script>
 
-#if $conf["main"].has_key("jsCache") and $conf["main"]["jsCache"]=="prod"
+#if "jsCache" in $conf["main"].keys() and $conf["main"]["jsCache"]=="prod"
 <script src="$conf["main"]["publicationUrl"]/#for i in $ljs##if $i.count("MMMap")==0#$i,#end if##end for#?language=$conf["main"]["language"]"></script>
 #else
 #for i in $ljs

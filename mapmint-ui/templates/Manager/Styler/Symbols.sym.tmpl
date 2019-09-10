@@ -1,5 +1,5 @@
 SYMBOLSET
-#if $inputs.has_key('charcodes') and $inputs["ttf"]["value"]!="images"
+#if 'charcodes' in $inputs.keys() and $inputs["ttf"]["value"]!="images"
 #set a=eval($inputs["charcodes"]["value"])
 #for i in a
 	SYMBOL
@@ -11,7 +11,7 @@ SYMBOLSET
 #else
 #import os
 #set a=os.listdir($conf["main"]["dataPath"]+"/fonts/images/")
-#if $inputs.has_key('charcodes')
+#if 'charcodes' in $inputs.keys()
 #set b=[$inputs["charcodes"]["value"].replace("[","").replace("]","")]
 #else
 #set b=[]

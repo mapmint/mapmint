@@ -61,7 +61,7 @@ requirejs.config({
         zoo: 'js/lib/zoo/zoo',
 
         domReady: 'js/lib/domReady',
-#if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false")
+#if ("senv" in $conf.keys() and "loggedin" in $conf["senv"].keys() and "lastname" in $conf["senv"].keys() and $conf["senv"]["loggedin"]!="false")
         app: 'js/$inputs["module"]["value"].lower()',
 #else
         app: 'js/login',
@@ -70,7 +70,7 @@ requirejs.config({
     },
     moduleName: "$inputs["module"]["value"]",
     shim: {
-#if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false")
+#if ("senv" in $conf.keys() and "loggedin" in $conf["senv"].keys() and "lastname" in $conf["senv"].keys() and $conf["senv"]["loggedin"]!="false")
         app: {
 	        deps: [#*'highcharts','enquire',*#'colResize','responsive','select','validator',#*'typeahead',*#'dataTablesB'#if $inputs["module"]["value"]=="Manager"#,'ol','splitter','colorpicker','cmenu'#end if#],
 	    },
@@ -174,7 +174,7 @@ requirejs.config({
         app: {
             url: '$conf["main"]["serverAddress"]',
             db: '$conf["main"]["dbuserName"]',
-#if $conf.keys().count($conf["main"]["dbuser"])
+#if $conf["main"]["dbuser"] in $conf.keys()
             dbschema: '$conf[$conf["main"]["dbuser"]]["schema"]',
 #end if
             delay: 2000,
@@ -189,7 +189,7 @@ requirejs.config({
 	    msVersion: "$mapscript.MS_VERSION",
 	    lang: "$lang",
 #set myCorrespondances={"fr-FR":"French.json","en-US":"English.json"}
-            translationUrl: "http://cdn.datatables.net/plug-ins/1.10.10/i18n/#if myCorrespondances.keys().count($conf["main"]["language"])>0#$myCorrespondances[$conf["main"]["language"]]#else#$myCorrespondances["en-US"]#end if#",
+            translationUrl: "http://cdn.datatables.net/plug-ins/1.10.10/i18n/#if $conf["main"]["language"] in myCorrespondances.keys()#$myCorrespondances[$conf["main"]["language"]]#else#$myCorrespondances["en-US"]#end if#",
 	    localizationStrings:{
 	        tables: {
 			    none: "$zoo._("None")"
@@ -206,8 +206,8 @@ requirejs.config({
 			 name: "$zoo._("Name")",
 		}
             },		    
-#if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false")
-#if $conf["senv"].keys().count("last_map")==0
+#if ("senv" in $conf.keys() and "loggedin" in $conf["senv"].keys() and "lastname" in $conf["senv"].keys() and $conf["senv"]["loggedin"]!="false")
+#if not("last_map" in $conf["senv"].keys())
 #set t=$conf
 #set $t["senv"]["last_map"]="Georeferencer"
 #end if
@@ -216,7 +216,7 @@ requirejs.config({
 #if $inputs["module"]["value"].lower()=="georeferencer"
 	    georef: {
 	    	    img: '$conf["senv"]["mmGeoImg"]',
-#if $conf["senv"].keys().count("mmGeoSize")>0
+#if "mmGeoSize" in $conf["senv"].keys()
 	    	    size: '$conf["senv"]["mmGeoSize"]',
 #end if
 	    	    map: '$conf["senv"]["mmGeoMap"]',

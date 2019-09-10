@@ -42,7 +42,7 @@ MapMint: Dashboard
 #set sections=['main','provider','identification']
 #set aliases=['main','provider','identification']
 #set icons=["laptop","user","lock"]
-#if $conf.keys().count($conf["main"]["dbuser"])>0
+#if $conf["main"]["dbuser"] in $conf.keys()
 #set sections+=[$conf["main"]["dbuser"]]
 #set icons+=["database"]
 #set aliases+=["database"]
@@ -124,7 +124,7 @@ MapMint: Dashboard
 #import json
 #set loutputs={"Result":{"value":""}}
 #set a1=listMap($conf,$inputs,$loutputs)
-#set nmaps=json.loads($loutputs["Result"]["value"])
+#set nmaps=($loutputs["Result"]["value"])
 
 
 
@@ -135,6 +135,7 @@ MapMint: Dashboard
                 <div class="col-lg-12">
                     <h1 class="page-header"><i class="fa fa-eye fa-fw"></i> $zoo._("Overview")</h1>
 		    <h6>$zoo._("Last connected on ")$conf['senv']['last_con']</h6>
+<!-- $conf['senv'] -->
                 </div>
                 <!-- /.col-lg-12 -->
             </div>
@@ -205,7 +206,8 @@ MapMint: Dashboard
                             <ul class="chat">
 #import mapfile.service as mms
 
-
+#set $nmap0=$eval($nmaps)
+#set $nmaps=$nmap0
 
 #set limit=3
 #if len($nmaps)<3
@@ -221,7 +223,7 @@ MapMint: Dashboard
 #set ll=$mms.getMetadata($mm.web,'mmActivatedLayers')
 #if ll==""
 #for kk in range(0,$mm.numlayers)
-#set $ll+=$mm.getLayer(0).name
+#set $ll+=$mm.getLayer($kk).name
 #if $kk+1<$mm.numlayers
 #set $ll+=","
 #end if
@@ -229,7 +231,7 @@ MapMint: Dashboard
 #end if
 #try
 #set a=$mm.getLayer(0).getExtent()
-#except Exception,e
+#except Exception as e
 $e
 #end try
 
@@ -279,6 +281,7 @@ $e
                         </a>
                     </div>
                 </div>
+
 		
                 <div class="col-lg-3 col-md-6">
                     <div class="panel panel-yellow">
@@ -334,11 +337,13 @@ $e
 #except
 #set sqliteVers=$zoo._("Unknown")
 #end try				    
-
+#import sys
+#set pyvers=sys.version.split(" ")[0]
 #set softs=[
      ["MapServer",$msVers],
      ["GDAL",$gdalVers],
      ["SQLite",$sqliteVers],
+     ["Python",$pyvers],
      ["Server IP",$lip],
 ]
 #for i in range(0,len($softs))
@@ -425,7 +430,6 @@ function symbolAddToRSelection(){
                         </a>
                     </div>
                 </div>
-
 
 
 #import sqlite_module as sql

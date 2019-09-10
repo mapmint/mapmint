@@ -5,7 +5,7 @@
 <legend>$zoo._("Source")</legend>
 <input disabled="true" type="hidden" id="dst_in" value=""/>
 <input type="hidden" id="dso_in1" value=""/>
-<input disabled="true" type="text" id="dso_in" value="#if $inputs.keys().count("dso")#$inputs["dso"]["value"]#else#layer#end if#"/>
+<input disabled="true" type="text" id="dso_in" value="#if "dso" in $inputs.keys()#$inputs["dso"]["value"]#else#layer#end if#"/>
 #import sqlite_module as sql
 #set v="SELECT code as id,name, fav from spatial_ref_sys where fav order by name"
 #set t=sql.request($conf,v)
@@ -41,7 +41,7 @@
 </div>
 <div>
 <label for="out_name">$zoo._("Datasource Name:")</label>
-<input type="text" id="out_name" value="new_#if $inputs.keys().count("dso")#$inputs["dso"]["value"]#else#layer#end if#"/>
+<input type="text" id="out_name" value="new_#if "dso" in $inputs.keys()#$inputs["dso"]["value"]#else#layer#end if#"/>
 </div>
 <div>
 <label for="tdso_chk_srs">SRS:</label>
@@ -69,7 +69,7 @@ $zoo._("Append:") <input type="radio" name="overr" id="ov2" />
 </fieldset>
 <fieldset>
 <legend>$zoo._("SQL") <input id="sql_chk" type="checkbox" onclick="\$('#sql')[0].style.display=(this.checked?'inline':'none');"/></legend>
-<textarea id="sql" style="width:470px;display:none;">SELECT * FROM #if $inputs.keys().count("dso")#$inputs["dso"]["value"]#else#layer#end if#</textarea>
+<textarea id="sql" style="width:470px;display:none;">SELECT * FROM #if "dso" in $inputs.keys()#$inputs["dso"]["value"]#else#layer#end if#</textarea>
 </fieldset>
 <input type="submit" value="$zoo._("Run convertion")" onclick="try{\$(this).hide();MapMintDSManager.runConvertion();}catch(e){alert(e)};return false;"/>
 </div>

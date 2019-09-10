@@ -1,44 +1,45 @@
 import zoo
-import os,sys,shutil
+import os, sys, shutil
 
-def copyTileIndex(conf,inputs,outputs):
-    dirs=os.listdir(inputs["InputDSTN"]["value"])
-    lname=None
+
+def copyTileIndex(conf, inputs, outputs):
+    dirs = os.listdir(inputs["InputDSTN"]["value"])
+    lname = None
     for i in dirs:
-        ii=i.split('.')
-        print  >> sys.stderr,str(ii)+" "+inputs["InputDSON"]["value"]
+        ii = i.split('.')
+        print(str(ii) + " " + inputs["InputDSON"]["value"], file=sys.stderr)
         if ii[0] == inputs["InputDSON"]["value"]:
-            dirs=[inputs["InputDSTN"]["value"]+"/"+i]
+            dirs = [inputs["InputDSTN"]["value"] + "/" + i]
             try:
-                print >> sys.stderr,inputs["InputDSTN"]["value"]+"/"+i
-                print >> sys.stderr,inputs["InputDSTN"]["value"]+"/"+i
-                os.unlink(inputs["InputDSTN"]["value"]+"/"+i)
-            except Exception,e:
-                print >> sys.stderr,e
+                print(inputs["InputDSTN"]["value"] + "/" + i, file=sys.stderr)
+                print(inputs["InputDSTN"]["value"] + "/" + i, file=sys.stderr)
+                os.unlink(inputs["InputDSTN"]["value"] + "/" + i)
+            except Exception as e:
+                print(e, file=sys.stderr)
                 pass
-            lname=ii[0]
-            lfname=i
+            lname = ii[0]
+            lfname = i
             break
-    lname=inputs["InputDSON"]["value"]
+    lname = inputs["InputDSON"]["value"]
     try:
-        dirs=os.listdir(conf["main"]["tmpPath"]+"/TEMP_"+lname)
+        dirs = os.listdir(conf["main"]["tmpPath"] + "/TEMP_" + lname)
         for i in dirs:
-            print >> sys.stderr,conf["main"]["tmpPath"]+"/TEMP_"+lname+"/"+i,conf["main"]["dataPath"]+"/dirs/"+inputs["idir"]["value"]+"/"+i
-            shutil.move(conf["main"]["tmpPath"]+"/TEMP_"+lname+"/"+i,conf["main"]["dataPath"]+"/dirs/"+inputs["idir"]["value"]+"/"+i)
+            print(conf["main"]["tmpPath"] + "/TEMP_" + lname + "/" + i, conf["main"]["dataPath"] + "/dirs/" + inputs["idir"]["value"] + "/" + i, file=sys.stderr)
+            shutil.move(conf["main"]["tmpPath"] + "/TEMP_" + lname + "/" + i, conf["main"]["dataPath"] + "/dirs/" + inputs["idir"]["value"] + "/" + i)
             try:
-                os.unlink(conf["main"]["dataPath"]+"/dirs/"+inputs["idir"]["value"]+"/ds_ows.map")
+                os.unlink(conf["main"]["dataPath"] + "/dirs/" + inputs["idir"]["value"] + "/ds_ows.map")
             except:
                 pass
-    except Exception,e:
-        print >> sys.stderr,e
-        print >> sys.stderr,conf["main"]["tmpPath"]+"/TEMP_"+lfname+" "+dirs[0]
-        shutil.move(conf["main"]["tmpPath"]+"/TEMP_"+lfname,dirs[0])
+    except Exception as e:
+        print(e, file=sys.stderr)
+        print(conf["main"]["tmpPath"] + "/TEMP_" + lfname + " " + dirs[0], file=sys.stderr)
+        shutil.move(conf["main"]["tmpPath"] + "/TEMP_" + lfname, dirs[0])
         try:
-            os.unlink(dir[0].replace(lfname,"ds_ows.map"))
-        except Exception,e:
-            print >> sys.stderr,e
+            os.unlink(dir[0].replace(lfname, "ds_ows.map"))
+        except Exception as e:
+            print(e, file=sys.stderr)
             pass
-        
+
         pass
-    outputs["Result"]["value"]=zoo._("Tile Index moved")
+    outputs["Result"]["value"] = zoo._("Tile Index moved")
     return 3

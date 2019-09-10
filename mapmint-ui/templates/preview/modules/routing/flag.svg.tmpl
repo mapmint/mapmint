@@ -1,6 +1,6 @@
 #set toto=$outputs
 #set $toto["Result"]["mimeType"]="image/svg+xml"
-#if $inputs.keys().count("svg")>0
+#if "svg" in $inputs.keys()
 #set f=open($conf["main"]["publicationPath"]+"/assets/fonts/"+$inputs["svg"]["value"]+".svg")
 #else
 #set f=open($conf["main"]["publicationPath"]+"/assets/fonts/f024.svg")
