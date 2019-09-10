@@ -331,14 +331,14 @@ def details(conf, inputs, outputs):
                               time.localtime(os.path.getmtime(a))).decode(locale.getlocale()[1], "replace")
     except Exception as e:
         pass
-        mTime = time.strftime(conf["mm"]["dateFormat"].encode("utf-8"), time.localtime(os.path.getmtime(a))).decode(
-            "utf-8", "replace")
+        mTime = time.strftime(str(conf["mm"]["dateFormat"].encode("utf-8")), time.localtime(os.path.getmtime(a))).encode(
+            "utf-8")
     try:
         locale.setlocale(locale.LC_ALL, oloc)
     except:
         pass
 
-    res = {"name": b[len(b) - 1], "link": link, "date": mTime}
+    res = {"name": b[len(b) - 1], "link": link, "date": str(mTime)}
     outputs["Result"]["value"] = json.dumps(res, ensure_ascii=False)
 
     return 3

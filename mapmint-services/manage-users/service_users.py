@@ -94,7 +94,7 @@ def getTableFeatures(conf, inputs, outputs):
             for k in range(0, len(res[i])):
                 if res[i][k] is not None and fields[k]["type"].count("char") > 0:
                     try:
-                        res0 += [res[i][k].encode("utf-8")]
+                        res0 += [str(res[i][k].decode("utf-8"))]
                     except:
                         res0 += [res[i][k]]
                 else:
@@ -477,7 +477,7 @@ def UpdateUser(conf, inputs, outputs):
                     if i == "login":
                         userl = j
             if "login" in inputs:
-                userl = inputs["login"]["value"].decode("utf-8")
+                userl = inputs["login"]["value"] #.decode("utf-8")
             if "type" in inputs and inputs["type"]["value"] == "delete":
                 try:
                     c.cur.execute("DELETE FROM " + prefix + "users WHERE login='" + userl + "'")

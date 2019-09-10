@@ -57,7 +57,7 @@
 #if $cfields[$kk]=="abstract"
 <textarea class="form-control" name="$cfields[$kk]" value="$conf[$a][$cfields[$kk]]">#if $conf["main"]["tmpUrl"] in $conf[$a]["abstract"]
 #set f=open($conf[$a]["abstract"].replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
-$f.read()
+$str(f.read().decode('utf-8'))
 #else
 $conf[$a]["abstract"].replace("[BR]","</p><p>")
 #end if

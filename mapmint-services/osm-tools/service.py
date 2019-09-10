@@ -22,7 +22,7 @@
 #  DEALINGS IN THE SOFTWARE.
 ################################################################################
 import zoo
-import libxml2
+#import libxml2
 import sys, os
 import osgeo.ogr
 

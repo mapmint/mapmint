@@ -24,7 +24,7 @@
 from osgeo import *
 import osgeo.ogr
 import osgeo.gdal
-import libxml2
+import lxml
 import os
 import sys
 import zoo

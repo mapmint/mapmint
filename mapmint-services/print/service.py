@@ -90,7 +90,8 @@ def printMap(conf, inputs, outputs):
         import json
         print("Start", file=sys.stderr)
         sys.stderr.flush()
-        err_log = file(conf["main"]["tmpPath"] + '/tmp_err_log_file', 'w', 0)
+        #err_log = file(conf["main"]["tmpPath"] + '/tmp_err_log_file', 'w', 0)
+        err_log = open(conf["main"]["tmpPath"] + '/tmp_err_log_file', 'w')
         os.dup2(err_log.fileno(), sys.stderr.fileno())
         process = Popen([conf["oo"]["path"]], stdin=PIPE, stdout=PIPE)
         print("Started", file=sys.stderr)
@@ -286,7 +287,7 @@ def printMap(conf, inputs, outputs):
  TYPE RASTER
  UNITS METERS
  STATUS ON
- DATA "''' + inputs["bgMap"]["value"] + '''"
+ DATA "''' + str(inputs["bgMap"]["value"].decode("utf-8")) + '''"
  PROCESSING "RESAMPLE=AVERAGE"
  PROJECTION 
    "init=epsg:900913"

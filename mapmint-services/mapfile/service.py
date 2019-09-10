@@ -198,8 +198,10 @@ def removeMap(conf, inputs, outputs):
         else:
             outputs["Result"]["value"] = zoo._("Project cannot be removed because it is the last one available.")
 
-        import libxml2
-        doc = libxml2.parseDoc(open(conf["mm"]["mapcacheCfg"], 'r').read())
+        #import libxml2
+        #doc = libxml2.parseDoc(open(conf["mm"]["mapcacheCfg"], 'r').read())
+        import lxml
+        doc = etree.fromstring(open(conf["mm"]["mapcacheCfg"], 'r').read())
         root = doc.xpathEval('/mapcache')
         nodes = doc.xpathEval('/mapcache/source[@name="' + inputs["mmProjectName"]["value"] + '"]')
 
@@ -516,7 +518,8 @@ def createVectorTileIndexLayer(conf, layer):
 
 def mmVectorInfo2MapPy(conf, inputs, outputs):
     import mapscript
-    import libxml2
+    #import libxml2
+    import lxml
     mapfile = inputs["dataStore"]["value"] + "ds_ows.map"
     m = None
     print(mapfile, file=sys.stderr)
@@ -693,8 +696,10 @@ def mmVectorInfo2MapPy(conf, inputs, outputs):
         if m is None:
             conf["lenv"]["message"] = zoo._("Unable to open the mapfile")
             return zoo.SERVICE_FAILED
-    doc = libxml2.newDoc("1.0")
-    rnode = libxml2.newNode('datasource')
+    from lxml.builder import E
+    #doc = libxml2.newDoc("1.0")
+    #rnode = libxml2.newNode('datasource')
+    rnode = E.datasource()
     print(mapfile, file=sys.stderr)
     for i in range(0, m.numlayers):
         print(mapfile, file=sys.stderr)
@@ -703,11 +708,16 @@ def mmVectorInfo2MapPy(conf, inputs, outputs):
         print(j.name, file=sys.stderr)
         print(j.metadata.get("mmWMS"), file=sys.stderr)
         if mm_access.checkDataSourcePriv(conf, m, inputs["dataStore"]["value"].replace("WFS:", "").replace("WMS:", ""), j.name, "r"):
-            node = libxml2.newNode('layer')
-            node1 = libxml2.newNode('name')
-            node1.addChild(libxml2.newText(j.name))
-            node.addChild(node1)
-            node1 = libxml2.newNode('geometry')
+            #node = libxml2.newNode('layer')
+            #node1 = libxml2.newNode('name')
+            node = E.layer()
+            node1 = E.name()
+            #node1.addChild(libxml2.newText(j.name))
+            node1.text=j.name
+            #node.addChild(node1)
+            #node1 = libxml2.newNode('geometry')
+            node.append(node1)
+            node1 = E.geometry()
             val = "Polygon"
             if j.type == mapscript.MS_LAYER_POINT:
                 val = "Point"
@@ -718,23 +728,33 @@ def mmVectorInfo2MapPy(conf, inputs, outputs):
                     if j.type == mapscript.MS_LAYER_RASTER:
                         val = "raster"
 
-            node1.addChild(libxml2.newText(val))
-            node.addChild(node1)
+            #node1.addChild(libxml2.newText(val))
+            #node.addChild(node1)
+            node1.text=val
+            node.append(node1)
 
             if j.connectiontype == mapscript.MS_WMS or j.metadata.get("mmWMS") == "true":
-                node1 = libxml2.newNode('label')
-                node1.addChild(libxml2.newText(j.metadata.get('ows_title')))
-                node.addChild(node1)
+                #node1 = libxml2.newNode('label')
+                #node1.addChild(libxml2.newText(j.metadata.get('ows_title')))
+                #node.addChild(node1)
+                node1 = E.label()
+                node1.text=j.metadata.get('ows_title')
+                node.append(node1)
 
-                node1 = libxml2.newNode('preview_link')
-                node1.addChild(libxml2.newText(j.connection))
-                node.addChild(node1)
+                #node1 = libxml2.newNode('preview_link')
+                #node1.addChild(libxml2.newText(j.connection))
+                #node.addChild(node1)
+                node1 = E.preview_link()
+                node1.text=j.connection
+                node.append(node1)
 
-            rnode.addChild(node)
+            #rnode.addChild(node)
+            rnode.append(node)
     print(sys.stderr, mapfile, file=sys.stderr)
-    doc.setRootElement(rnode)
+    #doc.setRootElement(rnode)
     print(sys.stderr, mapfile, file=sys.stderr)
-    outputs["Result"]["value"] = doc.serialize()
+    import lxml.etree as etree
+    outputs["Result"]["value"] = etree.tostring(rnode) #doc.serialize()
     print(sys.stderr, mapfile, file=sys.stderr)
     return zoo.SERVICE_SUCCEEDED
 
@@ -1365,9 +1385,13 @@ def createLegend0(conf, inputs, outputs):
                     {"id": layer.name, "value": conf["main"]["mapserverAddress"] + "?map=" + mapfile1 + "&LAYERS=" + layer.name + "&SRS=EPSG%3A4326&amp;FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&BBOX=0,0,0.002,0.002&WIDTH=24&HEIGHT=24&format=png"}]
                 tmpImage = tmpClass.createLegendIcon(m, layer, 24, 24)
                 # print(tmpImage, file=sys.stderr)
-                # print(conf["main"]["dataPath"]+"/maps/"+img_name, file=sys.stderr)
-                # print("Try to save", file=sys.stderr)
-                tmpImage.write(mapPath + "/" + img_name)
+                print(conf["main"]["dataPath"]+"/maps/"+img_name, file=sys.stderr)
+                print("Try to save", file=sys.stderr)
+                try:
+                    tmpImage.write(mapPath + "/" + img_name)
+                except Exception as e:
+                    print("Failed to save: "+mapPath + "/" + img_name, file=sys.stderr)
+                    print(str(e), file=sys.stderr)
             i += 1
 
     try:
@@ -1832,7 +1856,10 @@ def createLegend(conf, inputs, outputs):
                 # print(tmpImage, file=sys.stderr)
                 # print(conf["main"]["dataPath"]+"/maps/"+img_name, file=sys.stderr)
                 # print("Try to save", file=sys.stderr)
-                tmpImage.write(mapPath + "/" + img_name)
+                try:
+                    tmpImage.write(mapPath + "/" + img_name)
+                except Exception as e:
+                    print("Failed to save: "+mapPath + "/" + img_name, file=sys.stderr)
             i += 1
 
     try:
@@ -1910,16 +1937,16 @@ def listMap(conf, inputs, outputs):
             except:
                 pass
             try:
-                mTime = time.strftime(str(conf["mm"]["dateFormat"].encode('utf-8')), time.localtime(os.path.getmtime(conf["main"]["dataPath"] + "/" + prefix + "maps/" + i)))
+                mTime = time.strftime(str(conf["mm"]["dateFormat"]), time.localtime(os.path.getmtime(conf["main"]["dataPath"] + "/" + prefix + "maps/" + i)))
             except Exception as e:
                 print(e, file=sys.stderr)
-                mTime = time.strftime(str(conf["mm"]["dateFormat"].encode("utf-8")), time.localtime(os.path.getmtime(conf["main"]["dataPath"] + "/" + prefix + "maps/" + i)))
+                mTime = time.strftime(str(conf["mm"]["dateFormat"]), time.localtime(os.path.getmtime(conf["main"]["dataPath"] + "/" + prefix + "maps/" + i)))
             try:
                 locale.setlocale(locale.LC_ALL, oloc)
             except:
                 pass
-            res += [{"id": i.replace("project_", "").replace(".map", ""), "value": i, "mTime": mTime.encode('utf-8')}]
-    outputs["Result"]["value"] = json.dumps(str(res), ensure_ascii=False)
+            res += [{"id": i.replace("project_", "").replace(".map", ""), "value": i, "mTime": mTime}]
+    outputs["Result"]["value"] = json.dumps(res, ensure_ascii=False)
     return 3
 
 
@@ -2914,12 +2941,10 @@ def classifyMap0(conf, inputs, outputs):
     layer = m.getLayerByName(inputs["layer"]["value"])
     # print(layer, file=sys.stderr)
     print(inputs, file=sys.stderr)
-    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-    # if list(inputs.keys()).count("stepField")>0:
     if "stepField" in inputs:
         # layer=m.getLayerByName(inputs["layer"]["value"])
         lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": "SELECT DISTINCT " + inputs["stepField"]["value"] + " as c FROM " + layer.data + " ORDER BY " + inputs["stepField"]["value"] + " ASC"}}
-        # lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT "+inputs["stepField"]["value"]+" as c, ('||count(*)||' items)' as nb FROM "+layer.data+" GROUP BY inputs["stepField"]["value"] ORDER BY "+inputs["stepField"]["value"]+" ASC"},"dialect":{"value":"sqlite"}}
+        #lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT "+inputs["stepField"]["value"]+" as c, ('||count(*)||' items)' as nb FROM "+layer.data+" GROUP BY inputs["stepField"]["value"] ORDER BY "+inputs["stepField"]["value"]+" ASC"},"dialect":{"value":"sqlite"}}
         vt.vectInfo(conf, lInputs, outputs)
         ll = json.loads(outputs["Result"]["value"])
         print(ll, file=sys.stderr)
@@ -2963,8 +2988,6 @@ def classifyMap0(conf, inputs, outputs):
         outputs["Message"]["value"] = zoo._("Layer classified")
         return zoo.SERVICE_SUCCEEDED
 
-    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-    # if list(inputs.keys()).count("field")==0:
     if "field" not in inputs:
         inputs0 = inputs
         if layer.type == mapscript.MS_LAYER_RASTER:
@@ -2974,8 +2997,6 @@ def classifyMap0(conf, inputs, outputs):
                     inputs0["mmType"]["value"] = "greyScale"
             except:
                 pass
-            # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-            # if list(inputs.keys()).count("nodata"):
             if "nodata" in inputs:
                 inputs0["mmOffsite"] = {"value": inputs["nodata"]["value"]}
             inputs0["mmFill"] = {"value": "000000"}
@@ -3060,7 +3081,7 @@ def classifyMap0(conf, inputs, outputs):
         cond = " WHERE " + inputs["mmMExpr"]["value"].replace("\"[", "").replace("]\"", "")
         cond = cond.replace("[", "").replace("]", "")
     # lInputs={"encoding": {"value": layer.encoding},"dsoName": {"value": layer.name}, "dstName": {"value": layer.connection},"q": {"value": "SELECT DISTINCT "+inputs["field"]["value"]+" FROM "+layer.data+" "+cond+" ORDER BY "+inputs["field"]["value"]+" ASC"}}
-    lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": "SELECT count(*) as title," + inputs["field"]["value"] + " FROM " + layer.data + " GROUP BY " + inputs["field"]["value"] + " ORDER BY " + inputs["field"]["value"] + " ASC"},
+    lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": "SELECT " + inputs["field"]["value"] + ", count(*) as title FROM " + layer.data + " GROUP BY " + inputs["field"]["value"] + " ORDER BY " + inputs["field"]["value"] + " ASC"},
                "dialect": {"value": "sqlite"}}
 
     rClass = False
@@ -3328,7 +3349,8 @@ def classifyMap0(conf, inputs, outputs):
             else:
                 for j in tmp[i]:
                     try:
-                        print(dir(tmp[i]), file=sys.stderr)
+                        #print(str(tmp[i])+" "+str(dir(tmp[i])), file=sys.stderr)
+                        print("START "+str(tmp[i])+" "+str(j), file=sys.stderr)
                         if j == "pixel":
                             tmpClass.setExpression('( [' + j + '] = ' + str(tmp[i][j]) + ' ' + precond + ' )')
                         else:
@@ -3344,7 +3366,10 @@ def classifyMap0(conf, inputs, outputs):
                                     tmpClass.setExpression('( [' + j + '] = ' + str(int(tmp[i][j])) + ' ' + precond + ' )')
                             except:
                                 if j != "title":
-                                    tmpClass.setExpression('( "[' + j + ']" = ' + json.dumps(tmp[i][j].encode('utf-8')) + ' ' + precond + ' )')
+                                    print(tmp[i][j], file=sys.stderr)
+                                    tmpClass.setExpression('( "[' + j + ']" = "' + tmp[i][j] + '" ' + precond + ' )')
+                                    #tmpClass.setExpression('( "[' + j + ']" = ' + json.dumps(tmp[i][j].encode('utf-8').decode('utf-8')) + ' ' + precond + ' )')
+                        print("END "+str(tmp[i])+" "+str(j), file=sys.stderr)
                     except Exception as e:
                         print(e, file=sys.stderr)
                         iEnc = layer.encoding
@@ -3353,6 +3378,7 @@ def classifyMap0(conf, inputs, outputs):
                             tmpClass.setExpression('( "[' + j + ']" = "' + tmp[i][j].decode(oEnc).encode(iEnc) + '" ' + precond + ' )')
                         except:
                             tmpClass.setExpression('( "[' + j + ']" = "' + tmp[i][j] + '" ' + precond + ' )')
+                        print(str(tmp[i])+" "+str(j), file=sys.stderr)
                     print(tmpClass.getExpressionString(), file=sys.stderr)
                     if "mmFAS" in inputs and inputs["mmFAS"]["value"] == "true":
                         try:
@@ -3378,7 +3404,7 @@ def classifyMap0(conf, inputs, outputs):
                             tmpClass.name += " (" + str(tmp[i][j]) + " " + zoo._("item") + ")"
 
         except Exception as e:
-            # print(e, file=sys.stderr)
+            print(e, file=sys.stderr)
             pass
         i += 1
 
@@ -4691,29 +4717,35 @@ def updateMapcacheCfg0(conf, inputs, outputs):
         # No need for updating the cache
         return 3
 
-    import libxml2
-    doc = libxml2.parseDoc(open(conf["mm"]["mapcacheCfg"], 'r').read())
-    root = doc.xpathEval('/mapcache')
-    nodes = doc.xpathEval('/mapcache/source[@name="' + inputs["mmProjectName"]["value"] + '"]')
+    #import libxml2
+    # doc = libxml2.parseDoc(open(conf["mm"]["mapcacheCfg"], 'r').read())
+    import lxml.etree as etree
+    doc = etree.fromstring(bytes(open(conf["mm"]["mapcacheCfg"], 'r').read(),"utf-8"))
+    root = doc.xpath('/mapcache')
+    nodes = doc.xpath('/mapcache/source[@name="' + inputs["mmProjectName"]["value"] + '"]')
 
     from Cheetah.Template import Template
     searchList = {"conf": conf, "inputs": inputs, "outputs": outputs, "layers": fL}
     xmlSection = Template(file=conf["main"]["templatesPath"] + "/mapcacheLayer1.tmpl", searchList=searchList).__str__()
 
     # print(xmlSection, file=sys.stderr)
-    doc1 = libxml2.parseMemory(xmlSection, len(xmlSection))
-    aNodes = doc1.xpathEval('/mapcache/*')
+    doc1 = etree.fromstring(xmlSection)#, len(xmlSection))
+    aNodes = doc1.xpath('/mapcache/*')
 
     if len(nodes) == 0:
         for j in range(0, len(aNodes)):
-            root[0].addChild(aNodes[j])
+            root[0].append(aNodes[j])
     else:
-        nodes[0].replaceNode(aNodes[0])
-        nodes = doc.xpathEval('/mapcache/tileset[@name="' + inputs["mmProjectName"]["value"] + 'Tile"]')
-        nodes[0].replaceNode(aNodes[1])
-    f = open(conf["mm"]["mapcacheCfg"], 'w')
+        print(dir(nodes[0]),file=sys.stderr)
+        #should do
+        #nodes[0].replaceNode(aNodes[0])
+        nodes = doc.xpath('/mapcache/tileset[@name="' + inputs["mmProjectName"]["value"] + 'Tile"]')
+        #should do
+        #nodes[0].replaceNode(aNodes[1])
+    f = open(conf["mm"]["mapcacheCfg"], 'wb')
     # print( doc, file=sys.stderr)
-    doc.saveTo(f)
+    #doc.saveTo(f)
+    f.write((etree.tostring(doc)))
     f.close
     return 3
 
@@ -4732,29 +4764,33 @@ def updateMapcacheCfg(conf, inputs, outputs):
         # No need for updating the cache
         return 3
 
-    import libxml2
-    doc = libxml2.parseDoc(open(conf["mm"]["mapcacheCfg"], 'r').read())
-    root = doc.xpathEval('/mapcache')
-    nodes = doc.xpathEval('/mapcache/source[@name="' + inputs["mmProjectName"]["value"] + '"]')
+    #import libxml2
+    import lxml.etree as etree
+    doc =etree.fromstring(bytes(open(conf["mm"]["mapcacheCfg"], 'r').read(),"utf-8"))
+    root = doc.xpath('/mapcache')
+    nodes = doc.xpath('/mapcache/source[@name="' + inputs["mmProjectName"]["value"] + '"]')
 
     from Cheetah.Template import Template
     searchList = {"conf": conf, "inputs": inputs, "outputs": outputs, "layers": fL}
     xmlSection = Template(file=conf["main"]["templatesPath"] + "/mapcacheLayer.tmpl", searchList=searchList).__str__()
 
     # print(xmlSection, file=sys.stderr)
-    doc1 = libxml2.parseMemory(xmlSection, len(xmlSection))
-    aNodes = doc1.xpathEval('/mapcache/*')
+    doc1 = etree.fromstring(xmlSection) #, len(xmlSection))
+    aNodes = doc1.xpath('/mapcache/*')
 
     if len(nodes) == 0:
         for j in range(0, len(aNodes)):
-            root[0].addChild(aNodes[j])
+            root[0].append(aNodes[j])
     else:
-        nodes[0].replaceNode(aNodes[0])
-        nodes = doc.xpathEval('/mapcache/tileset[@name="' + inputs["mmProjectName"]["value"] + 'Tile"]')
-        nodes[0].replaceNode(aNodes[1])
-    f = open(conf["mm"]["mapcacheCfg"], 'w')
+        #should do
+        #nodes[0].replaceNode(aNodes[0])
+        nodes = doc.xpath('/mapcache/tileset[@name="' + inputs["mmProjectName"]["value"] + 'Tile"]')
+        #should do
+        #nodes[0].replaceNode(aNodes[1])
+    f = open(conf["mm"]["mapcacheCfg"], 'wb')
     # print( doc, file=sys.stderr)
-    doc.saveTo(f)
+    #doc.saveTo(f)
+    f.write((etree.tostring(doc)))
     f.close
     return 3
 
@@ -5478,7 +5514,7 @@ def generatePreview(conf, m):
 
     print(outputs0["Result"]["value"], file=sys.stderr)
     f = open(conf["main"]["tmpPath"] + "/preview_project_" + conf["senv"]["MMID"] + ".pdf", "wb")
-    f.write(outputs0["Result"]["value"])
+    f.write(bytes(outputs0["Result"]["value"],"utf-8"))
     f.close()
 
     outputs1 = {"Result": {"value": ""}}
@@ -5502,6 +5538,7 @@ def generatePreview(conf, m):
     # f=open(filename,"wb")
     # f.write(outputs1["Result"]["value"])
     # f.close()
+    print(outputs1["Result"]["generated_file"],file=sys.stderr)
     filename = outputs1["Result"]["generated_file"]
     # outputs["Result"]["generated_file"]=outputs1["Result"]["generated_file"]
     setMetadata(m.web, "previewUrl", filename.replace(conf["main"]["tmpPath"], conf["main"]["tmpUrl"]))

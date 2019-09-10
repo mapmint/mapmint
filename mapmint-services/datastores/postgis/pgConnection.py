@@ -1,5 +1,5 @@
 import psycopg2
-import libxml2
+import lxml
 # import libxslt
 from lxml import etree
 import osgeo.ogr
@@ -19,12 +19,15 @@ class pgConnection:
         self.conf = conf
 
     def parseConf(self):
-        libxml2.initParser()
-        doc = libxml2.parseFile(self.conf["main"]["dataPath"] + "/PostGIS/" + self.dbfile + ".xml")
-        styledoc = libxml2.parseFile(self.conf["main"]["dataPath"] + "/PostGIS/conn.xsl")
+        #libxml2.initParser()
+        #doc = libxml2.parseFile(self.conf["main"]["dataPath"] + "/PostGIS/" + self.dbfile + ".xml")
+        doc = etree.parse(self.conf["main"]["dataPath"] + "/PostGIS/" + self.dbfile + ".xml")
+        #styledoc = libxml2.parseFile(self.conf["main"]["dataPath"] + "/PostGIS/conn.xsl")
+        #style = etree.XSLT(styledoc)
+        styledoc = etree.parse(self.conf["main"]["dataPath"] + "/PostGIS/conn.xsl")
         style = etree.XSLT(styledoc)
         res = style(doc)
-        self.db_string = res.content.replace("PG: ", "")
+        self.db_string = str(res).replace("PG: ", "")
 
     def connect(self):
         try:
@@ -279,7 +282,7 @@ def getTableContent(conf, inputs, outputs):
                 res0 = []
                 for k in range(0, len(res[i])):
                     try:
-                        tmp = res[i][k].encode('utf-8')
+                        tmp = str(res[i][k].decode('utf-8'))
                         print(dir(tmp), file=sys.stderr)
                     except Exception as e:
                         print(e, file=sys.stderr)
@@ -411,7 +414,7 @@ def getTableContent1(conf, inputs, outputs):
                 res0 = []
                 for k in range(0, len(res[i])):
                     try:
-                        tmp = res[i][k].encode('utf-8')
+                        tmp = str(res[i][k].decode('utf-8'))
                         # print(dir(tmp), file=sys.stderr)
                     except Exception as e:
                         # print(e, file=sys.stderr)
@@ -548,8 +551,9 @@ def testDesc(val, desc):
                 return None
         else:
             if val != 'NULL':
-                tmp = adapt(val.encode('utf-8'))
-                return str(tmp).decode('utf-8')
+                tmp = adapt(val)#.encode('utf-8').decode('utf-8'))
+                tmp.encoding = "utf-8"
+                return str(tmp)#.decode('utf-8')
             else:
                 return "NULL"
     else:

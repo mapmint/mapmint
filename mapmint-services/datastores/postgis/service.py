@@ -3,32 +3,26 @@ import sys
 import os
 import shutil
 
-try:
-    from libxmlmods import libxml2mod as libxml2mod
-except:
-    pass
-import libxml2
 import osgeo.ogr
-# import libxslt
 from lxml import etree
 
 
 def test(conf, inputs, outputs):
-    libxml2.initParser()
     xcontent = '<connection><dbname>' + inputs["dbname"]["value"] + '</dbname><user>' + inputs["user"][
         "value"] + '</user><password>' + inputs["password"]["value"] + '</password><host>' + inputs["host"][
                    "value"] + '</host><port>' + inputs["port"]["value"] + '</port></connection>'
-    doc = libxml2.parseMemory(xcontent, len(xcontent))
-    styledoc = libxml2.parseFile(conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/conn.xsl")
+    doc = etree.fromstring(xcontent)
+    styledoc = etree.parse(conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/conn.xsl")
     style = etree.XSLT(styledoc)
     result = style(doc)
-    ds = osgeo.ogr.Open(result.content)
+    print(str(result),file=sys.stderr)
+    ds = osgeo.ogr.Open(str(result))
     if ds is None:
         conf["lenv"]["message"] = zoo._("Unable to connect to ") + inputs["name"]["value"]
         return 4
     else:
         print("OK 6'", file=sys.stderr)
-        outputs["Result"]["value"] = zoo._("Connection to ") + str(inputs["name"]["value"]).encode('utf-8') + zoo._(
+        outputs["Result"]["value"] = zoo._("Connection to ") + str(inputs["name"]["value"]) + zoo._(
             " successfull")
     ds = None
     return 3
@@ -40,24 +34,30 @@ def load(conf, inputs, outputs):
     dbParams = ['dbname', 'user', 'password', 'host', 'port']
     values = "{"
     try:
-        parse_options = libxml2.XML_PARSE_DTDLOAD + libxml2.XML_PARSE_NOENT
-        libxml2.initParser()
-        xqf = libxml2.readFile(
-            conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/" + inputs["name"]["value"] + ".xml", None,
-            parse_options)
+        #parse_options = libxml2.XML_PARSE_DTDLOAD + libxml2.XML_PARSE_NOENT
+        #libxml2.initParser()
+        xqf = etree.parse(
+            conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/" + inputs["name"]["value"] + ".xml")
         cnt = 0
         for j in dbParams:
             print(j, file=sys.stderr)
             # print( j, file=sys.stderr)
             try:
-                items = xqf.xpathEval("/connection/" + j)
+                #print(str(dir(xqf)),file=sys.stderr)
+                #items = xqf.xpathEval("/connection/" + j)
+                items = xqf.xpath("/connection/" + j)
                 for i in items:
+                    #print(str(i),file=sys.stderr)
+                    #print(str(dir(i)),file=sys.stderr)
+                    #print(str(dir(i)),file=sys.stderr)
                     # print( cnt, file=sys.stderr)
                     if cnt > 0:
                         values += ', '
-                    values += '"' + i.name + '": "' + str(i.children.get_content()) + '"'
+                    #values += '"' + i.name + '": "' + str(i.children.get_content()) + '"'
+                    values += '"' + str(j)  + '": "' + i.text + '"'
                     cnt += 1
-            except:
+            except Exception as e:
+                print(str(e),file=sys.stderr)
                 values += '"' + j + '": ""'
                 cnt += 1
                 pass
@@ -75,19 +75,19 @@ def details(conf, inputs, outputs):
     res = {}
     values = "{"
     try:
-        parse_options = libxml2.XML_PARSE_DTDLOAD + libxml2.XML_PARSE_NOENT
-        libxml2.initParser()
-        xqf = libxml2.readFile(
-            conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/" + inputs["name"]["value"] + ".xml", None,
-            parse_options)
+        #parse_options = libxml2.XML_PARSE_DTDLOAD + libxml2.XML_PARSE_NOENT
+        #libxml2.initParser()
+        xqf = etree.parse(
+            conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/" + inputs["name"]["value"] + ".xml"
+            )
         cnt = 0
         for j in dbParams:
             print(j, file=sys.stderr)
             # print( j, file=sys.stderr)
             try:
-                items = xqf.xpathEval("/connection/" + j)
+                items = xqf.xpath("/connection/" + j)
                 for i in items:
-                    res[i.name] = str(i.children.get_content())
+                    res[i.name] = str(i.text)
             except:
                 res[j] = ""
                 pass

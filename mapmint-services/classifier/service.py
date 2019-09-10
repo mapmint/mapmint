@@ -32,12 +32,31 @@ def write_png_in_mem(outputs, width, height, rgb_func):
     import struct
     import array
 
-    def output_chunk(out, chunk_type, data):
+    def myCRC32(data):
+        res=zlib.crc32(data) & 0xffffffff
+        return str(res)
+
+    def output_chunk(out, chunk_type0, data):
+        print(chunk_type0,file=sys.stderr)
+        chunk_type=bytes(chunk_type0,'utf-8')
         out["Result"]["value"] += struct.pack("!I", len(data))
         out["Result"]["value"] += chunk_type
-        out["Result"]["value"] += data
-        checksum = zlib.crc32(data, zlib.crc32(chunk_type))
-        out["Result"]["value"] += struct.pack("!i", checksum)
+        try:
+            out["Result"]["value"] += data
+        except Exception as e:
+            print(e,file=sys.stderr)
+            out["Result"]["value"] += bytes(data,"utf-8")
+        checksum0 =bytes( myCRC32(chunk_type),"utf-8") #zlib.crc32(chunk_type) & 0xffffffff
+        #checksum = str(zlib.crc32(data, int(myCRC32(chunk_type))) & 0xffffffff)
+        #zlib.crc32(data, bytes(checksum0,"utf-8")) & 0xffffffff
+        checksum1 = zlib.crc32(data, int(myCRC32(chunk_type))) & 0xffffffff
+        checksum = str(checksum1)
+        try:
+            out["Result"]["value"] += struct.pack("!i", int(checksum))
+        except Exception as e:
+            print(e,file=sys.stderr)
+
+
 
     def get_data(width, height, rgb_func):
         fw = float(width)
@@ -62,7 +81,7 @@ def write_png_in_mem(outputs, width, height, rgb_func):
     outputs["Result"]["value"] = struct.pack("8B", 137, 80, 78, 71, 13, 10, 26, 10)
     output_chunk(outputs, "IHDR", struct.pack("!2I5B", width, height, 8, 2, 0, 0, 0))
     output_chunk(outputs, "IDAT", get_data(width, height, rgb_func))
-    output_chunk(outputs, "IEND", "")
+    output_chunk(outputs, "IEND", bytes("","utf-8"))
 
 
 def linear_gradient(start_value, stop_value, start_offset=0.0, stop_offset=1.0):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
 #  Author:   Gérald Fenoy, gerald.fenoy@cartoworks.com
-#  Copyright (c) 2010-2014, Cartoworks Inc. 
+##  Copyright (c) 2010-2014, Cartoworks Inc. 
 ############################################################################### 
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -106,9 +106,9 @@ def list(conf, inputs, outputs):
     suported_dbs = ["PostGIS", "MySQL"]
     dbStrs = {}
     for i in suported_dbs:
-        print(i, file=sys.stderr)
+        #print(" ELEMENt "+str(i), file=sys.stderr)
         dbs.displayJson(conf, {"type": {"value": i}}, outputs)
-        print(str(outputs["Result"]["value"]), file=sys.stderr)
+        #print(str(outputs["Result"]["value"]), file=sys.stderr)
         try:
             dbStrs[i] = json.loads(outputs["Result"]["value"])
             b = 0
@@ -126,7 +126,7 @@ def list(conf, inputs, outputs):
                 li = {}
                 for c in tmp:
                     li[c] = {}
-                    li[c]["value"] = tmp[c].decode('utf-8')
+                    li[c]["value"] = str(tmp[c])
                 li["type"] = {}
                 li["type"]["value"] = i
                 if dbs.test(conf, li, outputs) == 3:

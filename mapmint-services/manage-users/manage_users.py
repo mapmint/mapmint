@@ -10,7 +10,7 @@ import re
 
 def mm_md5(c):
     h = hashlib.new('ripemd160')
-    h.update(c)
+    h.update(c.encode("utf-8"))
     return h.hexdigest()
 
 

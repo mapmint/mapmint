@@ -467,36 +467,44 @@ def logIn(conf, inputs, outputs):
         # print(con.desc, file=sys.stderr)
         c.execute(con.desc)
         desc = c.fetchall()
+        print(str(conf["senv"]), file=sys.stderr)
         for i in desc:
             if isinstance(a[0][i[0]], int):
                 conf["senv"][i[1]] = str(a[0][i[0]])
             else:
                 if a[0][i[0]] is not None:
+                    print("*****\n"+i[1]+"\n > "+str(a[0][i[0]]),file=sys.stderr)
                     try:
-                        conf["senv"][i[1]] = a[0][i[0]].encode('utf-8')
+                        conf["senv"][i[1]] = a[0][i[0]].decode('utf-8')
                     except:
-                        conf["senv"][i[1]] = a[0][i[0]]
+                        conf["senv"][i[1]] = str(a[0][i[0]])
                 else:
                     conf["senv"][i[1]] = str(a[0][i[0]])
+        print("SENV: "+str(conf["senv"]), file=sys.stderr)
+        print(str(desc), file=sys.stderr)
 
         conf["senv"]["group"] = getGroup(conf, con, inputs['login']['value'])
         conf["senv"]["loggedin"] = "true"
         conf["senv"]["isAdmin"] = "true"
+        print("SENV: "+str(conf["senv"]), file=sys.stderr)
 
         if "isTrial" in conf["main"] and conf["main"]["isTrial"] == "true":
             conf["senv"]["isTrial"] = "true"
         else:
             conf["senv"]["isTrial"] = "false"
 
+        print("SENV: "+str(conf["senv"]), file=sys.stderr)
         outputs["Result"]["value"] = zoo._("User ") + str(conf["senv"]["login"]) + zoo._(" authenticated")
+        print("SENV: "+str(conf["senv"]), file=sys.stderr)
         sql = " UPDATE " + prefix + "users set last_con=" + con.now + " WHERE login=[_login_]"
         con.pexecute_req([sql, {"login": {"value": inputs["login"]["value"], "format": "s"}}])
         conn.commit()
-        try:
-            loginFlux(conf, h)
-        except:
-            pass
-        # print(str(conf["senv"]), file=sys.stderr)
+        print(str(conf["senv"]), file=sys.stderr)
+        #try:
+        #    loginFlux(conf, h)
+        #except:
+        #    pass
+        print("SENV: "+str(conf["senv"]), file=sys.stderr)
         return zoo.SERVICE_SUCCEEDED
     else:
         conf["lenv"]["message"] = zoo._("Unable to connect with the provided login and password")

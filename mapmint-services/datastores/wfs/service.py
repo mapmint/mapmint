@@ -1,7 +1,6 @@
 import sys
 import os
 import shutil
-import libxml2
 import osgeo.ogr
 # import libxslt
 from lxml import etree

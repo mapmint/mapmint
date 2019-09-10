@@ -231,11 +231,17 @@ def display(conf, inputs, outputs):
             import time
             outputs["Result"]["value"] = t1.__str__()
         else:
+            page = "/error_bs.tmpl"
+            import traceback
+            nameSpace["errorMsg"] = str(e) + "\n" + str(traceback.format_exc())
+            t1 = Template(file=conf["main"]["templatesPath"] + page, searchList=nameSpace)
+            outputs["Result"]["value"] = t1.__str__()
+
             page1 = "/login.tmpl"
             t1 = Template(file=conf["main"]["templatesPath"] + page1, searchList=nameSpace)
             import time
             conf["lenv"]["cookie"] = "MMID=deleted; expires=" + time.strftime("%a, %d-%b-%Y %H:%M:%S GMT", time.gmtime()) + "; path=/"
-            outputs["Result"]["value"] = t1.__str__()
+            #outputs["Result"]["value"] = t1.__str__()
 
     if inputs["tmpl"]["value"].count('_css') or inputs["tmpl"]["value"].count('.css') > 0:
         outputs["Result"]["mimeType"] = "text/css"

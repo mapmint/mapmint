@@ -29,6 +29,8 @@ import re
 import authenticate.service as auth
 from types import *
 
+myList=list
+
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 
 '''
@@ -195,7 +197,9 @@ def searchByName(conf, inputs, outputs):
     for j in range(0, len(tmp)):
         if lclause != "":
             lclause += " or "
-        lclause += " name = " + str(adapt(tmp[j]))
+        extern = adapt(tmp[j])
+        extern.encoding("utf-8")
+        lclause += " name = " + str(etern)
     suffix1 = " (SELECT id FROM " + tprefix + "groups WHERE " + lclause + ") "
     suffix20 = "(SELECT DISTINCT i_id FROM ((select DISTINCT i_id from " + inputs["tbl"][
         "value"] + "_themes where t_id in (select DISTINCT t_id from " + tprefix + "themes_groups where g_id in " + suffix1 + ")) INTERSECT (select DISTINCT i_id from " + tprefix + "indicators_territories where t_id in ( select DISTINCT t_id from territories,territories_groups where territories.id=territories_groups.t_id " + suffix10 + " and g_id in " + suffix1 + "))) as foo)"
@@ -376,7 +380,9 @@ def getIndexRequest(conf, inputs, outputs):
         reqSuffix += " and (not(agregation) or agregation is null)"
     clause = ""
     if "query" in inputs and inputs["query"]["value"][0] != '<':
-        clause = inputs["qtype"]["value"] + " LIKE " + str(adapt(inputs["query"]["value"].replace("*", "%")))
+        clause_ext = adapt(inputs["query"]["value"].replace("*", "%"))
+        clause_ext.encoding="utf-8"
+        clause = inputs["qtype"]["value"] + " LIKE " + str(clause_ext)
     reqSuffix0 = ""
     dtableSuffix = " and step is null"
     tableName = tablePrefix + id
@@ -443,7 +449,9 @@ def _getIndexValues(conf, inputs, fields):
         reqSuffix += " and (not(agregation) or agregation is null)"
     clause = ""
     if "query" in inputs and inputs["query"]["value"] != "":
-        clause = inputs["qtype"]["value"] + " LIKE " + str(adapt(inputs["query"]["value"].replace("*", "%")))
+        clause_ext = adapt(inputs["query"]["value"].replace("*", "%"))
+        clause_ext.encoding="utf-8"
+        clause = inputs["qtype"]["value"] + " LIKE " + str(clause_ext)
     reqSuffix0 = ""
     dtableSuffix = " and step is null"
     tableName = tablePrefix + id
@@ -653,11 +661,9 @@ def saveIndexTable(conf, inputs, outputs):
         "i_id": inputs["i_id"],
     }
     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-    # if list(inputs.keys()).count("id") > 0:
     if "id" in inputs:
         inputs0["id"] = inputs["id"]
     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-    # if list(inputs.keys()).count("id") == 0:
     if "id" not in inputs:
         insertElem(conf, inputs0, outputs)
         # obj=detailsIndicateurs(conf,inputs,cur,inputs["i_id"]["value"],"table",prefix)
@@ -699,12 +705,19 @@ def saveIndexDisplaySettings(conf, inputs, outputs):
         print(tmp, file=sys.stderr)
         try:
             print(tmp["label"], file=sys.stderr)
-            tmp0 = "%s" % adapt(tmp["value"])
+            val_ext = adapt(tmp["value"])
+            val_ext.encoding = "utf-8"
+            tmp0 = "%s" % val_ext
+            #adapt(tmp["value"])
             tmp["value"] = str(tmp0)
-            tmp0 = "%s" % adapt(tmp["label"])
+            label_ext = adapt(tmp["label"])
+            label_ext.encoding="utf-8"
+            tmp0 = "%s" % label_ext
             print(tmp0, file=sys.stderr)
             tmp["label"] = str(tmp0)
-            tmp0 = "%s" % adapt(tmp["var"])
+            var_ext = adapt(tmp["var"])
+            var_ext.encoding="utf-8"
+            tmp0 = "%s" % var_ext
             tmp["var"] = str(tmp0)
             if tmp["pos"] == "":
                 tmp["pos"] = "(select count(*) from " + prefix + "dtable where it_id=(select id from " + prefix + "indicators_territories where i_id=" + inputs["id"]["value"] + reqSuffix + "))" + oSuffix
@@ -775,11 +788,17 @@ def saveRepportSettings(conf, inputs, outputs):
         tmp = json.loads(inputs["tuple"]["value"][i])
         tmp = eval(inputs["tuple"]["value"][i])
         try:
-            tmp0 = "%s" % adapt(tmp["value"])
+            var_ext = adapt(tmp["value"])
+            var_ext.encoding = "utf-8"
+            tmp0 = "%s" % var_ext #adapt(tmp["value"])
             tmp["value"] = str(tmp0)
-            tmp0 = "%s" % adapt(tmp["display"])
+            display_ext = adapt(tmp["display"])
+            display_ext.encoding = "utf-8"
+            tmp0 = "%s" % display_ext #adapt(tmp["display"])
             tmp["display"] = str(tmp0)
-            tmp0 = "%s" % adapt(tmp["var"])
+            var_ext = adapt(tmp["var"])
+            var_ext.encoding = "utf-8"
+            tmp0 = "%s" % var_ext #adapt(tmp["var"])
             tmp["var"] = str(tmp0)
             if not ("pos" in tmp):
                 tmp["pos"] = "(select id from " + prefix + "indicators_territories where i_id=" + inputs["id"]["value"] + reqSuffix + ")"
@@ -888,7 +907,9 @@ def createAgregate(conf, inputs, outputs):
         return zoo.SERVICE_FAILED
 
     subreq = "(SELECT id from " + tprefix + "indicators_territories where i_id=" + inputs["id"]["value"] + " and (not(agregation) or agregation is null))"
-    req = "DELETE FROM agregation where it_id=" + subreq + ";INSERT INTO agregation (it_id,t_id,formula) VALUES (" + subreq + "," + inputs["tid"]["value"] + "," + str(adapt(inputs["formula"]["value"])) + ")"
+    formula_ext = adapt(inputs["formula"]["value"])
+    formula_ext.encoding="utf-8"
+    req = "DELETE FROM agregation where it_id=" + subreq + ";INSERT INTO agregation (it_id,t_id,formula) VALUES (" + subreq + "," + inputs["tid"]["value"] + "," + str(formula_ext)  + ")"
     cur.execute(req)
     con.conn.commit()
 
@@ -958,12 +979,10 @@ def joinIndexTable(conf, inputs, outputs):
 
     fields = ""
     # TODO: possible optimization: assume inputs["rcol"] is a Python 3 dictionary object
-    # print(list(inputs["rcol"].keys()), file=sys.stderr)    ->    print(inputs["rcol"].keys(), file=sys.stderr)
-    print(list(inputs["rcol"].keys()), file=sys.stderr)
+    print(myList(inputs["rcol"].keys()), file=sys.stderr)
     print(inputs["rcol"]["value"][0], file=sys.stderr)
     for i in ["rcol", "field"]:
         # TODO: confirm assumption: inputs[i] is a Python 3 dictionary object
-        # if list(inputs[i].keys()).count("length") == 0:
         if "length" not in inputs[i]:
             inputs[i]["value"] = inputs[i]["value"].split(",")
 
@@ -1000,13 +1019,22 @@ def joinIndexTable(conf, inputs, outputs):
 
     filename = "NULL"
     if "filename" in inputs and inputs["filename"]["value"] != "NULL":
-        filename = "%s" % adapt(inputs["filename"]["value"]).getquoted()
+        filename_ext = adapt(inputs["filename"]["value"])
+        filename_ext.encoding="utf-8"
+        filename = "%s" % filename_ext.getquoted()
+        #filename = "%s" % adapt(inputs["filename"]["value"]).getquoted()
     query = "NULL"
     if "query" in inputs and inputs["query"]["value"] != "":
-        query = "%s" % adapt(inputs["query"]["value"]).getquoted()
+        query_ext = adapt(inputs["query"]["value"])
+        query_ext.encoding="utf-8"
+        query = "%s" % query_ext.getquoted()
+        #query = "%s" % adapt(inputs["query"]["value"]).getquoted()
     ds = "NULL"
     if "dbname" in inputs and inputs["dbname"]["value"] != "-1":
-        ds = "%s" % adapt(inputs["dbname"]["value"]).getquoted()
+        dbname_ext = adapt(inputs["dbname"]["value"])
+        dbname_ext.encoding = "utf-8"
+        ds = "%s" % dbname_ext.getquoted()
+        #ds = "%s" % adapt(inputs["dbname"]["value"]).getquoted()
     req = "insert into " + prefix + "indicators_territories (i_id,o_key_link,t_id,filename,tbl_link,tbl_key_link,fields,query,ds) VALUES (" + inputs["id"]["value"] + ",'" + inputs["field"]["value"][1] + "'," + inputs["territory"]["value"] + "," + filename + ",'" + inputs["layer"]["value"] + "','" + \
           inputs["field"]["value"][0] + "','" + "indexes.idx_table_" + inputs["id"]["value"] + "." + inputs["field"]["value"][0] + "," + fields + "'," + query + "," + ds + ")"
     print(req, file=sys.stderr)
@@ -1093,14 +1121,13 @@ def testQuery(conf, inputs, outputs):
         con = psycopg2.connect(dbs)
     except:
         try:
-            import libxml2 # , libxslt
             from lxml import etree
             import osgeo.ogr as ogr
-            doc = libxml2.parseFile(conf["main"]["dataPath"] + "/" + tmp[0] + "/" + tmp[1] + ".xml")
-            styledoc = libxml2.parseFile(conf["main"]["dataPath"] + "/" + tmp[0] + "/conn.xsl")
+            doc = etree.parse(conf["main"]["dataPath"] + "/" + tmp[0] + "/" + tmp[1] + ".xml")
+            styledoc = etree.parse(conf["main"]["dataPath"] + "/" + tmp[0] + "/conn.xsl")
             style = etree.XSLT(styledoc)
             result = style(doc)
-            print(result.content, file=sys.stderr)
+            print(str(result), file=sys.stderr)
             ds = ogr.Open(result.content)
             res = ds.ExecuteSQL(inputs["query"]["value"], None, None)
             n = res.GetFeatureCount()
@@ -1324,7 +1351,6 @@ def list(conf, inputs, outputs):
             else:
                 if inputs["table"]["value"].count('.') > 0:
                     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-                    # if list(inputs.keys()).count("cond"):
                     if "cond" in inputs:
                         res = listDefault(inputs["table"]["value"], cur, inputs["cond"]["value"])
                     else:
@@ -1370,22 +1396,27 @@ def insertElement(conf, inputs, outputs):
         if inputs["table"]["value"].count(".") > 0:
             prefix = ""
             # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-            # inputsKeys = list(inputs.keys())
             inputsKeys = inputs.keys()
             # if inputsKeys.count('title'):
             if 'title' in inputsKeys:
                 col_sufix = ",title"
-                val_sufix = "," + str(adapt(inputs["title"]["value"]))
+                title_ext=adapt(inputs["title"]["value"])
+                title_ext.encoding="utf-8"
+                val_sufix = "," + str(title_ext)
             if len(inputsKeys) > 2:  # maybe affected
                 for i in inputsKeys:  # maybe affected
                     print(i, file=sys.stderr)
                     if i != "table" and i != "name" and i != "title":
                         col_sufix += "," + i
-                        val_sufix += "," + str(adapt(inputs[i]["value"]))
+                        value_ext=adapt(inputs[i]["value"])
+                        value_ext.encoding="utf-8"
+                        val_sufix += "," + str(value_ext)
         else:
             prefix = auth.getPrefix(conf)
-        print("INSERT INTO " + prefix + inputs["table"]["value"] + " (name" + col_sufix + ") VALUES (" + str(adapt(inputs["name"]["value"])) + "" + val_sufix + ")", file=sys.stderr)
-        cur.execute("INSERT INTO " + prefix + inputs["table"]["value"] + " (name" + col_sufix + ") VALUES (" + str(adapt(inputs["name"]["value"])) + "" + val_sufix + ")")
+        name_ext=adapt(inputs["name"]["value"])
+        name_ext.encoding="utf-8"
+        print("INSERT INTO " + prefix + inputs["table"]["value"] + " (name" + col_sufix + ") VALUES (" + str(name_ext) + "" + val_sufix + ")", file=sys.stderr)
+        cur.execute("INSERT INTO " + prefix + inputs["table"]["value"] + " (name" + col_sufix + ") VALUES (" + str(name_ext) + "" + val_sufix + ")")
         outputs["Result"]["value"] = zoo._("Done")
     except Exception as e:
         conf["lenv"]["message"] = zoo._("An error occured when processing your request: ") + str(e)
@@ -1472,7 +1503,6 @@ def insertElem(conf, inputs, outputs):
         fields = ""
         values = ""
         # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-        # for i in list(inputs.keys():
         for i in inputs.keys():
             if i != "table" and i != "tid" and inputs[i]["value"] != "":
                 if not (auth.is_ftable(inputs["table"]["value"])):
@@ -1487,6 +1517,7 @@ def insertElem(conf, inputs, outputs):
                     values += inputs[i]["value"]
                 else:
                     tmp = adapt(inputs[i]["value"])
+                    tmp.encoding="utf-8"
                     values += str(tmp)
 
         req = "INSERT INTO " + prefix + inputs["table"]["value"] + " (" + fields + ") VALUES (" + values + ")"
@@ -1517,7 +1548,6 @@ def updateElem(conf, inputs, outputs):
         fields = ""
         values = ""
         # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-        # for i in list(inputs.keys()):
         for i in inputs.keys():
             if i != "table" and i != "id" and i != "tid" and inputs[i]["value"] != "":
                 if fields != "":
@@ -1527,6 +1557,7 @@ def updateElem(conf, inputs, outputs):
                     fields += inputs[i]["value"]
                 else:
                     tmp = adapt(inputs[i]["value"])
+                    tmp.encoding="utf-8"
                     fields += str(tmp)
 
         clause = ""
@@ -1554,11 +1585,13 @@ def updateElem(conf, inputs, outputs):
 def updateKeywords(conf, cur, nom, i_id, k):
     prefix = auth.getPrefix(conf)
     tmp = adapt(nom)
+    tmp.encoding="utf-8"
     req0 = "SELECT id from " + prefix + "keywords where "
     req0 += " nom = ".encode("utf-8") + str(tmp)
     cur.execute(req0)
     vals = cur.fetchone()
     tmp = adapt(nom)
+    tmp.encoding="utf-8"
     tmp0 = str(tmp)
     if vals is not None and len(vals) > 0:
         clause = " id = " + str(vals[0])
@@ -1612,7 +1645,6 @@ def updateElement(conf, inputs, outputs):
     clause = "id=[_id_]"
     # clause="id="+str(obj["id"])
     # TODO: confirm assumption: "obj" is a Python 3 dictionary object
-    # keys = list(obj.keys())
     keys = obj.keys()
     cnt = 0
     req1 = None
@@ -1889,7 +1921,7 @@ def detailsIndicateurs(conf, inputs, cur, val, tab, prefix):
             if len(vals) > 0:
                 for k in range(0, len(vals)):
                     if "indicators_keywords" in res:
-                        res["indicators_keywords"] += "," + str(vals[k][0].encode("utf-8")).decode('utf-8')
+                        res["indicators_keywords"] += "," + str(vals[k][0].encode("utf-8").decode('utf-8'))
                     else:
                         res["indicators_keywords"] = str(vals[k][0].encode("utf-8")).decode('utf-8')
 
@@ -2036,6 +2068,9 @@ def getTableElements(conf, con, cur, res, att, tbl, col):
         hasTheme = True
     except:
         con.conn.commit()
+        print(str(res), file=sys.stderr)
+        print(str(tbl), file=sys.stderr)
+        print(str(col), file=sys.stderr)
         req = "select *,array((select gid from mm_tables.p_" + tbl + "_groups where mm_tables.p_" + tbl + "s.id=mm_tables.p_" + tbl + "_groups." + col + ")) from mm_tables.p_" + tbl + "s where ptid=" + res["id"] + ";"
         cur.execute(req)
         con.conn.commit()
@@ -2062,12 +2097,12 @@ def getTableElements(conf, con, cur, res, att, tbl, col):
                     values1[tres2[k][1]] = obj["name"]
                 except:
                     try:
-                        values1[tres2[k][1]] = str(tmp[k].encode('utf-8'))
+                        values1[tres2[k][1]] = str(tmp[k].decode('utf-8'))
                     except:
                         values1[tres2[k][1]] = str(tmp[k])
             else:
                 try:
-                    values1[tres2[k][1]] = str(tmp[k].encode('utf-8'))
+                    values1[tres2[k][1]] = str(tmp[k].decode('utf-8'))
                 except:
                     values1[tres2[k][1]] = str(tmp[k])
         if hasTheme:
@@ -2079,7 +2114,7 @@ def getTableElements(conf, con, cur, res, att, tbl, col):
             lfields = {}
             for k in range(len(tres1)):
                 try:
-                    lfields[tres1[k][1]] = str(vals[l][k].encode('utf-8')).decode('utf-8')
+                    lfields[tres1[k][1]] = str(vals[l][k].decode('utf-8')).decode('utf-8')
                 except:
                     lfields[tres1[k][1]] = str(vals[l][k])
             values += [lfields]
@@ -2154,7 +2189,7 @@ def details(conf, inputs, outputs):
             content = json.loads(outputs0[1]["Result"]["value"])
             res = {}
             for i in range(0, len(desc)):
-                res[str(desc[i][1]).encode("utf-8")] = content["rows"][0]["cell"][i]
+                res[str(desc[i][1])] = content["rows"][0]["cell"][i]
                 print(desc[i][1], file=sys.stderr)
             if inputs["table"]["value"] == '"mm_tables"."importers"':
 
@@ -2186,7 +2221,7 @@ def details(conf, inputs, outputs):
                 for j in range(len(res1)):
                     lobj = {}
                     for l in range(0, len(ldesc)):
-                        lobj[str(ldesc[l][1]).encode("utf-8")] = res1[j][l]
+                        lobj[str(ldesc[l][1]).decode("utf-8")] = res1[j][l]
 
                     tres = pg.getTableDescription(conf, {"dataStore": {"value": conf["main"]["dbuserName"]}, "table": {"value": "mm_tables.page_fields"}, "clause": {"value": "pid='" + str(res1[j][0]) + "'"}}, outputs0[3])
                     print("******** -- " + str(outputs0[3]) + " -- **************", file=sys.stderr)
@@ -2199,7 +2234,7 @@ def details(conf, inputs, outputs):
                     for k in range(len(res2)):
                         lobj1 = {}
                         for l in range(0, len(ldesc1)):
-                            lobj1[str(ldesc1[l][1]).encode("utf-8")] = res2[k][l]
+                            lobj1[str(ldesc1[l][1]).decode("utf-8")] = res2[k][l]
                         lfields += [lobj1]
 
                     lobj["fields"] = lfields
@@ -2216,7 +2251,7 @@ def details(conf, inputs, outputs):
                     for k in range(len(res3)):
                         lobj1 = {}
                         for l in range(0, len(ldesc2)):
-                            lobj1[str(ldesc2[l][1]).encode("utf-8")] = res3[k][l]
+                            lobj1[str(ldesc2[l][1]).decode("utf-8")] = res3[k][l]
                         lfields += [lobj1]
                         tres = pg.getTableDescription(conf, {"dataStore": {"value": conf["main"]["dbuserName"]}, "table": {"value": "mm_tables.page_geom_fields"}, "clause": {"value": "pid='" + str(res3[k][0]) + "'"}}, outputs0[4])
                         ldesc3 = json.loads(outputs0[4]["Result"]["value"])
@@ -2228,7 +2263,7 @@ def details(conf, inputs, outputs):
                         for kk in range(len(res4)):
                             lobj2 = {}
                             for l in range(0, len(ldesc3)):
-                                lobj2[str(ldesc3[l][1]).encode("utf-8")] = res4[kk][l]
+                                lobj2[str(ldesc3[l][1]).decode("utf-8")] = res4[kk][l]
                             lfields1 += [lobj2]
                         lfields[len(lfields) - 1]["fields"] = lfields1
                     lobj["georef"] = lfields
@@ -2259,7 +2294,7 @@ def details(conf, inputs, outputs):
                     print(tres1, file=sys.stderr)
                     for k in range(len(tres2)):
                         try:
-                            values1[tres2[k][1]] = str(tmp[k].encode('utf-8'))
+                            values1[tres2[k][1]] = str(tmp[k].decode('utf-8'))
                         except:
                             values1[tres2[k][1]] = str(tmp[k])
                     values1["themes"] = str(tmp[len(tres2)])
@@ -2268,7 +2303,7 @@ def details(conf, inputs, outputs):
                         lfields = {}
                         for k in range(len(tres1)):
                             try:
-                                lfields[tres1[k][1]] = str(vals[l][k].encode('utf-8'))
+                                lfields[tres1[k][1]] = str(vals[l][k].decode('utf-8'))
                             except:
                                 lfields[tres1[k][1]] = str(vals[l][k])
                         values += [lfields]
@@ -2439,8 +2474,8 @@ def previewDoc(conf, inputs, outputs):
         vals1 = cur.fetchall()
         # print(vals1, file=sys.stderr)
         for i in range(0, len(vals1)):
-            req0 = ("select ").encode("utf-8") + vals1[i][1] + (" as ").encode("utf-8") + vals1[i][0] + (" from " + tablePrefix + inputs["id"]["value"] + " WHERE ogc_fid=" + _oid).encode("utf-8")
-            print(req0.encode('utf-8'), file=sys.stderr)
+            req0 = ("select ").decode("utf-8") + vals1[i][1] + (" as ").decode("utf-8") + vals1[i][0] + (" from " + tablePrefix + inputs["id"]["value"] + " WHERE ogc_fid=" + _oid).decode("utf-8")
+            print(req0.decode('utf-8'), file=sys.stderr)
             cur.execute(req0)
             vals2 = cur.fetchone()
             # print(vals2, file=sys.stderr)
@@ -2452,7 +2487,7 @@ def previewDoc(conf, inputs, outputs):
         # print(vals1, file=sys.stderr)
         for i in range(0, len(vals2)):
             req0 = "SELECT sources FROM " + tprefix + "indicators WHERE id=" + inputs["id"]["value"]
-            print(req0.encode('utf-8'), file=sys.stderr)
+            print(req0.decode('utf-8'), file=sys.stderr)
             cur.execute(req0)
             vals3 = cur.fetchone()
             # print(vals2, file=sys.stderr)
@@ -2700,7 +2735,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
                         lvals = cur.fetchone()
                         if lvals is not None:
                             if lvals[1] == 0:
-                                req0 = lvals[0].encode('utf-8')
+                                req0 = lvals[0].decode('utf-8')
                                 print(req0, file=sys.stderr)
                                 try:
                                     con.conn.commit()
@@ -2708,7 +2743,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
                                     lvals1 = cur.fetchone()
                                 except:
                                     con.conn.commit()
-                                    lvals1 = [lvals[0].encode('utf-8')]
+                                    lvals1 = [lvals[0].decode('utf-8')]
                                 if lvals1 is not None:
                                     script += "pm.searchAndReplace('[_" + i + "_]'," + json.dumps(lvals1[0]) + ")\n"
                                 else:
@@ -2868,12 +2903,16 @@ def viewRepport(conf, inputs, outputs):
     clause = ""
     if "length" in inputs["in_val"]:
         for i in range(0, int(inputs["in_val"]["length"])):
-            tmp0 = "%s" % adapt(inputs["in_val"]["value"][i]).getquoted()
+            in_val_ext = adapt(inputs["in_val"]["value"][i])
+            in_val_ext.encoding = "utf8"
+            tmp0 = "%s" % in_val_ext.getquoted()
             if clause != "":
                 clause += " OR "
             clause += field + "=" + tmp0
     else:
-        tmp0 = "%s" % adapt(inputs["in_val"]["value"]).getquoted()
+        in_val_ext = adapt(inputs["in_val"]["value"])
+        in_val_ext.encoding = "utf8"
+        tmp0 = "%s" % in_val_ext.getquoted()
         clause += field + "=" + tmp0
 
     clause_out = ""
@@ -2881,13 +2920,17 @@ def viewRepport(conf, inputs, outputs):
     if "out_val" in inputs:
         if "length" in inputs["out_val"]:
             for i in range(0, int(inputs["out_val"]["length"])):
-                tmp0 = "%s" % adapt(inputs["out_val"]["value"][i]).getquoted()
+                out_val_ext=adapt(inputs["out_val"]["value"][i])
+                out_val_ext.encoding = "utf-8"
+                tmp0 = "%s" % out_val_ext.getquoted()
                 if clause_out != "":
                     clause_out += " OR "
                     clause_out0 += field + "=" + tmp0
                 clause_out += field + "=" + tmp0
         else:
-            tmp0 = "%s" % adapt(inputs["out_val"]["value"]).getquoted()
+            out_val_ext=adapt(inputs["out_val"]["value"])
+            out_val_ext.encoding = "utf-8"
+            tmp0 = "%s" % out_val_ext.getquoted()
             clause_out += field + "=" + tmp0
 
     req = "SELECT datasource FROM territories where id = " + inputs["tid"]["value"]
@@ -3199,7 +3242,6 @@ def insert(conf, inputs, outputs):
                 col_sufix += ","
                 val_sufix += ","
             # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-            # if list(inputs.keys()).count("id") == 0:
             if "id" not in inputs:
                 print("OK ", file=sys.stderr)
                 col_sufix += columns[i]
@@ -3209,7 +3251,9 @@ def insert(conf, inputs, outputs):
                     content = packFile(conf, conf["main"]["tmpPath"] + "/data_tmp_1111" + conf["senv"]["MMID"] + "/" + inputs[columns[i]]["value"], columns[i])
                     val_sufix += "%s"
                 else:
-                    val_sufix += str(adapt(str(inputs[columns[i]]["value"]))).decode('utf-8')
+                    value_ext=adapt(inputs[columns[i]]["value"])
+                    value_ext.encoding="utf-8"
+                    val_sufix += str(value_ext)
             else:
                 if columns[i] == "file":
                     content = packFile(conf, conf["main"]["tmpPath"] + "/data_tmp_1111" + conf["senv"]["MMID"] + "/" + inputs[columns[i]]["value"], columns[i])
@@ -3220,16 +3264,19 @@ def insert(conf, inputs, outputs):
                         if len(inputs[columns[i]]["value"]) == 0 or inputs[columns[i]]["value"] == "NULL":
                             col_sufix += columns[i] + "=NULL"
                         else:
-                            col_sufix += columns[i] + "=" + str(adapt(str(inputs[columns[i]]["value"]))).decode('utf-8')
+                            value_ext=adapt(inputs[columns[i]]["value"])
+                            value_ext.encoding="utf-8"
+                            col_sufix += columns[i] + "=" + str(value_ext)
                     except:
                         if len(inputs[columns[i]]["value"]) == 0 or inputs[columns[i]]["value"] == "NULL":
                             col_sufix += columns[i] + "=NULL"
                         else:
-                            col_sufix += columns[i] + "=" + str(adapt(str(inputs[columns[i]]["value"])))
-            print(val_sufix.encode('utf-8'), file=sys.stderr)
+                            value_ext=adapt(inputs[columns[i]]["value"])
+                            value_ext.encoding="utf-8"
+                            col_sufix += columns[i] + "=" + str(value_ext)
+            #print(val_sufix.encode('utf-8'), file=sys.stderr)
         if len(columns) > 0:
             # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-            # if list(inputs.keys()).count("id") == 0:
             if "id" not in inputs:
                 req = "INSERT INTO " + inputs["table"]["value"] + " (" + col_sufix + ") VALUES (" + (val_sufix) + ") RETURNING id"
                 print(req.encode('utf-8'), file=sys.stderr)
@@ -3250,17 +3297,15 @@ def insert(conf, inputs, outputs):
             outputs["id"]["value"] = json.dumps(cid)
         else:
             # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-            # if list(inputs.keys()).count("id") > 0:
             if "id" in inputs:
                 outputs["id"]["value"] = inputs["id"]["value"]
             else:
                 outputs["id"]["value"] = "-1"
             cid = outputs["id"]["value"]
         # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-        # if list(inputs.keys()).count("links") > 0:
         if "links" in inputs:
             links = json.loads(inputs["links"]["value"])
-            lkeys = list(links.keys())
+            lkeys = myList(links)#.keys())
             for j in range(len(lkeys)):
                 obj = json.loads(inputs[lkeys[j]]["value"])
                 req = "DELETE FROM " + links[lkeys[j]]["table"] + " where " + links[lkeys[j]]["ocol"] + "=" + cid + ";"
@@ -3277,15 +3322,17 @@ def insert(conf, inputs, outputs):
                     if links[lkeys[j]]["ocol"] != links[lkeys[j]]["tid"]:
                         req = "INSERT INTO " + links[lkeys[j]]["table"] + " (" + links[lkeys[j]]["ocol"] + "," + links[lkeys[j]]["tid"] + ") VALUES (" + cid + "," + obj[k] + ");"
                     else:
-                        lcols = list(obj[k].keys())
+                        lcols = myList(obj[k].keys())
                         col_sufix = links[lkeys[j]]["ocol"]
                         val_sufix = cid
                         for i in range(len(lcols)):
                             print(obj[k][lcols[i]].encode('utf-8'), file=sys.stderr)
                             col_sufix += "," + lcols[i]
-                            val_sufix += "," + str(adapt(str(obj[k][lcols[i]].encode('utf-8')))).decode('utf-8')
+                            val_ext=adapt(obj[k][lcols[i]])
+                            val_ext.encoding="utf-8"
+                            val_sufix += "," + str(val_ext)
                         req = "INSERT INTO " + links[lkeys[j]]["table"] + " (" + col_sufix + ") VALUES (" + val_sufix + ");"
-                    print(req.encode('utf-8'), file=sys.stderr)
+                    #print(req.encode('utf-8'), file=sys.stderr)
                     cur.execute(req)
                     con.conn.commit()
         outputs["Result"]["value"] = zoo._("Done")
@@ -3502,8 +3549,8 @@ def clientInsert(conf, inputs, outputs):
         val_sufix = ""
         tuple = json.loads(inputs["tuple"]["value"])
         tupleReal = json.loads(inputs["tupleReal"]["value"])
-        realKeys = list(tupleReal.keys())
-        keys = list(tuple.keys())
+        realKeys = myList(tupleReal)#.keys())
+        keys = myList(tuple)#.keys())
         columns = realKeys + keys
         print(columns, file=sys.stderr)
         cnt = 0
@@ -3514,38 +3561,49 @@ def clientInsert(conf, inputs, outputs):
                     col_sufix += ","
                     val_sufix += ","
                 # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-                # if list(inputs.keys()).count("id") == 0:
+                print (sys.stdout.encoding,file=sys.stderr)
                 if "id" not in inputs:
-                    print("TUPLE " + str(i), file=sys.stderr)
+                    print("TUPLE 0" + str(i), file=sys.stderr)
                     col_sufix += columns[i]
                     if i >= len(realKeys):
                         try:
-                            print(" * " + str(tuple[columns[i]].encode("utf-8")), file=sys.stderr)
-                            val_sufix += str(adapt(str(tuple[columns[i]].encode("utf-8"))))
+                            print(" * " + str(tuple[columns[i]].encode('utf-8')), file=sys.stderr)
+                            val_ext=adapt(tuple[columns[i]])
+                            val_ext.encoding="utf-8"
+                            val_sufix += str(val_ext)
                         except:
                             print(" * " + str(tuple[columns[i]]), file=sys.stderr)
-                            val_sufix += str(adapt(str(tuple[columns[i]])))
+                            val_ext=adapt(tuple[columns[i]])
+                            val_ext.encoding="utf-8"
+                            val_sufix += str(val_ext)
                     else:
                         print(" * " + str(tupleReal[columns[i]]), file=sys.stderr)
-                        val_sufix += str(tupleReal[columns[i]])
+                        val_ext=adapt(tupleReal[columns[i]])
+                        val_ext.encoding="utf-8"
+                        val_sufix += str(val_ext)
                 else:
-                    print("TUPLE " + str(i), file=sys.stderr)
+                    print("TUPLE 1" + str(i), file=sys.stderr)
                     if i >= len(realKeys):
-                        print("TUPLE ", file=sys.stderr)
+                        print("TUPLE 2", file=sys.stderr)
                         try:
-                            print(" * " + str(tuple[columns[i]].encode("utf-8")), file=sys.stderr)
-                            print(" * " + str(adapt(str(tuple[columns[i]].encode("utf-8")))), file=sys.stderr)
-                            if len(str(adapt(str(tuple[columns[i]].encode("utf-8"))))) == 2:
+                            print(" * " + str(tuple[columns[i]]), file=sys.stderr)
+                            val_ext=adapt(tuple[columns[i]])
+                            val_ext.encoding="utf-8"
+                            print(" * " + str(val_ext), file=sys.stderr)
+                            if len(str(val_ext)) == 2:
                                 col_sufix += columns[i] + "=NULL"
                             else:
-                                col_sufix += columns[i] + "=" + str(adapt(str(tuple[columns[i]].encode("utf-8")))).decode('utf-8')
-                            print(" * " + str(adapt(str(tuple[columns[i]].encode("utf-8")))), file=sys.stderr)
+                                val1_ext=adapt(tuple[columns[i]])
+                                val1_ext.encoding="utf-8"
+                                col_sufix += columns[i] + "=" + str(val1_ext)
+                            print(" * " + str(val_ext), file=sys.stderr)
                         except:
                             col_sufix += columns[i] + "=" + str(tuple[columns[i]])
                     else:
-                        print("TUPLE ", file=sys.stderr)
-                        print(tupleReal[columns[i]].decode("utf-8"), file=sys.stderr)
-                        col_sufix += columns[i] + "=" + str(tupleReal[columns[i]])
+                        print("TUPLE 3", file=sys.stderr)
+                        val_ext=adapt(tupleReal[columns[i]])
+                        val_ext.encoding="utf-8"
+                        col_sufix += columns[i] + "=" +str(val_ext)
                 cnt += 1
             else:
                 hasElement = False
@@ -3554,12 +3612,13 @@ def clientInsert(conf, inputs, outputs):
                         col_sufix += ","
                         val_sufix += ","
                     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-                    # if list(inputs.keys()).count("id") == 0:
+                    val_ext=adapt(tuple[columns[i]])
+                    val_ext.encoding="utf-8"
                     if "id" not in inputs:
                         col_sufix += columns[i]
-                        val_sufix += str(adapt(str(tuple[columns[i]])))
+                        val_sufix += str(val_ext)
                     else:
-                        col_sufix += columns[i] + "=" + str(adapt(str(tuple[columns[i]])))
+                        col_sufix += columns[i] + "=" + str(val_ext)
                 else:
                     if dcols[specialFields.index(columns[i])]["type"] == "geometry":
                         tmp = tableName.split(".")
@@ -3570,16 +3629,20 @@ def clientInsert(conf, inputs, outputs):
                             col_sufix += ","
                             val_sufix += ","
                         col_sufix += columns[i]
-                        val_sufix += "ST_SetSRID(ST_GeometryFromText(" + str(adapt(str(tuple[columns[i]]))) + ")," + str(vals0[0]) + ")"
+                        geo_ext=adapt(tuple[columns[i]])
+                        geo_ext.encoding="utf-8"
+                        val_sufix += "ST_SetSRID(ST_GeometryFromText(" + str(geo_ext) + ")," + str(vals0[0]) + ")"
                     else:
                         if dcols[specialFields.index(columns[i])]["type"] == "varchar(32)":
                             import manage_users.manage_users as mu
                             if i >= len(realKeys):
-                                print(str(adapt(mu.mm_md5(tuple[columns[i]]))), file=sys.stderr)
-                                dvals += [str(adapt(mu.mm_md5(tuple[columns[i]])))]
+                                mm_md5_ext =adapt(mu.mm_md5(tuple[columns[i]]))
+                                mm_md5_ext.encoding="utf-8"
+                                dvals += [str(mm_md5_ext)]
                             else:
-                                print(str(adapt(mu.mm_md5(tupleReal[columns[i]]))), file=sys.stderr)
-                                dvals += [str(adapt(mu.mm_md5(tupleReal[columns[i]])))]
+                                mm_md5_ext =adapt(mu.mm_md5(tupleReal[columns[i]]))
+                                mm_md5_ext.encoding="utf-8"
+                                dvals += [str(mm_md5_ext)]
                         else:
                             if i >= len(realKeys):
                                 dvals += [tuple[columns[i]]]
@@ -3587,14 +3650,13 @@ def clientInsert(conf, inputs, outputs):
                                 dvals += [tupleReal[columns[i]]]
 
         # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-        # if list(inputs.keys()).count("id") == 0:
         if "id" not in inputs:
             print("COLS", file=sys.stderr)
             print(col_sufix, file=sys.stderr)
             print("VALS", file=sys.stderr)
             val_sufix = val_sufix.replace("'NULL'", "NULL")
             print(val_sufix, file=sys.stderr)
-            req = "INSERT INTO " + tableName + " (" + col_sufix + ") VALUES (" + val_sufix.decode("'utf-8") + ") RETURNING " + str(pkey)
+            req = "INSERT INTO " + tableName + " (" + col_sufix + ") VALUES (" + val_sufix + ") RETURNING " + str(pkey)
             print("VALS", file=sys.stderr)
             print(req.encode("utf-8"), file=sys.stderr)
             cur.execute(req)
@@ -3621,7 +3683,6 @@ def clientInsert(conf, inputs, outputs):
                 import osgeo
                 import osgeo.gdal
                 # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-                # if list(inputs.keys()).count("InputGeometry") > 0:
                 if "InputGeometry" in inputs:
                     try:
                         ds = osgeo.ogr.Open(inputs["InputGeometry"]["cache_file"])
@@ -3645,7 +3706,6 @@ def clientInsert(conf, inputs, outputs):
             if dcols[i]["type"] == "bytea":
                 print(dcols[i], file=sys.stderr)
                 # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-                # if list(inputs.keys()).count("id"):
                 if "id" in inputs:
                     cid = inputs["id"]["value"]
                 # try:
@@ -3658,7 +3718,6 @@ def clientInsert(conf, inputs, outputs):
             if dcols[i]["type"] == "tbl_linked":
                 lcomponents = dcols[i]["value"].split(';')
                 # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-                # if list(inputs.keys()).count("id"):
                 if "id" in inputs:
                     cid = inputs["id"]["value"]
                 # Remove possible previous tuple refering this element
@@ -3706,8 +3765,10 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
         req = "SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + clause + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
               conf["senv"]["id"] + "') order by mm_tables.p_reports.id asc"
     else:
+        rName_ext=adapt(rName)
+        rName_ext.encoding="utf-8"
         req = "SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
-              conf["senv"]["id"] + "') and mm_tables.p_reports.name=" + str(adapt(str(rName))) + " order by mm_tables.p_reports.id asc"
+              conf["senv"]["id"] + "') and mm_tables.p_reports.name=" + str(rName_ext) + " order by mm_tables.p_reports.id asc"
     print(req, file=sys.stderr)
     res = cur.execute(req)
     ovals0 = cur.fetchall()
@@ -3761,7 +3822,6 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
         rvals = cur.fetchone()
     print("*********** [" + str(rvals) + "] ***********", file=sys.stderr)
     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-    # if list(inputs.keys()).count("noPrint") > 0 and inputs["noPrint"]["value"] == "true":
     if "noPrint" in inputs and inputs["noPrint"]["value"] == "true":
         return rvals
     lfile = unpackFile(conf, ovals0[0][2])
@@ -3829,7 +3889,7 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
                                 # sys.setdefaultencoding('utf8')
                                 # print(rvals[rcnt].encode('utf-8'), file=sys.stderr)
                                 try:
-                                    script += "pm.statThis('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(rvals[rcnt].encode('utf-8')).replace("'{", "[").replace("}'", "]"))) + ")\ntime.sleep(0.01)\n"
+                                    script += "pm.statThis('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(rvals[rcnt].decode('utf-8')).replace("'{", "[").replace("}'", "]"))) + ")\ntime.sleep(0.01)\n"
                                     script += "print('" + vals0[i][2] + "',file=sys.stderr)\nsys.stderr.flush()\n"
                                 except Exception as e:
                                     print("ERROR 1 !", file=sys.stderr)
@@ -3842,7 +3902,9 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
                                 print(tmp, file=sys.stderr)
                                 f = fetchPrimaryKey(cur, tableName)
                                 f1 = fetchPrimaryKey(cur, tmp[1])
-                                req1 = "(SELECT id from mm_tables.p_tables where name=" + str(adapt(tmp[1])) + ")"
+                                tmp_ext=adapt(tmp[1])
+                                tmp_ext.encoding="utf-8"
+                                req1 = "(SELECT id from mm_tables.p_tables where name=" + str(tmp_ext) + ")"
                                 req = "SELECT " + f1 + "::text from " + tmp[1] + " WHERE " + tmp[0] + "=(select " + f + " from " + tableName + " where " + f + "=" + cid + " AND " + ovals0[0][3] + ")"
                                 if len(tmp) == 4:
                                     req += " ORDER BY " + tmp[3]
@@ -3908,12 +3970,12 @@ def clientPrint(conf, inputs, outputs):
     con.connect()
     cur = con.conn.cursor()
     fres = {}
-    if list(inputs.keys()).count("rid") > 0:
+    if "rid" in inputs:
         docs = _clientPrint(conf, inputs, cur, inputs["tableId"]["value"], inputs["id"]["value"], filters=json.loads(inputs["filters"]["value"]), rid=inputs["rid"]["value"])
     else:
         docs = _clientPrint(conf, inputs, cur, inputs["tableId"]["value"], inputs["id"]["value"], filters=json.loads(inputs["filters"]["value"]))
 
-    if list(inputs.keys()).count("noPrint") > 0 and inputs["noPrint"]["value"] == "true":
+    if "noPrint" in inputs and inputs["noPrint"]["value"] == "true":
         outputs["Result"]["value"] = json.dumps(docs)
         return zoo.SERVICE_SUCCEEDED
 
@@ -4017,7 +4079,6 @@ def clientView(conf, inputs, outputs):
         cvals = cur.fetchall()
         for j in range(len(cvals)):
             # TODO: confirm assumption: "files" is a Python 3 dictionary object
-            # if list(files.keys()).count(cvals[j][2]) > 0:
             if cvals[j][2] in files:
                 if rvals[rcolumns.index(cvals[j][2])] is not None:
                     file = unpackFile(conf, rvals[rcolumns.index(cvals[j][2])])
@@ -4030,13 +4091,12 @@ def clientView(conf, inputs, outputs):
                                 import json
                                 myObj = json.loads(cvals[j][4])
                                 # TODO: confirm assumption: myObj[0] is a Python 3 dictionary object
-                                # if list(myObj[0].keys()).count("myself") > 0:
                                 if "myself" in myObj[0]:
                                     myObj[0]["myself"]
                                     print(" **** MYSELF: " + str(myObj[0]["myself"]), file=sys.stderr)
                                     print(" **** MYSELF: " + str(cvals[j][5]), file=sys.stderr)
                                     print(" **** MYSELF: " + str(len(myObj[0]["myself"])), file=sys.stderr)
-                                    print(" **** MYSELF: " + str(list(myObj[0]["myself"][0].keys())), file=sys.stderr)
+                                    print(" **** MYSELF: " + str(myList(myObj[0]["myself"][0].keys())), file=sys.stderr)
                                     alphabet = "abcdefghijklmnopqrstuvwxxyz"
                                     tmpCnt = 0
                                     tmpReq = ""
@@ -4059,7 +4119,6 @@ def clientView(conf, inputs, outputs):
                                                 # tmpParams+=alphabet[tmpCnt]+"."+ myObj[0]["myself"][uv][uv1]["tfield"] +"=="
                                                 tmpCnt = tmpCnt + 1
                                                 # TODO: confirm assumption:  is a Python 3 dictionary object
-                                                # if list(myObj[0]["myself"][uv][uv1].keys()).count("dependents") > 0:
                                                 if "dependents" in myObj[0]["myself"][uv][uv1]:
                                                     for uw in range(len(myObj[0]["myself"][uv][uv1]["dependents"])):
                                                         for uw1 in myObj[0]["myself"][uv][uv1]["dependents"][uw]:
@@ -4157,7 +4216,7 @@ def buildClause(filters):
     for i in range(len(filters)):
         if res != "":
             res += " " + filters[i]["linkClause"] + " "
-        lkeys = list(filters[i].keys())
+        lkeys = myList(filters[i].keys())
         print(lkeys, file=sys.stderr)
         tres = ""
         for k in range(len(lkeys)):
@@ -4169,7 +4228,9 @@ def buildClause(filters):
                     tmp = int(filters[i][lkeys[k]])
                     tres += "( " + lkeys[k] + " = " + str(int(filters[i][lkeys[k]])) + " ) "
                 except:
-                    tres += "( " + lkeys[k] + "::varchar LIKE " + str(adapt(str(filters[i][lkeys[k]].replace("*", "%").encode('utf-8')))) + " ) "
+                    filters_ext=adapt(filters[i][lkeys[k]].replace("*", "%"))
+                    filters_ext.encoding="utf-8"
+                    tres += "( " + lkeys[k] + "::varchar LIKE " + str(filters_ext) + " ) "
             print(tres, file=sys.stderr)
         res += " ( " + tres + " ) "
     print(res, file=sys.stderr)
@@ -4211,13 +4272,11 @@ def clientViewTable(conf, inputs, outputs):
         if vals[i][5] is not None:
             classifier = table + "." + vals[i][6] + " " + classifiers[(vals[i][5] - 1)]
     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-    # if list(inputs.keys()).count("sortname") > 0 and list(inputs.keys()).count("sortname") != "":
-    if "sortname" in inputs and list(inputs.keys()).count("sortname") != "":
+    if "sortname" in inputs:
         for i in range(len(vals)):
             if vals[i][6] == inputs["sortname"]["value"]:
                 classifier = table + "." + vals[i][6] + " " + inputs["sortorder"]["value"]
     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-    # if list(inputs.keys()).count("filters") > 0:
     if "filters" in inputs:
         filters = json.loads(inputs["filters"]["value"])
         if len(filters) > 0:
@@ -4229,7 +4288,6 @@ def clientViewTable(conf, inputs, outputs):
     res = cur.execute(req1)
     fres["total"] = cur.fetchone()[0]
     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
-    # if list(inputs.keys()).count("page") > 0:
     if "page" in inputs:
         fres["page"] = inputs["page"]["value"]
     else:
@@ -4295,13 +4353,13 @@ def massiveImport(conf, inputs, outputs):
         res2 = cur.execute(req2)
         vals2 = cur.fetchall()
         try:
-            print(str(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '').encode('utf-8')), file=sys.stderr)
+            print(str(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '').decode('utf-8')), file=sys.stderr)
         except:
             print(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + ''), file=sys.stderr)
-        res = vectSql.vectInfo(conf, {"q": {"value": str(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '').encode('utf-8'))}, "dstName": {"value": inputs["dstName"]["value"]}}, outputs)
+        res = vectSql.vectInfo(conf, {"q": {"value": str(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '').decode('utf-8'))}, "dstName": {"value": inputs["dstName"]["value"]}}, outputs)
         res = json.loads(outputs["Result"]["value"])
         try:
-            print(str(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '').encode('utf-8')), file=sys.stderr)
+            print(str(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + '').decode('utf-8')), file=sys.stderr)
         except:
             print(('SELECT * FROM "' + vals[i][0] + '" order by ' + vals[i][2] + ' ' + vals[i][3] + ''), file=sys.stderr)
         tname = "imports.\"tmp_" + vals[i][4].replace(".", "___") + "_" + conf["lenv"]["usid"] + "\""
@@ -4360,8 +4418,10 @@ def massiveImport(conf, inputs, outputs):
                         fieldName = "Field" + str(ref[0] + 1)
                     value += res[ref[1]][fieldName]
                 try:
-                    cur.execute("SELECT " + str(adapt(value)).replace(",", ".") + "::" + j[2])
-                    reqInsertTemp += str(adapt(value)).replace(",", ".") + "::" + j[2]
+                    field_ext=adapt(value.replace(",", "."))
+                    field_ext.encoding="utf-8"
+                    cur.execute("SELECT " + str(field_ext) + "::" + j[2])
+                    reqInsertTemp += str(field_ext) + "::" + j[2]
                 except Exception as e:
                     print(e, file=sys.stderr)
                     con.conn.commit()
@@ -4408,7 +4468,7 @@ def massiveImport(conf, inputs, outputs):
                             else:
                                 fieldName = "Field" + str(ref[0] + 1)
                         else:
-                            fieldName = str(j[3].encode("utf-8"))
+                            fieldName = str(j[3].decode("utf-8"))
                         print(vals[i][2].count("Field"), file=sys.stderr)
                         # print(fieldName, file=sys.stderr)
                         print(res[k], file=sys.stderr)
@@ -4420,7 +4480,7 @@ def massiveImport(conf, inputs, outputs):
                         print("+++++++++++----- 1 -------=++++++++++++++++", file=sys.stderr)
                         if isinstance(value, str):
                             print("+++++++++++----- 11 -------=++++++++++++++++", file=sys.stderr)
-                            value = value.encode("utf-8")
+                            value = value #.decode("utf-8")
                             print(value, file=sys.stderr)
                         # toto=adapt(value.encode("utf-8"))
                         # print(unicode(str(adapt(value.encode("utf-8"))),"utf-8"), file=sys.stderr)
@@ -4428,7 +4488,7 @@ def massiveImport(conf, inputs, outputs):
                         req = ("SELECT " + str(adapt(value)).decode("utf-8").replace(",", ".") + "::" + j[2])
                         print("+++++++++++----- 3 -------=++++++++++++++++", file=sys.stderr)
                         # print(req.encode("utf-8"), file=sys.stderr)
-                        cur.execute(req.encode("utf-8"))
+                        cur.execute(req.decode("utf-8"))
                         print("+++++++++++----- 4 -------=++++++++++++++++", file=sys.stderr)
                         reqIS += str(adapt(value)).decode("utf-8").replace(",", ".") + "::" + j[2]
                         print("+++++++++++----- 5 -------=++++++++++++++++", file=sys.stderr)
@@ -4439,13 +4499,15 @@ def massiveImport(conf, inputs, outputs):
                         con.conn.commit()
                         reqIS += "NULL"
                     try:
-                        cur.execute("SELECT " + str(adapt(valueX)).replace(",", ".") + "::" + j[2])
-                        reqIS1 += str(adapt(valueX)).replace(",", ".") + "::" + j[2]
+                        valueX_ext=adapt(valueX)
+                        valueX_ext.encoding="utf-8"
+                        cur.execute("SELECT " + str(valueX_ext).replace(",", ".") + "::" + j[2])
+                        reqIS1 += str(valueX_ext).replace(",", ".") + "::" + j[2]
                     except:
                         con.conn.commit()
                         reqIS1 += "NULL"
                 if reqIS1 != reqIS:
-                    print(reqIS.encode("utf-8"), file=sys.stderr)
+                    print(reqIS, file=sys.stderr)
                     reqs += [reqIS]
             # reqInsertTemp+=",".join(reqs)+")"
         # isReference ?
@@ -4513,7 +4575,6 @@ def massiveImport(conf, inputs, outputs):
 
 def recursflo(obj):
     # TODO: confirm assumption: "obj" is a Python 3 dictionary object
-    # if list(obj.keys()).count("dependents"):
     if "dependents" in obj:
         return recursflo(obj["dependents"][0])
     else:
@@ -4521,7 +4582,7 @@ def recursflo(obj):
 
 
 def findLatestOptions(obj):
-    objKeys = list(obj.keys())
+    objKeys = myList(obj.keys())
     print(" *****-----***** " + str(obj), file=sys.stderr)
     print(" *****-----***** " + str(objKeys), file=sys.stderr)
     for k in range(len(objKeys)):
@@ -4534,7 +4595,6 @@ def findLatestOptions(obj):
                 print(" *****----- INNERL ***** " + str(l), file=sys.stderr)
                 hasDependents = True
                 # TODO: confirm assumption: obj[objKeys[k]][j][l] is a Python 3 dictionary object
-                # if list(obj[objKeys[k]][j][l].keys()).count("dependents"):
                 if "dependents" in obj[objKeys[k]][j][l]:
                     for k1 in range(len(obj[objKeys[k]][j][l]["dependents"])):
                         return recursflo(obj[objKeys[k]][j][l])
