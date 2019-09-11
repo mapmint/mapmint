@@ -76,7 +76,7 @@ def preview(conf, inputs, outputs):
         error_msg += open(conf["main"]["tmpPath"] + "/polux.log", "r").read()
         pass
     try:
-        outputs["Result"]["value"] = open(filename, "rb").read()
+        outputs["Result"]["generated_file"] = filename
         return zoo.SERVICE_SUCCEEDED
     except Exception as e:
         conf["lenv"]["message"] = error_msg + "\nUnable to open to generated preview: " + str(e)
@@ -360,19 +360,19 @@ END''')
         script += 'pm.saveDoc("' + docPath1 + '")\n'
         script += 'pm.unloadDoc("' + docPath + '")\n'
         try:
-            print("Run", file=sys.stderr)
+            print("Run 0", file=sys.stderr)
             print(script, file=sys.stderr)
-            process.stdin.write(script)
-            print("Run", file=sys.stderr)
+            process.stdin.write(bytes(script,"utf-8"))
+            print("Run 1", file=sys.stderr)
             sys.stderr.flush()
             process.stdin.close()
-            print("Run", file=sys.stderr)
+            print("Run 2", file=sys.stderr)
             sys.stderr.flush()
             process.wait()
             conf["lenv"]["message"] = str(process.stdout.readline())
             sys.stderr.flush()
             # sys.stderr.close()
-            err_log = file(conf["main"]["tmpPath"] + '/tmp_err_log_file', 'r', 0)
+            err_log = open(conf["main"]["tmpPath"] + '/tmp_err_log_file', 'r')
             conf["lenv"]["message"] += str(err_log.read())
         except Exception as e:
             conf["lenv"]["message"] = "Unable to print your document :" + str(e)
@@ -381,10 +381,7 @@ END''')
         pm.saveDoc(docPath)
         pm.unloadDoc(conf["main"]["dataPath"] + "/ftp/templates/MM-" + inputs["iFormat"]["value"] + "-template.odt")
 
-    outputs["Result"]["value"] = open(docPath1, "rb").read()
-    # outputs["Result"]["mimeType"]=pm.outputFormat[pm.format][0]
-    # os.unlink(docPath)
-
+    outputs["Result"]["generated_file"] = docPath1
     return 3
 
 

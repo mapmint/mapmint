@@ -5513,9 +5513,11 @@ def generatePreview(conf, m):
     pp.printMap(conf, inputs0, outputs0)
 
     print(outputs0["Result"]["value"], file=sys.stderr)
+    f0 = open(outputs0["Result"]["generated_file"], "rb")
     f = open(conf["main"]["tmpPath"] + "/preview_project_" + conf["senv"]["MMID"] + ".pdf", "wb")
-    f.write(bytes(outputs0["Result"]["value"],"utf-8"))
+    f.write(f0.read())
     f.close()
+    f0.close()
 
     outputs1 = {"Result": {"value": ""}}
     inputs0 = {
