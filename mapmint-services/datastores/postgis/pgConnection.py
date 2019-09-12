@@ -19,11 +19,7 @@ class pgConnection:
         self.conf = conf
 
     def parseConf(self):
-        #libxml2.initParser()
-        #doc = libxml2.parseFile(self.conf["main"]["dataPath"] + "/PostGIS/" + self.dbfile + ".xml")
         doc = etree.parse(self.conf["main"]["dataPath"] + "/PostGIS/" + self.dbfile + ".xml")
-        #styledoc = libxml2.parseFile(self.conf["main"]["dataPath"] + "/PostGIS/conn.xsl")
-        #style = etree.XSLT(styledoc)
         styledoc = etree.parse(self.conf["main"]["dataPath"] + "/PostGIS/conn.xsl")
         style = etree.XSLT(styledoc)
         res = style(doc)
@@ -47,12 +43,10 @@ class pgConnection:
                 return True
         except Exception as e:
             self.conf["lenv"]["message"] = "Unable to execute " + req.encode('utf-8') + " due to: " + str(e)
-            # print("Unable to execute "+req+str(e), file=sys.stderr)
             return False
 
 
 def listSchemas(conf, inputs, outputs):
-    print(inputs["dataStore"]["value"], file=sys.stderr)
     db = pgConnection(conf, inputs["dataStore"]["value"])
     db.parseConf()
     if db.connect():
@@ -137,7 +131,6 @@ def getDesc(cur, table):
                tmp[1] + "' and t.relnamespace=(select oid from pg_namespace where nspname='" + tmp[
                    0] + "') AND at2.attrelid=t.oid) AS foreigns ON foreigns.myid=a.\"Pos\")) As foo) as foo1 ORDER BY \"Pos\",\"Key\""
     else:
-        # print("SELECT DISTINCT on (\"Pos\") \"Pos\"-1 as \"Pos\",\"Field\",\"Type\",\"Key\", \"Ref\", \"RefCol\", \"RefCols\",array_upper(\"RefCols\",1) from (SELECT attnum AS \"Pos\", attname AS \"Field\",CASE WHEN atttypmod >0 THEN b.typname || '(' || atttypmod-4 || ')' ELSE b.typname END AS \"Type\" FROM pg_catalog.pg_attribute a, pg_catalog.pg_type b WHERE  a.atttypid=b.oid AND a.attrelid = (SELECT pg_class.oid FROM pg_class, pg_namespace WHERE relname='"+tmp[1]+"' AND pg_namespace.oid=relnamespace AND nspname='"+tmp[0]+"') AND a.attnum > 0 AND NOT a.attisdropped ORDER BY attnum) a LEFT JOIN (SELECT conkey,c.conname AS constraint_name, CASE c.contype WHEN 'c' THEN 'CHECK' WHEN 'f' THEN 'FOR' WHEN 'p' THEN 'PRI' WHEN 'u' THEN 'UNIQUE' END AS \"Key\", t3.nspname||'.'||t2.relname AS \"Ref\", (SELECT attname from pg_catalog.pg_attribute WHERE attrelid=c.confrelid AND confkey[1] = attnum) AS \"RefCol\"  FROM pg_constraint c LEFT JOIN pg_class t ON c.conrelid = t.oid LEFT JOIN pg_class t2 ON c.confrelid = t2.oid LEFT JOIN pg_namespace t3 ON t2.relnamespace=t3.oid WHERE t.relname = '"+tmp[1]+"'  and t.relnamespace=(select oid from pg_namespace where nspname='"+tmp[0]+"')) b ON get_nb_of(conkey,\"Pos\")>0 LEFT JOIN (SELECT DISTINCT ON (at2.attnum) c.*, at2.attnum AS \"myid\", ARRAY(SELECT attname  AS \"RefCol\"  FROM pg_constraint AS c, pg_catalog.pg_attribute, pg_class t, pg_class t2 WHERE c.conrelid = t.oid AND c.confrelid = t2.oid AND t.relname = '"+tmp[1]+"' AND attrelid=confrelid AND get_nb_of(confkey,attnum) > 0  and t.relnamespace=(select oid from pg_namespace where nspname='"+tmp[0]+"')) AS \"RefCols\", at2.attnum, at2.attname AS atn, get_index_of(conkey,at2.attnum) AS \"RealOrigColNum\", at1.attnum, at1.attname, get_index_of(confkey,at1.attnum) AS \"RealRefColNum\",  t.relname as orig, t2.relname as ref FROM pg_constraint AS c, pg_catalog.pg_attribute AS at1, pg_catalog.pg_attribute AS at2, pg_class t, pg_class t2 WHERE c.conrelid = t.oid AND c.confrelid = t2.oid AND t.relname = '"+tmp[1]+"' AND at1.attrelid=confrelid AND get_nb_of(conkey,at2.attnum) > 0 AND get_nb_of(confkey,at1.attnum) > 0 AND t.relname='"+tmp[1]+"' AND at2.attrelid=t.oid  and t.relnamespace=(select oid from pg_namespace where nspname='"+tmp[0]+"')) AS foreigns ON foreigns.myid=a.\"Pos\"", file=sys.stderr)
         return "SELECT DISTINCT on (\"Pos\") \"Pos\"-1 as \"Pos\",\"Field\",\"Type\",\"Key\", \"Ref\", \"RefCol\", \"RefCols\",array_upper(\"RefCols\",1) from (SELECT * FROM (SELECT attnum AS \"Pos\", attname AS \"Field\",CASE WHEN atttypmod >0 THEN b.typname || '(' || atttypmod-4 || ')' ELSE b.typname END AS \"Type\" FROM pg_catalog.pg_attribute a, pg_catalog.pg_type b WHERE  a.atttypid=b.oid AND a.attrelid = (SELECT pg_class.oid FROM pg_class, pg_namespace WHERE relname='" + \
                tmp[1] + "' AND pg_namespace.oid=relnamespace AND nspname='" + tmp[
                    0] + "') AND a.attnum > 0 AND NOT a.attisdropped ORDER BY attnum) a LEFT JOIN (SELECT conkey,c.conname AS constraint_name, CASE c.contype WHEN 'c' THEN 'CHECK' WHEN 'f' THEN 'FOR' WHEN 'p' THEN 'PRI' WHEN 'u' THEN 'UNIQUE' END AS \"Key\", t3.nspname||'.'||t2.relname AS \"Ref\", (SELECT attname from pg_catalog.pg_attribute WHERE attrelid=c.confrelid AND confkey[1] = attnum) AS \"RefCol\"  FROM pg_constraint c LEFT JOIN pg_class t ON c.conrelid = t.oid LEFT JOIN pg_class t2 ON c.confrelid = t2.oid LEFT JOIN pg_namespace t3 ON t2.relnamespace=t3.oid WHERE t.relname = '" + \
@@ -155,15 +148,11 @@ def getDesc(cur, table):
 
 def getTableDescription(conf, inputs, outputs):
     import authenticate.service as auth
-    # if not(auth.is_ftable(inputs["table"]["value"])):
-    #	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
-    #	return zoo.SERVICE_FAILED
     db = pgConnection(conf, inputs["dataStore"]["value"])
     db.parseConf()
     if db.connect():
         tmp = inputs["table"]["value"].split('.')
         req = getDesc(db.cur, inputs["table"]["value"])
-        # print(req, file=sys.stderr)
         res = db.execute(req)
         if res != False and len(res) > 0:
             outputs["Result"]["value"] = json.dumps(res)
@@ -178,9 +167,6 @@ def getTableDescription(conf, inputs, outputs):
 
 def getTableContent(conf, inputs, outputs):
     import authenticate.service as auth
-    # if not(auth.is_ftable(inputs["table"]["value"])):
-    #	conf["lenv"]["message"]=zoo._("Unable to identify your parameter as table or field name")
-    #	return zoo.SERVICE_FAILED
     db = pgConnection(conf, inputs["dataStore"]["value"])
     db.parseConf()
     getTableDescription(conf, inputs, outputs)
@@ -235,9 +221,7 @@ def getTableContent(conf, inputs, outputs):
             req += " WHERE " + inputs["clause"]["value"]
         if "search" in inputs and inputs["search"]["value"] != "NULL" and inputs["search"]["value"] != "asc":
             req += " WHERE "
-            print(req, file=sys.stderr)
             cnt = 0
-            print(req, file=sys.stderr)
             for i in range(0, len(tmp)):
                 if cnt > 0:
                     req += " OR "
@@ -256,9 +240,7 @@ def getTableContent(conf, inputs, outputs):
             req += " WHERE " + inputs["clause"]["value"]
         if "search" in inputs and inputs["search"]["value"] != "NULL" and inputs["search"]["value"] != "asc":
             req += " WHERE "
-            print(req, file=sys.stderr)
             cnt = 0
-            print(req, file=sys.stderr)
             for i in range(0, len(tmp)):
                 if cnt > 0:
                     req += " OR "
@@ -274,7 +256,6 @@ def getTableContent(conf, inputs, outputs):
         else:
             page = 1
             req += " LIMIT 10"
-        print(req, file=sys.stderr)
         res = db.execute(req)
         if res != False:
             rows = []
@@ -283,7 +264,6 @@ def getTableContent(conf, inputs, outputs):
                 for k in range(0, len(res[i])):
                     try:
                         tmp = str(res[i][k].decode('utf-8'))
-                        print(dir(tmp), file=sys.stderr)
                     except Exception as e:
                         print(e, file=sys.stderr)
                         tmp = str(res[i][k])
@@ -365,15 +345,12 @@ def getTableContent1(conf, inputs, outputs):
             req += " WHERE " + inputs["clause"]["value"]
         if "search" in inputs and inputs["search"]["value"] != "NULL" and inputs["search"]["value"] != "asc":
             req += " WHERE "
-            print(req, file=sys.stderr)
             cnt = 0
-            print(req, file=sys.stderr)
             for i in range(0, len(tmp)):
                 if cnt > 0:
                     req += " OR "
                 req += tmp[i][1] + "::varchar like '%" + inputs["search"]["value"] + "%'"
                 cnt += 1
-        print(req, file=sys.stderr)
         res = db.execute(req)
         if res != False:
             total = res[0][0]
@@ -387,15 +364,12 @@ def getTableContent1(conf, inputs, outputs):
             req += " WHERE " + inputs["clause"]["value"]
         if "search" in inputs and inputs["search"]["value"] != "NULL" and inputs["search"]["value"] != "asc":
             req += " WHERE "
-            print(req, file=sys.stderr)
             cnt = 0
-            print(req, file=sys.stderr)
             for i in range(0, len(tmp)):
                 if cnt > 0:
                     req += " OR "
                 req += tmp[i][1] + "::varchar like '%" + inputs["search"]["value"] + "%'"
                 cnt += 1
-            print(req, file=sys.stderr)
         if "sortname" in inputs and inputs["sortname"]["value"] != "NULL":
             req += " ORDER BY " + inputs["sortname"]["value"] + " " + inputs["sortorder"]["value"]
         if "limit" in inputs and inputs["limit"]["value"] != "NULL":
@@ -406,7 +380,6 @@ def getTableContent1(conf, inputs, outputs):
         else:
             page = 1
             req += " LIMIT 10"
-        print(req, file=sys.stderr)
         res = db.execute(req)
         if res != False:
             rows = []
@@ -415,9 +388,8 @@ def getTableContent1(conf, inputs, outputs):
                 for k in range(0, len(res[i])):
                     try:
                         tmp = str(res[i][k].decode('utf-8'))
-                        # print(dir(tmp), file=sys.stderr)
                     except Exception as e:
-                        # print(e, file=sys.stderr)
+                        print(e, file=sys.stderr)
                         tmp = str(res[i][k])
                     res0 += [str(tmp)]
                     if len(geom) > 0:
@@ -473,8 +445,6 @@ def editTuple(conf, inputs, outputs):
                 if k[1] == i:
                     fd = k[2]
             if fd is not None:
-                print(tmp, file=sys.stderr)
-                print(fd, file=sys.stderr)
                 td = testDesc(tmp[i], fd)
                 if td is not None:
                     if fields != "":
@@ -483,7 +453,6 @@ def editTuple(conf, inputs, outputs):
         if "content" in inputs:
             if fields != "":
                 fields += ","
-            print(inputs["content"]["value"], file=sys.stderr)
             tmp1 = inputs["content"]["value"]
             fields += '"content"=%s' % adapt(
                 inputs["content"]["value"].replace('<?xml version="1.0" encoding="utf-8"?>\n', ''))
@@ -520,7 +489,6 @@ def editTuple(conf, inputs, outputs):
         values += ")"
         req += fields + " VALUES " + values
         outputs["Result"]["value"] = "Tuple inserted"
-    print(req.encode("utf-8"), file=sys.stderr)
     db = pgConnection(conf, inputs["dataStore"]["value"])
     db.parseConf()
     if db.connect():
@@ -530,7 +498,6 @@ def editTuple(conf, inputs, outputs):
                 conf["lenv"]["message"] = db.conf["lenv"]["message"]
                 return zoo.SERVICE_FAILED
             db.conn.commit()
-            # print(res, file=sys.stderr)
             return zoo.SERVICE_SUCCEEDED
         except Exception as e:
             conf["lenv"]["message"] = "Unable to run the request " + str(e)
@@ -581,7 +548,6 @@ def fetchType(conf, ftype):
 
 
 def addColumn(conf, inputs, outputs):
-    print(inputs["dataStore"]["value"], file=sys.stderr)
     db = pgConnection(conf, inputs["dataStore"]["value"])
     db.parseConf()
     req = []
@@ -608,7 +574,6 @@ def addColumn(conf, inputs, outputs):
                         inputs["geo_x"]["value"] + "','" + inputs["geo_y"]["value"] + "','" + inputs["proj"][
                             "value"] + "')"]
                 outputs["Result"]["value"] += " " + zoo._("Trigger in place")
-            print(req, file=sys.stderr)
         for i in range(0, len(req)):
             if not (db.execute(req[i])):
                 return zoo.SERVICE_FAILED

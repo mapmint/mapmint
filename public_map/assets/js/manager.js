@@ -3037,6 +3037,15 @@ define([
 		$("#mm_layerOrderToggler").click();
 	    }
 	},
+	"delDir": {
+	    "identifier": "mapfile.removeGroupFromMap",
+	    "bindings": {
+		"group": "group"
+	    },
+	    "reload": [true],
+	    "hide": [true,2],
+	    "selector": "input"
+	},
 	"addLayer": {
 	    "identifier": "mapfile.loadMapForDs",
 	    "bindings": {

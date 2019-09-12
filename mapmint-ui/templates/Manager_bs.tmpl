@@ -316,11 +316,20 @@ $printAdder({"ltype": "div","id":"mm_addDir","title":$zoo._("Add Group"),"placeh
  <script type="template/text" id="layerLegend_group_template">
    <li class="list-group-item0" data-id="[lid]">
       <i class="fa fa-folder"></i>
+      <i class="fa fa-trash" onclick='\$(this).next().next().next().next().toggle();'></i>
       <i class="fa fa-edit" onclick='\$(this).next().next().toggle();'></i>
       <span>[id]</span>
       <div class="input-group" style="display:none" >
       <input name="g_value" value="[id]" onchange="console.log('CHANGE');\$(this).parent().parent().data('id',\$(this).val());\$(this).parent().prev().text(\$(this).val());" class="form-control" />
       <span class="input-group-btn"><button class="btn btn-default" type="button" href="#" onclick="\$(this).parent().parent().toggle();"><i class="fa fa-check"></i></button></span>
+      </div>
+      <div class="alert alert-warning" style="display:none" >
+      <p>$zoo._("Only item with no child should be removed.")</p>
+      <p>$zoo._("Removing a menu item is irreversible.")</p>
+      <div class="input-group"  >
+      <input name="group" value="[id]" class="form-control" />
+      <span class="input-group-btn"><button class="btn btn-default" type="button" href="#" onclick="app.complex('delDir',\$(this).parent().parent())"><i class="fa fa-trash"></i></button></span>
+      </div>
       </div>
       <ul class="nav-[level]-level collapse in" id="[lid]"></ul>
    </li>

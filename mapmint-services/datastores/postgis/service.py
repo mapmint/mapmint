@@ -15,13 +15,11 @@ def test(conf, inputs, outputs):
     styledoc = etree.parse(conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/conn.xsl")
     style = etree.XSLT(styledoc)
     result = style(doc)
-    print(str(result),file=sys.stderr)
     ds = osgeo.ogr.Open(str(result))
     if ds is None:
         conf["lenv"]["message"] = zoo._("Unable to connect to ") + inputs["name"]["value"]
         return 4
     else:
-        print("OK 6'", file=sys.stderr)
         outputs["Result"]["value"] = zoo._("Connection to ") + str(inputs["name"]["value"]) + zoo._(
             " successfull")
     ds = None
@@ -29,7 +27,6 @@ def test(conf, inputs, outputs):
 
 
 def load(conf, inputs, outputs):
-    # print( conf, file=sys.stderr)
     # To define
     dbParams = ['dbname', 'user', 'password', 'host', 'port']
     values = "{"
@@ -40,20 +37,11 @@ def load(conf, inputs, outputs):
             conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/" + inputs["name"]["value"] + ".xml")
         cnt = 0
         for j in dbParams:
-            print(j, file=sys.stderr)
-            # print( j, file=sys.stderr)
             try:
-                #print(str(dir(xqf)),file=sys.stderr)
-                #items = xqf.xpathEval("/connection/" + j)
                 items = xqf.xpath("/connection/" + j)
                 for i in items:
-                    #print(str(i),file=sys.stderr)
-                    #print(str(dir(i)),file=sys.stderr)
-                    #print(str(dir(i)),file=sys.stderr)
-                    # print( cnt, file=sys.stderr)
                     if cnt > 0:
                         values += ', '
-                    #values += '"' + i.name + '": "' + str(i.children.get_content()) + '"'
                     values += '"' + str(j)  + '": "' + i.text + '"'
                     cnt += 1
             except Exception as e:
@@ -75,15 +63,11 @@ def details(conf, inputs, outputs):
     res = {}
     values = "{"
     try:
-        #parse_options = libxml2.XML_PARSE_DTDLOAD + libxml2.XML_PARSE_NOENT
-        #libxml2.initParser()
         xqf = etree.parse(
             conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/" + inputs["name"]["value"] + ".xml"
             )
         cnt = 0
         for j in dbParams:
-            print(j, file=sys.stderr)
-            # print( j, file=sys.stderr)
             try:
                 items = xqf.xpath("/connection/" + j)
                 for i in items:
@@ -101,7 +85,6 @@ def details(conf, inputs, outputs):
 
 def delete(conf, inputs, outputs):
     try:
-        # print( conf["main"]["dataPath"]+"/"+inputs["type"]["value"]+"/"+inputs["name"]["value"]+".xml", file=sys.stderr)
         os.unlink(conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/" + inputs["name"]["value"] + ".xml")
         os.unlink(
             conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/" + inputs["name"]["value"] + "ds_ows.map")
@@ -172,9 +155,6 @@ def display(conf, inputs, outputs):
     default_dir = conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/"
     original_dir = conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/"
     label_dir = ""
-    # print( conf["main"]["dataPath"]+"/PostGIS/", file=sys.stderr)
-    # print( original_dir, file=sys.stderr)
-    # print( inputs["dir"]["value"], file=sys.stderr)
     try:
         tmp = os.listdir(original_dir)
     except:
