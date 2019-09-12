@@ -1,3 +1,26 @@
+# -*- coding: utf-8 -*-
+###############################################################################
+#  Author:   Gérald Fenoy, gerald.fenoy@geolabs.fr
+#  Copyright (c) 2010-2019, Cartoworks Inc. 
+############################################################################### 
+#  Permission is hereby granted, free of charge, to any person obtaining a
+#  copy of this software and associated documentation files (the "Software"),
+#  to deal in the Software without restriction, including without limitation
+#  the rights to use, copy, modify, merge, publish, distribute, sublicense,
+#  and/or sell copies of the Software, and to permit persons to whom the
+#  Software is furnished to do so, subject to the following conditions:
+# 
+#  The above copyright notice and this permission notice shall be included
+#  in all copies or substantial portions of the Software.
+# 
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+#  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+#  THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+#  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+#  DEALINGS IN THE SOFTWARE.
+################################################################################
 import osgeo.ogr
 import osgeo.gdal
 import sys
@@ -6,6 +29,8 @@ import shutil
 import json
 import mm_access
 import zoo
+
+myList=list
 
 if sys.platform == 'win32':
     import ntfslink
@@ -32,7 +57,6 @@ def mmListDir(path):
 
 
 def getOriginalDir(conf, val):
-    # TODO: confirm assumption: conf and conf["main"] are Python dictionary objects
     if ("isTrial" in conf["main"]) and conf["main"]["isTrial"] == "true":
         if val.count(conf["main"]["dataPath"] + "/ftp/") > 0:
             return val
@@ -46,7 +70,6 @@ def getOriginalDir(conf, val):
 
 
 def saveDir(conf, inputs, outputs):
-    # TODO: confirm assumption: inputs, inputs["path"] and inputs["type"] are Python dictionary objects
     if ("path" in inputs) and ("value" in inputs["path"]):
         od = getOriginalDir(conf, inputs["path"]["value"])
     if ("value" in inputs["type"]) and inputs["type"]["value"] == "new":
@@ -55,13 +78,11 @@ def saveDir(conf, inputs, outputs):
             inputs["path"]["value"] = conf["main"]["dataPath"] + "/ftp/" + inputs["name"]["value"]
         except:
             er = sys.exc_info()
-            # print( er, file=sys.stderr)
             conf["lenv"]["message"] = "Unable to create directory: " + er[1][1]
             return 4
     os.symlink(inputs["path"]["value"], conf["main"]["dataPath"] + "/dirs/" + inputs["name"]["value"])
     outputs["Result"]["value"] = "Directory added as a datastore"
-    # conf["main"]["dataPath"]+"/dirs/"+inputs["name"]["value"]
-    return 3
+    return zoo.SERVICE_SUCCEEDED
 
 
 def removeDS(conf, inputs, outputs):
@@ -81,7 +102,7 @@ def removeDS(conf, inputs, outputs):
             except Exception as e:
                 tmpStr += "Unable to remove: " + i + " " + str(e) + "<br/>"
     outputs["Result"]["value"] = "Files deleted: " + tmpStr
-    return 3
+    return zoo.SERVICE_SUCCEEDED
 
 
 def listJson(conf, inputs, outputs):
@@ -173,7 +194,7 @@ def display(conf, inputs, outputs):
         outputs["Result"]["value"] = ''' '''
     outputs["Result"]["value"] = '''<ul> ''' + outputs["Result"]["value"] + '''</ul>'''
 
-    return 3
+    return zoo.SERVICE_SUCCEEDED
 
 
 def list(conf, inputs, outputs):
@@ -293,7 +314,7 @@ def displayJSON(conf, inputs, outputs):
                 output.append({"id": (original_dir + "/").replace('/', '__') + t, "text": t, "state": status})
         i += 1
     outputs["Result"]["value"] = json.dumps(output)
-    return 3
+    return zoo.SERVICE_SUCCEEDED
 
 
 def load(conf, inputs, outputs):
@@ -303,7 +324,7 @@ def load(conf, inputs, outputs):
     # print( a[0:len(a)-1], file=sys.stderr)
     # print( b[len(b)-1], file=sys.stderr)
     outputs["Result"]["value"] = json.dumps({"name": b[len(b) - 1], "link": os.readlink(a[0:len(a) - 1])})
-    return 3
+    return zoo.SERVICE_SUCCEEDED
 
 
 def image(conf, inputs, outputs):
@@ -341,7 +362,7 @@ def details(conf, inputs, outputs):
     res = {"name": b[len(b) - 1], "link": link, "date": str(mTime)}
     outputs["Result"]["value"] = json.dumps(res, ensure_ascii=False)
 
-    return 3
+    return zoo.SERVICE_SUCCEEDED
 
 
 def delete(conf, inputs, outputs):
@@ -359,22 +380,14 @@ def delete(conf, inputs, outputs):
         conf["lenv"]["message"] = "Unable to drop directory (" + a[0:len(a) - 1] + "): " + er[1][1]
         return 4
     outputs["Result"]["value"] = "Datastore deleted"
-    return 3
+    return zoo.SERVICE_SUCCEEDED
 
 
 def getDirSize(folder):
     folder_size = 0
-    print("==============================\n" + str(folder_size), file=sys.stderr)
     for (path, dirs, files) in os.walk(folder):
-        print("==============================\n" + str(path), file=sys.stderr)
-        print("==============================\n" + str(dirs), file=sys.stderr)
-        print("==============================\n" + str(files), file=sys.stderr)
         for i in files:
-            print("==============================\n" + str(i), file=sys.stderr)
             filename = os.path.join(path, i)
-            print(
-                "==============================\n" + str(path) + " " + filename + " " + str(os.path.getsize(filename)),
-                file=sys.stderr)
             try:
                 folder_size += os.path.getsize(filename)
             except:
@@ -403,7 +416,7 @@ def cleanup(conf, inputs, outputs):
     import os
     nms = {"postgis": "PostGIS", "mysql": "MySQL", "wfs": "WFS", "wms": "WMS"}
     try:
-        tmp = list(nms.keys())
+        tmp = myList(nms.keys())
         tmp0 = inputs["dsName"]["value"].split(":")
         if tmp.count(inputs["dsType"]["value"].lower()) == 0:
             os.unlink(inputs["dsName"]["value"] + "/ds_ows.map")

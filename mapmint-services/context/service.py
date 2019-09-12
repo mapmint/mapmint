@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
-#  Author:   Gérald Fenoy, gerald.fenoy@cartoworks.com
-#  Copyright (c) 2010-2014, Cartoworks Inc. 
+#  Author:   Gérald Fenoy, gerald.fenoy@geolabs.fr
+#  Copyright (c) 2010-2019, Cartoworks Inc. 
 ############################################################################### 
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -51,8 +51,6 @@ POSTGRESQL:
 
 
 def saveContext(conf, inputs, outputs):
-    print("DEBUG 0000", file=sys.stderr)
-    # conn = sqlite3.connect(conf['main']['dblink'])
     con = auth.getCon(conf)
     prefix = auth.getPrefix(conf)
     con.connect()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
-#  Author:   Gérald Fenoy, gerald.fenoy@cartoworks.com
-#  Copyright (c) 2010-2014, Cartoworks Inc. 
+#  Author:   Gérald Fenoy, gerald.fenoy@geolabs.fr
+#  Copyright (c) 2010-2019, Cartoworks Inc. 
 ############################################################################### 
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -62,10 +62,8 @@ def SaveConf(conf, inputs, outputs):
                 f.write("[" + a + "]\n")
                 if a != inputs["section"]["value"]:
                     for b in conf[a]:
-                        # print("STD[" + b + "=" + conf[a][b] + "]\n", file=sys.stderr)
                         f.write(b + "=" + conf[a][b] + "\n")
                 else:
-                    print(a, file=sys.stderr)
                     if a == "main":
                         f.write("isTrial=" + conf["senv"]["isTrial"] + "\n")
 
@@ -74,7 +72,6 @@ def SaveConf(conf, inputs, outputs):
                             try:
                                 b.index('_label')
                                 f.write(b + "=" + conf[a][b] + "\n")
-                            # print("STD["+b+"="+conf[a][b]+"]\n", file= sys.stderr)
                             except:
                                 if b in inputs:
                                     if b != "abstract":
@@ -115,11 +112,7 @@ def SaveConf(conf, inputs, outputs):
                 i += 1
         outputs["Result"]["value"] = zoo._("done")
         f.close()
-    # print(os.path.abspath(os.getcwd())+'/main1.cfg'+" => "+os.path.abspath(os.getcwd())+'/main.cfg', file=sys.stderr)
-    # shutil.copy(os.path.abspath(os.getcwd())+'/main1.cfg',os.path.abspath(os.getcwd())+'/main.cfg')
     except Exception as e:
-        # print("Error occurs when trying to parse the section", file=sys.stderr)
-        # print(inputs["section"]["value"], file=sys.stderr)
         conf["lenv"]["message"] = zoo._("Error occurs when trying to parse the ") + inputs["section"]["value"] + zoo._(
             " section: ") + str(e)
         return 4
@@ -127,7 +120,6 @@ def SaveConf(conf, inputs, outputs):
 
 
 def display1(conf, inputs, outputs):
-    # print(conf, file=sys.stderr)
     outputs["Result"]["value"] = '''
     <h1>Configuration <a href="#" class="close" onclick="dashboardLayout.close(\'west\')"></a></h1>
 

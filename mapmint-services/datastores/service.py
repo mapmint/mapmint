@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
-#  Author:   Gérald Fenoy, gerald.fenoy@cartoworks.com
-##  Copyright (c) 2010-2014, Cartoworks Inc. 
+#  Author:   Gérald Fenoy, gerald.fenoy@geolabs.fr
+#  Copyright (c) 2010-2019, Cartoworks Inc. 
 ############################################################################### 
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -43,13 +43,10 @@ def removeDS(conf, inputs, outputs):
 
 
 def displayHTML(conf, inputs, outputs):
-    # print(conf, file=sys.stderr)
     import datastores.directories.service as dirs
-    # print(dir(dirs), file=sys.stderr)
     inputs["state"] = {"value": "open"}
     dirs.display(conf, inputs, outputs)
     dirStr = outputs["Result"]["value"]
-    # print(outputs, file=sys.stderr)
     import postgis.service as dbs
     # Hard coded supported dbs !
     suported_dbs = ["PostGIS", "MySQL"]
@@ -69,7 +66,7 @@ def displayHTML(conf, inputs, outputs):
     inputs["wms"] = {"value": wmsStrs}
     import template.service as tmpl
     tmpl.display(conf, {"tmpl": {"value": "Distiller"}, "force": {"value": "true"}}, outputs)
-    return 3
+    return zoo.SERVICE_SUCCEEDED
 
 
 def list(conf, inputs, outputs):
@@ -90,7 +87,6 @@ def list(conf, inputs, outputs):
     for k in range(0, len(wxs)):
         outputs["Result"]["value"] = '{"sub_elements":[]}'
         wfs.displayJSON(conf, {"state": {"value": "open"}, "type": {"value": wxs[k]}}, outputs)
-        print(outputs["Result"]["value"], file=sys.stderr)
         try:
             wfsStr = json.loads(outputs["Result"]["value"])
         except:
@@ -106,9 +102,7 @@ def list(conf, inputs, outputs):
     suported_dbs = ["PostGIS", "MySQL"]
     dbStrs = {}
     for i in suported_dbs:
-        #print(" ELEMENt "+str(i), file=sys.stderr)
         dbs.displayJson(conf, {"type": {"value": i}}, outputs)
-        #print(str(outputs["Result"]["value"]), file=sys.stderr)
         try:
             dbStrs[i] = json.loads(outputs["Result"]["value"])
             b = 0
@@ -120,9 +114,7 @@ def list(conf, inputs, outputs):
                 outputs1 = {"Result": {}}
                 inputs1 = {"type": {"value": i}, "name": {"value": a["name"]}}
                 dbs.load(conf, inputs1, outputs1)
-                print("LOAD <=> " + str(outputs1), file=sys.stderr)
                 tmp = json.loads(outputs1["Result"]["value"])
-                print("tmp <=> " + str(tmp), file=sys.stderr)
                 li = {}
                 for c in tmp:
                     li[c] = {}
@@ -134,11 +126,10 @@ def list(conf, inputs, outputs):
         except Exception as e:
             print(e, file=sys.stderr)
             pass
-        print("/" + i, file=sys.stderr)
 
     import json
     outputs["Result"]["value"] = json.dumps(elements)
-    return 3
+    return zoo.SERVICE_SUCCEEDED
 
 
 def options1(conf, inputs, outputs):
@@ -146,27 +137,22 @@ def options1(conf, inputs, outputs):
     import mm_access
     ds.list(conf, inputs, outputs)
     elements = eval(outputs["Result"]["value"])
-    print(str(elements), file=sys.stderr)
     li = []
     dsList = None
     dstnStr = ""
     for a in elements:
         if a == "Directories":
-            # print("ELEMENTS A 0 "+str(elements[a][0]), file=sys.stderr)
             for j in range(0, len(elements[a])):
                 if mm_access.checkDataStorePriv(conf, elements[a][j]["name"], "rx"):
                     dstnStr = elements[a][j]["name"]
-                    print("DSTN : " + dstnStr, file=sys.stderr)
                     outputs["Result"]["value"] = "[]"
                     ds.listDataSource(conf, {"dstn": {"value": elements[a][j]["name"] + "/"}}, outputs)
                     dsList = eval(outputs["Result"]["value"])
                     break
-            # print(str(dsList), file=sys.stderr)
         li += [{"name": a}]
 
     import template.service as tmpl
 
-    # print(conf, file=sys.stderr)
     mapfile = conf["main"]["dataPath"] + "/maps/project_" + conf["senv"]["last_map"] + ".map"
     import mapscript
     m = mapscript.mapObj(mapfile)
@@ -198,27 +184,22 @@ def options(conf, inputs, outputs):
     import mm_access
     ds.list(conf, inputs, outputs)
     elements = eval(outputs["Result"]["value"])
-    print(str(elements), file=sys.stderr)
     li = []
     dsList = None
     dstnStr = ""
     for a in elements:
         if a == "Directories":
-            # print("ELEMENTS A 0 "+str(elements[a][0]), file=sys.stderr)
             for j in range(0, len(elements[a])):
                 if mm_access.checkDataStorePriv(conf, elements[a][j]["name"], "rx"):
                     dstnStr = elements[a][j]["name"]
-                    print("DSTN : " + dstnStr, file=sys.stderr)
                     outputs["Result"]["value"] = "[]"
                     ds.listDataSource(conf, {"dstn": {"value": elements[a][j]["name"] + "/"}}, outputs)
                     dsList = eval(outputs["Result"]["value"])
                     break
-            # print(str(dsList), file=sys.stderr)
         li += [{"name": a}]
 
     import template.service as tmpl
 
-    # print(conf, file=sys.stderr)
     mapfile = conf["main"]["dataPath"] + "/maps/project_" + conf["senv"]["last_map"] + ".map"
     import mapscript
     m = mapscript.mapObj(mapfile)
@@ -241,47 +222,39 @@ def options(conf, inputs, outputs):
                         tmp1 = tmp[0].split(',')
                         for c in tmp1:
                             levels += ["-- " + c]
-    print("TEMPLATE!", file=sys.stderr)
-    print({"tmpl": {"value": "Manager/AddLayer"}, "dstn": dstnStr, "elements": elements, "dsList": dsList,
-           "groups": levels, "inputs": inputs}, file=sys.stderr)
     try:
         tmpl.display(conf,
                      {"tmpl": {"value": "Manager/AddLayer"}, "dstn": dstnStr, "elements": elements, "dsList": dsList,
                       "groups": levels, "inputs": inputs}, outputs)
     except Exception as e:
         print(e, file=sys.stderr)
-    return 3
+    return zoo.SERVICE_SUCCEEDED
 
 
 def listDataSource(conf, inputs, outputs):
     import mapscript
     import mm_access
-    # print(inputs["dstn"]["value"].replace(conf["main"]["dataPath"]+"/dirs/",""), file=sys.stderr)
     mapfile = conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"].replace(conf["main"]["dataPath"] + "/dirs/", "") + "/ds_ows.map"
-    # print(mapfile, file=sys.stderr)
     m = None
     try:
-        print(mapfile, file=sys.stderr)
         m = mapscript.mapObj(mapfile)
     except Exception as e:
         print(e, file=sys.stderr)
         for i in ["PostGIS", "MySQL"]:
             try:
                 mapfile = conf["main"]["dataPath"] + "/" + i + "/" + inputs["dstn"]["value"] + "ds_ows.map"
-                # print(mapfile, file=sys.stderr)
                 m = mapscript.mapObj(mapfile)
             except Exception as e:
                 print(e, file=sys.stderr)
                 pass
         if m is None:
             conf["lenv"]["message"] = zoo._("Unable to open the mapfile")
-            return 4
+            return zoo.SERVICE_FAILED
 
     outputs["Result"]["value"] = "["
     cnt = 0
     for i in range(0, m.numlayers):
         j = m.getLayer(i)
-        print(j.name + "not readable", file=sys.stderr)
         if mm_access.checkLayerPriv(conf, m, j.name, "r"):
             if cnt > 0:
                 outputs["Result"]["value"] += ", "
@@ -290,7 +263,7 @@ def listDataSource(conf, inputs, outputs):
         else:
             print(j.name + "not readable", file=sys.stderr)
     outputs["Result"]["value"] += "]"
-    return 3
+    return zoo.SERVICE_SUCCEEDED
 
 
 def startFromRoot(v):
@@ -304,22 +277,17 @@ def getPath(conf, ds):
         else:
             return ds + "/"
     else:
-        print(ds, file=sys.stderr)
         if "supportedDbs" in conf["mm"]:
             for i in conf["mm"]["supportedDbs"].split(','):
                 if os.path.exists(conf["main"]["dataPath"] + "/" + i + "/" + ds + ".xml"):
                     return conf["main"]["dataPath"] + "/" + i + "/" + ds
-        print(conf["mm"]["supportedDbs"], file=sys.stderr)
-        print(os.path.exists(conf["main"]["dataPath"] + "/dirs/" + ds), file=sys.stderr)
         if os.path.exists(conf["main"]["dataPath"] + "/dirs/" + ds):
             if ds[len(ds) - 1] != "/":
                 return conf["main"]["dataPath"] + "/dirs/" + ds + "/"
             else:
                 return conf["main"]["dataPath"] + "/dirs/" + ds
-        print(conf["mm"]["supportedDbs"], file=sys.stderr)
         if os.path.exists(conf["main"]["dataPath"] + "/WFS/" + ds.replace("WFS:", "") + ".txt"):
             return conf["main"]["dataPath"] + "/WFS/" + ds.replace("WFS:", "")
-        print(conf["mm"]["supportedDbs"], file=sys.stderr)
         if os.path.exists(conf["main"]["dataPath"] + "/WMS/" + ds.replace("WMS:", "") + ".txt"):
             return conf["main"]["dataPath"] + "/WMS/" + ds.replace("WMS:", "")
 
@@ -384,7 +352,6 @@ def isFavSrs(conf, inputs, outputs):
     try:
         con.pexecute_req([v, {"val": {"value": inputs["srs_id"]["value"], "format": "s"}}])
         val = con.cur.fetchone()
-        print(val, file=sys.stderr)
         if val[0] > 0:
             outputs["Result"]["value"] = "true"
         else:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
-#  Author:   Gérald Fenoy, gerald.fenoy@cartoworks.com
-#  Copyright (c) 2010-2014, Cartoworks Inc. 
+#  Author:   Gérald Fenoy, gerald.fenoy@geolabs.fr
+#  Copyright (c) 2010-2019, Cartoworks Inc. 
 ############################################################################### 
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -37,7 +37,6 @@ def write_png_in_mem(outputs, width, height, rgb_func):
         return str(res)
 
     def output_chunk(out, chunk_type0, data):
-        print(chunk_type0,file=sys.stderr)
         chunk_type=bytes(chunk_type0,'utf-8')
         out["Result"]["value"] += struct.pack("!I", len(data))
         out["Result"]["value"] += chunk_type
@@ -47,8 +46,6 @@ def write_png_in_mem(outputs, width, height, rgb_func):
             print(e,file=sys.stderr)
             out["Result"]["value"] += bytes(data,"utf-8")
         checksum0 =bytes( myCRC32(chunk_type),"utf-8") #zlib.crc32(chunk_type) & 0xffffffff
-        #checksum = str(zlib.crc32(data, int(myCRC32(chunk_type))) & 0xffffffff)
-        #zlib.crc32(data, bytes(checksum0,"utf-8")) & 0xffffffff
         checksum1 = zlib.crc32(data, int(myCRC32(chunk_type))) & 0xffffffff
         checksum = str(checksum1)
         try:
@@ -69,11 +66,9 @@ def write_png_in_mem(outputs, width, height, rgb_func):
             for x in range(width):
                 fx = float(x)
                 data.extend([int(v * 255) for v in rgb_func(fx / fw, fy / fh)])
-                # TODO: confirm assumption: outputs is Python dictionary object
                 if "Result1" not in outputs:
                     outputs["Result1"] = {"value": []}
                 outputs["Result1"]["value"] += [[int(v * 255) for v in rgb_func(fx / fw, fy / fh)]]
-                # print(outputs["Result1"]["value"], file=sys.stderr)
         compressed = compressor.compress(data.tostring())
         flushed = compressor.flush()
         return compressed + flushed
@@ -97,7 +92,6 @@ def gradient(DATA):
                 r = linear_gradient(start[0], end[0], initial_offset, offset)(y)
                 g = linear_gradient(start[1], end[1], initial_offset, offset)(y)
                 b = linear_gradient(start[2], end[2], initial_offset, offset)(y)
-                # print(str(r) + ' '+ str(g) + ' '+ str(b))
                 return r, g, b
             initial_offset = offset
 
@@ -120,7 +114,6 @@ def getClassifierImage(conf, inputs, outputs):
     ]))
     outputs["Result"] = lOutputs["Result"]
     outputs["Result"]["mimeType"] = "image/png"
-    print(outputs, file=sys.stderr)
     return 3
 
 
@@ -132,10 +125,7 @@ def discretise(main, inputs, outputs):
 
 
 def _discretise(data, nbc, method):
-    print(sys.version, file=sys.stderr)
-    print(sys.path, file=sys.stderr)
     import os
-    print(os.environ, file=sys.stderr)
     import rpy2.robjects as robjects
     # the following lines are need only because of
     # strange issue specific to R displaying msg :
@@ -144,14 +134,10 @@ def _discretise(data, nbc, method):
         sys.stdout.close()
     except:
         pass
-    print("OK", file=sys.stderr)
     # The logic code
     robjects.r('library(e1071)')
-    print("OK", file=sys.stderr)
     robjects.r('library(classInt)')
-    print("OK", file=sys.stderr)
     robjects.r('data(jenks71)')
-    print("OK", file=sys.stderr)
     tmp = data
     for i in range(len(tmp)):
         try:
@@ -160,24 +146,14 @@ def _discretise(data, nbc, method):
             print(e, file=sys.stderr)
             data[i] = 0.0000066
     jenksData = robjects.FloatVector(data)
-    print("OK", file=sys.stderr)
     ci = robjects.r.classIntervals
-    print("OK", file=sys.stderr)
     nbClasses = int(nbc)
-    print("OK", file=sys.stderr)
-    print(str(data), file=sys.stderr)
     classes = ci(jenksData, n=nbClasses, style=method)
-    print("OK", file=sys.stderr)
     trobj = classes.rx(-1)
-    print("OK", file=sys.stderr)
     tval = tuple(trobj)
-    print("OK", file=sys.stderr)
     res = []
-    print("OK", file=sys.stderr)
     for i in range(0, len(tval[0])):
         if i != 0:
             res += [[tval[0][i - 1], tval[0][i]]]
-    print("OK", file=sys.stderr)
     import json
-    print("OK", file=sys.stderr)
     return json.dumps(res)

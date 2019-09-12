@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
-#  Author:   Gérald Fenoy, gerald.fenoy@cartoworks.com
-#  Copyright (c) 2010-2014, Cartoworks Inc. 
+#  Author:   Gérald Fenoy, gerald.fenoy@geolabs.fr
+#  Copyright (c) 2010-2019, Cartoworks Inc. 
 ############################################################################### 
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -40,24 +40,16 @@ except:
 
 def loginFlux(conf, h):
     import requests
-    print(" ***************** TEST 1 **************", file=sys.stderr)
     dataParam = {'mp': h.hexdigest(), 'email': conf["senv"]["mail"]}
-    print(str(dataParam), file=sys.stderr)
     urlCon = "http://sigcod.geolabs.fr/flux/Services/service_connect"
     try:
-        print(" ***************** TEST 2 **************", file=sys.stderr)
         myRequest = requests.post(urlCon, data=dataParam)
-        print(" ***************** TEST 3 **************", file=sys.stderr)
-        print(myRequest.headers["set-cookie"].split(";")[2].split(",")[1], file=sys.stderr)
         conf["senv"]["ecookie"] = myRequest.headers["set-cookie"].split(";")[2].split(",")[1] + "; path=/"
         conf["senv"]["ecookie_length"] = str(1)
-        print(dir(myRequest), file=sys.stderr)
         conf["lenv"]["ecookie"] = myRequest.headers["set-cookie"].split(";")[2].split(",")[1] + "; path=/"
         conf["lenv"]["ecookie_length"] = str(1)
-        print(" ***************** TEST 4 **************", file=sys.stderr)
         return zoo.SERVICE_SUCCEEDED
     except:
-        print(" ***************** EXCEPT **************", file=sys.stderr)
         conf["lenv"]["message"] = zoo._("Unable to connect to flux")
         return zoo.SERVICE_FAILED
 
@@ -75,7 +67,6 @@ def parseDb(db):
     for i in db:
         if i != "schema":
             dbstr += " " + i + "=" + db[i]
-    print(dbstr, file=sys.stderr)
     return dbstr
 
 
@@ -185,7 +176,6 @@ def saveUserPreferences(conf, inputs, outputs):
             j += 1
     else:
         sqlStr += inputs["fields"]["value"] + "='" + inputs["values"]["value"] + "'"
-    print(sqlStr, file=sys.stderr)
     cur = conn.cursor()
     try:
         sql = "UPDATE " + prefix + "users set " + sqlStr + " where login=[_login_]"
@@ -235,7 +225,6 @@ def registerUser(conf, inputs, outputs):
     cur = conn.cursor()
     try:
         sql = "INSERT INTO " + prefix + "users (" + fieldsStr + ") VALUES(" + valuesStr + ")"
-        print(sql, file=sys.stderr)
         con.pexecute_req([sql, params])
         sql = "INSERT INTO " + prefix + "user_group (id_group,id_user) VALUES([_id_group_],(select last_value from " + prefix + (
             prefix.replace(".", "_")) + "users_idseq))"
@@ -276,7 +265,6 @@ def clogIn(conf, inputs, outputs):
     if len(a) > 0:
         # Set all the Session environment variables using the users 
         # table content.
-        print(a, file=sys.stderr)
         cid = "MM" + conf["lenv"]["usid"]
         conf["lenv"]["cookie"] = "MMID=" + cid + "; path=/"
         if "senv" not in conf:
@@ -302,27 +290,17 @@ def clogIn(conf, inputs, outputs):
 
         for i in desc:
             if i[1] == 'login':
-                print(" ***************** TEST **************", file=sys.stderr)
-                # conf["senv"]["login"]=a[0][i[0]].encode('utf-8')
                 dataParam = {'mp': h.hexdigest(), 'email': conf["senv"]["mail"]}
-                print(str(dataParam), file=sys.stderr)
                 urlCon = "http://sigcod.geolabs.fr/flux/Services/service_connect"
                 try:
-                    print(" ***************** TEST **************", file=sys.stderr)
                     myRequest = requests.post(urlCon, data=dataParam)
-
-                    print(" ***************** TEST **************", file=sys.stderr)
-                    print(myRequest.headers["set-cookie"].split(";")[2].split(",")[1], file=sys.stderr)
                     conf["senv"]["ecookie"] = myRequest.headers["set-cookie"].split(";")[2].split(",")[1] + "; path=/"
                     conf["senv"]["ecookie_length"] = str(1)
-                    print(dir(myRequest), file=sys.stderr)
                     conf["lenv"]["ecookie"] = myRequest.headers["set-cookie"].split(";")[2].split(",")[1] + "; path=/"
                     conf["lenv"]["ecookie_length"] = str(1)
-                    print(" ***************** TEST **************", file=sys.stderr)
                 except:
                     conf["lenv"]["message"] = zoo._("Unable to connect to flux")
                     return zoo.SERVICE_FAILED
-
                 break
         conf["senv"]["loggedin"] = "true"
         if "isTrial" in conf["main"] and conf["main"]["isTrial"] == "true":
@@ -422,14 +400,12 @@ def isSadm(conf):
 
 
 def logIn(conf, inputs, outputs):
-    # TODO: confirm assumption: conf is Python dictionary
     if "senv" in conf and conf["senv"] and conf["senv"]["loggedin"] == "true":
         conf["lenv"]["message"] = zoo._("No need to authenticate")
         return zoo.SERVICE_FAILED
     con = getCon(conf)
     con.conf = conf
     prefix = getPrefix(conf)
-    # con.connect(conf)
     try:
         conn = con.conn
     except:
@@ -457,14 +433,10 @@ def logIn(conf, inputs, outputs):
         cid = "MM" + conf["lenv"]["usid"]
         conf["lenv"]["cookie"] = "MMID=" + cid + "; path=/"
 
-        # cid=str(time.time()).split(".")[0]
-        # conf["lenv"]["cookie"]="MMID=MM"+cid+"; path=/"
-
         conf["senv"] = {}
         conf["senv"]["MMID"] = "MM" + cid
         # Set all the Session environment variables using the users 
         # table content.
-        # print(con.desc, file=sys.stderr)
         c.execute(con.desc)
         desc = c.fetchall()
         print(str(conf["senv"]), file=sys.stderr)
@@ -473,38 +445,33 @@ def logIn(conf, inputs, outputs):
                 conf["senv"][i[1]] = str(a[0][i[0]])
             else:
                 if a[0][i[0]] is not None:
-                    print("*****\n"+i[1]+"\n > "+str(a[0][i[0]]),file=sys.stderr)
                     try:
-                        conf["senv"][i[1]] = a[0][i[0]].decode('utf-8')
+                        conf["senv"][i[1]] = int(a[0][i[0]])
                     except:
                         conf["senv"][i[1]] = str(a[0][i[0]])
                 else:
                     conf["senv"][i[1]] = str(a[0][i[0]])
-        print("SENV: "+str(conf["senv"]), file=sys.stderr)
-        print(str(desc), file=sys.stderr)
 
         conf["senv"]["group"] = getGroup(conf, con, inputs['login']['value'])
         conf["senv"]["loggedin"] = "true"
         conf["senv"]["isAdmin"] = "true"
-        print("SENV: "+str(conf["senv"]), file=sys.stderr)
 
         if "isTrial" in conf["main"] and conf["main"]["isTrial"] == "true":
             conf["senv"]["isTrial"] = "true"
         else:
             conf["senv"]["isTrial"] = "false"
 
-        print("SENV: "+str(conf["senv"]), file=sys.stderr)
         outputs["Result"]["value"] = zoo._("User ") + str(conf["senv"]["login"]) + zoo._(" authenticated")
         print("SENV: "+str(conf["senv"]), file=sys.stderr)
         sql = " UPDATE " + prefix + "users set last_con=" + con.now + " WHERE login=[_login_]"
         con.pexecute_req([sql, {"login": {"value": inputs["login"]["value"], "format": "s"}}])
         conn.commit()
-        print(str(conf["senv"]), file=sys.stderr)
-        #try:
-        #    loginFlux(conf, h)
-        #except:
-        #    pass
-        print("SENV: "+str(conf["senv"]), file=sys.stderr)
+        if "hasFlux" in conf["main"]:
+            try:
+                loginFlux(conf, h)
+            except Exception as e:
+                print(str(e),file=sys.stderr)
+                pass
         return zoo.SERVICE_SUCCEEDED
     else:
         conf["lenv"]["message"] = zoo._("Unable to connect with the provided login and password")
