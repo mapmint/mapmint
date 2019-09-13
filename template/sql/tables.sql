@@ -1,5 +1,5 @@
 create schema mm_tables;
-create scheme mm_ghosts;
+create schema mm_ghosts;
 
 --
 -- Table used to store history
