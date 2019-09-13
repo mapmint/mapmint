@@ -123,16 +123,38 @@
 	onchange="if(\$(this).is(':checked'))\$(this).parent().next().show();else
 	\$(this).parent().next().hide();" /> </label>
         <div class="col-sm-9 range" style="display:none">
-	  <div class="input-group" id="wmts_server_url">
+#if $mms.getMetadata($m.web,"mmWMTSBLURL")!=""
+#try
+#set WMTSURLS=$mms.getMetadata($m.web,"mmWMTSBLURL").split(";")
+#set WMTSATTRIBUTIONS=$mms.getMetadata($m.web,"mmWMTSAttribution").split(";")
+#set WMTSLAYERS=$mms.getMetadata($m.web,"mmWMTSBaseLayers").split(";")
+#except
+#set WMTSURLS=[' ']
+#set WMTSATTRIBUTIONS=['']
+#set WMTSLAYERS=['']
+#end try
+#else
+#set WMTSURLS=[' ']
+#set WMTSATTRIBUTIONS=['']
+#set WMTSLAYERS=['']
+#end if
+#set limit=len(WMTSURLS)
+#if limit>1
+#set limit-=1
+#end if
+#for k in range(limit)
+#if WMTSURLS[k]!=""
+#set wmts={"url":WMTSURLS[k],"layers":WMTSLAYERS[k],"attribution":WMTSATTRIBUTIONS[k]}
+	  <div class="input-group  wmts_server_url" id="wmts_server_url">
 	    <span class="input-group-btn" title="$zoo._("Set URL")" rel="tooltip">
 	    <button class="btn btn-default disabled" type="button">$zoo._("Set")</button>
 	    </span>
-	    <input type="text" class="form-control" placeholder="$zoo._("WMTS Server URL")" value="$mms.getMetadata($m.web,"mmWMTSBLURL")"/>
+	    <input type="text" class="form-control" placeholder="$zoo._("WMTS Server URL")" value="$wmts["url"]"/>
 	  </div>
-	  <div id="wmts_layers_list">
+	  <div class="wmts_layers_list" id="wmts_layers_list">
 #try	    
-#if $mms.getMetadata($m.web,"mmWMTSBLURL")!=""
-#set tmp=$mms.getMetadata($m.web,"mmWMTSBaseLayers").split(",")
+#if $wmts["layers"]!=""
+#set tmp=$wmts["layers"].split(",")
 #for i in range(len($tmp))	    
 #set tmp0=tmp[$i].split("|")
 	    <div class="col-sm-6">
@@ -158,13 +180,20 @@
 	    <label class="col-sm-2">$zoo._("Attributions")</label>
 	    <div class="col-sm-10">
 #try
-#set val=open($mms.getMetadata($m.web,"mmWMTSAttribution").replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"])).read()
+#set val=open($wmts["attribution"].replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"])).read()
 #except
-#set val=$mms.getMetadata($m.web,"mmWMTSAttribution")
+#set val=$wmts["attribution"]
 #end try
 	      <textarea name="wmts_attribution" class="form-control mm-editor">$val</textarea>
 	    </div>
 	  </div>
+#end if
+          <div>
+            <a class="btn"  href="#" onclick="if(app.firstLoad==null) app.firstLoad=\$('#wmts_server_url').parent().html();\$(this).parent().parent().append(app.firstLoad);app.addWMTS();return true;">$zoo._("Add")</a>
+            <a class="btn" style="#if $k==0#display:none#end if#"  href="#" onclick="app.deleteWMTS();return true;">$zoo._("Remove")</a>
+          </div>
+#end for
+
 	</div>
       </div>
 <script id="template_wmts_layers" type="template/text">

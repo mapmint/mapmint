@@ -194,7 +194,32 @@ define([
 	    });
 
 	if($("#mmWMTSBL").is(":checked")){
-	    inputs.push({
+            $(".wmts_layers_list").each(function(){
+                inputs.push({
+			"identifier": "mmWMTSBLURL",
+			"value":      $(this).prev().find('input[type="text"]').val(),
+			"dataType":   "string"
+                });
+		var val=$(this).next().find("textarea[name=wmts_attribution]").summernote("code");
+		inputs.push({
+			"identifier": "mmWMTSAttribution",
+			"value": (val.indexOf("<div>")==0?"":"<div>")+val+(val.indexOf("<div>")==0?"":"</div>"),
+			"mimeType": "text/plain"
+		});
+	        var value="";
+		$(this).find('input[type="checkbox"]').each(function(){
+			if(value!="")
+				value+=",";
+			value+=$(this).parent().next().attr("data-value")+"|"+$(this).parent().parent().parent().next().find('input[type="text"]').first().val();
+		});
+		inputs.push({
+			"identifier": "mmWMTSBaseLayers",
+			"value": value,
+			"dataType": "string"
+		});
+		
+            });
+	    /*inputs.push({
 		"identifier": "mmWMTSBLURL",
 		"value":      $("#wmts_layers_list").prev().find('input[type="text"]').val(),
 		"dataType":   "string"
@@ -215,7 +240,7 @@ define([
 		"identifier": "mmWMTSBaseLayers",
 		"value": value,
 		"dataType": "string"
-	    });
+	    });*/
 
 	}
 
@@ -717,16 +742,94 @@ define([
 
 	if($("#wmts_layers_list").parent().find("input[type=text]").first().val()!=""){
 	    $("#mmWMTSBL").prop("checked",true).change();
-	    $("#wmts_server_url").find("input").first().input();
+	    $("#wmts_server_url").find("input").first().focus();
 	}
+        if($(".wmts_server_url").first().find('input').first().val()==" ")
+          $("#mmWMTSBL").prop("checked",false).change();
+
 	$("#mmBBDefault").change();
     };
 
+
+    function addWMTS(){
+        $(".wmts_server_url").last().find("input").last().on('input', function(){
+            console.log($(this));
+            if($(this).val().indexOf("http://")>=0 || $(this).val().indexOf("https://")>=0){
+                $(this).prev().find("button").first().removeClass("disabled");
+                $(this).prev().find("button").first().off("click");
+                var myElement=$(this).val();
+                $(this).prev().find("button").first().on("click",function(){
+                    console.log($(this));
+		    var myRootElement=$(this).parent().parent().next();
+                    myRootElement.html("");
+                    $.ajax({
+                        url: myElement,
+                        success: function(data){
+                            //alert("ok");
+                            console.log(data);
+                            var tmp=$(data).find("Contents").find("Layer").each(function(){
+                                var template=$("#template_wmts_layers")[0].innerHTML;
+                                template=template.replace(/VAL/g,$(this).find("ows\\:Identifier").text().replace(/ /g,"__")+'|'+$(this).find("ResourceURL").attr("template").replace(/TileMatrix/g,"z").replace(/TileCol/g,"x").replace(/TileRow/g,"y")+'|'+$(this).find("ows\\:Title").text());
+                                template=template.replace(/NEWTITLE/g,$(this).find("ows\\:Title").text());
+                                template=template.replace(/TITLE/g,$(this).find("ows\\:Title").text());
+                                myRootElement.append(template);
+                            });
+                            console.log(data);
+                            myRootElement.find('input[type="checkbox"]').each(function(){
+                                $(this).off("change");
+                                $(this).on("change",function(){
+                                    var closure=$(this);
+                                    if($(this).is(":checked")){
+                                        $("#base_layer_active").append("<option value='"+$("#base_layer_active").find("option").lengh+"'>"+closure.parent().parent().parent().next().find('input').first().val()+"</option>");
+                                    }else{
+                                        $("#base_layer_active").find("option").each(function(){
+                                            if($(this).text()==closure.parent().parent().parent().next().find('input').first().val())
+                                                $(this).remove();
+                                        });
+                                    }
+                                });
+                            });
+                            if($("#mmBBDefault_ini").length && $("#mmBBDefault_ini").val()!=""){
+                                var tmp=$("#mmBBDefault_ini").val().split(',');
+                                $("#Planet").find("option").each(function(){
+                                    if(tmp.indexOf($(this).val())>=0)
+                                        $(this).prop("selected",true);
+                                });
+                                $("#mmBBDefault_ini").val("");
+                            }
+
+                        },
+                        error: function(){
+                            alert("NO OK");
+                        }
+                    });
+                });
+            }
+        });
+        $(".wmts_server_url").last().next().next().next().find("a.btn").last().show();
+        if($("#wmts_layers_lis").parent().find("input[type=text]").first().val()!=""){
+            $("#mmWMTSBL").prop("checked",true).change();
+            $("#wmts_server_url").find("input").first().focus();
+        }
+        $("#mmBBDefault").change();
+    }
+   
+    function deleteWMTS(){
+       $(".wmts_server_url").last().next().next().next().remove();
+       $(".wmts_server_url").last().next().next().remove();
+       $(".wmts_server_url").last().next().remove();
+       $(".wmts_server_url").last().remove();
+    }
+
+    var firstLoad=null;
     // Return public methods
     return {
         initialize: initialize,
 	updateBaseLayers: updateBaseLayers,
 	displayPermissionForm: displayPermissionForm,
+        addWMTS: addWMTS,
+        deleteWMTS: deleteWMTS,
+        firstLoad: firstLoad,
     };
 
 

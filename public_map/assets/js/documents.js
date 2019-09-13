@@ -117,7 +117,7 @@ define([
 	    if(!$(this).attr("id"))
 		return;
 	    if($(this).attr("id").replace(reg,"")=="description"){
-		$(this).code(data[$(this).attr("id").replace(reg,"")]);
+		$(this).summernote("code",data[$(this).attr("id").replace(reg,"")]);
 	    }
 	    else
 		$(this).val(data[$(this).attr("id").replace(reg,"")]).change();
@@ -188,7 +188,7 @@ define([
 		return;
 	    var cid=$(this).attr('id').replace(reg0,"");
 	    if(cid=="description")
-		params[cid]=$(this).code();
+		params[cid]=$(this).summernote("code");
 	    else
 		params[cid]=$(this).val();
 	});

@@ -25,7 +25,25 @@
     DataType = string
     <Default />
    </LiteralData>
-  [mm_themes_class]
+  [mmWMTSBLURL]
+   Title = Input string
+   Abstract = The name of the map.
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [mmWMTSAttribution]
+   Title = Input string
+   Abstract = The name of the map.
+   minOccurs = 0
+   maxOccurs = unbounded
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [mmWMTSBaseLayers]
    Title = Input string
    Abstract = The name of the map.
    minOccurs = 0

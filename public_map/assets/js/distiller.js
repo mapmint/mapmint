@@ -748,7 +748,7 @@ define([
 		inputs.push({
 		    "identifier": checkboxes[i]["id"],
 		    "value": (checkboxes[i]["isSrs"]?"+init=":"")+myLocation.find("#"+checkboxes[i]["value"]).val(),
-		    "dataType": "string"
+		    "mimeType": "text/plain"
 		});
 	    }
 	}

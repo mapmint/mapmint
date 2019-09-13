@@ -1,3 +1,4 @@
+import zoo
 import sys
 
 mmatypes = ["r", "w", "x"]

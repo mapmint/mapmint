@@ -326,7 +326,7 @@ CREATE TABLE documents_themes (
 
 
 CREATE TABLE pages (
-    id integer NOT NULL,
+    id serial PRIMARY KEY,
     title character varying(255),
     content text
 );

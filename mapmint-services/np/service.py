@@ -33,6 +33,29 @@ myList=list
 
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 
+
+
+def unzip(conf,inputs,outputs):
+    import zipfile
+    f=open(inputs["zip"]["cache_file"])
+    z=zipfile.ZipFile(f)
+    fullDir=conf["main"]["tmpPath"]+"/zip_"+conf["lenv"]["usid"]
+    z.extractall(path=fullDir)
+    import glob,os,shutil
+    rpath=fullDir
+    tmp=glob.glob(rpath+"/*")
+    for i in range(len(tmp)):
+        source=tmp[i]
+        tmp0=tmp[i].split("/")
+        destination="/"
+        for j in range(len(tmp0)-1):
+            destination+=tmp0[j]+"/"
+        destination+=tmp0[len(tmp0)-1].replace(".2","_2").replace("-","_")
+        shutil.move(source,destination)
+    outputs["Result"]["value"]=fullDir
+    return zoo.SERVICE_SUCCEEDED
+
+
 '''
 JQuery ui tree json format:
 [

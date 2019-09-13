@@ -157,7 +157,7 @@ define([
 		if($(".window.active").length){
 		    if(!$(".window.active").find("h4").first().find("select").length){
 			var tmpTxt=$(".window.active").find("h4").first().text();
-			$(".window.active").find("h4").first().html("<select><option value='"+(featuresCnt)+"'>"+tmpTxt+"</option></select>");
+			$(".window.active").find("h4").first().html("<select class='form-control' style='max-width: 95%'><option value='"+(featuresCnt)+"'>"+tmpTxt+"</option></select>");
 		    }
 		    $(".window.active").find("h4").first().find("select").append("<option value='"+(featuresCnt+1)+"'>"+oLayers[gfLayer].alias+"</option>")
 		    $(".window.active").find(".window-body").first().append("<div class='featureInfo' id='featureInfo_"+(featuresCnt+1)+"'><p>"+res.replace(/script1/g,"script")+"</p></div>");
@@ -516,30 +516,33 @@ define([
 	if(baseLayers["wmtsBaseLayers"] && baseLayers["wmtsBaseLayers"].length>0){
 	    var wmtsAttrib="";
 	    
-	    for(i=0;i<baseLayers["wmtsBaseLayers"].length;i++){
+	    for(i=0;i<baseLayers["wmtsBaseLayers"].length-1;i++){
 		try{
 
+	          for(ii=0;ii<baseLayers["wmtsBaseLayers"][i].length;ii++){
 		    console.log(wmtsAttrib);
+                    console.log(baseLayers["wmtsBaseLayers"][i][ii]);
 		    layer=new ol.layer.Tile({
 			visible: baseLayers["default"]==myBaseLayers.length?true:false,
 			source: new ol.source.XYZ({
 			    attributions: [new ol.Attribution({
-				html: attributionsWMTS
+				html: attributionsWMTS[i]
 			    })],
-			    url: baseLayers["wmtsBaseLayers"][i].split("|")[1]
+			    url: baseLayers["wmtsBaseLayers"][i][ii].split("|")[1]
 			})
 		    });
 		    
 		    console.log("OK 0");
-		    console.log(baseLayers["wmtsBaseLayers"][i].replace(/\./g,"_"));
+		    console.log(baseLayers["wmtsBaseLayers"][i][ii].replace(/\./g,"_"));
 		    try{
-			url=loadBaseLayerIcon(baseLayers["wmtsBaseLayers"][i].split("|")[0].replace(/\./g,"_"),layer);
+			url=loadBaseLayerIcon(baseLayers["wmtsBaseLayers"][i][ii].split("|")[0].replace(/\./g,"_"),layer);
 		    }catch(e){
 			console.log(e);
 		    }
 		    console.log("OK 1");
 		    console.log(url);
 		    myBaseLayers.push(layer);
+                  }
 		}catch(e){
 		    console.log(e);
 		}
