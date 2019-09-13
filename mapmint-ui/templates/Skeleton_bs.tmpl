@@ -29,7 +29,7 @@
 <link rel="alternate" type="application/rss+xml" title="MapMint RSS Feed" href="$(conf["main"]["applicationAddress"])public/rss" />
 <title>$page_title</title>
 
-#if $conf["mm"].keys().count("useCdn")>0 and $conf["mm"]["useCdn"]=="true"
+#if "useCdn" in $conf["mm"].keys() and $conf["mm"]["useCdn"]=="true"
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 #else
@@ -57,7 +57,7 @@ $istyles
 #include($conf["main"]["templatesPath"]+"/loader_bs.tmpl")
 
 #if $mmodule!="public"
-#if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false") and not($verr)
+#if ("senv" in $conf.keys() and "loggedin" in $conf["senv"].keys() and "lastname" in $conf["senv"].keys() and $conf["senv"]["loggedin"]!="false") and not($verr)
 <div id="wrapper">
 #set lfonts={
 	"dashboard": "tachometer",
@@ -115,16 +115,16 @@ $istyles
    </ul>
 
 #if $mmenu0 is None	    
-#if $conf["mm"].keys().count('indicators')>0 and $conf["main"]["indicators"]=="true"
+#if 'indicators' in $conf["mm"].keys() and $conf["main"]["indicators"]=="true"
 #set menu=['Dashboard','Distiller','Territories','Indicators','Themes','Documents','Manager','Publisher']
 #else
-#if $conf["mm"].keys().count('indicators')>0 and $conf["mm"]["documents"]=="true"
+#if 'indicators' in $conf["mm"].keys() and $conf["mm"]["documents"]=="true"
 #set menu=['Dashboard','Distiller','Manager','Themes','Documents','Publisher']
 #else
 #set menu=['Dashboard','Distiller','Manager','Themes','Publisher']
 #end if
 #end if
-#if $conf["mm"].keys().count('tables')>0 and $conf["mm"]["tables"]=="true"
+#if 'tables' in $conf["mm"].keys() and $conf["mm"]["tables"]=="true"
 #set mmenu0=[]
 #for a in range(0,len($menu))
 #set $mmenu0+=[$menu[a]]
@@ -138,7 +138,7 @@ $istyles
 #set $menu=$mmenu0
 #end if
 
-#if $conf["mm"].keys().count('importers')>0 and $conf["mm"]["importers"]=="true"
+#if 'importers' in $conf["mm"].keys() and $conf["mm"]["importers"]=="true"
 #set mmenu0=[]
 #for a in range(0,len($menu))
 #set $mmenu0+=[$menu[a]]
@@ -165,7 +165,7 @@ $istyles
 #end if	      
 	      </li>
 #end for
-#if $menu.count($inputs['tmpl']['value'].replace("_bs",""))==0
+#if $inputs['tmpl']['value'].replace("_bs","") not in $menu
 	      $mmenu
 #end if
 
@@ -188,10 +188,10 @@ $body
 $tfooter
 #end if
 	</div>
-#if $mmodule!="public" and ($conf.keys().count("senv")>0 and $conf["senv"]["loggedin"]!="false" and $conf["senv"].keys().count("firstname")>0) and not($verr)
+#if $mmodule!="public" and ("senv" in $conf.keys() and $conf["senv"]["loggedin"]!="false" and "firstname" in $conf["senv"].keys()) and not($verr)
 <div class="ui-layout-south hide"></div>
 #else
-#if $conf["mm"].keys().count("nofooter")==0 or ($conf["mm"]["nofooter"]!="true" and $conf["mm"].keys().count("nofooter")>0)
+#if not("nofooter" in $conf["mm"].keys()) or ($conf["mm"]["nofooter"]!="true" and "nofooter" in $conf["mm"].keys())
 <footer>
   <div class="container text-center">
 #from datetime import datetime

@@ -81,7 +81,7 @@ var counter=0;
 </div>
 <div id="indicatorForm" class="col-sm-7 col-lg-8">
 #def printTab($obj)
-  <li role="presentation" #if $obj.keys().count("active")#class="active"#end if#><a role="tab" data-toggle="tab" href="#indicators_form_$obj["font"]"><i class="fa fa-$obj["font"]"> </i><span class="hidden-sm"> $obj["title"]</span></a></li>
+  <li role="presentation" #if "active" in $obj.keys()#class="active"#end if#><a role="tab" data-toggle="tab" href="#indicators_form_$obj["font"]"><i class="fa fa-$obj["font"]"> </i><span class="hidden-sm"> $obj["title"]</span></a></li>
 #end def
 
 #def label

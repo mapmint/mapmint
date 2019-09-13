@@ -1,10 +1,10 @@
 #import zoo
 <form method="post">
     <div class="ti-top">
-     <span>#if $inputs.keys().count('type')==0#$zoo._("TileIndex name:")#else#$zoo._("New file name:")#end if#</span>
+     <span>#if not('type' in $inputs.keys())#$zoo._("TileIndex name:")#else#$zoo._("New file name:")#end if#</span>
 	 <input name="tname" id="tname" value="" />
 	</div>
-#if $inputs.keys().count('type')==0
+#if not('type' in $inputs.keys())
     <div class="sti-top">
 
 #from Cheetah.Template import Template
@@ -40,5 +40,5 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection.tmpl",sear
          <span>$zoo._("Filename extension:")</span>
 	 <input type="text" id="t_ext" value="tif" />
 	</div>
-	<div><input type="submit" value="$zoo._("Create")" onclick="try{#if $inputs.keys().count('type')==0#createTileindex();#else#mozaicImages();#end if#}catch(e){alert(e);}return false;" /></div>
+	<div><input type="submit" value="$zoo._("Create")" onclick="try{#if not('type' in $inputs.keys())#createTileindex();#else#mozaicImages();#end if#}catch(e){alert(e);}return false;" /></div>
 </form>

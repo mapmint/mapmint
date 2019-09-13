@@ -19,7 +19,7 @@ $zoo._("Select a DataStore:")
 #set elements=eval($outputs["Result"]["value"])
 #for i in ('Directories','None')
 #set li=0
-#if $elements and $elements.keys().count($i) > 0
+#if $elements and $i in $elements.keys()
 #for j in $elements[$i] 
 #if li==0
 <!--  <option disabled="true" style="font-weight: bold;color: #111">$i</option> -->

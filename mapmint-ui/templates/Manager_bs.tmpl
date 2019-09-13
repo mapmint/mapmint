@@ -24,7 +24,7 @@ MapMint: $mmodule
 #end def
 
 #def printAdder($obj)
-     <#if $obj.keys().count("ltype")>0#$obj["ltype"]#else#li#end if# class="hide" id="$obj["id"]">
+     <#if "ltype" in $obj.keys()#$obj["ltype"]#else#li#end if# class="hide" id="$obj["id"]">
        <div class="padder">
 	 <h4>$obj["title"]</h4>
 	 <hr />
@@ -35,7 +35,7 @@ MapMint: $mmodule
 	   <button class="btn btn-default" id="$obj["action"]["name"]" onclick="app.basic('$(obj["action"]["name"])',\$(this).parent().prev());" type="button">$obj["action"]["title"]</button>
 	 </span>
        </div>   
-     </#if $obj.keys().count("ltype")>0#$obj["ltype"]#else#li#end if#>
+     </#if "ltype" in $obj.keys()#$obj["ltype"]#else#li#end if#>
 #end def
 
 #def admin_menu
@@ -110,7 +110,7 @@ MapMint: $mmodule
 	   <select id="select-datastore" name="selectDatastore" class="select-window form-control" onchange="app.refreshDatasources()">
 	     <option value="-1">$zoo._("Choose a Data Store")</option>
 #for i in ('WMS','WFS','Directories','MySQL','PostGIS')
-#if $res and $res.keys().count($i) > 0
+#if $res and $i in $res.keys()
 	     <option disabled="true" style="font-weight: bold;color: #111">$zoo._($i)</option>
 #set li=0
 #for j in $res[$i]
@@ -316,11 +316,20 @@ $printAdder({"ltype": "div","id":"mm_addDir","title":$zoo._("Add Group"),"placeh
  <script type="template/text" id="layerLegend_group_template">
    <li class="list-group-item0" data-id="[lid]">
       <i class="fa fa-folder"></i>
+      <i class="fa fa-trash" onclick='\$(this).next().next().next().next().toggle();'></i>
       <i class="fa fa-edit" onclick='\$(this).next().next().toggle();'></i>
       <span>[id]</span>
       <div class="input-group" style="display:none" >
       <input name="g_value" value="[id]" onchange="console.log('CHANGE');\$(this).parent().parent().data('id',\$(this).val());\$(this).parent().prev().text(\$(this).val());" class="form-control" />
       <span class="input-group-btn"><button class="btn btn-default" type="button" href="#" onclick="\$(this).parent().parent().toggle();"><i class="fa fa-check"></i></button></span>
+      </div>
+      <div class="alert alert-warning" style="display:none" >
+      <p>$zoo._("Only item with no child should be removed.")</p>
+      <p>$zoo._("Removing a menu item is irreversible.")</p>
+      <div class="input-group"  >
+      <input name="group" value="[id]" class="form-control" />
+      <span class="input-group-btn"><button class="btn btn-default" type="button" href="#" onclick="app.complex('delDir',\$(this).parent().parent())"><i class="fa fa-trash"></i></button></span>
+      </div>
       </div>
       <ul class="nav-[level]-level collapse in" id="[lid]"></ul>
    </li>

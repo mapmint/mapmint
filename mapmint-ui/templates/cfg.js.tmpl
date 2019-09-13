@@ -184,7 +184,7 @@ var processResultLayer;
 #include($conf["main"]["templatesPath"]+"/preview/modules/indexes/_init.js")
 #end if
 
-#if $inputs.has_key("filter")
+#if "filter" in $inputs.keys()
 System.iniFilterValue="$inputs["filter"]["value"]";
 #end if
 
@@ -196,7 +196,7 @@ var pmapfiles={
 #if $cnt >0
     ,
 #end if
-     "$m.getLayer($l).name":[ "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($m.getLayer($l).metadata.get('mmFilterField') or $m.getLayer($l).metadata.get('mmZFilterField')) and $inputs.has_key('filter')#_"+System.iniFilterValue+"#end if##end if#.map","$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map","$m.getLayer($l).metadata.get("mmTitle")",#if $m.getLayer($l).metadata.get('mmMaxScale')!=None#$m.getLayer($l).metadata.get('mmMaxScale')#else#100000000000000#end if#,#if $m.getLayer($l).metadata.get('mmMinScale')!=None#$m.getLayer($l).metadata.get('mmMinScale')#else#0#end if#,#if $m.getLayer($l).metadata.get('mmExport')=="true"#true#else#false#end if#,#if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $m.getLayer($l).metadata.get('mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#]
+     "$m.getLayer($l).name":[ "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($m.getLayer($l).metadata.get('mmFilterField') or $m.getLayer($l).metadata.get('mmZFilterField')) and (filter in $inputs.keys())#_"+System.iniFilterValue+"#end if##end if#.map","$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map","$m.getLayer($l).metadata.get("mmTitle")",#if $m.getLayer($l).metadata.get('mmMaxScale')!=None#$m.getLayer($l).metadata.get('mmMaxScale')#else#100000000000000#end if#,#if $m.getLayer($l).metadata.get('mmMinScale')!=None#$m.getLayer($l).metadata.get('mmMinScale')#else#0#end if#,#if $m.getLayer($l).metadata.get('mmExport')=="true"#true#else#false#end if#,#if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $m.getLayer($l).metadata.get('mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#]
 #set $cnt+=1
 #end if
 #end for

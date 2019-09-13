@@ -15,8 +15,8 @@
     <input type="text" id="umail" value="$res[0][0]" />
   </li>
 </ul>
-<input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Save")" onclick="try{saveUserPreferences();}catch(e){alert(e)}return false;" style="display:none"  />   
-#if not($inputs.has_key("pcancel"))
+<input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Save")" onclick="try{saveUserPreferences();}catch(e){alert(e)}return false;" style="display:none" />   
+#if not("pcancel" in $inputs.keys())
 <input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Cancel")" onclick="try{cancelUserPreferences();}catch(e){alert(e)}return false;" />
 #end if   
 <input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Logout")" onclick="try{logoutUser();}catch(e){alert(e)}return false;" />

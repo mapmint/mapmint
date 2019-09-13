@@ -1,5 +1,5 @@
 #def printListImgs($conf,$inputs,$cnt,$mapfile,$cimgs,$i,$j)
-<a href="#" id="$images[$i].id.replace('Symbol_',"")" onclick="#if $inputs.keys().count('ttf')>0#symbolAddToSelection(\$(this),'$images[$i].id.replace('Symbol_',"")')#else#symbolAddToRSelection(\$(this),'$i')#end if#">
+<a href="#" id="$images[$i].id.replace('Symbol_',"")" onclick="#if 'ttf' in $inputs.keys()#symbolAddToSelection(\$(this),'$images[$i].id.replace('Symbol_',"")')#else#symbolAddToRSelection(\$(this),'$i')#end if#">
 <span style="display:inline-block;background: #e6e6e6 url('$conf["main"]["mapserverAddress"]?map=$mapfile&LAYERS=$(','.join($cimgs))&SRS=EPSG%3A4326&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&BBOX=#if $cnt==0#-#end if#$(cnt*64).502,0,$((cnt+1)*64).502,0.002&WIDTH=2048&HEIGHT=32&format=png') no-repeat scroll #if $j>0#-#end if##if $cnt==0#$(((j)*31.51))#else#$((j-1)*32)#end if#px 0 !important;width:32px;height:32px;" >
 </span>
 <i class="fa fa-square-o" style="display:inline-block;position:relative;clear:none;top:-2px;left: -15px; margin-right:-15px;height:0px;"></i>
@@ -17,7 +17,7 @@
 #set cnt=0
 #for i in range(len($images))
 #*
-     <a href="#" onclick="#if $inputs.keys().count('ttf')>0#symbolAddToOrig('$images[$i].id.replace('Symbol_',"")')#end if#"><img src="$images[$i].value" /></a>
+     <a href="#" onclick="#if 'ttf' in $inputs.keys()#symbolAddToOrig('$images[$i].id.replace('Symbol_',"")')#end if#"><img src="$images[$i].value" /></a>
 *#
 
 #set $cimgs+=[$images[$i].id]

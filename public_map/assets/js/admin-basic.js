@@ -237,6 +237,44 @@ define([
 		cb(matches);
 	    };
 	};
+	(function(){
+		console.log("INVOCATION")
+	    zoo.execute({
+		identifier: "mapfile.listMap",
+		type: "POST",
+		dataInputs: [],
+		dataOutputs: [
+		    {"identifier":"Result","type":"raw"},
+		],
+		success: function(data){
+		    console.log("SUCCESS");
+		    console.log(data);
+			var resultSet=[];
+			for(var i=0;i<data.length;i++){
+				resultSet.push(data[i]["id"]);
+			}
+			var loadButton=elem[0].next().find("button").first();
+			loadButton.click(function(e){
+				if(!$(this).hasClass("disabled")){
+					if(!onLoad)
+						loadMap(zoo,[elem[0].val(),elem[1].val()]);
+					else
+						onLoad(zoo,[elem[0].val(),elem[1].val()]);
+				}
+			});
+			elem[0].typeahead(null,{           
+				name: 'Search-Project',
+				source: substringMatcher(resultSet)
+			}).on("typeahead:selected", function(obj, datum, name) {
+				loadButton.removeClass("disabled");
+			});
+		},
+		error: function(data){
+		    console.log("ERROR");
+		}
+	    });
+	})();
+	    /*
 	$.ajax({
 	    url: module.config().url+"?request=Execute&service=WPS&version=1.0.0&Identifier=mapfile.listMap&RawDataOutput=Result&DataInputs="+(extra?extra:""),
 	    method: 'GET',
@@ -269,6 +307,7 @@ define([
 		
 	    }
 	});	
+	*/
     }
 
     /** 

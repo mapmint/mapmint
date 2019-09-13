@@ -1,7 +1,7 @@
 #import zoo
 #import mm_access
 #import mapscript
-#if $inputs.has_key("dataStore")
+#if "dataStore" in $inputs.keys()
 #import datastores.service as ds
 #set m=mapscript.mapObj(ds.getPath($conf,$inputs["dataStore"]["value"])+"ds_ows.map")
 #else
@@ -10,7 +10,7 @@
 #set inputs1=$inputs
 #set $inputs1["prefix"]={"value":"layer_","dataType":"string"}
 <div id="datasourcePrivileges">
-#if ($inputs.has_key("dataStore") and $mm_access.checkDataSourcePriv($conf,$m,$inputs["dataStore"]["value"],$inputs["layer"]["value"],"rwx")) or not($inputs.has_key("dataStore"))
+#if ("dataStore" in $inputs.keys() and $mm_access.checkDataSourcePriv($conf,$m,$inputs["dataStore"]["value"],$inputs["layer"]["value"],"rwx")) or not("dataStore" in $inputs.keys())
 <form>
 <div>
 #try
@@ -22,7 +22,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/UsersManagement/GroupList_bs.ht
 </div>
 <div>
 <input type="hidden" id="am_layerName" value="$inputs["layer"]["value"]" />
-#if $inputs.has_key("dataStore")
+#if "dataStore" in $inputs.keys()
 <input type="hidden" id="am_dataStoreName" value="$inputs["dataStore"]["value"]" />
 #end if
 <button class="btn btn-default" value="" onclick="return false">$zoo._("Valid")</button>

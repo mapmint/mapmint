@@ -141,7 +141,7 @@ function init(){
     }
 
 #set urls=[]
-#if $conf["main"].has_key("mapserverAddresses")
+#if "mapserverAddresses" in $conf["main"].keys()
 #set tmp=$conf["main"]["mapserverAddresses"].split(",")
 #for i in $tmp
 #set $urls+=[$i+"?map="+$conf["main"]["dataPath"]+"/maps/baselayer.map"]

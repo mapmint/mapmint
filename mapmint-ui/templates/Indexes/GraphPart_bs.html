@@ -3,7 +3,7 @@
 #include $tmpl
 #set ftmpl=$self._CHEETAH__cheetahIncludes[$tmpl]
 #try
-#if $inputs.has_key("prefix")
+#if "prefix" in $inputs.keys()
 #set prefix="agregate_"
 #else
 #set prefix=""
@@ -12,7 +12,7 @@
 #set prefix=""
 #end try
 <div style="display:block;" class="form-horizontal" id="$(prefix)chart">
-#if $inputs.has_key("prefix")
+#if "prefix" in $inputs.keys()
   <input id="$(prefix)graphs_id" type="hidden" class="rounded frm" value="-1" />
 #else
   <div class="loader-container">
@@ -34,7 +34,7 @@
   $ftmpl.printLine({"rid":"documents_"+$prefix+"graphs_formula","id":$prefix+"graphs_formula","name":$zoo._("Formula"),"type":"textarea"})
   $ftmpl.printLine({"rid":"documents_"+$prefix+"graphs_tooltip","id":$prefix+"graphs_tooltip","name":$zoo._("Tooltip"),"type":"textarea"})
 
-#if $inputs.keys().count("prefix")==0
+#if not("prefix" in $inputs.keys())
   $ftmpl.printButton({"id":"preview","name":$zoo._("Preview")})
   $ftmpl.printButton({"id":"save","name":$zoo._("Save")})
 #end if

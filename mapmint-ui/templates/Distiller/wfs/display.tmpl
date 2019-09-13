@@ -1,5 +1,5 @@
 #import zoo
-#if $inputs.has_key("name")
+#if "name" in $inputs.keys()
 #set url=open($conf["main"]["dataPath"]+"/"+$inputs["type"]["value"].upper()+"/"+$inputs["name"]["value"]+".txt").read
 #set name=$inputs["name"]["value"]
 #set etype="Edit"

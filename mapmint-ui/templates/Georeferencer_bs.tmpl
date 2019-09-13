@@ -130,7 +130,7 @@ MapMint: $mmodule
 	    <div class="pull-right">
 	      <div class="btn-group">
 #for i in $objs
-	    <button type="button" class="btn btn-default btn-xs hidden-md hidden-xs hidden-sm #if $i.keys().count('optional')>0#disabled require-select#end if#"  data-toggle="tooltip" data-mmaction="$i.name" title="$i.title">
+	    <button type="button" class="btn btn-default btn-xs hidden-md hidden-xs hidden-sm #if 'optional' in $i.keys()#disabled require-select#end if#"  data-toggle="tooltip" data-mmaction="$i.name" title="$i.title">
 	    <i class="fa $i.font fa-fw"></i>
 	    </button>
 #end for

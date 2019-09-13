@@ -106,7 +106,7 @@ $printItem("favorite","fa-star-o","Add to favorites",True,True)
 #set ot=False
 #end if
 #* A button group *#
-#if $conf["navbar"].keys().count($i+"_group")>0
+#if $i+"_group" in $conf["navbar"].keys()
 #set num=0
 
 #for j in $conf["navbar"][$i+"_group"].split(',')

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
-#  Author:   Gérald Fenoy, gerald.fenoy@cartoworks.com
-#  Copyright (c) 2010-2014, Cartoworks Inc. 
+#  Author:   Gérald Fenoy, gerald.fenoy@geolabs.fr
+#  Copyright (c) 2010-2019, Cartoworks Inc. 
 ############################################################################### 
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -49,39 +49,41 @@ POSTGRESQL:
 
 '''
 
-def saveContext(conf,inputs,outputs):
-    print >> sys.stderr,"DEBUG 0000"
-    #conn = sqlite3.connect(conf['main']['dblink'])
-    con=auth.getCon(conf)
-    prefix=auth.getPrefix(conf)
+
+def saveContext(conf, inputs, outputs):
+    con = auth.getCon(conf)
+    prefix = auth.getPrefix(conf)
     con.connect()
     cur = con.conn.cursor()
-    newNameId=str(time.time()).split('.')[0]
-    name=shortInteger.shortURL(int(newNameId))
-    layers=""
-    if inputs["layers"].has_key('length'):
+    newNameId = str(time.time()).split('.')[0]
+    name = shortInteger.shortURL(int(newNameId))
+    layers = ""
+    if 'length' in inputs["layers"]:
         for i in inputs["layers"]["value"]:
-            if layers!='':
-                layers+=","
-            layers+=i
+            if layers != '':
+                layers += ","
+            layers += i
     else:
-            layers+=inputs["layers"]["value"]
-    req="INSERT INTO "+prefix+"contexts (name,layers,ext) VALUES ([_name_],[_layers_],[_extent_])"
-    con.pexecute_req([req,{"name":{"value":name,"format":"s"},"layers":{"value":layers,"format":"s"},"extent":{"value":inputs["extent"]["value"],"format":"s"}}])
+        layers += inputs["layers"]["value"]
+    req = "INSERT INTO " + prefix + "contexts (name,layers,ext) VALUES ([_name_],[_layers_],[_extent_])"
+    con.pexecute_req([req, {"name": {"value": name, "format": "s"}, "layers": {"value": layers, "format": "s"},
+                            "extent": {"value": inputs["extent"]["value"], "format": "s"}}])
     con.conn.commit()
-    outputs["Result"]["value"]=conf["main"]["applicationAddress"]+"public/"+conf["senv"]["last_map"]+";c="+name
+    outputs["Result"]["value"] = conf["main"]["applicationAddress"] + "public/" + conf["senv"][
+        "last_map"] + ";c=" + name
     return zoo.SERVICE_SUCCEEDED
 
-def loadContext(conf,inputs,outputs):
-    con=auth.getCon(conf)
-    prefix=auth.getPrefix(conf)
+
+def loadContext(conf, inputs, outputs):
+    con = auth.getCon(conf)
+    prefix = auth.getPrefix(conf)
     con.connect()
     conn = con.conn
     cur = con.conn.cursor()
-    name=inputs["name"]["value"]
-    req="SELECT ext,layers from "+prefix+"contexts where name = [_name_]"
-    con.pexecute_req([req,{"name":{"value":name,"format":"s"}}])
+    name = inputs["name"]["value"]
+    req = "SELECT ext,layers from " + prefix + "contexts where name = [_name_]"
+    con.pexecute_req([req, {"name": {"value": name, "format": "s"}}])
     con.conn.commit()
-    res=con.cur.fetchall()
-    outputs["Result"]["value"]=json.dumps({"ext": res[0][0],"layers": res[0][1].split(',')})
+    res = con.cur.fetchall()
+    outputs["Result"]["value"] = json.dumps({"ext": res[0][0], "layers": res[0][1].split(',')})
     return zoo.SERVICE_SUCCEEDED

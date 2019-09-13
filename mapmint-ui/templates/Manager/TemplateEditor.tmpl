@@ -1,7 +1,7 @@
 #import zoo
 #try
 #set ext="tmpl"
-#if $inputs.keys().count("name")
+#if "name" in $inputs.keys()
 #set ext=$inputs["name"]["value"]
 #end if
 #set f=open($conf["main"]["dataPath"]+"/templates/"+$inputs["layer"]["value"]+"_"+$inputs["map"]["value"]+"_"+$ext+".html","r")

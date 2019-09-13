@@ -11,10 +11,10 @@
 #end try
 
 #set mapPath=$conf["main"]["dataPath"]+"/maps"
-#if $inputs.has_key('prefix')
+#if 'prefix' in $inputs.keys()
 #set $mapPath=$conf["main"]["dataPath"]+"/"+$inputs["prefix"]["value"]+"_maps"
 #end if
-#if $inputs.has_key('mmStep')
+#if 'mmStep' in $inputs.keys()
 #set mapfile=$mapPath+"/map4legend_"+$inputs["name"]["value"]+"_"+$inputs["layer"]["value"].replace(".","_")+"_step"+$inputs["mmStep"]["value"]+".map"
 #else
 #set mapfile=$mapPath+"/map4legend_"+$inputs["name"]["value"]+"_"+$inputs["layer"]["value"].replace(".","_")+".map"
@@ -36,7 +36,7 @@
 </thead>
 <tbody>
 #for a in range(0,$m.getLayerByName($inputs["layer"]["value"]).numclasses)
- <tr  onclick="editClass('$a'#if $inputs.has_key('mmStep')#,'$inputs["mmStep"]["value"]'#else##if $inputs.has_key('isStep')#,'0'#end if##end if#);">
+ <tr  onclick="editClass('$a'#if 'mmStep' in $inputs.keys()#,'$inputs["mmStep"]["value"]'#else##if 'isStep' in $inputs.keys()#,'0'#end if##end if#);">
   <td>$(a+1)</td>
 
 #if $m.getLayerByName($inputs["layer"]["value"]).type != mapscript.MS_LAYER_RASTER

@@ -10,7 +10,7 @@
 *#
 #try
 #set obj=$json.loads($inputs["elements"]["value"])
-#except Exception,e
+#except Exception as e
 <h1>$e</h1>
 #end try
 #try
@@ -18,7 +18,7 @@
 #set lid=None
 #for k in range(len(objKeys))
 #for j in range(len($obj[$objKeys[k]]))
-#if $obj[$objKeys[k]][j].keys().count("myself")>0
+#if "myself" in $obj[$objKeys[k]][j].keys()
 #import np.service as np
 #set latestOptions=(np.findLatestOptions($obj[$objKeys[k]][j]))
 #set req="select name, value from mm_tables.p_edition_fields where id="+$objKeys[k].replace("edit_","")
@@ -29,7 +29,7 @@
 #set mlkeys=$latestOptions.keys()
 #for i in range(len(mlkeys))
 #* - *#
-#if $latestOptions[mlkeys[i]].keys().count("options")>0 and len($latestOptions[mlkeys[i]]["options"])>0
+#if "options" in $latestOptions[mlkeys[i]].keys() and len($latestOptions[mlkeys[i]]["options"])>0
 #for kk in range(len($latestOptions[mlkeys[i]]["options"]))
 #* -- *#
 #set clause=""
@@ -67,7 +67,7 @@ $json.dumps($fres)
 #set res=$con.pexecute_req([req,{"id":{"value":$val,"format":"s"},"name":{"value":$name,"format":"s"}}])
 #set vals=$con.cur.fetchall()
 #for i in range(len($vals))
-#if $obj[$objKeys[k]][j].keys().count($vals[i][1])>0
+#if $vals[i][1] in $obj[$objKeys[k]][j].keys()
 #for ii in range(len($obj[$objKeys[k]][j][$name]["options"]))
 #set clause=""
 #set $clause+=" "+$obj[$objKeys[k]][j][$name]["tfield"]+" "+$obj[$objKeys[k]][j][$name]["operator"]+" "+str($obj[$objKeys[k]][j][$name]["options"][ii])
@@ -91,8 +91,8 @@ $con.cur.execute($req)
 #end for
 #end for
 $json.dumps($fres)
-#except Exception,e
-#if $obj[0].keys().count("sql_query")>0
+#except Exception as e
+#if "sql_query" in $obj[0].keys()
 #try
 #if len($obj[0]["options"])>0
 #set results={}
@@ -120,7 +120,7 @@ $json.dumps($results)
 #set vals=$con.cur.fetchall()
 $json.dumps($vals)
 #end if
-#except Exception,e1
+#except Exception as e1
 <h2> $e1 </h2>
 #end try
 #else

@@ -3,12 +3,12 @@
 #import mapfile.service as mms
 #set sprefix=$auth.getPrefix($conf)
 #set con=$auth.getCon($conf)
-#if $inputs.has_key("prefix")
+#if "prefix" in $inputs.keys()
 #set prefix=$inputs["prefix"]["value"]
 #else
 #set prefix=""
 #end if
-#if $inputs.has_key("dataStore") and $inputs["dataStore"]["value"][:3]!="WMS"
+#if "dataStore" in $inputs.keys() and $inputs["dataStore"]["value"][:3]!="WMS"
 #set suffix=" WHERE adm=1 and "
 #set suffix1=" WHERE adm=1 "
 #else
@@ -22,7 +22,7 @@
 #set cnt=$cnt[0][0]
 #set res=cur.execute("SELECT name from "+$sprefix+"groups "+$suffix1)
 #set q0=cur.fetchall()
-#if $inputs.has_key("clause")
+#if "clause" in $inputs.keys()
 #if $inputs["clause"]["value"]=="id="
 #set q1=[[""]]
 #else
@@ -36,8 +36,8 @@
 #else
 #set q1=[["public"]]
 #set q2=[["1","1","1"]]
-#if $inputs.has_key("layer")
-#if $inputs.has_key("dataStore")
+#if "layer" in $inputs.keys()
+#if "dataStore" in $inputs.keys()
 #set q1=[["admin"]]
 #end if
 #if $mms.getMetadata($m.getLayerByName($inputs["layer"]["value"]),"mm_access_groups") is not None
@@ -51,7 +51,7 @@
 #end for
 #end if
 #else
-#if $inputs.has_key("dataStore")
+#if "dataStore" in $inputs.keys()
 #import datastores.service as ds
 #set outputs1={"Result":{"value":""}}
 #try
@@ -86,7 +86,7 @@
 <input id="$(prefix)um_gdelete" type="submit"  class="gselectDel" value="$zoo._("Delete")" />
 #end if
 </legend>
-#if $inputs.has_key("layer") or $inputs.has_key("dataStore")
+#if "layer" in $inputs.keys() or "dataStore" in $inputs.keys()
 <div class="row col-sm-12 col-xs-12">
   <div class="#if $ipTest#col-sm-6#else#col-sm-9#end if# col-xs-6 ">
     $zoo._("Group")
@@ -131,7 +131,7 @@
     <input type="text" value="" class="form-control" id="ipAddress" placeholder="$zoo._("IP Address")" />
   </div>
 #end if  
-#if $inputs.has_key("layer")  or $inputs.has_key("dataStore")
+#if "layer" in $inputs.keys()  or "dataStore" in $inputs.keys()
 #set l=0
 #for m in ["r","w","x"]
   <div class="col-sm-1 col-xs-1 ">
@@ -142,7 +142,7 @@
 #end if
 </div>
 #end for
-#if $inputs.has_key("layer") or $inputs.has_key("dataStore")
+#if "layer" in $inputs.keys() or "dataStore" in $inputs.keys()
 
 #end if
 </fieldset>
