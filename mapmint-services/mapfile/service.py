@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ###############################################################################
-#  Author:   Gérald Fenoy, gerald.fenoy@cartoworks.com
+#  Author:   Gérald Fenoy, gerald.fenoy@geolabs.fr
 #  Copyright (c) 2010-2014, Cartoworks Inc. 
 ############################################################################### 
 #  Permission is hereby granted, free of charge, to any person obtaining a
@@ -48,7 +48,7 @@ def getMetadata(elem, field):
 def updateAllExtentForMainDB(conf,inputs,outputs):
     import os,glob,time
     prefix="";
-    if inputs.keys().count("prefix")>0:
+    if "prefix" in inputs:
         prefix=inputs["prefix"]["value"]
     files = filter(os.path.isfile, glob.glob(conf["main"]["dataPath"]+"/"+prefix+"maps/project_*.map"))
     res=[]
@@ -59,15 +59,13 @@ def updateAllExtentForMainDB(conf,inputs,outputs):
             for j in range(myMap.numlayers):
                 l=myMap.getLayer(j)
                 if getMetadata(l,"mmDSTN")==conf["main"]["dbuser"]:
-                    print >> sys.stderr,"Should invoke refreshLayerInfo "+l.name
                     if res[len(res)-1].keys().count("layers")==0:
                         res[len(res)-1]["layer"]=[l.name]
                     else:
                         res[len(res)-1]["layer"]+=[l.name]
                     tmp=refreshLayerInfo(conf,{"map":{"value":files[i].replace(conf["main"]["dataPath"],"").replace("project_","").replace(".map","")},"layer":{"value":l.name}},outputs)
-        except Exception,e:
-            print >> sys.stderr,files[i]
-            print >> sys.stderr,e
+        except Exception as e:
+            print(e,file=sys.stderr)
             continue
     import json
     outputs["Result"]["value"]=json.dumps(res)
@@ -687,10 +685,8 @@ def mmVectorInfo2MapPy(conf, inputs, outputs):
                 node.append(node1)
 
             rnode.append(node)
-    print(sys.stderr, mapfile, file=sys.stderr)
     import lxml.etree as etree
     outputs["Result"]["value"] = etree.tostring(rnode) #doc.serialize()
-    print(sys.stderr, mapfile, file=sys.stderr)
     return zoo.SERVICE_SUCCEEDED
 
 
@@ -990,7 +986,6 @@ def getMapList(conf, inputs, outputs):
         d = getGroupList(conf, conf["main"]["dataPath"] + "/maps/project_" + inputs["name"]["value"] + ".map")
     import sys
     import json
-    print("GROUPS " + str(d), file=sys.stderr)
     outputs["Result"]["value"] = json.dumps(recursMapList(conf, d, []))
     return 3
 
@@ -999,12 +994,10 @@ def recursGroupList1(group, pref):
     res = []
     for i in group:
         res += [{"value": i, "text": pref + i}]
-        # print(type(group[i]).__name__, file=sys.stderr)
         if type(group[i]).__name__ == "str":
             return []
         else:
             for j in range(0, len(group[i])):
-                # print(group[i][j], file=sys.stderr)
                 res += recursGroupList1(group[i][j], i + " / ")
     return res
 
@@ -1012,7 +1005,6 @@ def recursGroupList1(group, pref):
 def getGroupList1(conf, inputs, outputs):
     import json
     d = getGroupList(conf, conf["main"]["dataPath"] + "/maps/project_" + inputs["name"]["value"] + ".map", True)
-    # print( recursGroupList1(d,""), file=sys.stderr)
     outputs["Result"]["value"] = json.dumps(d)
     return zoo.SERVICE_SUCCEEDED
 
@@ -1101,17 +1093,13 @@ def createLegend0(conf, inputs, outputs):
         m = mapscript.mapObj(mapPath + "/timeline_" + inputs["name"]["value"] + "_" + inputs["layer"]["value"].replace(".", "_") + "_step0.map")
         tmpSteps = l.metadata.get("mmSteps").split(',')
         for kk in range(1, len(tmpSteps)):
-            print(kk, file=sys.stderr)
-            print(list(range(0, len(tmpSteps))), file=sys.stderr)
             inputs0 = inputs.copy()
             inputs0["mmStep"] = {"value": str(kk)}
             outputs0 = outputs.copy()
             conf["lenv"]["message"] = zoo._("Create new style for step: ") + str(kk)
             zoo.update_status(conf, 10 + ((kk * 80 / len(tmpSteps))))
             tmp_res = createLegend0(conf, inputs0, outputs0)
-            print(json.loads(outputs0["Result"]["value"]), file=sys.stderr)
             mySteps += [json.loads(outputs0["Result"]["value"], encoding="utf-8")]
-            print(json.dumps(mySteps), file=sys.stderr)
         inputs["isStep"] = {"value": "true"}
     i = 0
     inColor = ""
@@ -1131,7 +1119,6 @@ def createLegend0(conf, inputs, outputs):
         if m.getLayer(i).name == inputs["layer"]["value"]:
             if m.getLayer(i).getClass(mmClass) is not None:
                 if m.getLayer(i).getClass(mmClass).numstyles <= 2:
-                    print("Create new style for symbol fill", file=sys.stderr)
                     m.getLayer(i).getClass(mmClass).insertStyle(m.getLayer(i).getClass(mmClass).getStyle(0).clone())
                 ic = m.getLayer(i).getClass(mmClass).getStyle(mmStyle).color
                 oc = m.getLayer(i).getClass(mmClass).getStyle(mmStyle).outlinecolor
@@ -1152,7 +1139,6 @@ def createLegend0(conf, inputs, outputs):
         if oldM.getLayer(i).name == inputs["layer"]["value"]:
             if oldM.getLayer(i).getClass(mmClass) is not None:
                 if oldM.getLayer(i).getClass(mmClass).numstyles <= 2:
-                    print("Create new style for symbol fill", file=sys.stderr)
                     oldM.getLayer(i).getClass(mmClass).insertStyle(oldM.getLayer(i).getClass(mmClass).getStyle(0).clone())
 
                 ic = oldM.getLayer(i).getClass(mmClass).getStyle(mmStyle).color
@@ -1185,7 +1171,6 @@ def createLegend0(conf, inputs, outputs):
                     else:
                         j.getClass(l).setExpression(None)
                     l -= 1
-                # print("INSERT Layer: "+j.name, file=sys.stderr)
                 oldM.insertLayer(j)
                 k += 1
         i -= 1
@@ -1209,15 +1194,12 @@ def createLegend0(conf, inputs, outputs):
         feature = feature.fromWKT(
             "POLYGON((6 3," + str(3 + (3 * math.cos(angle1))) + " " + str(3 + (3 * math.sin(angle1))) + "," + str(3 - (3 * math.cos(angle2))) + " " + str(3 + (3 * math.sin(angle2))) + "," + str(3 - (3 * math.cos(angle2))) + " " + str(3 - (3 * math.sin(angle2))) + "," + str(3 + (3 * math.cos(angle1))) + " " + str(
                 3 - (3 * math.sin(angle1))) + ",6 3))")
-    # if l.type==mapscript.MS_LAYER_RASTER:
-    #    feature=feature.fromWKT("POLYGON((5 1,5 5,1 5,1 1,5 1))")
 
     layer.addFeature(feature)
 
     if numClasses > 1:
         i = numClasses
         while i > 0:
-            # print("Produce layer "+layer.name+"_"+str(i), file=sys.stderr)
             l = oldM.getLayerByName(layer.name + "_" + str(i))
             l.connection = None
             l.data = None
@@ -1233,7 +1215,6 @@ def createLegend0(conf, inputs, outputs):
 
     while index >= 0:
         l = oldM.getLayer(index)
-        # print("LNAME 11 "+l.name+" == "+layer.name, file=sys.stderr)
         if l is not None and l.name.count(layer.name) > 0:
             l.setExtent(-1, -1, 1, 1)
             l.minscaledenom = -1
@@ -1295,9 +1276,7 @@ def createLegend0(conf, inputs, outputs):
 
     try:
         inColor1 = oldM.getLayerByName(inputs["layer"]["value"]).metadata.get("mmColor").split(" ")
-        # print("InColor: "+str(inColor1), file=sys.stderr)
         outColor1 = oldM.getLayerByName(inputs["layer"]["value"]).metadata.get("mmOutColor").split(" ")
-        # print(outColor1, file=sys.stderr)
         inColor1 = '#%02x%02x%02x' % (int(inColor1[0]), int(inColor1[1]), int(inColor1[2]))
         outColor1 = '#%02x%02x%02x' % (int(outColor1[0]), int(outColor1[1]), int(outColor1[2]))
     except:
@@ -1309,13 +1288,9 @@ def createLegend0(conf, inputs, outputs):
     processingDirectives = []
     if myLayer.type == mapscript.MS_LAYER_RASTER:
         try:
-            print(myLayer.numprocessing, file=sys.stderr)
             for kk in range(0, myLayer.numprocessing):
-                print(myLayer.getProcessing(kk), file=sys.stderr)
                 if myLayer.getProcessing(kk) is not None:
                     processingDirectives += [str(myLayer.getProcessing(kk))]
-                    print(kk, file=sys.stderr)
-                    print(str(myLayer.getProcessing(kk)), file=sys.stderr)
         except:
             processingDirectives = None
         if processingDirectives is not None:
@@ -1523,8 +1498,6 @@ def createLegend0(conf, inputs, outputs):
     nameSpace["data"] = layer.data
     nameSpace["mmSteps"] = mySteps
 
-    # print(nameSpace, file=sys.stderr)
-    # nameSpace["properties"]=json.loads(outputs1["Result"]["value"])
     saveProjectMap(m, mapfile1)
     outputs["Result"]["value"] = json.dumps(nameSpace)
     return zoo.SERVICE_SUCCEEDED
@@ -1532,7 +1505,6 @@ def createLegend0(conf, inputs, outputs):
 
 def createLegend(conf, inputs, outputs):
     import json
-    print("INPUTS " + str(inputs), file=sys.stderr)
     import math
     import mapscript
     mapPath = conf["main"]["dataPath"] + "/maps/"
@@ -1565,7 +1537,6 @@ def createLegend(conf, inputs, outputs):
         if l.metadata.get("mmClass") == "tl":
             m = mapscript.mapObj(mapPath + "/timeline_" + inputs["name"]["value"] + "_" + inputs["layer"]["value"].replace(".", "_") + "_step0.map")
             inputs["isStep"] = {"value": "true"}
-    print(mapPath + " \n\n project \n\n\n", file=sys.stderr)
     i = 0
     inColor = ""
     outColor = ""
@@ -1583,7 +1554,6 @@ def createLegend(conf, inputs, outputs):
         if m.getLayer(i).name == inputs["layer"]["value"]:
             if m.getLayer(i).getClass(mmClass) is not None:
                 if m.getLayer(i).getClass(mmClass).numstyles <= 2:
-                    print("Create new style for symbol fill", file=sys.stderr)
                     m.getLayer(i).getClass(mmClass).insertStyle(m.getLayer(i).getClass(mmClass).getStyle(0).clone())
                 ic = m.getLayer(i).getClass(mmClass).getStyle(mmStyle).color
                 oc = m.getLayer(i).getClass(mmClass).getStyle(mmStyle).outlinecolor
@@ -1607,7 +1577,6 @@ def createLegend(conf, inputs, outputs):
         if oldM.getLayer(i).name == inputs["layer"]["value"]:
             if oldM.getLayer(i).getClass(mmClass) is not None:
                 if oldM.getLayer(i).getClass(mmClass).numstyles <= 2:
-                    print("Create new style for symbol fill", file=sys.stderr)
                     oldM.getLayer(i).getClass(mmClass).insertStyle(oldM.getLayer(i).getClass(mmClass).getStyle(0).clone())
 
                 ic = oldM.getLayer(i).getClass(mmClass).getStyle(mmStyle).color
@@ -1640,7 +1609,6 @@ def createLegend(conf, inputs, outputs):
                     else:
                         j.getClass(l).setExpression(None)
                     l -= 1
-                # print("INSERT Layer: "+j.name, file=sys.stderr)
                 oldM.insertLayer(j)
                 k += 1
         i -= 1
@@ -1667,7 +1635,6 @@ def createLegend(conf, inputs, outputs):
     if numClasses > 1:
         i = numClasses
         while i > 0:
-            # print("Produce layer "+layer.name+"_"+str(i), file=sys.stderr)
             l = oldM.getLayerByName(layer.name + "_" + str(i))
             l.connection = None
             l.data = None
@@ -1680,7 +1647,6 @@ def createLegend(conf, inputs, outputs):
 
     while index >= 0:
         l = oldM.getLayer(index)
-        # print("LNAME 11 "+l.name+" == "+layer.name, file=sys.stderr)
         if l is not None and l.name.count(layer.name) > 0:
             l.setExtent(-1, -1, -1, -1)
             l.minscaledenom = -1
@@ -1915,10 +1881,7 @@ def saveLayerStyle0(conf, inputs, outputs):
             m = mapscript.mapObj(inputs["map"]["value"])
         else:
             m = mapscript.mapObj(mapPath + "/project_" + inputs["map"]["value"] + ".map")
-    print(m, file=sys.stderr)
-    print(inputs["layer"]["value"], file=sys.stderr)
     layer = m.getLayerByName(inputs["layer"]["value"])
-    print(layer, file=sys.stderr)
 
     try:
         noColor = False
@@ -1938,12 +1901,10 @@ def saveLayerStyle0(conf, inputs, outputs):
     else:
         nClass = 0
 
-    print("Edit the " + str(nClass) + " classe ", file=sys.stderr)
     mmStyle = 0
     if "mmStyle" in inputs:
         mmStyle = int(inputs["mmStyle"]["value"])
         if layer.getClass(nClass).numstyles <= 2:
-            print("Create new style for symbol fill", file=sys.stderr)
             layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
             layer.getClass(nClass).getStyle(2).angle = 0
 
@@ -1972,22 +1933,18 @@ def saveLayerStyle0(conf, inputs, outputs):
         layer.getClass(nClass).name = inputs["mmClassName"]["value"]
     if "mmExpr" in inputs and layer is not None:
         layer.getClass(nClass).setExpression(inputs["mmExpr"]["value"])
-        print(layer.getClass(nClass).getExpressionString(), file=sys.stderr)
 
-    print("Edit the " + str(nClass) + " classe " + str(not (noColor)), file=sys.stderr)
     if not (noColor) and layer is not None:
         layer.getClass(nClass).getStyle(mmStyle).opacity = int(inputs["mmOpacity"]["value"])
         if ("noFill" in inputs) or ("mmFill" not in inputs):
             layer.getClass(nClass).getStyle(mmStyle).color.setRGB(-1, -1, -1)
         else:
             setRGB(layer.getClass(nClass).getStyle(mmStyle).color, fillColor)
-            print("Fill  " + str(fillColor), file=sys.stderr)
 
         if 'noStroke' in inputs or ('mmStroke' not in inputs):
             layer.getClass(nClass).getStyle(mmStyle).outlinecolor.setRGB(-1, -1, -1)
         else:
             setRGB(layer.getClass(nClass).getStyle(mmStyle).outlinecolor, strokeColor)
-            print("Stroke " + str(strokeColor), file=sys.stderr)
     if "mmStrokeWidth" in inputs and 'mmStroke' in inputs:
         layer.getClass(nClass).getStyle(mmStyle).outlinewidth = float(inputs["mmStrokeWidth"]["value"])
 
@@ -2019,10 +1976,8 @@ def saveLayerStyle0(conf, inputs, outputs):
     if "mmSymb" in inputs and inputs["mmSymb"]["value"] != "":
         layer.getClass(nClass).getStyle(mmStyle).symbolname = inputs["mmSymb"]["value"].replace("Symbol_", "")
         if inputs["mmSymb"]["value"] == "polygon_hatch":
-            print("layer.getClass(nClass).numstyles 1 - " + str(layer.getClass(nClass).numstyles), file=sys.stderr)
             if layer.getClass(nClass).numstyles == 1:
                 layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
-                print("layer.getClass(nClass).numstyles 2 - " + str(layer.getClass(nClass).numstyles), file=sys.stderr)
 
             layer.getClass(nClass).getStyle(1).color.setRGB(-1, -1, -1)
             layer.getClass(nClass).getStyle(1).symbol = 0
@@ -2033,7 +1988,6 @@ def saveLayerStyle0(conf, inputs, outputs):
                 layer.getClass(nClass).getStyle(1).patternlength = 0
             except:
                 pass
-            print("layer.getClass(nClass).numstyles 3 - " + str(layer.getClass(nClass).numstyles), file=sys.stderr)
             style = layer.getClass(nClass).getStyle(1)
             setRGB(style.outlinecolor, strokeColor)
     else:
@@ -2054,7 +2008,6 @@ def saveLayerStyle0(conf, inputs, outputs):
             myStyle.gap = float(inputs["mmSymbolGap"]["value"])
         if "mmStyle" not in inputs:
             if "pattern" in inputs:
-                print("PATTERN (" + inputs["pattern"]["value"] + ")", file=sys.stderr)
                 try:
                     layer.getClass(nClass).getStyle(0).patternlength = 0
                 except:
@@ -2064,7 +2017,6 @@ def saveLayerStyle0(conf, inputs, outputs):
                 if layer.type != mapscript.MS_LAYER_POLYGON:
                     layer.getClass(nClass).getStyle(0).updateFromString("STYLE PATTERN " + inputs["pattern"]["value"] + " END END")
                 if layer.type == mapscript.MS_LAYER_POLYGON:
-                    print("NUMSTYLES " + str(layer.getClass(nClass).numstyles), file=sys.stderr)
                     if layer.getClass(nClass).numstyles == 1:
                         layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
                     myStyle = layer.getClass(nClass).getStyle(1)
@@ -2079,7 +2031,6 @@ def saveLayerStyle0(conf, inputs, outputs):
                     layer.getClass(nClass).getStyle(1).angle = 0
                     layer.getClass(nClass).getStyle(1).symbolname = None
                     layer.getClass(nClass).getStyle(1).size = -1
-                    print(dir(layer.getClass(nClass).getStyle(1)), file=sys.stderr)
                     try:
                         layer.getClass(nClass).getStyle(1).patternlength = 0
                         layer.getClass(nClass).getStyle(1).updateFromString("STYLE PATTERN " + inputs["pattern"]["value"] + " END END")
@@ -2089,7 +2040,6 @@ def saveLayerStyle0(conf, inputs, outputs):
                             lp[k] = float(lp[k])
                         layer.getClass(nClass).getStyle(1).pattern = lp
                         pass
-                    print("STYLE PATTERN " + inputs["pattern"]["value"] + " END END", file=sys.stderr)
             else:
                 try:
                     layer.getClass(nClass).getStyle(mmStyle).patternlength = 0
@@ -2209,12 +2159,10 @@ def saveLayerStyle(conf, inputs, outputs):
     else:
         nClass = 0
 
-    print("Edit the " + str(nClass) + " classe ", file=sys.stderr)
     mmStyle = 0
     if "mmStyle" in inputs:
         mmStyle = int(inputs["mmStyle"]["value"])
         if layer.getClass(nClass).numstyles <= 2:
-            print("Create new style for symbol fill", file=sys.stderr)
             layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
             layer.getClass(nClass).getStyle(2).angle = 0
 
@@ -2243,22 +2191,18 @@ def saveLayerStyle(conf, inputs, outputs):
         layer.getClass(nClass).name = inputs["mmClassName"]["value"]
     if "mmExpr" in inputs:
         layer.getClass(nClass).setExpression(inputs["mmExpr"]["value"])
-        print(layer.getClass(nClass).getExpressionString(), file=sys.stderr)
 
-    print("Edit the " + str(nClass) + " classe " + str(not (noColor)), file=sys.stderr)
     if not (noColor):
         layer.getClass(nClass).getStyle(mmStyle).opacity = int(inputs["mmOpacity"]["value"])
         if 'noFill' in inputs:
             layer.getClass(nClass).getStyle(mmStyle).color.setRGB(-1, -1, -1)
         else:
             setRGB(layer.getClass(nClass).getStyle(mmStyle).color, fillColor)
-            print("Fill  " + str(fillColor), file=sys.stderr)
 
         if 'noStroke' in inputs:
             layer.getClass(nClass).getStyle(mmStyle).outlinecolor.setRGB(-1, -1, -1)
         else:
             setRGB(layer.getClass(nClass).getStyle(mmStyle).outlinecolor, strokeColor)
-            print("Stroke " + str(strokeColor), file=sys.stderr)
     if "mmStrokeWidth" in inputs:
         layer.getClass(nClass).getStyle(mmStyle).outlinewidth = float(inputs["mmStrokeWidth"]["value"])
 
@@ -2290,10 +2234,8 @@ def saveLayerStyle(conf, inputs, outputs):
     if "mmSymb" in inputs and inputs["mmSymb"]["value"] != "":
         layer.getClass(nClass).getStyle(mmStyle).symbolname = inputs["mmSymb"]["value"].replace("Symbol_", "")
         if inputs["mmSymb"]["value"] == "polygon_hatch":
-            print("layer.getClass(nClass).numstyles 1 - " + str(layer.getClass(nClass).numstyles), file=sys.stderr)
             if layer.getClass(nClass).numstyles == 1:
                 layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
-                print("layer.getClass(nClass).numstyles 2 - " + str(layer.getClass(nClass).numstyles), file=sys.stderr)
 
             layer.getClass(nClass).getStyle(1).color.setRGB(-1, -1, -1)
             layer.getClass(nClass).getStyle(1).symbol = 0
@@ -2301,7 +2243,6 @@ def saveLayerStyle(conf, inputs, outputs):
             layer.getClass(nClass).getStyle(1).symbolname = None
             layer.getClass(nClass).getStyle(1).size = -1
             layer.getClass(nClass).getStyle(1).patternlength = 0
-            print("layer.getClass(nClass).numstyles 3 - " + str(layer.getClass(nClass).numstyles), file=sys.stderr)
             style = layer.getClass(nClass).getStyle(1)
             setRGB(style.outlinecolor, strokeColor)
     else:
@@ -2322,13 +2263,11 @@ def saveLayerStyle(conf, inputs, outputs):
             myStyle.gap = float(inputs["mmSymbolGap"]["value"])
         if "mmStyle" not in inputs:
             if "pattern" in inputs:
-                print("PATTERN (" + inputs["pattern"]["value"] + ")", file=sys.stderr)
                 layer.getClass(nClass).getStyle(0).patternlength = 0
                 layer.getClass(nClass).getStyle(0).linecap = mapscript.MS_CJC_BUTT
                 setMetadata(layer, "mmPattern_" + str(nClass), inputs["pattern"]["value"])
                 layer.getClass(nClass).getStyle(0).updateFromString("STYLE PATTERN " + inputs["pattern"]["value"] + " END END")
                 if layer.type == mapscript.MS_LAYER_POLYGON:
-                    print("NUMSTYLES " + str(layer.getClass(nClass).numstyles), file=sys.stderr)
                     if layer.getClass(nClass).numstyles == 1:
                         layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
                     myStyle = layer.getClass(nClass).getStyle(1)
@@ -2828,10 +2767,6 @@ def classifyMap0(conf, inputs, outputs):
             if "statusHandled" not in conf["lenv"]:
                 conf["lenv"]["message"] = zoo._("SQL Statement succeeded.")
                 zoo.update_status(conf, 35)
-            print("-- OK", file=sys.stderr)
-            print(res, file=sys.stderr)
-            print(outputs["Result"], file=sys.stderr)
-            print("OK --", file=sys.stderr)
         try:
             tmp = eval(outputs["Result"]["value"])
         except Exception as e:
@@ -2919,7 +2854,6 @@ def classifyMap0(conf, inputs, outputs):
         setMetadata(layer, "mmClass", "uv")
 
     lOutputs = {"Result": {"value": ""}}
-    # print(inputs, file=sys.stderr)
     sr = eval('0x' + inputs["from"]["value"][:2])
     sg = eval('0x' + inputs["from"]["value"][2:4])
     sb = eval('0x' + inputs["from"]["value"][4:6])
@@ -2974,7 +2908,6 @@ def classifyMap0(conf, inputs, outputs):
             if layer.type == mapscript.MS_LAYER_POINT:
                 style.size = 15
                 style.symbolname = "circle"
-                # print("Keys: "+str(inputs.keys().count("nbClasses")), file=sys.stderr)
 
             setMetadata(layer, "mmName", inputs["field"]["value"])
             try:
@@ -3032,7 +2965,6 @@ def classifyMap0(conf, inputs, outputs):
                             tmpClass.setExpression('( "[' + j + ']" = "' + tmp[i][j].decode(oEnc).encode(iEnc) + '" ' + precond + ' )')
                         except:
                             tmpClass.setExpression('( "[' + j + ']" = "' + tmp[i][j] + '" ' + precond + ' )')
-                        print(str(tmp[i])+" "+str(j), file=sys.stderr)
                     if "mmFAS" in inputs and inputs["mmFAS"]["value"] == "true":
                         try:
                             style.size = eval(inputs["mmFASF"]["value"].replace(j, tmp[i][j]));
@@ -3271,7 +3203,6 @@ def classifyMap(conf, inputs, outputs):
         setMetadata(layer, "mmClass", "uv")
 
     lOutputs = {"Result": {"value": ""}}
-    print(inputs, file=sys.stderr)
     sr = eval('0x' + inputs["from"]["value"][:2])
     sg = eval('0x' + inputs["from"]["value"][2:4])
     sb = eval('0x' + inputs["from"]["value"][4:6])
@@ -4246,7 +4177,6 @@ def updateMapcacheCfg0(conf, inputs, outputs):
         for j in range(0, len(aNodes)):
             root[0].append(aNodes[j])
     else:
-        print(dir(nodes[0]),file=sys.stderr)
         #should do
         #nodes[0].replaceNode(aNodes[0])
         nodes = doc.xpath('/mapcache/tileset[@name="' + inputs["mmProjectName"]["value"] + 'Tile"]')
