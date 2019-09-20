@@ -105,7 +105,7 @@ def getBaseLayersForTable(conf,inputs,outputs):
     import os,mapscript,json
     import mapfile.service as mmap
     bl=[]
-    if inputs["table"].keys().count("length")>0:
+    if "length" in inputs["table"]:
         for i in range(len(inputs["table"]["value"])):
             mapPath=conf["main"]["dataPath"]+"/public_maps/project_"+(inputs["table"]["value"][i].replace(".","___"))+".map"
             if os.path.exists(mapPath):
@@ -390,7 +390,7 @@ def getIndexDisplayJs(conf, inputs, outputs):
     cur.execute(req0)
     val = cur.fetchone()
     if val is not None:
-        title = str(val[0].encode('utf-8')).decode('utf-8')
+        title = str(val[0].encode('utf-8')) #.decode('utf-8')
         order_by = val[1]
     else:
         title = ""
@@ -3458,7 +3458,7 @@ def recoverFileFromHex(conf, inputs, outputs):
     # dec_string = int(inputs["binaryString"]["value"], 16)
     # print(inputs["binaryString"]["value"], file=sys.stderr)
     bin_ostring = inputs["binaryString"]["value"]
-    bin_string = bin_ostring[2:len(bin_ostring) - 1].decode('hex')  # bin(int(bin_ostring[2:len(bin_ostring)-1],16))
+    bin_string = bytearray.fromhex(bin_ostring[2:len(bin_ostring) - 1]) #bin_ostring[2:len(bin_ostring) - 1].decode('hex')  # bin(int(bin_ostring[2:len(bin_ostring)-1],16))
     try:
         lfile = unpackFile(conf, bin_string)
         fileName = conf["main"]["tmpPath"] + "/" + lfile["name"].replace("/", "_")
@@ -3474,7 +3474,7 @@ def recoverFileFromHex(conf, inputs, outputs):
         try:
             # print(bin_string.encode('utf-8'), file=sys.stderr)
             cur = con.conn.cursor()
-            cur.execute("UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=ST_SetSRID(ST_GeometryFromText('" + bin_string.encode('utf-8') + "'),4326) WHERE id=" + inputs["id"]["value"])
+            cur.execute("UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=ST_SetSRID(ST_GeometryFromText('" + str(bin_string,"utf-8") + "'),4326) WHERE id=" + inputs["id"]["value"])
             con.conn.commit()
             return zoo.SERVICE_SUCCEEDED
         except Exception as e:
@@ -3562,7 +3562,7 @@ def clientImportDataset(conf, inputs, outputs):
 def clientInsert(conf, inputs, outputs):
     import json
     con = auth.getCon(conf)
-    con.connect()
+    #con.connect()
     cur = con.conn.cursor()
     try:
         req = "SELECT name from mm_tables.p_tables where id=" + inputs["tableId"]["value"]
@@ -3573,9 +3573,9 @@ def clientInsert(conf, inputs, outputs):
         return zoo.SERVICE_FAILED
     tableName = vals[0]
     pkey = fetchPrimaryKey(cur, tableName)
-    if not (auth.is_ftable(tableName)):
-        conf["lenv"]["message"] = zoo._("Unable to identify your parameter as a table")
-        return zoo.SERVICE_FAILED
+    #if not (auth.is_ftable(tableName)):
+    #    conf["lenv"]["message"] = zoo._("Unable to identify your parameter as a table")
+    #    return zoo.SERVICE_FAILED
     try:
         req = "SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.ftypes,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_edition_fields.ftype=mm_tables.ftypes.id and not(mm_tables.ftypes.basic) and mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=" + \
               inputs["editId"]["value"] + " and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + inputs["tableId"]["value"] + " and mm.groups.id in (SELECT id from mm.groups where " + splitGroup(conf) + ")) as a ORDER BY a.id"
@@ -3936,7 +3936,7 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
                                 # sys.setdefaultencoding('utf8')
                                 # print(rvals[rcnt].encode('utf-8'), file=sys.stderr)
                                 try:
-                                    script += "pm.statThis('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(rvals[rcnt].decode('utf-8')).replace("'{", "[").replace("}'", "]"))) + ")\ntime.sleep(0.01)\n"
+                                    script += "pm.statThis('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(rvals[rcnt]).replace("'{", "[").replace("}'", "]"))) + ")\ntime.sleep(0.01)\n"
                                     script += "print('" + vals0[i][2] + "',file=sys.stderr)\nsys.stderr.flush()\n"
                                 except Exception as e:
                                     print("ERROR 1 !", file=sys.stderr)
@@ -4515,7 +4515,7 @@ def massiveImport(conf, inputs, outputs):
                             else:
                                 fieldName = "Field" + str(ref[0] + 1)
                         else:
-                            fieldName = str(j[3].decode("utf-8"))
+                            fieldName = str(j[3]) #.decode("utf-8"))
                         print(vals[i][2].count("Field"), file=sys.stderr)
                         # print(fieldName, file=sys.stderr)
                         print(res[k], file=sys.stderr)
@@ -4532,12 +4532,12 @@ def massiveImport(conf, inputs, outputs):
                         # toto=adapt(value.encode("utf-8"))
                         # print(unicode(str(adapt(value.encode("utf-8"))),"utf-8"), file=sys.stderr)
                         print("+++++++++++----- 2 -------=++++++++++++++++", file=sys.stderr)
-                        req = ("SELECT " + str(adapt(value)).decode("utf-8").replace(",", ".") + "::" + j[2])
+                        req = ("SELECT " + str(adapt(value)).replace(",", ".") + "::" + j[2])
                         print("+++++++++++----- 3 -------=++++++++++++++++", file=sys.stderr)
                         # print(req.encode("utf-8"), file=sys.stderr)
-                        cur.execute(req.decode("utf-8"))
+                        cur.execute(req)
                         print("+++++++++++----- 4 -------=++++++++++++++++", file=sys.stderr)
-                        reqIS += str(adapt(value)).decode("utf-8").replace(",", ".") + "::" + j[2]
+                        reqIS += str(adapt(value)).replace(",", ".") + "::" + j[2]
                         print("+++++++++++----- 5 -------=++++++++++++++++", file=sys.stderr)
                     except Exception as e:
                         print("+++++++++++----- XXXXXXXXXXXXX -------=++++++++++++++++", file=sys.stderr)

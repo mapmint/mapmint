@@ -12,11 +12,11 @@ function getSymbolChooser4TTF(conf,inputs,outputs){
 	}
 	inputs["ttf"].value=inputs["ttf"].value.replace(".TTF","").replace(".ttf","");
 	if(inputs["ttf"]["value"]!="images")
-	    inputs["charcodes"]={"value": myExecuteResult};
+	    inputs["charcodes"]={"value": myExecuteResult,"type":"string"};
     }
-  inputs["map"]={"value": conf["senv"]["last_map"]};
+  inputs["map"]={"value": conf["senv"]["last_map"],type: "string"};
     if(!inputs["tmpl"])
-	inputs["tmpl"]={"value":"/Manager/Styler/SymbolChooser.tmpl"};
+	inputs["tmpl"]={"value":"/Manager/Styler/SymbolChooser.tmpl","type": "string"};
   
   var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'symbol-tools.getAllSymbolsForTTF');
   var myExecuteResult1=myProcess1.Execute(inputs,myOutputs);

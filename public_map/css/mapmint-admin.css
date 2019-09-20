@@ -157,6 +157,7 @@ body {
         position: absolute;
         width: 250px;
         margin-top: 51px;
+	top: 0;
     }
 
     .navbar-top-links .dropdown-messages,

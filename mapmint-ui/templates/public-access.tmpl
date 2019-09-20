@@ -62,7 +62,7 @@ $conf["identification"]["title"]
 		<div id="master-header" class="clearix">
 		#if $conf["mm"]["slideshow"]=="true"
 		<div id="slideshow">
-		#set imgs=oslistdir($conf["main"]["mmPath"]+"/img/slideshow/")
+		#set imgs=os.listdir($conf["main"]["mmPath"]+"/img/slideshow/")
 		#for i in $imgs
 		#if $i!=".svn"
 	<div>

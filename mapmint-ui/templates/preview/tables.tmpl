@@ -69,7 +69,7 @@ $conf["identification"]["title"]: $zoo._("Tables management")
 
 #def getAbstract()
 #if $conf["identification"]["abstract"].count($conf["main"]["tmpUrl"])>0
-#set f=open($conf["identification"]["abstract"].replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"rb")
+#set f=open($conf["identification"]["abstract"].replace($conf["main"]["tmpUrl"],$conf["main"]["tmpPath"]),"r")
               $f.read()
 #else
               $conf["identification"]["abstract"].replace("[BR]","</p><p>")

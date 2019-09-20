@@ -1,4 +1,4 @@
-// Filename: login.js
+// Filename: tables-public.js
 
 
 define([
@@ -65,12 +65,9 @@ define([
 	var orderInit=[];
 	try{
 	    orderInit=$('input[name="'+lid.replace(/Listing_display/,"")+'TableOrder"]').val().split(' ');
-	    console.log(orderInit[0]);
 	    if(orderInit[0].indexOf("::")>=0)
 		orderInit[0]=orderInit[0].split("::")[0];
-	    console.log(rfields);
 	    orderInit[0]=rfields.split(',').indexOf(orderInit[0]);
-	    console.log(orderInit);
 	}catch(e){
 	}
 	
@@ -108,8 +105,6 @@ define([
 		{ "sWidth": "90%", "target": 1 }
 	    ],*/
 	    "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
-		console.log("Starting datatable download");
-		console.log(aoData);
 
 		var llimit=[];
 		for(j in {"iDisplayStart":0,"iDisplayLength":0,"iSortCol_0":0,"sSortDir_0":0,"sSearch":0})
@@ -120,24 +115,17 @@ define([
 			    if(llimit.length<4)
 				llimit.push(aoData[i].value);
 			}
-		console.log(llimit);
 
 		var closestproperties=rfields;
 		var page=llimit[0]+1;
-		console.log(page);
 		if(page!=1){
 		    page=(llimit[0]/llimit[1])+1;
-		    console.log(page);
 		}
-		console.log(page);
 
 		/*if(tfilters.length>1){
-		    console.log(tfilters);
 		    tfilters=[tfilters[tfilters.length-1]];
 		}*/
 		//var orderInit=$('input[name="'+lid+'TableOrder"]').val().split(' ');
-		console.log('input[name="'+lid.replace(/Listing_display/,"")+'TableOrder"]');
-		console.log($('input[name="'+lid.replace(/Listing_display/,"")+'TableOrder"]'));
 		
 		var opts=zoo.getRequest({
 		    identifier: "np.clientViewTable",
@@ -159,16 +147,12 @@ define([
 		    type: 'POST',
 		    storeExecuteResponse: false
 		});
-		console.log(lid);
-		console.log(opts);
 		opts["success"]=function(rdata) {
 		    features=rdata;
 		    featureCount=rdata["total"];
 		    var data=[];
 		    CFeatures=[];
-		    console.log(features);
 		    for(var i in features.rows){
-			console.log(features.rows[i]);
 			var lparams={
 			    "fid": lid+"_"+features.rows[i].id			    
 			}
@@ -186,12 +170,10 @@ define([
 			"iTotalDisplayRecords": featureCount, 
 			"aaData": (featureCount>0?data:[])
 		    };
-		    console.log(opts);
 		    fnCallback(opts);
 
 		    for(d in data){
 			if ( $.inArray(data[d].fid+"", CRowSelected) !== -1 ) {
-			    console.log(data[d].fid);
 			    $('#'+lid).DataTable().row($("#"+data[d].fid)).select();
 			}else{
 			    $('#'+lid).DataTable().row($("#"+data[d].fid)).deselect();
@@ -201,7 +183,6 @@ define([
 		    
 		    if(featureCount==0){
 			$('#'+lid+'Table').DataTable().clear();
-			console.log("clear table");
 		    }
 		    
 
@@ -209,7 +190,6 @@ define([
 		    $('.inner_displayer').off('click');
 		    $('.inner_displayer').on('click',function(){
 			var closure=$(this);
-			console.log($(this).parent().next());
 			if($(this).is(':checked')){
 			    $(this).parent().next().show();
 			}else {
@@ -217,15 +197,11 @@ define([
 			};
 		    });
 
-		    console.log('finish');
 		    
 
 		};
 		opts["error"]=function(){
-		    console.log("***** UNABLE TO FETCH TABLE CONTENT!");
-		    console.log(arguments);
 		    var myData=$.parseXML(arguments[0].responseText);
-		    console.log($(arguments[0].responseXML).text());
 		    $('#'+lid).parent().append('<div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+$(arguments[0].responseXML).text().replace("\n","<br />")+'</div>');
 		    notify('Execute failed');
 		};
@@ -239,12 +215,8 @@ define([
 	
 	$('#'+lid+' tbody').off('click');
 	$('#'+lid+' tbody').on('click', 'tr', function () {
-	    console.log($(this));
 	    var prefix=lid.replace(/mainListing_display/g,"");
-	    console.log(prefix);
-	    console.log(lid);
 	    var row = $('#'+lid).DataTable().row($(this));
-	    console.log(row);
 	    console.log("ID: "+$(this).find("input[name=id]").val());
 
 	    try{
@@ -276,7 +248,6 @@ define([
 		if(prefix.indexOf("input_")<0 && prefix.indexOf('embedded')<0)
 		    $(".toActivate").each(function(){
 			$(this).children().first().click();
-			console.log($(this));
 		    });
 
 		var params=[
@@ -300,29 +271,23 @@ define([
 		if(prefix.indexOf("input_")<0)
 		adminBasic.callService("np.clientView",params,function(data){
 		    for(i in data){
-			console.log(i);
-			console.log(data[i]);
 			var myRoot=$("#"+prefix+"edit0_"+i);
 			myRoot.find("input[name=edit_tuple_id]").val(cid);
-			console.log(myRoot);
 			for(j in data[i]){
-			    console.log(data[i][j]);
+
 			    if(data[i][j]){
 			    if(/*data[i][j] && */!data[i][j].type){
-				console.log(j);
 				if(data[i][j+"_mdep"]){
 				    for(var kk=0;kk<data[i][j+"_mdep"].length;kk++){
 				    	myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").parent().find("select"+":eq("+kk+")").val(data[i][j+"_mdep"]).change();
 					myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").parent().find("select"+":eq("+kk+")").attr("data-cvalue",data[i][j]);
 				    }
-				    console.log();
  				}
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
 				    if($(this).hasClass("htmlEditor")){
 					$(this).summernote('code',data[i][j]);
 				    }
-				    console.log($(this));
 				    /*console.log($(this).attr("type"));
 				    console.log($(this).prop("multiple"));
 				    if($(this).prop("multiple")){
@@ -335,7 +300,6 @@ define([
 					});
 				    }*/
 				    if($(this).attr("type")=="checkbox"){
-					console.log($(this));
 					$(this).prop("checked",(data[i][j]=="True"?true:false));
 				    }
 				});
@@ -343,11 +307,8 @@ define([
 				    var coordinates=data[i][j].replace(/POINT\(/,"").replace(/\)/,"").split(" ");
 				    myRoot.find("input[name=edit_"+j+"_x]").val(coordinates[0]).change();
 				    myRoot.find("input[name=edit_"+j+"_y]").val(coordinates[1]).change();
-				    //console.log(pStr);
 				}
 				if(data[i][j].indexOf && (data[i][j].indexOf("POLYGON(")>=0 || data[i][j].indexOf("LINESTRING(")>=0 || data[i][j].indexOf("POINT(")>=0)){
-				    console.log(j);
-				    console.log(data[i][j]);
 				    try{
 				    var fWKT=new ol.format.WKT();
 				    var myGeom=fWKT.readGeometry(data[i][j]).transform("EPSG:4326","EPSG:3857");
@@ -370,7 +331,7 @@ define([
 				    $(this).fileinput('destroy');
 				    var cname=data[i][j]["filename"].split('/');
 				    var display=data[i][j]["fileurl"];
-				    var regs=[RegExp("tif","g"),RegExp("gif","g"),RegExp("png","g"),RegExp("jpg","g"),RegExp("jpeg","g")];
+				    var regs=[RegExp("tif","g"),RegExp("gif","g"),RegExp("png","g"),RegExp("jpg","g"),RegExp("jpeg","g"),RegExp("JPG","g")];
 				    var isImage=false;
 				    for(var l=0;l<regs.length;l++){
 					if(data[i][j]["fileurl"]!=data[i][j]["fileurl"].replace(regs[l],"")){
@@ -414,10 +375,7 @@ define([
 				    $(this).on('fileuploaded', function(event, data, previewId, index) {
 					var form = data.form, files = data.files, extra = data.extra,
 					    response = data.response, reader = data.reader;
-					console.log('File uploaded triggered');
 					mainTableFiles[closure.attr("name")]=data.response.files[0].fileName;
-					console.log(data);
-					console.log(data.response.files[0].fileName);
 				    });
 				    
 				});
@@ -428,9 +386,7 @@ define([
 				    if($(this).hasClass("htmlEditor")){
 					$(this).summernote('code', data[i][j]);
 				    }
-				    console.log($(this).attr("type"));
 				    if($(this).attr("type")=="checkbox"){
-					console.log($(this));
 					$(this).prop("checked",(data[i][j]==true?true:false));
 				    }
 				});
@@ -507,53 +463,6 @@ define([
 
 				}
 			    }
-			    /*for(var i=0;i<embeddeds.length;i++)
-				if($("input[name="+prefix+"mainTableLevel]").val()+1==embeddeds[i].level){
-				console.log(embeddeds[i].level);
-				var prefix=embeddeds[i].id;
-				console.log(prefix);
-				try{
-				    if(tableDisplayed[prefix+"mainListing_display"]){
-					console.log(tableDisplayed[prefix+"mainListing_display"]);
-					tableDisplayed[prefix+"mainListing_display"].destroy();
-				    }
-				}catch(e){
-				    console.log(e);
-				}
-				embeddedTableFilter.push([]);
-				var oRoot=$("#"+prefix+"mainListing_display");
-				console.log(oRoot);
-				for(var j=0;j<6;j++){
-				    oRoot=oRoot.parent();
-				    console.log(oRoot);
-				}
-				console.log(oRoot);
-				var lRoot=oRoot.find("input").last();
-				console.log(lRoot);
-				if(lRoot.length==0){
-				    console.log("************ "+oRoot.parent().parent().parent());
-				    lRoot=oRoot.parent().parent().parent().find("input").last();
-				}
-				lRoot.each(function(){
-				    console.log($(this));
-				    var lid=oRoot.find("input[name="+prefix+"link_col]").val();
-				    console.log(lid);
-				    var obj={"linkClause":" AND "};
-				    obj[lid]=$(this).val();
-				    embeddedTableFilter[i].push(obj);
-				});
-				console.log(lRoot);
-				console.log(embeddedTableFilter);
-				try{
-				    func(i);
-				}catch(e){
-				    console.log('-----!!!!! ERROR: '+e);
-				}
-			    }
-
-			    /*loadEmbeddedTables(function(i){
-				console.log($("input[name="+prefix+"mainTableLevel]").val());
-			    });*/
 			}
 		    }catch(e){
 			console.log(e);
@@ -572,7 +481,6 @@ define([
 		    }).show();
 		});
 		else{
-		    console.log("**** TRAITEMENT DES INPUT TABLES"+"****");
 		    $("input[name="+prefix+"link_val]").val($(this).find("input[name=id]").val());
 		}
 		
@@ -581,22 +489,17 @@ define([
 		$(".require-"+prefix+"select").hide();
 		mainTableSelectedId=null;
 	    }
-	    console.log(row);
 	});
 
 	$(".mmFile").each(function(){
 	    var closure=$(this);
-	    console.log(closure.parent());
 	    var isInput=(!closure.parent().hasClass("importer_upload"));
-	    //console.log("***** MMFILE : "+closure.parent().attr('id'));
-	    //var isInput=(closure.parent().parent().attr('id')&&closure.parent().parent().attr('id').indexOf("importer")>=0?false:true);
 	    console.log("***** MMFILE : "+isInput);
 	    var lparams={
 		language: module.config().lang,
 		uploadUrl: module.config().url+"?service=WPS&version=1.0.0&request=Execute&RawDataOutput=Result&Identifier=upload.saveOnServer0&dataInputs=filename="+closure.attr("name")+";"+closure.attr("name")+"=Reference@isFile=true;dest=none", // server upload action
 		uploadAsync: true,
 		done: function (e, data) {
-		    console.log(data);
                     $.each(data.result.files, function (index, file) {
                         $('<p/>').text(file.name).appendTo('#files');
                     });
@@ -604,25 +507,19 @@ define([
 	    };
 	    if(isInput)
 		lparams["maxFileCount"]=1;
-	    console.log(lparams);
 	    $(this).fileinput(lparams);
 	    $(this).on('fileuploaded', function(event, data, previewId, index) {
 		var form = data.form, files = data.files, extra = data.extra,
 		    response = data.response, reader = data.reader;
-		console.log('File uploaded triggered');
-		console.log("***** MMFILE : "+isInput);
 		if(isInput)
 		    mainTableFiles[closure.attr("name")]=data.response.files[0].fileName;
 		else{
 		    importerUploadedFiles.push(data.response.files[0].fileName);
 		    $('.importer_submit').show();
-		    console.log(data.response.files[0]);
 		    $(".importer_submit_log").append(
 			$(managerTools.generateFromTemplate($("#importer_progress").html(),["id","file"],[importerUploadedFiles.length-1,data.files[0].name]))
 		    );
 		}
-		console.log(data);
-		console.log(data.response.files[0].fileName);
 	    });
 	});
 
@@ -632,7 +529,6 @@ define([
 
     function bindImport(){
 	$("[data-mmaction=runImport]").click(function(){
-	    console.log("run importer");
 	    var loparams=[
 		{"identifier": "id","value": $(this).parent().find('input[name="import_id"]').val(),"dataType":"string"}
 	    ];
@@ -640,7 +536,6 @@ define([
 	    for(var i=0;i<importerUploadedFiles.length;i++){
 		var lparams=loparams;
 		lparams.push({"identifier": "dstName","value": importerUploadedFiles[i],"dataType":"string"});
-		console.log(lparams);
 		(function(i){
 		    var progress=$("#progress-process-"+i);
 		    var infomsg=$("#infoMessage"+i);
@@ -655,21 +550,14 @@ define([
 			    {"identifier":"Result","mimeType":"text/plain"},
 			],
 			success: function(data, launched){
-			    console.log(data);
-			    console.log("****** +++++++ Execute asynchrone launched: "+launched.sid, 'info');
-			    console.log("****** +++++++ Execute asynchrone launched: "+launched.sid, 'info');
 			    zoo.watch(launched.sid, {
 				onPercentCompleted: function(data) {
-				    console.log("**** PercentCompleted **** "+i);
-				    console.log(data);
 				    progress.css('width', (data.percentCompleted)+'%');
 				    progress.text(data.text+' : '+(data.percentCompleted)+'%');
 				    progress.attr("aria-valuenow",data.percentCompleted);
 				    infomsg.html(data.text+' : '+(data.percentCompleted)+'%');
 				},
 				onProcessSucceeded: function(data) {
-				    console.log("**** ProcessSucceeded **** "+i);
-				    console.log(data);
 				    progress.css('width', (100)+'%');
 				    progress.text(data.text+' : '+(100)+'%');
 				    progress.removeClass("progress-bar-info").addClass("progress-bar-success");
@@ -677,8 +565,6 @@ define([
 				    progress.parent().next().html(data.text+' : '+(100)+'%');
 				},
 				onError: function(data) {
-				    console.log("**** onError **** "+i);
-				    console.log(data);
 				    infomsg.html('<div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.result.ExceptionReport.Exception.ExceptionText.toString()+'</div>');
 				}
 			    });
@@ -706,7 +592,6 @@ define([
 	$("[data-mmaction=runPrint]").click(function(){
 	    var closure=$(this);
 	    $(this).addClass("disabled");
-	    console.log($(this).children().first().next());
 	    $(this).children().first().next().show();
 	    $(this).children().first().hide();
 	    var tableId=null;
@@ -728,10 +613,6 @@ define([
 		tableId=$('#listing').first().find('input[name=mainTableId]').val();
 		tupleId=mainTableSelectedId;
 	    }
-	    console.log($(this).parent().parent().attr('id'));
-	    console.log(mainTableSelectedId);
-	    console.log(embeddedTableSelectedId);
-	    console.log($('#listing').first().find('input[name=mainTableId]').val());
 	    params=[
 		{identifier: "tableId", value: tableId, dataType: "string"},
 		{identifier: "id", value: tupleId, dataType: "string"},
@@ -755,18 +636,14 @@ define([
 		success: function(data, launched) {
 		    zoo.watch(launched.sid, {
 			onPercentCompleted: function(data) {
-			    console.log("**** PercentCompleted ****");
 			    progress.css('width', (data.percentCompleted)+'%');
 			    progress.text(data.text+' : '+(data.percentCompleted)+'%');
 			    progress.attr("aria-valuenow",data.percentCompleted);
-			    console.log(data);
 			},
 			onProcessSucceeded: function(data) {
 			    progress.css('width', (100)+'%');
 			    progress.text(data.text+' : '+(100)+'%');
 			    if (data.result.ExecuteResponse.ProcessOutputs) {
-				console.log("**** onSuccess ****");
-				console.log(data.result);
 				progress.css('width', (100)+'%');
 				progress.text(data.text+' : '+(100)+'%');
 				progress.attr("aria-valuenow",100);
@@ -775,8 +652,6 @@ define([
 				closure.children().first().next().hide();
 				closure.parent().parent().find(".report_display").html('');
 				var ul=$(managerTools.generateFromTemplate($("#"+closure.parent().parent().attr("id")+"_link_list").html(),[],[]));
-				console.log("**** onSuccess ****");
-				console.log(data.result.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData["__cdata"]);
 				var ldata=eval(data.result.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData["__cdata"]);
 				for(i=0;i<ldata.length;i++){
 				    var format="odt";
@@ -824,53 +699,16 @@ define([
 		    closure.parent().parent().find(".report_display").html('<div class="alert alert-danger">'+data["ExceptionReport"]["Exception"]["ExceptionText"].toString()+'</div>');
 		}
 	    });
-	    /*adminBasic.callService("np.clientPrint",params,function(data) {
-		console.log(data)
-		closure.removeClass("disabled");
-		closure.children().first().show();
-		closure.children().first().next().hide();
-		closure.parent().parent().find(".report_display").html('');
-		var ul=$(managerTools.generateFromTemplate($("#"+closure.parent().parent().attr("id")+"_link_list").html(),[],[]));
-		for(i=0;i<data.length;i++){
-		    var format="odt";
-		    var classe="fa-file-text-o";
-		    if(data[i].indexOf("pdf")>0){
-			format="pdf";
-			classe="fa-file-pdf-o";
-		    }
-		    if(data[i].indexOf("doc")>0){
-			format="doc";
-			classe="fa-file-word-o";
-		    }
-		    if(data[i].indexOf("html")>0){
-			format="html";
-			classe="fa-code";
-		    }
-		    ul.find(".list-group").append(
-			managerTools.generateFromTemplate($("#"+closure.parent().parent().attr("id")+"_link").html(),["link","format","class"],[data[i],format,classe])
-		    );
-		}
-		closure.parent().parent().find(".report_display").html(ul);
-	    },function(data){
-		closure.removeClass("disabled");
-		closure.children().first().show();
-		closure.children().first().next().hide();
-		closure.parent().parent().find(".report_display").html('<div class="alert alert-danger">'+data["ExceptionReport"]["Exception"]["ExceptionText"].toString()+'</div>');
-	    });*/
 	});
 
 	$("[data-mmaction=save]").click(function(){
-	    console.log('* Run save function');
 	    var myRoot=$(this).parent();
-	    console.log(myRoot);
 	    var myRoot1=$(this).parent().parent();
-	    console.log(myRoot1);
 	    params=[];
 	    var tupleReal={};
 	    myRoot.find("script").each(function(){
 		if($(this).attr('id') && $(this).attr('id').indexOf('runFirst')>=0)
 		    return;
-		console.log($(this));
 		try{
 		    console.log("**********- "+(myRoot1.attr('id').indexOf('embedded')<0));
 		    console.log("**********- "+(!$(this).parent().attr('id')));
@@ -878,14 +716,9 @@ define([
 		}catch(e){
 		    console.log(e);
 		}
-		console.log($(this).parent().parent().parent());
-		console.log($(this).parent().parent().parent().parent());
 
 		if((myRoot1.attr('id') &&  myRoot1.attr('id').indexOf('input')>=0) || (myRoot1.attr('id') && myRoot1.attr('id').indexOf('embedded')<0 && (!myRoot.attr('id') || myRoot.attr('id').indexOf("mm_table_editor_form")<0)))
 		    return;
-		console.log($(this).attr("name"));
-		console.log($(this).attr("id"));
-		console.log($(this)[0].innerHTML);
 		if($(this).attr('id') && $(this).attr("id")!="template_layerQuery_display" && $(this).attr("id").replace(/edition_/,"")!="importer_progress" && $(this).attr("id").indexOf("_template")<0)
 		    tupleReal[$(this).attr("id").replace(/edition_/,"")]=$(this)[0].innerHTML;
 	    });
@@ -902,18 +735,13 @@ define([
 			console.log("*** /CATCHED ERROR");
 		    }
 		}
-		console.log($(this));
-		console.log($(this).hasClass("htmlEditor"));
-		console.log($(this).hasClass("note-codable"));
 	    });
 	    myRoot.find("input,textarea,select").each(function(){
 		if($(this).hasClass("htmlEditor") || $(this).hasClass("note-codable"))
 		    return;
-		console.log($(this));
-		if(!$(this).find('option:selected').attr("data-map") && ($(this).is(":visible") && $(this).attr('id') || $(this).is("textarea")) && $(this).attr('id').indexOf("_mmtype")<0 && $(this).attr('id').indexOf("_mmlayer")<0 && $(this).attr('id').indexOf("_geotype")<0){
+		if(!$(this).find('option:selected').attr("data-map") && (($(this).is(":visible") || $(this).attr('id')=="edition_uid")  && $(this).attr('id') || $(this).is("textarea")) && $(this).attr('id') && $(this).attr('id').indexOf("_mmtype")<0 && $(this).attr('id').indexOf("_mmlayer")<0 && $(this).attr('id').indexOf("_geotype")<0){
 		    try{
 			// ISSUE WITH upload
-			console.log($(this));
 			var noDisplay=false;
 			/*try{
 			    console.log("**********- "+myRoot1.attr('id'))
@@ -959,7 +787,6 @@ define([
 			console.log("!!!!!!!! ERROR "+$(this).attr("id"));
 		    }
 		}else{
-		    console.log($(this));
 		    var tmpMap=$(this).find('option:selected').attr("data-map");
 		    if(tmpMap){
 			console.log("******** OM *********");
@@ -978,10 +805,6 @@ define([
 			    console.log(tmpFeature);
 			    console.log("###### DO SOMETHING WITH THE GEOMETRY!");
 			    var fwkt=new ol.format.WKT();
-			    /*var coords=tmpFeature.getGeometry().getCoordinates();
-			      for(i in coords)
-			      coords[i]=coords[i].reverse();
-			      tmpFeature.getGeometry().setCoordinates(coords);*/
 			    currentDrawnElement=fwkt.writeGeometry(tmpFeature.getGeometry().transform('EPSG:3857','EPSG:4326'));
 			    console.log(currentDrawnElement);
 
@@ -991,14 +814,9 @@ define([
 		    }
 		}
 	    });
-	    console.log(myRoot1.attr('id'));
 	    var parts=myRoot1.attr('id').split("_");
-	    console.log(parts);
 	    if(parts[0]=="embedded"){
 		var ei=-1;
-		console.log(ei);
-		console.log(embeddedTableFilter);
-		console.log(embeddeds);
 		var tmp=parts[0]+"_"+parts[1]+"_";
 		var elem=null;
 		for(var kk=0;kk<embeddeds.length;kk++){
@@ -1752,6 +1570,7 @@ define([
 								(function(a,b,c,d){
 								celement.parent().find("select[name="+ll+"]").on('change',function(){
 									console.log("MYSELF");
+						console.log(celement);
 									console.log(a);
 									console.log(b);
 									console.log(c);
@@ -1783,16 +1602,14 @@ define([
                                                 				success: function(data){
 											tmpId1="edit_"+tmpId;
 											var tempVal=celement.parent().find("select[name='"+tmpId1+"']").val();
-											console.log(tempVal);
 											celement.parent().find("select[name='"+tmpId1+"']").html("");
-											for(var j in data)
+											for(var j in data){
 												celement.parent().find("select[name='"+tmpId1+"']").append('<option value="'+data[j][0]+'">'+data[j][1]+'</option>');
-											console.log(originalElement.attr("data-cvalue"));
+											}
 											if(originalElement.attr("data-cvalue"))
 												celement.parent().find("select[name='"+tmpId1+"']").val(originalElement.attr("data-cvalue")).change();
 											else
-											celement.parent().find("select[name='"+tmpId1+"']").val(tempVal).change();
-											console.log(data);
+												celement.parent().find("select[name='"+tmpId1+"']").val(tempVal).change();
 										},
 										error: function(){
 										}

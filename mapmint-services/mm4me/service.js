@@ -63,6 +63,7 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     }
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult1=myProcess.Execute(myInputs,myOutputs1);
+    alert("replayHistoryForTable 1");
     alert(myExecuteResult1);
 
     var efields=eval(myExecuteResult1);
@@ -345,6 +346,7 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
 function replaySqliteHistory(conf,inputs,outputs){
     conf["lenv"]["message"]="Replay history log ...";
     ZOOUpdateStatus(conf,5);
+    alert(conf["lenv"]["message"]);
     var sqlContent=[];
     var sqlResult=[];
 
@@ -364,6 +366,7 @@ function replaySqliteHistory(conf,inputs,outputs){
 	var sqlPartContent="";
 	conf["lenv"]["message"]="Replay step: "+(i+1);
 	ZOOUpdateStatus(conf,14+((i)*(86/localResult.length)));
+	alert(conf["lenv"]["message"]);
 	replayHistoryForTable(conf,localResult[i],sqlResult,sqlContent,null);
     }
 
@@ -790,11 +793,14 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
     }
     outputs["Result"]["generated_file"]=conf["main"]["tmpPath"]+"/"+dbFile;
+    outputs["Result"]["storage"]=conf["main"]["tmpPath"]+"/"+dbFile;
     outputs["Result1"]["generated_file"]=conf["main"]["tmpPath"]+"/"+dbFile0;
+    outputs["Result1"]["storage"]=conf["main"]["tmpPath"]+"/"+dbFile0;
     if(inputs["tileId"]["value"]==0)
     outputs["Result2"]["generated_file"]=conf["main"]["tmpPath"]+"/tiles.db";
     else
     outputs["Result2"]["generated_file"]=conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+inputs["tileId"]["value"]+".db";
+    outputs["Result2"]["storage"]=outputs["Result2"]["generated_file"];
     myInputs={
       "table": {"value": mmPrimaryTables,"isArray":true,"length": mmPrimaryTables.length,"dataType":"string"}
     }

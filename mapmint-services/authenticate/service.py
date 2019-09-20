@@ -250,7 +250,7 @@ def clogIn(conf, inputs, outputs):
     prefix = getPrefix(conf)
     conn = con.conn
     h = hashlib.new('ripemd160')
-    h.update(inputs['password']['value'])
+    h.update(inputs['password']['value'].encode("utf-8"))
     c = conn.cursor()
     try:
         con.pexecute_req([
@@ -267,12 +267,14 @@ def clogIn(conf, inputs, outputs):
         # table content.
         cid = "MM" + conf["lenv"]["usid"]
         conf["lenv"]["cookie"] = "MMID=" + cid + "; path=/"
-        if "senv" not in conf:
-            cid = "MM" + conf["lenv"]["usid"]
-            conf["lenv"]["cookie"] = "MMID=" + cid + "; path=/"
-            conf["lenv"]["cookieArray"] = "MMID=" + cid + "; path=/"
-            conf["senv"] = {}
-            conf["senv"]["MMID"] = cid
+        projectOrig=None
+        if "senv" in conf:
+            projectOrig=conf["senv"]["last_map"]
+        cid = "MM" + conf["lenv"]["usid"]
+        conf["lenv"]["cookie"] = "MMID=" + cid + "; path=/"
+        conf["lenv"]["cookieArray"] = "MMID=" + cid + "; path=/"
+        conf["senv"] = {}
+        conf["senv"]["MMID"] = cid
         import requests
         c.execute(con.desc)
         desc = c.fetchall()
@@ -282,14 +284,14 @@ def clogIn(conf, inputs, outputs):
             else:
                 if a[0][i[0]] is not None:
                     try:
-                        conf["senv"][i[1]] = a[0][i[0]].encode('utf-8')
+                        conf["senv"][i[1]] = a[0][i[0]] #.encode('utf-8')
                     except:
                         conf["senv"][i[1]] = a[0][i[0]]
                 else:
                     conf["senv"][i[1]] = str(a[0][i[0]])
 
         for i in desc:
-            if i[1] == 'login':
+            if i[1] == 'login' and "hasFlux" in conf["main"] and conf["main"]["hasFlux"]=="true":
                 dataParam = {'mp': h.hexdigest(), 'email': conf["senv"]["mail"]}
                 urlCon = "http://sigcod.geolabs.fr/flux/Services/service_connect"
                 try:
@@ -313,6 +315,8 @@ def clogIn(conf, inputs, outputs):
         else:
             conf["senv"]["isAdmin"] = "false"
         # conf["lenv"]["cookie"]="MMID=MM"+conf["lenv"]["usid"]+"; path=/"
+        if projectOrig is not None:
+            conf["senv"]["last_map"]=projectOrig
         outputs["Result"]["value"] = zoo._("User ") + conf["senv"]["login"] + zoo._(" authenticated")
         sql = " UPDATE " + prefix + "users set last_con=" + con.now + " WHERE login=[_login_]"
         con.pexecute_req([sql, {"login": {"value": inputs['login']['value'], "format": "s"}}])
@@ -353,14 +357,16 @@ def logOut(conf, inputs, outputs):
     # TODO: confirm assumption: conf["senv"] is Python dictionary
     if "senv" in conf and "loggedin" in conf["senv"] and conf["senv"]["loggedin"] == "true":
         outputs["Result"]["value"] = zoo._("User disconnected")
+        cid = "MM" + conf["lenv"]["usid"]
         conf["senv"]["loggedin"] = "false"
+        conf["senv"]["MMID"] = cid
         conf["senv"]["login"] = "anonymous"
         conf["senv"]["group"] = "public"
         conf["lenv"]["ecookie_length"] = "1"
         conf["lenv"]["ecookie"] = "sid=empty; path=/"
         conf["senv"]["ecookie_length"] = "1"
         conf["senv"]["ecookie"] = "sid=empty; path=/"
-        conf["lenv"]["cookie"] = "MMID=" + conf["lenv"]["usid"] + "; expires=" + time.strftime(
+        conf["lenv"]["cookie"] = "MMID=" + cid + "; expires=" + time.strftime(
             "%a, %d-%b-%Y %H:%M:%S GMT", time.gmtime()) + "; path=/"
         return zoo.SERVICE_SUCCEEDED
     else:
@@ -434,7 +440,7 @@ def logIn(conf, inputs, outputs):
         conf["lenv"]["cookie"] = "MMID=" + cid + "; path=/"
 
         conf["senv"] = {}
-        conf["senv"]["MMID"] = "MM" + cid
+        conf["senv"]["MMID"] = cid
         # Set all the Session environment variables using the users 
         # table content.
         c.execute(con.desc)

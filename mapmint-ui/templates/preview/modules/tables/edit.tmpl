@@ -65,6 +65,7 @@
 #set isOptional=False
 #end if
 
+#set rvals=[$vals]
 
 #set step=$vals[1]
 
@@ -82,6 +83,7 @@
 #for i in range(len($vals))
 #if not($vals[i][1] in $alreadyDisplayed.keys())
 #set ctype=$vals[i][5]
+
 #if $description.count("(_"+$vals[i][1]+"_)")>0
 #set $alreadyDisplayed[$vals[i][1]]=True
 #end if
@@ -90,11 +92,7 @@ LOG
 $ctype
 $vals[i][1]
 -->
-
 #if ctype=="ref" 
-#*
- In case it is a select list
-*#
 #set res1=$cur.execute($vals[i][3])
 #try
 #set vals1=$cur.fetchall()
@@ -108,14 +106,8 @@ $vals[i][1]
 #set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"select","options":$options,"optional":$isOptional})
 #else
 #if ctype=="date" or ctype=="datetime" or ctype=="float"
-#*
- In case it is a date
-*#
 #set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
 #else
-#*
- In case it HTML
-*#
 #if $ctype=="html"
 #set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
 #else
@@ -123,11 +115,15 @@ $vals[i][1]
 #end if
 #end if
 #end if
+
 #end if
 
 
 #set $description=$description.replace("(_"+$vals[i][1]+"_)",tmpDisplay)
+
 #end for
+
+#set $vals=$rvals[0]
 #except Exception as e
 <h2>$e</h2>
 #end try
