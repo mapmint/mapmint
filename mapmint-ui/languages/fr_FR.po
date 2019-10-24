@@ -4,14 +4,14 @@
 # 
 # Translators:
 # dieng <adlsenegal@gmail.com>, 2015
-# Gérald FENOY <gerald.fenoy@geolabs.fr>, 2015
+# Gérald FENOY <gerald.fenoy@geolabs.fr>, 2015,2019
 # MapMint Test Account <gfenoy@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: User Interface\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-22 15:35+0100\n"
-"PO-Revision-Date: 2017-09-22 16:33+0000\n"
+"PO-Revision-Date: 2019-10-24 16:45+0000\n"
 "Last-Translator: Gérald FENOY <gerald.fenoy@geolabs.fr>\n"
 "Language-Team: French (France) (http://www.transifex.com/mapmint/user-interface/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
@@ -2201,7 +2201,7 @@ msgstr "A."
 #: /mapmint-ui/templates/Indexes/DocPart_bs.html:43
 #: /mapmint-ui/templates/Manager/LayerProperties_bs.html:154
 msgid "Value"
-msgstr ""
+msgstr "Valeur"
 
 #: /mapmint-ui/templates/Indexes.tmpl:34
 #: /mapmint-ui/templates/Indexes_bs.tmpl:34
