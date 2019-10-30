@@ -314,7 +314,7 @@ def GetUsersGroup(conf, inputs, outputs):
                 c.get_users_group_by_id(int(inputs["id"]["value"]), inputs["order"]["value"], inputs["sort"]["value"]))
             return 3
         else:
-            conf["lenv"]["message"] = zoo._("Action not permited")
+            conf["lenv"]["message"] = zoo._("Action not permitted")
             return 4
     else:
         conf["lenv"]["message"] = zoo._("User not authenticated")
@@ -362,7 +362,7 @@ def AddUser(conf, inputs, outputs):
                 conf["lenv"]["message"] = zoo._("SQL Error")
                 return 4
         else:
-            conf["lenv"]["message"] = zoo._("Action not permited")
+            conf["lenv"]["message"] = zoo._("Action not permitted")
             return 4
     else:
         conf["lenv"]["message"] = zoo._("User not authenticated")
@@ -385,7 +385,7 @@ def AddGroup(conf, inputs, outputs):
                 conf["lenv"]["message"] = 'Erreur sql'
                 return zoo.SERVICE_FAILED
         else:
-            conf["lenv"]["message"] = zoo._("Action not permited")
+            conf["lenv"]["message"] = zoo._("Action not permitted")
             return zoo.SERVICE_FAILED
     else:
         conf["lenv"]["message"] = zoo._("User not authenticated")
@@ -535,7 +535,7 @@ def UpdateUser(conf, inputs, outputs):
                     conf["lenv"]["message"] = zoo._("Update failed")
                     return 4
             else:
-                conf["lenv"]["message"] = zoo._("Action not permited")
+                conf["lenv"]["message"] = zoo._("Action not permitted")
                 return 4
         else:
             conf["lenv"]["message"] = zoo._("Parameter id invalid")

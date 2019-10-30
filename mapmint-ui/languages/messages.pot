@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-30 17:10+0100\n"
+"POT-Creation-Date: 2019-10-30 17:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -150,14 +150,11 @@ msgstr ""
 msgid "Action not allowed"
 msgstr ""
 
+#: /home/src/mapmint/mapmint-services/manage-users/service_users.py:259
 #: /home/src/mapmint/mapmint-services/manage-users/service_users.py:317
 #: /home/src/mapmint/mapmint-services/manage-users/service_users.py:365
 #: /home/src/mapmint/mapmint-services/manage-users/service_users.py:388
 #: /home/src/mapmint/mapmint-services/manage-users/service_users.py:538
-msgid "Action not permited"
-msgstr ""
-
-#: /home/src/mapmint/mapmint-services/manage-users/service_users.py:259
 msgid "Action not permitted"
 msgstr ""
 
