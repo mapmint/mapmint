@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-30 13:15+0100\n"
+"POT-Creation-Date: 2019-10-30 17:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,6 +32,10 @@ msgstr ""
 #: /home/src/mapmint/mapmint-services/authenticate/service.py:320
 #: /home/src/mapmint/mapmint-services/authenticate/service.py:470
 msgid " authenticated"
+msgstr ""
+
+#: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:235
+msgid " button."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/georeferencer/service.js:137
@@ -2901,6 +2905,10 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:255
 msgid "Operator"
+msgstr ""
+
+#: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:235
+msgid "Optionally, you can also add filter to existing one by pressing the "
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/ComplexSearch.tmpl:193
