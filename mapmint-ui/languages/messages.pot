@@ -3,8 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <gerald.fenoy@geolabs.fr>, 2015.
 #
-#: /home/src/mapmint/mapmint-services/raster-tools-src/cgi-env/dem_service.zo:421
-#: /home/src/zoo/zoo-project/zoo-services/gdal/dem/cgi-env/dem_service.zo:421
 #, fuzzy
 msgid ""
 msgstr ""
