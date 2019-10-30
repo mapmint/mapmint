@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-30 12:04+0100\n"
+"POT-Creation-Date: 2019-10-30 13:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,29 +21,8 @@ msgstr ""
 msgid " (require Google Earth application)."
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:35
-#: .cache/my_service_string_to_translate.c:103
-#: .cache/my_service_string_to_translate.c:175
-msgid ""
-" Compute and return all points which are accessible from the given point and "
-"distance"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:153
-#: .cache/my_service_string_to_translate.c:161
-msgid " Compute and return shortest path using pgRouting library"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Styler_bs.html:35
 msgid " Resampling method: "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:43
-#: .cache/my_service_string_to_translate.c:51
-#: .cache/my_service_string_to_translate.c:124
-msgid ""
-" Similar to do but compute and return shortest path using pgRouting library "
-"as a single feature"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:4680
@@ -70,7 +49,6 @@ msgstr ""
 msgid " field failed."
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:89
 #: /home/src/mapmint/mapmint-services/np/service.py:3047
 msgid " on "
 msgstr ""
@@ -122,50 +100,6 @@ msgstr ""
 msgid ">"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3542
-msgid "A PNG image containing the color gradient"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1302
-msgid ""
-"A new geometry object is created and returned containing the boundary of the "
-"geometry on which the method is invoked. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1320
-msgid ""
-"A new geometry object is created and returned containing the convex hull of "
-"the geometry on which the method is invoked."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:70
-#: .cache/my_service_string_to_translate.c:1284
-#: .cache/my_service_string_to_translate.c:1316
-#: .cache/my_service_string_to_translate.c:1342
-#: .cache/my_service_string_to_translate.c:1366
-#: .cache/my_service_string_to_translate.c:1380
-#: .cache/my_service_string_to_translate.c:1388
-#: .cache/my_service_string_to_translate.c:1416
-#: .cache/my_service_string_to_translate.c:1430
-#: .cache/my_service_string_to_translate.c:1438
-#: .cache/my_service_string_to_translate.c:1468
-msgid ""
-"A new geometry representing the intersection or NULL if there is no "
-"intersection or an error occurs."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1451
-msgid "A sql request"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1458
-msgid "A sql request using the OGR syntaxe."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3927
-msgid "A user id."
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:244
 msgid "AND"
 msgstr ""
@@ -198,11 +132,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/UsersManagement/GroupList.tmpl:60
 #: /home/src/mapmint/mapmint-ui/templates/Distiller.tmpl:97
 msgid "Access"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1447
-#: .cache/my_service_string_to_translate.c:1454
-msgid "Access features from a feature collection"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Publisher/Properties.html:23
@@ -337,36 +266,9 @@ msgstr ""
 msgid "Add a document"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:715
-#: .cache/my_service_string_to_translate.c:709
-#: .cache/my_service_string_to_translate.c:681
-#: .cache/my_service_string_to_translate.c:673
-#: .cache/my_service_string_to_translate.c:631
-#: .cache/my_service_string_to_translate.c:625
-#: .cache/my_service_string_to_translate.c:543
-#: .cache/my_service_string_to_translate.c:537
-msgid "Add a map to your favorite ones.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2577
-msgid "Add a metadata field pointing to the layer for a polygon label setup)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2583
-msgid "Add a metadata field pointing to the layer for a polygon label setup.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Tables/Views.html:71
 #: /home/src/mapmint/mapmint-ui/templates/Tables/Edition.html:11
 msgid "Add a row"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2965
-msgid "Add a specific layer for a polygon label setup)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2971
-msgid "Add a specific layer for a polygon label setup.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Styler_bs.html:133
@@ -376,11 +278,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/routing/display_bs.html:39
 #: /home/src/mapmint/mapmint-ui/templates/Indexes_bs.tmpl:284
 msgid "Add a step"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2433
-#: .cache/my_service_string_to_translate.c:2425
-msgid "Add a step name in project map.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/routing/display.html:47
@@ -407,10 +304,6 @@ msgstr ""
 msgid "Add grid"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3865
-msgid "Add group on database."
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/indexes/AddLayer.tmpl:5
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/addLayer/display.html:11
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/addLayer/display.html:19
@@ -427,29 +320,8 @@ msgstr ""
 msgid "Add new directory"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3713
-msgid ""
-"Add one or more symbols from the list of available symbols to MapServer.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3731
-msgid "Add one symbol to the list of available symbols to MapServer)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3737
-msgid "Add one symbol to the list of available symbols to MapServer.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1529
-msgid "Add rows of sqlite database."
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:324
 msgid "Add to the following layer:"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3885
-msgid "Add user on database."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/layerswitcher_bs.tmpl:68
@@ -489,11 +361,6 @@ msgstr ""
 msgid "An error occured ("
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:145
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:478
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:512
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:550
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:653
 #: /home/src/mapmint/mapmint-services/np/service.py:1471
 #: /home/src/mapmint/mapmint-services/np/service.py:1582
 #: /home/src/mapmint/mapmint-services/np/service.py:1628
@@ -511,41 +378,12 @@ msgstr ""
 msgid "An error occured: "
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1100
-#: .cache/my_service_string_to_translate.c:1104
-msgid "An information message"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1072
-msgid "An informational message"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1076
-msgid "An informational message."
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Styler/UniqSymb_bs.html:49
 msgid "Angle"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Styler/UniqSymb.tmpl:124
 msgid "Angle:"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3261
-msgid "Any field defining a user )"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3269
-msgid "Any field defining a user.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3245
-msgid "Any parameter to define new user)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3253
-msgid "Any parameter to define new user.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:63
@@ -657,27 +495,8 @@ msgstr ""
 msgid "Buffer"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:193
-#: .cache/my_service_string_to_translate.c:1287
-#: .cache/my_service_string_to_translate.c:1403
-msgid "Buffer Distance"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Label.tmpl:131
 msgid "Buffer color:"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:42
-#: .cache/my_service_string_to_translate.c:50
-#: .cache/my_service_string_to_translate.c:123
-#: .cache/my_service_string_to_translate.c:152
-#: .cache/my_service_string_to_translate.c:160
-#: .cache/my_service_string_to_translate.c:194
-#: .cache/my_service_string_to_translate.c:1288
-#: .cache/my_service_string_to_translate.c:1333
-#: .cache/my_service_string_to_translate.c:1397
-#: .cache/my_service_string_to_translate.c:1404
-msgid "Buffered Polygon"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Styler/Label_bs.html:99
@@ -703,10 +522,6 @@ msgstr ""
 msgid "CSV file saved."
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1127
-msgid "CSV file)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Territories.tmpl:120
 #: /home/src/mapmint/mapmint-ui/templates/Themes.tmpl:118
 #: /home/src/mapmint/mapmint-ui/templates/Themes.tmpl:131
@@ -727,15 +542,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Documents.tmpl:114
 #: /home/src/mapmint/mapmint-ui/templates/Documents.tmpl:127
 msgid "Cancel"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1733
-msgid "Check for favorite SRS)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2939
-#: .cache/my_service_string_to_translate.c:2933
-msgid "Check if a featuredataset is of type polygon.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:4552
@@ -884,11 +690,6 @@ msgstr ""
 msgid "Clause"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1871
-#: .cache/my_service_string_to_translate.c:1865
-msgid "Clean a directory datastore.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Label.tmpl:64
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Styler/Label_bs.html:68
 msgid "Clean size"
@@ -901,14 +702,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Manager/TemplateEditor.tmpl:19
 #: /home/src/mapmint/mapmint-ui/templates/Manager/TemplateEditor_bs.tmpl:43
 msgid "Click"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3275
-msgid "Client Login.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:199
-msgid "Client Print Service.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:775
@@ -951,11 +744,6 @@ msgstr ""
 msgid "Column names:"
 msgstr ""
 
-#: /home/src/zoo/zoo-project/zoo-services/ogr/tindex/service.c:128
-msgid "Compilation and runtime library versions differ"
-msgstr ""
-
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:89
 #: /home/src/mapmint/mapmint-services/np/service.py:3099
 msgid "Compiling documents in PDF format"
 msgstr ""
@@ -969,42 +757,9 @@ msgstr ""
 msgid "Complexe Search:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1688
-msgid ""
-"Compress JS/CSS files using respectively using https://pypi.python.org/pypi/"
-"slimit/ or for js files and for cssmin (easy_install csssmin install) css "
-"files. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1685
-msgid "Compress JS/CSS files. "
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/Georeference.tmpl:23
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/Georeference_bs.html:24
 msgid "Compression:"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1351
-#: .cache/my_service_string_to_translate.c:1355
-msgid "Compute a grid of 1ha parcels over a specific extent"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1299
-msgid "Compute boundary."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3538
-msgid "Compute color gradient between two given values."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1317
-msgid "Compute convex hull."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1323
-#: .cache/my_service_string_to_translate.c:1547
-msgid "Compute difference. . "
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Distiller_bs.tmpl:384
@@ -1016,50 +771,10 @@ msgstr ""
 msgid "Compute grid for extent"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:63
-#: .cache/my_service_string_to_translate.c:1277
-#: .cache/my_service_string_to_translate.c:1359
-#: .cache/my_service_string_to_translate.c:1373
-#: .cache/my_service_string_to_translate.c:1409
-#: .cache/my_service_string_to_translate.c:1431
-#: .cache/my_service_string_to_translate.c:1461
-msgid "Compute intersection. "
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/routing/display_bs.html:36
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/routing/display_bs.html:43
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/routing/display.html:39
 msgid "Compute route"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1439
-msgid "Compute symmetric difference. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1268
-#: .cache/my_service_string_to_translate.c:1296
-#: .cache/my_service_string_to_translate.c:1370
-#: .cache/my_service_string_to_translate.c:1421
-#: .cache/my_service_string_to_translate.c:1504
-#: .cache/my_service_string_to_translate.c:1718
-#: .cache/my_service_string_to_translate.c:2720
-#: .cache/my_service_string_to_translate.c:2882
-msgid "Compute the geometry centroid."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1578
-#: .cache/my_service_string_to_translate.c:1601
-#: .cache/my_service_string_to_translate.c:1667
-msgid "Compute the index of a raster files set."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1495
-msgid "Compute the index of a vector files set."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1271
-#: .cache/my_service_string_to_translate.c:1343
-msgid "Compute union. "
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Configuration.tmpl:3
@@ -1117,99 +832,8 @@ msgstr ""
 msgid "Controls"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:797
-msgid "Convert CSV file into ODS)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1201
-msgid "Convert ODT file.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1555
-#: .cache/my_service_string_to_translate.c:1567
-msgid ""
-"Convert PostgreSQL database and MapMint settings of the Tables module in "
-"SQLite DB for using with MapMint4ME. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1308
-msgid "Convert XML file into json format."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1305
-msgid "Convert XML file into json format. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1561
-#: .cache/my_service_string_to_translate.c:1571
-msgid ""
-"Convert a PostgreSQL database and MapMint settings of the Tables module in "
-"SQLite DB for using with MapMint4ME."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:55
-#: .cache/my_service_string_to_translate.c:1607
-#: .cache/my_service_string_to_translate.c:1627
-#: .cache/my_service_string_to_translate.c:1651
-msgid "Convert raster data from one format to another. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:379
-#: .cache/my_service_string_to_translate.c:3613
-#: .cache/my_service_string_to_translate.c:3635
-#: .cache/my_service_string_to_translate.c:3655
-#: .cache/my_service_string_to_translate.c:3665
-#: .cache/my_service_string_to_translate.c:3671
-msgid "Convert vector data from one format to another. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3619
-#: .cache/my_service_string_to_translate.c:3601
-#: .cache/my_service_string_to_translate.c:3589
-#: .cache/my_service_string_to_translate.c:3573
-msgid "Convert vector data from one format to another.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1193
-msgid "Convert)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:59
-#: .cache/my_service_string_to_translate.c:1632
-#: .cache/my_service_string_to_translate.c:1656
-msgid "Converts raster data between different formats."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:382
-#: .cache/my_service_string_to_translate.c:3616
-#: .cache/my_service_string_to_translate.c:3640
-#: .cache/my_service_string_to_translate.c:3660
-#: .cache/my_service_string_to_translate.c:3668
-#: .cache/my_service_string_to_translate.c:3676
-msgid "Converts vector data between different formats."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3627
-#: .cache/my_service_string_to_translate.c:3607
-#: .cache/my_service_string_to_translate.c:3595
-#: .cache/my_service_string_to_translate.c:3581
-msgid "Converts vector data between different formats.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3563
-msgid "Converts vector data from one format to another. "
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Distiller_bs.tmpl:377
 msgid "Coordinates SRS"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1087
-msgid "Copy a MapMint Georeferencing Project mapfile at its final location.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1077
-msgid "Copy a MapMint Georeferencing Project mapfile)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Publisher/Properties.html:40
@@ -1225,45 +849,8 @@ msgstr ""
 msgid "Cotinuous color"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3805
-msgid "Create a LineString shapefile for an OSM dataset)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3825
-#: .cache/my_service_string_to_translate.c:3785
-#: .cache/my_service_string_to_translate.c:3765
-msgid "Create a Point shapefile for an OSM dataset)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Distiller_bs.tmpl:458
 msgid "Create a TileIndex"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:191
-#: .cache/my_service_string_to_translate.c:1285
-#: .cache/my_service_string_to_translate.c:1331
-#: .cache/my_service_string_to_translate.c:1395
-#: .cache/my_service_string_to_translate.c:1401
-msgid "Create a buffer around a polygon. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:195
-#: .cache/my_service_string_to_translate.c:1289
-#: .cache/my_service_string_to_translate.c:1334
-#: .cache/my_service_string_to_translate.c:1398
-#: .cache/my_service_string_to_translate.c:1405
-msgid ""
-"Create a buffer around a single polygon. Accepts the polygon as GML and "
-"provides GML output for the buffered feature. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1314
-msgid ""
-"Create a copy of all features available in the inputed featurecollection."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1311
-msgid "Create a copy of features. "
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:381
@@ -1280,61 +867,6 @@ msgid ""
 "the selected layer"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3815
-#: .cache/my_service_string_to_translate.c:3795
-#: .cache/my_service_string_to_translate.c:3775
-#: .cache/my_service_string_to_translate.c:3755
-msgid "Create a shapefile from OSM dataset)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1477
-msgid "Create a tileindex. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3441
-msgid ""
-"Create a token based on the user group name to be used lately for requesting "
-"OGW WebServices.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3435
-msgid "Create a token based on the user group name.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:613
-#: .cache/my_service_string_to_translate.c:615
-msgid "Create a view on tables created from two different datasources."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:917
-#: .cache/my_service_string_to_translate.c:913
-#: .cache/my_service_string_to_translate.c:621
-#: .cache/my_service_string_to_translate.c:617
-#: .cache/my_service_string_to_translate.c:473
-#: .cache/my_service_string_to_translate.c:469
-#: .cache/my_service_string_to_translate.c:339
-#: .cache/my_service_string_to_translate.c:331
-msgid "Create a view on tables created from two different datasources.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3530
-msgid ""
-"Create an ExecuteResponse document from a sid (Service ID), it will use the "
-"niternal ZOO Kernel mechanisms to access the current status from a running "
-"Service and update the percentCompleted from the original backup file used "
-"by the ZOO Kernel when running a Service in background. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1575
-#: .cache/my_service_string_to_translate.c:1595
-#: .cache/my_service_string_to_translate.c:1661
-msgid "Create an index using raster files "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1489
-msgid "Create an index using vector files "
-msgstr ""
-
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:2895
 msgid "Create classes ..."
 msgstr ""
@@ -1345,10 +877,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:1099
 msgid "Create new style for step: "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2185
-msgid "Create or update a WMS/WFS Data Store.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Publisher/Layers.html:215
@@ -1372,10 +900,6 @@ msgstr ""
 msgid "Creation Date:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1640
-msgid "Creation Option"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/CropImage_bs.html:36
 msgid "Crop"
 msgstr ""
@@ -1383,14 +907,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer_bs.tmpl:42
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/CropImage_bs.html:5
 msgid "Crop Raster"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1097
-msgid "Crop an image."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1101
-msgid "Crop an image. "
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/Georeference.tmpl:17
@@ -1401,10 +917,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/Georeference.tmpl:18
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/Georeference_bs.html:19
 msgid "Cubic Spline"
-msgstr ""
-
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:334
-msgid "Current index saved"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/ComplexSearch.tmpl:49
@@ -1464,19 +976,8 @@ msgstr ""
 msgid "Data stores"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:2257
-#: .cache/my_service_string_to_translate.c:1949
-msgid "DataSource name)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Upload.tmpl:5
 msgid "DataStore destination for your files:"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2255
-#: .cache/my_service_string_to_translate.c:1947
-#: .cache/my_service_string_to_translate.c:1771
-msgid "DataStore name)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Indicators_bs.tmpl:162
@@ -1512,21 +1013,9 @@ msgstr ""
 msgid "Datasource Name:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:2949
-#: .cache/my_service_string_to_translate.c:1141
-#: .cache/my_service_string_to_translate.c:1057
-msgid "Datasource)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/CropImage_bs.html:9
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/CropeImage_bs.html:8
 msgid "Datastore"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2947
-#: .cache/my_service_string_to_translate.c:1139
-#: .cache/my_service_string_to_translate.c:1055
-msgid "Datastore)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:28
@@ -1556,14 +1045,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:4937
 #: /home/src/mapmint/mapmint-services/authenticate/service.py:61
 msgid "Default extent set."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2537
-msgid "Define properties of a layer using metadata fields in the mapfile)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2545
-msgid "Define properties of a layer using metadata fields in the mapfile.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Indicators_bs.tmpl:62
@@ -1603,26 +1084,8 @@ msgstr ""
 msgid "Delete Table"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:2213
-#: .cache/my_service_string_to_translate.c:2205
-msgid "Delete a WMS/WFS Data Store.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1925
-#: .cache/my_service_string_to_translate.c:1917
-msgid "Delete a directory datastore.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Tables_bs.tmpl:62
 msgid "Delete a table"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:837
-msgid "Delete an element from PGSQL table)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:849
-msgid "Delete an element from PGSQL table.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/UsersManagement.tmpl:82
@@ -1739,37 +1202,13 @@ msgstr ""
 msgid "Display On Map"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1257
-#: .cache/my_service_string_to_translate.c:1469
-msgid "Display a buffer hole"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1261
-#: .cache/my_service_string_to_translate.c:1473
-msgid "Display a buffer hole around one geometry"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/indexes/InfoIdx.tmpl:11
 msgid "Display agregated level"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3695
-msgid "Display all symbols available as HTML form)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/routing/view.html:28
 #: /home/src/mapmint/mapmint-services/routing/service.py:917
-#: .cache/my_service_string_to_translate.c:33
-#: .cache/my_service_string_to_translate.c:101
-#: .cache/my_service_string_to_translate.c:173
 msgid "Distance"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:197
-#: .cache/my_service_string_to_translate.c:1291
-#: .cache/my_service_string_to_translate.c:1407
-#: .cache/my_service_string_to_translate.c:3341
-msgid "Distance to be used to calculate buffer."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/routing/ddview.html:21
@@ -1830,11 +1269,6 @@ msgstr ""
 msgid "Documents"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:145
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:478
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:512
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:538
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:653
 #: /home/src/mapmint/mapmint-services/np/service.py:1469
 #: /home/src/mapmint/mapmint-services/np/service.py:1580
 #: /home/src/mapmint/mapmint-services/np/service.py:1626
@@ -1846,7 +1280,6 @@ msgstr ""
 msgid "Done"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:512
 #: /home/src/mapmint/mapmint-services/np/service.py:1577
 #: /home/src/mapmint/mapmint-services/np/service.py:1623
 msgid "Done (with graph view creation)"
@@ -1871,9 +1304,6 @@ msgid "Drawn line"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/toolbar_html5.tmpl:21
-#: .cache/my_service_string_to_translate.c:31
-#: .cache/my_service_string_to_translate.c:99
-#: .cache/my_service_string_to_translate.c:171
 msgid "Driving Distance"
 msgstr ""
 
@@ -1918,12 +1348,10 @@ msgstr ""
 msgid "Edit, style and process data layers"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:550
 #: /home/src/mapmint/mapmint-services/np/service.py:1819
 msgid "Element deleted"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:478
 #: /home/src/mapmint/mapmint-services/np/service.py:1431
 msgid "Elements were ordered successfully"
 msgstr ""
@@ -1943,23 +1371,11 @@ msgstr ""
 msgid "Email:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1245
-msgid "Encode a string into a QR Code"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Distiller_bs.tmpl:490
 msgid "Encoding:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:41
-#: .cache/my_service_string_to_translate.c:49
-#: .cache/my_service_string_to_translate.c:151
-#: .cache/my_service_string_to_translate.c:159
-msgid "End Point"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/routing/display_bs.html:30
-#: .cache/my_service_string_to_translate.c:129
 msgid "End point"
 msgstr ""
 
@@ -1969,8 +1385,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-services/service.py:9
 #: /home/src/mapmint/mapmint-services/service.py:14
-#: /home/src/zoo/zoo-project/zoo-services/utils/status/cgi-env/service.py:9
-#: /home/src/zoo/zoo-project/zoo-services/utils/status/cgi-env/service.py:13
 msgid "Error executing the service"
 msgstr ""
 
@@ -1978,7 +1392,6 @@ msgstr ""
 msgid "Error loading your template file "
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:365
 #: /home/src/mapmint/mapmint-services/np/service.py:598
 msgid "Error occur whenre trying to access the index map"
 msgstr ""
@@ -2025,19 +1438,6 @@ msgstr ""
 msgid "Execute"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3335
-#: .cache/my_service_string_to_translate.c:3339
-msgid "Execute a WFS Transaction request using a MapServer WFS server"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2697
-msgid "Execute privilege)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3529
-msgid "ExecuteResponse document"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:2771
 msgid "Executing SQL Statement ..."
 msgstr ""
@@ -2065,37 +1465,12 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Publisher/Map.html:39
 #: /home/src/mapmint/mapmint-ui/templates/Publisher.tmpl:268
-#: .cache/my_service_string_to_translate.c:1352
 msgid "Extent"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2845
-msgid "Extent of the layer)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1184
-msgid "Extention of the map"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1215
-msgid "Extention of the map)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Dashboard_bs.tmpl:387
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Styler/SymbolManager.tmpl:8
 msgid "External images"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3097
-msgid "Extract all the properties from  layer)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3105
-msgid "Extract all the properties from  layer.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1619
-msgid "Extract elevation values along a line. "
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:283
@@ -2107,24 +1482,12 @@ msgstr ""
 msgid "Failed to create feature in shapefile."
 msgstr ""
 
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:282
-msgid "Failed to run sacct remotely"
-msgstr ""
-
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:117
-msgid "Failed to run scontrol remotely"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Dashboard_bs.tmpl:450
 msgid "Favorite SRS"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/indexes/SelectIdx.tmpl:24
 msgid "Favorites"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1453
-msgid "Features Count"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/LayerProperties_bs.html:88
@@ -2136,10 +1499,6 @@ msgstr ""
 msgid "Fees:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1623
-msgid "Fetch the x,y,z values of a DEM raster file along a linestring"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Indicators_bs.tmpl:267
 #: /home/src/mapmint/mapmint-ui/templates/Manager/TemplateEditor_bs.html:21
 #: /home/src/mapmint/mapmint-ui/templates/Manager/ComplexSearch.tmpl:186
@@ -2149,84 +1508,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Styler_bs.html:121
 msgid "Field defining steps"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1005
-#: .cache/my_service_string_to_translate.c:999
-#: .cache/my_service_string_to_translate.c:993
-#: .cache/my_service_string_to_translate.c:987
-#: .cache/my_service_string_to_translate.c:981
-#: .cache/my_service_string_to_translate.c:975
-#: .cache/my_service_string_to_translate.c:969
-#: .cache/my_service_string_to_translate.c:967
-#: .cache/my_service_string_to_translate.c:965
-#: .cache/my_service_string_to_translate.c:963
-#: .cache/my_service_string_to_translate.c:957
-#: .cache/my_service_string_to_translate.c:955
-#: .cache/my_service_string_to_translate.c:953
-#: .cache/my_service_string_to_translate.c:951
-#: .cache/my_service_string_to_translate.c:945
-#: .cache/my_service_string_to_translate.c:943
-#: .cache/my_service_string_to_translate.c:937
-#: .cache/my_service_string_to_translate.c:935
-#: .cache/my_service_string_to_translate.c:929
-#: .cache/my_service_string_to_translate.c:923
-#: .cache/my_service_string_to_translate.c:893
-#: .cache/my_service_string_to_translate.c:887
-#: .cache/my_service_string_to_translate.c:881
-#: .cache/my_service_string_to_translate.c:875
-#: .cache/my_service_string_to_translate.c:869
-#: .cache/my_service_string_to_translate.c:863
-#: .cache/my_service_string_to_translate.c:805
-#: .cache/my_service_string_to_translate.c:799
-#: .cache/my_service_string_to_translate.c:793
-#: .cache/my_service_string_to_translate.c:787
-#: .cache/my_service_string_to_translate.c:741
-#: .cache/my_service_string_to_translate.c:735
-#: .cache/my_service_string_to_translate.c:717
-#: .cache/my_service_string_to_translate.c:711
-#: .cache/my_service_string_to_translate.c:685
-#: .cache/my_service_string_to_translate.c:683
-#: .cache/my_service_string_to_translate.c:677
-#: .cache/my_service_string_to_translate.c:675
-#: .cache/my_service_string_to_translate.c:669
-#: .cache/my_service_string_to_translate.c:663
-#: .cache/my_service_string_to_translate.c:657
-#: .cache/my_service_string_to_translate.c:651
-#: .cache/my_service_string_to_translate.c:645
-#: .cache/my_service_string_to_translate.c:639
-#: .cache/my_service_string_to_translate.c:633
-#: .cache/my_service_string_to_translate.c:627
-#: .cache/my_service_string_to_translate.c:585
-#: .cache/my_service_string_to_translate.c:579
-#: .cache/my_service_string_to_translate.c:545
-#: .cache/my_service_string_to_translate.c:539
-#: .cache/my_service_string_to_translate.c:521
-#: .cache/my_service_string_to_translate.c:515
-#: .cache/my_service_string_to_translate.c:509
-#: .cache/my_service_string_to_translate.c:503
-#: .cache/my_service_string_to_translate.c:497
-#: .cache/my_service_string_to_translate.c:491
-#: .cache/my_service_string_to_translate.c:485
-#: .cache/my_service_string_to_translate.c:479
-#: .cache/my_service_string_to_translate.c:453
-#: .cache/my_service_string_to_translate.c:447
-#: .cache/my_service_string_to_translate.c:409
-#: .cache/my_service_string_to_translate.c:403
-#: .cache/my_service_string_to_translate.c:343
-#: .cache/my_service_string_to_translate.c:341
-#: .cache/my_service_string_to_translate.c:335
-#: .cache/my_service_string_to_translate.c:333
-#: .cache/my_service_string_to_translate.c:297
-#: .cache/my_service_string_to_translate.c:289
-#: .cache/my_service_string_to_translate.c:283
-#: .cache/my_service_string_to_translate.c:277
-#: .cache/my_service_string_to_translate.c:271
-#: .cache/my_service_string_to_translate.c:265
-#: .cache/my_service_string_to_translate.c:259
-#: .cache/my_service_string_to_translate.c:253
-#: .cache/my_service_string_to_translate.c:231
-msgid "Fields used to joind the two dataSources)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Indicators_bs.tmpl:89
@@ -2241,10 +1522,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-services/vector-converter-src/cgi-env/service.py:62
 msgid "File converted"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1893
-msgid "File extension)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/np/service.py:4679
@@ -2384,15 +1661,6 @@ msgstr ""
 msgid "Footer"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1478
-#: .cache/my_service_string_to_translate.c:1479
-#: .cache/my_service_string_to_translate.c:1608
-#: .cache/my_service_string_to_translate.c:1652
-#: .cache/my_service_string_to_translate.c:3564
-#: .cache/my_service_string_to_translate.c:3656
-msgid "Format of the output data"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:54
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/VectorConverter.tmpl:60
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/VectorConverter_bs.html:54
@@ -2406,28 +1674,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:286
 msgid "FusionIntersects"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2951
-#: .cache/my_service_string_to_translate.c:1143
-msgid "GCP File)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1581
-msgid "GDAL Mozaic Tool"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:46
-#: .cache/my_service_string_to_translate.c:54
-#: .cache/my_service_string_to_translate.c:126
-#: .cache/my_service_string_to_translate.c:156
-#: .cache/my_service_string_to_translate.c:164
-#: .cache/my_service_string_to_translate.c:198
-#: .cache/my_service_string_to_translate.c:1292
-#: .cache/my_service_string_to_translate.c:1336
-#: .cache/my_service_string_to_translate.c:1400
-#: .cache/my_service_string_to_translate.c:1408
-msgid "GML stream describing the buffered polygon feature."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Styler/UniqSymb_bs.html:115
@@ -2457,76 +1703,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Styler_bs.html:281
 msgid "Generate"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:209
-msgid "Generate a pdf, odt and html files and return the documents Urls.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:67
-#: .cache/my_service_string_to_translate.c:1281
-#: .cache/my_service_string_to_translate.c:1363
-#: .cache/my_service_string_to_translate.c:1377
-#: .cache/my_service_string_to_translate.c:1413
-#: .cache/my_service_string_to_translate.c:1435
-msgid ""
-"Generates a new geometry which is the region of intersection of the two "
-"geometries operated on."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1327
-#: .cache/my_service_string_to_translate.c:1551
-msgid ""
-"Generates a new geometry which is the region of this geometry with the "
-"region of the other geometry removed."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1274
-#: .cache/my_service_string_to_translate.c:1347
-msgid ""
-"Generates a new geometry which is the region of union of the two geometries "
-"operated on."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1443
-msgid ""
-"Generates a new geometry which is the symmetric difference of this geometry "
-"and the other geometry."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:38
-#: .cache/my_service_string_to_translate.c:106
-#: .cache/my_service_string_to_translate.c:178
-msgid "GeoJSON stream containint all points reachable by distance providen."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:135
-msgid "GeoJSON stream containint the line to split."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:76
-#: .cache/my_service_string_to_translate.c:84
-#: .cache/my_service_string_to_translate.c:92
-#: .cache/my_service_string_to_translate.c:98
-#: .cache/my_service_string_to_translate.c:112
-#: .cache/my_service_string_to_translate.c:120
-#: .cache/my_service_string_to_translate.c:136
-#: .cache/my_service_string_to_translate.c:142
-#: .cache/my_service_string_to_translate.c:148
-#: .cache/my_service_string_to_translate.c:170
-msgid "GeoJSON stream containint the splited line."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:62
-msgid ""
-"GeoJSON string containing the X Y Z values where (X,Y) is corresponding to "
-"the original coordinates and Z the elevation value "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1626
-msgid ""
-"GeoJSON string containing the X Y Z values where (X,Y) is corresponding to "
-"the original coordinates and the elevation value. "
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Territories_bs.tmpl:92
@@ -2563,105 +1739,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-services/georeferencer/service.py:176
 #: /home/src/mapmint/mapmint-services/georeferencer/service.py:215
 msgid "Georeference Project saved"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1069
-msgid "Georeference an image."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1073
-msgid "Georeference an image. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:655
-#: .cache/my_service_string_to_translate.c:649
-msgid "Get Index Quote.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3903
-msgid "Get all groups from database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3873
-msgid "Get all users from database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:973
-msgid "Get base layers used by tables.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3160
-msgid "Get general informations about a map layer. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3923
-#: .cache/my_service_string_to_translate.c:3926
-msgid "Get groups for an user from database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3909
-msgid "Get groups from database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3157
-msgid "Get information about a map layer. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1537
-msgid "Get rows of sqlite database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:979
-msgid "Get the base layers available in every project linked to a table.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1265
-#: .cache/my_service_string_to_translate.c:1293
-#: .cache/my_service_string_to_translate.c:1367
-#: .cache/my_service_string_to_translate.c:1417
-#: .cache/my_service_string_to_translate.c:1501
-#: .cache/my_service_string_to_translate.c:1715
-#: .cache/my_service_string_to_translate.c:2717
-#: .cache/my_service_string_to_translate.c:2879
-msgid "Get the centroid of a polygon. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3533
-msgid "Get the classifier image. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:13
-#: .cache/my_service_string_to_translate.c:16
-msgid "Get the form to upload files"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1389
-#: .cache/my_service_string_to_translate.c:1392
-msgid "Get the point on surface of a polygon. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3879
-msgid "Get user from database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3861
-#: .cache/my_service_string_to_translate.c:3863
-msgid "Get user info from database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3851
-#: .cache/my_service_string_to_translate.c:3856
-msgid "Get users for a group from database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3283
-msgid ""
-"Give capability for client users to log into the system on the client side.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3303
-msgid ""
-"Give the capcbility to client applications to disconnect from the system.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/Styler_bs.html:102
@@ -2713,38 +1790,14 @@ msgstr ""
 msgid "Grid map has been updated successfully"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1111
-msgid "Ground Control Point)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer_bs.tmpl:129
 msgid "Ground Control Points"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1609
-msgid "Ground Point Control"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1615
-msgid "Ground Point Control in the form : pixel,line,eating,northing(,elev)."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/UsersManagement/GroupList.html:81
 #: /home/src/mapmint/mapmint-ui/templates/UsersManagement/GroupList_bs.html:92
 #: /home/src/mapmint/mapmint-ui/templates/UsersManagement/GroupList.tmpl:59
 msgid "Group"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2691
-#: .cache/my_service_string_to_translate.c:1779
-#: .cache/my_service_string_to_translate.c:1777
-#: .cache/my_service_string_to_translate.c:1775
-#: .cache/my_service_string_to_translate.c:1773
-msgid "Group name)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3891
-msgid "Group name."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/AddDir.tmpl:3
@@ -2868,7 +1921,6 @@ msgstr ""
 msgid "Import"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:273
 #: /home/src/mapmint/mapmint-services/np/service.py:4449
 msgid "Importing "
 msgstr ""
@@ -2889,32 +1941,26 @@ msgstr ""
 msgid "Index"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:391
 #: /home/src/mapmint/mapmint-services/np/service.py:783
 msgid "Index display settings saved"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:303
 #: /home/src/mapmint/mapmint-services/np/service.py:89
 msgid "Index quote saved."
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:23
 #: /home/src/mapmint/mapmint-services/np/service.py:85
 msgid "Index quote updated."
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:365
 #: /home/src/mapmint/mapmint-services/np/service.py:632
 msgid "Index successfully published"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:374
 #: /home/src/mapmint/mapmint-services/np/service.py:649
 msgid "Index successfully unpublished"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:447
 #: /home/src/mapmint/mapmint-services/np/service.py:1126
 msgid "Index was successfully removed."
 msgstr ""
@@ -2960,326 +2006,17 @@ msgstr ""
 msgid "Informations:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3797
-#: .cache/my_service_string_to_translate.c:3777
-msgid "Input OSM data)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1235
-msgid "Input file)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1182
-msgid "Input format"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1211
-msgid "Input format)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1185
-#: .cache/my_service_string_to_translate.c:1520
-#: .cache/my_service_string_to_translate.c:1521
-#: .cache/my_service_string_to_translate.c:1522
-#: .cache/my_service_string_to_translate.c:1530
-#: .cache/my_service_string_to_translate.c:1531
-#: .cache/my_service_string_to_translate.c:1538
-#: .cache/my_service_string_to_translate.c:1539
-#: .cache/my_service_string_to_translate.c:3836
-#: .cache/my_service_string_to_translate.c:3837
-#: .cache/my_service_string_to_translate.c:3838
-#: .cache/my_service_string_to_translate.c:3846
-#: .cache/my_service_string_to_translate.c:3852
-#: .cache/my_service_string_to_translate.c:3853
-#: .cache/my_service_string_to_translate.c:3854
-#: .cache/my_service_string_to_translate.c:3866
-#: .cache/my_service_string_to_translate.c:3867
-#: .cache/my_service_string_to_translate.c:3874
-#: .cache/my_service_string_to_translate.c:3875
-#: .cache/my_service_string_to_translate.c:3876
-#: .cache/my_service_string_to_translate.c:3877
-#: .cache/my_service_string_to_translate.c:3886
-#: .cache/my_service_string_to_translate.c:3887
-#: .cache/my_service_string_to_translate.c:3894
-#: .cache/my_service_string_to_translate.c:3895
-#: .cache/my_service_string_to_translate.c:3896
-#: .cache/my_service_string_to_translate.c:3904
-#: .cache/my_service_string_to_translate.c:3905
-#: .cache/my_service_string_to_translate.c:3906
-#: .cache/my_service_string_to_translate.c:3907
-#: .cache/my_service_string_to_translate.c:3916
-#: .cache/my_service_string_to_translate.c:3924
-#: .cache/my_service_string_to_translate.c:3930
-#: .cache/my_service_string_to_translate.c:3931
-#: .cache/my_service_string_to_translate.c:3932
-#: .cache/my_service_string_to_translate.c:3933
-#: .cache/my_service_string_to_translate.c:3934
-msgid "Input string"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3745
-#: .cache/my_service_string_to_translate.c:3517
-#: .cache/my_service_string_to_translate.c:3505
-#: .cache/my_service_string_to_translate.c:3493
-#: .cache/my_service_string_to_translate.c:3475
-#: .cache/my_service_string_to_translate.c:3473
-#: .cache/my_service_string_to_translate.c:3471
-#: .cache/my_service_string_to_translate.c:3469
-#: .cache/my_service_string_to_translate.c:3453
-#: .cache/my_service_string_to_translate.c:3451
-#: .cache/my_service_string_to_translate.c:3449
-#: .cache/my_service_string_to_translate.c:3437
-#: .cache/my_service_string_to_translate.c:3419
-#: .cache/my_service_string_to_translate.c:3417
-#: .cache/my_service_string_to_translate.c:3415
-#: .cache/my_service_string_to_translate.c:3413
-#: .cache/my_service_string_to_translate.c:3395
-#: .cache/my_service_string_to_translate.c:3393
-#: .cache/my_service_string_to_translate.c:3391
-#: .cache/my_service_string_to_translate.c:3389
-#: .cache/my_service_string_to_translate.c:3373
-#: .cache/my_service_string_to_translate.c:3371
-#: .cache/my_service_string_to_translate.c:3369
-#: .cache/my_service_string_to_translate.c:3351
-#: .cache/my_service_string_to_translate.c:3349
-#: .cache/my_service_string_to_translate.c:3347
-#: .cache/my_service_string_to_translate.c:3345
-#: .cache/my_service_string_to_translate.c:3233
-#: .cache/my_service_string_to_translate.c:3221
-#: .cache/my_service_string_to_translate.c:3191
-#: .cache/my_service_string_to_translate.c:3189
-#: .cache/my_service_string_to_translate.c:3177
-#: .cache/my_service_string_to_translate.c:3165
-#: .cache/my_service_string_to_translate.c:3143
-#: .cache/my_service_string_to_translate.c:3141
-#: .cache/my_service_string_to_translate.c:3139
-#: .cache/my_service_string_to_translate.c:3127
-#: .cache/my_service_string_to_translate.c:3115
-#: .cache/my_service_string_to_translate.c:3101
-#: .cache/my_service_string_to_translate.c:3099
-#: .cache/my_service_string_to_translate.c:3087
-#: .cache/my_service_string_to_translate.c:3073
-#: .cache/my_service_string_to_translate.c:3071
-#: .cache/my_service_string_to_translate.c:3043
-#: .cache/my_service_string_to_translate.c:3029
-#: .cache/my_service_string_to_translate.c:3027
-#: .cache/my_service_string_to_translate.c:3015
-#: .cache/my_service_string_to_translate.c:3003
-#: .cache/my_service_string_to_translate.c:2979
-#: .cache/my_service_string_to_translate.c:2923
-#: .cache/my_service_string_to_translate.c:2899
-#: .cache/my_service_string_to_translate.c:2887
-#: .cache/my_service_string_to_translate.c:2869
-#: .cache/my_service_string_to_translate.c:2857
-#: .cache/my_service_string_to_translate.c:2831
-#: .cache/my_service_string_to_translate.c:2829
-#: .cache/my_service_string_to_translate.c:2817
-#: .cache/my_service_string_to_translate.c:2805
-#: .cache/my_service_string_to_translate.c:2791
-#: .cache/my_service_string_to_translate.c:2789
-#: .cache/my_service_string_to_translate.c:2777
-#: .cache/my_service_string_to_translate.c:2765
-#: .cache/my_service_string_to_translate.c:2753
-#: .cache/my_service_string_to_translate.c:2733
-#: .cache/my_service_string_to_translate.c:2731
-#: .cache/my_service_string_to_translate.c:2729
-#: .cache/my_service_string_to_translate.c:2727
-#: .cache/my_service_string_to_translate.c:2725
-#: .cache/my_service_string_to_translate.c:2687
-#: .cache/my_service_string_to_translate.c:2673
-#: .cache/my_service_string_to_translate.c:2671
-#: .cache/my_service_string_to_translate.c:2657
-#: .cache/my_service_string_to_translate.c:2655
-#: .cache/my_service_string_to_translate.c:2639
-#: .cache/my_service_string_to_translate.c:2637
-#: .cache/my_service_string_to_translate.c:2635
-#: .cache/my_service_string_to_translate.c:2621
-#: .cache/my_service_string_to_translate.c:2619
-#: .cache/my_service_string_to_translate.c:2607
-#: .cache/my_service_string_to_translate.c:2593
-#: .cache/my_service_string_to_translate.c:2591
-#: .cache/my_service_string_to_translate.c:2557
-#: .cache/my_service_string_to_translate.c:2555
-#: .cache/my_service_string_to_translate.c:2541
-#: .cache/my_service_string_to_translate.c:2539
-#: .cache/my_service_string_to_translate.c:2527
-#: .cache/my_service_string_to_translate.c:2513
-#: .cache/my_service_string_to_translate.c:2511
-#: .cache/my_service_string_to_translate.c:2497
-#: .cache/my_service_string_to_translate.c:2495
-#: .cache/my_service_string_to_translate.c:2483
-#: .cache/my_service_string_to_translate.c:2471
-#: .cache/my_service_string_to_translate.c:2459
-#: .cache/my_service_string_to_translate.c:2445
-#: .cache/my_service_string_to_translate.c:2443
-#: .cache/my_service_string_to_translate.c:2429
-#: .cache/my_service_string_to_translate.c:2427
-#: .cache/my_service_string_to_translate.c:2395
-#: .cache/my_service_string_to_translate.c:2381
-#: .cache/my_service_string_to_translate.c:2379
-#: .cache/my_service_string_to_translate.c:2363
-#: .cache/my_service_string_to_translate.c:2351
-#: .cache/my_service_string_to_translate.c:2339
-#: .cache/my_service_string_to_translate.c:2323
-#: .cache/my_service_string_to_translate.c:2321
-#: .cache/my_service_string_to_translate.c:2319
-#: .cache/my_service_string_to_translate.c:2307
-#: .cache/my_service_string_to_translate.c:2293
-#: .cache/my_service_string_to_translate.c:2291
-#: .cache/my_service_string_to_translate.c:2275
-#: .cache/my_service_string_to_translate.c:2273
-#: .cache/my_service_string_to_translate.c:2271
-#: .cache/my_service_string_to_translate.c:2173
-#: .cache/my_service_string_to_translate.c:2171
-#: .cache/my_service_string_to_translate.c:2159
-#: .cache/my_service_string_to_translate.c:2147
-#: .cache/my_service_string_to_translate.c:2131
-#: .cache/my_service_string_to_translate.c:2129
-#: .cache/my_service_string_to_translate.c:2127
-#: .cache/my_service_string_to_translate.c:2111
-#: .cache/my_service_string_to_translate.c:2109
-#: .cache/my_service_string_to_translate.c:2107
-#: .cache/my_service_string_to_translate.c:2095
-#: .cache/my_service_string_to_translate.c:2083
-#: .cache/my_service_string_to_translate.c:2071
-#: .cache/my_service_string_to_translate.c:2055
-#: .cache/my_service_string_to_translate.c:2053
-#: .cache/my_service_string_to_translate.c:2051
-#: .cache/my_service_string_to_translate.c:2013
-#: .cache/my_service_string_to_translate.c:2011
-#: .cache/my_service_string_to_translate.c:1999
-#: .cache/my_service_string_to_translate.c:1987
-#: .cache/my_service_string_to_translate.c:1975
-#: .cache/my_service_string_to_translate.c:1963
-#: .cache/my_service_string_to_translate.c:1935
-#: .cache/my_service_string_to_translate.c:1921
-#: .cache/my_service_string_to_translate.c:1919
-#: .cache/my_service_string_to_translate.c:1907
-#: .cache/my_service_string_to_translate.c:1891
-#: .cache/my_service_string_to_translate.c:1879
-#: .cache/my_service_string_to_translate.c:1867
-#: .cache/my_service_string_to_translate.c:1851
-#: .cache/my_service_string_to_translate.c:1849
-#: .cache/my_service_string_to_translate.c:1847
-#: .cache/my_service_string_to_translate.c:1835
-#: .cache/my_service_string_to_translate.c:1823
-#: .cache/my_service_string_to_translate.c:1811
-#: .cache/my_service_string_to_translate.c:1799
-#: .cache/my_service_string_to_translate.c:1759
-#: .cache/my_service_string_to_translate.c:1747
-#: .cache/my_service_string_to_translate.c:1735
-#: .cache/my_service_string_to_translate.c:1723
-#: .cache/my_service_string_to_translate.c:1675
-#: .cache/my_service_string_to_translate.c:1509
-#: .cache/my_service_string_to_translate.c:1217
-#: .cache/my_service_string_to_translate.c:1197
-#: .cache/my_service_string_to_translate.c:1195
-#: .cache/my_service_string_to_translate.c:1039
-#: .cache/my_service_string_to_translate.c:1037
-#: .cache/my_service_string_to_translate.c:1035
-#: .cache/my_service_string_to_translate.c:1013
-#: .cache/my_service_string_to_translate.c:1011
-#: .cache/my_service_string_to_translate.c:901
-#: .cache/my_service_string_to_translate.c:899
-#: .cache/my_service_string_to_translate.c:845
-#: .cache/my_service_string_to_translate.c:843
-#: .cache/my_service_string_to_translate.c:841
-#: .cache/my_service_string_to_translate.c:839
-#: .cache/my_service_string_to_translate.c:827
-#: .cache/my_service_string_to_translate.c:813
-#: .cache/my_service_string_to_translate.c:811
-#: .cache/my_service_string_to_translate.c:749
-#: .cache/my_service_string_to_translate.c:747
-#: .cache/my_service_string_to_translate.c:723
-#: .cache/my_service_string_to_translate.c:699
-#: .cache/my_service_string_to_translate.c:595
-#: .cache/my_service_string_to_translate.c:593
-#: .cache/my_service_string_to_translate.c:591
-#: .cache/my_service_string_to_translate.c:565
-#: .cache/my_service_string_to_translate.c:563
-#: .cache/my_service_string_to_translate.c:551
-#: .cache/my_service_string_to_translate.c:459
-#: .cache/my_service_string_to_translate.c:433
-#: .cache/my_service_string_to_translate.c:431
-#: .cache/my_service_string_to_translate.c:417
-#: .cache/my_service_string_to_translate.c:415
-#: .cache/my_service_string_to_translate.c:387
-#: .cache/my_service_string_to_translate.c:367
-#: .cache/my_service_string_to_translate.c:365
-#: .cache/my_service_string_to_translate.c:351
-#: .cache/my_service_string_to_translate.c:349
-#: .cache/my_service_string_to_translate.c:319
-#: .cache/my_service_string_to_translate.c:317
-#: .cache/my_service_string_to_translate.c:203
-#: .cache/my_service_string_to_translate.c:201
-#: .cache/my_service_string_to_translate.c:181
-msgid "Input string)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:289
 msgid "Intersection"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1464
-msgid "Intersection of geometries"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:66
-#: .cache/my_service_string_to_translate.c:1280
-#: .cache/my_service_string_to_translate.c:1313
-#: .cache/my_service_string_to_translate.c:1339
-#: .cache/my_service_string_to_translate.c:1362
-#: .cache/my_service_string_to_translate.c:1376
-#: .cache/my_service_string_to_translate.c:1384
-#: .cache/my_service_string_to_translate.c:1412
-#: .cache/my_service_string_to_translate.c:1427
-#: .cache/my_service_string_to_translate.c:1434
-msgid "Intersection of the two geometries"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/manage-users/service_users.py:414
 msgid "Invalid set parameter: "
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:411
 #: /home/src/mapmint/mapmint-services/np/service.py:944
 #: /home/src/mapmint/mapmint-services/np/service.py:955
 msgid "Issue occurs: "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3847
-#: .cache/my_service_string_to_translate.c:3918
-msgid "JSON Object"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3888
-msgid "JSON Object representing the created user"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3892
-msgid "JSON Object representing the created user."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3850
-#: .cache/my_service_string_to_translate.c:3922
-msgid "JSON Object."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1298
-#: .cache/my_service_string_to_translate.c:1394
-msgid "JSON String / GML Entity of the centroid"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:23
-msgid "JSON object containing both rejected and accepted list of files)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:29
-msgid "JSON object containing both rejected and accepted list of files.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3694
-msgid "JSON string representing the context."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Indicators_bs.tmpl:278
@@ -3288,21 +2025,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Indicators_bs.tmpl:271
 msgid "Join with"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:81
-#: .cache/my_service_string_to_translate.c:89
-#: .cache/my_service_string_to_translate.c:110
-#: .cache/my_service_string_to_translate.c:117
-#: .cache/my_service_string_to_translate.c:140
-#: .cache/my_service_string_to_translate.c:146
-msgid "Keep a copy of the routing result"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:74
-msgid ""
-"Keep a copy of the routing result using styles defined in the StyleRoute "
-"project"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Publisher.tmpl:115
@@ -3530,10 +2252,6 @@ msgstr ""
 msgid "Layer settings"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:2689
-msgid "Layer)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/mobile.tmpl:145
 msgid "Layer:"
 msgstr ""
@@ -3545,14 +2263,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Manager_bs.html:50
 #: /home/src/mapmint/mapmint-ui/templates/Publisher_bs.tmpl:78
 msgid "Layers"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1183
-msgid "Layers list"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1213
-msgid "Layers list)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Publisher/Map.html:92
@@ -3621,305 +2331,12 @@ msgstr ""
 msgid "Links"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1157
-msgid "List all MapMint GCP CSV files)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1163
-msgid "List all MapMint GCP CSV files.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3701
-msgid "List all charcodes in a truetype font as HTML form)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3749
-#: .cache/my_service_string_to_translate.c:3725
-msgid "List all charcodes in a truetype font)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3743
-#: .cache/my_service_string_to_translate.c:3719
-msgid "List all charcodes in truetype font)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1897
-#: .cache/my_service_string_to_translate.c:1889
-msgid "List all files with a given extension from a directory.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3515
-#: .cache/my_service_string_to_translate.c:3491
-#: .cache/my_service_string_to_translate.c:3319
-#: .cache/my_service_string_to_translate.c:3291
-#: .cache/my_service_string_to_translate.c:3231
-#: .cache/my_service_string_to_translate.c:3219
-#: .cache/my_service_string_to_translate.c:3187
-#: .cache/my_service_string_to_translate.c:3175
-#: .cache/my_service_string_to_translate.c:3163
-#: .cache/my_service_string_to_translate.c:3085
-#: .cache/my_service_string_to_translate.c:3069
-#: .cache/my_service_string_to_translate.c:3041
-#: .cache/my_service_string_to_translate.c:3025
-#: .cache/my_service_string_to_translate.c:3001
-#: .cache/my_service_string_to_translate.c:2977
-#: .cache/my_service_string_to_translate.c:2897
-#: .cache/my_service_string_to_translate.c:2885
-#: .cache/my_service_string_to_translate.c:2867
-#: .cache/my_service_string_to_translate.c:2855
-#: .cache/my_service_string_to_translate.c:2827
-#: .cache/my_service_string_to_translate.c:2815
-#: .cache/my_service_string_to_translate.c:2787
-#: .cache/my_service_string_to_translate.c:2775
-#: .cache/my_service_string_to_translate.c:2763
-#: .cache/my_service_string_to_translate.c:2751
-#: .cache/my_service_string_to_translate.c:2723
-#: .cache/my_service_string_to_translate.c:2685
-#: .cache/my_service_string_to_translate.c:2653
-#: .cache/my_service_string_to_translate.c:2633
-#: .cache/my_service_string_to_translate.c:2617
-#: .cache/my_service_string_to_translate.c:2605
-#: .cache/my_service_string_to_translate.c:2589
-#: .cache/my_service_string_to_translate.c:2553
-#: .cache/my_service_string_to_translate.c:2525
-#: .cache/my_service_string_to_translate.c:2493
-#: .cache/my_service_string_to_translate.c:2481
-#: .cache/my_service_string_to_translate.c:2469
-#: .cache/my_service_string_to_translate.c:2457
-#: .cache/my_service_string_to_translate.c:2441
-#: .cache/my_service_string_to_translate.c:2377
-#: .cache/my_service_string_to_translate.c:2361
-#: .cache/my_service_string_to_translate.c:2349
-#: .cache/my_service_string_to_translate.c:2337
-#: .cache/my_service_string_to_translate.c:2317
-#: .cache/my_service_string_to_translate.c:2305
-#: .cache/my_service_string_to_translate.c:2289
-#: .cache/my_service_string_to_translate.c:2093
-#: .cache/my_service_string_to_translate.c:1961
-#: .cache/my_service_string_to_translate.c:1933
-#: .cache/my_service_string_to_translate.c:1905
-#: .cache/my_service_string_to_translate.c:1877
-#: .cache/my_service_string_to_translate.c:1833
-#: .cache/my_service_string_to_translate.c:1821
-#: .cache/my_service_string_to_translate.c:1809
-#: .cache/my_service_string_to_translate.c:1797
-#: .cache/my_service_string_to_translate.c:1745
-#: .cache/my_service_string_to_translate.c:1721
-#: .cache/my_service_string_to_translate.c:1673
-#: .cache/my_service_string_to_translate.c:1033
-#: .cache/my_service_string_to_translate.c:1025
-#: .cache/my_service_string_to_translate.c:1009
-#: .cache/my_service_string_to_translate.c:997
-#: .cache/my_service_string_to_translate.c:985
-#: .cache/my_service_string_to_translate.c:949
-#: .cache/my_service_string_to_translate.c:933
-#: .cache/my_service_string_to_translate.c:921
-#: .cache/my_service_string_to_translate.c:897
-#: .cache/my_service_string_to_translate.c:885
-#: .cache/my_service_string_to_translate.c:873
-#: .cache/my_service_string_to_translate.c:861
-#: .cache/my_service_string_to_translate.c:809
-#: .cache/my_service_string_to_translate.c:785
-#: .cache/my_service_string_to_translate.c:745
-#: .cache/my_service_string_to_translate.c:733
-#: .cache/my_service_string_to_translate.c:721
-#: .cache/my_service_string_to_translate.c:697
-#: .cache/my_service_string_to_translate.c:689
-#: .cache/my_service_string_to_translate.c:661
-#: .cache/my_service_string_to_translate.c:637
-#: .cache/my_service_string_to_translate.c:589
-#: .cache/my_service_string_to_translate.c:577
-#: .cache/my_service_string_to_translate.c:561
-#: .cache/my_service_string_to_translate.c:549
-#: .cache/my_service_string_to_translate.c:513
-#: .cache/my_service_string_to_translate.c:501
-#: .cache/my_service_string_to_translate.c:489
-#: .cache/my_service_string_to_translate.c:477
-#: .cache/my_service_string_to_translate.c:457
-#: .cache/my_service_string_to_translate.c:445
-#: .cache/my_service_string_to_translate.c:429
-#: .cache/my_service_string_to_translate.c:413
-#: .cache/my_service_string_to_translate.c:401
-#: .cache/my_service_string_to_translate.c:385
-#: .cache/my_service_string_to_translate.c:363
-#: .cache/my_service_string_to_translate.c:347
-#: .cache/my_service_string_to_translate.c:315
-#: .cache/my_service_string_to_translate.c:287
-#: .cache/my_service_string_to_translate.c:275
-#: .cache/my_service_string_to_translate.c:263
-#: .cache/my_service_string_to_translate.c:251
-#: .cache/my_service_string_to_translate.c:179
-msgid "List all key value from a configuration maps.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2069
-msgid "List all schemas from PgDatabase.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3019
-msgid "List all step names available for a project map.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2157
-#: .cache/my_service_string_to_translate.c:2145
-#: .cache/my_service_string_to_translate.c:2081
-#: .cache/my_service_string_to_translate.c:2009
-#: .cache/my_service_string_to_translate.c:1997
-#: .cache/my_service_string_to_translate.c:1985
-#: .cache/my_service_string_to_translate.c:1973
-#: .cache/my_service_string_to_translate.c:825
-msgid "List all tablles from PgDatabase.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3521
-#: .cache/my_service_string_to_translate.c:3497
-#: .cache/my_service_string_to_translate.c:3327
-#: .cache/my_service_string_to_translate.c:3295
-#: .cache/my_service_string_to_translate.c:3237
-#: .cache/my_service_string_to_translate.c:3225
-#: .cache/my_service_string_to_translate.c:3197
-#: .cache/my_service_string_to_translate.c:3181
-#: .cache/my_service_string_to_translate.c:3169
-#: .cache/my_service_string_to_translate.c:3091
-#: .cache/my_service_string_to_translate.c:3077
-#: .cache/my_service_string_to_translate.c:3047
-#: .cache/my_service_string_to_translate.c:3033
-#: .cache/my_service_string_to_translate.c:3007
-#: .cache/my_service_string_to_translate.c:2989
-#: .cache/my_service_string_to_translate.c:2903
-#: .cache/my_service_string_to_translate.c:2891
-#: .cache/my_service_string_to_translate.c:2873
-#: .cache/my_service_string_to_translate.c:2861
-#: .cache/my_service_string_to_translate.c:2835
-#: .cache/my_service_string_to_translate.c:2821
-#: .cache/my_service_string_to_translate.c:2795
-#: .cache/my_service_string_to_translate.c:2781
-#: .cache/my_service_string_to_translate.c:2769
-#: .cache/my_service_string_to_translate.c:2757
-#: .cache/my_service_string_to_translate.c:2737
-#: .cache/my_service_string_to_translate.c:2701
-#: .cache/my_service_string_to_translate.c:2661
-#: .cache/my_service_string_to_translate.c:2643
-#: .cache/my_service_string_to_translate.c:2625
-#: .cache/my_service_string_to_translate.c:2611
-#: .cache/my_service_string_to_translate.c:2597
-#: .cache/my_service_string_to_translate.c:2565
-#: .cache/my_service_string_to_translate.c:2531
-#: .cache/my_service_string_to_translate.c:2501
-#: .cache/my_service_string_to_translate.c:2487
-#: .cache/my_service_string_to_translate.c:2475
-#: .cache/my_service_string_to_translate.c:2463
-#: .cache/my_service_string_to_translate.c:2449
-#: .cache/my_service_string_to_translate.c:2385
-#: .cache/my_service_string_to_translate.c:2369
-#: .cache/my_service_string_to_translate.c:2355
-#: .cache/my_service_string_to_translate.c:2343
-#: .cache/my_service_string_to_translate.c:2327
-#: .cache/my_service_string_to_translate.c:2311
-#: .cache/my_service_string_to_translate.c:2297
-#: .cache/my_service_string_to_translate.c:2163
-#: .cache/my_service_string_to_translate.c:2151
-#: .cache/my_service_string_to_translate.c:2099
-#: .cache/my_service_string_to_translate.c:2087
-#: .cache/my_service_string_to_translate.c:2075
-#: .cache/my_service_string_to_translate.c:2029
-#: .cache/my_service_string_to_translate.c:2003
-#: .cache/my_service_string_to_translate.c:1991
-#: .cache/my_service_string_to_translate.c:1979
-#: .cache/my_service_string_to_translate.c:1967
-#: .cache/my_service_string_to_translate.c:1939
-#: .cache/my_service_string_to_translate.c:1911
-#: .cache/my_service_string_to_translate.c:1883
-#: .cache/my_service_string_to_translate.c:1839
-#: .cache/my_service_string_to_translate.c:1827
-#: .cache/my_service_string_to_translate.c:1815
-#: .cache/my_service_string_to_translate.c:1803
-#: .cache/my_service_string_to_translate.c:1751
-#: .cache/my_service_string_to_translate.c:1727
-#: .cache/my_service_string_to_translate.c:1679
-#: .cache/my_service_string_to_translate.c:1043
-#: .cache/my_service_string_to_translate.c:1029
-#: .cache/my_service_string_to_translate.c:1017
-#: .cache/my_service_string_to_translate.c:1003
-#: .cache/my_service_string_to_translate.c:991
-#: .cache/my_service_string_to_translate.c:961
-#: .cache/my_service_string_to_translate.c:941
-#: .cache/my_service_string_to_translate.c:927
-#: .cache/my_service_string_to_translate.c:905
-#: .cache/my_service_string_to_translate.c:891
-#: .cache/my_service_string_to_translate.c:879
-#: .cache/my_service_string_to_translate.c:867
-#: .cache/my_service_string_to_translate.c:831
-#: .cache/my_service_string_to_translate.c:817
-#: .cache/my_service_string_to_translate.c:803
-#: .cache/my_service_string_to_translate.c:791
-#: .cache/my_service_string_to_translate.c:753
-#: .cache/my_service_string_to_translate.c:739
-#: .cache/my_service_string_to_translate.c:727
-#: .cache/my_service_string_to_translate.c:703
-#: .cache/my_service_string_to_translate.c:693
-#: .cache/my_service_string_to_translate.c:667
-#: .cache/my_service_string_to_translate.c:643
-#: .cache/my_service_string_to_translate.c:601
-#: .cache/my_service_string_to_translate.c:583
-#: .cache/my_service_string_to_translate.c:569
-#: .cache/my_service_string_to_translate.c:555
-#: .cache/my_service_string_to_translate.c:519
-#: .cache/my_service_string_to_translate.c:507
-#: .cache/my_service_string_to_translate.c:495
-#: .cache/my_service_string_to_translate.c:483
-#: .cache/my_service_string_to_translate.c:463
-#: .cache/my_service_string_to_translate.c:451
-#: .cache/my_service_string_to_translate.c:437
-#: .cache/my_service_string_to_translate.c:421
-#: .cache/my_service_string_to_translate.c:407
-#: .cache/my_service_string_to_translate.c:393
-#: .cache/my_service_string_to_translate.c:371
-#: .cache/my_service_string_to_translate.c:355
-#: .cache/my_service_string_to_translate.c:323
-#: .cache/my_service_string_to_translate.c:295
-#: .cache/my_service_string_to_translate.c:281
-#: .cache/my_service_string_to_translate.c:269
-#: .cache/my_service_string_to_translate.c:257
-#: .cache/my_service_string_to_translate.c:185
-msgid "List all the key value pairs from the main configuration file.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:165
-msgid "List saved routing result"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3013
-msgid "List step names from a project map.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:168
-msgid "List the copye of saved routing result"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer_bs.tmpl:85
 #: /home/src/mapmint/mapmint-ui/templates/Manager_bs.tmpl:81
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/GCPList_bs.html:19
 #: /home/src/mapmint/mapmint-ui/templates/Manager_bs.html:45
 #: /home/src/mapmint/mapmint-ui/templates/Publisher_bs.tmpl:35
 msgid "Load"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1125
-msgid "Load a Ground Control Points CSV file)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1131
-msgid "Load a Ground Control Points CSV file.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3692
-msgid "Load a WMC"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2247
-#: .cache/my_service_string_to_translate.c:2241
-msgid "Load all WMS/WFS Data Stores.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/loader_bs.tmpl:6
@@ -3948,10 +2365,6 @@ msgstr ""
 msgid "Log out"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3299
-msgid "Log out service.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/auth/preferences.html:2
 msgid "Logged in as "
 msgstr ""
@@ -3965,10 +2378,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/login_bs.tmpl:11
 #: /home/src/mapmint/mapmint-ui/templates/login.tmpl:9
 msgid "Login"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3281
-msgid "Login message)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/auth/register.tmpl:15
@@ -3998,14 +2407,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/auth/preferences.html:14
 msgid "Mail:"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1705
-msgid "Main style name, color)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1711
-msgid "Main style name, color.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Dashboard.tmpl:31
@@ -4043,12 +2444,10 @@ msgstr ""
 msgid "Map Viewer"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:314
 #: /home/src/mapmint/mapmint-services/np/service.py:201
 msgid "Map added to your favorite list."
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:314
 #: /home/src/mapmint/mapmint-services/np/service.py:198
 msgid "Map removed from your favorite list."
 msgstr ""
@@ -4097,14 +2496,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Publisher/Layers.html:261
 #: /home/src/mapmint/mapmint-ui/templates/Publisher.tmpl:440
 msgid "Max Zoom"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1703
-msgid "Merge and compress CSS files )"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1709
-msgid "Merge and compress CSS files.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Indicators_bs.tmpl:204
@@ -4197,10 +2588,6 @@ msgstr ""
 msgid "Multiple"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1251
-msgid "Multiply two values and store the result in Result."
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Distiller.tmpl:50
 msgid "MySQL connections"
 msgstr ""
@@ -4229,10 +2616,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Indexes/DocPart_bs.html:41
 #: /home/src/mapmint/mapmint-ui/templates/Tables_bs.tmpl:76
 #: /home/src/mapmint/mapmint-ui/templates/Tables_bs.tmpl:217
-#: .cache/my_service_string_to_translate.c:1258
-#: .cache/my_service_string_to_translate.c:1259
-#: .cache/my_service_string_to_translate.c:1470
-#: .cache/my_service_string_to_translate.c:1471
 msgid "Name"
 msgstr ""
 
@@ -4242,15 +2625,6 @@ msgstr ""
 msgid ""
 "Name for the attribute in which to put the elevation. If not provided no "
 "elevation attribute is attached."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2985
-msgid "Name of the group)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2983
-#: .cache/my_service_string_to_translate.c:2981
-msgid "Name of the layer(s))"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Documents_bs.tmpl:45
@@ -4367,7 +2741,6 @@ msgstr ""
 msgid "No feature found !"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:273
 #: /home/src/mapmint/mapmint-services/np/service.py:4426
 msgid "No file found"
 msgstr ""
@@ -4381,12 +2754,6 @@ msgstr ""
 msgid "No server found."
 msgstr ""
 
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:104
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:267
-msgid "No service with this jobid can be found"
-msgstr ""
-
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:454
 #: /home/src/mapmint/mapmint-services/np/service.py:1220
 msgid "No territory found for the id provided"
 msgstr ""
@@ -4411,7 +2778,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Tables_bs.tmpl:248
 #: /home/src/mapmint/mapmint-ui/templates/Tables_bs.tmpl:272
 #: /home/src/mapmint/mapmint-ui/templates/Tables_bs.tmpl:290
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:184
 #: /home/src/mapmint/mapmint-services/np/service.py:2806
 #: /home/src/mapmint/mapmint-services/np/service.py:2814
 msgid "None"
@@ -4429,46 +2795,18 @@ msgstr ""
 msgid "Not allowed!"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:17
-msgid "Not used input"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:14
-msgid "Not used inputs"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Indexes.tmpl:316
 #: /home/src/mapmint/mapmint-ui/templates/Indexes_bs.tmpl:316
 msgid "Number of classes:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1450
-msgid "Number of features to pass over"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1457
-msgid "Number of features to pass over."
-msgstr ""
-
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:447
 #: /home/src/mapmint/mapmint-services/np/service.py:1184
 #: /home/src/mapmint/mapmint-services/np/service.py:1197
 msgid "Number of fetched elements from your query: "
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1449
-msgid "Number of returned features"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Tables/Views.html:78
 msgid "O."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3483
-#: .cache/my_service_string_to_translate.c:3427
-#: .cache/my_service_string_to_translate.c:3403
-#: .cache/my_service_string_to_translate.c:3359
-msgid "OGC Request.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Distiller_bs.html:87
@@ -4530,10 +2868,6 @@ msgid ""
 "Once removed, you cannot access the project anymore. You cannot recover a "
 "removed project. Deleting a project may destroy important data and make "
 "other projects unstable."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1121
-msgid "One or more group control point.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager_bs.tmpl:327
@@ -4690,10 +3024,6 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3279
-msgid "Password)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/UserPreferences.tmpl:38
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/auth/register.tmpl:22
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/auth/preferences.html:6
@@ -4750,7 +3080,6 @@ msgstr ""
 msgid "Please first create feature."
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:524
 #: /home/src/mapmint/mapmint-services/np/service.py:1665
 msgid "Please provide an id for the tuple to update"
 msgstr ""
@@ -4784,37 +3113,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:301
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:315
 msgid "Polygon"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:192
-#: .cache/my_service_string_to_translate.c:1286
-#: .cache/my_service_string_to_translate.c:1332
-#: .cache/my_service_string_to_translate.c:1396
-#: .cache/my_service_string_to_translate.c:1402
-msgid "Polygon to be buffered"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1318
-msgid "Polygon to compute convexhull"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1300
-msgid "Polygon to conpute boundary"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1266
-#: .cache/my_service_string_to_translate.c:1294
-#: .cache/my_service_string_to_translate.c:1306
-#: .cache/my_service_string_to_translate.c:1368
-#: .cache/my_service_string_to_translate.c:1390
-#: .cache/my_service_string_to_translate.c:1418
-#: .cache/my_service_string_to_translate.c:1419
-#: .cache/my_service_string_to_translate.c:1502
-#: .cache/my_service_string_to_translate.c:1716
-#: .cache/my_service_string_to_translate.c:2718
-#: .cache/my_service_string_to_translate.c:2880
-#: .cache/my_service_string_to_translate.c:3158
-msgid "Polygon to get the centroid"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/Georeference.tmpl:6
@@ -4891,46 +3189,8 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:773
-#: .cache/my_service_string_to_translate.c:761
-#: .cache/my_service_string_to_translate.c:531
-#: .cache/my_service_string_to_translate.c:525
-#: .cache/my_service_string_to_translate.c:243
-#: .cache/my_service_string_to_translate.c:235
-msgid "Preview Index pdf file as image.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1239
-#: .cache/my_service_string_to_translate.c:1233
-msgid "Preview a PDF file as image)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/rss.tmpl:53
 msgid "Preview of "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1691
-msgid "Print Cheetah templates as HTML)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1697
-msgid "Print Cheetah templates as HTML.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1181
-msgid "Print a Map into a PDF file"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1209
-msgid "Print a Map into a PDF file)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1187
-msgid "Print a Map into a PDF, Doc, RTF, HTML or ODT file"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1221
-msgid "Print a Map into a PDF, Doc, RTF, HTML or ODT file)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/leftcol_bs.tmpl:282
@@ -4957,19 +3217,6 @@ msgstr ""
 msgid "Processing"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3553
-#: .cache/my_service_string_to_translate.c:309
-msgid "Produce a Zip File containing the datasource files.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3527
-msgid "Produce an updated ExecuteResponse document. "
-msgstr ""
-
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:644
-msgid "Produce file step: "
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:498
 msgid "Produced documents"
 msgstr ""
@@ -4978,12 +3225,10 @@ msgstr ""
 msgid "Producing color ramp using Gdal_Dem..."
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:89
 #: /home/src/mapmint/mapmint-services/np/service.py:3090
 msgid "Producing document"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:89
 #: /home/src/mapmint/mapmint-services/np/service.py:3047
 msgid "Producing document "
 msgstr ""
@@ -5127,32 +3372,12 @@ msgstr ""
 msgid "Raster filename:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:2509
-msgid "Read a MapMint Template.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2693
-msgid "Read privilege)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2517
-msgid "Read the MapMint Template.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Dashboard.tmpl:176
 msgid "Recent Projects"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/public-access.tmpl:186
 msgid "Recent maps"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3650
-msgid "Recode a file from one encoding to another."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3645
-msgid "Recode a file."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:300
@@ -5168,24 +3393,8 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3307
-msgid "Regenerate password for a user.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3313
-msgid "Regenerate the password for a given user .)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/auth/register.tmpl:2
 msgid "Register"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3251
-msgid "Registering a new user.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3243
-msgid "Registering new user)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/login_bs_body.html:43
@@ -5202,66 +3411,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Manager.tmpl:76
 #: /home/src/mapmint/mapmint-ui/templates/Publisher_bs.tmpl:71
 msgid "Remove"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3061
-msgid "Remove a layer from a project map.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3053
-msgid "Remove a layer from a project.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:93
-msgid "Remove a routing result"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2677
-#: .cache/my_service_string_to_translate.c:2669
-msgid "Remove a step name from a project map.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1169
-msgid ""
-"Remove all files related to a MapMint Georeferencing Project except mapfile)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1175
-msgid ""
-"Remove all files related to a MapMint Georeferencing Project except mapfile.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2809
-msgid "Remove all mapfiles created by MapMint for a project.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2803
-msgid "Remove all maps dedicated to a project.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1385
-msgid "Remove feature from InputEntity1 which are present in InputEntity1."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1381
-msgid "Remove features. "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3707
-msgid ""
-"Remove one or more symbols from the list of available symbols to MapServer)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:96
-msgid "Remove the copy of the routing result"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3207
-msgid "Remove the specific layer for a polygon label setup)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3213
-msgid "Remove the specific layer for a polygon label setup.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager_bs.tmpl:328
@@ -5304,10 +3453,6 @@ msgstr ""
 msgid "Requested page could not be loaded"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3119
-msgid "Reread the mapfile from the Distiller and import extent and SRS.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:4646
 msgid "Resampling method saved."
 msgstr ""
@@ -5321,37 +3466,8 @@ msgstr ""
 msgid "Resampling method:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3137
-msgid "Resampling)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3113
-msgid "Resfresh layer informations.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Publisher.tmpl:269
 msgid "Restricted"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3872
-msgid "Result Group if success."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1546
-#: .cache/my_service_string_to_translate.c:3860
-#: .cache/my_service_string_to_translate.c:3864
-#: .cache/my_service_string_to_translate.c:3884
-#: .cache/my_service_string_to_translate.c:3914
-#: .cache/my_service_string_to_translate.c:3928
-msgid "Result of the request as a json object."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1528
-#: .cache/my_service_string_to_translate.c:1536
-#: .cache/my_service_string_to_translate.c:3844
-#: .cache/my_service_string_to_translate.c:3902
-#: .cache/my_service_string_to_translate.c:3942
-msgid "Result row if success."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Publisher/Map.html:125
@@ -5526,115 +3642,12 @@ msgstr ""
 msgid "Save Project"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3685
-msgid "Save WMC."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1105
-msgid "Save a GCPs list in a CSV file)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1115
-msgid "Save a GCPs list in a CSV file.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2955
-#: .cache/my_service_string_to_translate.c:1147
-#: .cache/my_service_string_to_translate.c:1061
-msgid ""
-"Save a MapMint Georeferencing Project and GCP file if any GCP was provided.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2945
-#: .cache/my_service_string_to_translate.c:1137
-#: .cache/my_service_string_to_translate.c:1053
-msgid "Save a MapMint Georeferencing Project)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2269
-msgid "Save a MapMint Template.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3681
-msgid "Save a WMC"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1783
-msgid "Save a datastor privileges .)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:77
-#: .cache/my_service_string_to_translate.c:85
-#: .cache/my_service_string_to_translate.c:107
-#: .cache/my_service_string_to_translate.c:113
-#: .cache/my_service_string_to_translate.c:137
-#: .cache/my_service_string_to_translate.c:143
-msgid "Save a routing result"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:71
-msgid "Save a routing result using styles"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3509
-#: .cache/my_service_string_to_translate.c:2261
-#: .cache/my_service_string_to_translate.c:2177
-#: .cache/my_service_string_to_translate.c:2135
-#: .cache/my_service_string_to_translate.c:2115
-#: .cache/my_service_string_to_translate.c:2059
-#: .cache/my_service_string_to_translate.c:1953
-#: .cache/my_service_string_to_translate.c:1855
-#: .cache/my_service_string_to_translate.c:1513
-msgid "Save a section in the ZOO main configuration file.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3503
-#: .cache/my_service_string_to_translate.c:2253
-#: .cache/my_service_string_to_translate.c:2169
-#: .cache/my_service_string_to_translate.c:2125
-#: .cache/my_service_string_to_translate.c:2105
-#: .cache/my_service_string_to_translate.c:2049
-#: .cache/my_service_string_to_translate.c:1945
-#: .cache/my_service_string_to_translate.c:1845
-#: .cache/my_service_string_to_translate.c:1507
-msgid "Save a section.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:776
 msgid "Save changes"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:2409
-#: .cache/my_service_string_to_translate.c:2393
-msgid "Save export and table display settings.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1757
-msgid "Save favorite SRS)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1
-#: .cache/my_service_string_to_translate.c:4
-#: .cache/my_service_string_to_translate.c:7
-#: .cache/my_service_string_to_translate.c:10
-msgid "Save individual file on server"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2915
-#: .cache/my_service_string_to_translate.c:2909
-msgid "Save label configuration.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:4556
 msgid "Save legend icons"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2279
-msgid "Save the MapMint Template.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2195
-msgid "Save the WMS/WFS Data Store settings.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/toolbar_html5.tmpl:15
@@ -5653,20 +3666,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/RasterWindow_bs.html:31
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/RasterWindow_bs.html:64
 msgid "Scale"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2559
-msgid "Scale Type)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2561
-msgid "Scale Value)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1649
-msgid ""
-"Scale is the ratio of vertical units to horizontal, for Feet:Latlong use "
-"370400, for Meters:LatLong use 111120"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager.tmpl:50
@@ -5708,32 +3707,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Publisher.tmpl:22
 #: /home/src/mapmint/mapmint-ui/templates/Documents.tmpl:94
 msgid "Search:"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3479
-#: .cache/my_service_string_to_translate.c:3467
-#: .cache/my_service_string_to_translate.c:3355
-#: .cache/my_service_string_to_translate.c:3343
-msgid "Securing access to a specific OGC Web Services Request.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3457
-#: .cache/my_service_string_to_translate.c:3447
-#: .cache/my_service_string_to_translate.c:3377
-#: .cache/my_service_string_to_translate.c:3367
-msgid "Securing access to any OGC Web Services.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3423
-#: .cache/my_service_string_to_translate.c:3399
-msgid ""
-"Securing response to a specific OGC Web Services Request by removing not "
-"allowed ressources from the resulting list.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3411
-#: .cache/my_service_string_to_translate.c:3387
-msgid "Securing response to a specific OGC Web Services Request.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/routing/view.html:26
@@ -5843,30 +3816,12 @@ msgstr ""
 msgid "Select one step"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1542
-msgid "Select row on sqlite database."
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Publisher.tmpl:193
 msgid "Select template:"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/indexes/SelectIdx.tmpl:11
 msgid "Select territory"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1614
-msgid ""
-"Select the output format by usig short name of the format (use gda-config --"
-"formats for list of available formats on your platform)."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1484
-#: .cache/my_service_string_to_translate.c:1485
-#: .cache/my_service_string_to_translate.c:1657
-#: .cache/my_service_string_to_translate.c:3569
-#: .cache/my_service_string_to_translate.c:3661
-msgid "Select the output format."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/indexes/SelectIdx.tmpl:22
@@ -5894,10 +3849,6 @@ msgstr ""
 msgid "Service"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3528
-msgid "Service ID"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:281
 #: /home/src/mapmint/mapmint-ui/templates/Publisher_bs.tmpl:80
 msgid "Services"
@@ -5918,11 +3869,6 @@ msgstr ""
 msgid "Set Group Name"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:227
-#: .cache/my_service_string_to_translate.c:219
-msgid "Set Index Quote.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Manager_bs.tmpl:301
 #: /home/src/mapmint/mapmint-ui/templates/Manager_bs.html:264
 msgid "Set Layer Order"
@@ -5930,16 +3876,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager.tmpl:69
 msgid "Set Master Fly"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1340
-#: .cache/my_service_string_to_translate.c:1428
-msgid "Set geometry to null."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1337
-#: .cache/my_service_string_to_translate.c:1425
-msgid "Set geometry to null. "
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager.tmpl:67
@@ -5965,24 +3901,6 @@ msgstr ""
 msgid "Set target resolution"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3131
-#: .cache/my_service_string_to_translate.c:2927
-msgid "Set the default extent in senv map corresponding to the user.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3125
-#: .cache/my_service_string_to_translate.c:2921
-msgid "Set the default extent in senv map.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3147
-msgid "Set the resampling method to be used to display raster files.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1763
-msgid "Set/Unset a SRS as favorite.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Dashboard_bs.tmpl:39
 #: /home/src/mapmint/mapmint-ui/templates/Manager/LayerProperties_bs.tmpl:113
 #: /home/src/mapmint/mapmint-ui/templates/Manager/LayerProperties.tmpl:111
@@ -5996,14 +3914,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-services/osm-tools/service.py:180
 msgid "Shapefile created"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:39
-#: .cache/my_service_string_to_translate.c:47
-#: .cache/my_service_string_to_translate.c:121
-#: .cache/my_service_string_to_translate.c:149
-#: .cache/my_service_string_to_translate.c:157
-msgid "Shortest Path"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/authenticate/service.py:331
@@ -6042,11 +3952,6 @@ msgstr ""
 msgid "Size:"
 msgstr ""
 
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:180
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:336
-msgid "Socket error"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Indicators_bs.tmpl:231
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/VectorConverter_bs.tmpl:5
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/VectorConverter.tmpl:6
@@ -6068,29 +3973,9 @@ msgstr ""
 msgid "Spatial Query:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:127
-msgid "Split a Line"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:132
-msgid "Split a Line from startPoint to endPoint"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/routing/view.html:12
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/routing/ddview.html:9
 msgid "Start"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:32
-#: .cache/my_service_string_to_translate.c:40
-#: .cache/my_service_string_to_translate.c:48
-#: .cache/my_service_string_to_translate.c:100
-#: .cache/my_service_string_to_translate.c:122
-#: .cache/my_service_string_to_translate.c:128
-#: .cache/my_service_string_to_translate.c:150
-#: .cache/my_service_string_to_translate.c:158
-#: .cache/my_service_string_to_translate.c:172
-msgid "Starting Point"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:2594
@@ -6262,13 +4147,6 @@ msgstr ""
 msgid "Table configuration"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1525
-#: .cache/my_service_string_to_translate.c:1534
-#: .cache/my_service_string_to_translate.c:1543
-msgid "Table name."
-msgstr ""
-
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:437
 #: /home/src/mapmint/mapmint-services/np/service.py:1103
 msgid "Table was successfully removed."
 msgstr ""
@@ -6324,13 +4202,6 @@ msgstr ""
 msgid "Template"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3323
-#: .cache/my_service_string_to_translate.c:3321
-#: .cache/my_service_string_to_translate.c:3309
-#: .cache/my_service_string_to_translate.c:1693
-msgid "Template name)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:4628
 msgid "Template saved"
 msgstr ""
@@ -6380,16 +4251,8 @@ msgstr ""
 msgid "Test"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:2231
-msgid "Test accessing to a WMS or a WFS Data Store.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-services/datastores/wfs/service.py:88
 msgid "Test connecting the Data Store "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2221
-msgid "Test connecting to a WMS or a WFS Data Store.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Publisher/Map.html:94
@@ -6400,612 +4263,9 @@ msgstr ""
 msgid "Text settings:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1713
-msgid "The CSS file.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1133
-msgid "The CSV file to parse.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1267
-#: .cache/my_service_string_to_translate.c:1295
-#: .cache/my_service_string_to_translate.c:1369
-#: .cache/my_service_string_to_translate.c:1391
-#: .cache/my_service_string_to_translate.c:1420
-#: .cache/my_service_string_to_translate.c:1503
-#: .cache/my_service_string_to_translate.c:1717
-#: .cache/my_service_string_to_translate.c:2719
-#: .cache/my_service_string_to_translate.c:2881
-#: .cache/my_service_string_to_translate.c:3159
-msgid "The Centroid"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2243
-#: .cache/my_service_string_to_translate.c:2223
-#: .cache/my_service_string_to_translate.c:2207
-#: .cache/my_service_string_to_translate.c:2187
-msgid "The Data Store Name)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1491
-#: .cache/my_service_string_to_translate.c:1576
-#: .cache/my_service_string_to_translate.c:1597
-#: .cache/my_service_string_to_translate.c:1663
-msgid "The DataStore name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1497
-#: .cache/my_service_string_to_translate.c:1579
-#: .cache/my_service_string_to_translate.c:1603
-#: .cache/my_service_string_to_translate.c:1669
-msgid "The DataStore name used to create the index."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3537
-msgid "The Gradient image"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1071
-msgid "The Ground Point Control"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1075
-msgid "The Ground Point Control."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1099
-msgid "The Ground Points Control"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1103
-msgid "The Ground Points Control."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3333
-#: .cache/my_service_string_to_translate.c:3317
-#: .cache/my_service_string_to_translate.c:3297
-#: .cache/my_service_string_to_translate.c:1701
-msgid "The HTML content out of the template.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:15
-#: .cache/my_service_string_to_translate.c:18
-msgid "The HTML form"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3699
-msgid "The HTML form to select new sybols)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3705
-msgid "The HTML form to select new sybols.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1307
-msgid "The JSON String"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1129
-msgid ""
-"The JSON multi-dimentional array containing parsed informations from the CSV "
-"file)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1135
-msgid ""
-"The JSON multi-dimentional array containing parsed informations from the CSV "
-"file.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:301
-msgid "The JSON object created by service.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:293
-msgid "The JSON object)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3519
-msgid "The JSON string)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3831
-#: .cache/my_service_string_to_translate.c:3811
-#: .cache/my_service_string_to_translate.c:3791
-#: .cache/my_service_string_to_translate.c:3771
-msgid "The MapMint DataSource filename to create)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3821
-#: .cache/my_service_string_to_translate.c:3801
-#: .cache/my_service_string_to_translate.c:3781
-#: .cache/my_service_string_to_translate.c:3761
-msgid "The MapMint DataSource)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3829
-#: .cache/my_service_string_to_translate.c:3809
-#: .cache/my_service_string_to_translate.c:3789
-#: .cache/my_service_string_to_translate.c:3769
-msgid "The MapMint DataStore to store outputed shapefile)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3819
-#: .cache/my_service_string_to_translate.c:3799
-#: .cache/my_service_string_to_translate.c:3779
-#: .cache/my_service_string_to_translate.c:3759
-msgid "The MapMint DataStore)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1070
-msgid "The MapMint GeoReferencing project name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1171
-#: .cache/my_service_string_to_translate.c:1159
-#: .cache/my_service_string_to_translate.c:1107
-msgid "The MapMint GeoReferencing project name)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1177
-#: .cache/my_service_string_to_translate.c:1165
-#: .cache/my_service_string_to_translate.c:1117
-msgid "The MapMint GeoReferencing project name.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1098
-msgid "The MapMint georeferencing project name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1102
-msgid "The MapMint georeferencing project name."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2227
-#: .cache/my_service_string_to_translate.c:2209
-#: .cache/my_service_string_to_translate.c:2191
-msgid "The OGC Protocol)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3481
-#: .cache/my_service_string_to_translate.c:3459
-#: .cache/my_service_string_to_translate.c:3425
-#: .cache/my_service_string_to_translate.c:3401
-#: .cache/my_service_string_to_translate.c:3379
-#: .cache/my_service_string_to_translate.c:3357
-msgid "The OGC server.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1241
-msgid "The PDF file to transform as image)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:45
-#: .cache/my_service_string_to_translate.c:53
-#: .cache/my_service_string_to_translate.c:155
-#: .cache/my_service_string_to_translate.c:163
-msgid "The Point to use as ending point of the path"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:36
-#: .cache/my_service_string_to_translate.c:44
-#: .cache/my_service_string_to_translate.c:52
-#: .cache/my_service_string_to_translate.c:104
-#: .cache/my_service_string_to_translate.c:125
-#: .cache/my_service_string_to_translate.c:133
-#: .cache/my_service_string_to_translate.c:154
-#: .cache/my_service_string_to_translate.c:162
-#: .cache/my_service_string_to_translate.c:176
-msgid "The Point to use as starting of the path"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1256
-msgid "The QRCode corresponding to the string encoded."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3638
-#: .cache/my_service_string_to_translate.c:3674
-msgid "The SRS"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2571
-msgid "The Scale Types.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2573
-msgid "The Scale Values.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2225
-#: .cache/my_service_string_to_translate.c:2189
-msgid "The Server Url)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3643
-#: .cache/my_service_string_to_translate.c:3679
-msgid "The Spatial reference to use for this datasource."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3721
-msgid "The TTF filename)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3727
-msgid "The TTF filename.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3338
-msgid "The TransactionResponse document"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2235
-#: .cache/my_service_string_to_translate.c:2199
-msgid "The URL to acces the WMS/WFS Server.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3684
-msgid "The URL to the client UI "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3688
-msgid "The URL to use to load the WMC on the client UI."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3336
-msgid "The WFS request to run"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3687
-msgid "The WMC extent"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3683
-msgid "The WMC extent "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:97
-#: .cache/my_service_string_to_translate.c:111
-#: .cache/my_service_string_to_translate.c:118
-#: .cache/my_service_string_to_translate.c:119
-#: .cache/my_service_string_to_translate.c:141
-#: .cache/my_service_string_to_translate.c:169
-msgid "The WMS Server url"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:90
-#: .cache/my_service_string_to_translate.c:147
-msgid "The WMS Server urls"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3531
-msgid ""
-"The ZOO Service ID of the ZOO Service we want to get the current status."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3723
-msgid "The array of available characters)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3729
-msgid "The array of available characters.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3817
-#: .cache/my_service_string_to_translate.c:3757
-msgid "The bbox)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2937
-msgid "The boolean result)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2943
-msgid "The boolean result.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3827
-#: .cache/my_service_string_to_translate.c:3767
-msgid "The bounding box to extract the OSM data)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1269
-#: .cache/my_service_string_to_translate.c:1297
-#: .cache/my_service_string_to_translate.c:1309
-#: .cache/my_service_string_to_translate.c:1371
-#: .cache/my_service_string_to_translate.c:1393
-#: .cache/my_service_string_to_translate.c:1422
-#: .cache/my_service_string_to_translate.c:1423
-#: .cache/my_service_string_to_translate.c:1505
-#: .cache/my_service_string_to_translate.c:1719
-#: .cache/my_service_string_to_translate.c:2721
-#: .cache/my_service_string_to_translate.c:2883
-#: .cache/my_service_string_to_translate.c:3161
-msgid "The centroid which is not necessarily within the geometry."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3540
-msgid "The color in hexa to end the gradient calculation."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3535
-msgid "The color in hexa to end with"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3534
-msgid "The color in hexa to start with"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3539
-msgid "The color in hexa to start with for gradient calculation."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1687
-msgid "The compressed content"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1690
-msgid "The compressed content."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3691
-msgid "The context as JSON string"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1319
-#: .cache/my_service_string_to_translate.c:1322
-msgid "The convex hull of the geometry"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3247
-msgid "The corresponding values for fields)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3255
-msgid "The corresponding values for fields.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3263
-msgid "The corresponding values)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3271
-msgid "The corresponding values.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2331
-msgid "The current name of the directory to rename in the map.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1583
-msgid "The data source names"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1590
-msgid "The data source set to mozaic."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1630
-msgid "The destination color filename"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:21
-msgid "The destination folder)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:27
-msgid "The destination folder.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1330
-#: .cache/my_service_string_to_translate.c:1554
-msgid "The difference between the two geometries."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1326
-#: .cache/my_service_string_to_translate.c:1550
-msgid "The difference between two geometries"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1490
-#: .cache/my_service_string_to_translate.c:1596
-#: .cache/my_service_string_to_translate.c:1662
-msgid "The directory"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1496
-#: .cache/my_service_string_to_translate.c:1602
-#: .cache/my_service_string_to_translate.c:1668
-msgid "The directory containing the raster files"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:37
-#: .cache/my_service_string_to_translate.c:105
-#: .cache/my_service_string_to_translate.c:177
-msgid "The distance used to compute driving distance "
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/leftcol_bs.tmpl:299
 #: /home/src/mapmint/mapmint-ui/templates/preview/index_bs.tmpl:350
 msgid "The document printed."
-msgstr ""
-
-#: /home/src/zoo/zoo-project/zoo-services/wcps-proxy/cgi-env/WCPS.py:40
-msgid "The end point at "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:134
-msgid "The end point to use as end of the path"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2713
-msgid "The execute privilege on the layer.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2047
-msgid "The execution message created by service.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2027
-msgid "The execution message)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1901
-msgid "The extension of files to list.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1356
-msgid "The extent to use to compute the polygon grid"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:87
-#: .cache/my_service_string_to_translate.c:91
-msgid "The extent to zoom to"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1190
-msgid "The extention of the map to print"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1227
-msgid "The extention of the map to print)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1743
-#: .cache/my_service_string_to_translate.c:1737
-msgid "The favorite value)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1448
-#: .cache/my_service_string_to_translate.c:1452
-msgid "The feature collection"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1455
-msgid "The feature collection used as a base dataset."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1459
-msgid "The feature collection."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2413
-msgid ""
-"The field is displayable if the value is true, it is not in other case.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2397
-msgid "The field is displayable)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2415
-msgid "The field is exportable if the value is true, it is not in other case.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2399
-msgid "The field is exportable)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2405
-#: .cache/my_service_string_to_translate.c:2403
-#: .cache/my_service_string_to_translate.c:2401
-#: .cache/my_service_string_to_translate.c:777
-#: .cache/my_service_string_to_translate.c:765
-#: .cache/my_service_string_to_translate.c:247
-#: .cache/my_service_string_to_translate.c:239
-msgid "The field name)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2421
-#: .cache/my_service_string_to_translate.c:2419
-#: .cache/my_service_string_to_translate.c:2417
-msgid "The field name.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:60
-#: .cache/my_service_string_to_translate.c:1624
-msgid ""
-"The file containing elevation model relative to the dataPath defined in the "
-"ZOO-Project main configuration file."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1895
-msgid "The file list)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1903
-msgid "The file list.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2
-#: .cache/my_service_string_to_translate.c:5
-#: .cache/my_service_string_to_translate.c:8
-#: .cache/my_service_string_to_translate.c:11
-msgid "The file name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:384
-#: .cache/my_service_string_to_translate.c:1488
-#: .cache/my_service_string_to_translate.c:1563
-#: .cache/my_service_string_to_translate.c:1564
-#: .cache/my_service_string_to_translate.c:1565
-#: .cache/my_service_string_to_translate.c:1566
-#: .cache/my_service_string_to_translate.c:1573
-#: .cache/my_service_string_to_translate.c:1574
-#: .cache/my_service_string_to_translate.c:1594
-#: .cache/my_service_string_to_translate.c:1618
-#: .cache/my_service_string_to_translate.c:1636
-#: .cache/my_service_string_to_translate.c:1650
-#: .cache/my_service_string_to_translate.c:1660
-#: .cache/my_service_string_to_translate.c:3572
-#: .cache/my_service_string_to_translate.c:3618
-#: .cache/my_service_string_to_translate.c:3644
-#: .cache/my_service_string_to_translate.c:3654
-#: .cache/my_service_string_to_translate.c:3664
-#: .cache/my_service_string_to_translate.c:3670
-#: .cache/my_service_string_to_translate.c:3680
-msgid "The file name resulting of the convertion"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3633
-#: .cache/my_service_string_to_translate.c:3611
-#: .cache/my_service_string_to_translate.c:3599
-#: .cache/my_service_string_to_translate.c:3587
-msgid "The file name resulting of the convertion)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1686
-msgid "The file to compress"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1689
-msgid "The file to compress."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1091
-msgid "The file to copy.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1081
-msgid "The file)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1493
-#: .cache/my_service_string_to_translate.c:1599
-#: .cache/my_service_string_to_translate.c:1665
-msgid "The format name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1188
-msgid "The format of the document (A4, A4l, ... A00, A00l)."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1223
-msgid "The format of the document (A4, A4l, ... A00, A00l).)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1255
-msgid "The generated image size."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/leftcol_bs.tmpl:340
@@ -7013,954 +4273,13 @@ msgstr ""
 msgid "The geographical zone displayed on this map will be printed."
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1304
-msgid ""
-"The geometry containing the boundary of the geometry on which the method is "
-"invoked."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1301
-msgid "The geometry created"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1276
-msgid ""
-"The geometry representing the union of the geometries contained in the "
-"dataset."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1350
-msgid "The geometry representing the union of the two geometries."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2707
-msgid "The group name for setting privileges.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1793
-#: .cache/my_service_string_to_translate.c:1791
-#: .cache/my_service_string_to_translate.c:1789
-#: .cache/my_service_string_to_translate.c:1787
-msgid "The group name which get access privileges for the dataStore.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1357
-msgid "The id used to name the produced grid"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:857
-#: .cache/my_service_string_to_translate.c:855
-#: .cache/my_service_string_to_translate.c:853
-msgid "The identifier of the element to remove.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1243
-msgid "The image containing a preview.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1237
-msgid "The image)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1494
-#: .cache/my_service_string_to_translate.c:1500
-#: .cache/my_service_string_to_translate.c:1577
-#: .cache/my_service_string_to_translate.c:1580
-#: .cache/my_service_string_to_translate.c:1600
-#: .cache/my_service_string_to_translate.c:1606
-#: .cache/my_service_string_to_translate.c:1666
-#: .cache/my_service_string_to_translate.c:1672
-msgid "The index creation success message"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:221
-msgid "The index id)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:380
-#: .cache/my_service_string_to_translate.c:383
-#: .cache/my_service_string_to_translate.c:1556
-#: .cache/my_service_string_to_translate.c:1562
-#: .cache/my_service_string_to_translate.c:1568
-#: .cache/my_service_string_to_translate.c:1572
-msgid "The index identifier"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:781
-#: .cache/my_service_string_to_translate.c:779
-#: .cache/my_service_string_to_translate.c:775
-#: .cache/my_service_string_to_translate.c:769
-#: .cache/my_service_string_to_translate.c:767
-#: .cache/my_service_string_to_translate.c:763
-#: .cache/my_service_string_to_translate.c:533
-#: .cache/my_service_string_to_translate.c:527
-#: .cache/my_service_string_to_translate.c:245
-#: .cache/my_service_string_to_translate.c:237
-#: .cache/my_service_string_to_translate.c:229
-msgid "The index identifier)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/indexes/InfoIdx.tmpl:5
-#: .cache/my_service_string_to_translate.c:1492
-#: .cache/my_service_string_to_translate.c:1598
-#: .cache/my_service_string_to_translate.c:1664
 msgid "The index name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3203
-#: .cache/my_service_string_to_translate.c:1007
-#: .cache/my_service_string_to_translate.c:871
-#: .cache/my_service_string_to_translate.c:671
-#: .cache/my_service_string_to_translate.c:299
-msgid "The information message created by service.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3193
-#: .cache/my_service_string_to_translate.c:1001
-#: .cache/my_service_string_to_translate.c:865
-#: .cache/my_service_string_to_translate.c:665
-#: .cache/my_service_string_to_translate.c:291
-msgid "The information message)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1474
-msgid "The input GML file"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3807
-#: .cache/my_service_string_to_translate.c:3787
-msgid "The input OSM dataset)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1480
-#: .cache/my_service_string_to_translate.c:1610
-#: .cache/my_service_string_to_translate.c:1638
-#: .cache/my_service_string_to_translate.c:1653
-#: .cache/my_service_string_to_translate.c:3565
-#: .cache/my_service_string_to_translate.c:3657
-msgid "The input data source name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:61
-#: .cache/my_service_string_to_translate.c:1486
-#: .cache/my_service_string_to_translate.c:1616
-#: .cache/my_service_string_to_translate.c:1625
-#: .cache/my_service_string_to_translate.c:1633
-#: .cache/my_service_string_to_translate.c:1658
-#: .cache/my_service_string_to_translate.c:3570
-#: .cache/my_service_string_to_translate.c:3662
-msgid "The input data source name to use as source for convertion."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1645
-msgid "The input data source name to use."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3637
-#: .cache/my_service_string_to_translate.c:3673
-msgid "The input datasource name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3642
-#: .cache/my_service_string_to_translate.c:3678
-msgid "The input datasource name to use as source for convertion."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3597
-msgid "The input datasource name to use as source for convertion.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3557
-msgid "The input datasource name to use.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3591
-#: .cache/my_service_string_to_translate.c:3547
-msgid "The input datasource name)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3614
-#: .cache/my_service_string_to_translate.c:3636
-#: .cache/my_service_string_to_translate.c:3666
-#: .cache/my_service_string_to_translate.c:3672
-msgid "The input datastore name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3555
-#: .cache/my_service_string_to_translate.c:311
-msgid "The input datastore name to search for datasource.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3617
-#: .cache/my_service_string_to_translate.c:3641
-#: .cache/my_service_string_to_translate.c:3669
-#: .cache/my_service_string_to_translate.c:3677
-msgid "The input datastore name to use as source for convertion."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3631
-#: .cache/my_service_string_to_translate.c:3629
-#: .cache/my_service_string_to_translate.c:3609
-#: .cache/my_service_string_to_translate.c:3585
-#: .cache/my_service_string_to_translate.c:3583
-msgid "The input datastore name to use as source for convertion.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3623
-#: .cache/my_service_string_to_translate.c:3621
-#: .cache/my_service_string_to_translate.c:3603
-#: .cache/my_service_string_to_translate.c:3577
-#: .cache/my_service_string_to_translate.c:3575
-msgid "The input datastore name)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3545
-#: .cache/my_service_string_to_translate.c:305
-msgid "The input datastore)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3647
-msgid "The input encoding"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3652
-msgid "The input encoding."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3646
-msgid "The input file"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3651
-msgid "The input file to recode."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3487
-#: .cache/my_service_string_to_translate.c:3463
-#: .cache/my_service_string_to_translate.c:3431
-#: .cache/my_service_string_to_translate.c:3407
-#: .cache/my_service_string_to_translate.c:3383
-#: .cache/my_service_string_to_translate.c:3363
-msgid "The intial request (POST / GET).)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1074
-msgid "The layer name of the raster file."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3065
-#: .cache/my_service_string_to_translate.c:2705
-msgid "The layer name.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3057
-msgid "The layer)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3682
-#: .cache/my_service_string_to_translate.c:3686
-msgid "The layers list"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1189
-msgid "The layers list to be printed on the map into the document"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1225
-msgid "The layers list to be printed on the map into the document)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3301
-#: .cache/my_service_string_to_translate.c:3293
-msgid "The logOut message)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3305
-msgid "The logOut message.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3285
-msgid "The login of the user.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3063
-msgid "The map name.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3209
-#: .cache/my_service_string_to_translate.c:2967
-#: .cache/my_service_string_to_translate.c:2935
-#: .cache/my_service_string_to_translate.c:2911
-#: .cache/my_service_string_to_translate.c:2579
-msgid "The map to search for the layer)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3215
-#: .cache/my_service_string_to_translate.c:2973
-#: .cache/my_service_string_to_translate.c:2941
-#: .cache/my_service_string_to_translate.c:2917
-#: .cache/my_service_string_to_translate.c:2585
-msgid "The map to search for the layer.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3055
-msgid "The map)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:72
-#: .cache/my_service_string_to_translate.c:75
-msgid "The mapfile to update"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2813
-msgid "The message created by service.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2203
-msgid ""
-"The message providing information about the creation of the WMS or WFS Data "
-"Store.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3023
-#: .cache/my_service_string_to_translate.c:2683
-#: .cache/my_service_string_to_translate.c:2439
-msgid "The message providing informations about step creation.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2239
-msgid ""
-"The message providing informations about tests run to access the WMS or WFS "
-"server.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2251
-#: .cache/my_service_string_to_translate.c:2219
-msgid ""
-"The message providing informations about the deletion of the WMS or WFS Data "
-"Store.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2143
-msgid "The message returned after trying to connect.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3289
-msgid "The message to let the client know if he was able to login or not.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1641
-msgid "The mode"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:56
-msgid "The name fo the MNT file"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2249
-#: .cache/my_service_string_to_translate.c:2233
-#: .cache/my_service_string_to_translate.c:2215
-#: .cache/my_service_string_to_translate.c:2197
-msgid "The name of the Data Store to create.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1620
-msgid "The name of the MNT file"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1079
-msgid "The name of the MapMint georeferencing project)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2035
-msgid "The name of the column to add.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3690
-msgid "The name of the context"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3693
-msgid "The name of the context you want to load"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2959
-#: .cache/my_service_string_to_translate.c:1151
-#: .cache/my_service_string_to_translate.c:1065
-msgid "The name of the datasource located in the specified datastore.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2265
-#: .cache/my_service_string_to_translate.c:1957
-msgid "The name of the datasource to remove.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2957
-#: .cache/my_service_string_to_translate.c:1149
-#: .cache/my_service_string_to_translate.c:1063
-msgid "The name of the datastore where to find the image.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2263
-#: .cache/my_service_string_to_translate.c:1955
-#: .cache/my_service_string_to_translate.c:1785
-msgid "The name of the datastore.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2839
-msgid "The name of the directory to add to the map.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1873
-msgid "The name of the directory to clean.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2453
-#: .cache/my_service_string_to_translate.c:2333
-msgid "The name of the directory to use in the map.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2961
-#: .cache/my_service_string_to_translate.c:1153
-#: .cache/my_service_string_to_translate.c:1119
-msgid "The name of the file where was stored GCPs.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1499
-msgid "The name of the format for file to index (shp, geojson ....)."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1605
-#: .cache/my_service_string_to_translate.c:1671
-msgid "The name of the format for file to index (tiff, jpeg ....)."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2997
-msgid "The name of the group to add layer(s))"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1191
-msgid "The name of the layer to extract values from."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3151
-#: .cache/my_service_string_to_translate.c:3109
-#: .cache/my_service_string_to_translate.c:1229
-#: .cache/my_service_string_to_translate.c:1205
-msgid "The name of the layer to extract values from.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3021
-msgid "The name of the layer to search for steps.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2679
-#: .cache/my_service_string_to_translate.c:2435
-msgid "The name of the layer to update.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2995
-#: .cache/my_service_string_to_translate.c:2993
-msgid "The name of the layer(s) to add to the map)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2521
-#: .cache/my_service_string_to_translate.c:2283
-msgid "The name of the layer.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3523
-msgid "The name of the main configuration file section.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3751
-#: .cache/my_service_string_to_translate.c:3499
-#: .cache/my_service_string_to_translate.c:3239
-#: .cache/my_service_string_to_translate.c:3227
-#: .cache/my_service_string_to_translate.c:3201
-#: .cache/my_service_string_to_translate.c:3199
-#: .cache/my_service_string_to_translate.c:3183
-#: .cache/my_service_string_to_translate.c:3171
-#: .cache/my_service_string_to_translate.c:3149
-#: .cache/my_service_string_to_translate.c:3133
-#: .cache/my_service_string_to_translate.c:3121
-#: .cache/my_service_string_to_translate.c:3093
-#: .cache/my_service_string_to_translate.c:3081
-#: .cache/my_service_string_to_translate.c:3079
-#: .cache/my_service_string_to_translate.c:3037
-#: .cache/my_service_string_to_translate.c:3035
-#: .cache/my_service_string_to_translate.c:3009
-#: .cache/my_service_string_to_translate.c:2991
-#: .cache/my_service_string_to_translate.c:2929
-#: .cache/my_service_string_to_translate.c:2905
-#: .cache/my_service_string_to_translate.c:2893
-#: .cache/my_service_string_to_translate.c:2875
-#: .cache/my_service_string_to_translate.c:2863
-#: .cache/my_service_string_to_translate.c:2851
-#: .cache/my_service_string_to_translate.c:2823
-#: .cache/my_service_string_to_translate.c:2811
-#: .cache/my_service_string_to_translate.c:2799
-#: .cache/my_service_string_to_translate.c:2797
-#: .cache/my_service_string_to_translate.c:2783
-#: .cache/my_service_string_to_translate.c:2771
-#: .cache/my_service_string_to_translate.c:2759
-#: .cache/my_service_string_to_translate.c:2665
-#: .cache/my_service_string_to_translate.c:2663
-#: .cache/my_service_string_to_translate.c:2649
-#: .cache/my_service_string_to_translate.c:2647
-#: .cache/my_service_string_to_translate.c:2645
-#: .cache/my_service_string_to_translate.c:2629
-#: .cache/my_service_string_to_translate.c:2627
-#: .cache/my_service_string_to_translate.c:2613
-#: .cache/my_service_string_to_translate.c:2601
-#: .cache/my_service_string_to_translate.c:2599
-#: .cache/my_service_string_to_translate.c:2569
-#: .cache/my_service_string_to_translate.c:2567
-#: .cache/my_service_string_to_translate.c:2549
-#: .cache/my_service_string_to_translate.c:2547
-#: .cache/my_service_string_to_translate.c:2533
-#: .cache/my_service_string_to_translate.c:2505
-#: .cache/my_service_string_to_translate.c:2503
-#: .cache/my_service_string_to_translate.c:2489
-#: .cache/my_service_string_to_translate.c:2477
-#: .cache/my_service_string_to_translate.c:2465
-#: .cache/my_service_string_to_translate.c:2411
-#: .cache/my_service_string_to_translate.c:2389
-#: .cache/my_service_string_to_translate.c:2387
-#: .cache/my_service_string_to_translate.c:2371
-#: .cache/my_service_string_to_translate.c:2357
-#: .cache/my_service_string_to_translate.c:2345
-#: .cache/my_service_string_to_translate.c:2313
-#: .cache/my_service_string_to_translate.c:2165
-#: .cache/my_service_string_to_translate.c:2153
-#: .cache/my_service_string_to_translate.c:2101
-#: .cache/my_service_string_to_translate.c:2089
-#: .cache/my_service_string_to_translate.c:2077
-#: .cache/my_service_string_to_translate.c:2033
-#: .cache/my_service_string_to_translate.c:2031
-#: .cache/my_service_string_to_translate.c:2005
-#: .cache/my_service_string_to_translate.c:1993
-#: .cache/my_service_string_to_translate.c:1981
-#: .cache/my_service_string_to_translate.c:1969
-#: .cache/my_service_string_to_translate.c:1941
-#: .cache/my_service_string_to_translate.c:1913
-#: .cache/my_service_string_to_translate.c:1899
-#: .cache/my_service_string_to_translate.c:1885
-#: .cache/my_service_string_to_translate.c:1841
-#: .cache/my_service_string_to_translate.c:1829
-#: .cache/my_service_string_to_translate.c:1817
-#: .cache/my_service_string_to_translate.c:1805
-#: .cache/my_service_string_to_translate.c:1765
-#: .cache/my_service_string_to_translate.c:1753
-#: .cache/my_service_string_to_translate.c:1741
-#: .cache/my_service_string_to_translate.c:1729
-#: .cache/my_service_string_to_translate.c:1681
-#: .cache/my_service_string_to_translate.c:1203
-#: .cache/my_service_string_to_translate.c:1049
-#: .cache/my_service_string_to_translate.c:1047
-#: .cache/my_service_string_to_translate.c:1045
-#: .cache/my_service_string_to_translate.c:1021
-#: .cache/my_service_string_to_translate.c:1019
-#: .cache/my_service_string_to_translate.c:909
-#: .cache/my_service_string_to_translate.c:907
-#: .cache/my_service_string_to_translate.c:833
-#: .cache/my_service_string_to_translate.c:821
-#: .cache/my_service_string_to_translate.c:819
-#: .cache/my_service_string_to_translate.c:757
-#: .cache/my_service_string_to_translate.c:755
-#: .cache/my_service_string_to_translate.c:729
-#: .cache/my_service_string_to_translate.c:705
-#: .cache/my_service_string_to_translate.c:607
-#: .cache/my_service_string_to_translate.c:605
-#: .cache/my_service_string_to_translate.c:603
-#: .cache/my_service_string_to_translate.c:573
-#: .cache/my_service_string_to_translate.c:571
-#: .cache/my_service_string_to_translate.c:557
-#: .cache/my_service_string_to_translate.c:465
-#: .cache/my_service_string_to_translate.c:441
-#: .cache/my_service_string_to_translate.c:439
-#: .cache/my_service_string_to_translate.c:425
-#: .cache/my_service_string_to_translate.c:423
-#: .cache/my_service_string_to_translate.c:395
-#: .cache/my_service_string_to_translate.c:375
-#: .cache/my_service_string_to_translate.c:373
-#: .cache/my_service_string_to_translate.c:359
-#: .cache/my_service_string_to_translate.c:357
-#: .cache/my_service_string_to_translate.c:327
-#: .cache/my_service_string_to_translate.c:325
-#: .cache/my_service_string_to_translate.c:213
-#: .cache/my_service_string_to_translate.c:211
-#: .cache/my_service_string_to_translate.c:187
-msgid "The name of the map to extract values from.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3107
-msgid "The name of the map to search the layer.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3049
-#: .cache/my_service_string_to_translate.c:2837
-#: .cache/my_service_string_to_translate.c:2747
-#: .cache/my_service_string_to_translate.c:2745
-#: .cache/my_service_string_to_translate.c:2743
-#: .cache/my_service_string_to_translate.c:2741
-#: .cache/my_service_string_to_translate.c:2739
-#: .cache/my_service_string_to_translate.c:2703
-#: .cache/my_service_string_to_translate.c:2519
-#: .cache/my_service_string_to_translate.c:2451
-#: .cache/my_service_string_to_translate.c:2329
-#: .cache/my_service_string_to_translate.c:2301
-#: .cache/my_service_string_to_translate.c:2299
-#: .cache/my_service_string_to_translate.c:2285
-#: .cache/my_service_string_to_translate.c:2281
-msgid "The name of the map.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1498
-#: .cache/my_service_string_to_translate.c:1604
-#: .cache/my_service_string_to_translate.c:1670
-msgid "The name of the output shapefile storing the tile index."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:78
-#: .cache/my_service_string_to_translate.c:79
-msgid "The name of the path"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3511
-#: .cache/my_service_string_to_translate.c:2181
-#: .cache/my_service_string_to_translate.c:2179
-#: .cache/my_service_string_to_translate.c:2141
-#: .cache/my_service_string_to_translate.c:2139
-#: .cache/my_service_string_to_translate.c:2137
-#: .cache/my_service_string_to_translate.c:2121
-#: .cache/my_service_string_to_translate.c:2119
-#: .cache/my_service_string_to_translate.c:2117
-#: .cache/my_service_string_to_translate.c:2065
-#: .cache/my_service_string_to_translate.c:2063
-#: .cache/my_service_string_to_translate.c:2061
-#: .cache/my_service_string_to_translate.c:1929
-#: .cache/my_service_string_to_translate.c:1927
-#: .cache/my_service_string_to_translate.c:1861
-#: .cache/my_service_string_to_translate.c:1859
-#: .cache/my_service_string_to_translate.c:1857
-#: .cache/my_service_string_to_translate.c:1515
-msgid "The name of the section to save.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2437
-msgid "The name of the step to add.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2681
-msgid "The name of the step to remove.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:851
-msgid "The name of the table.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3331
-#: .cache/my_service_string_to_translate.c:3329
-#: .cache/my_service_string_to_translate.c:3315
-#: .cache/my_service_string_to_translate.c:1699
-msgid "The name of the template to fill.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1089
-msgid "The name of your MapMint georeferencing project.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1262
-#: .cache/my_service_string_to_translate.c:1263
-#: .cache/my_service_string_to_translate.c:1475
-msgid "The name to display in the hello message"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3536
-msgid "The number of color"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3541
-msgid "The number of color to use in the gradient."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1460
-msgid "The number of features returned"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1456
-msgid "The number of returned features."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3559
-msgid "The output ZIP File name.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1487
-#: .cache/my_service_string_to_translate.c:3571
-#: .cache/my_service_string_to_translate.c:3663
-msgid "The output data name."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1481
-#: .cache/my_service_string_to_translate.c:1584
-#: .cache/my_service_string_to_translate.c:1585
-#: .cache/my_service_string_to_translate.c:1586
-#: .cache/my_service_string_to_translate.c:1611
-#: .cache/my_service_string_to_translate.c:1639
-#: .cache/my_service_string_to_translate.c:1654
-#: .cache/my_service_string_to_translate.c:3566
-#: .cache/my_service_string_to_translate.c:3658
-msgid "The output data source name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1591
-#: .cache/my_service_string_to_translate.c:1592
-#: .cache/my_service_string_to_translate.c:1593
-#: .cache/my_service_string_to_translate.c:1617
-#: .cache/my_service_string_to_translate.c:1634
-#: .cache/my_service_string_to_translate.c:1635
-#: .cache/my_service_string_to_translate.c:1659
-msgid "The output data source name to use as source for convertion."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1646
-msgid "The output data source name."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1582
-msgid "The output datastore name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1589
-msgid "The output datastore name."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3549
-msgid "The output zipfile name)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3287
-msgid "The password of the user.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:57
-#: .cache/my_service_string_to_translate.c:1621
-msgid "The path to calaculate profile"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/leftcol_bs.tmpl:313
 #: /home/src/mapmint/mapmint-ui/templates/preview/index_bs.tmpl:364
 msgid "The printed document."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1310
-msgid "The produced JSON String"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3111
-msgid "The properties as a JSON object)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:223
-msgid "The quote value)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2709
-msgid "The read privilege on the layer.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3153
-msgid "The resampling method name.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:34
-#: .cache/my_service_string_to_translate.c:73
-#: .cache/my_service_string_to_translate.c:80
-#: .cache/my_service_string_to_translate.c:88
-#: .cache/my_service_string_to_translate.c:95
-#: .cache/my_service_string_to_translate.c:102
-#: .cache/my_service_string_to_translate.c:109
-#: .cache/my_service_string_to_translate.c:116
-#: .cache/my_service_string_to_translate.c:130
-#: .cache/my_service_string_to_translate.c:131
-#: .cache/my_service_string_to_translate.c:139
-#: .cache/my_service_string_to_translate.c:145
-#: .cache/my_service_string_to_translate.c:167
-#: .cache/my_service_string_to_translate.c:174
-msgid "The result "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3342
-msgid "The resulting  WFS TransactionResponse document "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:313
-msgid "The resulting  directory path containing the uncompressed archive)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:307
-msgid "The resulting  directory path)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3532
-msgid "The resulting ExecuteResponse document."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1161
-msgid "The resulting JSON array)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1167
-msgid "The resulting JSON array.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3103
-msgid "The resulting JSON object)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3195
-msgid "The resulting array)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3205
-msgid "The resulting array.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:381
-#: .cache/my_service_string_to_translate.c:1482
-#: .cache/my_service_string_to_translate.c:1557
-#: .cache/my_service_string_to_translate.c:1558
-#: .cache/my_service_string_to_translate.c:1559
-#: .cache/my_service_string_to_translate.c:1560
-#: .cache/my_service_string_to_translate.c:1569
-#: .cache/my_service_string_to_translate.c:1570
-#: .cache/my_service_string_to_translate.c:1587
-#: .cache/my_service_string_to_translate.c:1612
-#: .cache/my_service_string_to_translate.c:1631
-#: .cache/my_service_string_to_translate.c:1643
-#: .cache/my_service_string_to_translate.c:1655
-#: .cache/my_service_string_to_translate.c:3567
-#: .cache/my_service_string_to_translate.c:3615
-#: .cache/my_service_string_to_translate.c:3639
-#: .cache/my_service_string_to_translate.c:3649
-#: .cache/my_service_string_to_translate.c:3659
-#: .cache/my_service_string_to_translate.c:3667
-#: .cache/my_service_string_to_translate.c:3675
-msgid "The resulting converted file"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3625
-#: .cache/my_service_string_to_translate.c:3605
-#: .cache/my_service_string_to_translate.c:3593
-#: .cache/my_service_string_to_translate.c:3579
-msgid "The resulting converted file)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1707
-msgid "The resulting css file)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3
-#: .cache/my_service_string_to_translate.c:6
-#: .cache/my_service_string_to_translate.c:9
-#: .cache/my_service_string_to_translate.c:12
-msgid "The resulting message"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2963
-#: .cache/my_service_string_to_translate.c:1155
-#: .cache/my_service_string_to_translate.c:1123
-#: .cache/my_service_string_to_translate.c:1095
-#: .cache/my_service_string_to_translate.c:1067
-msgid "The resulting message created by service.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3211
-#: .cache/my_service_string_to_translate.c:3059
-#: .cache/my_service_string_to_translate.c:3017
-#: .cache/my_service_string_to_translate.c:2969
-#: .cache/my_service_string_to_translate.c:2953
-#: .cache/my_service_string_to_translate.c:2913
-#: .cache/my_service_string_to_translate.c:2807
-#: .cache/my_service_string_to_translate.c:2675
-#: .cache/my_service_string_to_translate.c:2581
-#: .cache/my_service_string_to_translate.c:2431
-#: .cache/my_service_string_to_translate.c:2245
-#: .cache/my_service_string_to_translate.c:2229
-#: .cache/my_service_string_to_translate.c:2211
-#: .cache/my_service_string_to_translate.c:2193
-#: .cache/my_service_string_to_translate.c:2133
-#: .cache/my_service_string_to_translate.c:1145
-#: .cache/my_service_string_to_translate.c:1085
-#: .cache/my_service_string_to_translate.c:1059
-#: .cache/my_service_string_to_translate.c:983
-#: .cache/my_service_string_to_translate.c:977
-#: .cache/my_service_string_to_translate.c:719
-#: .cache/my_service_string_to_translate.c:713
-#: .cache/my_service_string_to_translate.c:687
-#: .cache/my_service_string_to_translate.c:679
-#: .cache/my_service_string_to_translate.c:659
-#: .cache/my_service_string_to_translate.c:653
-#: .cache/my_service_string_to_translate.c:635
-#: .cache/my_service_string_to_translate.c:629
-#: .cache/my_service_string_to_translate.c:547
-#: .cache/my_service_string_to_translate.c:541
-#: .cache/my_service_string_to_translate.c:233
-#: .cache/my_service_string_to_translate.c:225
-msgid "The resulting message)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3217
-#: .cache/my_service_string_to_translate.c:2975
-#: .cache/my_service_string_to_translate.c:2919
-#: .cache/my_service_string_to_translate.c:2587
-msgid "The resulting message.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:58
-#: .cache/my_service_string_to_translate.c:1622
-msgid "The resulting profile"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1260
-#: .cache/my_service_string_to_translate.c:1354
-#: .cache/my_service_string_to_translate.c:1472
-msgid "The resulting string"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3551
-msgid "The resulting zip file url)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1642
-msgid "The scale"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3525
-msgid "The section key value pairs for the specified section.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1588
-msgid ""
-"The service will mosaic a set of images. All the images must be in the same "
-"coordinate system and have a matching number of bands, but they may be "
-"overlapping, and at different resolutions. In areas of overlap, the last "
-"image will be copied over earlier ones."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:82
-#: .cache/my_service_string_to_translate.c:83
-msgid "The shortest path name"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1628
-msgid "The source color filename"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1629
-msgid "The source greyscale filename"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/vector-tools-src/service.c:1342
@@ -7969,464 +4288,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:4680
 msgid "The step "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1254
-msgid "The string (RRGGBBAA) for for background color."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1253
-msgid "The string (RRGGBBAA) for for foreground color."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1264
-#: .cache/my_service_string_to_translate.c:1358
-#: .cache/my_service_string_to_translate.c:1476
-msgid "The string created by service."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1252
-msgid "The string to encode using QREncode."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1173
-msgid ""
-"The success or failure message including the whole list of removed files)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1179
-msgid ""
-"The success or failure message including the whole list of removed files.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3823
-#: .cache/my_service_string_to_translate.c:3803
-#: .cache/my_service_string_to_translate.c:3783
-#: .cache/my_service_string_to_translate.c:3763
-#: .cache/my_service_string_to_translate.c:3735
-#: .cache/my_service_string_to_translate.c:3711
-#: .cache/my_service_string_to_translate.c:3507
-#: .cache/my_service_string_to_translate.c:3265
-#: .cache/my_service_string_to_translate.c:3249
-#: .cache/my_service_string_to_translate.c:1113
-msgid "The success or failure message)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3833
-#: .cache/my_service_string_to_translate.c:3813
-#: .cache/my_service_string_to_translate.c:3793
-#: .cache/my_service_string_to_translate.c:3773
-#: .cache/my_service_string_to_translate.c:3741
-#: .cache/my_service_string_to_translate.c:3717
-#: .cache/my_service_string_to_translate.c:3513
-#: .cache/my_service_string_to_translate.c:3273
-#: .cache/my_service_string_to_translate.c:3257
-msgid "The success or failure message.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3733
-#: .cache/my_service_string_to_translate.c:3709
-msgid "The symbol name)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3739
-#: .cache/my_service_string_to_translate.c:3715
-msgid "The symbol name.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1446
-msgid "The symmetric difference between the two geometries."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1442
-msgid "The symmetric difference between two geometries"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1093
-msgid "The target directory where to copy file.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1083
-msgid "The target directory)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3648
-msgid "The target encoding"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3653
-msgid "The target encoding."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3485
-#: .cache/my_service_string_to_translate.c:3461
-#: .cache/my_service_string_to_translate.c:3429
-#: .cache/my_service_string_to_translate.c:3405
-#: .cache/my_service_string_to_translate.c:3381
-#: .cache/my_service_string_to_translate.c:3361
-msgid "The token providing privileged access.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3921
-msgid "The total feature count."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2237
-#: .cache/my_service_string_to_translate.c:2217
-#: .cache/my_service_string_to_translate.c:2201
-msgid "The type of OGC protocol to use WMS or WFS.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2045
-#: .cache/my_service_string_to_translate.c:2043
-#: .cache/my_service_string_to_translate.c:2041
-#: .cache/my_service_string_to_translate.c:2039
-#: .cache/my_service_string_to_translate.c:2037
-msgid "The type of the column to add.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1273
-msgid "The union of the geometries"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1346
-msgid "The union of two geometries"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:94
-#: .cache/my_service_string_to_translate.c:108
-#: .cache/my_service_string_to_translate.c:114
-#: .cache/my_service_string_to_translate.c:115
-#: .cache/my_service_string_to_translate.c:138
-#: .cache/my_service_string_to_translate.c:166
-msgid "The url to the WMS Server"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:86
-#: .cache/my_service_string_to_translate.c:144
-msgid "The urls to the WMS Servers"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3443
-msgid "The user group.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:614
-#: .cache/my_service_string_to_translate.c:1186
-msgid "The welcome message"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:616
-#: .cache/my_service_string_to_translate.c:1192
-msgid "The welcome message created by service."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3753
-#: .cache/my_service_string_to_translate.c:3501
-#: .cache/my_service_string_to_translate.c:3489
-#: .cache/my_service_string_to_translate.c:3465
-#: .cache/my_service_string_to_translate.c:3445
-#: .cache/my_service_string_to_translate.c:3433
-#: .cache/my_service_string_to_translate.c:3409
-#: .cache/my_service_string_to_translate.c:3385
-#: .cache/my_service_string_to_translate.c:3365
-#: .cache/my_service_string_to_translate.c:3241
-#: .cache/my_service_string_to_translate.c:3229
-#: .cache/my_service_string_to_translate.c:3185
-#: .cache/my_service_string_to_translate.c:3173
-#: .cache/my_service_string_to_translate.c:3155
-#: .cache/my_service_string_to_translate.c:3135
-#: .cache/my_service_string_to_translate.c:3123
-#: .cache/my_service_string_to_translate.c:3095
-#: .cache/my_service_string_to_translate.c:3083
-#: .cache/my_service_string_to_translate.c:3067
-#: .cache/my_service_string_to_translate.c:3051
-#: .cache/my_service_string_to_translate.c:3039
-#: .cache/my_service_string_to_translate.c:3011
-#: .cache/my_service_string_to_translate.c:2999
-#: .cache/my_service_string_to_translate.c:2931
-#: .cache/my_service_string_to_translate.c:2907
-#: .cache/my_service_string_to_translate.c:2895
-#: .cache/my_service_string_to_translate.c:2877
-#: .cache/my_service_string_to_translate.c:2865
-#: .cache/my_service_string_to_translate.c:2853
-#: .cache/my_service_string_to_translate.c:2841
-#: .cache/my_service_string_to_translate.c:2825
-#: .cache/my_service_string_to_translate.c:2801
-#: .cache/my_service_string_to_translate.c:2785
-#: .cache/my_service_string_to_translate.c:2773
-#: .cache/my_service_string_to_translate.c:2761
-#: .cache/my_service_string_to_translate.c:2749
-#: .cache/my_service_string_to_translate.c:2715
-#: .cache/my_service_string_to_translate.c:2667
-#: .cache/my_service_string_to_translate.c:2651
-#: .cache/my_service_string_to_translate.c:2631
-#: .cache/my_service_string_to_translate.c:2615
-#: .cache/my_service_string_to_translate.c:2603
-#: .cache/my_service_string_to_translate.c:2575
-#: .cache/my_service_string_to_translate.c:2551
-#: .cache/my_service_string_to_translate.c:2535
-#: .cache/my_service_string_to_translate.c:2523
-#: .cache/my_service_string_to_translate.c:2507
-#: .cache/my_service_string_to_translate.c:2491
-#: .cache/my_service_string_to_translate.c:2479
-#: .cache/my_service_string_to_translate.c:2467
-#: .cache/my_service_string_to_translate.c:2455
-#: .cache/my_service_string_to_translate.c:2423
-#: .cache/my_service_string_to_translate.c:2391
-#: .cache/my_service_string_to_translate.c:2375
-#: .cache/my_service_string_to_translate.c:2373
-#: .cache/my_service_string_to_translate.c:2359
-#: .cache/my_service_string_to_translate.c:2347
-#: .cache/my_service_string_to_translate.c:2335
-#: .cache/my_service_string_to_translate.c:2315
-#: .cache/my_service_string_to_translate.c:2303
-#: .cache/my_service_string_to_translate.c:2287
-#: .cache/my_service_string_to_translate.c:2267
-#: .cache/my_service_string_to_translate.c:2183
-#: .cache/my_service_string_to_translate.c:2167
-#: .cache/my_service_string_to_translate.c:2155
-#: .cache/my_service_string_to_translate.c:2123
-#: .cache/my_service_string_to_translate.c:2103
-#: .cache/my_service_string_to_translate.c:2091
-#: .cache/my_service_string_to_translate.c:2079
-#: .cache/my_service_string_to_translate.c:2067
-#: .cache/my_service_string_to_translate.c:2007
-#: .cache/my_service_string_to_translate.c:1995
-#: .cache/my_service_string_to_translate.c:1983
-#: .cache/my_service_string_to_translate.c:1971
-#: .cache/my_service_string_to_translate.c:1959
-#: .cache/my_service_string_to_translate.c:1943
-#: .cache/my_service_string_to_translate.c:1931
-#: .cache/my_service_string_to_translate.c:1915
-#: .cache/my_service_string_to_translate.c:1887
-#: .cache/my_service_string_to_translate.c:1875
-#: .cache/my_service_string_to_translate.c:1863
-#: .cache/my_service_string_to_translate.c:1843
-#: .cache/my_service_string_to_translate.c:1831
-#: .cache/my_service_string_to_translate.c:1819
-#: .cache/my_service_string_to_translate.c:1807
-#: .cache/my_service_string_to_translate.c:1795
-#: .cache/my_service_string_to_translate.c:1767
-#: .cache/my_service_string_to_translate.c:1755
-#: .cache/my_service_string_to_translate.c:1731
-#: .cache/my_service_string_to_translate.c:1683
-#: .cache/my_service_string_to_translate.c:1517
-#: .cache/my_service_string_to_translate.c:1231
-#: .cache/my_service_string_to_translate.c:1207
-#: .cache/my_service_string_to_translate.c:1051
-#: .cache/my_service_string_to_translate.c:1031
-#: .cache/my_service_string_to_translate.c:1023
-#: .cache/my_service_string_to_translate.c:995
-#: .cache/my_service_string_to_translate.c:971
-#: .cache/my_service_string_to_translate.c:947
-#: .cache/my_service_string_to_translate.c:931
-#: .cache/my_service_string_to_translate.c:919
-#: .cache/my_service_string_to_translate.c:911
-#: .cache/my_service_string_to_translate.c:895
-#: .cache/my_service_string_to_translate.c:883
-#: .cache/my_service_string_to_translate.c:859
-#: .cache/my_service_string_to_translate.c:835
-#: .cache/my_service_string_to_translate.c:823
-#: .cache/my_service_string_to_translate.c:807
-#: .cache/my_service_string_to_translate.c:795
-#: .cache/my_service_string_to_translate.c:783
-#: .cache/my_service_string_to_translate.c:759
-#: .cache/my_service_string_to_translate.c:743
-#: .cache/my_service_string_to_translate.c:731
-#: .cache/my_service_string_to_translate.c:707
-#: .cache/my_service_string_to_translate.c:695
-#: .cache/my_service_string_to_translate.c:647
-#: .cache/my_service_string_to_translate.c:623
-#: .cache/my_service_string_to_translate.c:611
-#: .cache/my_service_string_to_translate.c:609
-#: .cache/my_service_string_to_translate.c:587
-#: .cache/my_service_string_to_translate.c:575
-#: .cache/my_service_string_to_translate.c:559
-#: .cache/my_service_string_to_translate.c:535
-#: .cache/my_service_string_to_translate.c:523
-#: .cache/my_service_string_to_translate.c:511
-#: .cache/my_service_string_to_translate.c:499
-#: .cache/my_service_string_to_translate.c:487
-#: .cache/my_service_string_to_translate.c:475
-#: .cache/my_service_string_to_translate.c:467
-#: .cache/my_service_string_to_translate.c:455
-#: .cache/my_service_string_to_translate.c:443
-#: .cache/my_service_string_to_translate.c:427
-#: .cache/my_service_string_to_translate.c:411
-#: .cache/my_service_string_to_translate.c:399
-#: .cache/my_service_string_to_translate.c:397
-#: .cache/my_service_string_to_translate.c:377
-#: .cache/my_service_string_to_translate.c:361
-#: .cache/my_service_string_to_translate.c:345
-#: .cache/my_service_string_to_translate.c:329
-#: .cache/my_service_string_to_translate.c:285
-#: .cache/my_service_string_to_translate.c:273
-#: .cache/my_service_string_to_translate.c:261
-#: .cache/my_service_string_to_translate.c:249
-#: .cache/my_service_string_to_translate.c:217
-#: .cache/my_service_string_to_translate.c:215
-#: .cache/my_service_string_to_translate.c:189
-msgid "The welcome message created by service.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3747
-#: .cache/my_service_string_to_translate.c:3495
-#: .cache/my_service_string_to_translate.c:3477
-#: .cache/my_service_string_to_translate.c:3455
-#: .cache/my_service_string_to_translate.c:3439
-#: .cache/my_service_string_to_translate.c:3421
-#: .cache/my_service_string_to_translate.c:3397
-#: .cache/my_service_string_to_translate.c:3375
-#: .cache/my_service_string_to_translate.c:3353
-#: .cache/my_service_string_to_translate.c:3325
-#: .cache/my_service_string_to_translate.c:3311
-#: .cache/my_service_string_to_translate.c:3235
-#: .cache/my_service_string_to_translate.c:3223
-#: .cache/my_service_string_to_translate.c:3179
-#: .cache/my_service_string_to_translate.c:3167
-#: .cache/my_service_string_to_translate.c:3145
-#: .cache/my_service_string_to_translate.c:3129
-#: .cache/my_service_string_to_translate.c:3117
-#: .cache/my_service_string_to_translate.c:3089
-#: .cache/my_service_string_to_translate.c:3075
-#: .cache/my_service_string_to_translate.c:3045
-#: .cache/my_service_string_to_translate.c:3031
-#: .cache/my_service_string_to_translate.c:3005
-#: .cache/my_service_string_to_translate.c:2987
-#: .cache/my_service_string_to_translate.c:2925
-#: .cache/my_service_string_to_translate.c:2901
-#: .cache/my_service_string_to_translate.c:2889
-#: .cache/my_service_string_to_translate.c:2871
-#: .cache/my_service_string_to_translate.c:2859
-#: .cache/my_service_string_to_translate.c:2847
-#: .cache/my_service_string_to_translate.c:2833
-#: .cache/my_service_string_to_translate.c:2819
-#: .cache/my_service_string_to_translate.c:2793
-#: .cache/my_service_string_to_translate.c:2779
-#: .cache/my_service_string_to_translate.c:2767
-#: .cache/my_service_string_to_translate.c:2755
-#: .cache/my_service_string_to_translate.c:2735
-#: .cache/my_service_string_to_translate.c:2699
-#: .cache/my_service_string_to_translate.c:2659
-#: .cache/my_service_string_to_translate.c:2641
-#: .cache/my_service_string_to_translate.c:2623
-#: .cache/my_service_string_to_translate.c:2609
-#: .cache/my_service_string_to_translate.c:2595
-#: .cache/my_service_string_to_translate.c:2563
-#: .cache/my_service_string_to_translate.c:2543
-#: .cache/my_service_string_to_translate.c:2529
-#: .cache/my_service_string_to_translate.c:2515
-#: .cache/my_service_string_to_translate.c:2499
-#: .cache/my_service_string_to_translate.c:2485
-#: .cache/my_service_string_to_translate.c:2473
-#: .cache/my_service_string_to_translate.c:2461
-#: .cache/my_service_string_to_translate.c:2447
-#: .cache/my_service_string_to_translate.c:2407
-#: .cache/my_service_string_to_translate.c:2383
-#: .cache/my_service_string_to_translate.c:2367
-#: .cache/my_service_string_to_translate.c:2365
-#: .cache/my_service_string_to_translate.c:2353
-#: .cache/my_service_string_to_translate.c:2341
-#: .cache/my_service_string_to_translate.c:2325
-#: .cache/my_service_string_to_translate.c:2309
-#: .cache/my_service_string_to_translate.c:2295
-#: .cache/my_service_string_to_translate.c:2277
-#: .cache/my_service_string_to_translate.c:2259
-#: .cache/my_service_string_to_translate.c:2175
-#: .cache/my_service_string_to_translate.c:2161
-#: .cache/my_service_string_to_translate.c:2149
-#: .cache/my_service_string_to_translate.c:2113
-#: .cache/my_service_string_to_translate.c:2097
-#: .cache/my_service_string_to_translate.c:2085
-#: .cache/my_service_string_to_translate.c:2073
-#: .cache/my_service_string_to_translate.c:2057
-#: .cache/my_service_string_to_translate.c:2001
-#: .cache/my_service_string_to_translate.c:1989
-#: .cache/my_service_string_to_translate.c:1977
-#: .cache/my_service_string_to_translate.c:1965
-#: .cache/my_service_string_to_translate.c:1951
-#: .cache/my_service_string_to_translate.c:1937
-#: .cache/my_service_string_to_translate.c:1923
-#: .cache/my_service_string_to_translate.c:1909
-#: .cache/my_service_string_to_translate.c:1881
-#: .cache/my_service_string_to_translate.c:1869
-#: .cache/my_service_string_to_translate.c:1853
-#: .cache/my_service_string_to_translate.c:1837
-#: .cache/my_service_string_to_translate.c:1825
-#: .cache/my_service_string_to_translate.c:1813
-#: .cache/my_service_string_to_translate.c:1801
-#: .cache/my_service_string_to_translate.c:1781
-#: .cache/my_service_string_to_translate.c:1761
-#: .cache/my_service_string_to_translate.c:1749
-#: .cache/my_service_string_to_translate.c:1725
-#: .cache/my_service_string_to_translate.c:1695
-#: .cache/my_service_string_to_translate.c:1677
-#: .cache/my_service_string_to_translate.c:1511
-#: .cache/my_service_string_to_translate.c:1219
-#: .cache/my_service_string_to_translate.c:1199
-#: .cache/my_service_string_to_translate.c:1041
-#: .cache/my_service_string_to_translate.c:1027
-#: .cache/my_service_string_to_translate.c:1015
-#: .cache/my_service_string_to_translate.c:989
-#: .cache/my_service_string_to_translate.c:959
-#: .cache/my_service_string_to_translate.c:939
-#: .cache/my_service_string_to_translate.c:925
-#: .cache/my_service_string_to_translate.c:915
-#: .cache/my_service_string_to_translate.c:903
-#: .cache/my_service_string_to_translate.c:889
-#: .cache/my_service_string_to_translate.c:877
-#: .cache/my_service_string_to_translate.c:847
-#: .cache/my_service_string_to_translate.c:829
-#: .cache/my_service_string_to_translate.c:815
-#: .cache/my_service_string_to_translate.c:801
-#: .cache/my_service_string_to_translate.c:789
-#: .cache/my_service_string_to_translate.c:771
-#: .cache/my_service_string_to_translate.c:751
-#: .cache/my_service_string_to_translate.c:737
-#: .cache/my_service_string_to_translate.c:725
-#: .cache/my_service_string_to_translate.c:701
-#: .cache/my_service_string_to_translate.c:691
-#: .cache/my_service_string_to_translate.c:641
-#: .cache/my_service_string_to_translate.c:619
-#: .cache/my_service_string_to_translate.c:599
-#: .cache/my_service_string_to_translate.c:597
-#: .cache/my_service_string_to_translate.c:581
-#: .cache/my_service_string_to_translate.c:567
-#: .cache/my_service_string_to_translate.c:553
-#: .cache/my_service_string_to_translate.c:529
-#: .cache/my_service_string_to_translate.c:517
-#: .cache/my_service_string_to_translate.c:505
-#: .cache/my_service_string_to_translate.c:493
-#: .cache/my_service_string_to_translate.c:481
-#: .cache/my_service_string_to_translate.c:471
-#: .cache/my_service_string_to_translate.c:461
-#: .cache/my_service_string_to_translate.c:449
-#: .cache/my_service_string_to_translate.c:435
-#: .cache/my_service_string_to_translate.c:419
-#: .cache/my_service_string_to_translate.c:405
-#: .cache/my_service_string_to_translate.c:391
-#: .cache/my_service_string_to_translate.c:389
-#: .cache/my_service_string_to_translate.c:369
-#: .cache/my_service_string_to_translate.c:353
-#: .cache/my_service_string_to_translate.c:337
-#: .cache/my_service_string_to_translate.c:321
-#: .cache/my_service_string_to_translate.c:279
-#: .cache/my_service_string_to_translate.c:267
-#: .cache/my_service_string_to_translate.c:255
-#: .cache/my_service_string_to_translate.c:241
-#: .cache/my_service_string_to_translate.c:207
-#: .cache/my_service_string_to_translate.c:205
-#: .cache/my_service_string_to_translate.c:183
-msgid "The welcome message)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2711
-msgid "The write privilege on the layer.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3561
-msgid "The zip file url)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Indicators_bs.tmpl:250
@@ -8477,16 +4338,6 @@ msgid ""
 "areas with slope=0."
 msgstr ""
 
-#: /home/src/zoo/zoo-project/zoo-services/ogr/tindex/service.c:451
-msgid "This driver failed to create!"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1465
-msgid ""
-"This function SHALL return a bag of geometry values representing the Point "
-"set intersection of geometry InputEntity1 and geometry InputEntity2."
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/RasterWindow_bs.tmpl:21
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/RasterWindow.tmpl:39
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/RasterWindow_bs.html:39
@@ -8506,12 +4357,6 @@ msgid ""
 "values. You have the option of specifying the type of slope value you want: "
 "degrees or percent slope. In cases where the horizontal units differ from "
 "the vertical units, you can also supply a scaling factor."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1648
-msgid ""
-"This service has 7 different modes :  hillshade,  slope,  aspect, color-"
-"relief, TRI, TPI, roughness"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/raster-tools-src/cgi-env/service.py:44
@@ -8604,10 +4449,6 @@ msgstr ""
 msgid "Tools"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1637
-msgid "Tools to analyze and visualize DEMs."
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Manager/LayerProperties_bs.html:91
 #: /home/src/mapmint/mapmint-ui/templates/Indexes/GraphPart_bs.html:35
 msgid "Tooltip"
@@ -8620,10 +4461,6 @@ msgid ""
 "Topographic Position Index, which is defined as the difference between a "
 "central pixel and the mean of its surrounding cells (see Wilson et al 2007, "
 "Marine Geodesy 30:3-35)."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3917
-msgid "Total feature count"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/Georeference.tmpl:4
@@ -8660,16 +4497,6 @@ msgstr ""
 msgid "Type:"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:196
-#: .cache/my_service_string_to_translate.c:1290
-#: .cache/my_service_string_to_translate.c:1303
-#: .cache/my_service_string_to_translate.c:1321
-#: .cache/my_service_string_to_translate.c:1335
-#: .cache/my_service_string_to_translate.c:1399
-#: .cache/my_service_string_to_translate.c:1406
-msgid "URI to a set of GML that describes the polygon."
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Indicators_bs.tmpl:91
 #: /home/src/mapmint/mapmint-ui/templates/Documents_bs.tmpl:100
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/wfs/display_bs.html:12
@@ -8682,8 +4509,6 @@ msgstr ""
 msgid "URL:"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:365
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:374
 #: /home/src/mapmint/mapmint-services/np/service.py:636
 #: /home/src/mapmint/mapmint-services/np/service.py:652
 msgid "Unable to access any index file"
@@ -8697,33 +4522,17 @@ msgstr ""
 msgid "Unable to access the Data Store:"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:447
 #: /home/src/mapmint/mapmint-services/np/service.py:1190
 msgid "Unable to access the database"
-msgstr ""
-
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:169
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:318
-msgid "Unable to access the downloaded execution log file"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/ows-security/service.py:742
 msgid "Unable to access the ressource: "
 msgstr ""
 
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:194
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:350
-msgid "Unable to announce the successful execution of the HPC service"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:2833
 #: /home/src/mapmint/mapmint-services/mapfile/service.py:3190
 msgid "Unable to classify using this raster band."
-msgstr ""
-
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:188
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:344
-msgid "Unable to connect"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/authenticate/service.py:53
@@ -8740,7 +4549,6 @@ msgstr ""
 msgid "Unable to connect with the provided login and password"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:538
 #: /home/src/mapmint/mapmint-services/np/service.py:1769
 msgid "Unable to copy uploaded file: "
 msgstr ""
@@ -8754,7 +4562,6 @@ msgstr ""
 msgid "Unable to create tile index for vector"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:145
 #: /home/src/mapmint/mapmint-services/np/service.py:3439
 #: /home/src/mapmint/mapmint-services/np/service.py:3443
 msgid "Unable to delete element: "
@@ -8797,10 +4604,6 @@ msgstr ""
 msgid "Unable to find any report for the current element"
 msgstr ""
 
-#: /home/src/zoo/zoo-project/zoo-services/ogr/tindex/service.c:415
-msgid "Unable to find driver!"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-services/routing/service.py:74
 #: /home/src/mapmint/mapmint-services/routing/service.py:90
 msgid "Unable to find reliable GeoCoder"
@@ -8810,19 +4613,14 @@ msgstr ""
 msgid "Unable to handle your SQL query: "
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:263
 #: /home/src/mapmint/mapmint-services/np/service.py:4358
 msgid "Unable to identify your parameter as a View Id: "
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:206
 #: /home/src/mapmint/mapmint-services/np/service.py:3535
 msgid "Unable to identify your parameter as a table"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:153
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:206
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:644
 #: /home/src/mapmint/mapmint-services/np/service.py:3530
 #: /home/src/mapmint/mapmint-services/np/service.py:3575
 #: /home/src/mapmint/mapmint-services/np/service.py:3814
@@ -8830,12 +4628,6 @@ msgstr ""
 msgid "Unable to identify your parameter as a tableId: "
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:121
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:469
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:478
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:494
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:512
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:538
 #: /home/src/mapmint/mapmint-services/np/service.py:1388
 #: /home/src/mapmint/mapmint-services/np/service.py:1440
 #: /home/src/mapmint/mapmint-services/np/service.py:1549
@@ -8870,11 +4662,6 @@ msgstr ""
 msgid "Unable to parse the file"
 msgstr ""
 
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:81
-#: /home/src/zoo/zoo-project/zoo-services/utils/hpc/service.c:244
-msgid "Unable to read the lenv section file of the requested jobid"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-services/authenticate/service.py:238
 msgid "Unable to register the user: "
 msgstr ""
@@ -8884,12 +4671,10 @@ msgstr ""
 msgid "Unable to remove the group as it is the only one remaining."
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:538
 #: /home/src/mapmint/mapmint-services/np/service.py:1761
 msgid "Unable to run the SQL request: "
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:447
 #: /home/src/mapmint/mapmint-services/np/service.py:1202
 msgid "Unable to run your query for the following reason: "
 msgstr ""
@@ -8902,8 +4687,6 @@ msgstr ""
 msgid "Unable to update user preferences: "
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:23
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:314
 #: /home/src/mapmint/mapmint-services/np/service.py:73
 #: /home/src/mapmint/mapmint-services/np/service.py:187
 msgid "Unable to use this service when you're not logued in"
@@ -8977,15 +4760,6 @@ msgstr ""
 msgid "Update failed"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:2849
-#: .cache/my_service_string_to_translate.c:2843
-msgid "Update the project_gridStyle mapfile)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3267
-msgid "Update users infromations.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Indicators_bs.tmpl:181
 #: /home/src/mapmint/mapmint-ui/templates/Tables_bs.tmpl:183
 msgid "Upload your file"
@@ -9005,14 +4779,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:366
 msgid "Use original extent"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3697
-msgid "Useless parameter)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3703
-msgid "Useless parameter.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/authenticate/service.py:320
@@ -9037,14 +4803,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-services/authenticate/service.py:240
 msgid "User have been successfully registered."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3890
-msgid "User informations to insert as a json object."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3277
-msgid "User login)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/toolbar_bs.tmpl:154
@@ -9118,18 +4876,6 @@ msgstr ""
 msgid "Vector"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1739
-msgid "Verifiy if a SRS is a favorite.)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:19
-msgid "Verify if uploaded files are well GIS data and remove others)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:25
-msgid "Verify if uploaded files are well GIS data and remove others.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/Georeference.tmpl:60
 #: /home/src/mapmint/mapmint-ui/templates/Georeferencer/Georeference_bs.html:68
 msgid "Vertical:"
@@ -9173,7 +4919,6 @@ msgstr ""
 msgid "View table"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:437
 #: /home/src/mapmint/mapmint-services/np/service.py:1093
 msgid "View was successfully created, index is ready to use."
 msgstr ""
@@ -9218,10 +4963,6 @@ msgstr ""
 msgid "Window"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:2695
-msgid "Write privilege)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Distiller_bs.tmpl:390
 msgid "X"
 msgstr ""
@@ -9236,21 +4977,6 @@ msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/tables/list.tmpl:755
 msgid "X:"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1270
-#: .cache/my_service_string_to_translate.c:1372
-#: .cache/my_service_string_to_translate.c:1424
-#: .cache/my_service_string_to_translate.c:1506
-#: .cache/my_service_string_to_translate.c:1720
-#: .cache/my_service_string_to_translate.c:2722
-#: .cache/my_service_string_to_translate.c:2884
-#: .cache/my_service_string_to_translate.c:3162
-msgid "XML File representing the vector informations"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3340
-msgid "XML WFS Transaction Request"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Distiller_bs.tmpl:394
@@ -9354,7 +5080,6 @@ msgstr ""
 msgid "Your own label"
 msgstr ""
 
-#: /home/src/mapmint/mapmint-services/np/.service.py.swp:447
 #: /home/src/mapmint/mapmint-services/np/service.py:1186
 #: /home/src/mapmint/mapmint-services/np/service.py:1199
 msgid "Your query sounds correct but didn't return any result"
@@ -9364,11 +5089,6 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/RasterWindow.tmpl:42
 #: /home/src/mapmint/mapmint-ui/templates/Distiller/RasterWindow_bs.html:42
 msgid "Z-Factor"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3543
-#: .cache/my_service_string_to_translate.c:303
-msgid "Zip a raster or vector datasource.)"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Manager/LayerProperties_bs.html:96
@@ -9411,14 +5131,6 @@ msgstr ""
 msgid "both"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:2025
-#: .cache/my_service_string_to_translate.c:2023
-#: .cache/my_service_string_to_translate.c:2021
-#: .cache/my_service_string_to_translate.c:2019
-#: .cache/my_service_string_to_translate.c:2017
-msgid "column's type)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Manager/LayerProperties_bs.html:98
 msgid "contained"
 msgstr ""
@@ -9443,60 +5155,8 @@ msgstr ""
 msgid "data stores"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3859
-#: .cache/my_service_string_to_translate.c:3881
-#: .cache/my_service_string_to_translate.c:3911
-msgid "desc or asc."
-msgstr ""
-
 #: /home/src/mapmint/mapmint-services/configuration/service.py:113
 msgid "done"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3871
-msgid "group description."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1613
-msgid "http://www.gdal.org/gdal_translate.html"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1644
-msgid "http://www.gdal.org/gdaldem.html"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3568
-msgid "http://www.gdal.org/ogr2ogr.html"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1483
-msgid "http://www.gdal.org/ogrtindex.html"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1353
-msgid "id"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3857
-msgid "id of group."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3841
-#: .cache/my_service_string_to_translate.c:3899
-#: .cache/my_service_string_to_translate.c:3937
-msgid "id user to update."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3869
-msgid "insert group on user database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1533
-msgid "insert row on sqlite database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3889
-msgid "insert user on user database."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-services/manage-users/service_users.py:474
@@ -9515,28 +5175,12 @@ msgstr ""
 msgid "items"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1544
-msgid "limit parameter for pagination."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3689
-msgid "load a WMC"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Dashboard.tmpl:109
 msgid "map"
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/Dashboard.tmpl:109
 msgid "maps"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:2015
-msgid "name of column)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3870
-msgid "name."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/toolbar_bs.tmpl:121
@@ -9547,24 +5191,8 @@ msgstr ""
 msgid "none"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:3883
-#: .cache/my_service_string_to_translate.c:3913
-msgid "number parameter for pagination."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3882
-#: .cache/my_service_string_to_translate.c:3912
-msgid "offset parameter for pagination."
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/Distiller_bs.tmpl:329
 msgid "options"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3858
-#: .cache/my_service_string_to_translate.c:3880
-#: .cache/my_service_string_to_translate.c:3910
-msgid "order."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/modules/auth/register.html:26
@@ -9575,139 +5203,12 @@ msgstr ""
 msgid "project"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1523
-#: .cache/my_service_string_to_translate.c:1532
-#: .cache/my_service_string_to_translate.c:1541
-#: .cache/my_service_string_to_translate.c:3839
-#: .cache/my_service_string_to_translate.c:3855
-#: .cache/my_service_string_to_translate.c:3862
-#: .cache/my_service_string_to_translate.c:3868
-#: .cache/my_service_string_to_translate.c:3878
-#: .cache/my_service_string_to_translate.c:3897
-#: .cache/my_service_string_to_translate.c:3908
-#: .cache/my_service_string_to_translate.c:3925
-#: .cache/my_service_string_to_translate.c:3935
-msgid "result of the request"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1535
-msgid "row to insert as a json object."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1526
-msgid "row to update as a json object."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1769
-msgid "save datastore privileges.)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-services/configuration/service.py:48
 msgid "section"
 msgstr ""
 
-#: .cache/my_service_string_to_translate.c:1647
-msgid "string representing options (NAME=VALUE)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1109
-msgid "the GCP File)"
-msgstr ""
-
 #: /home/src/mapmint/mapmint-ui/templates/preview/mobile.tmpl:238
 msgid "the KML file"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1250
-msgid "the QR Code image "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1312
-msgid "the feature collection"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1315
-msgid "the feature collection."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:64
-#: .cache/my_service_string_to_translate.c:1272
-#: .cache/my_service_string_to_translate.c:1278
-#: .cache/my_service_string_to_translate.c:1324
-#: .cache/my_service_string_to_translate.c:1338
-#: .cache/my_service_string_to_translate.c:1344
-#: .cache/my_service_string_to_translate.c:1360
-#: .cache/my_service_string_to_translate.c:1374
-#: .cache/my_service_string_to_translate.c:1382
-#: .cache/my_service_string_to_translate.c:1383
-#: .cache/my_service_string_to_translate.c:1410
-#: .cache/my_service_string_to_translate.c:1426
-#: .cache/my_service_string_to_translate.c:1432
-#: .cache/my_service_string_to_translate.c:1440
-#: .cache/my_service_string_to_translate.c:1462
-#: .cache/my_service_string_to_translate.c:1548
-msgid "the first geometry "
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:68
-#: .cache/my_service_string_to_translate.c:1275
-#: .cache/my_service_string_to_translate.c:1282
-#: .cache/my_service_string_to_translate.c:1328
-#: .cache/my_service_string_to_translate.c:1341
-#: .cache/my_service_string_to_translate.c:1348
-#: .cache/my_service_string_to_translate.c:1364
-#: .cache/my_service_string_to_translate.c:1378
-#: .cache/my_service_string_to_translate.c:1386
-#: .cache/my_service_string_to_translate.c:1387
-#: .cache/my_service_string_to_translate.c:1414
-#: .cache/my_service_string_to_translate.c:1429
-#: .cache/my_service_string_to_translate.c:1436
-#: .cache/my_service_string_to_translate.c:1444
-#: .cache/my_service_string_to_translate.c:1466
-#: .cache/my_service_string_to_translate.c:1552
-msgid "the first geometry to compare against."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1249
-msgid "the image size"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1246
-#: .cache/my_service_string_to_translate.c:1247
-#: .cache/my_service_string_to_translate.c:1248
-msgid "the input string"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3337
-msgid "the mapfile full path"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:65
-#: .cache/my_service_string_to_translate.c:1279
-#: .cache/my_service_string_to_translate.c:1325
-#: .cache/my_service_string_to_translate.c:1345
-#: .cache/my_service_string_to_translate.c:1361
-#: .cache/my_service_string_to_translate.c:1375
-#: .cache/my_service_string_to_translate.c:1411
-#: .cache/my_service_string_to_translate.c:1433
-#: .cache/my_service_string_to_translate.c:1441
-#: .cache/my_service_string_to_translate.c:1463
-#: .cache/my_service_string_to_translate.c:1549
-msgid "the other geometry"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:69
-#: .cache/my_service_string_to_translate.c:1283
-#: .cache/my_service_string_to_translate.c:1329
-#: .cache/my_service_string_to_translate.c:1349
-#: .cache/my_service_string_to_translate.c:1365
-#: .cache/my_service_string_to_translate.c:1379
-#: .cache/my_service_string_to_translate.c:1415
-#: .cache/my_service_string_to_translate.c:1437
-#: .cache/my_service_string_to_translate.c:1445
-#: .cache/my_service_string_to_translate.c:1467
-#: .cache/my_service_string_to_translate.c:1553
-msgid "the other geometry to compare against."
 msgstr ""
 
 #: /home/src/mapmint/mapmint-ui/templates/preview/mobile.tmpl:88
@@ -9722,57 +5223,4 @@ msgstr ""
 #: /home/src/mapmint/mapmint-ui/templates/Dashboard.tmpl:153
 #: /home/src/mapmint/mapmint-ui/templates/Dashboard.tmpl:158
 msgid "unknown"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3835
-#: .cache/my_service_string_to_translate.c:3840
-msgid "update group on groups database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1519
-#: .cache/my_service_string_to_translate.c:1524
-msgid "update row on sqlite database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3845
-#: .cache/my_service_string_to_translate.c:3848
-#: .cache/my_service_string_to_translate.c:3893
-#: .cache/my_service_string_to_translate.c:3898
-#: .cache/my_service_string_to_translate.c:3915
-#: .cache/my_service_string_to_translate.c:3919
-#: .cache/my_service_string_to_translate.c:3929
-#: .cache/my_service_string_to_translate.c:3936
-msgid "update user on users database."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3259
-msgid "update users infromations)"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3843
-#: .cache/my_service_string_to_translate.c:3901
-msgid "user to insert as a json object."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:3842
-#: .cache/my_service_string_to_translate.c:3849
-#: .cache/my_service_string_to_translate.c:3900
-#: .cache/my_service_string_to_translate.c:3920
-#: .cache/my_service_string_to_translate.c:3938
-#: .cache/my_service_string_to_translate.c:3939
-#: .cache/my_service_string_to_translate.c:3940
-#: .cache/my_service_string_to_translate.c:3941
-msgid "user to update as a json object."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1540
-msgid "where clause"
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1527
-msgid "where clause  as a json object."
-msgstr ""
-
-#: .cache/my_service_string_to_translate.c:1545
-msgid "where clause as a json object."
 msgstr ""
