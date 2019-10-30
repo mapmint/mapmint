@@ -77,6 +77,7 @@ def vectInfo(conf, inputs, outputs):
 
     pszSQLStatement = inputs["q"]["value"]
     pszDataSource = inputs["dstName"]["value"]
+    print(inputs,file=sys.stderr)
     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
     # if list(inputs.keys()).count("dialect") > 0 and pszDataSource.count("dbname") == 0:
     if "dialect" in inputs and pszDataSource.count("dbname") == 0:

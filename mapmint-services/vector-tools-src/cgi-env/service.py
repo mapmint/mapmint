@@ -64,9 +64,11 @@ def gdal_error_handler(err_class, err_num, err_msg):
     }
     err_msg = err_msg.replace('\n', ' ')
     err_class = errtype.get(err_class, 'None')
-    print('Error Number: %s' % (err_num), file=sys.stderr)
-    print('Error Type: %s' % (err_class), file=sys.stderr)
-    print('Error Message: %s' % (err_msg), file=sys.stderr)
+    #msg='Error Number: %s' % (str(err_num))
+    #print(msg, file=sys.stderr)
+    #print('Error Type: %s' % (err_class), file=sys.stderr)
+    #print('Error Message: %s' % (err_msg), file=sys.stderr)
+    #print('Error Message: '+err_msg , file=sys.stderr)
 
 
 def test(conf, inputs, outputs):

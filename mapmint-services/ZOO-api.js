@@ -435,11 +435,12 @@ ZOO.Request = {
    * Parameters:
    * url - {String} The URL to request.
    * params - {Object} Params to add to the url
+   * headers - {Object/Array}  A key-value object of headers
    * 
    * Returns:
    * {String} Request result.
    */
-  Get: function(url,params) {
+    Get: function(url,params,headers) {
     var paramsArray = [];
     for (var key in params) {
       var value = params[key];
@@ -465,7 +466,14 @@ ZOO.Request = {
       var separator = (url.indexOf('?') > -1) ? '&' : '?';
       url += separator + paramString;
     }
-    return ZOORequest('GET',url);
+    if(!(headers instanceof Array)) {
+	var headersArray = [];
+	for (var name in headers) {
+            headersArray.push(name+': '+headers[name]); 
+	}
+	headers = headersArray;
+    }
+    return ZOORequest('GET',url,headers);
   },
   /**
    * Function: POST
@@ -6192,12 +6200,13 @@ ZOO.Process = ZOO.Class({
   Execute: function(inputs,outputs) {
     if (this.identifier == null)
       return null;
-      var body = new XML('<wps:Execute service="WPS" version="1.0.0" xmlns:wps="'+this.namespaces['wps']+'" xmlns:ows="'+this.namespaces['ows']+'" xmlns:xlink="'+this.namespaces['xlink']+'" xmlns:xsi="'+this.namespaces['xsi']+'" xsi:schemaLocation="'+this.schemaLocation+'"><ows:Identifier>'+this.identifier+'</ows:Identifier>'+this.buildDataInputsNode(inputs)+this.buildDataOutputsNode(outputs)+'</wps:Execute>');
-    body = body.toXMLString();
+      var body = /*new XML*/('<wps:Execute service="WPS" version="1.0.0" xmlns:wps="'+this.namespaces['wps']+'" xmlns:ows="'+this.namespaces['ows']+'" xmlns:xlink="'+this.namespaces['xlink']+'" xmlns:xsi="'+this.namespaces['xsi']+'" xsi:schemaLocation="'+this.schemaLocation+'"><ows:Identifier>'+this.identifier+'</ows:Identifier>'+this.buildDataInputsNode(inputs)+this.buildDataOutputsNode(outputs)+'</wps:Execute>');
+    //body = body.toXMLString();
     var headers=['Content-Type: text/xml; charset=UTF-8'];
     if(arguments.length>2){
       headers[headers.length]=arguments[2];
     }
+    //alert(body);
     var response = ZOO.Request.Post(this.url,body,headers);
     return response;
   },

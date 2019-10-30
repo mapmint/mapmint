@@ -115,7 +115,7 @@ function checkWPSResult(){
     if(arguments.length==1 || arguments[1])
     	$.notifyBar({ cssClass: "error", html:  tmp});
     else if(arguments.length==3 && arguments[2]){
-        if($('#error-dialog')[0]){
+        /*if($('#error-dialog')[0]){
 		$( "#error-dialog" ).window('close');
 		$( "#error-dialog" ).remove();
         }
@@ -129,6 +129,11 @@ function checkWPSResult(){
 		resizable: false
 	    });
 	    $('#error-dialog').html(tmp);	
+	    */
+	 $('.notifications').notify({
+		 message: { text: tmp },
+		 type: 'danger',
+	 }).show();
     }
     return false;
   }

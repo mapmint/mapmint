@@ -318,7 +318,7 @@ Class.append(Function.prototype,{
 	    obj[i]=this.arguments[0][i];
 	  }
 	}
-      }catch(e){alert(e);}
+      }catch(e){console.logg(e);/*alert(e);*/}
     },
 
   mstartd: function(ms){

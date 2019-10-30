@@ -65,7 +65,7 @@ class pgConnection:
             else:
                 return True
         except Exception as e:
-            self.conf["lenv"]["message"] = "Unable to execute " + req.encode('utf-8') + " due to: " + str(e)
+            self.conf["lenv"]["message"] = "Unable to execute " + req + " due to: " + str(e)
             return False
 
 

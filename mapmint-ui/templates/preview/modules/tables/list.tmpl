@@ -220,9 +220,9 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
      <div>
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
-    <li class="active" role="presentation"><a href="#layerExtract" aria-controls="extract" role="tab" data-toggle="tab">$zoo._("Filter")</a></li>
-    <li role="presentation"><a href="#processing" aria-controls="processing" role="tab" data-toggle="tab">$zoo._("Processing")</a></li>
-    <li role="presentation"><a href="#sql" aria-controls="sql" role="tab" data-toggle="tab">$zoo._("Report")</a></li>
+    <li class="active" role="presentation"><a href="#layerExtract" aria-controls="extract" class="nav-link" role="tab" data-toggle="tab">$zoo._("Filter")</a></li>
+    <li role="presentation"><a href="#processing" aria-controls="processing" role="tab" class="nav-link" data-toggle="tab">$zoo._("Processing")</a></li>
+    <li role="presentation"><a href="#sql" aria-controls="sql" role="tab" data-toggle="tab" class="nav-link" >$zoo._("Report")</a></li>
 <!--    <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li> -->
   </ul>
 
@@ -493,11 +493,11 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
 </script>
 
 <script type="template/txt" id="$(prefix)report_$(rvals[i][0])_link_list">
-	<div class="panel panel-default">
-  	     <div class="panel-heading">
-	     	  <h3 class="panel-title"><i class="fa fa-th-list"></i> $zoo._("Produced documents")</h3>
+	<div class="card panel panel-default" style="margin-top: 20px;">
+  	     <div class="card-header panel-heading">
+	     	  <h3 class="card-title panel-title"><i class="fa fa-th-list"></i> $zoo._("Produced documents")</h3>
 	     </div>
-  	     <div class="panel-body">
+  	     <div class="card-body panel-body">
 	     	  <ul class="list-group">
 		  </ul>    	      
   	     </div>

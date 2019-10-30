@@ -163,8 +163,10 @@ body{
 #set m1=mapscript.mapObj($p)
 #set wmsl=[]
 #set ll=m1.web.metadata.get('mmActivatedLayers')
-#if $m1.web.metadata.get('max_minx') and $m1.web.metadata.get('max_minx')!=""
-#set a={"minx": float($m1.web.metadata.get('max_minx')),"miny": float($m1.web.metadata.get('max_miny')),"maxx": float($m1.web.metadata.get('max_maxx')),"maxy":float($m1.web.metadata.get('max_maxy'))}
+#set max_minx=$mms.getMetadata($m1.web,'max_minx')
+#if $max_minx is not None and $max_minx!=""
+#set mmCoords=[float($mms.getMetadata($m1.web,'max_minx')),float($mms.getMetadata($m1.web,'max_miny')),float($mms.getMetadata($m1.web,'max_maxx')),float($mms.getMetadata($m1.web,'max_maxy'))]
+#set a={"minx": mmCoords[0],"miny": mmCoords[1],"maxx": mmCoords[2],"maxy": mmCoords[3]}
 #else
 #set a=$m1.getLayer(0).getExtent()
 #try
@@ -173,6 +175,7 @@ body{
 /* BaseLayer */
 #end try
 #end if
+
 #set x=(($a.maxx-$a.minx)/2)+$a.minx
 #set y=(($a.maxy-$a.miny)/2)+$a.miny
 #base_layer_${i}{

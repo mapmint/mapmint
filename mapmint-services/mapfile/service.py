@@ -145,7 +145,7 @@ def setGeometryType(conf, inputs, outputs):
     lay = mapfile.getLayerByName(inputs["dso"]["value"])
     lay.type = int(inputs["geoType"]["value"])
     mapfile.save(inputs["dst"]["value"] + "/ds_ows.map")
-    outputs["Result"]["value"] = zoo._("Gometry Type Updated")
+    outputs["Result"]["value"] = zoo._("Geometry Type Updated")
     return zoo.SERVICE_SUCCEEDED
 
 
@@ -437,7 +437,7 @@ def mmDataStoreHasMap(conf, inputs, outputs):
     try:
         m = mapscript.mapObj(mapfile)
     except Exception as e:
-        print(str(e), file=sys.stderr)
+        print("mmDataStoreHasMap "+str(e), file=sys.stderr)
         for i in ["PostGIS", "MySQL", "WFS", "WMS"]:
             try:
                 mapfile = conf["main"]["dataPath"] + "/" + i + "/" + inputs["dataStore"]["value"].replace("WFS:", "").replace("WMS:", "") + "ds_ows.map"
@@ -1872,16 +1872,23 @@ def addGroup(conf, inputs, outputs):
 def saveLayerStyle0(conf, inputs, outputs):
     import mapscript
     mapPath = conf["main"]["dataPath"] + "/maps"
+    print(mapPath,file=sys.stderr)
     if "prefix" in inputs:
         mapPath = conf["main"]["dataPath"] + "/" + inputs["prefix"]["value"] + "_maps"
+    print(mapPath,file=sys.stderr)
     if "mmStep" in inputs:
+        print(inputs["mmStep"],file=sys.stderr)
         m = mapscript.mapObj(mapPath + "/timeline_" + inputs["map"]["value"] + "_" + inputs["layer"]["value"].replace(".", "_") + "_step" + inputs["mmStep"]["value"] + ".map")
     else:
         if inputs["map"]["value"].count(conf["main"]["dataPath"]) > 0:
+            print(inputs["map"]["value"],file=sys.stderr)
             m = mapscript.mapObj(inputs["map"]["value"])
         else:
+            print(mapPath + "/project_" + inputs["map"]["value"] + ".map",file=sys.stderr)
             m = mapscript.mapObj(mapPath + "/project_" + inputs["map"]["value"] + ".map")
     layer = m.getLayerByName(inputs["layer"]["value"])
+    print(layer,file=sys.stderr)
+    print(inputs["layer"]["value"],file=sys.stderr)
 
     try:
         noColor = False
@@ -1945,7 +1952,7 @@ def saveLayerStyle0(conf, inputs, outputs):
             layer.getClass(nClass).getStyle(mmStyle).outlinecolor.setRGB(-1, -1, -1)
         else:
             setRGB(layer.getClass(nClass).getStyle(mmStyle).outlinecolor, strokeColor)
-    if "mmStrokeWidth" in inputs and 'mmStroke' in inputs:
+    if "mmStrokeWidth" in inputs and 'mmStroke' in inputs and layer is not None:
         layer.getClass(nClass).getStyle(mmStyle).outlinewidth = float(inputs["mmStrokeWidth"]["value"])
 
     if "force" in inputs:
@@ -1995,7 +2002,7 @@ def saveLayerStyle0(conf, inputs, outputs):
             layer.getClass(nClass).getStyle(mmStyle).symbol = 0
             layer.getClass(nClass).getStyle(mmStyle).symbolname = None
 
-    if layer.type != mapscript.MS_LAYER_RASTER:
+    if layer is not None and layer.type != mapscript.MS_LAYER_RASTER:
         if 'mmSymbolFill' in inputs:
             myStyle = layer.getClass(nClass).getStyle(layer.getClass(nClass).numstyles - 1)
             myStyle.symbolname = inputs["mmSymbolFill"]["value"]
@@ -3753,7 +3760,7 @@ def setMapLayerProperties(conf, inputs, outputs):
         lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": sql}}
         output1 = {"Result": {"value": ""}}
         vt.vectInfo(conf, lInputs, outputs)
-        tmp = json.loads(outputs["Result"]["value"].decode("utf-8"))
+        tmp = json.loads(outputs["Result"]["value"])
         for i in range(0, len(tmp)):
             if i > 0 and i % 10 == 0:
                 conf["lenv"]["message"] = zoo._("Producing filtered map %d / %d") % (i, len(tmp))
@@ -4378,10 +4385,12 @@ def savePublishMap(conf, inputs, outputs):
         if i in inputs:
             if i in inputs and "value" in inputs[i]:
                 if "value" in inputs[i]:
-                    setMetadata(m.web, i, inputs[i]["value"])
+                    if inputs[i]["value"]!="NULL":
+                        setMetadata(m.web, i, inputs[i]["value"])
+                    else:
+                        setMetadata(m.web, i, "")
                 else:
                     setMetadata(m.web, i, "")
-            setMetadata(m.web, i, inputs[i]["value"]);
             if i == "mmProjectName" and isPassed < 0:
                 import os
                 try:
@@ -4416,6 +4425,20 @@ def savePublishMap(conf, inputs, outputs):
         cid = str(cid).split(".")[0]
         open(conf["main"]["tmpPath"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html", "w").write(inputs["mmWMTSAttribution"]["value"].replace("&39;", "&#39;"))
         setMetadata(m.web, "mmWMTSAttribution", conf["main"]["tmpUrl"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html")
+    bt={"layers":"","url":"","attribution":""};
+    if "mmWMTSBLURL" in inputs and "length" in inputs["mmWMTSBLURL"]:
+        for ii in range(int(inputs["mmWMTSBLURL"]["length"])):
+            bt["layers"]+=inputs["mmWMTSBaseLayers"]["value"][ii]+";"
+            bt["url"]+=inputs["mmWMTSBLURL"]["value"][ii]+";"
+            import time,random
+            cid=time.clock()+random.randrange(100000)
+            cid=str(cid).split(".")[0]
+            open(conf["main"]["tmpPath"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html","w").write(inputs["mmWMTSAttribution"]["value"][ii].replace("&39;","&#39;"))
+            bt["attribution"]+=conf["main"]["tmpUrl"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html"+";"
+        setMetadata(m.web,"mmWMTSAttribution",bt["attribution"])
+        setMetadata(m.web,"mmWMTSBLURL",bt["url"])
+        setMetadata(m.web,"mmWMTSBaseLayers",bt["layers"])
+
     setMetadata(m.web, "mmEditor", conf["senv"]["login"])
     setMetadata(m.web, "tile_map_edge_buffer", "32")
     # setMetadata(m.web,"tile_metatile_level","1")

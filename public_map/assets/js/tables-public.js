@@ -43,6 +43,7 @@ define([
     var importerUploadedFiles=[];
     var mainTableSelectedId=null;
     var mainTableFilter=[];
+    var mainTableOperators=[];
     var mainTableFiles={};
     var embeddedTableFilter=[];
     var embeddedTableFiles=[];
@@ -52,7 +53,7 @@ define([
     var mynotify = $('.top-right');
     var myMapIframe;
     
-    function displayTable(lid,ltype,tfields,rfields,tfilters,rorder){
+    function displayTable(lid,ltype,tfields,rfields,tfilters,rorder,toperators){
 	console.log("START DISPLAY TABLE");
 	var cnt=0;
 	var CRowSelected=[];
@@ -71,6 +72,14 @@ define([
 	}catch(e){
 	}
 	
+	    console.log(tfields);
+	    var cnt=0;
+	    for(var t=0;t<tfields.length;t++){
+		cnt=eval(cnt+" + "+tfields[t].sWidth.replace(/%/g,""));
+	    }
+	    if(cnt<100)
+		cnt=100;
+	    console.log(cnt);
 	tableDisplayed[lid]=$('#'+lid).DataTable( {
 	    language: {
                 url: module.config().translationUrl
@@ -83,8 +92,8 @@ define([
 	    "scrollY":  ($(window).height()/2)+"px",
 	    "scrollCollapse": true,
 	    "scrollX": true,
-	    //"sScrollX": "100%",
-	    //"sScrollXInner": "100%",
+	    "sScrollX": "100%",
+	    "sScrollXInner": cnt+"%",
 	    "bAutoWidth": false,
 	    "bProcessing": true,
 	    "bServerSide": true,
@@ -98,7 +107,7 @@ define([
 	    "order": [orderInit],
 	    //order: [orderInit],
 	    //order: [(rorder?rorder:[1,"asc"])],
-	    "lengthMenu": [[5, 10, 25, 50, 1000], [5, 10, 25, 50, "All"]],
+	    "lengthMenu": [[10, 15, 25, 50, 1000], [10, 15, 25, 50, "All"]],
 	    aoColumns: tfields,
 	    /*"aoColumns": [
 		{ "sWidth": "10%", "target": 0 }, // 1st column width 
@@ -139,7 +148,8 @@ define([
 			//{"identifier":"sortorder","value":(orderInit.length>1?orderInit[1]:llimit[3]),"dataType":"string"},
 			//{"identifier":"sortname","value":(orderInit.length>0?orderInit[0]:closestproperties.split(",")[llimit[2]]),"dataType":"string"},
 			{"identifier":"search","value":$('#'+lid+'_wrapper').find("input[type=search]").first().val(),"dataType":"string"},
-			{"identifier":"filters","value":JSON.stringify(tfilters, null, ' '),"mimeType":"application/json"}
+			{"identifier":"filters","value":JSON.stringify(tfilters, null, ' '),"mimeType":"application/json"},
+			{"identifier":"operators","value":JSON.stringify(toperators, null, ' '),"mimeType":"application/json"}
 		    ],
 		    dataOutputs: [
 			{"identifier":"Result","mimeType":"application/json","type":"raw"}
@@ -285,7 +295,7 @@ define([
  				}
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
-				    if($(this).hasClass("htmlEditor")){
+				    if($(this).hasClass("htmlEditor") || $(this).hasClass("note-codable")){
 					$(this).summernote('code',data[i][j]);
 				    }
 				    /*console.log($(this).attr("type"));
@@ -300,7 +310,8 @@ define([
 					});
 				    }*/
 				    if($(this).attr("type")=="checkbox"){
-					$(this).prop("checked",(data[i][j]=="True"?true:false));
+					    console.log(data[i][j]);
+					$(this).prop("checked",(data[i][j]/*=="True"*/?true:false));
 				    }
 				});
 				if(data[i][j].indexOf && data[i][j].indexOf("POINT(")>=0){
@@ -321,6 +332,9 @@ define([
 					name: "Element"
 				    });
 				    myMapIframe.app.addASelectedFeature([feature]);
+					if(data[i][j].indexOf("POINT(")>=0){
+						myMapIframe.app.getMap().getView().fit(ol.extent.buffer(myGeom.getExtent(),5),myMapIframe.app.getMap().getSize());
+					}
 				    }catch(e){
 					console.log("No map  "+e);
 				    }
@@ -383,7 +397,7 @@ define([
 			    }else{
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
 				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
-				    if($(this).hasClass("htmlEditor")){
+				    if($(this).hasClass("htmlEditor") || $(this).hasClass("note-codable")){
 					$(this).summernote('code', data[i][j]);
 				    }
 				    if($(this).attr("type")=="checkbox"){
@@ -468,10 +482,12 @@ define([
 			console.log(e);
 			console.log("---- No embedded tables");
 		    }
+			console.log("NOTIFY!");
 		    $(".notifications").notify({
 			message: { text: "Tuple loaded." },
 			type: 'success',
 		    }).show();
+			console.log("NOTIFY!");
 
 		},function(data){
 		    myRoot.append(data["ExceptionReport"]["Exception"]["ExceptionText"].toString());
@@ -739,10 +755,13 @@ define([
 	    myRoot.find("input,textarea,select").each(function(){
 		if($(this).hasClass("htmlEditor") || $(this).hasClass("note-codable"))
 		    return;
+		                                console.log($(this))
+
 		if(!$(this).find('option:selected').attr("data-map") && (($(this).is(":visible") || $(this).attr('id')=="edition_uid")  && $(this).attr('id') || $(this).is("textarea")) && $(this).attr('id') && $(this).attr('id').indexOf("_mmtype")<0 && $(this).attr('id').indexOf("_mmlayer")<0 && $(this).attr('id').indexOf("_geotype")<0){
 		    try{
 			// ISSUE WITH upload
 			var noDisplay=false;
+			    console.log("**********- "+myRoot1.attr('id'))
 			/*try{
 			    console.log("**********- "+myRoot1.attr('id'))
 			    console.log($(this));
@@ -766,6 +785,8 @@ define([
 			console.log($(this).parent().parent().parent());
 			console.log($(this).parent().parent().parent().parent());
 			console.log("++++++ "+$(this).attr("id").replace(/edition_/,""));
+			    console.log(mainTableFiles);
+			    console.log(mainTableFiles+" "+$(this).attr("name"));
 			if(!mainTableFiles[$(this).attr("name")]){
 			    if($(this).attr("name").indexOf("link_col")<0){
 				if($(this).attr("type")=="checkbox"){
@@ -812,6 +833,15 @@ define([
 			params.push({"identifier":"InputGeometry","value": currentDrawnElement, "mimeType": "text/plain"});
 			currentDrawnElement=null;
 		    }
+		   if($(this).attr('id')=='edition_wkb_geometry' && $(this).parent().find('input').length==3){
+			 var coords=[];
+			 coords.push($(this).parent().find('input:eq(0)').val());
+			 coords.push($(this).parent().find('input:eq(1)').val());
+			 console.log(coords);
+			 params.push({"identifier":"InputGeometry","value": 'POINT('+coords[0]+' '+coords[1]+')', "mimeType": "text/plain"});
+			   console.log(params);
+			 //tuple[$(this).attr("id").replace(/edition_/,"")]="ST_SetSRID(ST_GeometryFromText('POINT("+coords[0]+" "+coords[1]+"),4326)')";
+		   }
 		}
 	    });
 	    var parts=myRoot1.attr('id').split("_");
@@ -1166,12 +1196,18 @@ define([
 	    var myRoot=$(this).parent();
 	    params=[];
 	    var tuple={};
+	    var operators={};
 	    var lines="";
 	    myRoot.find("input,textarea").each(function(){
 		if(!$(this).is(":disabled") && $(this).attr("id")!="edition_uid"){
 		    try{
 			tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
-			lines+=managerTools.generateFromTemplate($("#filter_line_template")[0].innerHTML,["line"],[$(this).parent().parent().prev().html()+" - "+$(this).val()]);
+			if($(this).next().length>0){
+			  operators[$(this).attr("id").replace(/edition_/,"")]=$(this).next().find("select").val();
+			  lines+=managerTools.generateFromTemplate($("#filter_line_template")[0].innerHTML,["line"],[$(this).parent().parent().prev().html()+" "+($(this).next().find("select").val()=="eq"?"=":($(this).next().find("select").val()=="lt"?"&lt;":"&gt;"))+" "+$(this).val()]);
+			}else
+			  lines+=managerTools.generateFromTemplate($("#filter_line_template")[0].innerHTML,["line"],[$(this).parent().parent().prev().html()+" - "+$(this).val()]);
+			
 		    }catch(e){
 			console.log($(this));
 		    }
@@ -1194,12 +1230,14 @@ define([
 	    console.log('************** '+clause+' **********************');
 	    $("#listing").prepend(managerTools.generateFromTemplate($("#filter_complete_template")[0].innerHTML,["type","id","cid","body"],[(clause!="OR"?"info":"primary"),mainTableFilter.length,mainTableFilter.length+1,lines]));
 	    mainTableFilter.push(tuple);
+	    mainTableOperators.push(operators);
 	    $("#listing").find(".close").each(function(){
 		$(this).off('click');
 		$(this).on('click',function(e){
 		    console.log($(this).parent().parent());
 		    var cid=parseInt($(this).parent().attr('id').replace(/filter_/,""));
 		    mainTableFilter.splice(cid,1);
+		    mainTableOperators.splice(cid,1);
 		    var lRoot=$(this).parent().parent();
 		    $(this).parent().remove();
 		    console.log(cid);
@@ -1364,7 +1402,11 @@ define([
 	    console.log(e);
 	}
 	console.log("OK");
-	displayTable("mainListing_display",$("input[name=mainTableViewId]").val(),mainTableFields,mainTableRFields.join(","),mainTableFilter);
+	try{
+	displayTable("mainListing_display",$("input[name=mainTableViewId]").val(),mainTableFields,mainTableRFields.join(","),mainTableFilter,null,mainTableOperators);
+	}catch(e){
+		console.log(e);
+	}
 	console.log("OK");
 	try{   
 	    console.log(embeddeds);
@@ -1797,7 +1839,7 @@ define([
 
     function loopTillAppLoaded(win){
 	if(!win.app){
-	    setTimeout(function(){loopTillAppLoaded(win)},0.1);
+	    setTimeout(function(){loopTillAppLoaded(win)},100);
 	    console.log("*** WAIT ***");
 	}
 	else{
@@ -1811,6 +1853,10 @@ define([
 		console.log("********** OK TRIGGER");
 		setTimeout(function(){
 		    win.app.setMapHeight();
+		    console.log($("#associatedMap").contents().find("#map").height());
+		    if($("#associatedMap").contents().find("#map").height()==0)
+			$("#associatedMap").contents().find("#map").height($(window).height()-410);
+		    win.app.getMap().updateSize();
 		},10);
 	    });
 	    var layers=win.app.getLayers();
@@ -3259,6 +3305,7 @@ define([
 	embedded: embedded,
 	initializeMap: initializeMap,
 	bindFilterLayer: bindFilterLayer,
+	$: $,
 	win: getWin
     };
 

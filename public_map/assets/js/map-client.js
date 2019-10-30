@@ -1534,9 +1534,9 @@ define([
 		}
 		return feature;
 	    });
-	    console.log("pointermove");
+	    /*console.log("pointermove");
 	    console.log(evt);
-	    console.log("pointermove");
+	    console.log("pointermove");*/
 	    
 	    if (feature && feature.get("layerName")) {
 		var geometry = feature.getGeometry();
@@ -1576,8 +1576,10 @@ define([
 		    });*/
 		    displayFeatureInfo(evt,feature.get("layerName"),function(res){
 			if(res.length>1)
+			    setTimeout(function(){
 			    popup[1].show(evt.coordinate, '<div>' + res
-				       +'</div>');
+				       +'</div>')
+			    },1);
 			else{
 			    console.log("popup hide!");
 			    popup[1].hide();

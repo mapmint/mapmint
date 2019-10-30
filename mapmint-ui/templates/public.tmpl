@@ -18,5 +18,17 @@
 #set m=mapscript.mapObj($mapfile)
 #include $conf["main"]["templatesPath"]+"/preview/"+$mms.getMetadata($m.web,'layout_t')+".tmpl"
 #else
+#try
+#import authenticate.service as auth
+#set con=$auth.getCon($conf)
+#set cur=con.conn.cursor()
+#set prefix=$auth.getPrefix($conf)
+#set req="SELECT content from "+$prefix+"pages WHERE title='public_index'"
+#set res=cur.execute($req)
+#set vals=cur.fetchone()
+$(Template($vals[0],searchList={"conf": $conf,"inputs": $inputs,"outputs":$outputs,"con":$con}))
+#except Exception as e
+<!-- $e --> 
 $(Template(file=$conf["main"]["templatesPath"]+"/public-access.tmpl",searchList=$searchList))
+#end try
 #end if

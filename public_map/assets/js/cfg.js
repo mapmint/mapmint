@@ -66,7 +66,8 @@ requirejs.config({
 	        deps: ['notify']
 	},
 	Popper: {
-	    deps: ['jquery']
+	    deps: ['jquery'],
+	    exports: 'Popper'
 	},
         bootstrap: {
             deps: ['Popper'],

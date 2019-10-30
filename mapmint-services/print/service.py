@@ -287,7 +287,7 @@ def printMap(conf, inputs, outputs):
  TYPE RASTER
  UNITS METERS
  STATUS ON
- DATA "''' + str(inputs["bgMap"]["value"].decode("utf-8")) + '''"
+ DATA "''' + str(inputs["bgMap"]["value"]) + '''"
  PROCESSING "RESAMPLE=AVERAGE"
  PROJECTION 
    "init=epsg:900913"

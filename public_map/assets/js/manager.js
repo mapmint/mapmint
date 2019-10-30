@@ -859,6 +859,7 @@ define([
 		    var reg=new RegExp("_"+index,"g");
 		    var cLayer=cId.replace(reg,"");
 		    console.log(cLayer);
+		    console.log(cId);
 		    console.log(index);
 		    console.log(params);
 		    var ibindings={
@@ -881,6 +882,7 @@ define([
 			"symbWidth": "mmSymbolWidth",
 			"symbGap": "mmSymbolGap"							    
 		    };
+		    var lfilters=["mmExpr","mmClassName"];
 		    var inputs=[];
 		    for(var i in ibindings){
 			for(var j in params){
@@ -889,7 +891,7 @@ define([
 				    "identifier": ibindings[i],
 				    "value": params[j].value
 				});
-				if(i=="mmExpr")
+				if(lfilters.indexOf(ibindings[i])>=0 )
 				    inputs[inputs.length-1]["mimeType"]="application/json";
 				else
 				    inputs[inputs.length-1]["dataType"]="string";

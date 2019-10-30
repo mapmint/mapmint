@@ -706,11 +706,20 @@ define([
 			for(var i in ibindings){
 			    for(var j in params){
 				if(params[j].id==i){
+					console.log(ibindings[i]);
+				    if(ibindings[i]!="mmExpr")
 				    inputs.push({
 					"identifier": ibindings[i],
 					"value": params[j].value,
 					"dataType": "string"
 				    });
+				    else
+				    inputs.push({
+					"identifier": ibindings[i],
+					"value": params[j].value,
+					"mimeType": "text/plain"
+				    });
+
 				    break;
 				}
 			    }

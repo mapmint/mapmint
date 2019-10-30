@@ -55,6 +55,7 @@
    <LiteralData>
     DataType = string
     <Default>
+     useMapServer = true
     </Default>	
     <Supported>
     </Supported>

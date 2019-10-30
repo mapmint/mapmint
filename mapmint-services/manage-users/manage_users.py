@@ -8,6 +8,9 @@ import smtplib
 import re
 
 
+from psycopg2.extensions import *
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
+
 def mm_md5(c):
     h = hashlib.new('ripemd160')
     h.update(c.encode("utf-8"))
@@ -90,7 +93,7 @@ class manage_users:
                 self.desc = pg.getDesc(self.cur, self.prefix + "users")
                 return True
             except Exception as e:
-                print(e, file=sys.stderr)
+                print("Manage_users: "+str(e), file=sys.stderr)
                 return False
         return True
 

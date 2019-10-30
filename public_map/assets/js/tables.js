@@ -209,6 +209,19 @@ define([
 	$("#tables_view_icon").val("info");
         $("#tables_view_icon").off("keyup");
         $("#tables_view_icon").on("keyup",function(){$(this).parent().find('i').remove();$(this).parent().append('<i class=\'fa fa-'+$(this).val()+'\'> </i>');});
+	    $("#tables_view_id").val("-1");
+	    $("#tables_view_title").val("");
+	    $("#tables_view_clause").val("");
+	    $("#tables_view_menu_order").val("");
+	    $("#tables_view_visible").prop("checked",true);
+	    var tmp=["groups","themes"];
+	    for(var i=0;i<tmp.length;i++){
+		$("#tables_view_"+tmp[i]).find("option").each(function(){
+		    console.log($(this).prop("selected"));
+		    $(this).prop("selected",false);
+		    console.log($(this).prop("selected"));
+		});
+	    }
 	if(!data.mmViews[id]){
 	    console.log(data.mmDesc);
 	    $("#tables_view_id").val("-1");
@@ -274,7 +287,7 @@ define([
 	}else{
 	    for(var i in data.mmViews[id].view){
 		console.log(i);
-		if(data.mmViews[id].view[i].indexOf("]")<0){
+		if(data.mmViews[id].view[i].indexOf("]")<0 || data.mmViews[id].view[i].indexOf("_]")>0){
 		    console.log(i);
 		    console.log((data.mmViews[id].view[i]=="True"));
 		    if(i=="visible")
@@ -352,8 +365,10 @@ define([
 	var ebody="";
 	console.log(!data.mmEdits[id]);
 	var tmp=["groups","themes"];
+	var panels=[/*"view",*/"edition"/*,"report"*/];
+	for(var j=0;j<panels.length;j++)
 	for(var i=0;i<tmp.length;i++){
-	    $("#tables_edition_"+tmp[i]).find("option").each(function(){
+	    $("#tables_"+panels[j]+"_"+tmp[i]).find("option").each(function(){
 		$(this).prop("selected",false);
 	    });
 	}
@@ -415,6 +430,7 @@ define([
 			$("#tables_edition_"+i.replace(/name/g,"title")).summernote("code",data.mmEdits[id].view[i]);
 		}
 		else{
+		    console.log(data);
 		    var obj=JSON.parse(data.mmEdits[id].view[i]);
 		    for(var j=0;j<obj.length;j++)
 			$("#tables_edition_"+i).find("option").each(function(){
@@ -1559,6 +1575,8 @@ define([
 	    $("#adder").removeClass("in");
 	});
 	$("#deleter").find("button").click(function(){
+	    if($(this).parent().attr('id')=='indicators_form_eye')
+		tableName='mm_tables.p_views';
 	    deleteAnElement(localId);
 	    $("#deleter").removeClass("in");
 	});
@@ -1601,14 +1619,14 @@ define([
 
 	$("#indicators_form_eye").find("button[data-mmaction='delete']").last().click(function(e){
 	    var params=[
-		{"identifier": "table","value": "mm_tables.p_editions","dataType":"string"},
+		{"identifier": "table","value": "mm_tables.p_views","dataType":"string"},
 		{"identifier": "ptid","value": $("#tables_id").val(),"dataType":"string"},
 		{"identifier": "atable","value": "mm_tables.p_view_fields","dataType":"string"},
-		{"identifier": "akey","value": "eid","dataType":"string"},
+		{"identifier": "akey","value": "vid","dataType":"string"},
 		{"identifier": "atable","value": "mm_tables.p_view_groups","dataType":"string"},
-		{"identifier": "akey","value": "eid","dataType":"string"},
+		{"identifier": "akey","value": "vid","dataType":"string"},
 		{"identifier": "atable","value": "mm_tables.p_view_themes","dataType":"string"},
-		{"identifier": "akey","value": "eid","dataType":"string"}		
+		{"identifier": "akey","value": "vid","dataType":"string"}		
 	    ];
 	    if($("#tables_view_id").val()!=-1)
 		params.push({"identifier": "id","value": $("#tables_view_id").val(),"dataType":"string"});
@@ -1703,7 +1721,7 @@ define([
 		{"identifier": "ptid","value": $("#tables_id").val(),"dataType":"string"},
 		{"identifier": "name","value": $("#tables_view_title").val(),"dataType":"string"},
 		{"identifier": "icon","value": $("#tables_view_icon").val(),"dataType":"string"},
-		{"identifier": "clause","value": $("#tables_view_clause").val(),"dataType":"string"},
+		{"identifier": "clause","value": $("#tables_view_clause").val(),"mimeType":"string"},
 		{"identifier": "menu_order","value": $("#tables_view_menu_order").val(),"dataType":"string"},
 		{"identifier": "visible","value": $("#tables_view_visible").is(":checked"),"dataType":"string"},
 		{"identifier": "view_groups","value": JSON.stringify(multiples[0], null, ' '),"mimeType":"application/json"},

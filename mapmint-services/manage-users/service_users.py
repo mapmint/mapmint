@@ -256,7 +256,7 @@ def GetGroups(conf, inputs, outputs):
     if is_connected(conf):
         c = auth.getCon(conf)
         if not c.is_admin(conf["senv"]["login"]):
-            conf["lenv"]["message"] = zoo._("Action not permited")
+            conf["lenv"]["message"] = zoo._("Action not permitted")
             return 4
         if not re.match(r"(^\w+\Z)", inputs["order"]["value"]):
             conf["lenv"]["message"] = zoo._("Parameter order invalid")
@@ -394,7 +394,7 @@ def AddGroup(conf, inputs, outputs):
 
 import psycopg2
 from psycopg2.extensions import *
-
+psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 
 def UpdateGroup(conf, inputs, outputs):
     # TODO: confirm assumption: inputs is a Python 3 dictionary object
@@ -429,16 +429,24 @@ def UpdateGroup(conf, inputs, outputs):
                 #    req='UPDATE '+prefix+'groups set name=%s, description=%s, adm=1 WHERE '+clause
                 # else:
                 #    req='UPDATE '+prefix+'groups set name=%s, description=%s, adm=0 WHERE '+clause
-                req = req % (adapt(group["name"].encode('utf-8')).getquoted(),
-                             adapt(group["description"].encode('utf-8')).getquoted())
+                #req = req % (str(adapt(group["name"]).getquoted()),
+                #             str(adapt(group["description"]).getquoted()))
+                gname=adapt(group["name"])
+                gname.encoding="utf-8"
+                gdesc=adapt(group["description"])
+                gdesc.encoding="utf-8"
+                req = req % (gname,gdesc)
             else:
                 inputs["type"]["value"] += "e"
                 if group["adm"]:
                     req = 'INSERT INTO ' + prefix + 'groups (name,description,adm) VALUES(%s,%s,1)'
                 else:
                     req = 'INSERT INTO ' + prefix + 'groups (name,description,adm) VALUES(%s,%s,0)'
-                req = req % (adapt(group["name"].encode('utf-8')).getquoted(),
-                             adapt(group["description"].encode('utf-8')).getquoted())
+                gname=adapt(group["name"])
+                gname.encoding="utf-8"
+                gdesc=adapt(group["description"])
+                gdesc.encoding="utf-8"
+                req = req % (gname,gdesc)
         print(req, file=sys.stderr)
         c.cur.execute(req)
         c.conn.commit()
@@ -511,6 +519,7 @@ def UpdateUser(conf, inputs, outputs):
                             linkGroupToUser(conf, c, prefix, inputs["group"]["value"][i], inputs["login"]["value"])
                     else:
                         linkGroupToUser(conf, c, prefix, inputs["group"]["value"], inputs["login"]["value"])
+                    c.close()
                 return 3
             else:
                 conf["lenv"]["message"] = zoo._("Update failed")
@@ -544,6 +553,6 @@ def linkGroupToUser(conf, c, prefix, gname, login):
         c.conn.commit()
         return True
     except Exception as e:
-        print(e, file=sys.stderr)
+        print(" ERROR When updating the groups: " +str(e), file=sys.stderr)
         conf["lenv"]["message"] = zoo._("Error occured: ") + str(e)
         return False
