@@ -77,6 +77,10 @@ class LOClient:
         except Exception as e:
             print('Unable to connect to the MapMint Document Server for the following reasons:\n' + str(e), file=sys.stderr)
 
+    def setConf(self,conf):
+        import json
+        self.conf=json.loads(conf)
+
     def createDoc(self, name):
         print(name, file=sys.stderr)
         parts = name.split('.')
@@ -215,14 +219,15 @@ class LOClient:
         for i in range(self.doc.TextTables.getCount()):
             for j in range(self.doc.TextTables.getByIndex(i).getColumns().getCount()):
                 for k in range(self.doc.TextTables.getByIndex(i).getRows().getCount()):
-                    if (self.doc.TextTables.getByIndex(i).getCellByPosition(j, k).String.count(word) > 0):
-                        self.text = self.doc.TextTables.getByIndex(i).getCellByPosition(j, k).Text
-                        self.cursor = self.text.createTextCursor()
-                        self.cursor.gotoStart(False)
-                        # self.cursor.goRight(self.text.String.index(word)+(self.nbc)-1,False)
-                        # self.cursor.goRight(len(word),True)
-                        return True
-                        # self.cursor.goRight(len(word),False)
+                    try:
+                        if (self.doc.TextTables.getByIndex(i).getCellByPosition(j, k).String.count(word) > 0):
+                            self.text = self.doc.TextTables.getByIndex(i).getCellByPosition(j, k).Text
+                            self.cursor = self.text.createTextCursor()
+                            self.cursor.gotoStart(False)
+                            return True
+                    except:
+                        continue
+        return False
 
     def goToWord(self, word):
         """ Search for a word in a document
@@ -305,8 +310,10 @@ class LOClient:
         objSearch.SearchWords = 1
 
         tmp = self.doc.findFirst(objSearch)
-
-        objSearch.ReplaceString = new
+        try:
+            objSearch.ReplaceString = new
+        except:
+            return None
 
         if not (first):
             self.doc.replaceAll(objSearch)
@@ -465,19 +472,40 @@ class LOClient:
         if self.cursor is None:
             self.getCursor()
         self.goToWord(pName)
-        text.insertString(self.cursor, "", 0)
-        text.insertControlCharacter(self.cursor, PARAGRAPH_BREAK, 0)
+        #text.insertString(self.cursor, "", 0)
+        #text.insertControlCharacter(self.cursor, PARAGRAPH_BREAK, 0)
         cnt = 0
+        isHTML=False
         for i in pData:
             try:
-                text.insertString(self.cursor, unicode(i + "", 'utf-8'), 0)
-            except:
+                import time
+                import random
+                if i.count("<")>0:
+                    if not(isHTML):
+                        isHTML=True
+                        fname = "/var/www/html/tmp/tmp_" + pName  + str(int(time.time()*random.random())) + ".html"
+                        f = open(fname, "wb")
+                    f.write( (i+"<br/>").encode("utf-8") )
+
+                    #f.close()
+                    #self.insertDoc(fname)
+                else:
+                    text.insertString(self.cursor, i, 0)
+                    text.insertString(self.cursor, "\n", 0)
+            #try:
+            #    text.insertString(self.cursor, unicode(i + "", 'utf-8'), 0)
+            except Exception as e:
+                print(str(e),file=sys.stderr)
                 text.insertString(self.cursor, i, 0)
-            if cnt + 1 < len(pData):
-                text.insertControlCharacter(self.cursor, PARAGRAPH_BREAK, 0)
-            else:
-                text.insertString(self.cursor, " ", 0)
+            text.insertControlCharacter(self.cursor, LINE_BREAK, 0)
+            #if cnt + 1 < len(pData):
+            #    text.insertControlCharacter(self.cursor, PARAGRAPH_BREAK, 0)
+            #else:
+            #    text.insertString(self.cursor, " ", 0)
             cnt += 1
+        if isHTML:
+            f.close()
+            self.insertDoc(fname)
         self.searchAndReplace(pName, "")
 
     def searchTable(self, tName):
@@ -490,7 +518,7 @@ class LOClient:
         text = self.doc.Text
         self.searchTable(tName)
         if self.cursor is None:
-            self.getCursor()
+            self.cursor=self.getCursor()
         if self.table is None:
             self.table = self.doc.createInstance("com.sun.star.text.TextTable")
             self.table.initialize(len(tData), len(tData[0]))
@@ -499,6 +527,10 @@ class LOClient:
         i = 0
         i0 = 1
         countline = 0
+        if len(tData)<=1:
+            self.table.dispose()
+            return -1
+
         while i < len(tData):
             j = 0
             if countline > 1:
@@ -521,7 +553,15 @@ class LOClient:
                     try:
                         cell.setString(unicode(str(toto), 'utf-8'))
                     except:
-                        cell.setString(str(toto))
+                        if toto.count('</')>0 or toto.count('/>')>0:
+                            fname = self.conf["tmpPath"] + "/report_tmp_" + self.conf["usid"] + ".html"
+                            hfile = open(fname, "w")
+                            hfile.write(str(toto))
+                            hfile.close()
+                            self.cursor=cell.createTextCursor()
+                            self.insertDoc(fname)
+                        else:
+                            cell.setString(str(toto))
                 j += 1
             countline += 1
             i0 += 1

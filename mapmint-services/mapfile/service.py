@@ -2734,7 +2734,7 @@ def classifyMap0(conf, inputs, outputs):
     if layer.type != mapscript.MS_LAYER_RASTER and "mmMExpr" in inputs and inputs["mmMExpr"]["value"] != "":
         cond = " WHERE " + inputs["mmMExpr"]["value"].replace("\"[", "").replace("]\"", "")
         cond = cond.replace("[", "").replace("]", "")
-    lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": "SELECT " + inputs["field"]["value"] + ", count(*) as title FROM " + layer.data + " GROUP BY " + inputs["field"]["value"] + " ORDER BY " + inputs["field"]["value"] + " ASC"},
+    lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": "SELECT " + inputs["field"]["value"] + ', count(*) as title FROM "' + layer.data + '" GROUP BY ' + inputs["field"]["value"] + " ORDER BY " + inputs["field"]["value"] + " ASC"},
                "dialect": {"value": "sqlite"}}
 
     rClass = False
@@ -3764,7 +3764,7 @@ def setMapLayerProperties(conf, inputs, outputs):
         for i in range(0, len(tmp)):
             if i > 0 and i % 10 == 0:
                 conf["lenv"]["message"] = zoo._("Producing filtered map %d / %d") % (i, len(tmp))
-                zoo.update_status(conf, ((i + 1) * 100) / len(tmp))
+                zoo.update_status(conf,int( ((i + 1) * 100) / len(tmp)))
             _filter = ""
             fval = ""
             ffilter = ""
@@ -3775,9 +3775,9 @@ def setMapLayerProperties(conf, inputs, outputs):
             for j in range(0, layer.numclasses):
                 if layer.getClass(j).getExpressionString() is not None:
                     if layer.encoding is not None:
-                        tmp0 = layer.getClass(j).getExpressionString().decode(layer.encoding)
+                        tmp0 = layer.getClass(j).getExpressionString()
                         tmp0 = tmp0.replace(")", _filter)
-                        layer.getClass(j).setExpression(tmp0.encode(layer.encoding))
+                        layer.getClass(j).setExpression(tmp0)
                     else:
                         layer.getClass(j).setExpression(layer.getClass(j).getExpressionString().replace(")", _filter))
                 else:
@@ -3797,12 +3797,42 @@ def setMapLayerProperties(conf, inputs, outputs):
                     else:
                         labelLayer.getClass(j).setExpression(_filter.replace("AND ", "(", 1))
                 saveProjectMap(labelMapfile, conf["main"]["dataPath"] + "/maps/label_" + mf + "_" + lname + "_" + fval + ".map")
+            # 2020 08 13
+            # fetch extent and chenge map settings
+            for k in tmp[i]:
+                geometryName="GEOMETRY"
+                if layer.connection.count("PG:")>0:
+                    geometryName="WKB_GEOMETRY"
+                inputs1={
+                        "dsoName": {"value": layer.data},
+                        "dstName": {"value": layer.connection},
+                        "dialect": {"value": "sqlite"},
+                        "q": {"value": "SELECT ST_Minx(Extent("+geometryName+")) as minx, ST_Miny(Extent("+geometryName+")) as miny,ST_Maxx(Extent("+geometryName+")) as maxx,ST_Maxy(Extent("+geometryName+")) as maxy, Extent("+geometryName+") as geometry from "+layer.data+" WHERE "+k+" = '"+tmp[i][k]+"'"}
+                    }
+                outputs1={"Result": {"mimType": "application/json"}}
+                res=vt.vectInfo(conf, inputs1, outputs1)
+                import json
+                print(outputs1["Result"]["value"],file=sys.stderr)
+                try:
+                    values=json.loads(outputs1["Result"]["value"])[0]  
+                    print(str(values),file=sys.stderr)
+                    layer.setExtent(float(values["minx"]),float(values["miny"]),float(values["maxx"]),float(values["maxy"]))
+                    m0.setExtent(float(values["minx"]),float(values["miny"]),float(values["maxx"]),float(values["maxy"]))
+                except Exception as e:
+                    print(str(e),file=sys.stderr)
+                    continue
             saveProjectMap(m0, conf["main"]["dataPath"] + "/maps/search_" + mf + "_" + lname + "_" + fval + ".map")
             f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + fval + "_" + conf["senv"]["last_map"] + "_sld.xml", 'w')
             f.write(layer.generateSLD())
             f.close()
             m0 = mapscript.mapObj(conf["main"]["dataPath"] + "/maps/search_" + mf + "_" + lname + ".map")
             layer = m0.getLayer(0)
+            # 2020 08 13
+            #f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + fval + "_" + conf["senv"]["last_map"] + "_sld.xml", 'w')
+            #f.write(layer.generateSLD())
+            #f.close()
+            #m0 = mapscript.mapObj(conf["main"]["dataPath"] + "/maps/search_" + mf + "_" + lname + ".map")
+            #layer = m0.getLayer(0)
     outputs["Result"]["value"] = "Layer properties saved."
     return 3
 
@@ -3856,6 +3886,7 @@ def removeLayer(conf, inputs, outputs):
 
 
 def setLayerScale(conf, inputs, outputs):
+    print(inputs,file=sys.stderr)
     if "isArray" in inputs["st"]:
         for i in range(0, len(inputs["st"]["value"])):
             input0 = {}
@@ -3865,6 +3896,9 @@ def setLayerScale(conf, inputs, outputs):
             output1 = outputs
             input0["st"] = {"value": inputs["st"]["value"][i][:3].title()}
             input0["sv"] = {"value": inputs["sv"]["value"][i]}
+            print(input0,file=sys.stderr)
+            print(inputs["sv"]["value"],file=sys.stderr)
+            print(inputs["st"]["value"],file=sys.stderr)
             if inputs["st"]["value"][i][3:] == "Display":
                 res = _setLayerScale(conf, input0, outputs)
             else:
@@ -3880,8 +3914,8 @@ def _setLayerScale(conf, inputs, outputs):
     i = 0
     while i < m.numlayers:
         if m.getLayer(i).name == inputs["layer"]["value"]:
-            if int(float(inputs["sv"]["value"])) != -1:
-                setMetadata(m.getLayer(i), "mm" + inputs["st"]["value"] + "Scale", str(int(float(inputs["sv"]["value"]))))
+            if int((inputs["sv"]["value"])) != -1:
+                setMetadata(m.getLayer(i), "mm" + inputs["st"]["value"] + "Scale", str(int((inputs["sv"]["value"]))))
             else:
                 try:
                     m.getLayer(i).metadata.remove("mm" + inputs["st"]["value"] + "Scale")
@@ -3906,23 +3940,23 @@ def setLayerLabelScale(conf, inputs, outputs):
     i = 0
     while i < m.numlayers:
         if m.getLayer(i).name == inputs["layer"]["value"]:
-            if int(float(inputs["sv"]["value"])) != -1:
-                setMetadata(m.getLayer(i), "mmLabel" + inputs["st"]["value"] + "Scale", str(int(float(inputs["sv"]["value"]))))
+            if str((inputs["sv"]["value"])) != "-1":
+                setMetadata(m.getLayer(i), "mmLabel" + inputs["st"]["value"] + "Scale", str(((inputs["sv"]["value"]))))
             else:
                 try:
                     m.getLayer(i).metadata.remove("mmLabel" + inputs["st"]["value"] + "Scale")
                 except:
                     pass
             if inputs["st"]["value"] == "Min":
-                m.getLayer(i).labelminscaledenom = int(float(inputs["sv"]["value"]))
+                m.getLayer(i).labelminscaledenom = int((inputs["sv"]["value"]))
             else:
-                m.getLayer(i).labelmaxscaledenom = int(float(inputs["sv"]["value"]))
+                m.getLayer(i).labelmaxscaledenom = int((inputs["sv"]["value"]))
             if m.getLayer(i).metadata.get('mmLabelsMap') is not None:
                 m0 = mapscript.mapObj(m.getLayer(i).metadata.get('mmLabelsMap'))
                 if inputs["st"]["value"] == "Min":
-                    m0.getLayer(0).labelminscaledenom = int(float(inputs["sv"]["value"]))
+                    m0.getLayer(0).labelminscaledenom = int((inputs["sv"]["value"]))
                 else:
-                    m0.getLayer(0).labelmaxscaledenom = int(float(inputs["sv"]["value"]))
+                    m0.getLayer(0).labelmaxscaledenom = int((inputs["sv"]["value"]))
                 saveProjectMap(m0, m.getLayer(i).metadata.get('mmLabelsMap'))
 
         i += 1
@@ -4186,7 +4220,9 @@ def updateMapcacheCfg0(conf, inputs, outputs):
     else:
         #should do
         #nodes[0].replaceNode(aNodes[0])
+        root[0].replace(nodes[0],aNodes[0])
         nodes = doc.xpath('/mapcache/tileset[@name="' + inputs["mmProjectName"]["value"] + 'Tile"]')
+        root[0].replace(nodes[0],aNodes[1]) 
         #should do
         #nodes[0].replaceNode(aNodes[1])
     f = open(conf["mm"]["mapcacheCfg"], 'wb')
@@ -4226,7 +4262,9 @@ def updateMapcacheCfg(conf, inputs, outputs):
     else:
         #should do
         #nodes[0].replaceNode(aNodes[0])
+        root[0].replace(nodes[0],aNodes[0]) 
         nodes = doc.xpath('/mapcache/tileset[@name="' + inputs["mmProjectName"]["value"] + 'Tile"]')
+        root[0].replace(nodes[0],aNodes[1])
         #should do
         #nodes[0].replaceNode(aNodes[1])
     f = open(conf["mm"]["mapcacheCfg"], 'wb')
@@ -4881,7 +4919,7 @@ def generatePreview(conf, m):
     ext = [p0.x, p0.y, p1.x, p1.y]
 
     response = urllib.request.urlopen(
-        conf["main"]["serverAddress"] + "?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.translate&DataInputs=InputDSN=base_layers/mq-osm.xml;OutputDSN=tmp_MM1369836649;Format=GTiff;OutSize=1024,768;ProjWin=" + str(ext[0]) + "," + str(ext[3]) + "," + str(ext[2]) + "," + str(
+        conf["main"]["serverAddress"] + "?service=WPS&version=1.0.0&request=Execute&Identifier=raster-tools.translate&DataInputs=InputDSN=base_layers/mq-osm.xml;OutputDSN=tmp_MM1369836649;Format=GTiff;OutSize="+str(1024*4)+","+str(768*4)+";ProjWin=" + str(ext[0]) + "," + str(ext[3]) + "," + str(ext[2]) + "," + str(
             ext[1]) + "&RawDataOutput=Result")
     html = response.read()
 
@@ -4918,7 +4956,7 @@ def generatePreview(conf, m):
     outputs1 = {"Result": {"value": ""}}
     inputs0 = {
         "file": {"value": conf["main"]["tmpPath"] + "/preview_project_" + conf["senv"]["MMID"] + ".pdf"},
-        "res": {"value": "42"}
+        "res": {"value": "512"}
     }
     pp.preview(conf, inputs0, outputs1)
     import time, random

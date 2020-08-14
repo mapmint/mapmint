@@ -491,4 +491,7 @@ table.dataTable thead .sorting:after {
     margin: 0 0 0 4px;
 }
 
+.invalid-feedback{
+	display: none
+}
 /**/

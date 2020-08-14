@@ -18,13 +18,13 @@
 <link rel="alternate" type="application/rss+xml" title="MapMint RSS Feed" href="$(conf["main"]["applicationAddress"])public/rss" />
 <title>$page_title</title>
 #for $f in $ocss:
-<link type="text/css" rel="stylesheet" href="#if $f[0:7]=='http://'#$f#else#$conf["main"]["mmAddress"]/css/$f#end if#" />
+<link type="text/css" rel="stylesheet" href="#if $f[0:7]=='http://' or $f[0:8]=='https://'#$f#else#$conf["main"]["mmAddress"]/css/$f#end if#" />
 #end for
 
 #attr $css = ["green"]
 
 #for $f in $css:
-<link type="text/css" rel="stylesheet" #if ("senv" in $conf.keys() and "loggedin" in $conf["senv"].keys() and $conf["senv"]["loggedin"])#media="screen" title="#if "adminTheme" in $conf["mm"].keys()#$conf["mm"]["adminTheme"]#else#$f#end if#"#end if# href="#if $f[0:7]=='http://'#$f#else#$conf["main"]["mmAddress"]/css/#if "adminTheme" in $conf["mm"].keys()#$conf["mm"]["adminTheme"]#else#$f#end if##end if#" id="#if "adminTheme" in $conf["mm"].keys()#$conf["mm"]["adminTheme"]#else#$f#end if#" />
+<link type="text/css" rel="stylesheet" #if ("senv" in $conf.keys() and "loggedin" in $conf["senv"].keys() and $conf["senv"]["loggedin"])#media="screen" title="#if "adminTheme" in $conf["mm"].keys()#$conf["mm"]["adminTheme"]#else#$f#end if#"#end if# href="#if $f[0:7]=='http://' or $f[0:8]=='https://'#$f#else#$conf["main"]["mmAddress"]/css/#if "adminTheme" in $conf["mm"].keys()#$conf["mm"]["adminTheme"]#else#$f#end if##end if#" id="#if "adminTheme" in $conf["mm"].keys()#$conf["mm"]["adminTheme"]#else#$f#end if#" />
 #end for
 <link type="text/css" rel="stylesheet" href="$conf["main"]["mmAddress"]/new-themes/themes/default/loader.css" /> 
 <!--[if IE]>

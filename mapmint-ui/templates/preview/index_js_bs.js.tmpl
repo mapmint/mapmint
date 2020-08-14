@@ -62,6 +62,7 @@ var zooDictionary={
     "Facebook sharing": "$zoo._("Facebook sharing")",
 }
 #if "filter" in $inputs.keys()
+System={};
 System.iniFilterValue="$inputs["filter"]["value"]";
 #end if
 
@@ -156,7 +157,7 @@ var oLayers={
 	],
      	"map": "$conf["main"]["dataPath"]/public_maps/timeline_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)_step0.map",
 #else
-     	"map": "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($mms.getMetadata($m.getLayer($l),'mmFilterField') or $mms.getMetadata($m.getLayer($l),'mmZFilterField')) and 'filter' in $inputs.keys()#_"+System.iniFilterValue+"#end if##end if#.map",
+     	"map": "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($mms.getMetadata($m.getLayer($l),'mmFilterField') or $mms.getMetadata($m.getLayer($l),'mmZFilterField')) and 'filter' in $inputs#_"+System.iniFilterValue+"#end if##end if#.map",
 #if $mms.getMetadata($m.web,"mmRT") and $mms.getMetadata($m.web,"mmRT").count("timeline")>0 and $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $mms.getMetadata($m.getLayer($l),"mmRasterTimeline") is not None and $mms.getMetadata($m.getLayer($l),"mmRasterTimeline")=="true"
     	"maps":[
 #set cg=$mms.getMetadata($m.getLayer($l),"mm_group")
@@ -191,6 +192,7 @@ var oLayers={
 	"display": #if vl.count($m.getLayer($l).name)>0#"vector"#else#"raster"#end if#,
 	"opacity": 1,
 	"filter": #if $mms.getMetadata($m.getLayer($l),'mmFilterField') and 'filter' in $inputs.keys()#true#else#false#end if#,
+	"zoomTo": #if $mms.getMetadata($m.getLayer($l),'mmZFilter') and $mms.getMetadata($m.getLayer($l),'mmZFilter')=='true' and 'filter' in $inputs.keys()#true#else#false#end if#,
 	"title": "$mms.getMetadata($m.getLayer($l),"ows_title")",
 	"maxScale": #if $mms.getMetadata($m.getLayer($l),'mmMaxScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMaxScale')#else#100000000000000#end if#,
 	"minScale": #if $mms.getMetadata($m.getLayer($l),'mmMinScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMinScale')#else#0#end if#,

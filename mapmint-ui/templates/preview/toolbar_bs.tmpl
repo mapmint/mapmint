@@ -49,6 +49,11 @@
     </ul>
 #if $mms.getMetadata($m.web,'mmOT')
 #set f=$mms.getMetadata($m.web,'mmOT').split(',')
+<!-- MERDE  $f -->
+#for i in range(0,$m.numlayers)
+<!-- $mms.getMetadata($m.getLayer($i),'mmSearchField') $(m.getLayer(i).metadata is None) -->
+#end for
+
 #if f.count('SearchBox')>0
 
     <div class="col-sm-3 col-md-3">
@@ -58,20 +63,23 @@
 	 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
 	  <span id="search_concept">$zoo._("Layer")</span> <span class="caret"></span>
 	 </button>
+
 	 <ul class="dropdown-menu" role="menu">
 #set nbSearch=0
 #for i in range(0,$m.numlayers)
-#if $m.getLayer(i).metadata.get('mmSearchField') is not None
-#if $m.getLayer(i).metadata.get('ows_title') is not None
-#set title=$m.getLayer(i).metadata.get('ows_title')
+#if $mms.getMetadata($m.getLayer($i),'mmSearchField') is not None 
+#set searchField=$mms.getMetadata($m.getLayer($i),'mmSearchField')
+#if $mms.getMetadata($m.getLayer($i),'ows_title')!=""
+#set title=$mms.getMetadata($m.getLayer($i),'ows_title')
 #else
 #set title=$m.getLayer(i).name
 #end if
-	   <li><a href="#" data-field="$m.getLayer(i).metadata.get('mmSearchField')" data-name="$m.getLayer(i).name">#if $nbSearch==0#<i class="fa fa-check"></i>#end if# $title</a></li>
+	   <li><a href="#" data-field="$searchField" data-name="$m.getLayer(i).name">#if $nbSearch==0#<i class="fa fa-check"></i>#end if# $title</a></li>
 #set nbSearch+=1
 #end if
 #end for
 	 </ul>
+
        </div>
        <input type="hidden" name="search_param" value="all" id="search_param" />         
        <input type="text" class="form-control" id="search_value" name="search_value" placeholder="$zoo._("Search...")" />
@@ -82,6 +90,7 @@
       </form>
     </div>
 #end if
+
 #end if
 #else
 #if ot

@@ -16,6 +16,7 @@
       <tr>
 	<th style="width:25px"></th>
 	<th style="width:25px">$zoo._("E.")</th>
+	<th style="width:25px">$zoo._("O.")</th>
 	<th style="width:25px">$zoo._("Name")</th>
 	<th style="width:25px">$zoo._("Type")</th>
 	<th style="width:25px">$zoo._("Label")</th>
@@ -36,14 +37,18 @@
  <script type="template/text" id="edition_c1_template">
   <input name="edition" type="checkbox" [display] />
  </script>
-  
+
  <script type="template/text" id="edition_c2_template">
+  <input name="optional" type="checkbox" [display] />
+ </script>
+  
+ <script type="template/text" id="edition_c3_template">
   <a href="#edition_selector_template"><i class="fa fa-trash"> </i></a>
   <span id="oname_txt">[name]</span>
   <input name="oname" type="text" value="[name]" onkeyup="\$(this).prev().html(\$(this).val())" />
  </script>
   
- <script type="template/text" id="edition_c3_template">
+ <script type="template/text" id="edition_c4_template">
   <select class="form-control" name="ftype">
     #set res=$cur.execute("select id,name from mm_tables.ftypes where ftype='e' order by id")
     #set res=$cur.fetchall()
@@ -55,11 +60,11 @@
   <textarea class="form-control" name="dependencies" style="display:none">[dependencies]</textarea>
  </script>
 
- <script type="template/text" id="edition_c4_template">
+ <script type="template/text" id="edition_c5_template">
   <input class="form-control" name="alias" type="text" value="[label]" />  
  </script>
 
- <script type="template/text" id="edition_c5_template">
+ <script type="template/text" id="edition_c6_template">
   <textarea class="form-control" name="value">[value]</textarea>
  </script>
 
@@ -70,6 +75,7 @@
       <input type="hidden" name="field_id" value="[id]" />
     </td>
     <td><input name="edition" type="checkbox" [display] /></td>
+    <td><input name="optional" type="checkbox" [optional] /></td>
     <td>
       <a href="#edition_selector_template"><i class="fa fa-trash"> </i></a>
       [name]

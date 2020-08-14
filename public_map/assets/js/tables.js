@@ -209,24 +209,26 @@ define([
 	$("#tables_view_icon").val("info");
         $("#tables_view_icon").off("keyup");
         $("#tables_view_icon").on("keyup",function(){$(this).parent().find('i').remove();$(this).parent().append('<i class=\'fa fa-'+$(this).val()+'\'> </i>');});
-	    $("#tables_view_id").val("-1");
-	    $("#tables_view_title").val("");
-	    $("#tables_view_clause").val("");
-	    $("#tables_view_menu_order").val("");
-	    $("#tables_view_visible").prop("checked",true);
-	    var tmp=["groups","themes"];
-	    for(var i=0;i<tmp.length;i++){
-		$("#tables_view_"+tmp[i]).find("option").each(function(){
-		    console.log($(this).prop("selected"));
-		    $(this).prop("selected",false);
-		    console.log($(this).prop("selected"));
-		});
-	    }
+	$("#tables_view_id").val("-1");
+	$("#tables_view_title").val("");
+	$("#tables_view_clause").val("");
+	$("#tables_view_mclause").val("");
+	$("#tables_view_menu_order").val("");
+	$("#tables_view_visible").prop("checked",true);
+	var tmp=["groups","themes"];
+	for(var i=0;i<tmp.length;i++){
+	    $("#tables_view_"+tmp[i]).find("option").each(function(){
+		console.log($(this).prop("selected"));
+		$(this).prop("selected",false);
+		console.log($(this).prop("selected"));
+	    });
+	}
 	if(!data.mmViews[id]){
 	    console.log(data.mmDesc);
 	    $("#tables_view_id").val("-1");
 	    $("#tables_view_title").val("");
 	    $("#tables_view_clause").val("");
+	    $("#tables_view_mclause").val("");
 	    $("#tables_view_menu_order").val("");
 	    $("#tables_view_visible").prop("checked",true);
 	    var tmp=["groups","themes"];
@@ -290,8 +292,8 @@ define([
 		if(data.mmViews[id].view[i].indexOf("]")<0 || data.mmViews[id].view[i].indexOf("_]")>0){
 		    console.log(i);
 		    console.log((data.mmViews[id].view[i]=="True"));
-		    if(i=="visible")
-			$("#tables_view_visible").prop("checked",(data.mmViews[id].view[i]=="True"));
+		    if(i=="visible" || i=="exportable")
+			$("#tables_view_"+i).prop("checked",(data.mmViews[id].view[i]=="True"));
 		    else
 			$("#tables_view_"+i.replace(/name/g,"title")).val(data.mmViews[id].view[i]);
 		}
@@ -367,11 +369,11 @@ define([
 	var tmp=["groups","themes"];
 	var panels=[/*"view",*/"edition"/*,"report"*/];
 	for(var j=0;j<panels.length;j++)
-	for(var i=0;i<tmp.length;i++){
-	    $("#tables_"+panels[j]+"_"+tmp[i]).find("option").each(function(){
-		$(this).prop("selected",false);
-	    });
-	}
+	    for(var i=0;i<tmp.length;i++){
+		$("#tables_"+panels[j]+"_"+tmp[i]).find("option").each(function(){
+		    $(this).prop("selected",false);
+		});
+	    }
 	if(!data.mmEdits[id]){
 	    $("#tables_edition_id").val("-1");
 	    $("#tables_edition_title").val("");
@@ -431,16 +433,24 @@ define([
 		}
 		else{
 		    console.log(data);
-		    var obj=JSON.parse(data.mmEdits[id].view[i]);
-		    for(var j=0;j<obj.length;j++)
-			$("#tables_edition_"+i).find("option").each(function(){
-			    console.log($(this).attr("value"));
-			    console.log(obj[j]);
-			    console.log($(this).attr("value")==obj[j]);
-			    if($(this).attr("value")==obj[j]){
-				$(this).prop("selected",true);
-			    }
-			});
+		    try{
+			var obj=JSON.parse(data.mmEdits[id].view[i]);
+			for(var j=0;j<obj.length;j++)
+			    $("#tables_edition_"+i).find("option").each(function(){
+				console.log($(this).attr("value"));
+				console.log(obj[j]);
+				console.log($(this).attr("value")==obj[j]);
+				if($(this).attr("value")==obj[j]){
+				    $(this).prop("selected",true);
+				}
+			    });
+		    }catch(e){
+			console.log(data.mmEdits[id].view[i]);
+			console.log("Fetched exception "+e);
+			$("#tables_edition_"+i.replace(/name/g,"title")).val(data.mmEdits[id].view[i]);
+			if(i.replace(/name/g,"title")=="description")
+			    $("#tables_edition_"+i.replace(/name/g,"title")).summernote("code",data.mmEdits[id].view[i]);
+		    }
 		}
 		console.log($("#tables_edition_"+i));
 	    }
@@ -451,6 +461,7 @@ define([
 		    [
 			"id",
 			"display",
+			"optional",
 			"name",
 			"label",
 			"dependencies",
@@ -460,6 +471,7 @@ define([
 		    [
 			i,
 			(data.mmEdits[id].fields[i].edition=="True"?"checked=checked":""),
+			(data.mmEdits[id].fields[i].optional=="True"?"checked=checked":""),
 			data.mmEdits[id].fields[i].name,
 			data.mmEdits[id].fields[i].alias,
 			data.mmEdits[id].fields[i].dependencies,
@@ -486,6 +498,9 @@ define([
 		    }else
 			$(this).parent().find("textarea").hide();
 		});
+	    });
+	    $("#mm_edition_table_display").find("input[type=checkbox]").each(function(){
+
 	    });
 
 	    $('#edition_table_display').DataTable({
@@ -629,7 +644,7 @@ define([
 	    bindDeleteRow();
 	}
     }
-	
+    
     function loadAnElement(id,localTest){
 	localId=id;
 	//console.log("loadATheme -> "+id);
@@ -762,10 +777,11 @@ define([
 		[
 		    managerTools.generateFromTemplate($("#edition_c0_template")[0].innerHTML,['id'],[nbItem[1]]),
 		    managerTools.generateFromTemplate($("#edition_c1_template")[0].innerHTML,['display'],[""]),
-		    managerTools.generateFromTemplate($("#edition_c2_template")[0].innerHTML,['name'],["unamed_"+nbItem[1]]),
-		    managerTools.generateFromTemplate($("#edition_c3_template")[0].innerHTML,['label'],["Label "+nbItem[1]]),
+		    managerTools.generateFromTemplate($("#edition_c2_template")[0].innerHTML,['name'],["unamed__"+nbItem[1]]),
+		    managerTools.generateFromTemplate($("#edition_c3_template")[0].innerHTML,['name'],["unalmed"+nbItem[1]]),
 		    managerTools.generateFromTemplate($("#edition_c4_template")[0].innerHTML,['label'],["Label "+nbItem[1]]),
-		    managerTools.generateFromTemplate($("#edition_c5_template")[0].innerHTML,['value'],["Value "+nbItem[1]])
+		    managerTools.generateFromTemplate($("#edition_c5_template")[0].innerHTML,['label'],["Label "+nbItem[1]]),
+		    managerTools.generateFromTemplate($("#edition_c6_template")[0].innerHTML,['value'],["Value "+nbItem[1]])
 		]
 	    ],
 	    
@@ -1112,15 +1128,15 @@ define([
 		    CFeaturesSelected.pop(CFeaturesSelected[0]);
 		}
 		/*if(CFeaturesSelected.length==0)
-		    myRootElement.find(".require-select").removeClass("disabled");*/
-		    
+		  myRootElement.find(".require-select").removeClass("disabled");*/
+		
 		CRowSelected.push( id );
 
 		$('#'+lid).DataTable().row("#"+id).select();
 
 		for(var i=0;i<CFeatures.length;i++){
 		    if(CFeatures[i]["fid"]==id)
-		       CFeaturesSelected.push( CFeatures[i] );
+			CFeaturesSelected.push( CFeatures[i] );
 		}
 
 		reg=new RegExp(ltype+"_","g");
@@ -1180,14 +1196,14 @@ define([
 			    $("#DS_indicatorTable_indicator").remove();
 			$("[data-mmaction=join]").first().parent().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg,val)).attr("id","DS_indicatorTable_indicator"));
 			managerTools.displayVector(data,ldata,"indicatorTable","indicator",val,
-						function(){
-						    $("#DS_indicatorTable_indicator").find(".panel").addClass("panel-warning").removeClass("panel-default");
-						    $("[data-mmaction=join]").addClass("disabled");
-						},
-						function(){
-						    $("#DS_indicatorTable_indicator").find(".panel").removeClass("panel-warning").addClass("panel-default");
-						    $("[data-mmaction=join]").removeClass("disabled");
-						}); 
+						   function(){
+						       $("#DS_indicatorTable_indicator").find(".panel").addClass("panel-warning").removeClass("panel-default");
+						       $("[data-mmaction=join]").addClass("disabled");
+						   },
+						   function(){
+						       $("#DS_indicatorTable_indicator").find(".panel").removeClass("panel-warning").addClass("panel-default");
+						       $("[data-mmaction=join]").removeClass("disabled");
+						   }); 
 		    });
 		}
 	    },
@@ -1582,10 +1598,10 @@ define([
 	});
 
 	/*$(".tab-pane").css({"max-height":($(window).height()-($(".navbar").height()*3.5))+"px","overflow-y":"auto","overflow-x":"hidden"});
-	$("#page-wrapper").find("[role=presentation]").first().children().first().click();
-	
+	  $("#page-wrapper").find("[role=presentation]").first().children().first().click();
+	  
 
-	console.log($("#page-wrapper").find("[role=presentation]").first());
+	  console.log($("#page-wrapper").find("[role=presentation]").first());
 	*/
 
 	$("#pg_schema").change(function(){
@@ -1707,6 +1723,7 @@ define([
 	    var obj1={
 		"name": $("#tables_view_title").val(),
 		"clause": $("#tables_view_clause").val(),
+		"mclause": $("#tables_view_mclause").val(),
 		"views_groups": JSON.stringify(multiples[0], null, ' '),
 		"views_themes": JSON.stringify(multiples[1], null, ' ')
 	    };
@@ -1716,14 +1733,16 @@ define([
 	    console.log(obj1);
 	    var params=[
 		{"identifier": "table","value": "mm_tables.p_views","dataType":"string"},
-		{"identifier": "columns","value": JSON.stringify(["ptid","name","icon","clause","visible","menu_order"], null, ' '),"mimeType":"application/json"},
+		{"identifier": "columns","value": JSON.stringify(["ptid","name","icon","clause","mclause","visible","exportable","menu_order"], null, ' '),"mimeType":"application/json"},
 		{"identifier": "links","value": JSON.stringify({"view_groups":{"table":"mm_tables.p_view_groups","ocol":"vid","tid":"gid"},"view_themes":{"table":"mm_tables.p_view_themes","ocol":"vid","tid":"tid"},"vfields":{"table":"mm_tables.p_view_fields","ocol":"vid","tid":"vid"}}, null, ' '),"mimeType":"application/json"},
 		{"identifier": "ptid","value": $("#tables_id").val(),"dataType":"string"},
 		{"identifier": "name","value": $("#tables_view_title").val(),"dataType":"string"},
 		{"identifier": "icon","value": $("#tables_view_icon").val(),"dataType":"string"},
 		{"identifier": "clause","value": $("#tables_view_clause").val(),"mimeType":"string"},
+		{"identifier": "mclause","value": $("#tables_view_mclause").val(),"mimeType":"string"},
 		{"identifier": "menu_order","value": $("#tables_view_menu_order").val(),"dataType":"string"},
 		{"identifier": "visible","value": $("#tables_view_visible").is(":checked"),"dataType":"string"},
+		{"identifier": "exportable","value": $("#tables_view_exportable").is(":checked"),"dataType":"string"},
 		{"identifier": "view_groups","value": JSON.stringify(multiples[0], null, ' '),"mimeType":"application/json"},
 		{"identifier": "view_themes","value": JSON.stringify(multiples[1], null, ' '),"mimeType":"application/json"},
 		{"identifier": "vfields","value": JSON.stringify(objs, null, ' '),"mimeType":"application/json"}

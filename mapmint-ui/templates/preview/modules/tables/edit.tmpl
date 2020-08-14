@@ -74,7 +74,7 @@
 #set description=$vals[4]
 
 
-#set req="SELECT mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,mm_tables.p_edition_fields.alias,mm_tables.p_edition_fields.value,mm_tables.p_edition_fields.edition,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.dependencies FROM mm_tables.p_editions,mm_tables.p_edition_fields where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm_tables.p_editions.id="+$inputs["id"]["value"]
+#set req="SELECT mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,mm_tables.p_edition_fields.alias,mm_tables.p_edition_fields.value,mm_tables.p_edition_fields.edition,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.dependencies,not(mm_tables.p_edition_fields.optional) FROM mm_tables.p_editions,mm_tables.p_edition_fields where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm_tables.p_editions.id="+$inputs["id"]["value"]
 #set res=$cur.execute($req)
 #set vals=$cur.fetchall()
 
@@ -107,15 +107,15 @@ $vals[i][1]
 #except Exception as e
 #set options=[["-1",$zoo._("No element")]]
 #end try
-#set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"select","options":$options,"optional":$isOptional})
+#set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"select","options":$options,"optional":$isOptional,"required":$vals[i][7]})
 #else
 #if ctype=="date" or ctype=="datetime" or ctype=="float"
-#set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+#set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional,"required":$vals[i][7]})
 #else
 #if $ctype=="html"
-#set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+#set tmpDisplay=$ftmpl.printEmbeddedLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional,"required":$vals[i][7]})
 #else
-#set tmpDisplay=$ftmpl.printEmbeddedLine({"noline":True,"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"optional":$isOptional})
+#set tmpDisplay=$ftmpl.printEmbeddedLine({"noline":True,"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"optional":$isOptional,"required":$vals[i][7]})
 #end if
 #end if
 #end if
@@ -153,7 +153,7 @@ $vals[4]
 #end if
 #set step=$vals[1]
 
-#set req="SELECT mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,mm_tables.p_edition_fields.alias,mm_tables.p_edition_fields.value,mm_tables.p_edition_fields.edition,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.dependencies FROM mm_tables.p_editions,mm_tables.p_edition_fields where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm_tables.p_editions.id="+$inputs["id"]["value"]
+#set req="SELECT mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,mm_tables.p_edition_fields.alias,mm_tables.p_edition_fields.value,mm_tables.p_edition_fields.edition,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.dependencies,not(mm_tables.p_edition_fields.optional) FROM mm_tables.p_editions,mm_tables.p_edition_fields where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm_tables.p_editions.id="+$inputs["id"]["value"]
 #set res=$cur.execute($req)
 #set vals=$cur.fetchall()
 
@@ -188,13 +188,13 @@ $vals[4]
 #if $vals[i][4]
 
 #if $vals[i][6] is not None and $vals[i][6]!=''
-$ftmpl.printHiddenContent({"rid":"runFirst_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][6],"optional":$isOptional})
+$ftmpl.printHiddenContent({"rid":"runFirst_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][6],"optional":$isOptional,"required": $vals[i][7]})
 #end if
 
 #*
  $ctype=="text" or $ctype=="varchar(255)" or $ctype=="html" or $ctype=="geometry" 
  *#
-#if $ctype=="text" or $ctype=="varchar(255)" or $ctype=="html" or $ctype=="geometry" 
+#if $ctype=="text" or $ctype=="varchar(255)" or $ctype=="html" or $ctype.count("geometry")>0 
 #set hasStandardFields=True
 #*
  $ctype=="geometry" 
@@ -209,15 +209,15 @@ $ftmpl.printHiddenContent({"rid":"runFirst_"+str($vals[i][1]),"id":"edit_"+str($
 #set res0=$cur.execute($tmpReq)
 #set toto=$cur.fetchone()
 #if $toto[0]=='POINT'
-$ftmpl.printCoordInput({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+$ftmpl.printCoordInput({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional,"required": $vals[i][7]})
 #else
-$ftmpl.printHidden({"rid":"edit_"+str($vals[i][0])+"_geotype","id":"edit_"+str($vals[i][0])+"_geotype","name":$vals[i][2],"value":$toto[0],"optional":$isOptional})
+$ftmpl.printHidden({"rid":"edit_"+str($vals[i][0])+"_geotype","id":"edit_"+str($vals[i][0])+"_geotype","name":$vals[i][2],"value":$toto[0],"optional":$isOptional,"required": $vals[i][7]})
 
 #set options=[["layer",$zoo._("Use an existing geometry")],["draw",$zoo._("Draw a geometry on map")]]
 
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1])+"_mmtype","id":"edit_"+str($vals[i][0])+"_mmtype","name":$vals[i][2]+'<input type="checkbox" name="edit_'+str($vals[i][0])+'_mmcheck" onchange="console.log($(this).prop(\'checked\'));if($(this).prop(\'checked\')){$(this).parent().next().find(\'select\').change();$(this).parent().next().show();$(this).parent().parent().next().show();}else{$(this).parent().next().hide();$(this).parent().parent().next().hide();}" />',"type":"select","options":$options,"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1])+"_mmtype","id":"edit_"+str($vals[i][0])+"_mmtype","name":$vals[i][2]+'<input type="checkbox" name="edit_'+str($vals[i][0])+'_mmcheck" onchange="console.log($(this).prop(\'checked\'));if($(this).prop(\'checked\')){$(this).parent().next().find(\'select\').change();$(this).parent().next().show();$(this).parent().parent().next().show();}else{$(this).parent().next().hide();$(this).parent().parent().next().hide();}" />',"type":"select","options":$options,"optional":$isOptional,"required": $vals[i][7]})
 
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1])+"_mmlayer","id":"edit_"+str($vals[i][0])+"_mmlayer","name":"","type":"select","options":[[-1,$zoo._("Please first create feature.")]],"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1])+"_mmlayer","id":"edit_"+str($vals[i][0])+"_mmlayer","name":"","type":"select","options":[[-1,$zoo._("Please first create feature.")]],"optional":$isOptional,"required": $vals[i][7]})
 
 <script name="edition_$(vals[i][1])" type="application/javascript" id="geometryField_runFirst">
 try{
@@ -243,13 +243,41 @@ console.log("***************** GEOMETRY *****************");
 
 
 #else
+
+#if $ctype=="geometry_reference"
+$ftmpl.printHidden({"rid":"edit_"+str($vals[i][0])+"_geofield","id":"edit_"+str($vals[i][0])+"_geofield","name":$vals[i][2],"value":$vals[i][3],"optional":$isOptional,"required": $vals[i][7]})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1])+"_mmlayerref","id":"edit_"+str($vals[i][0])+"_mmlayerref","name":$vals[i][2]+' <input type="checkbox" name="edit_'+str($vals[i][0])+'_mmcheck" onchange="console.log($(this).prop(\'checked\'));if($(this).prop(\'checked\')){$(this).parent().next().find(\'select\').change();$(this).parent().next().show();$(this).parent().parent().next().show();}else{$(this).parent().next().hide();$(this).parent().parent().next().hide();}" />',"type":"select","options":[[-1,$zoo._("Please first create feature.")]],"optional":$isOptional,"required": $vals[i][7]})
+<!-- $vals[i] -->
+<script name="edition_$(vals[i][1])" type="application/javascript" id="geometryRefField_runFirst">
+try{
+  console.log("geometryRefFields",geometryRefFields);
+}catch(e){
+  geometryRefFields=[];
+}
+if(geometryRefFields.indexOf("edit_$vals[i][0]")<0)
+geometryRefFields.push("edit_$vals[i][0]");
+console.log("***************** GEOMETRY REF *****************");
+try{
+  \$("#edit_$(vals[i][0])_type").off("change");
+  \$("#edit_$(vals[i][0])_type").change(function(){
+    console.log("CHANGE TO DRAW ?");
+  });
+}catch(e){
+  console.log();
+}
+\$("input[name=edit_"+str($vals[i][0])+"_mmcheck]").change();
+console.log("***************** GEOMETRY REF *****************");
+</script>
+#else
+
 #*
  In case it is a long text content
 *#
 #if $ctype=="html"
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional,"required": $vals[i][7]})
 #else
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":"textarea","optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":"textarea","optional":$isOptional,"required": $vals[i][7]})
+#end if
 #end if
 #end if
 #*
@@ -261,7 +289,7 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
  *#
 #if ctype=="bytea"
 #set hasStandardFields=True
-$ftmpl.printBasicLine({"label":$vals[i][2],"content":$ftmpl.printUploadInputNew({"id":"edit_"+str($vals[i][0]),"name":"edition_"+str($vals[i][1])})})
+$ftmpl.printBasicLine({"label":$vals[i][2],"content":$ftmpl.printUploadInputNew({"id":"edit_"+str($vals[i][0]),"name":"edition_"+str($vals[i][1])}),"required": $vals[i][7]})
 #else
 #if ctype=="tbl_linked" 
 #*
@@ -280,9 +308,9 @@ $ftmpl.printBasicLine({"label":$vals[i][2],"content":$ftmpl.printUploadInputNew(
 #except Exception as e
 #set options=[["-1",$zoo._("No element")]]
 #end try
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"multiple","options":$options,"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"multiple","options":$options,"optional":$isOptional,"required": $vals[i][7]})
 #else
-#if ctype=="ref" 
+#if ctype=="ref" or ctype=="ref_search" 
 #*
  In case it is a select list
 *#
@@ -298,14 +326,58 @@ $ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]
 #except Exception as e
 #set options=[["-1",$zoo._("No element")]]
 #end try
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"select","options":$options,"optional":$isOptional})
+#if ctype=="ref"
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"select","options":$options,"optional":$isOptional,"required": $vals[i][7]})
+#else
+
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":"","optional":$isOptional,"required": $vals[i][7]})
+<div id="edition_$(vals[i][1])_alert" class="alert alert-danger alert-dismissible" role="alert">
+  <p></p>
+  <!--
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+-->
+</div>
+<div style="display:none">
+$ftmpl.printLine({"rid":"search_"+str($vals[i][1]),"id":"search_"+str($vals[i][0]),"name":$vals[i][2],"type":"select","options":$options,"optional":$isOptional,"required": $vals[i][7]})
+</div>
+<script name="edition_$($vals[i][1])" type="application/json" id="$(vals[i][1])_runFirst">
+\$("#edition_$(vals[i][1])_alert").hide();
+
+\$("input[name=edit_$(vals[i][0])]").off('change');
+\$("input[name=edit_$(vals[i][0])]").on('change',function(){
+console.log("change value!");
+var cValue=\$(this).val();
+var hasCValue=false;
+\$(this).parent().parent().parent().find("select[name=search_$(vals[i][0])]").find("option").each(function(){
+if(\$(this).text()==cValue){
+  \$(this).prop("selected",true);
+  hasCValue=true;
+}
+else
+  \$(this).prop("selected",false);
+});
+if(!hasCValue){
+#set tmpStr=($zoo._("Please, select a valid value for %s") % $vals[i][2])
+  var eStr="$tmpStr";
+  \$(this).parent().parent().parent().find("#edition_$(vals[i][1])_alert").find("p").first().html(eStr);
+  \$(this).parent().parent().parent().find("#edition_$(vals[i][1])_alert").show();
+}else{
+\$(this).parent().parent().parent().find("#edition_$(vals[i][1])_alert").hide();//alert('close');
+}
+  //alert(eStr);
+});
+</script>
+#end if
+
 #else
 #if ctype=="date" or ctype=="datetime" or ctype=="float"
 #*
  In case it is a date
 *#
 #set hasStandardFields=True
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"type":$ctype,"optional":$isOptional,"required": $vals[i][7]})
 #else
 #if ctype=="link"
 #*
@@ -413,20 +485,20 @@ $ftmpl.printBasicLine({"label":$preTitle+$vals[i][2].title(),"content":$content}
 $ftmpl.printBasicLine({"label":$toto[0]["main_title"],"content":$content})
 #except Exception as e
 <!-- $e -->
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"checkbox","value":$vals[i][3],"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"type":"checkbox","value":$vals[i][3],"optional":$isOptional,"required": $vals[i][7]})
 #end try
 <!-- $vals[i] -->
 #else
 #if ctype=="varchar(32)"
 #* Password *#
 #set hasStandardFields=True
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"optional":True,"isPassword":True,"type":"password"})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"optional":True,"isPassword":True,"type":"password","required": $vals[i][7]})
 #else
 #*
  In other cases
 *#
 #set hasStandardFields=True
-$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"optional":$isOptional})
+$ftmpl.printLine({"rid":"edition_"+str($vals[i][1]),"id":"edit_"+str($vals[i][0]),"name":$vals[i][2],"value":$vals[i][3],"optional":$isOptional,"required": $vals[i][7]})
 #end if
 #end if
 #end if
@@ -530,7 +602,7 @@ $ftmpl.printButton({"id":"import1","name":$zoo._("Import")})
 
 #if $step!=-10 and $step!=-3 
 
-#set opts=[$zoo._("OR"),$zoo._("AND")]
+#set opts=["OR","AND"]
 $ftmpl.printLine({"rid":"edition_linkClause","id":"edit_linkClause","name":$zoo._("Link clauses with"),"value":$vals[i][3],"optional":False,"type":"select","options":opts})
 
 $ftmpl.printButton({"id":"search","name":$zoo._("Search")})

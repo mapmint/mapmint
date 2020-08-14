@@ -49,6 +49,14 @@ def saveLayer(conf, inputs, outputs):
         pass
     return 3
 
+def moveFile(conf,inputs,outputs):
+    try:
+        shutil.move(inputs["fileIn"]["value"].replace(conf["main"]["tmpUrl"],conf["main"]["tmpPath"]), inputs["fileOut"]["value"])
+        outputs["Result"]["value"] = zoo._("File moved")
+        return zoo.SERVICE_SUCCEEDED
+    except Exception as e:
+        conf["lenv"]["message"] = str(e)
+        return zoo.SERVICE_FAILED
 
 def Recode(conf, inputs, outputs):
     import shutil

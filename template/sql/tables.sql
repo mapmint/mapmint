@@ -57,6 +57,10 @@ INSERT INTO mm_tables.ftypes (name,code,ftype,basic) VALUES ('Table element', 't
 INSERT INTO mm_tables.ftypes (name,code,ftype,basic) VALUES ('default', 'default', 'r', false);
 INSERT INTO mm_tables.ftypes (name,code,ftype,basic) VALUES ('HTML Content', 'html', 'r', false);
 INSERT INTO mm_tables.ftypes (name,code,ftype,basic) VALUES ('Date and Time', 'datetime', 'e', true);
+INSERT INTO mm_tables.ftypes (name,code,ftype,basic) VALUES ('Filter', 'filter', 'R', true);
+INSERT INTO mm_tables.ftypes (name,code,ftype,basic) VALUES ('Reference Search', 'ref_search', 'e', true);
+INSERT INTO mm_tables.ftypes (name,code,ftype,basic) VALUES ('Geometry Reference', 'geometry_reference', 'e', true);
+
 
 --
 -- Table used to store tables information
@@ -77,9 +81,11 @@ CREATE TABLE mm_tables.p_views (
     name character varying(255),
     description text,
     clause text,
+    mclause text,
     icon text,
     menu_order int,
-    visible boolean DEFAULT true
+    visible boolean DEFAULT true,
+    exportable boolean DEFAULT true
 );
 
 --

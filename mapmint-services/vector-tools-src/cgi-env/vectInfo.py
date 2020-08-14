@@ -130,7 +130,7 @@ def vectInfo(conf, inputs, outputs):
         nRepeatCount = 0  # // skip layer reporting.
 
         if papszLayers is not None:
-            print("layer names ignored in combination with -sql.")
+            print("layer names ignored in combination with -sql.", file=sys.stderr)
 
         poResultSet = poDS.ExecuteSQL(pszSQLStatement, poSpatialFilter,
                                       pszDialect)
@@ -153,7 +153,7 @@ def vectInfo(conf, inputs, outputs):
                 poLayer = poDS.GetLayer(iLayer)
 
                 if poLayer is None:
-                    print("FAILURE: Couldn't fetch advertised layer %d!" % iLayer)
+                    print("FAILURE: Couldn't fetch advertised layer %d!" % iLayer, file=sys.stderr)
                     return 1
 
                 if not bAllLayers:
@@ -162,7 +162,7 @@ def vectInfo(conf, inputs, outputs):
                     if poLayer.GetLayerDefn().GetGeomType() != ogr.wkbUnknown:
                         line = line + " (%s)" % ogr.GeometryTypeToName(poLayer.GetLayerDefn().GetGeomType())
 
-                    print(line)
+                    print(line,file=sys.stderr)
                 else:
                     if iRepeat != 0:
                         poLayer.ResetReading()
@@ -175,9 +175,8 @@ def vectInfo(conf, inputs, outputs):
             # /* -------------------------------------------------------------------- */
             for papszIter in papszLayers:
                 poLayer = poDS.GetLayerByName(papszIter)
-
                 if poLayer is None:
-                    print("FAILURE: Couldn't fetch requested layer %s!" % papszIter)
+                    print("FAILURE: Couldn't fetch requested layer %s!" % papszIter,file=sys.stderr)
                     return 1
 
                 if iRepeat != 0:
@@ -225,18 +224,18 @@ def ReportOnLayer(poLayer, pszWHERE, poSpatialFilter, options):
     # /* -------------------------------------------------------------------- */
     # /*      Report various overall information.                             */
     # /* -------------------------------------------------------------------- */
-    print("")
+    print("",file=sys.stderr)
 
-    print("Layer name: %s" % poDefn.GetName())
+    print("Layer name: %s" % poDefn.GetName(), file=sys.stderr)
 
     if bVerbose:
-        print("Geometry: %s" % ogr.GeometryTypeToName(poDefn.GetGeomType()))
+        print("Geometry: %s" % ogr.GeometryTypeToName(poDefn.GetGeomType()), file=sys.stderr)
 
-        print("Feature Count: %d" % poLayer.GetFeatureCount())
+        print("Feature Count: %d" % poLayer.GetFeatureCount(), file=sys.stderr)
 
         oExt = poLayer.GetExtent(True)
         if oExt is not None:
-            print("Extent: (%f, %f) - (%f, %f)" % (oExt[0], oExt[1], oExt[2], oExt[3]))
+            print("Extent: (%f, %f) - (%f, %f)" % (oExt[0], oExt[1], oExt[2], oExt[3]), file=sys.stderr)
 
         if poLayer.GetSpatialRef() is None:
             pszWKT = "(unknown)"
@@ -246,10 +245,10 @@ def ReportOnLayer(poLayer, pszWHERE, poSpatialFilter, options):
         print("Layer SRS WKT:\n%s" % pszWKT)
 
         if len(poLayer.GetFIDColumn()) > 0:
-            print("FID Column = %s" % poLayer.GetFIDColumn())
+            print("FID Column = %s" % poLayer.GetFIDColumn(), file=sys.stderr)
 
         if len(poLayer.GetGeometryColumn()) > 0:
-            print("Geometry Column = %s" % poLayer.GetGeometryColumn())
+            print("Geometry Column = %s" % poLayer.GetGeometryColumn(), file=sys.stderr)
 
         for iAttr in range(poDefn.GetFieldCount()):
             poField = poDefn.GetFieldDefn(iAttr)
@@ -258,7 +257,7 @@ def ReportOnLayer(poLayer, pszWHERE, poSpatialFilter, options):
                 poField.GetNameRef(), \
                 poField.GetFieldTypeName(poField.GetType()), \
                 poField.GetWidth(), \
-                poField.GetPrecision()))
+                poField.GetPrecision()), file=sys.stderr)
 
     # /* -------------------------------------------------------------------- */
     # /*      Read, and dump features.                                        */
@@ -276,7 +275,7 @@ def ReportOnLayer(poLayer, pszWHERE, poSpatialFilter, options):
 
         poFeature = poLayer.GetFeature(nFetchFID)
         if poFeature is None:
-            print("Unable to locate feature id %d on this layer." % nFetchFID)
+            print("Unable to locate feature id %d on this layer." % nFetchFID, file=sys.stderr)
 
         else:
             DumpReadableFeature(poFeature, options)
@@ -286,7 +285,7 @@ def ReportOnLayer(poLayer, pszWHERE, poSpatialFilter, options):
 
 def DumpReadableFeature(poFeature, options=None):
     poDefn = poFeature.GetDefnRef()
-    print("OGRFeature(%s):%ld" % (poDefn.GetName(), poFeature.GetFID()))
+    print("OGRFeature(%s):%ld" % (poDefn.GetName(), poFeature.GetFID()), file=sys.stderr)
 
     if 'DISPLAY_FIELDS' not in options or EQUAL(options['DISPLAY_FIELDS'], 'yes'):
         for iField in range(poDefn.GetFieldCount()):
@@ -302,19 +301,19 @@ def DumpReadableFeature(poFeature, options=None):
             else:
                 line = line + "(null)"
 
-            print(line)
+            print(line, file=sys.stderr)
 
     if poFeature.GetStyleString() is not None:
 
         if 'DISPLAY_STYLE' not in options or EQUAL(options['DISPLAY_STYLE'], 'yes'):
-            print("  Style = %s" % GetStyleString())
+            print("  Style = %s" % GetStyleString(), file=sys.stderr)
 
     poGeometry = poFeature.GetGeometryRef()
     if poGeometry is not None:
         if 'DISPLAY_GEOMETRY' not in options or not EQUAL(options['DISPLAY_GEOMETRY'], 'no'):
             DumpReadableGeometry(poGeometry, "  ", options)
 
-    print('')
+    print('', file=sys.stderr)
 
     return
 
@@ -329,7 +328,7 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
         eType = poGeometry.GetGeometryType()
         if eType == ogr.wkbLineString or eType == ogr.wkbLineString25D:
             line = line + ("%d points" % poGeometry.GetPointCount())
-            print(line)
+            print(line, file=sys.stderr)
         elif eType == ogr.wkbPolygon or eType == ogr.wkbPolygon25D:
             nRings = poGeometry.GetGeometryCount()
             if nRings == 0:
@@ -345,7 +344,7 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
                         poRing = poGeometry.GetGeometryRef(ir + 1)
                         line = line + ("%d points" % poRing.GetPointCount())
                     line = line + ")"
-            print(line)
+            print(line, file=sys.stderr)
 
         elif eType == ogr.wkbMultiPoint or \
                 eType == ogr.wkbMultiPoint25D or \
@@ -357,7 +356,7 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
                 eType == ogr.wkbGeometryCollection25D:
 
             line = line + "%d geometries:" % poGeometry.GetGeometryCount()
-            print(line)
+            print(line, file=sys.stderr)
             for ig in range(poGeometry.GetGeometryCount()):
                 subgeom = poGeometry.GetGeometryRef(ig)
                 from sys import version_info
@@ -367,12 +366,12 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
                     exec('print("",)')
                 DumpReadableGeometry(subgeom, pszPrefix, options)
         else:
-            print(line)
+            print(line, file=sys.stderr)
 
     elif 'DISPLAY_GEOMETRY' not in options or EQUAL(options['DISPLAY_GEOMETRY'], 'yes') \
             or EQUAL(options['DISPLAY_GEOMETRY'], 'WKT'):
 
-        print("%s%s" % (pszPrefix, poGeometry.ExportToWkt()))
+        print("%s%s" % (pszPrefix, poGeometry.ExportToWkt()), file=sys.stderr)
 
     return
 

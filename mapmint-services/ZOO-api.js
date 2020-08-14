@@ -6265,8 +6265,9 @@ ZOO.Process = ZOO.Class({
       if (data.schema)
         input.*::Data.*::ComplexData.@schema = data.schema;
       input = input.toXMLString();
-      if(data.value)
+      if(data.value){
         return (('<wps:Input xmlns:wps="'+this.namespaces['wps']+'"><ows:Identifier xmlns:ows="'+this.namespaces['ows']+'">'+identifier+'</ows:Identifier>'+(data.value?'<wps:Data><wps:ComplexData '+(data.mimeType?'mimeType="'+data.mimeType+'"':"")+'><![CDATA['+data.value+']]></wps:ComplexData></wps:Data>':(data.xlink?'<wps:Reference xmlns:xlink="'+this.namespaces['xlink']+'" xlink:href="'+data.xlink+'" mimeType="'+data.mimeType+'" />':''))+'</wps:Input>'));
+      }
       else
         return input;
     },
@@ -6306,7 +6307,7 @@ ZOO.Process = ZOO.Class({
         return input;
       }else if(data){
         var inputf="";
-        for(i=0;i<parseInt(data["length"]);i++){
+        for(i=0;i<data.value.length;i++){
 	  var input = new XML('<wps:Input xmlns:wps="'+this.namespaces['wps']+'"><ows:Identifier xmlns:ows="'+this.namespaces['ows']+'">'+identifier+'</ows:Identifier><wps:Data><wps:LiteralData>'+data.value[i]+'</wps:LiteralData></wps:Data></wps:Input>');
 	  if (data.type)
 	    input.*::Data.*::LiteralData.@dataType = data.type;

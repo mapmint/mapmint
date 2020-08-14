@@ -1,13 +1,20 @@
 #import mapscript
+#import mapfile.service as mms
 
 #set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_Overlays.map")
 
+#if $m is not None
+
 #for i in range(0,$m.numlayers)
+#try
 #set l=$m.getLayer($i)
+
+#if $l is not None
+
 
 #if $l.numclasses == 1
 #layer_$(i)_overlays label .fa-circle:before{
-    background:url('#if $l.metadata.get('mmIcon') is not None#$l.metadata.get('mmIcon')#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_Overlays_$(l.name).map&LAYERS=$(l.name)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat scroll 0 0 transparent !important;
+    background:url('#if $mms.getMetadata($l,"mmIcon") is not None#$mms.getMetadata($l,"mmIcon")#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/map4legend_Overlays_$(l.name).map&LAYERS=$(l.name)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=-1.5,-1.5,7.5,7.5&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat scroll 0 0 transparent !important;
     content: " ";
     display: block;
     height: 16px;
@@ -32,7 +39,7 @@
 }
 #end for
 
-#if $l.metadata.get("mmClass")=="tl"
+#if $mms.getMetadata($l,"mmClass")=="tl" and $mms.getMetadata($l,"mmSteps") is not None
 
 #set steps=$l.metadata.get("mmSteps").split(',')
 
@@ -72,5 +79,10 @@ $kk {}
 #end if
 #end if
 
+
+#end if
+#except Exception as e
+/* $e */
+#end try
 #end for
-     
+#end if     

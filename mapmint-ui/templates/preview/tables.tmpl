@@ -50,7 +50,7 @@
 #import authenticate.service as auth
 #set prefix=auth.getPrefix($conf)
 #try
-#set req="SELECT mm_tables.p_views.name,mm_tables.p_tables.description,mm_tables.p_tables.name,mm_tables.p_tables.id,mm_tables.p_views.clause FROM mm_tables.p_views,mm_tables.p_tables where mm_tables.p_tables.id=mm_tables.p_views.ptid and mm_tables.p_views.id="+$pid[0]
+#set req="SELECT mm_tables.p_views.name,mm_tables.p_tables.description,mm_tables.p_tables.name,mm_tables.p_tables.id,mm_tables.p_views.clause,mm_tables.p_views.exportable FROM mm_tables.p_views,mm_tables.p_tables where mm_tables.p_tables.id=mm_tables.p_views.ptid and mm_tables.p_views.id="+$pid[0]
 #set con=auth.getCon($conf)
 #set cur=con.conn.cursor()
 #set res=$cur.execute($req)

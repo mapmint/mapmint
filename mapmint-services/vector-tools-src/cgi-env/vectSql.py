@@ -80,7 +80,7 @@ def vectInfo(conf, inputs, outputs):
     print(inputs,file=sys.stderr)
     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
     # if list(inputs.keys()).count("dialect") > 0 and pszDataSource.count("dbname") == 0:
-    if "dialect" in inputs and pszDataSource.count("dbname") == 0:
+    if "dialect" in inputs and inputs["dialect"]["value"]!="NULL":# and pszDataSource.count("dbname") == 0:
         pszDialect = inputs["dialect"]["value"]
 
     # papszLayers.append(inputs["dsoName"]["value"])
@@ -150,7 +150,7 @@ def vectInfo(conf, inputs, outputs):
                     poLayer = poDS.GetLayer(iLayer)
 
                     if poLayer is None:
-                        print(("FAILURE: Couldn't fetch advertised layer %d!" % iLayer))
+                        print(("FAILURE: Couldn't fetch advertised layer %d!" % iLayer), file=sys.stderr)
                         return 1
 
                     if not bAllLayers:
@@ -159,7 +159,7 @@ def vectInfo(conf, inputs, outputs):
                         if poLayer.GetLayerDefn().GetGeomType() != ogr.wkbUnknown:
                             line = line + " (%s)" % ogr.GeometryTypeToName(poLayer.GetLayerDefn().GetGeomType())
 
-                        print(line)
+                        print(line, file=sys.stderr)
                     else:
                         if iRepeat != 0:
                             poLayer.ResetReading()
@@ -175,7 +175,8 @@ def vectInfo(conf, inputs, outputs):
                     poLayer = poDS.GetLayerByName(papszIter)
 
                     if poLayer is None:
-                        print(("FAILURE: Couldn't fetch requested layer %s!" % papszIter))
+                        myStr=("FAILURE: Couldn't fetch requested layer %s!" % papszIter)
+                        print(myStr, file=sys.stderr)
                         return 1
 
                     if iRepeat != 0:
@@ -239,7 +240,7 @@ def ReportOnLayer(inputs, res, poLayer, pszWHERE, poSpatialFilter, options):
 
         poFeature = poLayer.GetFeature(nFetchFID)
         if poFeature is None:
-            print(("Unable to locate feature id %d on this layer." % nFetchFID))
+            print(("Unable to locate feature id %d on this layer." % nFetchFID), file=sys.stderr)
 
         else:
             DumpReadableFeature(inputs, res, poFeature, options)
@@ -293,7 +294,7 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
         eType = poGeometry.GetGeometryType()
         if eType == ogr.wkbLineString or eType == ogr.wkbLineString25D:
             line = line + ("%d points" % poGeometry.GetPointCount())
-            print(line)
+            print(line, file=sys.stderr)
         elif eType == ogr.wkbPolygon or eType == ogr.wkbPolygon25D:
             nRings = poGeometry.GetGeometryCount()
             if nRings == 0:
@@ -309,7 +310,7 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
                         poRing = poGeometry.GetGeometryRef(ir + 1)
                         line = line + ("%d points" % poRing.GetPointCount())
                     line = line + ")"
-            print(line)
+            print(line, file=sys.stderr)
 
         elif eType == ogr.wkbMultiPoint or \
                 eType == ogr.wkbMultiPoint25D or \
@@ -321,7 +322,7 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
                 eType == ogr.wkbGeometryCollection25D:
 
             line = line + "%d geometries:" % poGeometry.GetGeometryCount()
-            print(line)
+            print(line, file=sys.stderr)
             for ig in range(poGeometry.GetGeometryCount()):
                 subgeom = poGeometry.GetGeometryRef(ig)
                 from sys import version_info
@@ -331,12 +332,12 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
                     exec('print("",)')
                 DumpReadableGeometry(subgeom, pszPrefix, options)
         else:
-            print(line)
+            print(line, file=sys.stderr)
 
     elif 'DISPLAY_GEOMETRY' not in options or EQUAL(options['DISPLAY_GEOMETRY'], 'yes') \
             or EQUAL(options['DISPLAY_GEOMETRY'], 'WKT'):
 
-        print(("%s%s" % (pszPrefix, poGeometry.ExportToWkt())))
+        print(("%s%s" % (pszPrefix, poGeometry.ExportToWkt())), file=sys.stderr)
 
     return
 

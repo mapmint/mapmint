@@ -2,8 +2,13 @@
 
 #set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_idxOverlays.map")
 
+#if $m is not None
+
+
 #for i in range(0,$m.numlayers)
 #set l=$m.getLayer($i)
+
+#if $l is not None
 
 #for j in range(0,$l.numclasses)
 .tree_overlays_layer$(i)_class$(j){
@@ -50,7 +55,9 @@ $kk {}
 #end for
 
 #end if
+#end if
 
 
 #end for
+#end if
      

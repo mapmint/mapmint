@@ -575,3 +575,33 @@ function createSqliteDB4ME(conf,inputs,outputs){
     return {result: ZOO.SERVICE_SUCCEEDED, conf: conf, outputs: outputs };
     
 }
+
+function exportTableTo(conf,inputs,outputs){
+	var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'np.clientViewTable');
+	var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
+	for(i in inputs){
+		if(!inputs[i]["mimeType"])
+			inputs[i]["type"]="string";
+		else
+			inputs[i]["type"]="complex";
+	}
+	var myExecuteResult=myProcess.Execute(inputs,myOutputs,"Cookie: MMID="+conf["senv"]["MMID"]);
+	alert("clientViewTable\n"+myExecuteResult);
+	var inputDSN=getMapLayersInfo(conf);
+	inputDSN+="";
+        var myInputs={
+		"overwrite": {"value": "true","type":"string"},
+		"InputDSN": {"value": inputDSN.split(',')[0],"type":"string"},
+		"OutputDSN": {"value": "export_"+conf["lenv"]["usid"]+"."+(inputs["type"]["value"]=="CSV"?"csv":(inputs["type"]["value"]=="ODS"?"ods":"xlsx")),"type":"string"},
+		"F": {"value": inputs["type"]["value"],"type":"string"},
+		"nln": {"value": "Export","type":"string"},
+		"sql": {"value": myExecuteResult.replace(/"/g,"").replace(/,id/g,""),"type":"complex","mimeType":"application/json"},
+	};
+	var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
+	var myOutputs= {"OutputedDataSourceName": { type: 'RawDataOutput', "mimeType": "application/json" }};
+	var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
+	alert(myExecuteResult);
+	var reg=RegExp(conf["main"]["serverAddress"]);
+	outputs["Result"]["value"]=myExecuteResult.replace(reg,"");
+	return {result: ZOO.SERVICE_SUCCEEDED, conf: conf, outputs: outputs };
+}

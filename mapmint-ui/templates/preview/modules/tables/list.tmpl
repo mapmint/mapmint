@@ -73,7 +73,7 @@ $embedded
 
 
 
-#set req="SELECT mm_tables.p_views.name,mm_tables.p_tables.description,mm_tables.p_tables.name,mm_tables.p_tables.id,mm_tables.p_views.clause FROM mm_tables.p_views,mm_tables.p_tables where mm_tables.p_tables.id=mm_tables.p_views.ptid and mm_tables.p_views.id="+$qComponents[0]
+#set req="SELECT mm_tables.p_views.name,mm_tables.p_tables.description,mm_tables.p_tables.name,mm_tables.p_tables.id,mm_tables.p_views.clause,mm_tables.p_views.mclause FROM mm_tables.p_views,mm_tables.p_tables where mm_tables.p_tables.id=mm_tables.p_views.ptid and mm_tables.p_views.id="+$qComponents[0]
 #set res=$cur.execute($req)
 #set vals=$cur.fetchone()
 
@@ -84,6 +84,7 @@ $embedded
 #set table=$vals[2]
 #set tableId=str($vals[3])
 #set clause=$vals[4]
+#set mclause=$vals[5]
 
 
 #* Edition *#
@@ -203,7 +204,15 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
      <div id="$(prefix)map" role="tabpanel" class="tab-pane" >
        <div class="row">
      	  <div class="col-sm-9">
-		<iframe id="associatedMap" src="$conf["main"]["rootUrl"]$associatedMapName" style="border:0;width:100%;"></iframe>
+#if $mclause is not None
+#import np.service as np
+#set lmclause=$np.replaceFilter($conf,$mclause)
+#set lires=$cur.execute("SELECT "+$lmclause)
+#set lvals=$cur.fetchall()
+#else
+#set lvals=None
+#end if
+		<iframe id="associatedMap" src="$conf["main"]["rootUrl"]$associatedMapName#if $lvals is not None and $lvals[0][0] is not None#?filter=$lvals[0][0]#end if#" style="border:0;width:100%;"></iframe>
 	  </div>
 	  <div class="col-sm-3">
 	  <div>
@@ -375,7 +384,7 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
     <div role="tabpanel" class="tab-pane" id="sql">
      <div class="col-sm-12">
       <p>$zoo._("Create a new layer or a report by running a SQL query on the features from the selected layer")</p>
-      <p>$zoo._('You can  use the SQLite dialect supported by GDAL <a target="_blank" href="http://www.gdal.org/ogr_sql_sqlite.html"><i class="fa fa-question"></i></a>.')</p> 
+      <p>$zoo._("You can  use the SQLite dialect supported by GDAL") <a target="_blank" href="https://gdal.org/user/sql_sqlite_dialect.html"><i class="fa fa-question"></i></a>.</p> 
      </div>
      <div class="col-sm-12">
       <label>$zoo._("Create a new layer")</label>
@@ -476,7 +485,7 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
      <div id="$(prefix)report_$(rvals[i][0])" role="tabpanel" class="tab-pane" >
        <div class="row">
          <h2>$zoo._("Report")</h2>
-	 <p id="no_version_message">$zoo._("Depending on its complexity, producing a report may be a a time consuming process. For this reason, the reports are not generated everytime you access an element but on the specific user demand. You can generate a document by pressing the '"+$zoo._("Run")+"' button bellow.")</p>
+	 <p id="no_version_message">$zoo._("Depending on its complexity, producing a report may be a a time consuming process. For this reason, the reports are not generated everytime you access an element but on the specific user demand. You can generate a document by pressing the '")$zoo._("Run")$zoo._("' button bellow.")</p>
          $ftmpl.printButton({"id":"runPrint","name":'<i class="fa fa-print fa-fw"></i><i class="fa fa-spinner fa-spin" style="display:none"></i> '+$zoo._("Run")})
 	 $ftmpl.printHidden({"rid":"edition_tuple_id","id":"edit_tuple_id","name":"edition_tuple_id","value":"-1"})
 	 $ftmpl.printHidden({"rid":"edition_report_id","id":"edit_report_id","name":"edition_report_id","value":$rvals[i][0]})
@@ -592,6 +601,19 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 <input type="hidden" name="$(prefix)mainTableId" value="$tableId" />
 <input type="hidden" name="$(prefix)mainTableViewId" value="$qComponents[0]" />
 <input type="hidden" name="$(prefix)mainTableLevel" value="$cLevel" />
+
+<script type="template/text" id="dropdown_template">
+<div class="dropdown">
+  <button class="paginate_button btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    $zoo._("Export")
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#">CSV</a>
+    <a class="dropdown-item" href="#">ODS</a>
+    <a class="dropdown-item" href="#">XLSX</a>
+  </div>
+</div>
+</script>
 
 
 #set req="SELECT mm_tables.p_view_fields.id,mm_tables.p_view_fields.alias,mm_tables.p_view_fields.value,mm_tables.p_view_fields.view,mm_tables.p_view_fields.search,mm_tables.p_view_fields.class,mm_tables.p_view_fields.width,mm_tables.p_view_fields.name FROM mm_tables.p_views,mm_tables.p_view_fields where mm_tables.p_views.id=mm_tables.p_view_fields.vid and mm_tables.p_views.id="+$qComponents[0]

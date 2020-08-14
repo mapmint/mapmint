@@ -468,10 +468,10 @@ define([
 	    }
 
             function onSuccess(data) {
-		//if(closure.debug){
+		if(closure.debug){
                     console.log("++++ getStatus SUCCESS "+sid);
                     console.log(data);
-		//}
+		}
 
 		if(data.ExceptionReport){
 		    if (handlers.onError instanceof Function) {
@@ -648,7 +648,7 @@ define([
 			console.log("++++ getStatus TERMINATED "+sid);
 		    }
                 }
-                else if (!closure.percent.hasOwnProperty(sid) || closure.percent[sid]<100) {
+                else if (!closure.percent.hasOwnProperty(sid) || closure.percent[sid]<=100) {
                     setTimeout( function() {
                         ping(sid);
                      }, closure.delay);

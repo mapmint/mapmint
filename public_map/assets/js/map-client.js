@@ -430,7 +430,7 @@ define([
 			    })
 			};
 			var urls= {
-			    "ESRI": 'http://server.arcgisonline.com/ArcGIS/rest/services/' +
+			    "ESRI": 'https://server.arcgisonline.com/ArcGIS/rest/services/' +
 				baseLayers["proprietary"]["layers"][i]+
 				'/MapServer/tile/{z}/{y}/{x}',
 			    "MapBox": "https://api.mapbox.com/v4/" + 
@@ -580,7 +580,7 @@ define([
 	if(baseLayers["myBaseLayers"] && baseLayers["myBaseLayers"].length>=1){
 	    for(var j=0;j<baseLayers["myBaseLayers"].length;j++){
 		layer=new ol.layer.Tile({
-		    visible: false,
+		    visible: baseLayers["default"]==myBaseLayers.length?true:false,
 		    source: new ol.source.TileWMS({
 			url: cacheUrl,
 			params: {'LAYERS': baseLayers["myBaseLayers"][j]+"Tile", 'TILED': true},
@@ -1058,7 +1058,7 @@ define([
 	    if(oLayers[layerName].display=="raster"){
 		console.log(oLayers[layerName]);
 		var lmapfile=pmapfile;
-		if(oLayers[layerName].maps)
+		if(oLayers[layerName].maps || oLayers[layerName].filter)
 		    lmapfile=oLayers[layerName].map;
 		var layer;
 		if(layerName.indexOf("grid_")===-1){
@@ -2366,6 +2366,48 @@ define([
 		j++;
             }
 	});
+
+	console.log(" ------ "+pmapfiles);
+	    setTimeout(function(){
+	for(var i in oLayers){
+		console.log(oLayers[i]);
+		if(oLayers[i].filter){
+			(function(i){
+			$.ajax(msUrl+'?map='+oLayers[i].map+'&service=WMS&request=GetCapabilities').then(function(response) {
+				try{
+				var parser = new ol.format.WMSCapabilities();
+				var result = parser.read(response);
+				var ext=result["Capability"]["Layer"]["Layer"][0]["BoundingBox"][0]["extent"];
+				oLayers[i]["extent"]=[
+					ext[1],
+					ext[0],
+					ext[3],
+					ext[2]
+				];
+				console.log(oLayers[i]);
+				if(oLayers[i]["zoomTo"]){
+					console.log(oLayers[i]["zoomTo"]);
+					var transformer = ol.proj.getTransform('EPSG:4326', 'EPSG:3857');
+					try{
+						var extent=ol.extent.applyTransform(oLayers[i]["extent"], transformer);
+						map.getView().fit(extent,map.getSize());
+					}catch(e){
+						console.log(layer);
+						console.log(Object.keys(oLayers).length);
+						var extent=ol.extent.applyTransform(addedLayers[i-Object.keys(oLayers).length]["extent"], transformer);
+						map.getView().fit(extent,map.getSize());
+					}
+
+				}
+				}catch(e){
+					console.log(e);
+				}
+			});
+			})(i);
+		}
+	}
+	    },500);
+
 	$(".mm-menu").each(function(){
 	    console.log($(this));
 	    var closure=$(this);
@@ -2537,6 +2579,13 @@ define([
 	if(!isActive){
 	    if(args.mmModify){
 		console.log("Add modify capability");
+		var features=selectLayer.getSource().getFeatures();
+        	for(var i=0;i<features.length;i++)
+		    if(args.source)
+			    args.source.addFeature(features[i].clone());
+		    else
+			drawSource.addFeature(features[i].clone());
+
 		mapInteractions[args.name+"_modify"] = new ol.interaction.Modify({
 		    source: (args.source?args.source:drawSource)
 		});
@@ -3916,6 +3965,9 @@ define([
 
     var hasAddedFeature=false;
     function addASelectedFeature(feature){
+        var features=selectLayer.getSource().getFeatures();
+        for(var i=0;i<features.length;i++)
+            selectLayer.getSource().removeFeature(features[i]);
 	selectLayer.getSource().clear();
 	selectLayer.getSource().addFeatures(feature);
 	hasAddedFeature=true;
@@ -3952,6 +4004,10 @@ define([
 
     function getMap(){
 	return map;
+    }
+
+    function getPmap(){
+            return pmapfile;
     }
 
     function addLayerToMap(obj){
@@ -4208,6 +4264,7 @@ define([
 	positionFeature: positionFeature,
 	load_menu: load_menu,
 	shouldDisplayTabsForToggle: shouldDisplayTabsForToggle,
+	getPmap: getPmap,
     };
 
 

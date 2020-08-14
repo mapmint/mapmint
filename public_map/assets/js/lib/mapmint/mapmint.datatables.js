@@ -372,7 +372,7 @@ define([
 				    features=JSON.parse(outputs[i]["Data"]["ComplexData"].toString());
 			    }
 			    var format=new ol.format.GeoJSON({});
-			    CFeatures=format.readFeatures(outputs[i]["Data"]["ComplexData"].toString(),{
+			    CFeatures=format.readFeatures(features/*outputs[i]["Data"]["ComplexData"].toString()*/,{
 				dataProjection: ol.proj.get('EPSG:4326'),
 				featureProjection: ol.proj.get('EPSG:3857')
 			    });

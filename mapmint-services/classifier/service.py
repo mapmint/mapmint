@@ -49,7 +49,7 @@ def write_png_in_mem(outputs, width, height, rgb_func):
         checksum1 = zlib.crc32(data, int(myCRC32(chunk_type))) & 0xffffffff
         checksum = str(checksum1)
         try:
-            out["Result"]["value"] += struct.pack("!i", int(checksum))
+            out["Result"]["value"] += struct.pack("!L", int(checksum))
         except Exception as e:
             print(e,file=sys.stderr)
 

@@ -76,15 +76,27 @@ $json.dumps($fres)
 #if $vals[i][1] in $obj[$objKeys[k]][j].keys()
 #for ii in range(len($obj[$objKeys[k]][j][$name]["options"]))
 #set clause=""
+#set pre_clause=""
+
+#if "tcond" not in $obj[$objKeys[k]][j][$name]
 #set $clause+=" "+$obj[$objKeys[k]][j][$name]["tfield"]+" "+$obj[$objKeys[k]][j][$name]["operator"]+" "+str(adapt($obj[$objKeys[k]][j][$name]["options"][ii]))
+#else
+#set $pre_clause+=","+$obj[$objKeys[k]][j][$name]["ttable"]
+#if $obj[$objKeys[k]][j][$name]["tcond"].count("[_COND_]")==0
+#set $clause+=$obj[$objKeys[k]][j][$name]["tcond"]+" "+$obj[$objKeys[k]][j][$name]["operator"]+" "+str(adapt($obj[$objKeys[k]][j][$name]["options"][ii]))
+#else
+#set $clause+=$obj[$objKeys[k]][j][$name]["tcond"].replace("[_COND_]",$obj[$objKeys[k]][j][$name]["operator"]+" "+str(adapt($obj[$objKeys[k]][j][$name]["options"][ii])))
+#end if
+#end if
+
 #if $vals[i][2].upper().count("WHERE")==0
 #if $vals[i][2].count(" order by")>0
-#set req=$vals[i][2].replace(" order by"," WHERE " + $clause + " order by")
+#set req=$vals[i][2].replace(" order by",$pre_clause + " WHERE " + $clause + " order by")
 #else
 #if $vals[i][2].count(" ORDER BY ")>0
-#set req=($vals[i][2].replace(" ORDER BY"," WHERE " + $clause + " ORDER BY"))
+#set req=($vals[i][2].replace(" ORDER BY", $pre_clause + " WHERE " + $clause + " ORDER BY"))
 #else
-#set req=($vals[i][2]+(" WHERE " + $clause ))
+#set req=($vals[i][2]+($pre_clause + " WHERE " + $clause ))
 #end if
 #end if
 #end if

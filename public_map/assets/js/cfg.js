@@ -55,6 +55,7 @@ requirejs.config({
         app: 'js/map-client',
             
     },
+	urlArgs: (document.location.href.indexOf(";")>=0?document.location.href.split(';')[1]:(document.location.href.indexOf("?")>=0?document.location.href.split('?')[1]:"")),
     shim: {
 	typeahead: {
 	    deps: ['jquery'],

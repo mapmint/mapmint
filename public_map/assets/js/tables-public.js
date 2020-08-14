@@ -43,6 +43,7 @@ define([
     var importerUploadedFiles=[];
     var mainTableSelectedId=null;
     var mainTableFilter=[];
+    var mainTableFilterLabels=[];
     var mainTableOperators=[];
     var mainTableFiles={};
     var embeddedTableFilter=[];
@@ -72,14 +73,14 @@ define([
 	}catch(e){
 	}
 	
-	    console.log(tfields);
-	    var cnt=0;
-	    for(var t=0;t<tfields.length;t++){
-		cnt=eval(cnt+" + "+tfields[t].sWidth.replace(/%/g,""));
-	    }
-	    if(cnt<100)
-		cnt=100;
-	    console.log(cnt);
+	console.log(tfields);
+	var cnt=0;
+	for(var t=0;t<tfields.length;t++){
+	    cnt=eval(cnt+" + "+tfields[t].sWidth.replace(/%/g,""));
+	}
+	if(cnt<100)
+	    cnt=100;
+	console.log(cnt);
 	tableDisplayed[lid]=$('#'+lid).DataTable( {
 	    language: {
                 url: module.config().translationUrl
@@ -110,9 +111,9 @@ define([
 	    "lengthMenu": [[10, 15, 25, 50, 1000], [10, 15, 25, 50, "All"]],
 	    aoColumns: tfields,
 	    /*"aoColumns": [
-		{ "sWidth": "10%", "target": 0 }, // 1st column width 
-		{ "sWidth": "90%", "target": 1 }
-	    ],*/
+	      { "sWidth": "10%", "target": 0 }, // 1st column width 
+	      { "sWidth": "90%", "target": 1 }
+	      ],*/
 	    "fnServerData": function ( sSource, aoData, fnCallback, oSettings ) {
 
 		var llimit=[];
@@ -132,8 +133,8 @@ define([
 		}
 
 		/*if(tfilters.length>1){
-		    tfilters=[tfilters[tfilters.length-1]];
-		}*/
+		  tfilters=[tfilters[tfilters.length-1]];
+		  }*/
 		//var orderInit=$('input[name="'+lid+'TableOrder"]').val().split(' ');
 		
 		var opts=zoo.getRequest({
@@ -156,6 +157,45 @@ define([
 		    ],
 		    type: 'POST',
 		    storeExecuteResponse: false
+		});
+	    	console.log($("#dropdown_template").html());
+		console.log($(this).attr("id"));
+
+		$("#"+$(this).attr("id")+"_filter").html($("#dropdown_template").html());
+		$("#"+$(this).attr("id")+"_filter").find("a").each(function(){
+		    $(this).off("click");
+		    $(this).on("click",function(){
+			zoo.execute({
+			    identifier: "np.exportTableTo",
+			    dataInputs: [
+				{"identifier":"type","value":$(this).html(),"dataType":"string"},
+				{"identifier":"force","value":"true","dataType":"string"},
+				{"identifier":"table","value":ltype,"dataType":"string"},
+				{"identifier":"offset","value":0,"dataType":"int"},
+				{"identifier":"limit","value":100000000,"dataType":"int"},
+				{"identifier":"page","value":1,"dataType":"int"},
+				{"identifier":"sortorder","value":llimit[3],"dataType":"string"},
+				{"identifier":"sortname","value":closestproperties.split(",")[llimit[2]],"dataType":"string"},
+				//{"identifier":"sortorder","value":(orderInit.length>1?orderInit[1]:llimit[3]),"dataType":"string"},
+				//{"identifier":"sortname","value":(orderInit.length>0?orderInit[0]:closestproperties.split(",")[llimit[2]]),"dataType":"string"},
+				{"identifier":"search","value":$('#'+lid+'_wrapper').find("input[type=search]").first().val(),"dataType":"string"},
+				{"identifier":"filters","value":JSON.stringify(tfilters, null, ' '),"mimeType":"application/json"},
+				{"identifier":"operators","value":JSON.stringify(toperators, null, ' '),"mimeType":"application/json"}
+			    ],
+			    dataOutputs: [
+				{"identifier":"Result","mimeType":"text/plain"}
+			    ],
+			    type: 'POST',
+			    storeExecuteResponse: false,
+			    success: function(data){
+				console.log(data);
+				console.log(data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"]["__text"]);
+				window.location=data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"]["__text"];
+				//window.location=data;
+			    }
+			});
+
+		    });
 		});
 		opts["success"]=function(rdata) {
 		    features=rdata;
@@ -220,8 +260,8 @@ define([
 	});
 
 	/*$('#'+lid).DataTable( {
-	
-	});*/
+	  
+	  });*/
 	
 	$('#'+lid+' tbody').off('click');
 	$('#'+lid+' tbody').on('click', 'tr', function () {
@@ -246,6 +286,45 @@ define([
 		$('#'+lid).DataTable().row($(this)).deselect();
 		CRowSelected.pop();
 	    });
+	    /*if(test)*/{
+		$(".mmFile").each(function(){
+		    $(this).fileinput("destroy");
+		    var closure=$(this);
+		    var isInput=(!closure.parent().hasClass("importer_upload"));
+		    console.log("***** MMFILE : "+isInput);
+		    var lparams={
+			language: module.config().lang,
+			uploadUrl: module.config().url+"?service=WPS&version=1.0.0&request=Execute&RawDataOutput=Result&Identifier=upload.saveOnServer0&dataInputs=filename="+closure.attr("name")+";"+closure.attr("name")+"=Reference@isFile=true;dest=none", // server upload action
+			uploadAsync: true,
+			done: function (e, data) {
+			    $.each(data.result.files, function (index, file) {
+				$('<p/>').text(file.name).appendTo('#files');
+			    });
+			}
+		    };
+		    if(isInput)
+			lparams["maxFileCount"]=1;
+		    $(this).fileinput(lparams);
+		    $(this).on('fileuploaded', function(event, data, previewId, index) {
+			var form = data.form, files = data.files, extra = data.extra,
+			    response = data.response, reader = data.reader;
+			if(isInput){
+			    mainTableFiles[closure.attr("name")]=data.response.files[0].fileName;
+			    if(mmEditSaveUpload){
+				mmEditSaveUpload(data.response.files[0]);
+			    }
+
+			}
+			else{
+			    importerUploadedFiles.push(data.response.files[0].fileName);
+			    $('.importer_submit').show();
+			    $(".importer_submit_log").append(
+				$(managerTools.generateFromTemplate($("#importer_progress").html(),["id","file"],[importerUploadedFiles.length-1,data.files[0].name]))
+			    );
+			}
+		    });
+		});
+	    }
 	    if(!test){
 		if(lid=="mainListing_display")
 		    mainTableSelectedId=$(this).find("input[name=id]").val();
@@ -277,225 +356,298 @@ define([
 		    }catch(e){
 		    }
 		}
-		    
+		
 		if(prefix.indexOf("input_")<0)
-		adminBasic.callService("np.clientView",params,function(data){
-		    for(i in data){
-			var myRoot=$("#"+prefix+"edit0_"+i);
-			myRoot.find("input[name=edit_tuple_id]").val(cid);
-			for(j in data[i]){
+		    adminBasic.callService("np.clientView",params,function(data){
+			for(i in data){
+			    var myRoot=$("#"+prefix+"edit0_"+i);
+			    myRoot.find("input[name=edit_tuple_id]").val(cid);
+			    for(j in data[i]){
+				console.log(j);
 
-			    if(data[i][j]){
-			    if(/*data[i][j] && */!data[i][j].type){
-				if(data[i][j+"_mdep"]){
-				    for(var kk=0;kk<data[i][j+"_mdep"].length;kk++){
-				    	myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").parent().find("select"+":eq("+kk+")").val(data[i][j+"_mdep"]).change();
-					myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").parent().find("select"+":eq("+kk+")").attr("data-cvalue",data[i][j]);
-				    }
- 				}
-				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
-				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
-				    if($(this).hasClass("htmlEditor") || $(this).hasClass("note-codable")){
-					$(this).summernote('code',data[i][j]);
-				    }
-				    /*console.log($(this).attr("type"));
-				    console.log($(this).prop("multiple"));
-				    if($(this).prop("multiple")){
+				console.log(data[i][j]);
+				$(".fileinput-remove").each(function(){
+				    if($(this).parent().find("img").length>0){
+					console.log($(this).parent().find("img"));
 					console.log($(this));
-					$(this).find('option').each(function(){
-					    $(this).prop("selected",false);
-					    for(var k=0;k<data[i][j].length;k++)
-						if(data[i][j][k]==$(this).val())
-						    $(this).prop("selected",true);						    
+					//$(this).click();
+					//$(".fileinput-remove").click();
+				    }
+				});
+				//
+
+				//
+				if(data[i][j]){
+				    console.log(data[i][j]);
+				    if(/*data[i][j] && */!data[i][j].type){
+					console.log("input[name=edit_"+j+"_mmlayerref]");
+
+					if(myRoot.find("select[name=edit_"+j+"_mmlayerref]").length){
+					    console.log("select[name=edit_"+j+"_mmlayerref]");
+					    console.log(myRoot.find("select[name=edit_"+j+"_mmlayerref]"));
+					    console.log("=== geometry Reference ===");
+					    var geoField=myRoot.find("input[name=edit_"+j+"_geofield]").val().split(';');
+					    console.log(myRoot.find("input[name=edit_"+j+"_geofield]"));
+					    console.log(myRoot.find("select[name=edit_"+j+"_mmlayerref]"));
+					    clause=('<ogc:Filter><ogc:PropertyIsEqualTo>'+
+						    '<ogc:PropertyName>'+geoField[1]+'</ogc:PropertyName>'+
+						    '<ogc:Literal>'+data[i][j]+'</ogc:Literal>'+
+						    '</ogc:PropertyIsEqualTo></ogc:Filter>');
+					    console.log(clause);
+					    var propertiesXML="";
+					    var wfsRequest='<wfs:GetFeature xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" service="WFS" version="1.1.0" outputFormat="text/xml; subtype=gml/3.1.1">'+
+						'<wfs:Query xmlns:ms="http://geolabs.fr/" typeName="'+geoField[0]+'">'+propertiesXML+
+						clause+
+						'</wfs:Query>'+
+						'</wfs:GetFeature>';
+					    console.log(wfsRequest);
+					    var wfsUrl=module.config().msUrl+'?map='+myMapIframe.app.getPmap();
+					    
+					    $.ajax({
+						type: "POST",
+						url: wfsUrl,
+						data: wfsRequest,
+						success: function(){
+						    var formatWFS = new ol.format.WFS(),
+							features=formatWFS.readFeatures(arguments[0],{
+							    dataProjection: ol.proj.get('EPSG:4326'),
+							    featureProjection: ol.proj.get('EPSG:3857')
+							});
+						    
+						    myMapIframe.app.addASelectedFeature(features);
+						    console.log(features[0]);
+						    myMapIframe.app.getMap().getView().fit(ol.extent.buffer(features[0].getGeometry().getExtent(),-0.2),myMapIframe.app.getMap().getSize());
+						    myMapIframe.app.getMap().getView().fit(features[0].getGeometry().getExtent(),myMapIframe.app.getMap().getSize());
+
+
+						},
+						contentType: "text/xml"
+					    });
+
+					}
+					if(data[i][j+"_mdep"]){
+					    for(var kk=0;kk<data[i][j+"_mdep"].length;kk++){
+				    		myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").parent().find("select"+":eq("+kk+")").val(data[i][j+"_mdep"]).change();
+						myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").parent().find("select"+":eq("+kk+")").attr("data-cvalue",data[i][j]);
+					    }
+ 					}
+                                        if(myRoot.find("select[name=search_"+j+"]").length==0)
+                                            myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
+                                        else{
+                                            myRoot.find("select[name=search_"+j+"]").val(data[i][j]).change();
+                                            myRoot.find("input[name=edit_"+j+"]").val(myRoot.find("select[name=search_"+j+"]").find("option:selected").text()).change();
+                                        }
+					//myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
+					myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
+					    if($(this).hasClass("htmlEditor") || $(this).hasClass("note-codable")){
+						$(this).summernote('code',data[i][j]);
+					    }
+					    /*console.log($(this).attr("type"));
+					      console.log($(this).prop("multiple"));
+					      if($(this).prop("multiple")){
+					      console.log($(this));
+					      $(this).find('option').each(function(){
+					      $(this).prop("selected",false);
+					      for(var k=0;k<data[i][j].length;k++)
+					      if(data[i][j][k]==$(this).val())
+					      $(this).prop("selected",true);						    
+					      });
+					      }*/
+					    if($(this).attr("type")=="checkbox"){
+						console.log(data[i][j]);
+						$(this).prop("checked",(data[i][j]/*=="True"*/?true:false));
+					    }
 					});
-				    }*/
-				    if($(this).attr("type")=="checkbox"){
-					    console.log(data[i][j]);
-					$(this).prop("checked",(data[i][j]/*=="True"*/?true:false));
-				    }
-				});
-				if(data[i][j].indexOf && data[i][j].indexOf("POINT(")>=0){
-				    var coordinates=data[i][j].replace(/POINT\(/,"").replace(/\)/,"").split(" ");
-				    myRoot.find("input[name=edit_"+j+"_x]").val(coordinates[0]).change();
-				    myRoot.find("input[name=edit_"+j+"_y]").val(coordinates[1]).change();
-				}
-				if(data[i][j].indexOf && (data[i][j].indexOf("POLYGON(")>=0 || data[i][j].indexOf("LINESTRING(")>=0 || data[i][j].indexOf("POINT(")>=0)){
-				    try{
-				    var fWKT=new ol.format.WKT();
-				    var myGeom=fWKT.readGeometry(data[i][j]).transform("EPSG:4326","EPSG:3857");
-				    myMapIframe=$("#associatedMap")[0].contentWindow || $("#associatedMap")[0];
-				    searchMap=myMapIframe.app.getMap();
-				    myContent=myMapIframe.$(document).find("#map");
-				    searchMap.getView().fit(myGeom.getExtent(), { size: [myContent.width(),myContent.height()], nearest: false });
-				    var feature = new ol.Feature({
-					geometry: myGeom,
-					name: "Element"
-				    });
-				    myMapIframe.app.addASelectedFeature([feature]);
-					if(data[i][j].indexOf("POINT(")>=0){
-						myMapIframe.app.getMap().getView().fit(ol.extent.buffer(myGeom.getExtent(),5),myMapIframe.app.getMap().getSize());
+					if(data[i][j].indexOf && data[i][j].indexOf("POINT(")>=0){
+					    var coordinates=data[i][j].replace(/POINT\(/,"").replace(/\)/,"").split(" ");
+					    myRoot.find("input[name=edit_"+j+"_x]").val(coordinates[0]).change();
+					    myRoot.find("input[name=edit_"+j+"_y]").val(coordinates[1]).change();
 					}
-				    }catch(e){
-					console.log("No map  "+e);
-				    }
-				}
-			    }else{
-				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
-				    var closure=$(this);
-				    $(this).fileinput('destroy');
-				    var cname=data[i][j]["filename"].split('/');
-				    var display=data[i][j]["fileurl"];
-				    var regs=[RegExp("tif","g"),RegExp("gif","g"),RegExp("png","g"),RegExp("jpg","g"),RegExp("jpeg","g"),RegExp("JPG","g")];
-				    var isImage=false;
-				    for(var l=0;l<regs.length;l++){
-					if(data[i][j]["fileurl"]!=data[i][j]["fileurl"].replace(regs[l],"")){
-					    isImage=true;
-					    break;
+					if(data[i][j].indexOf && (data[i][j].indexOf("POLYGON(")>=0 || data[i][j].indexOf("LINESTRING(")>=0 || data[i][j].indexOf("POINT(")>=0)){
+					    try{
+						var fWKT=new ol.format.WKT();
+						var myGeom=fWKT.readGeometry(data[i][j]).transform("EPSG:4326","EPSG:3857");
+						myMapIframe=$("#associatedMap")[0].contentWindow || $("#associatedMap")[0];
+						searchMap=myMapIframe.app.getMap();
+						myContent=myMapIframe.$(document).find("#map");
+						searchMap.getView().fit(myGeom.getExtent(), { size: [myContent.width(),myContent.height()], nearest: false });
+						var feature = new ol.Feature({
+						    geometry: myGeom,
+						    name: "Element"
+						});
+						myMapIframe.app.addASelectedFeature([feature]);
+						console.log("DRAW SOURCE !!");
+						myMapIframe.app.getDrawSource().getSource().clear();
+						myMapIframe.app.getDrawSource().getSource().addFeatures([feature]);
+						hasAddedFeature=true;
+						
+						if(data[i][j].indexOf("POINT(")>=0){
+						    myMapIframe.app.getMap().getView().fit(ol.extent.buffer(myGeom.getExtent(),5),myMapIframe.app.getMap().getSize());
+						}
+					    }catch(e){
+						console.log("No map  "+e);
+					    }
+					}
+				    }else{
+					console.log("input[name=edit_"+j+"_mmlayerref]");
+					{
+					    myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
+						var closure=$(this);
+						$(this).fileinput('destroy');
+						var cname=data[i][j]["filename"].split('/');
+						var display=data[i][j]["fileurl"];
+						var regs=[RegExp("tif","g"),RegExp("gif","g"),RegExp("png","g"),RegExp("jpg","g"),RegExp("jpeg","g"),RegExp("JPG","g")];
+						var isImage=false;
+						for(var l=0;l<regs.length;l++){
+						    if(data[i][j]["fileurl"]!=data[i][j]["fileurl"].replace(regs[l],"")){
+							isImage=true;
+							break;
+						    }
+						}
+						isRecognizedFileType=false;
+						var recognizedFileTypes=[
+						    [RegExp("pdf","g"),"fa-file-pdf-o"],
+						    [RegExp("doc","g"),"fa-file-word-o"],
+						    [RegExp("xls","g"),"fa-file-excel-o"],
+						    [RegExp("ppt","g"),"fa-file-powerpoint-o"],
+						    [RegExp("dbf","g"),"fa-table"],
+						    [RegExp("csv","g"),"fa-table"],
+						    [RegExp("zip","g"),"fa-file-zip-o"],
+						    ["default","fa-external-link"]
+						];
+						var iClass=recognizedFileTypes[recognizedFileTypes.length-1][1];
+						for(var l=0;l<recognizedFileTypes.length;l++){
+						    if(data[i][j]["fileurl"]!=data[i][j]["fileurl"].replace(recognizedFileTypes[l][0],"")){
+							isRecognizedFileType=true;
+							iClass=recognizedFileTypes[l][1];
+							break;
+						    }
+						}
+						$(this).fileinput({
+						    initialPreview: [
+							'<a href="'+data[i][j]["fileurl"]+'" target="_blank">'+(isImage?'<img src="'+data[i][j]["fileurl"]+'" style="height:160px" />':'<i class="fa '+iClass+'" aria-hidden="true" style="font-size: 10em;"></i>')+'</a>'
+						    ],
+						    initialPreviewAsData: true,
+						    initialPreviewConfig: [
+							{caption: cname[cname.length-1], width: "120px"}
+						    ],
+						    overwriteInitial: true,
+						    language: module.config().lang,
+						    uploadUrl: module.config().url+"?service=WPS&version=1.0.0&request=Execute&RawDataOutput=Result&Identifier=upload.saveOnServer0&dataInputs=filename="+closure.attr("name")+";"+closure.attr("name")+"=Reference@isFile=true;dest=none", 
+						    uploadAsync: true,
+						    maxFileCount: 1,
+						});
+						$(this).on('fileuploaded', function(event, data, previewId, index) {
+						    var form = data.form, files = data.files, extra = data.extra,
+							response = data.response, reader = data.reader;
+						    mainTableFiles[closure.attr("name")]=data.response.files[0].fileName;
+						});
+						
+					    });
 					}
 				    }
-				    isRecognizedFileType=false;
-				    var recognizedFileTypes=[
-					[RegExp("pdf","g"),"fa-file-pdf-o"],
-					[RegExp("doc","g"),"fa-file-word-o"],
-					[RegExp("xls","g"),"fa-file-excel-o"],
-					[RegExp("ppt","g"),"fa-file-powerpoint-o"],
-					[RegExp("dbf","g"),"fa-table"],
-					[RegExp("csv","g"),"fa-table"],
-					[RegExp("zip","g"),"fa-file-zip-o"],
-					["default","fa-external-link"]
-				    ];
-				    var iClass=recognizedFileTypes[recognizedFileTypes.length-1][1];
-				    for(var l=0;l<recognizedFileTypes.length;l++){
-					if(data[i][j]["fileurl"]!=data[i][j]["fileurl"].replace(recognizedFileTypes[l][0],"")){
-					    isRecognizedFileType=true;
-					    iClass=recognizedFileTypes[l][1];
-					    break;
+				}else{
+				    myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
+				    myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
+					if($(this).hasClass("htmlEditor") || $(this).hasClass("note-codable")){
+					    $(this).summernote('code', data[i][j]);
 					}
-				    }
-				    $(this).fileinput({
-					initialPreview: [
-					    '<a href="'+data[i][j]["fileurl"]+'" target="_blank">'+(isImage?'<img src="'+data[i][j]["fileurl"]+'" style="height:160px" />':'<i class="fa '+iClass+'" aria-hidden="true" style="font-size: 10em;"></i>')+'</a>'
-					],
-					initialPreviewAsData: true,
-					initialPreviewConfig: [
-					    {caption: cname[cname.length-1], width: "120px"}
-					],
-					overwriteInitial: true,
-					language: module.config().lang,
-					uploadUrl: module.config().url+"?service=WPS&version=1.0.0&request=Execute&RawDataOutput=Result&Identifier=upload.saveOnServer0&dataInputs=filename="+closure.attr("name")+";"+closure.attr("name")+"=Reference@isFile=true;dest=none", 
-					uploadAsync: true,
-					maxFileCount: 1,
+					if($(this).attr("type")=="checkbox"){
+					    $(this).prop("checked",(data[i][j]==true?true:false));
+					}
 				    });
-				    $(this).on('fileuploaded', function(event, data, previewId, index) {
-					var form = data.form, files = data.files, extra = data.extra,
-					    response = data.response, reader = data.reader;
-					mainTableFiles[closure.attr("name")]=data.response.files[0].fileName;
-				    });
-				    
-				});
-			    }
-			    }else{
-				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").val(data[i][j]).change();
-				myRoot.find("input[name=edit_"+j+"],select[name=edit_"+j+"],textarea[name=edit_"+j+"]").each(function(){
-				    if($(this).hasClass("htmlEditor") || $(this).hasClass("note-codable")){
-					$(this).summernote('code', data[i][j]);
-				    }
-				    if($(this).attr("type")=="checkbox"){
-					$(this).prop("checked",(data[i][j]==true?true:false));
-				    }
-				});
 
+				}
 			    }
 			}
-		    }
-		    try{
-			if(prefix==""){
-			    console.log("____ loadEmbeddedTables ____");
-			    loadEmbeddedTables(/*$("input[name="+prefix+"mainTableLevel]").val(),*/function(i){
-				console.log($("input[name="+prefix+"mainTableLevel]").val());
-				console.log("____ EmbeddedTables load "+embeddeds[i].id);
-				//$("embedded_"+i+"_mainListing_display").dataTable().fnDraw();
-				//$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
-				console.log("____ EmbeddedTables loaded "+i);
-				if(embeddeds[i].level==1 || embeddeds[i].id=="embedded_1024_")
-				    displayTable(embeddeds[i].id+"mainListing_display",$("input[name="+embeddeds[i].id+"mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),embeddedTableFilter[i]);
-				$(".require-"+embeddeds[i].id+"select").hide();
-			    });
-			    console.log("____ loadEmbeddedTables");
-			}else{
-			    console.log("ELSE ____ loadEmbeddedTables ____ "+prefix+" ");
-			    for(var i=0;i<embeddeds.length;i++){
-				console.log(embeddeds[i]);
-				console.log(embeddeds[i].level);
-				console.log(prefix+"mainTableLevel");
-				console.log(eval($("input[name="+prefix+"mainTableLevel]").val())+1);
-				if(eval($("input[name="+prefix+"mainTableLevel]").val())+1==embeddeds[i].level){
+			try{
+			    if(prefix==""){
+				console.log("____ loadEmbeddedTables ____");
+				loadEmbeddedTables(/*$("input[name="+prefix+"mainTableLevel]").val(),*/function(i){
+				    console.log($("input[name="+prefix+"mainTableLevel]").val());
+				    console.log("____ EmbeddedTables load "+embeddeds[i].id);
+				    //$("embedded_"+i+"_mainListing_display").dataTable().fnDraw();
+				    //$.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+				    console.log("____ EmbeddedTables loaded "+i);
+				    if(embeddeds[i].level==1 || embeddeds[i].id=="embedded_1024_")
+					displayTable(embeddeds[i].id+"mainListing_display",$("input[name="+embeddeds[i].id+"mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),embeddedTableFilter[i]);
+				    $(".require-"+embeddeds[i].id+"select").hide();
+				});
+				console.log("____ loadEmbeddedTables");
+			    }else{
+				console.log("ELSE ____ loadEmbeddedTables ____ "+prefix+" ");
+				for(var i=0;i<embeddeds.length;i++){
+				    console.log(embeddeds[i]);
 				    console.log(embeddeds[i].level);
-				    var lprefix=embeddeds[i].id;
-				    console.log(prefix);
-				    try{
-					if(tableDisplayed[lprefix+"mainListing_display"]){
-					    console.log(tableDisplayed[lprefix+"mainListing_display"]);
-					    tableDisplayed[lprefix+"mainListing_display"].destroy();
+				    console.log(prefix+"mainTableLevel");
+				    console.log(eval($("input[name="+prefix+"mainTableLevel]").val())+1);
+				    if(eval($("input[name="+prefix+"mainTableLevel]").val())+1==embeddeds[i].level){
+					console.log(embeddeds[i].level);
+					var lprefix=embeddeds[i].id;
+					console.log(prefix);
+					try{
+					    if(tableDisplayed[lprefix+"mainListing_display"]){
+						console.log(tableDisplayed[lprefix+"mainListing_display"]);
+						tableDisplayed[lprefix+"mainListing_display"].destroy();
+					    }
+					}catch(e){
+					    console.log(e);
 					}
-				    }catch(e){
-					console.log(e);
-				    }
-				    var oRoot=$("#"+lprefix+"mainListing_display");
-				    console.log(oRoot);
-				    for(var j=0;j<6;j++){
-					oRoot=oRoot.parent();
+					var oRoot=$("#"+lprefix+"mainListing_display");
 					console.log(oRoot);
-				    }
-				    console.log(oRoot);
-				    var lRoot=oRoot.find("input").last();
-				    console.log(lRoot);
-				    if(lRoot.length==0){
-					console.log("************ "+oRoot.parent().parent().parent());
-					lRoot=oRoot.parent().parent().parent().find("input").last();
-				    }
-				    lRoot.each(function(){
-					//console.log($(this));
-					var lid=oRoot.find("input[name="+lprefix+"link_col]").val();
-					console.log(lid);
-					var obj={"linkClause":" AND "};
-					obj[lid]=$(this).val();
-					console.log(obj);
-					console.log(embeddedTableFilter[i]);
-					embeddedTableFilter[i].push(obj);
-					console.log(embeddedTableFilter[i]);
-				    });
-				    console.log(lRoot);
-				    console.log(embeddedTableFilter);
-				    try{
-					console.log("RUN DISPLAY TABLE !");
-					displayTable(embeddeds[i].id+"mainListing_display",$("input[name="+embeddeds[i].id+"mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),[embeddedTableFilter[i][embeddedTableFilter[i].length-1]]);
-					//func(i);
-				    }catch(e){
-					console.log('-----!!!!! ERROR: '+e);
-				    }
+					for(var j=0;j<6;j++){
+					    oRoot=oRoot.parent();
+					    console.log(oRoot);
+					}
+					console.log(oRoot);
+					var lRoot=oRoot.find("input").last();
+					console.log(lRoot);
+					if(lRoot.length==0){
+					    console.log("************ "+oRoot.parent().parent().parent());
+					    lRoot=oRoot.parent().parent().parent().find("input").last();
+					}
+					lRoot.each(function(){
+					    //console.log($(this));
+					    var lid=oRoot.find("input[name="+lprefix+"link_col]").val();
+					    console.log(lid);
+					    var obj={"linkClause":" AND "};
+					    obj[lid]=$(this).val();
+					    console.log(obj);
+					    console.log(embeddedTableFilter[i]);
+					    embeddedTableFilter[i].push(obj);
+					    console.log(embeddedTableFilter[i]);
+					});
+					console.log(lRoot);
+					console.log(embeddedTableFilter);
+					try{
+					    console.log("RUN DISPLAY TABLE !");
+					    displayTable(embeddeds[i].id+"mainListing_display",$("input[name="+embeddeds[i].id+"mainTableViewId]").val(),embeddeds[i].mainTableFields,embeddeds[i].mainTableRFields.join(","),[embeddedTableFilter[i][embeddedTableFilter[i].length-1]]);
+					    //func(i);
+					}catch(e){
+					    console.log('-----!!!!! ERROR: '+e);
+					}
 
+				    }
 				}
 			    }
+			}catch(e){
+			    console.log(e);
+			    console.log("---- No embedded tables");
 			}
-		    }catch(e){
-			console.log(e);
-			console.log("---- No embedded tables");
-		    }
 			console.log("NOTIFY!");
-		    $(".notifications").notify({
-			message: { text: "Tuple loaded." },
-			type: 'success',
-		    }).show();
+			$(".notifications").notify({
+			    message: { text: "Tuple loaded." },
+			    type: 'success',
+			}).show();
 			console.log("NOTIFY!");
 
-		},function(data){
-		    myRoot.append(data["ExceptionReport"]["Exception"]["ExceptionText"].toString());
-		    $(".notifications").notify({
-			message: { text: data },
-			type: 'success',
-		    }).show();
-		});
+		    },function(data){
+			myRoot.append(data["ExceptionReport"]["Exception"]["ExceptionText"].toString());
+			$(".notifications").notify({
+			    message: { text: data },
+			    type: 'success',
+			}).show();
+		    });
 		else{
 		    $("input[name="+prefix+"link_val]").val($(this).find("input[name=id]").val());
 		}
@@ -527,8 +679,13 @@ define([
 	    $(this).on('fileuploaded', function(event, data, previewId, index) {
 		var form = data.form, files = data.files, extra = data.extra,
 		    response = data.response, reader = data.reader;
-		if(isInput)
+		if(isInput){
 		    mainTableFiles[closure.attr("name")]=data.response.files[0].fileName;
+		    if(mmEditSaveUpload){
+			mmEditSaveUpload(data.response.files[0]);
+		    }
+
+		}
 		else{
 		    importerUploadedFiles.push(data.response.files[0].fileName);
 		    $('.importer_submit').show();
@@ -539,6 +696,9 @@ define([
 	    });
 	});
 
+
+	console.log($("#dropdown_template").html());
+	$("#mainListing_display_filter").html($("#dropdown_template").html());
 	$('.importer_submit').hide();
 
     }
@@ -594,7 +754,7 @@ define([
 	    }
 	    
 	});
-					    
+	
     }
 
     function notify(text, type) {
@@ -605,6 +765,7 @@ define([
     }
 
     function bindSave(){
+	$(".tab-pane").find("input[type=checkbox]").change();
 	$("[data-mmaction=runPrint]").click(function(){
 	    var closure=$(this);
 	    $(this).addClass("disabled");
@@ -633,6 +794,8 @@ define([
 		{identifier: "tableId", value: tableId, dataType: "string"},
 		{identifier: "id", value: tupleId, dataType: "string"},
 		{identifier: "rid", value: $(this).parent().find('input[name="edit_report_id"]').val(), dataType: "string"},
+		{"identifier":"operators","value":JSON.stringify(mainTableOperators, null, ' '),"mimeType":"application/json"},
+		{"identifier":"filter_labels","value":JSON.stringify(mainTableFilterLabels, null, ' '),"mimeType":"application/json"},
 		{"identifier":"filters","value":JSON.stringify(mainTableFilter, null, ' '),"mimeType":"application/json"}
 	    ];
 	    
@@ -720,6 +883,22 @@ define([
 	$("[data-mmaction=save]").click(function(){
 	    var myRoot=$(this).parent();
 	    var myRoot1=$(this).parent().parent();
+	    var isValidated=true;
+	    myRoot.find("input,select,textarea").each(function(){
+		if($(this).prop("required") && $(this).val()=="" && $(this).parent().parent().parent().attr('id')==myRoot1.attr("id")){
+		    console.log($(this));
+		    isValidated=false;
+		    $(this).addClass("was-validated");
+		    $(this).addClass("is-invalid");
+	    	}else{
+		    if($(this).prop("required")&& $(this).parent().parent().parent().attr('id')==myRoot1.attr("id"))
+			$(this).removeClass("is-invalid").addClass("is-valid");
+		}
+	    });
+	    if(!isValidated){
+		console.log("form invalid, please check messages");
+		return false;
+	    }
 	    params=[];
 	    var tupleReal={};
 	    myRoot.find("script").each(function(){
@@ -755,27 +934,27 @@ define([
 	    myRoot.find("input,textarea,select").each(function(){
 		if($(this).hasClass("htmlEditor") || $(this).hasClass("note-codable"))
 		    return;
-		                                console.log($(this))
+		console.log($(this))
 
 		if(!$(this).find('option:selected').attr("data-map") && (($(this).is(":visible") || $(this).attr('id')=="edition_uid")  && $(this).attr('id') || $(this).is("textarea")) && $(this).attr('id') && $(this).attr('id').indexOf("_mmtype")<0 && $(this).attr('id').indexOf("_mmlayer")<0 && $(this).attr('id').indexOf("_geotype")<0){
 		    try{
 			// ISSUE WITH upload
 			var noDisplay=false;
-			    console.log("**********- "+myRoot1.attr('id'))
+			console.log("**********- "+myRoot1.attr('id'))
 			/*try{
-			    console.log("**********- "+myRoot1.attr('id'))
-			    console.log($(this));
-			    console.log("**********- "+($(this).parent().parent().parent().parent().attr('id') && $(this).parent().parent().parent().parent().attr('id').indexOf("embedded_")>=0));
-			    console.log("**********- "+($(this).parent().parent().parent().attr('id') && $(this).parent().parent().parent().attr('id').indexOf("embedded_")>=0));
-			    noDisplay=($(this).attr("id")==null ||
-				       ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="tuple_id") ||
-				       ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="table_id") ||
-				       ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="edition_id") );
-			    console.log("**********- "+(myRoot1.attr('id').indexOf('embedded')<0));
-			    console.log("**********- "+noDisplay);
-			}catch(e){
-			    console.log(e);
-			}*/
+			  console.log("**********- "+myRoot1.attr('id'))
+			  console.log($(this));
+			  console.log("**********- "+($(this).parent().parent().parent().parent().attr('id') && $(this).parent().parent().parent().parent().attr('id').indexOf("embedded_")>=0));
+			  console.log("**********- "+($(this).parent().parent().parent().attr('id') && $(this).parent().parent().parent().attr('id').indexOf("embedded_")>=0));
+			  noDisplay=($(this).attr("id")==null ||
+			  ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="tuple_id") ||
+			  ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="table_id") ||
+			  ($(this).attr("id")!=null && $(this).attr("id").replace(/edition_/,"")=="edition_id") );
+			  console.log("**********- "+(myRoot1.attr('id').indexOf('embedded')<0));
+			  console.log("**********- "+noDisplay);
+			  }catch(e){
+			  console.log(e);
+			  }*/
 			if(noDisplay || (myRoot1.attr('id').indexOf('embedded')<0 && (
 			    ($(this).parent().parent().parent().parent().attr('id') &&
 			     $(this).parent().parent().parent().parent().attr('id').indexOf("embedded_")>=0)
@@ -785,15 +964,22 @@ define([
 			console.log($(this).parent().parent().parent());
 			console.log($(this).parent().parent().parent().parent());
 			console.log("++++++ "+$(this).attr("id").replace(/edition_/,""));
-			    console.log(mainTableFiles);
-			    console.log(mainTableFiles+" "+$(this).attr("name"));
+			console.log(mainTableFiles);
+			console.log(mainTableFiles+" "+$(this).attr("name"));
 			if(!mainTableFiles[$(this).attr("name")]){
 			    if($(this).attr("name").indexOf("link_col")<0){
 				if($(this).attr("type")=="checkbox"){
 				    tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).prop("checked");
 				}
 				else
-				    tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
+                                    if($(this).attr("id").indexOf("g-recaptcha")<0){
+                                        if($(this).parent().parent().parent().find("select[name=search_"+$(this).attr("name").replace(/edit_/,"")+"]").length==0)
+                                            tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
+                                        else{
+                                            tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).parent().parent().parent().find("select[name=search_"+$(this).attr("name").replace(/edit_/,"")+"]").val();
+                                        }
+                                    }
+				//tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
 			    }
 			    else{
 				tuple[$(this).val()]=$(this).next().val();
@@ -815,6 +1001,10 @@ define([
 			console.log(module.config().msUrl+"?map="+tmpMap+"&service=WFS&version=1.0.0&request=GetFeature&typename="+$(this).find('option:selected').val());
 			console.log("******** OM *********");
 		    }
+		    var tmpMap1=$(this).parent().parent().prev().val();
+		    if(tmpMap1){
+			params.push({"identifier":"InputGeometryField","value":tmpMap1,"dataType":"string"});
+		    }
 		    if($(this).val()=="draw"){
 			console.log("SHOULD USE GEOMETRYINPUT FROM OL DRAW");
 			console.log(searchMap);
@@ -826,22 +1016,26 @@ define([
 			    console.log(tmpFeature);
 			    console.log("###### DO SOMETHING WITH THE GEOMETRY!");
 			    var fwkt=new ol.format.WKT();
-			    currentDrawnElement=fwkt.writeGeometry(tmpFeature.getGeometry().transform('EPSG:3857','EPSG:4326'));
-			    console.log(currentDrawnElement);
+			    try{
+			        currentDrawnElement=fwkt.writeGeometry(ol.geom.Polygon.fromCircle(tmpFeature.getGeometry().transform('EPSG:3857','EPSG:4326')),92,0);
+			    }catch(e){
+			    	currentDrawnElement=fwkt.writeGeometry(tmpFeature.getGeometry().transform('EPSG:3857','EPSG:4326'));
+			    	console.log(currentDrawnElement);
+			    }
 
 			}
 			params.push({"identifier":"InputGeometry","value": currentDrawnElement, "mimeType": "text/plain"});
 			currentDrawnElement=null;
 		    }
-		   if($(this).attr('id')=='edition_wkb_geometry' && $(this).parent().find('input').length==3){
-			 var coords=[];
-			 coords.push($(this).parent().find('input:eq(0)').val());
-			 coords.push($(this).parent().find('input:eq(1)').val());
-			 console.log(coords);
-			 params.push({"identifier":"InputGeometry","value": 'POINT('+coords[0]+' '+coords[1]+')', "mimeType": "text/plain"});
-			   console.log(params);
-			 //tuple[$(this).attr("id").replace(/edition_/,"")]="ST_SetSRID(ST_GeometryFromText('POINT("+coords[0]+" "+coords[1]+"),4326)')";
-		   }
+		    if($(this).attr('id')=='edition_wkb_geometry' && $(this).parent().find('input').length==3){
+			var coords=[];
+			coords.push($(this).parent().find('input:eq(0)').val());
+			coords.push($(this).parent().find('input:eq(1)').val());
+			console.log(coords);
+			params.push({"identifier":"InputGeometry","value": 'POINT('+coords[0]+' '+coords[1]+')', "mimeType": "text/plain"});
+			console.log(params);
+			//tuple[$(this).attr("id").replace(/edition_/,"")]="ST_SetSRID(ST_GeometryFromText('POINT("+coords[0]+" "+coords[1]+"),4326)')";
+		    }
 		}
 	    });
 	    var parts=myRoot1.attr('id').split("_");
@@ -866,11 +1060,11 @@ define([
 		}
 	    }
 	    /*myRoot1.find("#edition_table_id").last().each(function(){
-		params.push({identifier: "tableId", value: $(this).val(), dataType: "string"});
-	    });*/
+	      params.push({identifier: "tableId", value: $(this).val(), dataType: "string"});
+	      });*/
 	    /*myRoot1.find("#edition_edition_id").last().each(function(){
-		params.push({identifier: "editId", value: $(this).val(), dataType: "string"});
-		});*/
+	      params.push({identifier: "editId", value: $(this).val(), dataType: "string"});
+	      });*/
 	    console.log(myRoot1);
 	    console.log(myRoot1.find("#edition_table_id"));
 	    params.push({identifier: "tableId", value: myRoot.next().val(), dataType: "string"});
@@ -881,85 +1075,103 @@ define([
 	    });
 	    params.push({identifier: "tuple", value: JSON.stringify(tuple, null, ' '), mimeType: "application/json"});
 	    /*if(tupleReal["template_layerQuery_display"])
-		params.push({identifier: "tupleReal", value: JSON.stringify({}, null, ' '), mimeType: "application/json"});
-	    else*/
-		params.push({identifier: "tupleReal", value: JSON.stringify(tupleReal, null, ' '), mimeType: "application/json"});
+	      params.push({identifier: "tupleReal", value: JSON.stringify({}, null, ' '), mimeType: "application/json"});
+	      else*/
+	    params.push({identifier: "tupleReal", value: JSON.stringify(tupleReal, null, ' '), mimeType: "application/json"});
 	    console.log(params);
-	    adminBasic.callService("np.clientInsert",params,function(data){
-		$(".notifications").notify({
-		    message: { text: data },
-		    type: 'success',
-		}).show();
-		console.log("RELOAD UPDATED LIST");
-		console.log(myRoot1.parent().parent().parent().prev());
-		var lRoot=myRoot1.parent().parent().parent().prev();
-		var tlRoot=lRoot.find('li').first().children().first();
-		try{
-		    tlRoot.attr("href").indexOf("embedded")
-		}catch(e){
-		    lRoot=myRoot1.parent().prev();
-		    tlRoot=lRoot.find('li').first().children().first();
-		}
-		lRoot.find('li').first().children().first().click();
-		console.log(lRoot.find('li').first().children().first().attr("href"));
-		if(lRoot.find('li').first().children().first().attr("href").indexOf("embedded")>=0 && tlRoot.attr("href").indexOf("embedded")>=0){
-		    var tid=tlRoot.attr("href").replace(/#/g,"").replace(/listing/g,"mainListing_display");
-		    $(".require-"+tid.replace(/mainListing_display/g,"select")).hide();
-		    tableDisplayed[tid].CRowSelected=[];
-		    tableDisplayed[tid].rows().every( function () {
-			tableDisplayed[tid].row(this).deselect();
-		    });
-		    tableDisplayed[tid].columns.adjust().draw();
-		    $(lRoot.find('li').first().children().first().attr("href")).find('tr').each(function(){
-			console.log($(this));
-			$(this).removeClass("selected");
-			//$(this).click();
-		    });
-		    console.log(tlRoot);
-
-		}
-		else if(tlRoot.attr("href")=="#listing"){
-		    /*tableDisplayed["mainListing_display"].rows().each(function(){
-			$(this).deselect();
-		    });*/
-		    $(".require-select").hide();
-		    //tableDisplayed["mainListing_display"].destroy();
-		    //console.log("fnDraw");
-		    //tableDisplayed["mainListing_display"].draw();
-		    //alert('ok');
-		    $("#mainListing_display").find('tr').each(function(){
-			console.log($(this));
-			if($(this).hasClass("selected"))
+            var isValidEdit=true;
+	    try{
+		if(mmEditSaveValidate)
+		    if(!mmEditSaveValidate()){
+			isValidEdit=false;
+			//return false;
+		    }
+	    }catch(e){console.log(e);}
+	    console.log(isValidEdit); 
+	    if(isValidEdit)
+		adminBasic.callService("np.clientInsert",params,function(data){
+		    $(".notifications").notify({
+			message: { text: data },
+			type: 'success',
+		    }).show();
+		    console.log("RELOAD UPDATED LIST");
+		    try{
+			if(mmEditSaveCallback)
+			    mmEditSaveCallback(data);
+		    }catch(e){
+		    }
+		    var lRoot=myRoot1.parent().parent().parent().prev();
+		    if(myRoot1.parent().parent().hasClass("container"))
+			lRoot=myRoot1.parent().parent();
+		    console.log(myRoot1);
+		    console.log(myRoot1.parent().parent().parent().prev());
+		    var tlRoot=lRoot.find('li').first().children().first();
+		    try{
+			tlRoot.attr("href").indexOf("embedded")
+		    }catch(e){
+			lRoot=myRoot1.parent().prev();
+			tlRoot=lRoot.find('li').first().children().first();
+		    }
+		    lRoot.find('li').first().children().first().click();
+		    console.log(lRoot.find('li').first().children().first().attr("href"));
+		    if(lRoot.find('li').first().children().first().attr("href").indexOf("embedded")>=0 && tlRoot.attr("href").indexOf("embedded")>=0){
+			var tid=tlRoot.attr("href").replace(/#/g,"").replace(/listing/g,"mainListing_display");
+			$(".require-"+tid.replace(/mainListing_display/g,"select")).hide();
+			tableDisplayed[tid].CRowSelected=[];
+			tableDisplayed[tid].rows().every( function () {
+			    tableDisplayed[tid].row(this).deselect();
+			});
+			tableDisplayed[tid].columns.adjust().draw();
+			$(lRoot.find('li').first().children().first().attr("href")).find('tr').each(function(){
 			    console.log($(this));
-			$(this).removeClass("selected");
-			//$(this).click();
-		    });
-		    tableDisplayed["mainListing_display"].rows().every( function () {
-			console.log(this);
-			console.log(tableDisplayed["mainListing_display"].row(this));
-			tableDisplayed["mainListing_display"].row(this).deselect();
-		    });
-		    tableDisplayed["mainListing_display"].columns.adjust().draw();
-		    tableDisplayed["mainListing_display"].rows().every( function () {
-			console.log(this);
-			console.log(tableDisplayed["mainListing_display"].row(this));
-			tableDisplayed["mainListing_display"].row(this).deselect();
-		    });
-		    $("#mainListing_display").find('tr').each(function(){
-			console.log($(this));
-			$(this).removeClass("selected");
-			//$(this).click();
-		    });
-		    //displayTable("mainListing_display",$("input[name=mainTableViewId]").val(),mainTableFields,mainTableRFields.join(","),mainTableFilter);
-		}
-		//console.log(lRoot.next().find('.active').first().find('.dataTables_wrapper').first().attrd('id'));
-	    },function(data){
-		myRoot.append('<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+data["ExceptionReport"]["Exception"]["ExceptionText"].toString()+'</div>');
-		$(".notifications").notify({
-		    message: { text: data },
-		    type: 'success',
-		}).show();
-	    });
+			    $(this).removeClass("selected");
+			    //$(this).click();
+			});
+			console.log(tlRoot);
+
+		    }
+		    else if(tlRoot.attr("href")=="#listing"){
+			/*tableDisplayed["mainListing_display"].rows().each(function(){
+			  $(this).deselect();
+			  });*/
+			$(".require-select").hide();
+			//tableDisplayed["mainListing_display"].destroy();
+			//console.log("fnDraw");
+			//tableDisplayed["mainListing_display"].draw();
+			//alert('ok');
+			$("#mainListing_display").find('tr').each(function(){
+			    console.log($(this));
+			    if($(this).hasClass("selected"))
+				console.log($(this));
+			    $(this).removeClass("selected");
+			    //$(this).click();
+			});
+			tableDisplayed["mainListing_display"].rows().every( function () {
+			    console.log(this);
+			    console.log(tableDisplayed["mainListing_display"].row(this));
+			    tableDisplayed["mainListing_display"].row(this).deselect();
+			});
+			tableDisplayed["mainListing_display"].columns.adjust().draw();
+			tableDisplayed["mainListing_display"].rows().every( function () {
+			    console.log(this);
+			    console.log(tableDisplayed["mainListing_display"].row(this));
+			    tableDisplayed["mainListing_display"].row(this).deselect();
+			});
+			$("#mainListing_display").find('tr').each(function(){
+			    console.log($(this));
+			    $(this).removeClass("selected");
+			    //$(this).click();
+			});
+			//displayTable("mainListing_display",$("input[name=mainTableViewId]").val(),mainTableFields,mainTableRFields.join(","),mainTableFilter);
+		    }
+		    //console.log(lRoot.next().find('.active').first().find('.dataTables_wrapper').first().attrd('id'));
+		},function(data){
+		    myRoot.append('<div class="alert alert-danger"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+data["ExceptionReport"]["Exception"]["ExceptionText"].toString()+'</div>');
+		    $(".notifications").notify({
+			message: { text: data },
+			type: 'success',
+		    }).show();
+		});
 	    if(myMapIframe){
 		var myInteractions=myMapIframe.app.getInteractions();
 		myMapIframe.app.desactivateInteractions();
@@ -1039,25 +1251,25 @@ define([
 				    if (data.result.ExecuteResponse.ProcessOutputs) {
 					console.log("SUCCESS !");
 					/*var ref=data.result["ExecuteResponse"]["ProcessOutputs"]["Output"]["Reference"]["_href"];
-					var mapParts=ref.split('&');
-					console.log(mapParts[0]);
-					var mapParts=mapParts[0].split("=");
-					console.log(mapParts[1]);
-					myMapIframe.app.addLayerToMap({
-					    mapfile: mapParts[1],
-					    layers: ["Result"],
-					    labels: [currentElement.parent().find('input[name="processLayer_'+cid+'"]').val()],//$("#layerTitle").val()],
-					    listHTML: currentElement.parent().find('input[name="processLayer_'+cid+'"]').val(),//$("#layerTitle").val(),
-					    cselection: ""
-					});
-					$("#layerExtract").find('form:gt(0)').remove();
-					console.log(data);
-					console.log(mapParts);
+					  var mapParts=ref.split('&');
+					  console.log(mapParts[0]);
+					  var mapParts=mapParts[0].split("=");
+					  console.log(mapParts[1]);
+					  myMapIframe.app.addLayerToMap({
+					  mapfile: mapParts[1],
+					  layers: ["Result"],
+					  labels: [currentElement.parent().find('input[name="processLayer_'+cid+'"]').val()],//$("#layerTitle").val()],
+					  listHTML: currentElement.parent().find('input[name="processLayer_'+cid+'"]').val(),//$("#layerTitle").val(),
+					  cselection: ""
+					  });
+					  $("#layerExtract").find('form:gt(0)').remove();
+					  console.log(data);
+					  console.log(mapParts);
 
-					$(".notifications").notify({
-					    message: { text: data.text },
-					    type: 'success',
-					    }).show();*/
+					  $(".notifications").notify({
+					  message: { text: data.text },
+					  type: 'success',
+					  }).show();*/
 					console.log(data);
 					$(".notifications").notify({
 					    message: { text: "Fait" },
@@ -1067,8 +1279,8 @@ define([
 				},
 				onError: function(data) {
 				    /*progress.attr("aria-valuenow",100);
-				    progress.css('width', (100)+'%');
-				    progress.text(data.text+' : '+(100)+'%');*/
+				      progress.css('width', (100)+'%');
+				      progress.text(data.text+' : '+(100)+'%');*/
 				    try{
 					$(".notifications").notify({
 					    message: { text: data["result"]["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
@@ -1089,21 +1301,21 @@ define([
 		    });
 
 		    /*var ref=data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Reference"]["_href"];
-		    var mapParts=ref.split('&');
-		    console.log(mapParts[0]);
-		    var mapParts=mapParts[0].split("=");
-		    console.log(mapParts[1]);
-		    myMapIframe.app.addLayerToMap({
-			mapfile: mapParts[1],
-			layers: ["Result"],
-			labels: [$("#layerTitle").val()],
-			listHTML: $("#layerTitle").val(),
-			cselection: ""
-		    });
-		    $("#layerExtract").find('form:gt(0)').remove();
-		    $("#layerTitle").val("");
-		    console.log(data);
-		    console.log(mapParts);*/
+		      var mapParts=ref.split('&');
+		      console.log(mapParts[0]);
+		      var mapParts=mapParts[0].split("=");
+		      console.log(mapParts[1]);
+		      myMapIframe.app.addLayerToMap({
+		      mapfile: mapParts[1],
+		      layers: ["Result"],
+		      labels: [$("#layerTitle").val()],
+		      listHTML: $("#layerTitle").val(),
+		      cselection: ""
+		      });
+		      $("#layerExtract").find('form:gt(0)').remove();
+		      $("#layerTitle").val("");
+		      console.log(data);
+		      console.log(mapParts);*/
 		},
 		error: function(data){
 		    console.log("ERROR !");
@@ -1127,13 +1339,13 @@ define([
 	    params=[];
 	    var tuple={};
 	    /*myRoot.find("input,textarea,select").each(function(){
-		console.log($(this).attr("name"));
-		console.log($(this).attr("id"));
-		console.log($(this).val());
-		if(!$(this).attr("id"))
-		    return;
-		tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
-	    });*/
+	      console.log($(this).attr("name"));
+	      console.log($(this).attr("id"));
+	      console.log($(this).val());
+	      if(!$(this).attr("id"))
+	      return;
+	      tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
+	      });*/
 	    var myRoot1=$(this).parent().parent();
 	    myRoot1.find("#edition_table_id").each(function(){
 		params.push({identifier: "tableId", value: $(this).val(), dataType: "string"});
@@ -1190,6 +1402,8 @@ define([
 	});
     }
 
+    var filterLabels=[];
+
     function bindSearch(){
 	$("[data-mmaction=search]").click(function(){
 	    console.log('* Run search function');
@@ -1198,15 +1412,19 @@ define([
 	    var tuple={};
 	    var operators={};
 	    var lines="";
+            var filterLabel="";
 	    myRoot.find("input,textarea").each(function(){
 		if(!$(this).is(":disabled") && $(this).attr("id")!="edition_uid"){
 		    try{
 			tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
 			if($(this).next().length>0){
-			  operators[$(this).attr("id").replace(/edition_/,"")]=$(this).next().find("select").val();
-			  lines+=managerTools.generateFromTemplate($("#filter_line_template")[0].innerHTML,["line"],[$(this).parent().parent().prev().html()+" "+($(this).next().find("select").val()=="eq"?"=":($(this).next().find("select").val()=="lt"?"&lt;":"&gt;"))+" "+$(this).val()]);
-			}else
-			  lines+=managerTools.generateFromTemplate($("#filter_line_template")[0].innerHTML,["line"],[$(this).parent().parent().prev().html()+" - "+$(this).val()]);
+			    operators[$(this).attr("id").replace(/edition_/,"")]=$(this).next().find("select").val();
+			    lines+=managerTools.generateFromTemplate($("#filter_line_template")[0].innerHTML,["line"],[$(this).parent().parent().prev().html()+" "+($(this).next().find("select").val()=="eq"?"=":($(this).next().find("select").val()=="lt"?"&lt;":"&gt;"))+" "+$(this).val()]);
+			    filterLabel=($(this).parent().parent().prev().html()+"  "+($(this).next().find("select").val()=="eq"?"=":($(this).next().find("select").val()=="lt"?"<":">"))+" "+$(this).val());
+			}else{
+			    lines+=managerTools.generateFromTemplate($("#filter_line_template")[0].innerHTML,["line"],[$(this).parent().parent().prev().html()+" - "+$(this).val()]);
+			    filterLabel=($(this).parent().parent().prev().html()+" - "+$(this).val());
+			}
 			
 		    }catch(e){
 			console.log($(this));
@@ -1220,6 +1438,7 @@ define([
 			tuple[$(this).attr("id").replace(/edition_/,"")]=$(this).val();
 			if($(this).attr("id")!="edition_linkClause"){
 			    lines+=managerTools.generateFromTemplate($("#filter_line_template")[0].innerHTML,["line"],[$(this).parent().parent().prev().html()+" - "+$(this).find("option:selected").text()]);
+			    filterLabel=($(this).parent().parent().prev().html()+" - "+$(this).find("option:selected").text());
 			}else
 			    clause=$(this).val();
 		    }catch(e){
@@ -1231,6 +1450,7 @@ define([
 	    $("#listing").prepend(managerTools.generateFromTemplate($("#filter_complete_template")[0].innerHTML,["type","id","cid","body"],[(clause!="OR"?"info":"primary"),mainTableFilter.length,mainTableFilter.length+1,lines]));
 	    mainTableFilter.push(tuple);
 	    mainTableOperators.push(operators);
+	    mainTableFilterLabels.push(filterLabel);
 	    $("#listing").find(".close").each(function(){
 		$(this).off('click');
 		$(this).on('click',function(e){
@@ -1238,6 +1458,7 @@ define([
 		    var cid=parseInt($(this).parent().attr('id').replace(/filter_/,""));
 		    mainTableFilter.splice(cid,1);
 		    mainTableOperators.splice(cid,1);
+                    mainTableFilterLabels.splice(cid,1);
 		    var lRoot=$(this).parent().parent();
 		    $(this).parent().remove();
 		    console.log(cid);
@@ -1261,6 +1482,10 @@ define([
 	    });
 	    $("#mainListing_display").dataTable().fnDraw();
 	    $.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
+	    var lObj=$(this).parent().parent().parent().parent().find("li.nav-item").first().find("a");
+	    window.setTimeout(function () {
+		lObj.click();
+	    },500);
 	    console.log('* Search function end');
 	    return false;
 	});
@@ -1403,9 +1628,45 @@ define([
 	}
 	console.log("OK");
 	try{
-	displayTable("mainListing_display",$("input[name=mainTableViewId]").val(),mainTableFields,mainTableRFields.join(","),mainTableFilter,null,mainTableOperators);
+	    displayTable("mainListing_display",$("input[name=mainTableViewId]").val(),mainTableFields,mainTableRFields.join(","),mainTableFilter,null,mainTableOperators);
 	}catch(e){
-		console.log(e);
+	    console.log(e);
+	    $(".mmFile").each(function(){
+		var closure=$(this);
+		var isInput=(!closure.parent().hasClass("importer_upload"));
+		console.log("***** MMFILE : "+isInput);
+		var lparams={
+		    language: module.config().lang,
+		    uploadUrl: module.config().url+"?service=WPS&version=1.0.0&request=Execute&RawDataOutput=Result&Identifier=upload.saveOnServer0&dataInputs=filename="+closure.attr("name")+";"+closure.attr("name")+"=Reference@isFile=true;dest=none", // server upload action
+		    uploadAsync: true,
+		    done: function (e, data) {
+			$.each(data.result.files, function (index, file) {
+                            $('<p/>').text(file.name).appendTo('#files');
+			});
+                    }
+		};
+		if(isInput)
+		    lparams["maxFileCount"]=1;
+		$(this).fileinput(lparams);
+		$(this).on('fileuploaded', function(event, data, previewId, index) {
+		    var form = data.form, files = data.files, extra = data.extra,
+			response = data.response, reader = data.reader;
+		    if(isInput){
+			mainTableFiles[closure.attr("name")]=data.response.files[0].fileName;
+			if(mmEditSaveUpload){
+			    mmEditSaveUpload(data.response.files[0]);
+			}
+		    }else{
+			importerUploadedFiles.push(data.response.files[0].fileName);
+			$('.importer_submit').show();
+			$(".importer_submit_log").append(
+			    $(managerTools.generateFromTemplate($("#importer_progress").html(),["id","file"],[importerUploadedFiles.length-1,data.files[0].name]))
+			);
+		    }
+		});
+	    });
+
+
 	}
 	console.log("OK");
 	try{   
@@ -1420,7 +1681,7 @@ define([
 	    if($(this).attr('name'))
 		try{
 		    console.log($(this).html());
-		    if($(this).attr('name').indexOf("geometryField")>0){
+		    if($(this).attr('name').indexOf("geometryField")>0 || $(this).attr('id').indexOf("_runFirst")>0){
 			//$("body").append("<script>"+$(this).html()+"</script>");
 			eval($(this).html());
 			return;
@@ -1511,8 +1772,9 @@ define([
 					console.log(changingFields[changingFields.length-1][lname][i]);
 					
 					(function(closure,ref){
+					    console.log(closure);
 					    closure.parent().find('select[name='+closure.attr('name')+']').first().off('change');
-					    closure.parent().find('select[name='+closure.attr('name')+']').first().change(function(){
+					    closure.parent().find('select[name='+closure.attr('name')+']').first().on("change",function(){
 						console.log("*****\n OK *****");
 						console.log(ref);
 						for(var ti=0;ti<ref.length;ti++)
@@ -1522,17 +1784,21 @@ define([
 							    console.log(tj);
 							    console.log(closure);
 							    console.log(ref[ti][tj]);
+							    console.log($(this).val());
+							    console.log($.isArray($(this).val()));
+							    console.log($.isArray($(this).val()) && $(this).val().indexOf(ref[ti][tj]["options"][0]));
+							    console.log($.isArray($(this).val()) && $(this).val().indexOf(""+ref[ti][tj]["options"][0]));
 							    console.log('input,select,textarea#edition_'+tj+'');
 							    console.log(closure.parent().find('input#edition_'+tj+',select#edition_'+tj+''));
-							    if(ref[ti][tj]["options"][0]==$(this).val()){
+							    if(ref[ti][tj]["options"][0]==$(this).val() || ( $.isArray($(this).val()) && $(this).val().indexOf(""+ref[ti][tj]["options"][0])>=0 ) ) {
 								console.log(" ****** \n DISPLAY \n ****** ");
 								console.log(closure.parent().find('input#edition_'+tj+',select#edition_'+tj+''));
-								closure.parent().find('input#edition_'+tj+',select#edition_'+tj+'').parent().parent().show();
+								closure.parent().find('input#edition_'+tj+',select#edition_'+tj+',textarea#edition_'+tj).parent().parent().show();
 							    }
 							    else{
 								console.log(" ****** \n HIDE \n ****** ");
 								console.log(closure.parent().find('input#edition_'+tj+',select#edition_'+tj+''));
-								closure.parent().find('input#edition_'+tj+',select#edition_'+tj+'').parent().parent().hide();
+								closure.parent().find('input#edition_'+tj+',select#edition_'+tj+',textarea#edition_'+tj).parent().parent().hide();
 							    }
 							}
 						    }
@@ -1608,59 +1874,59 @@ define([
 							for(var jj in refObject)
 							    for(var kk in refObject[jj][0]["myself"])
 								for(var ll in refObject[jj][0]["myself"][kk]){
-								celement.parent().find("select[name="+ll+"]").off('change');
-								(function(a,b,c,d){
-								celement.parent().find("select[name="+ll+"]").on('change',function(){
-									console.log("MYSELF");
-						console.log(celement);
-									console.log(a);
-									console.log(b);
-									console.log(c);
-									console.log(d);
-									var originalElement=$(this);
-									var tmpClause="";
-									var tmpId=0;
-									for(var i in refObject){
-									    tmpId=i.replace(/edit_/,"");
-									    for(var j in refObject[i][0]["myself"])
-										for(var k in refObject[i][0]["myself"][j]){
+								    celement.parent().find("select[name="+ll+"]").off('change');
+								    (function(a,b,c,d){
+									celement.parent().find("select[name="+ll+"]").on('change',function(){
+									    console.log("MYSELF");
+									    console.log(celement);
+									    console.log(a);
+									    console.log(b);
+									    console.log(c);
+									    console.log(d);
+									    var originalElement=$(this);
+									    var tmpClause="";
+									    var tmpId=0;
+									    for(var i in refObject){
+										tmpId=i.replace(/edit_/,"");
+										for(var j in refObject[i][0]["myself"])
+										    for(var k in refObject[i][0]["myself"][j]){
 											if(tmpClause!="")
-												tmpClause+=" "+refObject[i][0]["myself"][j][k]['cond_join']+" ";
+											    tmpClause+=" "+refObject[i][0]["myself"][j][k]['cond_join']+" ";
 											tmpClause+=" "+refObject[i][0]["myself"][j][k]['tfield']+" "+refObject[i][0]["myself"][j][k]['operator']+" "+(refObject[i][0]["myself"][j][k]['operator']=="like"?"'":"")+(celement.parent().find("select[name="+k+"]").val())+(refObject[i][0]["myself"][j][k]['operator']=="like"?"'":"");
-										}
-									}
-									console.log(tmpClause);
-									zoo.execute({
+										    }
+									    }
+									    console.log(tmpClause);
+									    zoo.execute({
                                                 				"identifier": "template.display",
                                                 				"type": "POST",
                                                 				dataInputs: [
-                                                    					{"identifier":"tmpl","value":"public/modules/tables/fetchDependencies1_js","dataType":"string"},
-                                                    					{"identifier":"element","value":tmpId,"dataType":"float"},
-											{"identifier":"cond","value":tmpClause,"mimeType":"applicatioin/json"},
+                                                    				    {"identifier":"tmpl","value":"public/modules/tables/fetchDependencies1_js","dataType":"string"},
+                                                    				    {"identifier":"element","value":tmpId,"dataType":"float"},
+										    {"identifier":"cond","value":tmpClause,"mimeType":"applicatioin/json"},
                                                 				],
                                                 				dataOutputs: [
-                                                    					{"identifier":"Result","type":"raw"},
+                                                    				    {"identifier":"Result","type":"raw"},
                                                 				],
                                                 				success: function(data){
-											tmpId1="edit_"+tmpId;
-											var tempVal=celement.parent().find("select[name='"+tmpId1+"']").val();
-											celement.parent().find("select[name='"+tmpId1+"']").html("");
-											for(var j in data){
-												celement.parent().find("select[name='"+tmpId1+"']").append('<option value="'+data[j][0]+'">'+data[j][1]+'</option>');
-											}
-											if(originalElement.attr("data-cvalue"))
-												celement.parent().find("select[name='"+tmpId1+"']").val(originalElement.attr("data-cvalue")).change();
-											else
-												celement.parent().find("select[name='"+tmpId1+"']").val(tempVal).change();
+										    tmpId1="edit_"+tmpId;
+										    var tempVal=celement.parent().find("select[name='"+tmpId1+"']").val();
+										    celement.parent().find("select[name='"+tmpId1+"']").html("");
+										    for(var j in data){
+											celement.parent().find("select[name='"+tmpId1+"']").append('<option value="'+data[j][0]+'">'+data[j][1]+'</option>');
+										    }
+										    if(originalElement.attr("data-cvalue"))
+											celement.parent().find("select[name='"+tmpId1+"']").val(originalElement.attr("data-cvalue")).change();
+										    else
+											celement.parent().find("select[name='"+tmpId1+"']").val(tempVal).change();
 										},
 										error: function(){
 										}
+									    });
+									    
+									    
 									});
-									
-	
-								});
-								})(jj,kk,l,refObject);
-							    }
+								    })(jj,kk,l,refObject);
+								}
 						    }
 
 						},
@@ -1758,9 +2024,11 @@ define([
 	console.log("Start Table Public Module");
 
 	$("#associatedMap").css({"min-height": ($(window).height()-280)+"px"});
-	setTimeout(function(){
-	    initializeMap();
-	}, 100);
+	if($("#associatedMap").length>0){
+	    setTimeout(function(){
+		initializeMap();
+	    }, 100);
+	}
 	//$( "#associatedMap" ).contents().find( "a" ).css( "background-color", "#BADA55" );
 
 
@@ -1825,6 +2093,7 @@ define([
 	    $("#map_Toggler").click();
 	    setTimeout(function(){
 		$("#associatedMap").contents().find("body").find( ".ol-zoom-extent" ).find("button").click();
+		$("#associatedMap").contents().find("a#home").first().remove();
 		$("#listing_Toggler").click();
 	    },100);
 	},100);
@@ -1883,7 +2152,7 @@ define([
 			if(i>1 && rdata.fields[i]!="gml_id")
 			    properties+=","
 			if(rdata.fields[i]!="gml_id")
-			properties+=rdata.fields[i];
+			    properties+=rdata.fields[i];
 		    }
 		properties+=",msGeometry";
 		tableDescRef.find('option:selected').attr("data-properties",properties);
@@ -2004,9 +2273,9 @@ define([
 		console.log("###### DO SOMETHING WITH THE GEOMETRY!");
 		var fwkt=new ol.format.WKT();
 		/*var coords=tmpFeature.getGeometry().getCoordinates();
-		for(i in coords)
-		    coords[i]=coords[i].reverse();
-		tmpFeature.getGeometry().setCoordinates(coords);*/
+		  for(i in coords)
+		  coords[i]=coords[i].reverse();
+		  tmpFeature.getGeometry().setCoordinates(coords);*/
 		currentDrawnElement=fwkt.writeGeometry(tmpFeature.getGeometry().transform('EPSG:3857','EPSG:4326'));
 		console.log(currentDrawnElement);
 	    }
@@ -2016,6 +2285,10 @@ define([
 	    if(myMapIframe.app.getDrawSource().getFeatures().length>0){
 		myMapIframe.app.getDrawSource().removeFeature(myMapIframe.app.getDrawSource().getFeatures()[0]);
 	    }
+	    if(myMapIframe.app.getSelectLayer().getSource().getFeatures()[0])
+		myMapIframe.app.getDrawSource().addFeature(myMapIframe.app.getSelectLayer().getSource().getFeatures()[0].clone());
+	}else{
+	    console.log("DRAW WHAT THE FUCK!!!");
 	    if(myMapIframe.app.getSelectLayer().getSource().getFeatures()[0])
 		myMapIframe.app.getDrawSource().addFeature(myMapIframe.app.getSelectLayer().getSource().getFeatures()[0].clone());
 	}
@@ -2215,6 +2488,7 @@ define([
     
     var searchMap;
     var geometryFieldsFirstRun=true;
+    var geometryRefFieldsFirstRun=true;
     var originalExtent=null;
     var hasFeature=false;
 
@@ -2234,7 +2508,7 @@ define([
 	    
 	    searchMap.getView().fit(extent, { size: [myContent.width(),myContent.height()], nearest: false });
 	    //searchMap.getView().fit(extent,searchMap.getSize());
-	
+	    
 	    var myGeom=ol.geom.Polygon.fromExtent(extent);
 	    var feature = new ol.Feature({
 		geometry: myGeom,
@@ -2274,6 +2548,25 @@ define([
 		}
 	    }catch(e){
 		console.log("No geometryFields: "+e);
+
+
+	    }
+	    try{
+		if(geometryRefFields){
+		    console.log(geometryRefFields);
+		    if(geometryRefFieldsFirstRun){
+			for(var j=0;j<geometryRefFields.length;j++){
+			    $("select[name='"+geometryRefFields[j]+"_mmlayerref']").html("");
+			}
+			geometryRefFieldsFirstRun=false;
+		    }
+		    for(var j=0;j<geometryRefFields.length;j++)
+			for(var i=0;i<a.layers.length;i++){
+			    $("select[name='"+geometryRefFields[j]+"_mmlayerref']").append('<option data-map="'+a.mapfile+'" value="'+a.layers[i]+'">'+a.labels[i]+'</option>');
+			}
+		}
+	    }catch(e){
+		console.log("No geometryRefFields: "+e);
 	    }
 	    registerAddedLayersEvent();
 	};
@@ -2484,42 +2777,42 @@ define([
                     }
                 });
             else{
-	    /*zoo.execute({
-		"identifier": ($('select[name="processing_service"]').val()=="RVoronoi"?"RVoronoi2":"vector-tools."+$('select[name="processing_service"]').val()),//+($('select[name="processing_service"]').val()!="Voronoi"?"Py":"")),
-		"type": "POST",
-		dataInputs: params,
-		dataOutputs: [
-		    {"identifier":"Result","mimeType":"image/png"}
-		],
-		success: function(data){
-		    if (data.ExecuteResponse.ProcessOutputs) {
-			console.log("SUCCESS !");
-			var ref=data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Reference"]["_href"];
-			var mapParts=ref.split('&');
-			console.log(mapParts[0]);
-			var mapParts=mapParts[0].split("=");
-			console.log(mapParts[1]);
-			myMapIframe.app.addLayerToMap({
-			    mapfile: mapParts[1],
-			    layers: ["Result"],
-			    labels: [$("#layerTitle").val()],
-			    listHTML: $("#layerTitle").val(),
-			    cselection: ""
-			});
-			$("#layerExtract").find('form:gt(0)').remove();
-			$("#layerTitle").val("");
-			console.log(data);
-			console.log(mapParts);
-			
-		    }
-		},
-		error: function(data){
-		    console.log("ERROR !");
-		    console.log(data);
-		}
-		});*/
+		/*zoo.execute({
+		  "identifier": ($('select[name="processing_service"]').val()=="RVoronoi"?"RVoronoi2":"vector-tools."+$('select[name="processing_service"]').val()),//+($('select[name="processing_service"]').val()!="Voronoi"?"Py":"")),
+		  "type": "POST",
+		  dataInputs: params,
+		  dataOutputs: [
+		  {"identifier":"Result","mimeType":"image/png"}
+		  ],
+		  success: function(data){
+		  if (data.ExecuteResponse.ProcessOutputs) {
+		  console.log("SUCCESS !");
+		  var ref=data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Reference"]["_href"];
+		  var mapParts=ref.split('&');
+		  console.log(mapParts[0]);
+		  var mapParts=mapParts[0].split("=");
+		  console.log(mapParts[1]);
+		  myMapIframe.app.addLayerToMap({
+		  mapfile: mapParts[1],
+		  layers: ["Result"],
+		  labels: [$("#layerTitle").val()],
+		  listHTML: $("#layerTitle").val(),
+		  cselection: ""
+		  });
+		  $("#layerExtract").find('form:gt(0)').remove();
+		  $("#layerTitle").val("");
+		  console.log(data);
+		  console.log(mapParts);
+		  
+		  }
+		  },
+		  error: function(data){
+		  console.log("ERROR !");
+		  console.log(data);
+		  }
+		  });*/
 
-	    
+		
 		zoo.execute({
 		    "identifier": ($('select[name="processing_service"]').val()=="RVoronoi"?"RVoronoi2":"vector-tools."+$('select[name="processing_service"]').val()),//"vector-tools."+$('select[name="processing_service"]').val()+($('select[name="processing_service"]').val()!="Voronoi"?"Py":""),
 		    "type": "POST",
@@ -2815,30 +3108,30 @@ define([
 
 			    }
 			    else{
-			    if($("#layerTitle").val().indexOf("Table Filter:")<0 && $("#sqlQueryIdentifiers").find("option:selected").text().indexOf("Table Filter:")<0){
-				var contentHTML='<table id="myDataTable" class="display"  cellspacing="0" width="100%">';
-				for(var i=0;i<data["features"].length;i++){
-				    if(i==0){
-					contentHTML+="<thead>";
-					for(var j in data["features"][i]["properties"]){
-					    contentHTML+="<th>"+j+"</th>";
+				if($("#layerTitle").val().indexOf("Table Filter:")<0 && $("#sqlQueryIdentifiers").find("option:selected").text().indexOf("Table Filter:")<0){
+				    var contentHTML='<table id="myDataTable" class="display"  cellspacing="0" width="100%">';
+				    for(var i=0;i<data["features"].length;i++){
+					if(i==0){
+					    contentHTML+="<thead>";
+					    for(var j in data["features"][i]["properties"]){
+						contentHTML+="<th>"+j+"</th>";
+					    }
+					    contentHTML+="</thead>";
 					}
-					contentHTML+="</thead>";
+					if(i==0)
+					    contentHTML+="<tbody>";
+					contentHTML+="<tr>";
+					for(var j in data["features"][i]["properties"]){
+					    contentHTML+="<td>"+data["features"][i]["properties"][j]+"</td>";
+					}				    
+					contentHTML+="</tr>";
+					if(i==0)
+					    contentHTML+="</tbody>";
 				    }
-				    if(i==0)
-					contentHTML+="<tbody>";
-				    contentHTML+="<tr>";
-				    for(var j in data["features"][i]["properties"]){
-					contentHTML+="<td>"+data["features"][i]["properties"][j]+"</td>";
-				    }				    
-				    contentHTML+="</tr>";
-				    if(i==0)
-					contentHTML+="</tbody>";
-				}
-				contentHTML+='</table>';
-				console.log(contentHTML);
-				var tmp=$("#template_layerQuery_display")[0].innerHTML.replace(/CONTENT/g,contentHTML);
-				$("#queryLayerResult").html(tmp);
+				    contentHTML+='</table>';
+				    console.log(contentHTML);
+				    var tmp=$("#template_layerQuery_display")[0].innerHTML.replace(/CONTENT/g,contentHTML);
+				    $("#queryLayerResult").html(tmp);
 				    
 				    // Fill the X and Y field select lists
 				    if(data["features"].length>0){
@@ -2867,227 +3160,228 @@ define([
 					    console.log(ldata);
 					    printQueryGraph(ldata);
 					});
-				    if(sqlQueriesCallbacks!=null)
-					sqlQueriesCallbacks();
-				    $("#my-modal").find("button").last().on('click',function(){
-					console.log(ldata);
-					console.log($("#sqlQuery").val());
-					console.log($("#queryLayerDiagramTitle").val());
-					console.log($("#queryLayerDiagramType").val());
-					console.log($("#queryLayerDiagramX").val());
-					console.log($("#queryLayerDiagramY").val());
-					var lparams=[
-				            {"identifier": "table",value:"mm_tables.query_references",dataType:"string"},
-				            {"identifier": "query",value:$("#sqlQuery").val(),mimeType:"text/plain"},
-				            {"identifier": "name",value:$("#queryLayerDiagramTitle").val(),dataType:"string"},
-				            {"identifier": "g_type",value:$("#queryLayerDiagramType").val(),dataType:"string"},
-				            {"identifier": "x_col",value:$("#queryLayerDiagramX").val(),dataType:"string"},
-				            {"identifier": "y_col",value:$("#queryLayerDiagramY").val(),dataType:"string"},
-					    {"identifier": "table_id",value:$('#listing').first().find('input[name=mainTableId]').val(),dataType:"string"},
-					];
-					var procId="np.insertElement";
-					if($("#sqlQueryIdentifiers").val()!="-1") {
-					    lparams.push({"identifier": "id",value:$("#sqlQueryIdentifiers").val(),dataType:"string"});
-					    procId="np.updateElement";
-					}
-					zoo.execute({
-					    "identifier": procId,
-					    "type": "POST",
-					    dataInputs: lparams,
-					    dataOutputs: [
-						{"identifier":"Result","type":"raw"},
-					    ],
-					    success: function(data){
-						console.log("SUCCESS");
-						console.log(data);
-						console.log("SUCCESS");
-					    },
-					    error: function(data){
-						console.log("ERROR");
-						console.log(data);
-						console.log("ERROR");
-					    }
-					});
-					console.log(lparams);
-					console.log(params);
-					//printQueryGraph(ldata);
-				    });
-				})(data);
-				$("#layerQueryParameters").find("button").first().click();
-				$('#my-modal').modal('show');
-				$('#home-tab').click();
-				$('#my-modal').draggable({ handle: ".modal-header" });
-			    }else{
-				var cfilters=[];
-				console.log("Register station filter");
-				for(i=0;i<data["features"].length;i++){
-				    cfilters.push({"x": data["features"][i]["properties"]["x"],"y": data["features"][i]["properties"]["y"],"linkClause": "OR"});
-				}
-				console.log(cfilters);
-				var ctable=null;
-				try{
-				    ctable=$("#layerTitle").val().split(":")[1].replace(/ /g,"");
-				}catch(e){
-				    ctable=$("#sqlQueryIdentifiers").find('option:selected').text().split(":")[1].replace(/ /g,"");
-				}
-				console.log(ctable);
-				zoo.execute({
-				    "identifier": "template.display",
-				    "type": "POST",
-				    dataInputs: [
-					{"identifier":"tmpl","value":"public/modules/tables/reports","dataType":"string"},
-					{"identifier":"table","value":ctable,"dataType":"string"},
-				    ],
-				    dataOutputs: [
-					{"identifier":"Result","type":"raw"},
-				    ],
-				    success: function(data){
-					console.log("SUCCESS");
-					console.log(data);
-					$("#queryLayerResult").html(data);
-					$("#queryLayerResult").find(".btn").off("click");
-					$("#queryLayerResult").find(".btn").on("click", function(){
-					    //	$("[data-mmaction=runPrint]").click(function(){
-					    var closure=$(this);
-					    $(this).addClass("disabled");
-					    console.log($(this).children().first().next());
-					    $(this).children().first().next().show();
-					    $(this).children().first().hide();
-					    var tableId=null;
-					    var tupleId=null;
-
-					    tableId=$(this).parent().find('input[name=report_table_id]').val();
-
-					    params=[
-						{identifier: "tableId", value: tableId, dataType: "string"},
-						{identifier: "id", value: -1, dataType: "string"},
-						{identifier: "rid", value: $(this).parent().find('input[name="report_report_id"]').val(), dataType: "string"},
-						{"identifier":"filters","value":JSON.stringify(cfilters, null, ' '),"mimeType":"application/json"}
+					if(sqlQueriesCallbacks!=null)
+					    sqlQueriesCallbacks();
+					$("#my-modal").find("button").last().on('click',function(){
+					    console.log(ldata);
+					    console.log($("#sqlQuery").val());
+					    console.log($("#queryLayerDiagramTitle").val());
+					    console.log($("#queryLayerDiagramType").val());
+					    console.log($("#queryLayerDiagramX").val());
+					    console.log($("#queryLayerDiagramY").val());
+					    var lparams=[
+						{"identifier": "table",value:"mm_tables.query_references",dataType:"string"},
+						{"identifier": "query",value:$("#sqlQuery").val(),mimeType:"text/plain"},
+						{"identifier": "name",value:$("#queryLayerDiagramTitle").val(),dataType:"string"},
+						{"identifier": "g_type",value:$("#queryLayerDiagramType").val(),dataType:"string"},
+						{"identifier": "x_col",value:$("#queryLayerDiagramX").val(),dataType:"string"},
+						{"identifier": "y_col",value:$("#queryLayerDiagramY").val(),dataType:"string"},
+						{"identifier": "table_id",value:$('#listing').first().find('input[name=mainTableId]').val(),dataType:"string"},
 					    ];
-					    
-					    closure=$(this);
-					    var progress=closure.parent().find(".progress-bar").first();
-					    progress.css('display','block');
-					    progress.parent().show();
+					    var procId="np.insertElement";
+					    if($("#sqlQueryIdentifiers").val()!="-1") {
+						lparams.push({"identifier": "id",value:$("#sqlQueryIdentifiers").val(),dataType:"string"});
+						procId="np.updateElement";
+					    }
 					    zoo.execute({
-						identifier: 'np.clientPrint',
-						type: 'POST',
-						dataInputs: params,
+						"identifier": procId,
+						"type": "POST",
+						dataInputs: lparams,
 						dataOutputs: [
-						    {"identifier":"Result","mimeType":"application/json"},
+						    {"identifier":"Result","type":"raw"},
 						],
-						storeExecuteResponse: true,
-						status: true,
-						success: function(data, launched) {
-						    zoo.watch(launched.sid, {
-							onPercentCompleted: function(data) {
-							    console.log("**** PercentCompleted ****");
-							    console.log(data);
-							    progress.css('width', (data.percentCompleted)+'%');
-							    progress.text(data.text+' : '+(data.percentCompleted)+'%');
-							    progress.attr("aria-valuenow",data.percentCompleted);
-							    //infomsg.html(data.text+' : '+(data.percentCompleted)+'%');
-							},
-							onProcessSucceeded: function(data) {
-							    progress.css('width', (100)+'%');
-							    progress.text(data.text+' : '+(100)+'%');
-							    progress.attr("aria-valuenow",100);
-							    closure.removeClass("disabled");
-							    closure.children().first().show();
-							    closure.children().first().next().hide();
-							    closure.parent().parent().find(".report_display").html('');
-							    var ul=$(managerTools.generateFromTemplate($("#"+closure.parent().parent().attr("id")+"_link_list").html(),[],[]));
-							    if (data.result.ExecuteResponse.ProcessOutputs) {
-								console.log("**** onSuccess ****");
-								console.log(data.result.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData["__cdata"]);
-								var ldata=eval(data.result.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData["__cdata"]);
-								for(i=0;i<ldata.length;i++){
-								    var format="odt";
-								    var classe="fa-file-text-o";
-								    if(ldata[i].indexOf("pdf")>0){
-									format="pdf";
-									classe="fa-file-pdf-o";
-								    }
-								    if(ldata[i].indexOf("doc")>0){
-									format="doc";
-									classe="fa-file-word-o";
-								    }
-								    if(ldata[i].indexOf("html")>0){
-									format="html";
-									classe="fa-code";
-								    }
-								    ul.find(".list-group").append(
-									managerTools.generateFromTemplate($("#"+closure.parent().parent().attr("id")+"_link").html(),["link","format","class"],[ldata[i],format,classe])
-								    );
-								}
-								closure.parent().parent().find(".report_display").html(ul);
-								progress.parent().hide();
-							    }
-							},
-							onError: function(data) {
-							    console.log("**** onError ****");
-							    console.log(data);
-							},
-						    });
-						},
-						error: function(data) {
-						    console.log("**** ERROR ****");
+						success: function(data){
+						    console.log("SUCCESS");
 						    console.log(data);
-						    notify("Execute asynchrone failed", 'danger');
-						    closure.removeClass("disabled");
-						    closure.children().first().show();
-						    closure.children().first().next().hide();
-						    closure.parent().parent().find(".report_display").html('<div class="alert alert-danger">'+data["ExceptionReport"]["Exception"]["ExceptionText"].toString()+'</div>');
+						    console.log("SUCCESS");
+						},
+						error: function(data){
+						    console.log("ERROR");
+						    console.log(data);
+						    console.log("ERROR");
 						}
 					    });
-
-					    /*adminBasic.callService("np.clientPrint",params,function(data){
-						console.log(data)
-						closure.removeClass("disabled");
-						closure.children().first().show();
-						closure.children().first().next().hide();
-						closure.parent().parent().find(".report_display").html('');
-						var ul=$(managerTools.generateFromTemplate($("#"+closure.parent().parent().attr("id")+"_link_list").html(),[],[]));
-						for(i=0;i<data.length;i++){
-						    var format="odt";
-						    var classe="fa-file-text-o";
-						    if(data[i].indexOf("pdf")>0){
-							format="pdf";
-							classe="fa-file-pdf-o";
-						    }
-						    if(data[i].indexOf("doc")>0){
-							format="doc";
-							classe="fa-file-word-o";
-						    }
-						    if(data[i].indexOf("html")>0){
-							format="html";
-							classe="fa-code";
-						    }
-						    ul.find(".list-group").append(
-							managerTools.generateFromTemplate($("#"+closure.parent().parent().attr("id")+"_link").html(),["link","format","class"],[data[i],format,classe])
-						    );
-						}
-						closure.parent().parent().find(".report_display").html(ul);
-					    },function(data){
-						closure.removeClass("disabled");
-						closure.children().first().show();
-						closure.children().first().next().hide();
-						closure.parent().parent().find(".report_display").html('<div class="alert alert-danger">'+data["ExceptionReport"]["Exception"]["ExceptionText"].toString()+'</div>');
-					    });*/
-					//	});
-
+					    console.log(lparams);
+					    console.log(params);
+					    //printQueryGraph(ldata);
 					});
-					console.log("SUCCESS");
-				    },
-				    error: function(data){
-					console.log("ERROR");
-					console.log(data);
-					console.log("ERROR");
+				    })(data);
+				    $("#layerQueryParameters").find("button").first().click();
+				    $('#my-modal').modal('show');
+				    $('#home-tab').click();
+				    $('#my-modal').draggable({ handle: ".modal-header" });
+				}else{
+				    var cfilters=[];
+				    console.log("Register station filter");
+				    for(i=0;i<data["features"].length;i++){
+					cfilters.push({"x": data["features"][i]["properties"]["x"],"y": data["features"][i]["properties"]["y"],"linkClause": "OR"});
 				    }
-				});
+				    console.log(cfilters);
+				    var ctable=null;
+				    try{
+					ctable=$("#layerTitle").val().split(":")[1].replace(/ /g,"");
+				    }catch(e){
+					ctable=$("#sqlQueryIdentifiers").find('option:selected').text().split(":")[1].replace(/ /g,"");
+				    }
+				    console.log(ctable);
+				    zoo.execute({
+					"identifier": "template.display",
+					"type": "POST",
+					dataInputs: [
+					    {"identifier":"tmpl","value":"public/modules/tables/reports","dataType":"string"},
+					    {"identifier":"table","value":ctable,"dataType":"string"},
+					],
+					dataOutputs: [
+					    {"identifier":"Result","type":"raw"},
+					],
+					success: function(data){
+					    console.log("SUCCESS");
+					    console.log(data);
+					    $("#queryLayerResult").html(data);
+					    $("#queryLayerResult").find(".btn").off("click");
+					    $("#queryLayerResult").find(".btn").on("click", function(){
+						//	$("[data-mmaction=runPrint]").click(function(){
+						var closure=$(this);
+						$(this).addClass("disabled");
+						console.log($(this).children().first().next());
+						$(this).children().first().next().show();
+						$(this).children().first().hide();
+						var tableId=null;
+						var tupleId=null;
 
+						tableId=$(this).parent().find('input[name=report_table_id]').val();
+
+						params=[
+						    {identifier: "tableId", value: tableId, dataType: "string"},
+						    {identifier: "id", value: -1, dataType: "string"},
+						    {identifier: "rid", value: $(this).parent().find('input[name="report_report_id"]').val(), dataType: "string"},
+						    {"identifier":"filter_labels","value":JSON.stringify(cfilters, null, ' '),"mimeType":"application/json"},
+						    {"identifier":"filters","value":JSON.stringify(cfilters, null, ' '),"mimeType":"application/json"}
+						];
+						
+						closure=$(this);
+						var progress=closure.parent().find(".progress-bar").first();
+						progress.css('display','block');
+						progress.parent().show();
+						zoo.execute({
+						    identifier: 'np.clientPrint',
+						    type: 'POST',
+						    dataInputs: params,
+						    dataOutputs: [
+							{"identifier":"Result","mimeType":"application/json"},
+						    ],
+						    storeExecuteResponse: true,
+						    status: true,
+						    success: function(data, launched) {
+							zoo.watch(launched.sid, {
+							    onPercentCompleted: function(data) {
+								console.log("**** PercentCompleted ****");
+								console.log(data);
+								progress.css('width', (data.percentCompleted)+'%');
+								progress.text(data.text+' : '+(data.percentCompleted)+'%');
+								progress.attr("aria-valuenow",data.percentCompleted);
+								//infomsg.html(data.text+' : '+(data.percentCompleted)+'%');
+							    },
+							    onProcessSucceeded: function(data) {
+								progress.css('width', (100)+'%');
+								progress.text(data.text+' : '+(100)+'%');
+								progress.attr("aria-valuenow",100);
+								closure.removeClass("disabled");
+								closure.children().first().show();
+								closure.children().first().next().hide();
+								closure.parent().parent().find(".report_display").html('');
+								var ul=$(managerTools.generateFromTemplate($("#"+closure.parent().parent().attr("id")+"_link_list").html(),[],[]));
+								if (data.result.ExecuteResponse.ProcessOutputs) {
+								    console.log("**** onSuccess ****");
+								    console.log(data.result.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData["__cdata"]);
+								    var ldata=eval(data.result.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData["__cdata"]);
+								    for(i=0;i<ldata.length;i++){
+									var format="odt";
+									var classe="fa-file-text-o";
+									if(ldata[i].indexOf("pdf")>0){
+									    format="pdf";
+									    classe="fa-file-pdf-o";
+									}
+									if(ldata[i].indexOf("doc")>0){
+									    format="doc";
+									    classe="fa-file-word-o";
+									}
+									if(ldata[i].indexOf("html")>0){
+									    format="html";
+									    classe="fa-code";
+									}
+									ul.find(".list-group").append(
+									    managerTools.generateFromTemplate($("#"+closure.parent().parent().attr("id")+"_link").html(),["link","format","class"],[ldata[i],format,classe])
+									);
+								    }
+								    closure.parent().parent().find(".report_display").html(ul);
+								    progress.parent().hide();
+								}
+							    },
+							    onError: function(data) {
+								console.log("**** onError ****");
+								console.log(data);
+							    },
+							});
+						    },
+						    error: function(data) {
+							console.log("**** ERROR ****");
+							console.log(data);
+							notify("Execute asynchrone failed", 'danger');
+							closure.removeClass("disabled");
+							closure.children().first().show();
+							closure.children().first().next().hide();
+							closure.parent().parent().find(".report_display").html('<div class="alert alert-danger">'+data["ExceptionReport"]["Exception"]["ExceptionText"].toString()+'</div>');
+						    }
+						});
+
+						/*adminBasic.callService("np.clientPrint",params,function(data){
+						  console.log(data)
+						  closure.removeClass("disabled");
+						  closure.children().first().show();
+						  closure.children().first().next().hide();
+						  closure.parent().parent().find(".report_display").html('');
+						  var ul=$(managerTools.generateFromTemplate($("#"+closure.parent().parent().attr("id")+"_link_list").html(),[],[]));
+						  for(i=0;i<data.length;i++){
+						  var format="odt";
+						  var classe="fa-file-text-o";
+						  if(data[i].indexOf("pdf")>0){
+						  format="pdf";
+						  classe="fa-file-pdf-o";
+						  }
+						  if(data[i].indexOf("doc")>0){
+						  format="doc";
+						  classe="fa-file-word-o";
+						  }
+						  if(data[i].indexOf("html")>0){
+						  format="html";
+						  classe="fa-code";
+						  }
+						  ul.find(".list-group").append(
+						  managerTools.generateFromTemplate($("#"+closure.parent().parent().attr("id")+"_link").html(),["link","format","class"],[data[i],format,classe])
+						  );
+						  }
+						  closure.parent().parent().find(".report_display").html(ul);
+						  },function(data){
+						  closure.removeClass("disabled");
+						  closure.children().first().show();
+						  closure.children().first().next().hide();
+						  closure.parent().parent().find(".report_display").html('<div class="alert alert-danger">'+data["ExceptionReport"]["Exception"]["ExceptionText"].toString()+'</div>');
+						  });*/
+						//	});
+
+					    });
+					    console.log("SUCCESS");
+					},
+					error: function(data){
+					    console.log("ERROR");
+					    console.log(data);
+					    console.log("ERROR");
+					}
+				    });
+
+				}
 			    }
-			}
 			},
 			error: function(data){
 			    console.log("ERROR !");
@@ -3305,6 +3599,7 @@ define([
 	embedded: embedded,
 	initializeMap: initializeMap,
 	bindFilterLayer: bindFilterLayer,
+	zoo: zoo,
 	$: $,
 	win: getWin
     };

@@ -25,7 +25,7 @@ $(Template(file=$conf["main"]["templatesPath"]+$page,searchList=$nameSpace))
 <title>MapMint | $title</title> 
 <meta name="description" content="mapmint,webgis,app" /> 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" /> 
-<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" />
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/mm-font.css" />
 <link rel="stylesheet" href="$conf["main"]["publicationUrl"]/css/ol.css" />
 <link rel="stylesheet" href="$conf["main"]["publicationUrl"]/assets/css/fonts.css" />
@@ -266,6 +266,10 @@ $(printWrapper())
   </ul>
 *#
  </div>
+
+<script type="text/x-magento-init">
+window.urlArgs='#if 'filter' in $inputs#$inputs["filter"]["value"]#end if#';
+</script>
 
 <script data-main="$conf["main"]["publicationUrl"]/assets/js/cfg" src="$conf["main"]["publicationUrl"]/assets/js/lib/require.js"></script>
 

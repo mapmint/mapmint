@@ -67,6 +67,26 @@ JQuery ui tree json format:
 ]
 '''
 
+def sendMail(conf, inputs, outputs):
+    print("Start",file=sys.stderr)
+    import smtplib
+    from email.mime.text import MIMEText
+    f0 = open(inputs["body"]["cache_file"])
+    msgTxt = f0.read()
+    msg = MIMEText(msgTxt, "html", _charset='utf-8')
+    msg['Subject']=inputs["subject"]["value"]
+    if 'ufrom' in conf["smtp"]:
+        msg["From"] = "<" + conf["smtp"]["from"] + "> " + zoo._(conf["smtp"]["ufrom"])
+    else:
+        msg["From"] = conf["smtp"]["from"]
+    msg["To"] = inputs["dest"]["value"]
+    serv = smtplib.SMTP(conf["smtp"]["host"], conf["smtp"]["port"])
+    if "login" in conf["smtp"]:
+        serv.login(conf["smtp"]["login"], conf["smtp"]["passwd"])
+    serv.sendmail(conf["smtp"]["from"], [msg["To"]], msg.as_string())
+    outputs["Result"]["value"]=zoo._("Message sent")
+    return zoo.SERVICE_SUCCEEDED
+
 
 def setIndexQuote(conf, inputs, outputs):
     if conf["senv"]["login"] == "anonymous":
@@ -3730,6 +3750,53 @@ def clientInsert(conf, inputs, outputs):
         for i in range(len(dcols)):
             print("+++++" + str(dcols[i]), file=sys.stderr)
             # print("+++++"+str(dvals[i]), file=sys.stderr)
+            if dcols[i]["type"] == "geometry_reference":
+                # cur.execute("UPDATE "+tableName+" set "+dcols[i]["name"]+"=%s WHERE "+pkey+"="+cid,(psycopg2.Integer(),))
+                print("+++++ OM +++++" + str(dvals), file=sys.stderr)
+                import osgeo
+                import osgeo.gdal
+                # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
+                hasBeenExecuted=False
+                if "InputGeometry" in inputs:
+                    try:
+                        ds = osgeo.ogr.Open(inputs["InputGeometry"]["cache_file"])
+                        layer = ds.GetLayerByIndex(0)
+                        feat = layer.GetNextFeature()
+                        geometry = None
+                        index=-1
+                        cnt=0
+                        while feat is not None:
+                            if index==-1:
+                                index=feat.GetFieldIndex(inputs["InputGeometryField"]["value"].split(';')[1])
+                            geometry = feat.GetFieldAsString(index)
+                            print("+++++ OM +++++ [" + str(geometry)+"]", file=sys.stderr)
+                            geometry = feat.GetFieldAsInteger(index)
+                            print("+++++ OM +++++ [" + str(geometry)+"]", file=sys.stderr)
+                            if "id" not in inputs and feat is not None and cnt>0:
+                                val_sufix = val_sufix.replace("'NULL'", "NULL")
+                                print("INSERT INTO " + tableName + " (" + col_sufix + ") VALUES (" + val_sufix + ") RETURNING " + str(pkey),file=sys.stderr)
+                                req = "INSERT INTO " + tableName + " (" + col_sufix + ") VALUES (" + val_sufix + ") RETURNING " + str(pkey)
+                                cur.execute(req)
+                                cid = str(cur.fetchone()[0])
+                            print("+++++ OM +++++ [" + str(geometry)+"]", file=sys.stderr)
+                            print(str(feat), file=sys.stderr)
+                            feat.Destroy()
+                            print("UPDATE " + tableName + " set " + dcols[i]["name"] + "=" + str(geometry) + " WHERE " + pkey + "=" + cid,file=sys.stderr)
+                            cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=" + str(geometry) + " WHERE " + pkey + "=" + cid, ())
+                            hasBeenExecuted=True
+                            print(str(feat), file=sys.stderr)
+                            print("+++++ OM +++++ [" + str(geometry)+"]", file=sys.stderr)
+                            feat = layer.GetNextFeature()
+                            print(str(feat), file=sys.stderr)
+                            print("+++++ OM +++++ [" + str(geometry)+"]", file=sys.stderr)
+                            cnt+=1
+                    except Exception as e:
+                        print(str(e), file=sys.stderr)
+                        geometry = inputs["InputGeometry"]["value"]
+                    print("+++++ OM +++++" + str(geometry), file=sys.stderr)
+                    if not(hasBeenExecuted):
+                        print("UPDATE " + tableName + " set " + dcols[i]["name"] + "=" + str(geometry) + " WHERE " + pkey + "=" + cid,file=sys.stderr)
+                        cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=" + str(geometry) + " WHERE " + pkey + "=" + cid, ())
             if dcols[i]["type"] == "geometry":
                 # cur.execute("UPDATE "+tableName+" set "+dcols[i]["name"]+"=%s WHERE "+pkey+"="+cid,(psycopg2.Integer(),))
                 print("+++++ OM +++++" + str(dvals), file=sys.stderr)
@@ -3750,9 +3817,16 @@ def clientInsert(conf, inputs, outputs):
                         geometry = inputs["InputGeometry"]["value"]
                     print("+++++ OM +++++" + str(geometry), file=sys.stderr)
                     if str(geometry).count("POINT")>0:
-                        cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_SetSRID((ST_GeometryFromText('" + str(geometry) + "')),4326) WHERE " + pkey + "=" + cid, ())
+                        if dcols[i]["value"] != "":
+                            cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_Transform(ST_SetSRID((ST_GeometryFromText('" + str(geometry) + "')),4326),"+(dcols[i]["value"].replace("EPSG:",""))+") WHERE " + pkey + "=" + cid, ())
+                        else:
+                            cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_SetSRID((ST_GeometryFromText('" + str(geometry) + "')),4326) WHERE " + pkey + "=" + cid, ())
                     else:
-                        cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_SetSRID(ST_Multi(ST_GeometryFromText('" + str(geometry) + "')),4326) WHERE " + pkey + "=" + cid, ())
+                        if dcols[i]["value"] != "":
+                            print("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_Transform(ST_SetSRID(ST_Multi(ST_GeometryFromText('" + str(geometry) + "')),4326),"+(dcols[i]["value"].replace("EPSG:",""))+") WHERE " + pkey + "=" + cid,file=sys.stderr)
+                            cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_Transform(ST_SetSRID(ST_Multi(ST_GeometryFromText('" + str(geometry) + "')),4326),"+(dcols[i]["value"].replace("EPSG:",""))+") WHERE " + pkey + "=" + cid, ())
+                        else:
+                            cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_SetSRID(ST_Multi(ST_GeometryFromText('" + str(geometry) + "')),4326) WHERE " + pkey + "=" + cid, ())
 
             if dcols[i]["type"] == "varchar(32)":
                 print(dcols[i], file=sys.stderr)
@@ -3803,8 +3877,13 @@ def clientInsert(conf, inputs, outputs):
     con.conn.close()
     return zoo.SERVICE_SUCCEEDED
 
+def replaceFilter(conf,value):
+    result=value;
+    for a in conf["senv"]:
+        result=result.replace("[_senv_"+a+"_]",conf["senv"][a])
+    return result
 
-def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None):
+def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators, rid=None, rName=None):
     import json
     try:
         req = "SELECT name from mm_tables.p_tables where id=" + tableId
@@ -3844,7 +3923,10 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
         print(vals0[i][3], file=sys.stderr)
         print(str(vals0[i]), file=sys.stderr)
         if vals0[i][3] != "multiple_doc":
-            rcolumns += [vals0[i][4]]
+            if vals0[i][3] != "filter":
+                rcolumns += [vals0[i][4]]
+            else:
+                rcolumns += [replaceFilter(conf,vals0[i][4])]
         else:
             postDocuments += [vals0[i][4]]
     rfields = (",".join(rcolumns))
@@ -3852,22 +3934,29 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
     print("*********** [" + str(postDocuments) + "] ***********", file=sys.stderr)
     print("*********** [" + str(ovals0) + "] ***********", file=sys.stderr)
     print("*********** [" + str(rcolumns) + "] ***********", file=sys.stderr)
-
+    import time
+    #time.sleep(10)
     if not (ovals0[0][4]):
         clause = ovals0[0][3]
         if len(filters) > 0:
             if clause != "":
-                clause += " AND " + buildClause(filters,None)
+                clause += " AND " + buildClause(filters,operators)
             else:
-                clause = buildClause(filters,None)
+                clause = buildClause(filters,operators)
         rfields = rfields.replace("[_CLAUSE_]", clause)
         # rreq="SELECT DISTINCT "+rfields+" from "+tableName+" where "+clause
         rreq = "SELECT " + rfields
     else:
         if len(filters) > 0:
-            clause = buildClause(filters)
+            clause = buildClause(filters,operators)
+        else:
+            clause=""
         rfields = rfields.replace("[_CLAUSE_]", clause)
-        rreq = "SELECT " + rfields + " from " + tableName + " where id=" + cid + " AND " + ovals0[0][3] + " AND " + clause
+        print("*********** [" + str(clause) + "] ***********", file=sys.stderr)
+        if clause!="":
+            rreq = "SELECT " + rfields + " from " + tableName + " where id=" + cid + " AND " + ovals0[0][3] + " AND " + clause
+        else:
+            rreq = "SELECT " + rfields + " from " + tableName + " where id=" + cid + " AND " + ovals0[0][3]
     print(" *$*$*$ RREQ "+rreq, file=sys.stderr)
     print(vals0, file=sys.stderr)
     res = cur.execute(rreq)
@@ -3878,7 +3967,6 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
     else:
         rvals = cur.fetchone()
     print("*********** [" + str(rvals) + "] ***********", file=sys.stderr)
-    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
     if "noPrint" in inputs and inputs["noPrint"]["value"] == "true":
         return rvals
     lfile = unpackFile(conf, ovals0[0][2])
@@ -3905,7 +3993,11 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
     script = "import sys\nimport shutil\nimport time\n"
     script += "import print.PaperMint as PaperMint\n"
     script += "pm=PaperMint.LOClient()\n"
+    script += "pm.setVar('tmpPath','"+conf["main"]["tmpPath"]+"')\n"
+    script += "pm.setVar('usid','"+conf["lenv"]["usid"]+"')\n"
     script += "pm.loadDoc('" + docPath + "')\n"
+    #import json
+    #script += "pm.setConf('"+ json.dumps(conf) +"')\n"
     rcnt = 0
     pcnt = 0
     for i in range(len(vals0)):
@@ -3932,6 +4024,7 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
             else:
                 if vals0[i][3] == "paragraph_sql_array":
                     # print(str(rvals[i]).replace("'{","[").replace("}'","]"), file=sys.stderr)
+                    #script += "pm.addParagraph('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(rvals[rcnt], "utf-8").replace("'{", "[").replace("}'", "]"))) + ")\n"
                     script += "pm.addParagraph('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(str(rvals[rcnt]), "utf-8").replace("'{", "[").replace("}'", "]"))) + ")\n"
                     rcnt += 1
                 else:
@@ -3974,7 +4067,7 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
                                 cur.execute(req)
                                 lvals = cur.fetchall()
                                 for j in range(len(lvals)):
-                                    ldocs = _clientPrint(conf, inputs, cur, req1, lvals[j][0], rid, tmp[2])
+                                    ldocs = _clientPrint(conf, inputs, cur, req1, lvals[j][0], filters, operators, rid, tmp[2])
                                     print(ldocs, file=sys.stderr)
                                     print(conf["lenv"]["message"], file=sys.stderr)
                                     # if j==0:
@@ -3987,6 +4080,13 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
                                     if j + 1 == len(lvals):
                                         script += "pm.searchAndReplace('[_" + vals0[i][2] + "_]',\"\")\n"
                                 pcnt += 1
+                            else:
+                                toAppend=""
+                                tmp=json.loads(inputs["filter_labels"]["value"])
+                                if len(tmp)==0:
+                                    tmp=[zoo._("None")]
+                                script += "pm.searchAndReplace('[_" + vals0[i][2] + "_]'," + json.dumps(zoo._("General filter: ")+rvals[rcnt]+"\n"+zoo._("Personalized filter: ")+("\n".join(tmp)).replace("<","de fin :").replace(">","de début :")) + ")\n"
+                                rcnt += 1
 
     script += "pm.saveDoc('" + docPath1 + "')\n"
     if rName is None:
@@ -4000,7 +4100,7 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, rid=None, rName=None)
     os.dup2(err_log.fileno(), sys.stderr.fileno())
     scriptFile = conf["main"]["tmpPath"] + "/script_" + conf["lenv"]["usid"] + ".py"
     f = open(scriptFile, "w")
-    f.write(script)
+    f.write(script.replace("null","'Néant'"))
     f.close()
 
     # process = Popen([conf["oo"]["path"],scriptFile],stdin=PIPE,stdout=PIPE)
@@ -4063,8 +4163,7 @@ def clientView(conf, inputs, outputs):
         return zoo.SERVICE_FAILED
     tableName = vals[0]
     # clientPrint(conf,inputs,outputs)
-    req = "SELECT mm_tables.p_editions.id,mm_tables.p_editions.name FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + inputs["tableId"][
-        "value"] + " and mm.groups.id in (SELECT id from mm.groups where " + splitGroup(conf) + ") and (mm_tables.p_editions.step=-2 or mm_tables.p_editions.step=-10 or mm_tables.p_editions.step>=0 ) order by mm_tables.p_editions.step asc"
+    req = "SELECT mm_tables.p_editions.id,mm_tables.p_editions.name FROM mm_tables.p_editions,mm.groups,mm_tables.p_edition_groups where mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + inputs["tableId"]["value"] + " and mm.groups.id in (SELECT id from mm.groups where " + splitGroup(conf) + ") and (mm_tables.p_editions.step=-2 or mm_tables.p_editions.step=-10 or mm_tables.p_editions.step>=0 ) order by mm_tables.p_editions.step asc"
     print(" -------- 0 -------- ", file=sys.stderr)
     print(req, file=sys.stderr)
     print(" -------- 0 -------- ", file=sys.stderr)
@@ -4099,7 +4198,10 @@ def clientView(conf, inputs, outputs):
             if vals[i][3] == "bytea":
                 files[vals[i][2]] = 1
             if vals[i][3] == "geometry":
-                rcolumns += ["ST_AsText(" + vals[i][2] + ") as " + vals[i][2]]
+                if vals[i][4]!="":
+                    rcolumns += ["ST_AsText(ST_Transform(" + vals[i][2] + ",4326)) as " + vals[i][2]]
+                else:
+                    rcolumns += ["ST_AsText(" + vals[i][2] + ") as " + vals[i][2]]
             else:
                 if vals[i][3] != "link" and vals[i][3] != "tbl_link" and vals[i][2].count("unamed") == 0:
                     if vals[i][5]:
@@ -4294,12 +4396,15 @@ def clientView(conf, inputs, outputs):
     return zoo.SERVICE_SUCCEEDED
 
 
-def buildClause(filters,operators):
+def buildClause(filters,operators=None):
     res = ""
     for i in range(len(filters)):
         if res != "":
             res += " " + filters[i]["linkClause"] + " "
-        lkeys = myList(filters[i].keys())
+        try:
+            lkeys = myList(filters[i].keys())
+        except:
+            return res
         print(lkeys, file=sys.stderr)
         tres = ""
         for k in range(len(lkeys)):
@@ -4323,7 +4428,7 @@ def buildClause(filters,operators):
     print(res, file=sys.stderr)
     if res != "":
         res = " ( " + res + " ) "
-    print(res, file=sys.stderr)
+    print("CLAUSE BUILT: "+res, file=sys.stderr)
     return res
 
 
@@ -4400,6 +4505,9 @@ def clientViewTable(conf, inputs, outputs):
     print("******* " + str(clause), file=sys.stderr)
     print("******* " + str(classifier), file=sys.stderr)
     req1 = "SELECT " + (",".join(values + [cid])) + " FROM " + table + " WHERE " + clause + " ORDER BY " + classifier + " LIMIT " + inputs["limit"]["value"] + " OFFSET " + inputs["offset"]["value"]
+    if "force" in inputs and inputs["force"]["value"]=="true":
+        outputs["Result"]["value"]=json.dumps(req1)
+        return zoo.SERVICE_SUCCEEDED
     # print(req1, file=sys.stderr)
     res = cur.execute(req1)
     vals = cur.fetchall()

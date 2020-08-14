@@ -270,7 +270,7 @@ def demo(conf, inputs, outputs):
 
 
 def access(conf, inputs, outputs):
-    # print(str(inputs), file=sys.stderr)
+    #print(str(inputs), file=sys.stderr)
     osgeo.gdal.FileFromMemBuffer('/vsimem//temp1', inputs["InputData"]["value"])
     ds = osgeo.ogr.Open('/vsimem//temp1')
     print(ds, file=sys.stderr)
@@ -348,7 +348,10 @@ def Buffer(conf, inputs, outputs):
     rgeometries = []
     while i < len(geometry):
         conf["lenv"]["message"] = str(i) + " / " + str(len(geometry)) + " Run Buffer Operation .."
-        zoo.update_status(conf, (i * 100) / len(geometry))
+        try:
+            zoo.update_status(conf, int((i * 100) / len(geometry)))
+        except:
+            print("ok",file=sys.stderr)
         tmp = geometry[i].Clone()
         resg = geometry[i].GetGeometryRef().Buffer(bdist)
         tmp.SetGeometryDirectly(resg)
@@ -739,7 +742,10 @@ def UnionOneGeom(conf, inputs, outputs):
     origin = []
     while i < len(geometry1):
         conf["lenv"]["message"] = "(" + str(i) + "/" + str(len(geometry1)) + ") " + zoo._("Running process...")
-        zoo.update_status(conf, (i * 100) / len(geometry1))
+        try:
+            zoo.update_status(conf, int((i * 100) / len(geometry1)))
+        except:
+            continue
         j = 0
         tmp = geometry1[i].GetGeometryRef()
         line = shapely.wkt.loads(tmp.ExportToWkt())
@@ -791,7 +797,10 @@ def FusionIntersectsPy(conf, inputs, outputs):
     rmulti = ogr.Geometry(ogr.wkbMultiPolygon)
     for i in range(len(geometry1)):
         conf["lenv"]["message"] = "(" + str(i) + "/" + str(len(geometry1)) + ") " + zoo._("Running process...")
-        zoo.update_status(conf, (i * 100) / len(geometry1))
+        try:
+            zoo.update_status(conf, int((i * 100) / len(geometry1)))
+        except:
+            continue
         resg0 = geometry1[i].GetGeometryRef().Clone()
         print("****** 3: " + str(resg0), file=sys.stderr)
         j = 0
@@ -865,7 +874,10 @@ def Intersection(conf, inputs, outputs):
     i = 0
     for i in range(len(geometry1)):
         conf["lenv"]["message"] = "(" + str(i) + "/" + str(len(geometry1)) + ") " + zoo._("Running process...")
-        zoo.update_status(conf, (i * 100) / len(geometry1))
+        try:
+            zoo.update_status(conf, int((i * 100) / len(geometry1)))
+        except Exception as e:
+            print("----- ERROR : "+str(e))
         j = 0
         for j in range(len(geometry2)):
             tmp = geometry2[j].Clone()
@@ -875,7 +887,10 @@ def Intersection(conf, inputs, outputs):
             # resg=resg.Intersection(geometry1[i].GetGeometryRef())
             if len(geometry1) == 1:
                 conf["lenv"]["message"] = "(" + str(j) + "/" + str(len(geometry2)) + ") " + zoo._("Run intersection process...")
-                zoo.update_status(conf, (j * 100) / len(geometry2))
+                try:
+                    zoo.update_status(conf, int((j * 100) / len(geometry2)))
+                except Exception as e:
+                    print("----- ERROR : "+str(e))
             if geometry1[i].GetGeometryRef().GetGeometryType() == osgeo.ogr.wkbMultiPolygon:
                 for k in range(geometry1[i].GetGeometryRef().GetGeometryCount()):
                     try:
