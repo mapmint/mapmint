@@ -966,7 +966,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": inputDSN,"type":"string"},
-	"q": {"value": "SELECT name, (select clause from mm_tables.p_views where ptid=mm_tables.p_tables.id) as restriction FROM "+dbs["mm4me_tables"]["table"]+" "+dbs["mm4me_tables"]["clause"],"type":"string"},
+	"q": {"value": "SELECT name, (select clause from mm_tables.p_views where ptid=mm_tables.p_tables.id and id in (select vid from mm_tables.p_view_groups where gid in (select id from mm.groups where name in ('"+groups.join("','")+"'))) ) as restriction FROM "+dbs["mm4me_tables"]["table"]+" "+dbs["mm4me_tables"]["clause"],"type":"string"},
     }
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult=myProcess.Execute(myInputs,myOutputs);

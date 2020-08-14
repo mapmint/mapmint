@@ -1,0 +1,121 @@
+{{#ProcessDescriptions}}
+{{#ProcessDescriptions.ProcessDescription}}
+<div data-role="popup" id="wps_{{Identifier1}}" data-dismissible="false" data-overlay-theme="a" data-theme="c" class="pm-popup  ui-corner-all clearfix">
+<div data-role="header" data-theme="a" class="ui-corner-top">
+  <h3 id="run-wps-header"><img style="width:30px" src="https://www.orfeo-toolbox.org/wp-content/uploads/2016/03/logo-orfeo-toolbox.png"/> {{Identifier}}</h3>
+</div>
+<div data-role="content" data-theme="d" class="ui-corner-bottom
+  ui-content">
+  <h4>{{Title}}</h4>
+  <p> {{Abstract}}</p>
+<div class="ui-field-contain">
+  {{#DataInputs}}
+  <h4>DataInputs</h4>
+    
+      {{#Input}}
+<div data-role="content" data-theme="d" class="ui-corner-bottom
+  ui-content col-sm-12">
+  <label for="wps_i_{{Identifier}}">{{Identifier}}</label>
+  {{#optional}}
+  <input type="checkbox" name="wps_i_{{Identifier}}"
+	id="wps_i_{{Identifier}}_active" value="" placeholder="Resource
+	title..." data-clear-btn="true" data-mini="true" onchange="$('#wps_i_{{Identifier}}_details').toggle();"/>
+  <div id="wps_i_{{Identifier}}_details" style="display:none">
+  {{/optional}}
+  <span class="wps-title">{{Title}}</span>
+  {{#ComplexData}}
+  <div class="row">
+  <div class="col-sm-6">
+  <select class="form-control pre_i" id="wps_pre_i_{{Identifier}}">
+  </select>
+  </div>
+  <div class="col-sm-6">
+  <select class="form-control i" id="wps_i_{{Identifier}}">
+  </select>
+  </div>
+  </div>
+  <!--
+  <input type="hidden" name="file" id="wps_i_{{Identifier}}" value="http://geolabs.fr/dl/Landsat8Extract1.tif" />
+  <label for="wps_i_{{Identifier}}_format}">Format</label>
+  <select data-lid="{{Identifier}}" data-target="wps_i_{{Identifier}}_datastore" id="wps_i_{{Identifier}}_format" class="wps_format">
+    {{#Default.Format}}
+    <option>{{MimeType}}</option>
+    {{/Default.Format}}
+    {{#ComplexData.Supported.Format}}
+    <option>{{MimeType}}</option>
+    {{/ComplexData.Supported.Format}}
+  </select>
+  <label for="wps_i_{{Identifier}}_format}">Datastore</label>
+  <select data-orig="wps_i_{{Identifier}}_format" data-lid="{{Identifier}}"
+    id="wps_i_{{Identifier}}_datastore"
+    data-target="wps_i_{{Identifier}}_datasource" class="wps_datastore">
+  </select>
+  <label for="wps_i_{{Identifier}}_format}">Datasource</label>
+  <select data-lid="{{Identifier}}" id="wps_i_{{Identifier}}_datasource">
+  </select>
+  -->
+  {{/ComplexData}}
+  {{#LiteralData}}
+  {{#AllowedValues}}
+  <select type="text" class="form-control" name="wps_i_{{Identifier}}"
+	id="wps_i_{{Identifier}}" data-ltype="{{DataType}}" value="" placeholder="{{Identifier}}
+	..." data-clear-btn="true" data-mini="true" >
+	{{#Value}}
+	 <option>{{.}}</option>
+	{{/Value}}
+	</select>
+  {{/AllowedValues}}
+  <input type="text"  name="wps_i_{{Identifier}}"
+	id="wps_i_{{Identifier}}" class="form-control {{#AllowedValues}}hide{{/AllowedValues}}" data-ltype="{{DataType}}" value="{{#DefaultValue}}{{DefaultValue}}{{/DefaultValue}}" placeholder="{{Identifier}}
+	..." data-clear-btn="true" data-mini="true" />
+  {{/LiteralData}}
+  <p></p>
+  {{#optional}}
+  </div>
+  {{/optional}}
+  </div>
+      
+      {{/Input}}
+    
+  
+  {{/DataInputs}}
+  <h4>ProcessOutputs</h4>
+  {{#ProcessOutputs.Output}}
+  <div class="col-sm-12">
+  <label for="wps_o_{{Identifier}}">{{Identifier}}</label>
+  <span class="wps-title">{{Title}}</span>
+    {{#ComplexOutput}}
+  <select data-lid="{{Identifier}}" class="form-control" id="format_wps_o_{{Identifier}}">
+    {{#Default.Format}}
+    <option>{{MimeType}}</option>
+    {{/Default.Format}}
+    {{#Supported.Format}}
+    <option>{{MimeType}}</option>
+    {{/Supported.Format}}
+  </select>
+  {{/ComplexOutput}}
+  </div>
+  {{/ProcessOutputs.Output}}
+
+  </div>
+  <div class="col-sm-12" style="margin-top:0.5em">
+    <div class="col-sm-3"><button id="btn-wps-execute" href="#"
+      data-rel="close" class="btn btn-default" style="margin-left:
+      0px !important;">Execute</button>
+    </div>
+    <div class="col-md-19">
+      <div class="progress" style="margin-top: 0.5em;">
+        <div id="progress-process" class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+          <span class="sr-only"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="infoMessage" class="col-sm-12" style="margin-top:0.5em">
+    
+  </div>
+
+
+</div>
+{{/ProcessDescriptions.ProcessDescription}}
+{{/ProcessDescriptions}}
