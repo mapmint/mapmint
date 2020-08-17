@@ -332,6 +332,10 @@ CREATE TABLE pages (
 );
 
 
+--
+-- The following SQL queries are required for OWS-Security support
+-- 
+
 CREATE TABLE servers (
     id serial PRIMARY KEY,
     name character varying(50),

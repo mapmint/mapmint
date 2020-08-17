@@ -145,7 +145,8 @@ CREATE TABLE mm_tables.p_edition_fields (
     value text,
     dependencies text,
     edition boolean,
-    name text
+    name text,
+    optional boolean
 );
 
 --
