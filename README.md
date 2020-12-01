@@ -19,7 +19,7 @@ The main idea behind the MapMint solution is the massive usage of OGC Web Servic
 
 <h3>Main software components</h3>
 
-MapMint is using numerous OSGeo softwares and bring them all together in a complete Web-GIS platform by using the WPS to make them understandable and usable to and from each other.
+MapMint is using numerous OSGeo softwares and bring them all together in a comprehensive Web-GIS platform by using the WPS to make them accessible and usable to and from each other.
 
 
  Software |	Usage 
