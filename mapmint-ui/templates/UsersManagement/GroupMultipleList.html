@@ -1,5 +1,0 @@
-#set res=$cur.execute("SELECT id,name as val from "+$prefix+"groups order by name")
-#set vals=$cur.fetchall()
-#for i in range(0,len(vals))
-		<option value="$vals[i][0]">$vals[i][1]</option>
-#end for

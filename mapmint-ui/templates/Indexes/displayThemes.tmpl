@@ -1,6 +1,0 @@
-#for i in range(0,len(themes))
-     <option value="$themes[$i].id">$prefix $themes[$i].text</option>
-#if len($themes[$i].children)>0
-$(Template(file=$conf["main"]["templatesPath"]+"/Indexes/displayThemes.html",searchList={"cur":$cur,"themes": $themes[$i].children,"prefix":$prefix+"-"}))
-#end if
-#end for

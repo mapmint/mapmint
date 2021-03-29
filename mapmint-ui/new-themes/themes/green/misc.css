@@ -1,7 +1,0 @@
-.tabs-right ul li:hover, .maps-container ul li:hover {cursor:pointer;
-background: -moz-linear-gradient(top, #C2FF7E , #4FA33F);
-background: -webkit-gradient(linear, left top, left bottom, from(#C2FF7E), to(#4FA33F));
-background: -ms-linear-gradient(#C2FF7E, #4FA33F);
-filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#C2FF7E', endColorstr='#4FA33F');
--ms-filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#C2FF7E', endColorstr='#4FA33F');
-}

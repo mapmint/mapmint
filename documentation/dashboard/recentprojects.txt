@@ -1,4 +1,0 @@
-.. _dashboard-recentsprojects:
-
-Panneau projets récents
-==========================
