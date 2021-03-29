@@ -1,6 +1,0 @@
-#set res=$cur.execute("SELECT name, content from "+$prefix+"ilinks where short='"+$inputs["idp"]["value"]+"'")
-#set $vals=$cur.fetchall()
-	  <div class="post">
-	    <h2 class="htxt">$vals[0][0] <a href="$conf["main"]["applicationAddress"]/public/">retour</a></h2>
-	    <p>$vals[0][1].replace("\\n","</p><p>")</p>
-	  </div>

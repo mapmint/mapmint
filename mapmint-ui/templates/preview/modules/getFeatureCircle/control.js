@@ -1,1 +1,0 @@
-	,getFeatureCircle: gfiControlCircle

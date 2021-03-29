@@ -1,7 +1,0 @@
-#import zoo
-#if $m.web.metadata.get('mmOT')
-#set f0=$m.web.metadata.get('mmOT').split(',')
-#if $f0.count('MMOVMap')>0 or $f0.count('MMOVMapFixed')>0
-<a class="ls-button ui-state-default ui-corner-all fg-button-icon-solo ov-toogler" href="#" title="$zoo._("Overview Map")"></a>
-#end if
-#end if
