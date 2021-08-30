@@ -30,6 +30,7 @@ MapMint: $mmodule
 #set outputs1={"Result":{"value":""}}
 #set res=datastores.list($conf,$inputs1,$outputs1)
 #set dirStr=json.loads($outputs1["Result"]["value"])
+<!-- $dirStr -->
 
 <ul class="nav nav-second-level collapse in">
   <li class="active">
@@ -44,7 +45,7 @@ MapMint: $mmodule
 #for i in ["MySQL","PostGIS"]
      <li class="active">
        <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $i 
-#if $dirStr.keys().count($i)>0
+#if $i in $dirStr.keys()
        <span class="fa arrow"></span></a>
        <ul class="nav nav-forth-level">
 #for j in $dirStr[$i]
@@ -77,7 +78,7 @@ MapMint: $mmodule
 #for i in ["Directories"]
   <li class="active">
     <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $zoo._($i)
-#if $dirStr.keys().count($i)>0
+#if $i in $dirStr.keys()
     <span class="fa arrow"></span></a>
       <ul class="nav nav-forth-level">
 #for j in $dirStr[$i]
@@ -111,7 +112,7 @@ MapMint: $mmodule
 #for i in ["WMS","WFS"]
       <li class="active">
         <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $i 
-#if $dirStr.keys().count($i)>0
+#if $i in $dirStr.keys()
         <span class="fa arrow"></span></a>
         <ul class="nav nav-forth-level">
 #for j in $dirStr[$i]
@@ -232,6 +233,8 @@ MapMint: $mmodule
 {"name": "download","title": $zoo._('Download selection'),"font":"fa-download","optional":True},
 {"name": "open","title": $zoo._('Open selection in Manager'),"font":"fa-share","optional":True},
 {"name": "upload","title": $zoo._('Import data'),"font":"fa-upload"},
+{"name": "otb","title": $zoo._('OTB'),"font":"fa-cogs"},
+{"name": "saga","title": $zoo._('SAGA-GIS'),"font":"fa-cogs"},
 {"name": "tileindex","title": $zoo._('Create TileIndex'),"font":"fa-th"},
 {"name": "privileges","title": $zoo._('Privileges'),"font":"fa-users"},
 {"name": "settings","title": $zoo._('Settings'),"font":"fa-wrench"},
@@ -249,7 +252,7 @@ MapMint: $mmodule
 	  <div class="btn-group">
 #for i in $objs
 	    <button type="button" class="btn btn-default btn-xs
-	    hidden-md hidden-xs hidden-sm #if $i.keys().count('optional')>0#hide require-select#end if#"  data-toggle="tooltip" data-mmaction="$i.name" title="$i.title">
+	    hidden-md hidden-xs hidden-sm #if 'optional' in $i.keys()#hide require-select#end if#"  data-toggle="tooltip" data-mmaction="$i.name" title="$i.title">
 	    <i class="fa $i.font fa-fw"></i>
 	    </button>
 #end for
@@ -258,7 +261,7 @@ MapMint: $mmodule
 	    </button>
 	    <ul class="dropdown-menu pull-right" role="menu">
 #for i in $objs
-	      <li class="#if $i.keys().count('optional')>0#hide require-select#end if#">
+	      <li class="#if 'optional' in $i.keys()#hide require-select#end if#">
 	        <a href="#" data-mmaction="$i.name" ><i class="fa $i.font fa-fw"></i> $i.title</a>
 	      </li>
 #end for

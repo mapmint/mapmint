@@ -73,7 +73,7 @@ MapMint: $mmodule
 	   <select id="select-datastore" name="selectDatastore" class="select-window" onchange="app.refreshDatasources()">
 	     <option value="-1">$zoo._("Choose a Data Store")</option>
 #for i in ('WMS','WFS','Directories','MySQL','PostGIS')
-#if $res and $res.keys().count($i) > 0
+#if $res and $i in $res.keys()
 	     <option disabled="true" style="font-weight: bold;color: #111">$zoo._($i)</option>
 #set li=0
 #for j in $res[$i]

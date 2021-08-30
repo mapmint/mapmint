@@ -2,8 +2,8 @@
 
 
 define([
-    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic',"datepicker","fileinput","fileinput_local",'highcharts'
-], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,datepicker,fileinput,fileinput_local,Highcharts) {
+    'module', 'jquery', 'zoo','notify', 'metisMenu', 'summernote', 'xml2json','typeahead', 'adminBasic',"datepicker","fileinput","fileinput_local",'highcharts','hgn!tpl/describe_process_form'
+], function(module, $,Zoo,notify, metisMenu, summernote, X2JS,typeahead,adminBasic,datepicker,fileinput,fileinput_local,Highcharts,tpl_describeProcess) {
     
 
     (function(){
@@ -365,7 +365,7 @@ define([
 		}
 		if(CFeaturesSelected.length==0)
 		    myRootElement.find(".require-select").removeClass("disabled");
-		    
+		
 		CRowSelected.push( id );
 
 		$('#'+lid).DataTable().row("#"+id).select();
@@ -374,7 +374,7 @@ define([
 		for(var i=0;i<CFeatures.length;i++){
 		    console.log(CFeatures[i]["fid"]);
 		    if(CFeatures[i]["fid"]==id)
-		       CFeaturesSelected.push( CFeatures[i] );
+			CFeaturesSelected.push( CFeatures[i] );
 		}
 		$("."+lid+"EditForm").find("input,textarea,select").each(function(){
 		    console.log(ltype+' _');
@@ -386,7 +386,7 @@ define([
 			attribute=$(this).attr("name").replace(reg0,'');
 			if(attribute=="id")
 			    attribute="fid";
-			    console.log(CFeaturesSelected[0][attribute]+'_');
+			console.log(CFeaturesSelected[0][attribute]+'_');
 			console.log("RNAME: "+attribute+'_');
 		    }
 		    if($(this).attr("type")=="checkbox")
@@ -719,96 +719,96 @@ define([
     
     function runConversion(elem){
 	try{
-	var myLocation=elem.parent();
-	var inputs=[];
-	var checkboxes={
-	    "chk1": {
-		"id": "s_srs",
-		"value": "s_srs",
-		"isSrs": true
-	    },
-	    "tdso_chk_srs": {
-		"id": "t_srs",
-		"value": "tdso_srs",
-		"isSrs": true
-	    },
-	    "sql_chk": {
-		"id": "sql",
-		"value": "sql",
-		"isSrs": false
-	    },
-	    "chkType": {
-		"id": "nlt",
-		"value": "force_geometry_type",
-		"isSrs": false
-	    },
-	};
-	for(var i in checkboxes){
-	    if(myLocation.find("input#"+i).is(":checked")){
+	    var myLocation=elem.parent();
+	    var inputs=[];
+	    var checkboxes={
+		"chk1": {
+		    "id": "s_srs",
+		    "value": "s_srs",
+		    "isSrs": true
+		},
+		"tdso_chk_srs": {
+		    "id": "t_srs",
+		    "value": "tdso_srs",
+		    "isSrs": true
+		},
+		"sql_chk": {
+		    "id": "sql",
+		    "value": "sql",
+		    "isSrs": false
+		},
+		"chkType": {
+		    "id": "nlt",
+		    "value": "force_geometry_type",
+		    "isSrs": false
+		},
+	    };
+	    for(var i in checkboxes){
+		if(myLocation.find("input#"+i).is(":checked")){
+		    inputs.push({
+			"identifier": checkboxes[i]["id"],
+			"value": (checkboxes[i]["isSrs"]?"+init=":"")+myLocation.find("#"+checkboxes[i]["value"]).val(),
+			"mimeType": "application/json"
+		    });
+		}
+	    }
+	    if(myLocation.find("input#ov1").is(":checked")){
 		inputs.push({
-		    "identifier": checkboxes[i]["id"],
-		    "value": (checkboxes[i]["isSrs"]?"+init=":"")+myLocation.find("#"+checkboxes[i]["value"]).val(),
-		    "mimeType": "text/plain"
+		    "identifier": "overwrite",
+		    "value": "true",
+		    "dataType": "boolean"
+		});
+	    }else{
+		inputs.push({
+		    "identifier": "append",
+		    "value": "true",
+		    "dataType": "boolean"
 		});
 	    }
-	}
-	if(myLocation.find("input#ov1").is(":checked")){
-	    inputs.push({
-		"identifier": "overwrite",
-		"value": "true",
-		"dataType": "boolean"
-	    });
-	}else{
-	    inputs.push({
-		"identifier": "append",
-		"value": "true",
-		"dataType": "boolean"
-	    });
-	}
-	var params={
-	    "dst_in": "dst_in",
-	    "dso_in": "dso_in1",
-	    "dso_f": "tdso_format",
-	    "dst_out": "tdso",
-	    "dso_out": "out_name"
-	};
-	for(var i in params){
-	    inputs.push({
-		"identifier": i,
-		"value": myLocation.find("#"+params[i]).val(),
-		"dataType": "string"
-	    });
-	}
-
-	console.log(inputs);
-	var myRootLocation=myLocation.parent().parent();
-	myRootLocation.addClass("panel-warning");
-	zoo.execute({
-	    identifier: "vector-converter.convert",
-	    type: "POST",
-	    dataInputs: inputs,
-	    dataOutputs: [
-		{"identifier":"Result"},
-	    ],
-	    success: function(data){
-		console.log("SUCCESS");
-		console.log(data);
-		myRootLocation.removeClass("panel-warning");
-		myRootLocation.addClass("panel-success");
-		myLocation.parent().collapse();
-		myLocation.parent().removeClass("in");
-		myLocation.remove();
-		window.setTimeout(function () { 
-		    myRootLocation.removeClass("panel-success");
-		}, 1000);
-	    },
-	    error: function(data){
-		$(".notifications").notify({
-		    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
-		    type: 'danger',
-		}).show();
+	    var params={
+		"dst_in": "dst_in",
+		"dso_in": "dso_in1",
+		"dso_f": "tdso_format",
+		"dst_out": "tdso",
+		"dso_out": "out_name"
+	    };
+	    for(var i in params){
+		inputs.push({
+		    "identifier": i,
+		    "value": myLocation.find("#"+params[i]).val(),
+		    "dataType": "string"
+		});
 	    }
-	});
+
+	    console.log(inputs);
+	    var myRootLocation=myLocation.parent().parent();
+	    myRootLocation.addClass("panel-warning");
+	    zoo.execute({
+		identifier: "vector-converter.convert",
+		type: "POST",
+		dataInputs: inputs,
+		dataOutputs: [
+		    {"identifier":"Result"},
+		],
+		success: function(data){
+		    console.log("SUCCESS");
+		    console.log(data);
+		    myRootLocation.removeClass("panel-warning");
+		    myRootLocation.addClass("panel-success");
+		    myLocation.parent().collapse();
+		    myLocation.parent().removeClass("in");
+		    myLocation.remove();
+		    window.setTimeout(function () { 
+			myRootLocation.removeClass("panel-success");
+		    }, 1000);
+		},
+		error: function(data){
+		    $(".notifications").notify({
+			message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+			type: 'danger',
+		    }).show();
+		}
+	    });
 	}catch(e){
 	    console.log(e);
 	}
@@ -1432,7 +1432,7 @@ define([
 					    }
 					    else
 						$(".field-require-geometry-point-active").hide();
-					   
+					    
 					});
 					// GEOMETRY TYPE (18)
 					if($(this).val()==18){
@@ -1643,6 +1643,884 @@ define([
 		return;
 	    });
 	},
+	"otb": function(data,param,dsid,dataType,obj){//data,param,dsid,datasource,geometryType,obj){
+	    $(obj).off("click");
+	    $(obj).click(function(e){
+		e.preventDefault();
+		zoo.getCapabilities({
+		    success: function(data){
+			$("#DS_"+dsid).find(".panel-body").first().prepend("<div class='row myWell'><div class='col-md-4'><select id='OTBProcess' class='form-control'></select></div><div id='OTBConf' class='col-md-12'></div></div>");
+			console.log(data);
+			for(var i=0;i<data["Capabilities"]["ProcessOfferings"]["Process"].length;i++){
+			    if(data["Capabilities"]["ProcessOfferings"]["Process"][i]["Identifier"].toString().indexOf("OTB")>=0){
+				console.log(data["Capabilities"]["ProcessOfferings"]["Process"][i]);
+				$("#OTBProcess").append("<option>"+data["Capabilities"]["ProcessOfferings"]["Process"][i]["Identifier"].toString()+"</option>");
+			    }
+			}
+			$("#OTBProcess").on("change",function(){
+			    zoo.describeProcess({
+				identifier: $(this).val(),
+				success: function(data){
+				    var details =  tpl_describeProcess(data);
+				    $("#OTBConf").html(details);
+				    zoo.execute({
+					identifier: "datastores.list",
+					type: "POST", 
+					dataInputs: [],
+					dataOutputs: [
+					    {"identifier":"Result","type":"raw"}
+					],
+					success: function(data){ 
+					    console.log(data);   
+					    data=JSON.parse(data);
+					    for(var i in data){
+						for(var j=0;j<data[i].length;j++){
+						    console.log(data[i][j]);
+						    $(".pre_i").append("<option>"+data[i][j].name+"</option>");
+						}
+					    }
+					    $(".pre_i").off("change");
+					    $(".pre_i").each(function(){
+						$(this).on("change",function(){
+						    var rootElement=$(this).parent().next().find("select").first();
+						    rootElement.html("");
+						    zoo.execute({
+							identifier: "mapfile.redrawDsList",
+							type: "POST",
+							dataInputs: [
+							    {"identifier":"name","value":$(this).val(),"dataType":"string"}
+							],
+							dataOutputs: [
+							    {"identifier":"Result","type":"raw"}
+							],
+							success: function(data){
+							    console.log(data);
+							    for(var k=0;k<data.length;k++)
+								rootElement.append("<option>"+data[k].name+"</option>")
+							},
+							error: function(data){
+							    console.log(data);
+							}
+						    });
+						});
+					    });
+
+					},
+					error: function(data){
+					    console.log(data);
+					}
+				    });
+				    //$("#wps_i_in").val(ldatasource);
+				    $("#btn-wps-execute").off('click');
+				    $("#btn-wps-execute").on('click',function(){
+					var layerInputs=[];
+					var resultFetch=0;
+					var realLayerInputs=[];
+					$("#OTBConf").find("select").each(function(){
+					    if($(this).attr("id") && $(this).attr("id").indexOf("wps_pre_i_")>=0){
+						layerInputs.push($(this).attr("id").replace(/wps_pre_i_/g,""));
+						var cInput=layerInputs[layerInputs.length-1];
+						(function(a,dsid,lid){
+						    zoo.execute({
+							identifier: "mapfile.getMapLayersInfo",
+							type: 'POST',
+							dataInputs: [
+							    {"identifier": "fullPath", "value": "true", "dataType": "string" },
+							    {"identifier": "map", "value": module.config().dataPath+"/dirs/"+dsid+"/ds_ows.map", "dataType": "string" },
+							    {"identifier": "layer", "value": lid, "dataType": "string" },
+							],
+							dataOutputs: [
+							    {"identifier": "Result"}//, "type": "raw"}
+							],
+							success: function(data){
+							    var ldata=eval(data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"].toString());
+							    console.log(ldata);
+							    realLayerInputs.push({"id": a,"ar": ldata});
+							    resultFetch+=1;
+							},
+							error: function(data){
+							    console.log(data);
+							}
+						    });
+						})(cInput,$(this).val(),$("#"+$(this).attr('id').replace(/wps_pre_i_/g,"wps_i_")).val());
+					    }
+					});
+					console.log(layerInputs);
+					console.log(realLayerInputs);
+					function runOTBProcess(layers){
+					    var loaded=[];
+					    var linputs=[];
+					    var loutputs=[];
+					    var dataSources=[];
+					    console.log(layerInputs);
+					    $("#OTBConf").find("input,select").each(function(){
+						if($(this).attr('id').indexOf("wps_i")>=0){
+						    if(loaded.indexOf($(this).attr('id').replace(/wps_i_/g,""))<0){
+							linputs.push({"identifier": $(this).attr('id').replace(/wps_i_/g,""), value: $(this).val() });
+							loaded.push($(this).attr('id').replace(/wps_i_/g,""));
+							console.log($(this).attr('id').replace(/wps_i_/g,""));
+							console.log(layerInputs);
+							if(layerInputs.indexOf($(this).attr('id').replace(/wps_i_/g,""))>=0){
+							    for(var i=0;i<layers.length;i++)
+								if(layers[i].id==$(this).attr('id').replace(/wps_i_/g,"")){
+								    linputs[linputs.length-1]["href"]="file://"+layers[i].ar[2];
+								    break;
+								}
+							    linputs[linputs.length-1]["mimeType"]="image/tif";
+							}else{
+							    linputs[linputs.length-1]["dataType"]="string";
+							}
+						    }
+						}else{
+						    if($(this).attr('id').indexOf("wps_o")>=0){
+							loutputs.push({
+							    "identifier": $(this).attr('id').replace(/format_wps_o_/g,""), 
+							    "mimeType": $(this).val(),
+							    asReference: "true" 
+							});
+						    }
+						}
+						
+					    });
+					    var progress=$("#OTBConf").find("#progress-process").first();
+					    zoo.execute({
+						identifier: $("#OTBProcess").val(),
+						type: 'POST',
+						dataInputs: linputs,
+						dataOutputs: loutputs,
+						storeExecuteResponse: true,
+						status: true,
+						success: function(data, launched) {
+						    zoo.watch(launched.sid, {
+							onPercentCompleted: function(data) {
+							    console.log("**** PercentCompleted ****");
+							    console.log(data);
+							    progress.css('width', (data.percentCompleted)+'%'); 
+							    progress.text(data.text+' : '+(data.percentCompleted)+'%');
+							},
+							onProcessSucceeded: function(data) {
+							    progress.css('width', (100)+'%');
+							    progress.text(data.text+' : '+(100)+'%');
+							    if (data.result.ExecuteResponse.ProcessOutputs) {
+								console.log("**** onSuccess ****");
+								console.log(data.result);
+								var res=null;
+								if(!$.isArray(data.result.ExecuteResponse.ProcessOutputs.Output)){
+								    res=[data.result.ExecuteResponse.ProcessOutputs.Output];
+								}else
+								    res=data.result.ExecuteResponse.ProcessOutputs.Output;
+								for(var j=0;j<res.length;j++){
+								    var fileIn=res[j].Reference._href;
+								    var tmpFile=fileIn.split('/');
+								    tmpFileName=tmpFile[tmpFile.length-1];
+								    var input0=[
+									{"identifier": "fileIn", "value": fileIn, "dataType": "string"},
+									{"identifier": "fileOut", "value": module.config().dataPath+"/dirs/"+dsid+"/"+tmpFileName, "dataType": "string"},
+								    ];
+								    console.log(input0);
+								    zoo.execute({
+									identifier: "vector-converter.moveFile",
+									type: 'POST',
+									dataInputs: input0,
+									dataOutputs: [
+									    {"identifier": "Result"}
+									],
+									success: function(data){
+									    console.log(data);
+									},
+									error: function(data){
+									    console.log(data);
+									}
+								    });
+								}
+
+							    }
+
+							    console.log(data);
+							},
+							onError: function(data) {
+							    console.log("**** onError ****");
+							    console.log(data);
+							},
+						    });
+						},
+						error: function(data) {
+						    console.log("**** ERROR ****");
+						    console.log(data);
+						    notify("Execute asynchrone failed", 'danger');
+						}
+					    });
+					};
+					function test(){
+					    return (realLayerInputs.length!=layerInputs.length && resultFetch!=layerInputs.length);
+					};
+					function loop(){
+					    console.log(resultFetch);
+					    console.log(layerInputs);
+					    console.log(realLayerInputs);
+					    if(test())
+						setTimeout(function(){console.log("try again");loop();},100);
+					    else{
+						console.log("wait ends!");
+						runOTBProcess(realLayerInputs);
+					    }
+					};
+					loop();
+					/*
+					  setTimeout(function(){
+					  if(test)
+					  loop();
+					  console.log("Continue!");
+					  console.log(realLayerInputs);
+					  },1000);
+					*/
+
+					/*
+					  var inputs0=[
+					  {"identifier": "fullPath", "value":"true", "dataType": "string" },
+					  {"value": module.config().dataPath+"/dirs/"+dsid+"/ds_ows.map", "identifier":"map", "dataType": "string" },
+					  {"identifier": "layer", "value":ldatasource, "dataType": "string" },
+					  ];
+					  zoo.execute({
+					  identifier: "mapfile.getMapLayersInfo",
+					  type: "POST",
+					  dataInputs: inputs0,
+					  dataOutputs: [
+					  {"identifier":"Result"}//,"type":"raw"},
+					  ],
+					  success: function(data){
+
+					  console.log("SUCCESS");
+					  console.log(data);
+					  console.log(data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"].toString());
+					  var ldata=eval(data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"].toString());
+					  var loaded=[];
+					  var linputs=[];
+					  var loutputs=[];
+					  var dataSources=[];
+					  $("#OTBConf").find("select").each(function(){
+					  if($(this).attr("id") && $(this).attr("id").indexOf("wps_pre_")>=0){
+					  dataSources.push($(this).attr("id").replace(/wps_pre_/g,""));
+					  }
+					  });
+					  $("#OTBConf").find("input,select").each(function(){
+					  if($(this).attr('id').indexOf("wps_i")>=0){
+					  if(loaded.indexOf($(this).attr('id').replace(/wps_i_/g,""))<0){
+					  linputs.push({"identifier": $(this).attr('id').replace(/wps_i_/g,""), value: $(this).val() });
+					  loaded.push($(this).attr('id').replace(/wps_i_/g,""));
+					  if(dataSources.indexOf($(this).attr('id').replace(/wps_i_/g,""))>=0){
+					  zoo.execute({
+					  identifier: "mapfile.getMapLayersInfo",
+					  type: 'POST',
+					  dataInputs: [
+					  {"identifier": "fullPath", "value": "true", "dataType": "string" },
+					  {"identifier": "maph", "value": module.config().dataPath+"/dirs/"+$("#"+$(this).attr('id').replace(/wps_i_/g,"wps_pre_i_")).val()+"/ds_ows.map", "dataType": "string" },
+					  {"identifier": "layer", "value": $().val(), "dataType": "string" },
+					  ],
+					  dataOutputs: [
+					  {"identifier": "Result", "type": "raw"}
+					  ],
+					  success: function(data){
+					  console.log(data);
+					  },
+					  error: function(data){
+					  }
+					  });
+
+					  }else{
+					  if($(this).val()!=ldatasource)
+					  linputs[linputs.length-1]["dataType"]="string";
+					  else{
+					  linputs[linputs.length-1]["mimeType"]="image/tif";
+					  linputs[linputs.length-1]["href"]="file://"+ldata[2];
+					  }
+					  }
+					  }
+					  }else{
+					  if($(this).attr('id').indexOf("wps_o")>=0){
+					  loutputs.push({
+					  "identifier": $(this).attr('id').replace(/format_wps_o_/g,""), 
+					  "mimeType": $(this).val(),
+					  asReference: "true" 
+					  });
+					  }
+					  }
+					  
+					  });
+					  console.log(linputs);
+					  var progress=$("#OTBConf").find("#progress-process").first();
+					  zoo.execute({
+					  identifier: $("#OTBProcess").val(),
+					  type: 'POST',
+					  dataInputs: linputs,
+					  dataOutputs: loutputs,
+					  storeExecuteResponse: true,
+					  status: true,
+					  success: function(data, launched) {
+					  zoo.watch(launched.sid, {
+					  onPercentCompleted: function(data) {
+					  console.log("**** PercentCompleted ****");
+					  console.log(data);
+					  progress.css('width', (data.percentCompleted)+'%'); 
+					  progress.text(data.text+' : '+(data.percentCompleted)+'%');
+					  },
+					  onProcessSucceeded: function(data) {
+					  progress.css('width', (100)+'%');
+					  progress.text(data.text+' : '+(100)+'%');
+					  if (data.result.ExecuteResponse.ProcessOutputs) {
+					  console.log("**** onSuccess ****");
+					  console.log(data.result);
+					  var res=null;
+					  if(!$.isArray(data.result.ExecuteResponse.ProcessOutputs.Output)){
+					  res=[data.result.ExecuteResponse.ProcessOutputs.Output];
+					  }else
+					  res=data.result.ExecuteResponse.ProcessOutputs.Output;
+					  for(var j=0;j<res.length;j++){
+					  var fileIn=res[j].Reference._href;
+					  var tmpFile=fileIn.split('/');
+					  tmpFileName=tmpFile[tmpFile.length-1];
+					  var input0=[
+					  {"identifier": "fileIn", "value": fileIn, "dataType": "string"},
+					  {"identifier": "fileOut", "value": module.config().dataPath+"/dirs/"+dsid+"/"+tmpFileName, "dataType": "string"},
+					  ];
+					  console.log(input0);
+					  zoo.execute({
+					  identifier: "vector-converter.moveFile",
+					  type: 'POST',
+					  dataInputs: input0,
+					  dataOutputs: [
+					  {"identifier": "Result"}
+					  ],
+					  success: function(data){
+					  console.log(data);
+					  },
+					  error: function(data){
+					  console.log(data);
+					  }
+					  });
+					  }
+
+					  }
+
+					  console.log(data);
+					  },
+					  onError: function(data) {
+					  console.log("**** onError ****");
+					  console.log(data);
+					  },
+					  });
+					  },
+					  error: function(data) {
+					  console.log("**** ERROR ****");
+					  console.log(data);
+					  notify("Execute asynchrone failed", 'danger');
+					  }
+					  });
+					  $(".notifications").notify({
+					  message: { text: data },
+					  type: 'success',
+					  }).show();
+					  },
+					  error: function(data){
+					  console.log(data);
+					  }
+					  });
+					*/
+				    });
+				}
+			    });
+			});
+			$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().collapse('toggle');
+		    }
+		});
+		console.log(module.config().dataPath);
+	    });
+	},
+	"saga": function(data,param,dsid,dataType,obj){//data,param,dsid,datasource,geometryType,obj){
+	   var tags={
+		   "climate_tools": "Climate - Climate Tools",
+		   "garden_fractals": "Garden - Fractals",
+		   "garden_games": "Garden - Games",
+		   "earn_to_program": "Garden - Introducing Tool Programming",
+		   "grid_analysis": "Grid - Analysis",
+		   "grid_calculus": "Grid - Calculus",
+		   "grid_calculus_bsl": "Grid - Calculus BSL",
+		   "grid_filter": "Grid - Filtler",
+		   "contrib_perego": "Grid - Filtler (Perego 2009)",
+		   "grid_gridding": "Grid - Gridding",
+		   "grid_spline": "Grid - Spline Interpolation",
+		   "grid_tools": "Grid - Tools",
+		   "imagery_classification": "Imagery - Classification",
+		   "imagery_isocluster": "Imagery - ISODATA Clustering",
+		   "imagery_maxent": "Imagery - Maximum Entropy",
+		   "imagery_opencv": "Imagery - OpenCV",
+		   "imagery_photogrammetry": "Imagery - Photogrammetry",
+		   "imagery_svm": "Imagery - SVM",
+		   "imagery_segmentation": "Imagery - Segmentation",
+		   "imagery_tools": "Imagery - Tools",
+		   "imagery_vigra": "Imagery - ViGrA",
+		   "docs_html": "Reports - HTML",
+		   "docs_pdf": "Reports - PDF",
+		   "shapes_lines": "Shapes - Lines",
+		   "pointcloud_tools": "Shapes - Point Clouds",
+		   "shapes_points": "Shapes - Points",
+		   "shapes_polygons": "Shapes - Polygons",
+		   "shapes_grid": "Shapes - Shapes-Grid Tools",
+		   "shapes_tools": "Shapes - Tools",
+		   "shapes_transect": "Shapes - Transects",
+		   "sim_cellular_automata": "Simulation - Cellular Automata",
+		   "sim_erosion": "Simulation - Erosion",
+		   "sim_fire_spreading": "Simulation - Fire Spreading Analysis",
+		   "sim_geomorphology": "Simulation - Geomorphology",
+		   "sim_hydrology": "Simulation - Hydrology",
+		   "sim_ihacres": "Simulation - Hydrology: IHACRES",
+		   "sim_landscape_evolution": "Simulation - Landscape Evolution",
+		   "sim_ecosystems_hugget": "Simulation - Modelling the Human Impact on Nature",
+		   "sim_qm_of_esp": "Simulation - QM of ESP",
+		   "sim_rivflow": "Simulation - RivFlow@",
+		   "statistics_grid": "Spatial and Geostatistics - Grids",
+		   "statistics_kriging": "Spatial and Geostatistics - Kriging",
+		   "statistics_points": "Spatial and Geostatistics - Points",
+		   "statistics_regression": "Spatial and Geostatistics - Regression",
+		   "tin_tools": "TIN - Tools",
+		   "tin_viewer": "TIN - Visualization",
+		   "ta_channels": "Terrain Analysis - Channels",
+		   "ta_cliffmetrics": "Terrain Analysis - CliffMetrics",
+		   "ta_compound": "Terrain Analysis - Compound Analyses",
+		   "ta_hydrology": "Terrain Analysis - Hydrology",
+		   "ta_lighting": "Terrain Analysis - Lighting, Visibility",
+		   "ta_morphometry": "Terrain Analysis - Morphometry",
+		   "ta_preprocessor": "Terrain Analysis - Preprocessing",
+		   "ta_profiles": "Terrain Analysis - Profiles",
+		   "ta_slope_stability": "Terrain Analysis - Slope Stability",
+		   "garden_3d_viewer": "Visualization - 3D Viewer",
+		   "grid_visualisation": "Visualization - Grids",
+		   "pointcloud_viewer": "Visualization - Point Clouds Viewer",
+	   };
+	    $(obj).off("click");
+	    $(obj).click(function(e){
+		e.preventDefault();
+		zoo.getCapabilities({
+		    success: function(data){
+			$("#DS_"+dsid).find(".panel-body").first().prepend("<div class='row myWell'><div class='col-md-1'>Category:</div><div class='col-md-4'><select id='SAGACLasses' class='form-control'></select></div><div class='col-md-4'><select id='SAGAProcess' class='form-control'></select></div><div id='SAGAConf' class='col-md-12'></div></div>");
+			console.log(data);
+			var SagaAlgortyhms={};
+			for(var i=0;i<data["Capabilities"]["ProcessOfferings"]["Process"].length;i++){
+			    if(data["Capabilities"]["ProcessOfferings"]["Process"][i]["Identifier"].toString().indexOf("SAGA")>=0){
+				console.log(data["Capabilities"]["ProcessOfferings"]["Process"][i]);
+				var tmp=data["Capabilities"]["ProcessOfferings"]["Process"][i]["Identifier"].toString().split('.');
+				if(!SagaAlgortyhms[tmp[1]])
+				    SagaAlgortyhms[tmp[1]]=[];
+				SagaAlgortyhms[tmp[1]].push({"id": data["Capabilities"]["ProcessOfferings"]["Process"][i]["Identifier"].toString() ,"title": data["Capabilities"]["ProcessOfferings"]["Process"][i]["Title"].toString()});
+				//$("#SAGAProcess").append("<option>"+data["Capabilities"]["ProcessOfferings"]["Process"][i]["Identifier"].toString()+"</option>");
+			    }
+			}
+			console.log(SagaAlgortyhms);
+			for(var j in SagaAlgortyhms)
+			    $("#SAGACLasses").append("<option value='"+j+"'>"+tags[j]+"</option>");
+			$("#SAGACLasses").on("change",function(){
+				$("#SAGAProcess").html("<option></option>");
+				console.log($(this).val());
+				if(!SagaAlgortyhms[$(this).val()])
+					alert("not found");
+				for(var i=0;i<SagaAlgortyhms[$(this).val()].length;i++){
+				    $("#SAGAProcess").append("<option value='"+SagaAlgortyhms[$(this).val()][i]["id"]+"'>"+SagaAlgortyhms[$(this).val()][i]["title"]+"</option>");
+				}
+
+			});
+			/*for(var i=0;i<data["Capabilities"]["ProcessOfferings"]["Process"].length;i++){
+			    if(data["Capabilities"]["ProcessOfferings"]["Process"][i]["Identifier"].toString().indexOf("SAGA")>=0){
+				console.log(data["Capabilities"]["ProcessOfferings"]["Process"][i]);
+				$("#SAGAProcess").append("<option>"+data["Capabilities"]["ProcessOfferings"]["Process"][i]["Identifier"].toString()+"</option>");
+			    }
+			}*/
+			$("#SAGAProcess").on("change",function(){
+			    zoo.describeProcess({
+				identifier: $(this).val(),
+				success: function(data){
+				    var details =  tpl_describeProcess(data);
+				    $("#SAGAConf").html(details);
+				    $("#SAGAConf").find("div").find("p").first().each(function(){
+					    console.log("OK RUNNING! "+$(this).text());
+					    $(this).html($(this).text());
+				    });//$("#SAGAConf").html(details);
+				    $("#SAGAConf").find("div").find("img").first().each(function(){
+					    console.log("OK RUNNING! "+$(this).text());
+					    $(this).attr("src","https://upload.wikimedia.org/wikipedia/fr/e/e9/Logo_SAGA_GIS.png");
+				    });//$("#SAGAConf").html(details);
+				    zoo.execute({
+					identifier: "datastores.list",
+					type: "POST", 
+					dataInputs: [],
+					dataOutputs: [
+					    {"identifier":"Result","type":"raw"}
+					],
+					success: function(data){ 
+					    console.log(data);   
+					    data=JSON.parse(data);
+					    for(var i in data){
+						for(var j=0;j<data[i].length;j++){
+						    console.log(data[i][j]);
+						    $(".pre_i").append("<option>"+data[i][j].name+"</option>");
+						}
+					    }
+					    $(".pre_i").off("change");
+					    $(".pre_i").each(function(){
+						$(this).on("change",function(){
+						    var rootElement=$(this).parent().next().find("select").first();
+						    rootElement.html("");
+						    zoo.execute({
+							identifier: "mapfile.redrawDsList",
+							type: "POST",
+							dataInputs: [
+							    {"identifier":"name","value":$(this).val(),"dataType":"string"}
+							],
+							dataOutputs: [
+							    {"identifier":"Result","type":"raw"}
+							],
+							success: function(data){
+							    console.log(data);
+							    for(var k=0;k<data.length;k++)
+								rootElement.append("<option>"+data[k].name+"</option>")
+							},
+							error: function(data){
+							    console.log(data);
+							}
+						    });
+						});
+					    });
+
+					},
+					error: function(data){
+					    console.log(data);
+					}
+				    });
+				    //$("#wps_i_in").val(ldatasource);
+				    $("#btn-wps-execute").off('click');
+				    $("#btn-wps-execute").on('click',function(){
+					var layerInputs=[];
+					var resultFetch=0;
+					var realLayerInputs=[];
+					$("#SAGAConf").find("select").each(function(){
+					    if($(this).attr("id") && $(this).attr("id").indexOf("wps_pre_i_")>=0){
+						layerInputs.push($(this).attr("id").replace(/wps_pre_i_/g,""));
+						var cInput=layerInputs[layerInputs.length-1];
+						(function(a,dsid,lid){
+						    zoo.execute({
+							identifier: "mapfile.getMapLayersInfo",
+							type: 'POST',
+							dataInputs: [
+							    {"identifier": "fullPath", "value": "true", "dataType": "string" },
+							    {"identifier": "map", "value": module.config().dataPath+"/dirs/"+dsid+"/ds_ows.map", "dataType": "string" },
+							    {"identifier": "layer", "value": lid, "dataType": "string" },
+							],
+							dataOutputs: [
+							    {"identifier": "Result"}//, "type": "raw"}
+							],
+							success: function(data){
+							    var ldata=eval(data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"].toString());
+							    console.log(ldata);
+							    realLayerInputs.push({"id": a,"ar": ldata});
+							    resultFetch+=1;
+							},
+							error: function(data){
+							    console.log(data);
+							}
+						    });
+						})(cInput,$(this).val(),$("#"+$(this).attr('id').replace(/wps_pre_i_/g,"wps_i_")).val());
+					    }
+					});
+					console.log(layerInputs);
+					console.log(realLayerInputs);
+					function runSAGAProcess(layers){
+					    var loaded=[];
+					    var linputs=[];
+					    var loutputs=[];
+					    var dataSources=[];
+					    console.log(layerInputs);
+					    $("#SAGAConf").find("input,select").each(function(){
+						if($(this).attr('id').indexOf("wps_i")>=0){
+						    if(loaded.indexOf($(this).attr('id').replace(/wps_i_/g,""))<0){
+							linputs.push({"identifier": $(this).attr('id').replace(/wps_i_/g,""), value: $(this).val() });
+							loaded.push($(this).attr('id').replace(/wps_i_/g,""));
+							console.log($(this).attr('id').replace(/wps_i_/g,""));
+							console.log(layerInputs);
+							if(layerInputs.indexOf($(this).attr('id').replace(/wps_i_/g,""))>=0){
+							    for(var i=0;i<layers.length;i++)
+								if(layers[i].id==$(this).attr('id').replace(/wps_i_/g,"")){
+								    linputs[linputs.length-1]["href"]="file://"+layers[i].ar[2];
+								    break;
+								}
+							    linputs[linputs.length-1]["mimeType"]="image/tif";
+							}else{
+							    linputs[linputs.length-1]["dataType"]="string";
+							}
+						    }
+						}else{
+						    if($(this).attr('id').indexOf("wps_o")>=0){
+							loutputs.push({
+							    "identifier": $(this).attr('id').replace(/format_wps_o_/g,""), 
+							    "mimeType": $(this).val(),
+							    asReference: "true" 
+							});
+						    }
+						}
+						
+					    });
+					    var progress=$("#SAGAConf").find("#progress-process").first();
+					    zoo.execute({
+						identifier: $("#SAGAProcess").val(),
+						type: 'POST',
+						dataInputs: linputs,
+						dataOutputs: loutputs,
+						storeExecuteResponse: true,
+						status: true,
+						success: function(data, launched) {
+						    zoo.watch(launched.sid, {
+							onPercentCompleted: function(data) {
+							    console.log("**** PercentCompleted ****");
+							    console.log(data);
+							    progress.css('width', (data.percentCompleted)+'%'); 
+							    progress.text(data.text+' : '+(data.percentCompleted)+'%');
+							},
+							onProcessSucceeded: function(data) {
+							    progress.css('width', (100)+'%');
+							    progress.text(data.text+' : '+(100)+'%');
+							    if (data.result.ExecuteResponse.ProcessOutputs) {
+								console.log("**** onSuccess ****");
+								console.log(data.result);
+								var res=null;
+								if(!$.isArray(data.result.ExecuteResponse.ProcessOutputs.Output)){
+								    res=[data.result.ExecuteResponse.ProcessOutputs.Output];
+								}else
+								    res=data.result.ExecuteResponse.ProcessOutputs.Output;
+								for(var j=0;j<res.length;j++){
+								    var fileIn=res[j].Reference._href;
+								    var tmpFile=fileIn.split('/');
+								    tmpFileName=tmpFile[tmpFile.length-1];
+								    var input0=[
+									{"identifier": "fileIn", "value": fileIn, "dataType": "string"},
+									{"identifier": "fileOut", "value": module.config().dataPath+"/dirs/"+dsid+"/"+tmpFileName, "dataType": "string"},
+								    ];
+								    console.log(input0);
+								    zoo.execute({
+									identifier: "vector-converter.moveFile",
+									type: 'POST',
+									dataInputs: input0,
+									dataOutputs: [
+									    {"identifier": "Result"}
+									],
+									success: function(data){
+									    console.log(data);
+									},
+									error: function(data){
+									    console.log(data);
+									}
+								    });
+								}
+
+							    }
+
+							    console.log(data);
+							},
+							onError: function(data) {
+							    console.log("**** onError ****");
+							    console.log(data);
+							},
+						    });
+						},
+						error: function(data) {
+						    console.log("**** ERROR ****");
+						    console.log(data);
+						    notify("Execute asynchrone failed", 'danger');
+						}
+					    });
+					};
+					function test(){
+					    return (realLayerInputs.length!=layerInputs.length && resultFetch!=layerInputs.length);
+					};
+					function loop(){
+					    console.log(resultFetch);
+					    console.log(layerInputs);
+					    console.log(realLayerInputs);
+					    if(test())
+						setTimeout(function(){console.log("try again");loop();},100);
+					    else{
+						console.log("wait ends!");
+						runSAGAProcess(realLayerInputs);
+					    }
+					};
+					loop();
+					/*
+					  setTimeout(function(){
+					  if(test)
+					  loop();
+					  console.log("Continue!");
+					  console.log(realLayerInputs);
+					  },1000);
+					*/
+
+					/*
+					  var inputs0=[
+					  {"identifier": "fullPath", "value":"true", "dataType": "string" },
+					  {"value": module.config().dataPath+"/dirs/"+dsid+"/ds_ows.map", "identifier":"map", "dataType": "string" },
+					  {"identifier": "layer", "value":ldatasource, "dataType": "string" },
+					  ];
+					  zoo.execute({
+					  identifier: "mapfile.getMapLayersInfo",
+					  type: "POST",
+					  dataInputs: inputs0,
+					  dataOutputs: [
+					  {"identifier":"Result"}//,"type":"raw"},
+					  ],
+					  success: function(data){
+
+					  console.log("SUCCESS");
+					  console.log(data);
+					  console.log(data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"].toString());
+					  var ldata=eval(data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"].toString());
+					  var loaded=[];
+					  var linputs=[];
+					  var loutputs=[];
+					  var dataSources=[];
+					  $("#OTBConf").find("select").each(function(){
+					  if($(this).attr("id") && $(this).attr("id").indexOf("wps_pre_")>=0){
+					  dataSources.push($(this).attr("id").replace(/wps_pre_/g,""));
+					  }
+					  });
+					  $("#OTBConf").find("input,select").each(function(){
+					  if($(this).attr('id').indexOf("wps_i")>=0){
+					  if(loaded.indexOf($(this).attr('id').replace(/wps_i_/g,""))<0){
+					  linputs.push({"identifier": $(this).attr('id').replace(/wps_i_/g,""), value: $(this).val() });
+					  loaded.push($(this).attr('id').replace(/wps_i_/g,""));
+					  if(dataSources.indexOf($(this).attr('id').replace(/wps_i_/g,""))>=0){
+					  zoo.execute({
+					  identifier: "mapfile.getMapLayersInfo",
+					  type: 'POST',
+					  dataInputs: [
+					  {"identifier": "fullPath", "value": "true", "dataType": "string" },
+					  {"identifier": "maph", "value": module.config().dataPath+"/dirs/"+$("#"+$(this).attr('id').replace(/wps_i_/g,"wps_pre_i_")).val()+"/ds_ows.map", "dataType": "string" },
+					  {"identifier": "layer", "value": $().val(), "dataType": "string" },
+					  ],
+					  dataOutputs: [
+					  {"identifier": "Result", "type": "raw"}
+					  ],
+					  success: function(data){
+					  console.log(data);
+					  },
+					  error: function(data){
+					  }
+					  });
+
+					  }else{
+					  if($(this).val()!=ldatasource)
+					  linputs[linputs.length-1]["dataType"]="string";
+					  else{
+					  linputs[linputs.length-1]["mimeType"]="image/tif";
+					  linputs[linputs.length-1]["href"]="file://"+ldata[2];
+					  }
+					  }
+					  }
+					  }else{
+					  if($(this).attr('id').indexOf("wps_o")>=0){
+					  loutputs.push({
+					  "identifier": $(this).attr('id').replace(/format_wps_o_/g,""), 
+					  "mimeType": $(this).val(),
+					  asReference: "true" 
+					  });
+					  }
+					  }
+					  
+					  });
+					  console.log(linputs);
+					  var progress=$("#OTBConf").find("#progress-process").first();
+					  zoo.execute({
+					  identifier: $("#OTBProcess").val(),
+					  type: 'POST',
+					  dataInputs: linputs,
+					  dataOutputs: loutputs,
+					  storeExecuteResponse: true,
+					  status: true,
+					  success: function(data, launched) {
+					  zoo.watch(launched.sid, {
+					  onPercentCompleted: function(data) {
+					  console.log("**** PercentCompleted ****");
+					  console.log(data);
+					  progress.css('width', (data.percentCompleted)+'%'); 
+					  progress.text(data.text+' : '+(data.percentCompleted)+'%');
+					  },
+					  onProcessSucceeded: function(data) {
+					  progress.css('width', (100)+'%');
+					  progress.text(data.text+' : '+(100)+'%');
+					  if (data.result.ExecuteResponse.ProcessOutputs) {
+					  console.log("**** onSuccess ****");
+					  console.log(data.result);
+					  var res=null;
+					  if(!$.isArray(data.result.ExecuteResponse.ProcessOutputs.Output)){
+					  res=[data.result.ExecuteResponse.ProcessOutputs.Output];
+					  }else
+					  res=data.result.ExecuteResponse.ProcessOutputs.Output;
+					  for(var j=0;j<res.length;j++){
+					  var fileIn=res[j].Reference._href;
+					  var tmpFile=fileIn.split('/');
+					  tmpFileName=tmpFile[tmpFile.length-1];
+					  var input0=[
+					  {"identifier": "fileIn", "value": fileIn, "dataType": "string"},
+					  {"identifier": "fileOut", "value": module.config().dataPath+"/dirs/"+dsid+"/"+tmpFileName, "dataType": "string"},
+					  ];
+					  console.log(input0);
+					  zoo.execute({
+					  identifier: "vector-converter.moveFile",
+					  type: 'POST',
+					  dataInputs: input0,
+					  dataOutputs: [
+					  {"identifier": "Result"}
+					  ],
+					  success: function(data){
+					  console.log(data);
+					  },
+					  error: function(data){
+					  console.log(data);
+					  }
+					  });
+					  }
+
+					  }
+
+					  console.log(data);
+					  },
+					  onError: function(data) {
+					  console.log("**** onError ****");
+					  console.log(data);
+					  },
+					  });
+					  },
+					  error: function(data) {
+					  console.log("**** ERROR ****");
+					  console.log(data);
+					  notify("Execute asynchrone failed", 'danger');
+					  }
+					  });
+					  $(".notifications").notify({
+					  message: { text: data },
+					  type: 'success',
+					  }).show();
+					  },
+					  error: function(data){
+					  console.log(data);
+					  }
+					  });
+					*/
+				    });
+				}
+			    });
+			});
+			$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().collapse('toggle');
+		    }
+		});
+		console.log(module.config().dataPath);
+	    });
+	},
 	"upload": function(data,param,dsid,dataType,obj){
 	    var ldata=data;
 	    $(obj).off("click");
@@ -1790,7 +2668,7 @@ define([
 				"value": dsid,
 				"dataType": "string"
 			    },
-			    			    {
+			    {
 				"identifier": "path",
 				"value": $("#tileindex-form").find('input[name="browse"]:checked').val()+"/",
 				"dataType": "string"
@@ -1915,7 +2793,7 @@ define([
 		    e.stopPropagation();
 		}
 		if(!DSPreviews["DS_"+dsid+"_"+ldatasource]){
-			
+		    
 		    var tmpPopover=$(obj).popover({
 			html: true,
 			placement: ($(obj).is("a")?'bottom':'left'),
@@ -1925,7 +2803,7 @@ define([
 			content: function(){console.log("temp"); return '<div ><i id="preview_'+dsid+'_'+ldatasource+'" class="fa fa-spinner fa-spin" ></i></div>';}
 		    });
 		    $(obj).popover('toggle');
-			
+		    
 		    zoo.execute({
 			identifier: "template.display",
 			type: "POST",
@@ -1940,28 +2818,28 @@ define([
 			success: function(data){
 			    DSPreviews["DS_"+dsid+"_"+ldatasource]=data;
 			    $(obj).popover('destroy');
-				setTimeout(function(){
-			    $(obj).popover({
-				html: true,
-				placement: ($(obj).is("a")?'bottom':'left'),
-				trigger: 'click',
-				container: 'body',
-				viewport: { "selector": "#DS_"+dsid+"_"+ldatasource, "padding": 0 },
-				content: function(){console.log("temp"); return '<div style="height:250px"><img style="width:500px" class="img-responsive" src="'+ DSPreviews["DS_"+dsid+"_"+ldatasource] + '" /></div>';}
-			    });
-			     $(obj).popover('show');
-				},250);
-				/*setTimeout(function(){*/
-			   //$(obj).popover('hide');
+			    setTimeout(function(){
+				$(obj).popover({
+				    html: true,
+				    placement: ($(obj).is("a")?'bottom':'left'),
+				    trigger: 'click',
+				    container: 'body',
+				    viewport: { "selector": "#DS_"+dsid+"_"+ldatasource, "padding": 0 },
+				    content: function(){console.log("temp"); return '<div style="height:250px"><img style="width:500px" class="img-responsive" src="'+ DSPreviews["DS_"+dsid+"_"+ldatasource] + '" /></div>';}
+				});
+				$(obj).popover('show');
+			    },250);
+			    /*setTimeout(function(){*/
+			    //$(obj).popover('hide');
 			    //$(obj).popover('toggle');
-				/*}, 200);*/
+			    /*}, 200);*/
 			    /*if(!$(obj).is("a"))
-				$(window).on("click",function(){
-				    if(arguments[0].target!=obj){
-					$(obj).popover('hide');
-				    }
-				});*/
-				
+			      $(window).on("click",function(){
+			      if(arguments[0].target!=obj){
+			      $(obj).popover('hide');
+			      }
+			      });*/
+			    
 			},
 			error: function(data){
 			    $(".notifications").notify({
@@ -1972,6 +2850,162 @@ define([
 		    });
 
 		}
+	    });
+	},
+	"otb": function(data,param,dsid,datasource,geometryType,obj){
+	    $(obj).off("click");
+	    $(obj).click(function(e){
+		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
+		e.preventDefault();
+		zoo.getCapabilities({
+		    success: function(data){
+			$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().html("<select id='OTBProcess'></select><div id='OTBConf'></div>");
+			console.log(data);
+			for(var i=0;i<data["Capabilities"]["ProcessOfferings"]["Process"].length;i++){
+			    if(data["Capabilities"]["ProcessOfferings"]["Process"][i]["Identifier"].toString().indexOf("OTB")>=0){
+				console.log(data["Capabilities"]["ProcessOfferings"]["Process"][i]);
+				$("#OTBProcess").append("<option>"+data["Capabilities"]["ProcessOfferings"]["Process"][i]["Identifier"].toString()+"</option>");
+			    }
+			}
+			$("#OTBProcess").on("change",function(){
+			    zoo.describeProcess({
+				identifier: $(this).val(),
+				success: function(data){
+				    var details =  tpl_describeProcess(data);
+				    $("#OTBConf").html(details);
+				    $("#wps_i_in").val(ldatasource);
+				    $("#btn-wps-execute").off('click');
+				    $("#btn-wps-execute").on('click',function(){
+					var inputs0=[
+					    {"identifier": "fullPath", "value":"true", "dataType": "string" },
+					    {"value": module.config().dataPath+"/dirs/"+dsid+"/ds_ows.map", "identifier":"map", "dataType": "string" },
+					    {"identifier": "layer", "value":ldatasource, "dataType": "string" },
+					];
+					zoo.execute({
+					    identifier: "mapfile.getMapLayersInfo",
+					    type: "POST",
+					    dataInputs: inputs0,
+					    dataOutputs: [
+						{"identifier":"Result"}//,"type":"raw"},
+					    ],
+					    success: function(data){
+						console.log("SUCCESS");
+						console.log(data);
+						console.log(data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"].toString());
+						var ldata=eval(data["ExecuteResponse"]["ProcessOutputs"]["Output"]["Data"]["ComplexData"].toString());
+						var loaded=[];
+						var linputs=[];
+						var loutputs=[];
+						$("#OTBConf").find("input,select").each(function(){
+						    if($(this).attr('id').indexOf("wps_i")>=0){
+							if(loaded.indexOf($(this).attr('id').replace(/wps_i_/g,""))<0){
+							    linputs.push({"identifier": $(this).attr('id').replace(/wps_i_/g,""), value: $(this).val() });
+							    loaded.push($(this).attr('id').replace(/wps_i_/g,""));
+							    if($(this).val()!=ldatasource)
+								linputs[linputs.length-1]["dataType"]="string";
+							    else{
+								linputs[linputs.length-1]["mimeType"]="image/tif";
+								linputs[linputs.length-1]["href"]="file://"+ldata[2];
+							    }
+							}
+						    }else{
+							if($(this).attr('id').indexOf("wps_o")>=0){
+							    loutputs.push({
+								"identifier": $(this).attr('id').replace(/format_wps_o_/g,""), 
+								"mimeType": $(this).val(),
+								asReference: "true" 
+							    });
+							}
+						    }
+						    
+						});
+						console.log(linputs);
+						var progress=$("#OTBConf").find("#progress-process").first();
+						zoo.execute({
+						    identifier: $("#OTBProcess").val(),
+						    type: 'POST',
+						    dataInputs: linputs,
+						    dataOutputs: loutputs,
+						    storeExecuteResponse: true,
+						    status: true,
+						    success: function(data, launched) {
+							zoo.watch(launched.sid, {
+							    onPercentCompleted: function(data) {
+								console.log("**** PercentCompleted ****");
+								console.log(data);
+								progress.css('width', (data.percentCompleted)+'%'); 
+								progress.text(data.text+' : '+(data.percentCompleted)+'%');
+							    },
+							    onProcessSucceeded: function(data) {
+								progress.css('width', (100)+'%');
+								progress.text(data.text+' : '+(100)+'%');
+								if (data.result.ExecuteResponse.ProcessOutputs) {
+								    console.log("**** onSuccess ****");
+								    console.log(data.result);
+								    var res=null;
+								    if(!$.isArray(data.result.ExecuteResponse.ProcessOutputs.Output)){
+									res=[data.result.ExecuteResponse.ProcessOutputs.Output];
+								    }else
+									res=data.result.ExecuteResponse.ProcessOutputs.Output;
+								    for(var j=0;j<res.length;j++){
+									var fileIn=res[j].Reference._href;
+									var tmpFile=fileIn.split('/');
+									tmpFileName=tmpFile[tmpFile.length-1];
+									var input0=[
+									    {"identifier": "fileIn", "value": fileIn, "dataType": "string"},
+									    {"identifier": "fileOut", "value": module.config().dataPath+"/dirs/"+dsid+"/"+tmpFileName, "dataType": "string"},
+									];
+									console.log(input0);
+									zoo.execute({
+									    identifier: "vector-converter.moveFile",
+									    type: 'POST',
+									    dataInputs: input0,
+									    dataOutputs: [
+										{"identifier": "Result"}
+									    ],
+									    success: function(data){
+										console.log(data);
+									    },
+									    error: function(data){
+										console.log(data);
+									    }
+									});
+								    }
+
+								}
+
+								console.log(data);
+							    },
+							    onError: function(data) {
+								console.log("**** onError ****");
+								console.log(data);
+							    },
+							});
+						    },
+						    error: function(data) {
+							console.log("**** ERROR ****");
+							console.log(data);
+							notify("Execute asynchrone failed", 'danger');
+						    }
+						});
+						$(".notifications").notify({
+						    message: { text: data },
+						    type: 'success',
+						}).show();
+					    },
+					    error: function(data){
+						console.log(data);
+					    }
+					});
+
+				    });
+				}
+			    });
+			});
+			$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().collapse('toggle');
+		    }
+		});
+		console.log(module.config().dataPath);
 	    });
 	},
 	"process": function(data,param,dsid,datasource,geometryType,obj){
@@ -2041,7 +3075,7 @@ define([
 			    });
 		    }
 		}
-		    
+		
 		if(!initial)
 		    $("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().collapse('toggle');
 		else
@@ -2319,9 +3353,9 @@ define([
 			}catch(e){
 			    console.log("CallBack issue ("+$(this).attr("data-mmaction")+"): "+e);
 			}
-			if($(this).attr("data-toggle")=="tooltip")
-			  $(this).tooltip({container: 'body'});
-		    });
+		    if($(this).attr("data-toggle")=="tooltip")
+			$(this).tooltip({container: 'body'});
+		});
 	    },
 	    error: function(data){
 		console.log("ERROR");
@@ -2361,9 +3395,9 @@ define([
 		    }
 		$($("#dataStore_template")[0].innerHTML.replace(reg1,font).replace(reg,$(this).text())).attr("id","DS_"+$(this).text()).appendTo("#distDetails");
 		if(isDb)
-		   $("#DS_"+$(this).text()).find(".require-db").parent().show();
+		    $("#DS_"+$(this).text()).find(".require-db").parent().show();
 		else
-		   $("#DS_"+$(this).text()).find(".require-db").parent().hide();
+		    $("#DS_"+$(this).text()).find(".require-db").parent().hide();
 		if(!$("#distDetails").hasClass("active")){
 		    $("#distOverviewAction").removeClass("active");
 		    $("#distOverviewAction").parent().removeClass("active");
@@ -2387,7 +3421,7 @@ define([
 		    //$(this).tab("show");
 		}
 	    }
-		
+	    
 	});
 
 	$("#removeModal").find(".modal-footer").find("button").last().click(function(e){

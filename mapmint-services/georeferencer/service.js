@@ -23,10 +23,11 @@
 
 function georeference(conf,inputs,outputs){
     var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
-
     /**
      * Copy original file into dataPath
      */
+    conf["lenv"]["message"]=("Copy original file into dataPath");
+    ZOO.UpdateStatus(conf,5);
     var inputs0={
 	"layer":{"value": conf["senv"]["mmGeoDSO"]}	
     }
@@ -36,17 +37,19 @@ function georeference(conf,inputs,outputs){
 	alert(i+" = "+inputs["gcp"][i]);
     
     for(i=0;i<parseInt(inputs["gcp"]["length"]);i++)
-	alert("GCPs",inputs["gcp"]["value_"+i]);
+	alert("GCPs",inputs["gcp"]["value"][i]);
     var myExecuteResult=myProcess0.Execute(inputs0,myOutputs);
     alert("Copy original file into dataPath",myOutputs);
 
     /**
      * Add GCPs to the original file and store the result in tmpPath
      */
+    conf["lenv"]["message"]=("Add GCPs to the original file and store the result in tmpPath");
+    ZOO.UpdateStatus(conf,15);
     var inputs1={
 	"InputDSN": {"dataType":"string","value":conf["senv"]["mmGeoImg"]},
 	"OutputDSN": {"dataType":"string","value":conf["senv"]["mmGeoDSO"]+"_georef"},
-	"gcp": {"dataType": "string","value":inputs["gcp"]["value"],"isArray":"true"},
+	"gcp": {"dataType": "string","value":inputs["gcp"]["value"],"isArray":"true","length":inputs["gcp"]["value"].length},
 	"SRS": {"dataType":"string","value": "epsg:4326"}
     };
     var myProcess1 = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.Gdal_Translate');
@@ -56,6 +59,8 @@ function georeference(conf,inputs,outputs){
     /**
      * Copy resulting file into dataPath
      */
+    conf["lenv"]["message"]=("Copy resulting file into dataPath");
+    ZOO.UpdateStatus(conf,25);
     inputs0["lfile"]={"value": myExecuteResult1};
     myProcess = new ZOO.Process(conf["main"]["serverAddress"],'georeferencer.copyLayerFile');
     try{
@@ -69,11 +74,13 @@ function georeference(conf,inputs,outputs){
     /**
      * Apply GCPs to distord the file and store the result in tmpPath
      */
+    conf["lenv"]["message"]=("Apply GCPs to distord the file and store the result in tmpPath");
+    ZOO.UpdateStatus(conf,45);
     var inputs2={
 	"InputDSN": {"dataType":"string","value":conf["senv"]["mmGeoDSO"]+"_georef.tif"},
 	"OutputDSN": {"dataType":"string","value":inputs["dso"]["value"]},
 	"r": inputs["r"],
-	"co": {"value": "COMPRESSION="+inputs["COMPRESSION"]["value"],"dataType":"string"}
+	"co": {"value": "COMPRESS="+inputs["COMPRESSION"]["value"],"dataType":"string"}
     };
     if(inputs["trans"]["value"]!="tps"){
 	inputs2["order"]={"dataType": "string","value": inputs["trans"]["value"]}
@@ -82,13 +89,37 @@ function georeference(conf,inputs,outputs){
     if(inputs["hres"] && inputs["vres"]){
 	inputs2["tr"]={"dataType":"string","value":inputs["hres"]+","+inputs["vres"]};
     }
-    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.Gdal_Warp');
-    var myExecuteResult2=myProcess2.Execute(inputs2,myOutputs);
+    var myOutputs1= {Result: { "type": "ResponseDocument", "mimeType": "text/plain" }};
+    var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'raster-tools.Gdal_Warp',true);
+    var myExecuteResult2=myProcess2.Execute(inputs2,myOutputs1);
     alert("raster-tools.Gdal_Warp",myExecuteResult2);
+    var formatWPS=new ZOO.Format.WPS();
+    var response=formatWPS.read(myExecuteResult2);
+    for(var j in response){
+                    alert(j+" = "+response[j]);
+    }
+    alert("raster-tools.Gdal_Warp 0",myExecuteResult2);
+    var ri=0;
+    while(response!=null && response.status){
+        sleep(1501);
+        var response1 = ZOO.Request.Get(response.status.replace(/amp;/g,""),null);
+        alert("raster-tools.Gdal_Warp "+(ri+1),response1);
+        response=formatWPS.read(response1);
+        alert("raster-tools.Gdal_Warp "+(ri+2),response);
+	for(var j in response){
+		alert(j+" => "+response[j]);
+	}
+	if(response.value)
+	    myExecuteResult2=response.value;
+	ri++;
+    }
+
 
     /**
      * Copy resulting file into dataPath
      */
+    conf["lenv"]["message"]=("Copy resulting file into dataPath then refresh");
+    ZOO.UpdateStatus(conf,75);
     inputs0["lfile"]={"value": myExecuteResult2};
     inputs0["target"]={"value": conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]};
     myProcess = new ZOO.Process(conf["main"]["serverAddress"],'georeferencer.copyLayerFile');
@@ -113,6 +144,8 @@ function georeference(conf,inputs,outputs){
     };
     var myProcess4 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.mmVectorInfo2Map');
     myExecuteResult0=myProcess4.Execute(inputs4,myOutputs);
+    conf["lenv"]["message"]=("Refreshing dataStore, the georeferenced image should appear on the map after that step.");
+    ZOO.UpdateStatus(conf,95);
     alert("vector-tools.mmVectorInfo2Map",myExecuteResult0);
     var inputs4={
 	"dataStore": {"dataType": "string","value": conf["main"]["dataPath"]+"/dirs/"+inputs["dst"]["value"]+"/"}

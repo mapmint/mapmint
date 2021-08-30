@@ -2,12 +2,12 @@
 #import authenticate.service as auth
 #set sprefix=$auth.getPrefix($conf)
 #set con=$auth.getCon($conf)
-#if $inputs.has_key("prefix")
+#if "prefix" in $inputs.keys()
 #set prefix=$inputs["prefix"]["value"]
 #else
 #set prefix=""
 #end if
-#if $inputs.has_key("dataStore") and $inputs["dataStore"]["value"][:3]!="WMS"
+#if "dataStore" in $inputs.keys() and $inputs["dataStore"]["value"][:3]!="WMS"
 #set suffix=" WHERE adm=1 and "
 #set suffix1=" WHERE adm=1 "
 #else
@@ -21,7 +21,7 @@
 #set cnt=$cnt[0][0]
 #set res=cur.execute("SELECT name from "+$sprefix+"groups "+$suffix1)
 #set q0=cur.fetchall()
-#if $inputs.has_key("clause")
+#if "clause" in $inputs.keys()
 #if $inputs["clause"]["value"]=="id="
 #set q1=[[""]]
 #else
@@ -35,8 +35,8 @@
 #else
 #set q1=[["public"]]
 #set q2=[["1","1","1"]]
-#if $inputs.has_key("layer")
-#if $inputs.has_key("dataStore")
+#if "layer" in $inputs.keys()
+#if "dataStore" in $inputs.keys()
 #set q1=[["admin"]]
 #end if
 #if $m.getLayerByName($inputs["layer"]["value"]).metadata.get("mm_access_groups") is not None
@@ -50,7 +50,7 @@
 #end for
 #end if
 #else
-#if $inputs.has_key("dataStore")
+#if "dataStore" in $inputs.keys()
 #import datastores.service as ds
 #set outputs1={"Result":{"value":""}}
 #try
@@ -74,8 +74,8 @@
 #end if
 #end if
 #end if
-<legend>$zoo._("Groups") #if len(q0)>1#<input type="submit" value="$zoo._("Add")" onclick="var tmp=(\$('.$(prefix)gselect').length);#if $inputs.has_key("layer") or $inputs.has_key("dataStore")#\$('#$(prefix)um_gtr_0').clone().attr('id', '$(prefix)um_gtr_'+tmp).appendTo('#$(prefix)um_table');#else#\$('select#$(prefix)um_group_0').clone().attr('id', '$(prefix)um_group_'+tmp).appendTo('.$(prefix)um_groups_f');#end if# if(tmp+1>1) \$('#$(prefix)um_gdelete').show();return false;" /><input id="$(prefix)um_gdelete" type="submit" value="$zoo._("Delete")" onclick="var tmp=(\$('.$(prefix)gselect').length-1);if(tmp>0){\$('select#$(prefix)um_group_'+tmp).remove();#if $inputs.has_key("layer") or $inputs.has_key("dataStore")#\$('#$(prefix)um_gtr_'+tmp).remove();#end if#}else {alert('$zoo._("You should keep at least one group linked to a user")');\$('#$(prefix)um_gdelete').toggle();}if(tmp-1==0) \$('#$(prefix)um_gdelete').toggle();return false;" #if len($q1)==1#style="display:none"#end if#/>#end if#</legend>
-#if $inputs.has_key("layer") or $inputs.has_key("dataStore")
+<legend>$zoo._("Groups") #if len(q0)>1#<input type="submit" value="$zoo._("Add")" onclick="var tmp=(\$('.$(prefix)gselect').length);#if "layer" in $inputs.keys() or "dataStore" in $inputs.keys()#\$('#$(prefix)um_gtr_0').clone().attr('id', '$(prefix)um_gtr_'+tmp).appendTo('#$(prefix)um_table');#else#\$('select#$(prefix)um_group_0').clone().attr('id', '$(prefix)um_group_'+tmp).appendTo('.$(prefix)um_groups_f');#end if# if(tmp+1>1) \$('#$(prefix)um_gdelete').show();return false;" /><input id="$(prefix)um_gdelete" type="submit" value="$zoo._("Delete")" onclick="var tmp=(\$('.$(prefix)gselect').length-1);if(tmp>0){\$('select#$(prefix)um_group_'+tmp).remove();#if "layer" in $inputs.keys() or "dataStore" in $inputs.keys()#\$('#$(prefix)um_gtr_'+tmp).remove();#end if#}else {alert('$zoo._("You should keep at least one group linked to a user")');\$('#$(prefix)um_gdelete').toggle();}if(tmp-1==0) \$('#$(prefix)um_gdelete').toggle();return false;" #if len($q1)==1#style="display:none"#end if#/>#end if#</legend>
+#if "layer" in $inputs.keys() or "dataStore" in $inputs.keys()
 <table id="$(prefix)um_table">
 <tr>
 <th>$zoo._("Group")</th>
@@ -89,7 +89,7 @@
 </tr>
 #end if
 #for k in range(0,len($q1))
-#if $inputs.has_key("layer") or $inputs.has_key("dataStore")
+#if "layer" in $inputs.keys() or "dataStore" in $inputs.keys()
 <tr id="$(prefix)um_gtr_$k">
 <td>
 #end if
@@ -101,7 +101,7 @@
 #end for
 #end for
 </select>
-#if $inputs.has_key("layer")  or $inputs.has_key("dataStore")
+#if "layer" in $inputs.keys()  or "dataStore" in $inputs.keys()
 </td>
 #set l=0
 #for m in ["r","w","x"]
@@ -111,7 +111,7 @@
 </tr>
 #end if
 #end for
-#if $inputs.has_key("layer") or $inputs.has_key("dataStore")
+#if "layer" in $inputs.keys() or "dataStore" in $inputs.keys()
 </table>
 #end if
 </fieldset>

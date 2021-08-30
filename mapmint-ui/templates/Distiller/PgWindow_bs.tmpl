@@ -1,11 +1,11 @@
 #encoding "UTF-8"
 #import zoo
 <form method="post" id="db_access">
-#if $inputs.keys().count("no-header")==0
+#if not("no-header" in $inputs.keys())
  <h3>$zoo._("Database Access")</h3>
 #end if
  <div class="form-group">
-  #if $inputs.keys().count("no-header")==0#<label for="pg_schema">#end if#$zoo._("Schemas:")#if $inputs.keys().count("no-header")==0#</label>#end if
+  #if not("no-header" in $inputs.keys())#<label for="pg_schema">#end if#$zoo._("Schemas:")#if not("no-header" in $inputs.keys())#</label>#end if
 #from datastores.postgis import pgConnection
 #set demo=pgConnection.listSchemas($conf,$inputs,$outputs)
 #set ress=eval($outputs["Result"]["value"])
@@ -20,7 +20,7 @@
 #set j=$j+1
 #end for
   </select>
-  #if $inputs.keys().count("no-header")==0#<label for="pg_table">#end if#$zoo._("Tables:")#if $inputs.keys().count("no-header")==0#</label>#end if#
+  #if not("no-header" in $inputs.keys())#<label for="pg_table">#end if#$zoo._("Tables:")#if not("no-header" in $inputs.keys())#</label>#end if#
 #set tmpO=$outputs
 #set $tmpO["Result"]={"value": ""}
 #set demo=$pgConnection.listTables($conf,$tmp,$tmpO)

@@ -1,0 +1,43 @@
+[moveFile]
+ Title = Convert vector data from one format to another. 
+ Abstract = Converts vector data between different formats.
+ processVersion = 1
+ storeSupported = true
+ statusSupported = true
+ serviceType = Python
+ serviceProvider = service
+ <MetaData>
+   title = My Demo
+ </MetaData>
+ <DataInputs>
+  [fileIn]
+   Title = The input file URL / name
+   Abstract = The input file name to move
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+  [fileOut]
+   Title = The output file URL / name
+   Abstract = The output file name to move
+   minOccurs = 1
+   maxOccurs = 1
+   <LiteralData>
+    DataType = string
+    <Default />
+   </LiteralData>
+ </DataInputs>
+ <DataOutputs>
+  [Result]
+   Title = The resulting converted file
+   Abstract = The file name resulting of the convertion
+   <LiteralData>
+    DataType = string
+    <Default>
+    </Default>	
+    <Supported>
+    </Supported>
+   </LiteralData>
+ </DataOutputs>  

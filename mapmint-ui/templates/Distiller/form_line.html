@@ -10,7 +10,7 @@
 #end def
 
 #def printButtonGroupA0($obj)
-<div class="btn-group #if $obj.keys().count('class')>0#$obj["class"]#end if#">
+<div class="btn-group #if 'class' in $obj.keys()#$obj["class"]#end if#">
 #for o in $obj["a"]
   $printButtonA($o)
 #end for
@@ -34,7 +34,7 @@
 <li role="presentation" #if $classe is not None#class="$classe"#end if#>
   <a id="$(id)_Toggler" href="#$id" aria-controls="home" role="tab" data-toggle="tab">
     <i class="fa $font fa-fw"></i>
-    <span class="hidden-xs hidden-sm hidden-md">
+    <span class="hidden-xs hidden-sm hidden-md d-none d-lg-inline d-xl-inline">
       $title
     </span>
   </a>
@@ -42,16 +42,16 @@
 #end def
 
 #def printHidden(obj)
-    <input name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="hidden" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
+    <input name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control" type="hidden" #if "value" in $obj.keys()#value="$obj["value"]"#end if#/>
 #end def
 
 #def printHiddenContent(obj)
-    <script type="template/txt" name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if#>#if $obj.keys().count("value")>0#$obj["value"]#end if#</script>
+    <script type="template/txt" name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if#>#if "value" in $obj.keys()#$obj["value"]#end if#</script>
 #end def
 
 #def printBasicLine(obj)
-<div class="form-group row #if $obj.keys().count("classes")>0#$obj["classes"]#end if#">
-#if obj.keys().count('label')
+<div class="form-group row #if "classes" in $obj.keys()#$obj["classes"]#end if#">
+#if 'label' in obj.keys()
   <label class="col-sm-6 col-md-5 col-lg-4 control-label">
   $obj["label"]
   </label>
@@ -65,12 +65,12 @@
 #end def
 
 #def printCoordInput(obj0)
-<div class="form-group row #if $obj0.keys().count("classes")>0#$obj0["classes"]#end if#">
+<div class="form-group row #if "classes" in $obj0.keys()#$obj0["classes"]#end if#">
   <label class="col-sm-6 col-md-5 col-lg-4 control-label">
   $obj0["name"]
   </label>
   <div class="col-sm-6 col-md-7 col-lg-8 ">
-    <div class="col-xs-6">
+    <div class="col-sm-6 col-xs-6">
       <div class="input-group">
 	<span class="input-group-addon" id="basic-addon1">X</span>
 	<input class="form-control" name="$(obj0["id"])_x"
@@ -78,7 +78,7 @@
 	    value="" />
       </div>
     </div>
-    <div class="col-xs-6">
+    <div class="col-sm-6 col-xs-6">
       <div class="input-group">
 	<span class="input-group-addon" id="basic-addon1">Y</span>
 	<input class="form-control" name="$(obj0["id"])_y"
@@ -97,7 +97,7 @@
     <a id="$(obj["id"])_link" href="" target="_blank"></a>
   </form>
   <input type="hidden" id="$(obj["id"])name" class="form-control" />
-  <iframe #if $obj.keys().count("onLoad")# onload="$obj["onLoad"]"#end if# name="$(obj["id"])_uploader" id="$(obj["id"])_uploader"style="display:none"></iframe>
+  <iframe #if "onLoad" in $obj.keys()# onload="$obj["onLoad"]"#end if# name="$(obj["id"])_uploader" id="$(obj["id"])_uploader"style="display:none"></iframe>
 #end def
 
 #def printUploadInputNew(obj)
@@ -106,26 +106,26 @@
 
 #def printEmbeddedLine(obj)
 #set ltypes=["select","multiple","textarea","date","datetime","float","html","checkbox"]
-#if $obj.keys().count("optional")>0 and $obj["optional"]
+#if "optional" in $obj.keys() and $obj["optional"]
     <div class="input-group">
       <span class="input-group-addon">
         <input type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" name="filter" value=""/>
       </span>
 #end if
-#if $obj.keys().count("type")==0
-    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control form-control-inline" type="text" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
+#if not("type" in $obj.keys())
+    <input #if "optional" in $obj.keys() and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control form-control-inline" type="text" #if "value" in $obj.keys()#value="$obj["value"]"#end if#  #if "required" in $obj and $obj["required"]#required#end if#/>
 #else
 #if $obj["type"]=="date" or $obj["type"]=="datetime" or $obj["type"]=="checkbox"
-    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control form-control-inline#if $obj["type"]=="checkbox"#-checkbox#end if#" type="$obj["type"]#if $obj["type"]!="date" and $obj["type"]!="checkbox"#-local#end if#" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if# #if $obj.keys().count("value")>0 and $obj["type"]=="checkbox" and $obj["value"]=="true"#checked="checked"#end if#/>
+    <input #if "optional" in $obj.keys() and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control form-control-inline#if $obj["type"]=="checkbox"#-checkbox#end if#" type="$obj["type"]#if $obj["type"]!="date" and $obj["type"]!="checkbox"#-local#end if#" #if "value" in $obj.keys()#value="$obj["value"]"#end if# #if "value" in $obj.keys() and $obj["type"]=="checkbox" and $obj["value"]=="true"#checked="checked"#end if#  #if "required" in $obj and $obj["required"]#required#end if#/>
 
 #else
 #if $obj["type"]=="float"
-    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control form-control-inline" type="number" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
+    <input #if "optional" in $obj.keys() and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control form-control-inline" type="number" #if "value" in $obj.keys()#value="$obj["value"]"#end if#  #if "required" in $obj and $obj["required"]#required#end if#/>
 #else
 #if $obj["type"]=="textarea" or $obj["type"]=="html"
-    <textarea #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control form-control-inline #if $obj["type"]=="html"# htmlEditor #end if# #if $obj.keys().count("iclasses")>0#$obj["iclasses"]#end if#">#if $obj.keys().count("value")>0#$obj["value"]#end if#</textarea>
+    <textarea #if "optional" in $obj.keys() and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control form-control-inline #if $obj["type"]=="html"# htmlEditor #end if# #if "iclasses" in $obj.keys()#$obj["iclasses"]#end if#"  #if "required" in $obj and $obj["required"]#required#end if#>#if "value" in $obj.keys()#$obj["value"]#end if#</textarea>
 #else	  
-    <select #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# #if $obj["type"]=="multiple"#multiple="multiple"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control form-control-inline #if $obj.keys().count("iclasses")>0#$obj["iclasses"]#end if#">
+    <select #if "optional" in $obj.keys() and $obj["optional"]#disabled="disabled"#end if# #if $obj["type"]=="multiple"#multiple="multiple"#end if# name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control form-control-inline #if "iclasses" in $obj.keys()#$obj["iclasses"]#end if#"  #if "required" in $obj and $obj["required"]#required#end if#>
 #for a in $obj["options"]
 #if type($a)==type("")	    
       <option value="$a">$a</option>
@@ -138,40 +138,49 @@
 #end if
 #end if
 #end if
-#if $obj.keys().count("optional")>0 and $obj["optional"]
+#if "optional" in $obj.keys() and $obj["optional"]
     </div>
 #end if
 #end def
 
 #def printLine(obj)
 #set ltypes=["select","multiple","textarea","date","datetime","float","html","checkbox"]
-<div class="form-group row #if $obj.keys().count("classes")>0#$obj["classes"]#end if#">
+<div class="form-group row #if "classes" in $obj.keys()#$obj["classes"]#end if#">
   <label class="col-sm-6 col-md-5 col-lg-4 control-label">$obj["name"]</label>
   <div class="col-sm-6 col-md-7 col-lg-8 ">
 
-#if $obj.keys().count("optional")>0 and $obj["optional"]
+#if "optional" in $obj.keys() and $obj["optional"]
     <div class="input-group">
       <span class="input-group-addon">
         <input type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" name="filter" value=""/>
       </span>
 #end if
-#if $obj.keys().count("type")==0
-    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="text" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
+#if not("type" in $obj.keys())
+    <input #if "optional" in $obj.keys() and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control" type="text" #if "value" in $obj.keys()#value="$obj["value"]"#end if# #if "required" in $obj and $obj["required"]#required#end if#/>
 #else
 #if $ltypes.count($obj["type"])==0
-    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="password" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
+    <input #if "optional" in $obj.keys() and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control" type="password" #if "value" in $obj.keys()#value="$obj["value"]"#end if#  #if "required" in $obj and $obj["required"]#required#end if#/>
 #else
 #if $obj["type"]=="date" or $obj["type"]=="datetime" or $obj["type"]=="checkbox"
-    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control#if $obj["type"]=="checkbox"#-checkbox#end if#" type="$obj["type"]#if $obj["type"]!="date" and $obj["type"]!="checkbox"#-local#end if#" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if# #if $obj.keys().count("value")>0 and $obj["type"]=="checkbox" and $obj["value"]=="true"#checked="checked"#end if#/>
+    <input #if "optional" in $obj.keys() and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control#if $obj["type"]=="checkbox"#-checkbox#end if#" type="$obj["type"]#if $obj["type"]!="date" and $obj["type"]!="checkbox"#-local#end if#" #if "value" in $obj.keys()#value="$obj["value"]"#end if# #if "value" in $obj.keys() and $obj["type"]=="checkbox" and $obj["value"]=="true"#checked="checked"#end if# #if "required" in $obj and $obj["required"]#required#end if#/>
+#if $obj["type"]=="date" or $obj["type"]=="datetime"
+#if "optional" in $obj.keys() and $obj["optional"]
+    <span class="input-group-addon"><select class="date-operator">
+	<option value="eq"> = </option>
+	<option value="lt"> &lt; </option>
+	<option value="gt"> &gt; </option>
+    </select></span>
+#end if
+#end if
 
 #else
 #if $obj["type"]=="float"
-    <input #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control" type="number" #if $obj.keys().count("value")>0#value="$obj["value"]"#end if#/>
+    <input #if "optional" in $obj.keys() and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control" type="number" #if "value" in $obj.keys()#value="$obj["value"]"#end if# #if "required" in $obj and $obj["required"]#required#end if#/>
 #else
 #if $obj["type"]=="textarea" or $obj["type"]=="html"
-    <textarea #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control #if $obj["type"]=="html"# htmlEditor #end if# #if $obj.keys().count("iclasses")>0#$obj["iclasses"]#end if#">#if $obj.keys().count("value")>0#$obj["value"]#end if#</textarea>
+    <textarea #if "optional" in $obj.keys() and $obj["optional"]#disabled="disabled"#end if# name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control #if $obj["type"]=="html"# htmlEditor #end if# #if "iclasses" in $obj.keys()#$obj["iclasses"]#end if#"  #if "required" in $obj and $obj["required"]#required#end if#>#if "value" in $obj.keys()#$obj["value"]#end if#</textarea>
 #else	  
-    <select #if $obj.keys().count("optional")>0 and $obj["optional"]#disabled="disabled"#end if# #if $obj["type"]=="multiple"#multiple="multiple"#end if# name="$obj["id"]" #if $obj.keys().count("rid")>0#id="$obj["rid"]"#end if# class="form-control #if $obj.keys().count("iclasses")>0#$obj["iclasses"]#end if#">
+    <select #if "optional" in $obj.keys() and $obj["optional"]#disabled="disabled"#end if# #if $obj["type"]=="multiple"#multiple="multiple"#end if# name="$obj["id"]" #if "rid" in $obj.keys()#id="$obj["rid"]"#end if# class="form-control #if "iclasses" in $obj.keys()#$obj["iclasses"]#end if#"  #if "required" in $obj and $obj["required"]#required#end if#>
 #for a in $obj["options"]
 #if type($a)==type("")	    
       <option value="$a">$a</option>
@@ -185,22 +194,25 @@
 #end if
 #end if
 #end if
-#if $obj.keys().count("optional")>0 and $obj["optional"]
+#if "optional" in $obj.keys() and $obj["optional"]
     </div>
 #end if    
+    <div class="invalid-feedback">
+        $($zoo._("The field %s is required. Please, provide a valid value.").replace("%s",$obj["name"]))
+    </div>
   </div>
 </div>
 #end def
 
 #def printButton(obj)
-<button class="btn btn-default  #if $obj.keys().count("classes")>0#$obj["classes"]#end if#" data-mmaction="$obj["id"]">$obj["name"]</button>
+<button class="btn btn-default  #if "classes" in $obj.keys()#$obj["classes"]#end if#" data-mmaction="$obj["id"]">$obj["name"]</button>
 #end def
 
 #def printTabHeader(id,title,font,classe)
 <li role="presentation" class="nav-item #if $classe is not None#$classe"#end if#>
   <a id="$(id)_Toggler" class="nav-link" href="#$id" aria-controls="home" role="tab" data-toggle="tab">
     <i class="fa $font fa-fw"></i>
-    <span class="hidden-xs hidden-sm hidden-md">
+    <span class="hidden-xs hidden-sm hidden-md d-none d-lg-inline d-xl-inline">
       $title
     </span>
   </a>
@@ -208,15 +220,15 @@
 #end def
 
 #def printTabHeaderNew(obj)
-<li role="presentation" class="nav-item #if obj.keys().count("classe")>0#$(obj.classe)#end if#">
-  <a class="nav-link" id="#if obj.keys().count("id")>0#$(obj.id)#end if#_Toggler" href="\##if obj.keys().count("id")>0#$(obj.id)#end if#" aria-controls="home" role="tab" data-toggle="tab">
-#if obj.keys().count("font")
+<li role="presentation" class="nav-item #if "classe" in obj.keys()#$(obj.classe)#end if#">
+  <a class="nav-link" id="#if "id" in obj.keys()#$(obj.id)#end if#_Toggler" href="\##if "id" in obj.keys()#$(obj.id)#end if#" aria-controls="home" role="tab" data-toggle="tab">
+#if "font" in obj.keys()
     <i class="fa $(obj.font) fa-fw"></i>
 #end if
-#if obj.keys().count("cnt")>0
-    <span class="hidden-lg">$(obj.cnt)</span>
+#if "cnt" in obj.keys()
+    <span class="hidden-lg d-inline d-lg-none">$(obj.cnt)</span>
 #end if
-    <span class="hidden-xs hidden-sm hidden-md">$(obj.title)</span>
+    <span class="hidden-xs hidden-sm hidden-md d-none d-lg-inline d-xl-inline">$(obj.title)</span>
   </a>
 </li>
 #end def

@@ -259,7 +259,7 @@ function convert(conf,inputs,outputs){
   };
 
   if(inputs["sql"] && inputs["sql"]["value"]!="NULL"){
-    inputs3["sql"]={"value":inputs["sql"]["value"],"type":"string"};
+    inputs3["sql"]={"value":inputs["sql"]["value"],"type":"complex","mimeType":"application/json"};
   }
   if(inputs["simplify"] && inputs["simplify"]["value"]!="NULL"){
     inputs3["simplify"]={"value":inputs["simplify"]["value"],"type":"string"};

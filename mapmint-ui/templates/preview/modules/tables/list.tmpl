@@ -30,7 +30,7 @@
 <!--
 #try
 #set cLevel=$rLevel
-#except Exception,e
+#except Exception as e
 $e
 #set cLevel=0
 #end try
@@ -66,14 +66,14 @@ $e
 <!--
 #try
 $embedded
-#except Exception,e
+#except Exception as e
 #set embedded=0
 #end try
 -->
 
 
 
-#set req="SELECT mm_tables.p_views.name,mm_tables.p_tables.description,mm_tables.p_tables.name,mm_tables.p_tables.id,mm_tables.p_views.clause FROM mm_tables.p_views,mm_tables.p_tables where mm_tables.p_tables.id=mm_tables.p_views.ptid and mm_tables.p_views.id="+$qComponents[0]
+#set req="SELECT mm_tables.p_views.name,mm_tables.p_tables.description,mm_tables.p_tables.name,mm_tables.p_tables.id,mm_tables.p_views.clause,mm_tables.p_views.mclause FROM mm_tables.p_views,mm_tables.p_tables where mm_tables.p_tables.id=mm_tables.p_views.ptid and mm_tables.p_views.id="+$qComponents[0]
 #set res=$cur.execute($req)
 #set vals=$cur.fetchone()
 
@@ -84,6 +84,7 @@ $embedded
 #set table=$vals[2]
 #set tableId=str($vals[3])
 #set clause=$vals[4]
+#set mclause=$vals[5]
 
 
 #* Edition *#
@@ -203,7 +204,15 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
      <div id="$(prefix)map" role="tabpanel" class="tab-pane" >
        <div class="row">
      	  <div class="col-sm-9">
-		<iframe id="associatedMap" src="$conf["main"]["rootUrl"]$associatedMapName" style="border:0;width:100%;"></iframe>
+#if $mclause is not None
+#import np.service as np
+#set lmclause=$np.replaceFilter($conf,$mclause)
+#set lires=$cur.execute("SELECT "+$lmclause)
+#set lvals=$cur.fetchall()
+#else
+#set lvals=None
+#end if
+		<iframe id="associatedMap" src="$conf["main"]["rootUrl"]$associatedMapName#if $lvals is not None and $lvals[0][0] is not None#?filter=$lvals[0][0]#end if#" style="border:0;width:100%;"></iframe>
 	  </div>
 	  <div class="col-sm-3">
 	  <div>
@@ -220,9 +229,9 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
      <div>
   <!-- Nav tabs -->
   <ul class="nav nav-tabs" role="tablist">
-    <li class="active" role="presentation"><a href="#layerExtract" aria-controls="extract" role="tab" data-toggle="tab">$zoo._("Filter")</a></li>
-    <li role="presentation"><a href="#processing" aria-controls="processing" role="tab" data-toggle="tab">$zoo._("Processing")</a></li>
-    <li role="presentation"><a href="#sql" aria-controls="sql" role="tab" data-toggle="tab">$zoo._("Report")</a></li>
+    <li class="active" role="presentation"><a href="#layerExtract" aria-controls="extract" class="nav-link" role="tab" data-toggle="tab">$zoo._("Filter")</a></li>
+    <li role="presentation"><a href="#processing" aria-controls="processing" role="tab" class="nav-link" data-toggle="tab">$zoo._("Processing")</a></li>
+    <li role="presentation"><a href="#sql" aria-controls="sql" role="tab" data-toggle="tab" class="nav-link" >$zoo._("Report")</a></li>
 <!--    <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li> -->
   </ul>
 
@@ -232,7 +241,7 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
     <div class="col-sm-12">
      <p>$zoo._("Create a new layer by applying filters to the available features")</p>
      <p>$zoo._("First choose a layer, then choose one or more field and define for every column the operator and value to check for filtering features.")</p>
-     <p>$zoo._('Optionaly, you can also add filter to existing one by pressing the <i class="fa fa-plus"></i> button.')</p>
+     <p>$zoo._("Optionally, you can also add filter to existing one by pressing the ")<i class="fa fa-plus"></i>$zoo._(" button.")</p>
     </div>
     <div class="col-sm-12">
       <button class="btn btn-default" onclick="return false;"> $zoo._("Filter")</button>
@@ -375,7 +384,7 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
     <div role="tabpanel" class="tab-pane" id="sql">
      <div class="col-sm-12">
       <p>$zoo._("Create a new layer or a report by running a SQL query on the features from the selected layer")</p>
-      <p>$zoo._('You can  use the SQLite dialect supported by GDAL <a target="_blank" href="http://www.gdal.org/ogr_sql_sqlite.html"><i class="fa fa-question"></i></a>.')</p> 
+      <p>$zoo._("You can  use the SQLite dialect supported by GDAL") <a target="_blank" href="https://gdal.org/user/sql_sqlite_dialect.html"><i class="fa fa-question"></i></a>.</p> 
      </div>
      <div class="col-sm-12">
       <label>$zoo._("Create a new layer")</label>
@@ -476,7 +485,7 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
      <div id="$(prefix)report_$(rvals[i][0])" role="tabpanel" class="tab-pane" >
        <div class="row">
          <h2>$zoo._("Report")</h2>
-	 <p id="no_version_message">$zoo._("Depending on its complexity, producing a report may be a a time consuming process. For this reason, the reports are not generated everytime you access an element but on the specific user demand. You can generate a document by pressing the '"+$zoo._("Run")+"' button bellow.")</p>
+	 <p id="no_version_message">$zoo._("Depending on its complexity, producing a report may be a a time consuming process. For this reason, the reports are not generated everytime you access an element but on the specific user demand. You can generate a document by pressing the '")$zoo._("Run")$zoo._("' button bellow.")</p>
          $ftmpl.printButton({"id":"runPrint","name":'<i class="fa fa-print fa-fw"></i><i class="fa fa-spinner fa-spin" style="display:none"></i> '+$zoo._("Run")})
 	 $ftmpl.printHidden({"rid":"edition_tuple_id","id":"edit_tuple_id","name":"edition_tuple_id","value":"-1"})
 	 $ftmpl.printHidden({"rid":"edition_report_id","id":"edit_report_id","name":"edition_report_id","value":$rvals[i][0]})
@@ -493,11 +502,11 @@ $ftmpl.printTabHeader($prefix+"report_"+str($rvals[i][0]),$rvals[i][1],$font,"")
 </script>
 
 <script type="template/txt" id="$(prefix)report_$(rvals[i][0])_link_list">
-	<div class="panel panel-default">
-  	     <div class="panel-heading">
-	     	  <h3 class="panel-title"><i class="fa fa-th-list"></i> $zoo._("Produced documents")</h3>
+	<div class="card panel panel-default" style="margin-top: 20px;">
+  	     <div class="card-header panel-heading">
+	     	  <h3 class="card-title panel-title"><i class="fa fa-th-list"></i> $zoo._("Produced documents")</h3>
 	     </div>
-  	     <div class="panel-body">
+  	     <div class="card-body panel-body">
 	     	  <ul class="list-group">
 		  </ul>    	      
   	     </div>
@@ -526,7 +535,7 @@ $preTitle
 $content
 
 #set inputs0={"id":{"value":str($vals[i][0])},"isHistory":{"value":"true"}}
-#except Exception,e
+#except Exception as e
 ERROR 
 $e
 #set inputs0={"id":{"value":str($vals[i][0])},"isHistory":{"value":"true"}}
@@ -593,6 +602,19 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 <input type="hidden" name="$(prefix)mainTableViewId" value="$qComponents[0]" />
 <input type="hidden" name="$(prefix)mainTableLevel" value="$cLevel" />
 
+<script type="template/text" id="dropdown_template">
+<div class="dropdown">
+  <button class="paginate_button btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    $zoo._("Export")
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#">CSV</a>
+    <a class="dropdown-item" href="#">ODS</a>
+    <a class="dropdown-item" href="#">XLSX</a>
+  </div>
+</div>
+</script>
+
 
 #set req="SELECT mm_tables.p_view_fields.id,mm_tables.p_view_fields.alias,mm_tables.p_view_fields.value,mm_tables.p_view_fields.view,mm_tables.p_view_fields.search,mm_tables.p_view_fields.class,mm_tables.p_view_fields.width,mm_tables.p_view_fields.name FROM mm_tables.p_views,mm_tables.p_view_fields where mm_tables.p_views.id=mm_tables.p_view_fields.vid and mm_tables.p_views.id="+$qComponents[0]
 #set res=$cur.execute($req)
@@ -638,7 +660,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/tables/edit.tmp
 #end for
      </tr>
 #end for
-#except Exception,e
+#except Exception as e
      <tr>
        <td class="alert alert-danger" colspan="$(len($vals))">$(zoo._("Configuration error: ")+str($e))</td>
      </tr>

@@ -10,7 +10,7 @@ $zoo._("Name:")
 <input type="text" name="lname" id="lname" value="$m.getLayerByName($inputs["layer"]["value"]).name"/>
 </td>
 </tr>
-#if $conf["main"].has_key("3D") and $conf["main"]["3D"]=="true"
+#if "3D" in $conf["main"].keys() and $conf["main"]["3D"]=="true"
 <tr>
 <td>
 $zoo._("TE Fly URL:")

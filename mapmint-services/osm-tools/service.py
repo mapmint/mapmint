@@ -22,146 +22,160 @@
 #  DEALINGS IN THE SOFTWARE.
 ################################################################################
 import zoo
-import libxml2
+#import libxml2
 import sys, os
 import osgeo.ogr
 
-def createShpFromOSMP(conf,inputs,outputs):
+
+def createShpFromOSMP(conf, inputs, outputs):
     # Parse OSM data
-    content=inputs["osm"]["value"]
-    doc=libxml2.parseMemory(content,len(content))
+    content = inputs["osm"]["value"]
+    doc = libxml2.parseMemory(content, len(content))
 
     # Get all fields available from the dataset
-    nodes=doc.xpathEval('/osm/node/tag')
-    fields={}
+    nodes = doc.xpathEval('/osm/node/tag')
+    fields = {}
     for i in range(len(nodes)):
-        cc=nodes[i].xpathEval('@k')[0].getContent()
-        if fields.keys().count(cc)==0:
-            fields[cc]=len(nodes[i].xpathEval('@v')[0].getContent())
+        cc = nodes[i].xpathEval('@k')[0].getContent()
+        # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+        # if list(fields.keys()).count(cc) == 0:
+        if cc not in fields:
+            fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
         else:
             if len(nodes[i].xpathEval('@v')[0].getContent()) > fields[cc]:
-                fields[cc]=len(nodes[i].xpathEval('@v')[0].getContent())
-    print >> sys.stderr,fields
+                fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
+    print(fields, file=sys.stderr)
 
     # Create Datasource
-    drv = osgeo.ogr.GetDriverByName( "ESRI Shapefile" )
-    print >> sys.stderr,dir(drv)
-    ds = drv.CreateDataSource( conf["main"]["dataPath"]+"/dirs/"+inputs["dstn"]["value"]+"/"+inputs["dson"]["value"]+".shp" )
-    
-    print >> sys.stderr, conf["main"]["dataPath"]+"/dirs/"+inputs["dstn"]["value"]+"/"+inputs["dson"]["value"]+".shp"
-    lyr = ds.CreateLayer( inputs["dson"]["value"], None, osgeo.ogr.wkbPoint )
+    drv = osgeo.ogr.GetDriverByName("ESRI Shapefile")
+    print(dir(drv), file=sys.stderr)
+    ds = drv.CreateDataSource(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp")
+
+    print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp", file=sys.stderr)
+    lyr = ds.CreateLayer(inputs["dson"]["value"], None, osgeo.ogr.wkbPoint)
 
     # Create Fields
-    field_defn = osgeo.ogr.FieldDefn( "MMID", osgeo.ogr.OFTInteger )
-    if lyr.CreateField ( field_defn ) != 0:
-        conf["lenv"]["message"]="Creating MMID field failed."
+    field_defn = osgeo.ogr.FieldDefn("MMID", osgeo.ogr.OFTInteger)
+    if lyr.CreateField(field_defn) != 0:
+        conf["lenv"]["message"] = "Creating MMID field failed."
         return 4
 
+    # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+    # for i in list(fields.keys()):
     for i in fields.keys():
-        field_defn = osgeo.ogr.FieldDefn( i.replace(":","_"), osgeo.ogr.OFTString )
-        field_defn.SetWidth( fields[i] )
-        if lyr.CreateField ( field_defn ) != 0:
-            conf["lenv"]["message"]=zoo._("Creating ")+i+zoo._(" field failed.")
+        field_defn = osgeo.ogr.FieldDefn(i.replace(":", "_"), osgeo.ogr.OFTString)
+        field_defn.SetWidth(fields[i])
+        if lyr.CreateField(field_defn) != 0:
+            conf["lenv"]["message"] = zoo._("Creating ") + i + zoo._(" field failed.")
             return 4
 
     # Pass through all nodes available
-    nodes=doc.xpathEval('/osm/node')
+    nodes = doc.xpathEval('/osm/node')
     for i in range(len(nodes)):
-        feat = osgeo.ogr.Feature( lyr.GetLayerDefn())
-        feat.SetField( "MMID", nodes[i].xpathEval('@id')[0].getContent())
+        feat = osgeo.ogr.Feature(lyr.GetLayerDefn())
+        feat.SetField("MMID", nodes[i].xpathEval('@id')[0].getContent())
+        # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+        # for j in list(fields.keys()):
         for j in fields.keys():
-            tmp=nodes[i].xpathEval('tag[@k=\''+j+'\']')
-            print >> sys.stderr,tmp
-            if len(tmp)>0:
-                print >> sys.stderr,tmp[0].xpathEval('@v')[0].getContent()
-                feat.SetField( j.replace(":","_")[:10], tmp[0].xpathEval('@v')[0].getContent())
+            tmp = nodes[i].xpathEval('tag[@k=\'' + j + '\']')
+            print(tmp, file=sys.stderr)
+            if len(tmp) > 0:
+                print(tmp[0].xpathEval('@v')[0].getContent(), file=sys.stderr)
+                feat.SetField(j.replace(":", "_")[:10], tmp[0].xpathEval('@v')[0].getContent())
         pt = osgeo.ogr.Geometry(osgeo.ogr.wkbPoint)
         pt.SetPoint_2D(0, float(nodes[i].xpathEval('@lon')[0].getContent()), float(nodes[i].xpathEval('@lat')[0].getContent()))
         feat.SetGeometry(pt)
         if lyr.CreateFeature(feat) != 0:
-            conf["lenv"]["message"]=zoo._("Failed to create feature in shapefile.")
+            conf["lenv"]["message"] = zoo._("Failed to create feature in shapefile.")
             return zoo.SERVICE_FAILED
         feat.Destroy()
-    ds=None
+    ds = None
 
     try:
-        print >> sys.stderr,conf["main"]["dataPath"]+"/dirs/"+inputs["dstn"]["value"]+"/ds_ows.map"
-        os.unlink(conf["main"]["dataPath"]+"/dirs/"+inputs["dstn"]["value"]+"/ds_ows.map")
+        print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map", file=sys.stderr)
+        os.unlink(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map")
     except:
         pass
-    outputs["Result"]["value"]="Shapefile created"
+    outputs["Result"]["value"] = "Shapefile created"
     return 3
 
-def createShpFromOSML(conf,inputs,outputs):
+
+def createShpFromOSML(conf, inputs, outputs):
     # Parse OSM data
-    content=inputs["osm"]["value"]
-    doc=libxml2.parseMemory(content,len(content))
+    content = inputs["osm"]["value"]
+    doc = libxml2.parseMemory(content, len(content))
 
     # Get all fields available from the dataset
-    nodes=doc.xpathEval('/osm/way/tag')
-    fields={}
+    nodes = doc.xpathEval('/osm/way/tag')
+    fields = {}
     for i in range(len(nodes)):
-        cc=nodes[i].xpathEval('@k')
-        print >> sys.stderr,cc
-        if cc is not None and len(cc)>0:
-            cc=cc[0].getContent()
-            if fields.keys().count(cc)==0:
-                fields[cc]=len(nodes[i].xpathEval('@v')[0].getContent())
+        cc = nodes[i].xpathEval('@k')
+        print(cc, file=sys.stderr)
+        if cc is not None and len(cc) > 0:
+            cc = cc[0].getContent()
+            # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+            # if list(fields.keys()).count(cc) == 0:
+            if cc not in fields:
+                fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
             else:
                 if len(nodes[i].xpathEval('@v')[0].getContent()) > fields[cc]:
-                    fields[cc]=len(nodes[i].xpathEval('@v')[0].getContent())
-    print >> sys.stderr,fields
+                    fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
+    print(fields, file=sys.stderr)
 
     # Create Datasource
-    drv = osgeo.ogr.GetDriverByName( "ESRI Shapefile" )
-    ds = drv.CreateDataSource( conf["main"]["dataPath"]+"/dirs/"+inputs["dstn"]["value"]+"/"+inputs["dson"]["value"]+".shp" )
-    
-    print >> sys.stderr, conf["main"]["dataPath"]+"/dirs/"+inputs["dstn"]["value"]+"/"+inputs["dson"]["value"]+".shp"
-    lyr = ds.CreateLayer( inputs["dson"]["value"], None, osgeo.ogr.wkbLineString )
+    drv = osgeo.ogr.GetDriverByName("ESRI Shapefile")
+    ds = drv.CreateDataSource(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp")
+
+    print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp", file=sys.stderr)
+    lyr = ds.CreateLayer(inputs["dson"]["value"], None, osgeo.ogr.wkbLineString)
 
     # Create Fields
-    field_defn = osgeo.ogr.FieldDefn( "MMID", osgeo.ogr.OFTInteger )
-    if lyr.CreateField ( field_defn ) != 0:
-        conf["lenv"]["message"]=zoo._("Creating MMID field failed.")
+    field_defn = osgeo.ogr.FieldDefn("MMID", osgeo.ogr.OFTInteger)
+    if lyr.CreateField(field_defn) != 0:
+        conf["lenv"]["message"] = zoo._("Creating MMID field failed.")
         return zoo.SERVICE_FAILED
 
+    # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+    # for i in list(fields.keys()):
     for i in fields.keys():
-        field_defn = osgeo.ogr.FieldDefn( i.replace(":","_"), osgeo.ogr.OFTString )
-        field_defn.SetWidth( fields[i] )
-        if lyr.CreateField ( field_defn ) != 0:
-            conf["lenv"]["message"]=zoo._("Creating ")+i+zoo._(" field failed.")
+        field_defn = osgeo.ogr.FieldDefn(i.replace(":", "_"), osgeo.ogr.OFTString)
+        field_defn.SetWidth(fields[i])
+        if lyr.CreateField(field_defn) != 0:
+            conf["lenv"]["message"] = zoo._("Creating ") + i + zoo._(" field failed.")
             return zoo.SERVICE_FAILED
 
     # Pass through all ways available
-    nodes=doc.xpathEval('/osm/way')
+    nodes = doc.xpathEval('/osm/way')
     for i in range(len(nodes)):
-        feat = osgeo.ogr.Feature( lyr.GetLayerDefn())
-        feat.SetField( "MMID", nodes[i].xpathEval('@id')[0].getContent())
+        feat = osgeo.ogr.Feature(lyr.GetLayerDefn())
+        feat.SetField("MMID", nodes[i].xpathEval('@id')[0].getContent())
+        # TODO: confirm assumption: "fields" is a Python 3 dictionary object
+        # for j in list(fields.keys()):
         for j in fields.keys():
-            tmp=nodes[i].xpathEval('tag[@k=\''+j+'\']')
-            print >> sys.stderr,tmp
-            if len(tmp)>0:
-                print >> sys.stderr,tmp[0].xpathEval('@v')[0].getContent()
-                feat.SetField( j.replace(":","_")[:10], tmp[0].xpathEval('@v')[0].getContent())
+            tmp = nodes[i].xpathEval('tag[@k=\'' + j + '\']')
+            print(tmp, file=sys.stderr)
+            if len(tmp) > 0:
+                print(tmp[0].xpathEval('@v')[0].getContent(), file=sys.stderr)
+                feat.SetField(j.replace(":", "_")[:10], tmp[0].xpathEval('@v')[0].getContent())
         line = osgeo.ogr.Geometry(osgeo.ogr.wkbLineString)
-        nodes1=nodes[i].xpathEval('./nd')
+        nodes1 = nodes[i].xpathEval('./nd')
         for j in nodes1:
-            ref=j.xpathEval('@ref')[0].getContent()
-            nd=doc.xpathEval("/osm/node[@id='"+ref+"']")
-            print >> sys.stderr,ref+" "+str(nd)
-            if len(nd)>0:
+            ref = j.xpathEval('@ref')[0].getContent()
+            nd = doc.xpathEval("/osm/node[@id='" + ref + "']")
+            print(ref + " " + str(nd), file=sys.stderr)
+            if len(nd) > 0:
                 line.AddPoint_2D(float(nd[0].xpathEval('@lon')[0].getContent()), float(nd[0].xpathEval('@lat')[0].getContent()))
         feat.SetGeometry(line)
         if lyr.CreateFeature(feat) != 0:
-            conf["lenv"]["message"]=zoo._("Failed to create feature in shapefile.")
+            conf["lenv"]["message"] = zoo._("Failed to create feature in shapefile.")
             return 4
         feat.Destroy()
-    ds=None
+    ds = None
 
     try:
-        print >> sys.stderr,conf["main"]["dataPath"]+"/dirs/"+inputs["dstn"]["value"]+"/ds_ows.map"
-        os.unlink(conf["main"]["dataPath"]+"/dirs/"+inputs["dstn"]["value"]+"/ds_ows.map")
+        print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map", file=sys.stderr)
+        os.unlink(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map")
     except:
         pass
-    outputs["Result"]["value"]=zoo._("Shapefile created")
+    outputs["Result"]["value"] = zoo._("Shapefile created")
     return 3

@@ -8,18 +8,18 @@
 #end try
 
 #def printCheckbox(obj)
-<div class="form-group #if $obj.keys().count("classe")>0#$obj["classe"]#end if#">
+<div class="form-group #if "classe" in $obj.keys()#$obj["classe"]#end if#">
   <label class="col-sm-3 control-label">$obj["title"]</label>
   <div class="col-sm-9 ">
-#if $obj.keys().count("select")
+#if "select" in $obj.keys()
     <div class="input-group">
       <span class="input-group-addon">
         <input name="$obj["name"]"
       type="checkbox" onchange="\$(this).parent().next().attr('disabled',!\$(this).is(':checked'));" />
       </span>
-      <select class="form-control #if $obj["select"].keys().count("class")>0# $obj["select"]["class"]#end if#" disabled="disabled"
-	name="$obj["select"]["name"]" #if $obj["select"].keys().count("multiple")>0#multiple="multiple"#end if#>
-#if $obj["select"].keys().count("options")
+      <select class="form-control #if "class" in $obj["select"].keys()# $obj["select"]["class"]#end if#" disabled="disabled"
+	name="$obj["select"]["name"]" #if "multiple" in $obj["select"].keys()#multiple="multiple"#end if#>
+#if "options" in $obj["select"].keys()
 #for j in $obj["select"]["options"]
 	<option value="$j">$j.title()</option>
 #end for
@@ -34,7 +34,7 @@
 #end def
 
 #def printText(obj)
-<div class="form-group #if $obj.keys().count("classe")>0#$obj["classe"]#end if#">
+<div class="form-group #if "classe" in $obj.keys()#$obj["classe"]#end if#">
   <label class="col-sm-3 control-label">$obj["title"]</label>
   <div class="col-sm-9">
     <input name="$obj["name"]" class="form-control" placeholder="$obj["placeholder"]" type="text" />
@@ -77,7 +77,7 @@
 <form class="form-horizontal mtpp" method="get" >
 #set obj={"name":"name","title": $zoo._("Name"),"placeholder":$zoo._("Sample Name")}
 $printText($obj)
-#if $conf["main"].has_key("3D") and $conf["main"]["3D"]=="true"
+#if "3D" in $conf["main"].keys() and $conf["main"]["3D"]=="true"
 #set obj={"name":"fly","title": $zoo._("TE Fly URL"),"placeholder":$zoo._("Sample.fly")}
 $printText($obj)
 #end if
@@ -98,7 +98,7 @@ $printText($obj)
 {"type":"select","name":"squery","title":$zoo._("Spatial Query"),"placeholder":$zoo._("Layer Spatial Query"),"select":{"name":"squery_field","options":[$zoo._("none"),$zoo._("contained"),$zoo._("contains"),$zoo._("both")]},"classe": "no-grid no-raster"},
 ]
 #for i in $objs
-#if i.keys().count("type")>0
+#if "type" in i.keys()
 #if $i.type=="area"
 $printTextarea($i.name,$i.title,$i.placeholder)
 #else

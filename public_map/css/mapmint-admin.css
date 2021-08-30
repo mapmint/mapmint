@@ -157,6 +157,7 @@ body {
         position: absolute;
         width: 250px;
         margin-top: 51px;
+	top: 0;
     }
 
     .navbar-top-links .dropdown-messages,
@@ -490,4 +491,7 @@ table.dataTable thead .sorting:after {
     margin: 0 0 0 4px;
 }
 
+.invalid-feedback{
+	display: none
+}
 /**/

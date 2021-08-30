@@ -377,7 +377,7 @@ $(Template(file=$conf["main"]["templatesPath"]+"/preview/modules/routing/_init.j
 #end if
     checkForScales();
 
-#if $conf["senv"].has_key('default_extent') and $conf["senv"]["last_map"]!="Default"
+#if 'default_extent' in $conf["senv"].keys() and $conf["senv"]["last_map"]!="Default"
     var tmp0=new OpenLayers.Bounds($conf["senv"]["default_extent"]);
     if(!System.hasExtent)
 	map.zoomToExtent(tmp0.transform(new OpenLayers.Projection("EPSG:4326"),map.getProjectionObject()));
@@ -862,7 +862,7 @@ function _saveContext(params,func){
     });
 }
 
-#if $conf["senv"].has_key("last_index") and $conf["senv"]["last_index"]!="" and $mms.getMetadata($m.web,'layout_t')=="natureparif-indicateurs"
+#if "last_index" in $conf["senv"].keys() and $conf["senv"]["last_index"]!="" and $mms.getMetadata($m.web,'layout_t')=="natureparif-indicateurs"
 System.index="$conf["senv"]["last_index"]";
 #end if
 System.ilayers=[];
@@ -1009,7 +1009,7 @@ function loadIndex(){
 }
 
 #try
-#if $inputs.has_key("c")
+#if "c" in $inputs.keys()
 #set context=$inputs["c"]["value"]
 System.context="$context";
 function loadContext(){

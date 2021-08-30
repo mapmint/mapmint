@@ -1,6 +1,6 @@
 #import zoo
 <h3 class="lgn">$zoo._("Logged in as ") $conf["senv"]["login"]</h3>
-<p>Change your password <input type="checkbox" name="chpasswd" onchange="if(\$(this).is(':checked')) {\$(this).parent().next().show();\$(this).parent().next().next().show(); }  else {\$(this).parent().next().hide(); \$(this).parent().next().next().hide(); } "/></p>
+<p>$zoo._("Change your password") <input type="checkbox" name="chpasswd" onchange="if(\$(this).is(':checked')) {\$(this).parent().next().show();\$(this).parent().next().next().show(); }  else {\$(this).parent().next().hide(); \$(this).parent().next().next().hide(); } "/></p>
 <ul data-role="listview"  data-inset="true" data-theme="d" data-dividertheme="c" style="display:none" >
   <li data-role="fieldcontain">
     <label for="upass">$zoo._("Password:")</label>
@@ -15,8 +15,8 @@
     <input type="text" id="umail" value="$res[0][0]" />
   </li>
 </ul>
-<input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Save")" onclick="try{saveUserPreferences();}catch(e){alert(e)}return false;" style="display:none"  />   
-#if not($inputs.has_key("pcancel"))
+<input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Save")" onclick="try{saveUserPreferences();}catch(e){alert(e)}return false;" style="display:none" />   
+#if not("pcancel" in $inputs.keys())
 <input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Cancel")" onclick="try{cancelUserPreferences();}catch(e){alert(e)}return false;" />
 #end if   
 <input type="submit" id="validate" class="butt ui-corner-all" value="$zoo._("Logout")" onclick="try{logoutUser();}catch(e){alert(e)}return false;" />

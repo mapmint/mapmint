@@ -11,7 +11,7 @@
 </Geometry>
 <Fill>
 
-<CssParameter name="fill">#if $inputs.has_key("color") and $inputs["color"]["value"][0]!="#"#\##end if##if $inputs.has_key("color")#$inputs["color"]["value"]#else#000000#end if#</CssParameter>
+<CssParameter name="fill">#if "color" in $inputs.keys() and $inputs["color"]["value"][0]!="#"#\##end if##if "color" in $inputs.keys()#$inputs["color"]["value"]#else#000000#end if#</CssParameter>
 </Fill>
 </PolygonSymbolizer>
 </Rule>

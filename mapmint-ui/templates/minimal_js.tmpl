@@ -1,15 +1,15 @@
 #encoding UTF-8
 #import zoo
 System.zooUrl="$conf["main"]["serverAddress"]";
-#if $conf["mm"].keys().count("indexes")>0 and $conf["mm"]["indexes"]=="true"
+#if "indexes" in $conf["mm"].keys() and $conf["mm"]["indexes"]=="true"
 System.hasIIndexes=true;
 #else
 System.hasIIndexes=false;
 #end if
-#if $conf.keys().count("senv")>0
+#if "senv" in $conf.keys()
 System.mapfile="$conf["main"]["dataPath"]/public_maps/project_$(conf["senv"]["last_map"]).map";
 #end if
-#if $conf["main"].keys().count("dbuserName")>0
+#if "dbuserName" in $conf["main"].keys()
 System.dbuser="$conf["main"]["dbuserName"]";
 #end if
 #import authenticate.service as auth
@@ -21,12 +21,12 @@ System.dbuserName="$conf["main"]["dbuserName"]";
 System.indexMap="$conf["main"]["dataPath"]/PostGIS/$(conf["main"]["dbuserName"])ds_ows.map";
 System.tmpPath="$conf["main"]["tmpPath"]";
 System.tmpUrl="$conf["main"]["tmpUrl"]";
-#if $conf.has_key("senv") and $conf["senv"].has_key("last_index")
+#if "senv" in $conf.keys() and "last_index" in $conf["senv"].keys()
 System.initialIndex=$conf["senv"]["last_index"];
 #end if
 
 \$.ajaxSetup({ cache: false });
-#if $conf.keys().count("senv")>0
+#if "senv" in $conf.keys()
 function defaultInit(){
       \$("#logout").click(function(){
 	  \$.ajax({

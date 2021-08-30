@@ -6,7 +6,7 @@
   <div class="form-group">
     <label class="col-sm-3 control-label">$obj["title"]</label>
     <div class="col-sm-9 range">
-#if $obj.keys().count("textarea")==0
+#if not("textarea" in $obj.keys())
       <input type="text" name="$obj["name"]" class="form-control" value="$obj["value"]"  />
 #else
       <textarea name="$obj["name"]" class="form-control mm-editor">$obj["value"]</textarea>

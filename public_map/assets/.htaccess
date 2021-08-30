@@ -2,4 +2,4 @@ RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-l
-RewriteRule ^js/(.*)$ /cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=template.display&DataInputs=tmpl=preview/$1&RawDataOutput=Result [L,QSA]
+RewriteRule ^js/(.*)$ /cgi-bin/mm/zoo_loader.cgi?request=Execute&service=WPS&version=1.0.0&Identifier=template.display&DataInputs=tmpl=preview/$1;%{QUERY_STRING}&RawDataOutput=Result [L,QSA]

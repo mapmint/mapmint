@@ -39,7 +39,7 @@ body{
 #set center=[(cext.maxx-cext.minx)/2,(cext.maxy-cext.miny)/2]
 #set bbox=[(cext.minx+center[0])-0.01,(cext.miny+center[1])-0.01,(cext.minx+center[0])+0.01,(cext.miny+center[1])+0.01]
     background:url('#if $mms.getMetadata($l,'mmIcon') is not None#$mms.getMetadata($l,'mmIcon')#else#$conf["main"]["mapserverAddress"]?map=$conf["main"]["dataPath"]/maps/project_$(conf["senv"]["last_map"]).map&LAYERS=$(l.name)&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=$(bbox[0]),$(str(bbox[1])),$(str(bbox[2])),$(str(bbox[3]))&SRS=EPSG:4326&WIDTH=16&HEIGHT=16&r=1315253453.18#end if#') no-repeat scroll 0 0 transparent !important;
-#except Exception,e
+#except Exception as e
 /**
  The following error occcured!
   $e
@@ -76,7 +76,7 @@ body{
     background:	url(data:image/png;base64,$fc) no-repeat !important;
     content: "$mms.getMetadata($l,'mmSprite')";
 }
-#except Exception,e
+#except Exception as e
  /* $e */
 #end try
 #end if
@@ -163,8 +163,10 @@ body{
 #set m1=mapscript.mapObj($p)
 #set wmsl=[]
 #set ll=m1.web.metadata.get('mmActivatedLayers')
-#if $m1.web.metadata.get('max_minx') and $m1.web.metadata.get('max_minx')!=""
-#set a={"minx": float($m1.web.metadata.get('max_minx')),"miny": float($m1.web.metadata.get('max_miny')),"maxx": float($m1.web.metadata.get('max_maxx')),"maxy":float($m1.web.metadata.get('max_maxy'))}
+#set max_minx=$mms.getMetadata($m1.web,'max_minx')
+#if $max_minx is not None and $max_minx!=""
+#set mmCoords=[float($mms.getMetadata($m1.web,'max_minx')),float($mms.getMetadata($m1.web,'max_miny')),float($mms.getMetadata($m1.web,'max_maxx')),float($mms.getMetadata($m1.web,'max_maxy'))]
+#set a={"minx": mmCoords[0],"miny": mmCoords[1],"maxx": mmCoords[2],"maxy": mmCoords[3]}
 #else
 #set a=$m1.getLayer(0).getExtent()
 #try
@@ -173,6 +175,7 @@ body{
 /* BaseLayer */
 #end try
 #end if
+
 #set x=(($a.maxx-$a.minx)/2)+$a.minx
 #set y=(($a.maxy-$a.miny)/2)+$a.miny
 #base_layer_${i}{

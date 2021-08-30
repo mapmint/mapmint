@@ -4,7 +4,7 @@
 #set cur=con.conn.cursor()
 #set prefix=$auth.getPrefix($conf)
 #set fields="id,login,firstname,lastname,mail,phone,passwd,last_con,last_map"
-#if $inputs.has_key("clause")
+#if "clause" in $inputs.keys()
 #set haveGroup=True
 #if $inputs["clause"]["value"]=="id="
 #set q=[["","","","","","","","","",""]]
@@ -18,12 +18,12 @@
 #set q=cur.fetchall()
 #end if
 #set titles=['id','login','first name','last name','email','phone','password','last_con','last_map']
-<div id="$inputs["type"]["value"]-user#if $inputs.keys().count("pref")>0#-preferences#end if#" class="collapse userBaseEditForm #if $inputs["type"]["value"]!="insert"#userEditForm#end if#">
+<div id="$inputs["type"]["value"]-user#if "pref" in $inputs.keys()#-preferences#end if#" class="collapse userBaseEditForm #if $inputs["type"]["value"]!="insert"#userEditForm#end if#">
 <form class="form-inline mt myWell" data-toggle="validator" role="form">
 <fieldset class="mbp mtp">
 <legend>$zoo._("General informations")</legend>
 <div class="form-group myWell">
-#if not($inputs.has_key("type")) or ($inputs.has_key("type") and $inputs["type"]["value"]!="delete")
+#if not("type" in $inputs.keys()) or ("type" in $inputs.keys() and $inputs["type"]["value"]!="delete")
 #set cnt=1
 #set j=1
 #for i in titles
@@ -43,7 +43,7 @@
 <div class="row">
 <div class="col-sm-12 col-xs-12">
 <fieldset>
-<legend>$zoo._("Password:") <input type="checkbox" id="up_cp" #if $inputs.keys().count("pref")==0#data-toggle="collapse"#end if# data-target="#userPassword$inputs["type"]["value"].title()" /></legend>
+<legend>$zoo._("Password:") <input type="checkbox" id="up_cp" #if not("pref" in $inputs.keys())#data-toggle="collapse"#end if# data-target="#userPassword$inputs["type"]["value"].title()" /></legend>
 <div id="userPassword$inputs["type"]["value"].title()" class="myWell collapse">
 <div class="col-sm-12">
 <label class="control-label col-sm-5" for="up_$i">$zoo._($i): </label>
@@ -76,13 +76,13 @@
 <input id="up_$ii" name="user_$i" class="form-control" value="$q[0][1]"/>
 #end if
 
-#if $inputs.has_key("clause")
+#if "clause" in $inputs.keys()
 <input id="um_uclause" name="user_fid" type="hidden" value="$login" />
 #end if
-#if $inputs.has_key("type")
+#if "type" in $inputs.keys()
 <input id="um_utype" type="hidden" value="$inputs["type"]["value"]" />
 #end if
-#if $inputs.has_key('type')
+#if 'type' in $inputs.keys()
 <button type="submit" href="#" class="btn btn-primary userSubmitForm">
 #if $inputs["type"]["value"]=="delete"#$zoo._("Delete")#else##if $inputs["type"]["value"]=="update"#$zoo._("Save")#else#$zoo._("Add")#end if##end if#
 </button>

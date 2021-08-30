@@ -4,7 +4,7 @@
 #set cur=con.conn.cursor()
 #set prefix=$auth.getPrefix($conf)
 #set fields="id,login,firstname,lastname,mail,phone,passwd,last_con,last_map"
-#if $inputs.has_key("clause")
+#if "clause" in $inputs.keys()
 #set haveGroup=True
 #if $inputs["clause"]["value"]=="id="
 #set q=[["","","","","","","","","",""]]
@@ -23,7 +23,7 @@
 <fieldset class="mbp mtp">
 <legend>General information</legend>
 <div class="form-group">
-#if not($inputs.has_key("type")) or ($inputs.has_key("type") and $inputs["type"]["value"]!="delete")
+#if not("type" in $inputs.keys()) or ("type" in $inputs.keys() and $inputs["type"]["value"]!="delete")
 #set j=1
 #for i in titles
 #set ii=$i.replace(' ','_')
@@ -68,13 +68,13 @@
 <input id="up_$ii" value="$q[0][1]"/>
 #end if
 
-#if $inputs.has_key("clause")
+#if "clause" in $inputs.keys()
 <input id="um_uclause" type="hidden" value="$login" />
 #end if
-#if $inputs.has_key("type")
+#if "type" in $inputs.keys()
 <input id="um_utype" type="hidden" value="$inputs["type"]["value"]" />
 #end if
-#if $inputs.has_key('type')
+#if 'type' in $inputs.keys()
 <button href="#">
 #if $inputs["type"]["value"]=="delete"#$zoo._("Delete")#else##if $inputs["type"]["value"]=="update"#$zoo._("Save")#else#$zoo._("Add")#end if##end if#
 </button>

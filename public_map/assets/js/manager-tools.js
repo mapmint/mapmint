@@ -2,8 +2,8 @@
 
 
 define([
-    'module', 'jquery', 'metisMenu', 'xml2json', 'colorpicker'
-], function(module, $, metisMenu, X2JS, colorpicker) {
+    'module', 'jquery', 'metisMenu', 'xml2json', 'colorpicker', 'notify'
+], function(module, $, metisMenu, X2JS, colorpicker, notify) {
 
     var legendSteps={};
     var geotypeClasses=[
@@ -253,7 +253,9 @@ define([
 		    
 		    efunc();
 		};
-		opts["error"]=function(){
+		opts["error"]=function(data){
+		    console.log(data);
+			console.log(arguments);
 		    notify('Execute failed:' +data.ExceptionReport.Exception.ExceptionText, 'danger');
 		};
 		oSettings.jqXHR = $.ajax( opts );
@@ -706,11 +708,20 @@ define([
 			for(var i in ibindings){
 			    for(var j in params){
 				if(params[j].id==i){
+					console.log(ibindings[i]);
+				    if(ibindings[i]!="mmExpr")
 				    inputs.push({
 					"identifier": ibindings[i],
 					"value": params[j].value,
 					"dataType": "string"
 				    });
+				    else
+				    inputs.push({
+					"identifier": ibindings[i],
+					"value": params[j].value,
+					"mimeType": "text/plain"
+				    });
+
 				    break;
 				}
 			    }

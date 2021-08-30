@@ -25,7 +25,7 @@
 $vals*#
 #for i in range(len($vals))
 #*$vals[i][0]*#
-#if $obj[$objKeys[k]][j].keys().count($vals[i][0])>0
+#if $vals[i][0] in $obj[$objKeys[k]][j].keys()
 #*$obj[$objKeys[k]][j][$name]["options"]*#
 #for ii in range(len($obj[$objKeys[k]][j][$name]["options"]))
 #set clause=""

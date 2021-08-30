@@ -48,7 +48,7 @@ MapMint: Distiller
 	<span>$zoo._("Databases")</span>
 	<ul>
 	  <li id="mysqlList" iconCls="icon-db"><span>$zoo._("MySQL connections")</span>
-#if $inputs.keys().count("dbs")
+#if "dbs" in $inputs.keys()
 	  $inputs["dbs"]["value"]["MySQL"]
 #end if
 	  </li>
@@ -56,7 +56,7 @@ MapMint: Distiller
 	<ul>
 
 	  <li id="postgisList" iconCls="icon-db"><span>$zoo._("PostGIS connections")</span>
-#if $inputs.keys().count("dbs")
+#if "dbs" in $inputs.keys()
 	  $inputs["dbs"]["value"]["PostGIS"]
 #end if
 	  </li>
@@ -64,19 +64,19 @@ MapMint: Distiller
       </li>
       <li id="mainDirectoriesList">
 	<span>$zoo._("Directories")</span>
-#if $inputs.has_key('dirs')
+#if 'dirs' in $inputs.keys()
 	  $inputs["dirs"]["value"]
 #end if
       </li>
       <li id="wfsList" iconCls="icon-wfs">
 	<span>$zoo._("WFS Servers")</span>
-#if $inputs.keys().count("wfs")
+#if "wfs" in $inputs.keys()
 	  $inputs["wfs"]["value"]
 #end if
       </li>
       <li id="wmsList" iconCls="icon-wms">
 	<span>$zoo._("WMS Servers")</span>
-#if $inputs.keys().count("wms")
+#if "wms" in $inputs.keys()
 	  $inputs["wms"]["value"]
 #end if
       </li>

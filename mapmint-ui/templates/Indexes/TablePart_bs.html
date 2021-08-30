@@ -1,15 +1,15 @@
 #import zoo
 #try
-#if $inputs.has_key("prefix")
+#if "prefix" in $inputs.keys()
 #set prefix="agregate_"
 #else
 #set prefix=""
 #end if
-#except Exception,e
+#except Exception as e
 #set prefix=""
 #end try
 <div class="form-horizontal" id="$(prefix)table">
-#if not($inputs.has_key("prefix"))
+#if not("prefix" in $inputs.keys())
   <div class="loader-container">
     <div id="loader"> </div>
   </div>

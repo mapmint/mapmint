@@ -9,7 +9,7 @@ System.TimelinedLayers=[];
 System.TimelinedLayers.push("$l.name");
 #set cid=$i
 #try
-#if $inputs.has_key('prefix')
+#if 'prefix' in $inputs.keys()
 #if not(timelinr)
 #set m0=mapscript.mapObj($conf["main"]["dataPath"]+"/public_maps/project_indicateurs.map")
 #set cid+=m0.numlayers

@@ -509,6 +509,7 @@ define([
             name: 'osm'
         });
 	myBaseLayers.push(osm);
+	    /*
 	var mq0=new ol.layer.Tile({
 	    source: new ol.source.MapQuest({layer: "osm"}),
 	    visible: false,
@@ -521,6 +522,7 @@ define([
 	    name: 'mapquest-sat'
 	});
 	myBaseLayers.push(mq1);
+	*/
 	var cbl=new ol.layer.Tile({
 	    visible: false,
 	    source: new ol.source.TileWMS({
@@ -980,11 +982,28 @@ define([
 	zoo.execute({
 	    identifier: "georeferencer.georeference",
 	    type: "POST",
+	    storeExecuteResponse: true,
+	    status: true,
 	    dataInputs: params,
 	    dataOutputs: [
-		{"identifier":"Result","type":"raw"},
+		{"identifier":"Result","mimeType":"text/plain"},
 	    ],
-	    success: function(data){
+	    success: function(data, launched){
+              zoo.watch(launched.sid, {
+		      onPercentCompleted: function(data) {
+                         console.log("**** PercentCompleted ****");
+                         console.log(data);
+			      if($("#georeferencerLog").length==0)
+			      $("#geoForm").find('li').last().append('<div id="georeferencerLog"></div>');
+                         $("#georeferencerLog").html("<p>"+data.text+" ("+data.percentCompleted+"% completed)</p>");
+                         //progress.css('width', (data.percentCompleted)+'%');
+                         //progress.text(data.text+' : '+(data.percentCompleted)+'%');
+                      },
+		      onProcessSucceeded: function(data) {
+
+		console.log(data);
+			      $("#georeferencerLog").remove();
+
 		$("#geoForm").find("button").last().removeClass('disabled');
 		$("#geoForm").find("button").next().addClass('hide');
 
@@ -1019,6 +1038,9 @@ define([
 		console.log(map.getLayers());
 		map.getLayers().item(map.getLayers().getLength()-1).setVisible(false);
 		map.getLayers().item(map.getLayers().getLength()-1).setVisible(true);
+                      }
+	      });
+
 	    },
 	    error: function(data){
 		$(".notifications").notify({

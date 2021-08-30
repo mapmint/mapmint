@@ -1,6 +1,6 @@
 #import zoo
 <div style="display:block;" id="repport">
-#if not($inputs.has_key("prefix"))
+#if not("prefix" in $inputs.keys())
   <table class="gen" id="#">
     <tr>
       <td valign="middle" style="width:200px;">$zoo._("Document model:")</td>
@@ -13,12 +13,12 @@
 	<iframe onload="if(counter>0){try{if(\$('#repport_doc_url').html()) saveRepportFile();counter=1;}catch(e){alert(e);}}else counter+=1;" name="uploader1" id="uploader1" style="display:none"></iframe>
       </td>
     </tr>
-    <tr id="#if $inputs.has_key("prefix")#agregate_#end if#repport_steps" style="display:none;">
+    <tr id="#if "prefix" in $inputs.keys()#agregate_#end if#repport_steps" style="display:none;">
       <td>
 	$zoo._("Step:")
       </td>
       <td>
-	<select id="#if $inputs.has_key("prefix")#agregate_#end if#repport_step" onchange="System.refreshSteps=false;editRepport();"/>
+	<select id="#if "prefix" in $inputs.keys()#agregate_#end if#repport_step" onchange="System.refreshSteps=false;editRepport();"/>
       </td>      
     </tr>
   </table>

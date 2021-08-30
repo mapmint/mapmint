@@ -11,22 +11,22 @@
   #set rcols=$inputs["rcol"]["value"].split(',') 
   #set rwidth=$inputs["rwidth"]["value"].split(',') 
 
-  #if $inputs.has_key("tid")
-  #if $inputs.has_key("step")
+  #if "tid" in $inputs.keys()
+  #if "step" in $inputs.keys()
   #set res=$cur.execute($pp.getDesc($cur,"indexes.agregate_t"+$inputs["tid"]["value"]+"_idx_"+$inputs["id"]["value"]+"_step"+$inputs["step"]["value"]))
   #else
   #set res=$cur.execute($pp.getDesc($cur,"indexes.agregate_t"+$inputs["tid"]["value"]+"_idx_"+$inputs["id"]["value"]))
   #end if
   #set reqSuffix=" and t_id="+$inputs["tid"]["value"]
   #else
-  #*if $inputs.has_key("step")
+  #*if "step" in $inputs.keys()
   #set res=$cur.execute($pp.getDesc($cur,"indexes.view_idx_"+$inputs["id"]["value"]+"_step"+$inputs["step"]["value"]))
   #else*#
   #set res=$cur.execute($pp.getDesc($cur,"indexes.view_idx"+$inputs["id"]["value"]))
   #*end if*#
   #set reqSuffix=" and (not(agregation) or agregation is null)"
   #end if
-  #if $inputs.has_key("step")
+  #if "step" in $inputs.keys()
   #set reqSuffix0=" and step="+$inputs["step"]["value"]
   #else
   #set reqSuffix0=" and step is null"
@@ -91,7 +91,7 @@
       #end for
 
       #for i in $vals
-      #if $i[1]!="ogc_fid" and $i[1]!="wkb_geometry" and not($iniVals.has_key($i[1]))
+      #if $i[1]!="ogc_fid" and $i[1]!="wkb_geometry" and not($i[1] in $iniVals.keys())
       <tr>
 	<td><input type="checkbox" id="dtable_display_$cnt" /></td>
 	<td><input type="checkbox" id="dtable_search_$cnt" /></td>
@@ -111,6 +111,6 @@
     </tbody>
   </table>
   <input type="hidden" id="dtable_fnb" value="$cnt" />
-  <a href="#" class="wbutton ui-corner-all" onclick="saveIndexDisplaySettings(#if $inputs.has_key('tid')#\$('#p_tname').val()#end if#);" >Valider</a>
-  <a href="#" class="wbutton ui-corner-all" onclick="refreshIndexDisplay(#if $inputs.has_key('tid')#\$('#p_tname').val()#end if#);" >Rafraichir</a>
+  <a href="#" class="wbutton ui-corner-all" onclick="saveIndexDisplaySettings(#if 'tid' in $inputs.keys()#\$('#p_tname').val()#end if#);" >Valider</a>
+  <a href="#" class="wbutton ui-corner-all" onclick="refreshIndexDisplay(#if 'tid' in $inputs.keys()#\$('#p_tname').val()#end if#);" >Rafraichir</a>
 </div>

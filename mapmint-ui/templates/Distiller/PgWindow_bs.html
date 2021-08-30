@@ -1,7 +1,7 @@
 #encoding "utf8"
 #import zoo
 <form method="post" class="form-horizontal ">
-#if $inputs.keys().count("no-header")==0
+#if not("no-header" in $inputs.keys())
  <h3>$zoo._("Database Access")</h3>
 #end if
  <div class="form-group">

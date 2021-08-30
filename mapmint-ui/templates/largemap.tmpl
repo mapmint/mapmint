@@ -1,5 +1,5 @@
 #import mapscript
-#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$conf["senv"]
+#set m=mapscript.mapObj($conf["main"]["dataPath"]+"/maps/project_"+$conf["senv"])
 #if m.web.metadata.get("mmTitle") is not None and m.web.metadata.get("mmTitle")!=""
 #set title=m.web.metadata.get("mmTitle")
 #else

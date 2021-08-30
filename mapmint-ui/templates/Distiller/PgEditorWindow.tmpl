@@ -6,7 +6,7 @@
 #set $inputs1["force"]={"value":"true"}
 #set demo=pgConnection.getTableDescription($conf,$inputs,$outputs)
 #set tmp=json.loads($outputs["Result"]["value"],encoding="utf-8")
-#if $inputs.has_key("clause") and $inputs["clause"]["value"]!="NULL"
+#if "clause" in $inputs.keys() and $inputs["clause"]["value"]!="NULL"
 #set demo1=pgConnection.getTableContent($conf,$inputs1,$outputs)
 #set tmp1=json.loads($outputs["Result"]["value"],encoding="utf-8")
 #else
@@ -16,7 +16,7 @@
 #end for
 #end if
 #set j=0
-#if $inputs1.has_key("clause")
+#if "clause" in $inputs1.keys()
 #set hasClause=True
 #set clause=$inputs1["clause"]["value"]
 #else
@@ -48,7 +48,7 @@
 #end if
 #end for
 
-#if not($inputBis.has_key("clause"))
+#if not("clause" in $inputBis.keys())
 #set hasClause=False
 #set $inputBis["clause"]={"value":""}
 #end if

@@ -43,7 +43,7 @@ MapMint: $mmodule
 #for i in ["MySQL","PostGIS"]
      <li class="active">
        <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $i 
-#if $dirStr.keys().count($i)>0
+#if $i in $dirStr.keys()
        <span class="fa arrow"></span></a>
        <ul class="nav nav-forth-level">
 #for j in $dirStr[$i]
@@ -67,7 +67,7 @@ MapMint: $mmodule
 #for i in ["Directories"]
   <li>
     <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $i 
-#if $dirStr.keys().count($i)>0
+#if $i in $dirStr.keys()
     <span class="fa arrow"></span></a>
       <ul class="nav nav-forth-level">
 #for j in $dirStr[$i]
@@ -92,7 +92,7 @@ MapMint: $mmodule
 #for i in ["WMS","WFS"]
       <li>
         <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $i 
-#if $dirStr.keys().count($i)>0
+#if $i in $dirStr.keys()
         <span class="fa arrow"></span></a>
         <ul class="nav nav-forth-level">
 #for j in $dirStr[$i]
@@ -207,7 +207,7 @@ MapMint: $mmodule
         <div class="pull-right">
 	  <div class="btn-group">
 #for i in $objs
-	    <button type="button" class="btn btn-default btn-xs hidden-md hidden-xs hidden-sm #if $i.keys().count('optional')>0#hide require-select#end if#"  data-toggle="tooltip" data-mmaction="$i.name" title="$i.title">
+	    <button type="button" class="btn btn-default btn-xs hidden-md hidden-xs hidden-sm #if 'optional' in $i.keys()#hide require-select#end if#"  data-toggle="tooltip" data-mmaction="$i.name" title="$i.title">
 	    <i class="fa $i.font fa-fw"></i>
 	    </button>
 #end for

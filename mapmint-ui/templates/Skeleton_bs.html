@@ -40,7 +40,7 @@ $istyles
 </head>
 <body>
 #if $mmodule!="public"
-#if ($conf.keys().count("senv")>0 and $conf["senv"].keys().count("loggedin")>0 and $conf["senv"].keys().count("lastname")>0 and $conf["senv"]["loggedin"]!="false") and not($verr)
+#if ("senv" in $conf.keys() and "loggedin" in $conf["senv"].keys() and "lastname" in $conf["senv"].keys() and $conf["senv"]["loggedin"]!="false") and not($verr)
 <div id="wrapper">
 
   <!-- Navigation -->
@@ -148,7 +148,7 @@ $istyles
 
 $body
 
-#if $mmodule!="public" and ($conf.keys().count("senv")>0 and $conf["senv"]["loggedin"]!="false" and $conf["senv"].keys().count("firstname")>0) and not($verr)
+#if $mmodule!="public" and ("senv" in $conf.keys() and $conf["senv"]["loggedin"]!="false" and "firstname" in $conf["senv"].keys()) and not($verr)
 <div class="ui-layout-south"> 
   <p class="credits">&copy; copyright <a href="$conf["provider"]["providerSite"]">$conf["provider"]["providerName"]</a></p>
 
@@ -158,7 +158,7 @@ $body
 </div>
 </div>
 #else
-#if $conf["mm"].keys().count("nofooter")==0 or ($conf["mm"]["nofooter"]!="true" and $conf["mm"].keys().count("nofooter")>0)
+#if not("nofooter" in $conf["mm"].keys()) or ($conf["mm"]["nofooter"]!="true" and "nofooter" in $conf["mm"].keys())
 <footer>
   <div class="container text-center">
 #from datetime import datetime

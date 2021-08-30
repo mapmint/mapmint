@@ -25,23 +25,27 @@
 
 import re
 
+
 def strip_comments_helper(data):
     """remove all /* */ format comments and surrounding whitespace."""
     p = re.compile(r'[\s]*/\*.*?\*/[\s]*', re.DOTALL)
-    return p.sub('',data)
+    return p.sub('', data)
+
 
 def minimize(data, exclude=None):
     """Central function call. This will call all other compression
        functions. To add further compression algorithms, simply add
        functions whose names end in _helper which take a string as input 
        and return a more compressed string as output."""
-    for key, item in globals().iteritems():
+    for key, item in globals().items():
         if key.endswith("_helper"):
             func_key = key[:-7]
-            if not exclude or not func_key in exclude:   
+            if not exclude or not func_key in exclude:
                 data = item(data)
-    return data   
+    return data
+
 
 if __name__ == "__main__":
     import sys
-    print minimize(open(sys.argv[1]).read())
+
+    print(minimize(open(sys.argv[1]).read()))

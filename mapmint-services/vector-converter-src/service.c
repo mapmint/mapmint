@@ -783,6 +783,7 @@ int main( int nArgc, char ** papszArgv )
     tmpMap=getMapFromMaps(inputs,"append","value");
     if(tmpMap!=NULL && strncasecmp(tmpMap->value,"TRUE",4)==0){
       bAppend = TRUE;
+      bUpdate = TRUE;
     }
 
     tmpMap=NULL;
@@ -1544,7 +1545,7 @@ int main( int nArgc, char ** papszArgv )
 #if GDAL_VERSION_MAJOR >= 2
 	  poODS =
 	    (GDALDataset*) GDALOpenEx( pszDestDataSource,
-				       GDAL_OF_READONLY | GDAL_OF_VECTOR,
+				       GDAL_OF_UPDATE | GDAL_OF_VECTOR,
 				       NULL, NULL, NULL );
 #else
             poODS = OGRSFDriverRegistrar::Open( pszDestDataSource, TRUE, &poDriver );
