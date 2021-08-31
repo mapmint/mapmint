@@ -330,6 +330,7 @@ RUN set -ex \
     && cp -r  /mapmint/template/data/*/  /usr/com/zoo-project/ \
     && ln -s /mapmint/mapmint-ui /var/www/html/ui \
     && ln -s /mapmint/public_map /var/www/html/pm \
+    && ln -s /usr/lib/cgi-bin/mapserv /usr/lib/cgi-bin/mapserv.cgi \
     && mkdir /tmp/cache /usr/com/zoo-project/dirs /tmp/descriptions /var/www/html/pm/styles \
     && chown www-data:www-data -R /tmp/cache /mapmint/template/data/ /usr/lib/cgi-bin/ /tmp/descriptions /var/www/html/pm/styles \    
     && curl -o /usr/com/zoo-project/PostGIS/mmdb.xml https://raw.githubusercontent.com/mapmint/ansible-roles/gsoc/debian/mapmint/files/mmdb.xml \
