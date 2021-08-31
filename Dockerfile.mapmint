@@ -1,0 +1,346 @@
+#
+# Base: Ubuntu 18.04 with updates and external packages
+#
+FROM ubuntu:bionic-20201119 AS base
+ARG DEBIAN_FRONTEND=noninteractive
+ARG BUILD_DEPS=" \
+    dirmngr \
+    gpg-agent \
+    software-properties-common \
+"
+ARG RUN_DEPS=" \
+    libcurl3-gnutls \
+    libfcgi \
+    libmapserver-dev \
+    curl \
+    \
+    saga \
+    libsaga-api-7.3.0 \
+    libotb \
+    otb-bin \
+    \
+    libpq5 \
+    libpython3.6 \
+    libxslt1.1 \
+    gdal-bin \
+    libcgal13 \
+    python3 \
+    r-base \
+    python3-pip\
+"
+RUN set -ex \
+    && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
+    \
+    && add-apt-repository ppa:osgeolive/nightly \
+    && add-apt-repository ppa:ubuntugis/ubuntugis-unstable \
+    #&& add-apt-repository ppa:ubuntugis/ppa \
+    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 \
+    && add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/' \
+    \
+    && apt-get install -y $RUN_DEPS \
+    && curl -o libmozjs185-1.0_1.8.5-1.0.0+dfsg-7_amd64.deb http://launchpadlibrarian.net/309343863/libmozjs185-1.0_1.8.5-1.0.0+dfsg-7_amd64.deb \
+    && curl -o libmozjs185-dev_1.8.5-1.0.0+dfsg-7_amd64.deb http://launchpadlibrarian.net/309343864/libmozjs185-dev_1.8.5-1.0.0+dfsg-7_amd64.deb \
+    && dpkg --force-depends -i libmozjs185-1.0_1.8.5-1.0.0+dfsg-7_amd64.deb \
+    && dpkg --force-depends -i libmozjs185-dev_1.8.5-1.0.0+dfsg-7_amd64.deb \
+    && apt  -y --fix-broken install \
+    && rm /libmozjs185*.deb \
+    \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
+    && rm -rf /var/lib/apt/lists/*
+
+#
+# builder1: base image with zoo-kernel
+#
+FROM base AS builder1
+ARG DEBIAN_FRONTEND=noninteractive
+ARG BUILD_DEPS=" \
+    bison \
+    flex \
+    make \
+    autoconf \
+    gcc \
+    gettext-base \
+    gettext \
+    locales \
+    locales-all \
+    \
+    # Comment lines bellow if nor OTB nor SAGA \
+    libotb-dev \
+    otb-qgis \
+    otb-bin-qt \
+    qttools5-dev \
+    qttools5-dev-tools \
+    qtbase5-dev \
+    libqt5opengl5-dev \
+    libtinyxml-dev \
+    libfftw3-dev \
+    cmake \
+    libsaga-dev \
+    # Comment lines before this one if nor OTB nor SAGA \
+    \
+    libfcgi-dev \
+    libproj-dev \
+    libgdal-dev \
+    libwxgtk3.0-dev \
+    libjson-c-dev \
+    libssh2-1-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    python3-dev \
+    uuid-dev \
+    r-base-dev \
+"
+WORKDIR /zoo-project
+COPY . .
+
+RUN set -ex \
+    && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
+    \
+    && make -C ./thirds/cgic206 libcgic.a \
+    \
+    && cd ./zoo-project/zoo-kernel \
+    && autoconf \
+    && find /usr -name otbWrapperApplication.h \
+    && ./configure --with-python=/usr --with-pyvers=3.6 --with-js=/usr --with-mapserver=/usr --with-ms-version=7 --with-json=/usr --with-r=/usr --with-db-backend --prefix=/usr --with-otb=/usr/ --with-itk=/usr --with-otb-version=7.0 --with-itk-version=4.12 --with-saga=/usr --with-saga-version=7.2 --with-wx-config=/usr/bin/wx-config \
+    && make \
+    && make install \
+    \
+    && locale-gen en_US.UTF-8 \    
+    && for i in fr_FR it_IT ja_JP; do msgfmt locale/po/$i.po -o /usr/share/locale/$(echo $i | cut -d'_' -f1)/LC_MESSAGES/zoo-kernel.mo ; done\
+    && for i in fi es zh_CN; do msgfmt locale/po/$i.po -o /usr/share/locale/$i/LC_MESSAGES/zoo-kernel.mo ; done \
+    && find /usr/share/locale -name "*mo" \
+    # TODO: why not copied by 'make'?
+    && cp zoo_loader.cgi main.cfg /usr/lib/cgi-bin/ \
+    && cp ../zoo-services/hello-py/cgi-env/* /usr/lib/cgi-bin/ \
+    && cp ../zoo-services/hello-js/cgi-env/* /usr/lib/cgi-bin/ \
+    && cp ../zoo-api/js/* /usr/lib/cgi-bin/ \
+    && cp ../zoo-services/utils/open-api/cgi-env/* /usr/lib/cgi-bin/ \
+    && cp ../zoo-services/hello-py/cgi-env/* /usr/lib/cgi-bin/ \
+    && cp ../zoo-services/hello-js/cgi-env/* /usr/lib/cgi-bin/ \
+    && cp ../zoo-services/hello-r/cgi-env/* /usr/lib/cgi-bin/ \
+    && cp ../zoo-api/js/* /usr/lib/cgi-bin/ \
+    && cp ../zoo-api/r/minimal.r /usr/lib/cgi-bin/ \
+    \
+    && cp oas.cfg /usr/lib/cgi-bin/ \
+    \
+    # TODO: main.cfg is not processed \
+    && prefix=/usr envsubst < main.cfg > /usr/lib/cgi-bin/main.cfg \
+    \
+    #Comment lines below from here if no OTB \
+    && mkdir otb_build \
+    && cd otb_build \
+    && cmake ../../../thirds/otb2zcfg \
+    && make \
+    && mkdir OTB \
+    && cd OTB \
+    && ITK_AUTOLOAD_PATH=/usr/lib/x86_64-linux-gnu/otb/applications/ ../otb2zcfg \
+    && mkdir /usr/lib/cgi-bin/OTB \
+    && cp *zcfg /usr/lib/cgi-bin/OTB \
+    #&& for i in *zcfg; do cp $i /usr/lib/cgi-bin/$i ; j="$(echo $i | sed "s:.zcfg::g")" ; sed "s:$j:OTB_$j:g" -i  /usr/lib/cgi-bin/OTB_$i ; done \
+    #Comment lines before this one if no OTB \
+    \
+    #Comment lines below from here if no SAGA \
+    && cd .. \
+    && make -C ../../../thirds/saga2zcfg \
+    && mkdir zcfgs \
+    && cd zcfgs \
+    && dpkg -L saga \
+    && export MODULE_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/saga/ \
+    && export SAGA_MLB=/usr/lib/x86_64-linux-gnu/saga/ \
+    && ln -s /usr/lib/x86_64-linux-gnu/saga/ /usr/lib/saga \
+    && ../../../../thirds/saga2zcfg/saga2zcfg \
+    && mkdir /usr/lib/cgi-bin/SAGA \
+    && ls \
+    && cp -r * /usr/lib/cgi-bin/SAGA \
+    #Remove OTB if not built or SAGA if no SAGA \
+    && for j in OTB SAGA ; do for i in $(find /usr/lib/cgi-bin/$j/ -name "*zcfg"); do sed "s:image/png:image/png\n     useMapserver = true\n     msClassify = true:g;s:text/xml:text/xml\n     useMapserver = true:g;s:mimeType = application/x-ogc-aaigrid:mimeType = application/x-ogc-aaigrid\n   </Supported>\n   <Supported>\n     mimeType = image/png\n     useMapserver=true:g" -i $i; done; done \
+    \
+    && cd ../.. \
+    #Comment lines before this one if nor OTB nor SAGA \
+    \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
+    && rm -rf /var/lib/apt/lists/*
+
+#
+# Optional zoo modules build.
+#
+FROM base AS builder2
+ARG DEBIAN_FRONTEND=noninteractive
+ARG BUILD_DEPS=" \
+    git \
+    bison \
+    flex \
+    make \
+    autoconf \
+    g++ \
+    gcc \
+    libc-dev \
+    libfcgi-dev \
+    libgdal-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    libcgal-dev \
+    libfreetype6-dev \
+"
+WORKDIR /zoo-project
+COPY ./zoo-project/zoo-services ./zoo-project/zoo-services
+
+# From zoo-kernel
+COPY --from=builder1 /usr/lib/cgi-bin/ /usr/lib/cgi-bin/
+COPY --from=builder1 /usr/lib/libzoo_service.so.1.8 /usr/lib/libzoo_service.so.1.8
+COPY --from=builder1 /usr/lib/libzoo_service.so /usr/lib/libzoo_service.so
+COPY --from=builder1 /usr/com/zoo-project/ /usr/com/zoo-project/
+COPY --from=builder1 /usr/include/zoo/ /usr/include/zoo/
+
+# Additional files from bulder2
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/ZOOMakefile.opts /zoo-project/zoo-project/zoo-kernel/ZOOMakefile.opts
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/sqlapi.h /zoo-project/zoo-project/zoo-kernel/sqlapi.h
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/service.h /zoo-project/zoo-project/zoo-kernel/service.h
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/service_internal.h /zoo-project/zoo-project/zoo-kernel/service_internal.h
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/service_internal_ms.h /zoo-project/zoo-project/zoo-kernel/service_internal_ms.h
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/version.h /zoo-project/zoo-project/zoo-kernel/version.h
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/service_internal_ms.o /zoo-project/zoo-project/zoo-kernel/service_internal_ms.o
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/response_print.o /zoo-project/zoo-project/zoo-kernel/response_print.o
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/server_internal.o /zoo-project/zoo-project/zoo-kernel/server_internal.o
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/lex.sr.o /zoo-project/zoo-project/zoo-kernel/lex.sr.o
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/lex.cr.o /zoo-project/zoo-project/zoo-kernel/lex.cr.o
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/main_conf_read.tab.o /zoo-project/zoo-project/zoo-kernel/main_conf_read.tab.o
+COPY --from=builder1 /zoo-project/zoo-project/zoo-kernel/service_conf.tab.o /zoo-project/zoo-project/zoo-kernel/service_conf.tab.o
+
+
+RUN set -ex \
+    && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
+    \
+    && cd ./zoo-project/zoo-services/utils/status \
+    && make \
+    && make install \
+    \
+    && cd ../../cgal \
+    && make \
+    && cp cgi-env/* /usr/lib/cgi-bin/ \
+    \
+    && cd .. \
+    && cd ../zoo-services/ogr/base-vect-ops \
+    && make \
+    && cp cgi-env/* /usr/lib/cgi-bin/ \
+    && cd ../.. \
+    \
+    && cd ../zoo-services/gdal/ \
+    && for i in contour dem grid profile translate warp ; do cd $i ; make && cp cgi-env/* /usr/lib/cgi-bin/ ; cd .. ; done \
+    \
+    && cd / \
+    && git clone https://github.com/mapmint/mapmint.git --branch gsoc \
+    && cd mapmint/mapmint-services/ \
+    && for i in *-src ; do echo $i; cd $i; sed "s:g++:g++ \${CFLAGS}:g" -i Makefile.in ; autoconf; ./configure --with-zoo-kernel=/zoo-project/zoo-project/zoo-kernel --with-mapserver=/usr ; make ; cd .. ; done \
+    && cd ../.. \
+    && curl -o qrencode-3.4.1.tar.gz https://fukuchi.org/works/qrencode/qrencode-3.4.1.tar.gz \
+    && tar -xvf qrencode-3.4.1.tar.gz \
+    && cd qrencode-3.4.1 \
+    && ./configure && make && make install \
+    && cd .. \
+    && pwd && ls && ls zoo-project \
+    && cd ./zoo-project/zoo-project/zoo-services/qrencode \
+    && make \
+    && cp cgi-env/* /usr/lib/cgi-bin \
+    \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
+    && rm -rf /var/lib/apt/lists/*
+
+#
+# Optional zoo demos download.
+#
+FROM base AS demos
+ARG DEBIAN_FRONTEND=noninteractive
+ARG BUILD_DEPS=" \
+    git \
+    \
+"
+WORKDIR /zoo-project
+
+RUN set -ex \
+    && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
+    \
+    && git clone https://github.com/ZOO-Project/examples.git \
+    && git clone https://github.com/swagger-api/swagger-ui.git
+
+#
+# Runtime image with apache2.
+#
+FROM base AS runtime
+ARG DEBIAN_FRONTEND=noninteractive
+ARG RUN_DEPS=" \
+    apache2 \
+    curl \
+    cgi-mapserver \
+    mapserver-bin \
+    python3-mapscript \
+    python3-psycopg2 \
+    python3-lxml \
+    python3-gdal \
+    python3-setuptools \
+    python3-requests \
+    python3-cssmin \
+    python3-jsmin \
+    python3-redis \
+    gettext \
+    locales \
+    locales-all \
+    #Uncomment the line below to add vi editor \
+    vim \
+    #Uncomment the lines below to add debuging \
+    valgrind \
+    gdb \
+"
+
+# From zoo-kernel
+COPY --from=builder1 /usr/lib/cgi-bin/ /usr/lib/cgi-bin/
+COPY --from=builder1 /usr/lib/libzoo_service.so.1.8 /usr/lib/libzoo_service.so.1.8
+COPY --from=builder1 /usr/lib/libzoo_service.so /usr/lib/libzoo_service.so
+COPY --from=builder1 /usr/com/zoo-project/ /usr/com/zoo-project/
+COPY --from=builder1 /usr/include/zoo/ /usr/include/zoo/
+
+# From optional zoo modules
+COPY --from=builder2 /usr/lib/cgi-bin/ /usr/lib/cgi-bin/
+COPY --from=builder2 /usr/com/zoo-project/ /usr/com/zoo-project/
+COPY --from=builder2 /mapmint/ /mapmint/
+
+# From optional zoo demos
+COPY --from=demos /zoo-project/examples/data/ /usr/com/zoo-project/
+COPY --from=demos /zoo-project/examples/ /var/www/html/
+COPY --from=demos /zoo-project/swagger-ui /var/www/html/swagger-ui
+
+
+RUN set -ex \
+    && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
+    && apt-cache search gdal \
+    \
+    && curl -o /usr/com/zoo-project/mm.db http://geolabs.fr/dl/mm.db \
+    && sed "s=https://petstore.swagger.io/v2/swagger.json=http://localhost/ogc-api/api=g" -i /var/www/html/swagger-ui/dist/index.html \
+    && mv  /var/www/html/swagger-ui/dist  /var/www/html/swagger-ui/oapip \
+    && ln -s /tmp/ /var/www/html/temp \
+    && ln -s /var/www/html/temp /var/www/html/tmp \
+    && ln -s /usr/lib/x86_64-linux-gnu/saga/ /usr/lib/saga \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip3 install Cheetah3 \
+    && sed "s:AllowOverride None:AllowOverride All:g" -i /etc/apache2/apache2.conf \
+    && mkdir -p /tmp/statusInfos \
+    && ln -s /usr/lib/cgi-bin/ /usr/lib/cgi-bin/mm \
+    && ln -s /mapmint/mapmint-ui/templates/* /var/www/ \
+    && cp -r  /mapmint/template/data/*/  /usr/com/zoo-project/ \
+    && ln -s /mapmint/mapmint-ui /var/www/html/ui \
+    && ln -s /mapmint/public_map /var/www/html/pm \
+    && mkdir /tmp/cache /usr/com/zoo-project/dirs /tmp/descriptions /var/www/html/pm/styles \
+    && chown www-data:www-data -R /tmp/cache /mapmint/template/data/ /usr/lib/cgi-bin/ /tmp/descriptions /var/www/html/pm/styles \    
+    && curl -o /usr/com/zoo-project/PostGIS/mmdb.xml https://raw.githubusercontent.com/mapmint/ansible-roles/gsoc/debian/mapmint/files/mmdb.xml \
+    && sed "s:/var/run/postgresql/:pgbouncer:g;s:mmdb:zoo:g;s:postgres:zoo:g;s:nopassword:zoo:g" -i /usr/com/zoo-project/PostGIS/mmdb.xml \
+    && sed "s:('encoding', None,:('encoding', 'utf-8',:g" -i /usr/local/lib/python3.6/dist-packages/Cheetah/Compiler.py \
+    && curl -o fonts.tar.bz2 http://geolabs.fr/dl/fonts.tar.bz2 \
+    && mkdir /usr/com/zoo-project/fonts /mapmint/mapmint-ui//img/slideshow/ /usr/com/zoo-project/public_maps/ \
+    && tar -C /usr/com/zoo-project/fonts -xvf fonts.tar.bz2 \
+    && for i in /mapmint/mapmint-services/*; do ln -s $i /usr/lib/cgi-bin/ ; done \
+    && chown www-data:www-data -R /tmp/statusInfos /usr/com/zoo-project /mapmint/mapmint-ui//img/slideshow/ \
+    && a2enmod cgi rewrite
+
+EXPOSE 80
+CMD /usr/sbin/apache2ctl -D FOREGROUND
