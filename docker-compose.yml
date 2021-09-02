@@ -3,9 +3,6 @@ services:
   zookernel:
     platform: linux/amd64
     image: geolabs/mapmint:latest
-    #build:
-    #  context: .
-    #  dockerfile: Dockerfile.mapmint
     ports:
       - "80:80"
     volumes:
@@ -42,6 +39,7 @@ services:
     command: ["--port=8888", "/shell.py"]
   pg:
     platform: linux/amd64
+    #For M1 users please build kartoza/postgis then uncomment the line below
     #image: docker.io/kartoza/postgis
     image: postgis/postgis:10-2.5-alpine
     restart: always
