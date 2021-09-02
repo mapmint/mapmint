@@ -1,0 +1,47 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      # Authenticate to docker
+      - name: docker login
+        env:
+          DOCKER_USER: ${{secrets.DOCKER_USER}}
+          DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+        run: |
+          docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+
+      # Runs a set of commands using the runners shell
+      - name: Build docker image then push SHA and latest version
+        run: |
+          git clone https://github.com/ZOO-Project/ZOO-Project.git
+          cd ZOO-Project
+          cp -r $GITHUB_WORKSPACE ./mapmint
+          cp mapmint/docker/stable/Dockerfile.mapmint .
+          cp mapmint/docker-compose-mapmint.yml .
+          docker build . --file Dockerfile --tag geolabs/mapmint:$GITHUB_SHA
+          docker tag geolabs/mapmint:$GITHUB_SHA geolabs/mapmint:latest
+          docker push geolabs/mapmint:$GITHUB_SHA
+          docker push geolabs/mapmint
