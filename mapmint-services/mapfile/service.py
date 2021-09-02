@@ -186,11 +186,11 @@ def getFlyAddress(conf, inputs, outputs):
 
 def saveProjectMap(m, mapfile):
     m.save(mapfile)
-    fi = open(mapfile, "r")
+    fi = open(mapfile, "r", encoding='utf-8')
     tmp = fi.read()
     fi.close()
     if tmp != "":
-        fo = open(mapfile, "w")
+        fo = open(mapfile, "w", encoding='utf-8')
         fo.write(tmp.replace("CONNECTIONTYPE GRATICULE", ""))
         fo.close()
 
@@ -225,7 +225,7 @@ def removeMap(conf, inputs, outputs):
         #import libxml2
         #doc = libxml2.parseDoc(open(conf["mm"]["mapcacheCfg"], 'r').read())
         import lxml
-        doc = etree.fromstring(open(conf["mm"]["mapcacheCfg"], 'r').read())
+        doc = etree.fromstring(open(conf["mm"]["mapcacheCfg"], 'r', encoding='utf-8').read())
         root = doc.xpathEval('/mapcache')
         nodes = doc.xpathEval('/mapcache/source[@name="' + inputs["mmProjectName"]["value"] + '"]')
 
@@ -236,7 +236,7 @@ def removeMap(conf, inputs, outputs):
         for j in range(len(nodes)):
             root[0].removeChild(nodes[j])
 
-        f = open(conf["mm"]["mapcacheCfg"], 'w')
+        f = open(conf["mm"]["mapcacheCfg"], 'w', encoding='utf-8')
         doc.saveTo(f)
         f.close
 
@@ -466,7 +466,7 @@ def createVectorTileIndexLayer(conf, layer):
         res = vt.vectInfo(conf, lInputs, output1)
         if res == zoo.SERVICE_SUCCEEDED:
             obj = json.loads(output1["Result"]["value"]);
-            myDataSource = osgeo.ogr.Open(obj[0]["LOCATION"].split(',')[0])
+            myDataSource = osgeo.ogr.Open(obj[0]["LOCATION"].split(',')[0], encoding='utf-8')
             geometryType = myDataSource.GetLayerByIndex(0).GetGeomType()
             polygons = [osgeo.ogr.wkbPolygon, osgeo.ogr.wkbPolygon25D, osgeo.ogr.wkbMultiPolygon, osgeo.ogr.wkbMultiPolygon25D]
             lines = [osgeo.ogr.wkbLineString, osgeo.ogr.wkbLineString25D, osgeo.ogr.wkbMultiLineString, osgeo.ogr.wkbMultiLineString25D]
@@ -1016,7 +1016,7 @@ def loadLegendMapfile(conf, inputs):
     if "prefix" in inputs:
         if inputs["prefix"]["value"] == "indexes":
             try:
-                open(conf["main"]["dataPath"] + "/" + inputs["prefix"]["value"] + "_maps/project_" + inputs["name"]["value"] + ".map")
+                open(conf["main"]["dataPath"] + "/" + inputs["prefix"]["value"] + "_maps/project_" + inputs["name"]["value"] + ".map", encoding='utf-8')
             except:
                 if "orig" in inputs:
                     m = mapscript.mapObj(conf["main"]["dataPath"] + "/PostGIS/" + inputs["orig"]["value"] + "ds_ows.map")
@@ -1064,7 +1064,7 @@ def createLegend0(conf, inputs, outputs):
             if inputs["prefix"]["value"] == "indexes":
                 inputs["layer"] = {"value": "indexes.view_idx" + inputs["id"]["value"]}
                 try:
-                    open(conf["main"]["dataPath"] + "/" + inputs["prefix"]["value"] + "_maps/project_" + inputs["name"]["value"] + ".map")
+                    open(conf["main"]["dataPath"] + "/" + inputs["prefix"]["value"] + "_maps/project_" + inputs["name"]["value"] + ".map", encoding='utf-8')
                 except:
                     if "orig" in inputs:
                         m = mapscript.mapObj(conf["main"]["dataPath"] + "/PostGIS/" + inputs["orig"]["value"] + "ds_ows.map")
@@ -1429,7 +1429,7 @@ def createLegend0(conf, inputs, outputs):
         if i == "click":
             tmpl = conf["main"]["dataPath"] + "/templates/click_" + inputs["layer"]["value"] + "_" + inputs["name"]["value"] + "_tmpl.html"
         try:
-            f = open(tmpl, "r")
+            f = open(tmpl, "r", encoding='utf-8')
             nameSpace[i + "_tmpl"] = f.read().replace("<!-- MapServer Template -->\n", "")
         except:
             nameSpace[i + "_tmpl"] = ""
@@ -1511,7 +1511,7 @@ def createLegend(conf, inputs, outputs):
     if "prefix" in inputs:
         if inputs["prefix"]["value"] == "indexes":
             try:
-                open(conf["main"]["dataPath"] + "/" + inputs["prefix"]["value"] + "_maps/project_" + inputs["name"]["value"] + ".map")
+                open(conf["main"]["dataPath"] + "/" + inputs["prefix"]["value"] + "_maps/project_" + inputs["name"]["value"] + ".map", encoding='utf-8')
             except:
                 if "orig" in inputs:
                     m = mapscript.mapObj(conf["main"]["dataPath"] + "/PostGIS/" + inputs["orig"]["value"] + "ds_ows.map")
@@ -1817,7 +1817,7 @@ def saveMap(conf, inputs, outputs):
                     inputs["layer"] = {"value": lname}
                     createLegend(conf, inputs, outputs1)
                     try:
-                        f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_sld.xml", 'w')
+                        f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_sld.xml", 'w', encoding='utf-8')
                         f.write(layer.generateSLD())
                         f.close()
                     except:
@@ -1981,7 +1981,10 @@ def saveLayerStyle0(conf, inputs, outputs):
         except:
             layer.getClass(nClass).getStyle(mmStyle).angle = inputs["mmAngle"]["value"]
     if "mmSymb" in inputs and inputs["mmSymb"]["value"] != "":
-        layer.getClass(nClass).getStyle(mmStyle).symbolname = inputs["mmSymb"]["value"].replace("Symbol_", "")
+        try:
+            layer.getClass(nClass).getStyle(mmStyle).symbolname = inputs["mmSymb"]["value"].replace("Symbol_", "")
+        except:
+            layer.getClass(nClass).getStyle(mmStyle).updateFromString('STYLE SYMBOL "'+inputs["mmSymb"]["value"].replace("Symbol_", "")+'" END')
         if inputs["mmSymb"]["value"] == "polygon_hatch":
             if layer.getClass(nClass).numstyles == 1:
                 layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
@@ -2126,9 +2129,9 @@ def saveLayerStyle0(conf, inputs, outputs):
             createColorRamp(conf, m, layer);
     try:
         if "mmStep" in inputs:
-            f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_step" + inputs["mmStep"]["value"] + "_sld.xml", 'w')
+            f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_step" + inputs["mmStep"]["value"] + "_sld.xml", 'w', encoding='utf-8')
         else:
-            f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_sld.xml", 'w')
+            f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_sld.xml", 'w', encoding='utf-8')
         f.write(layer.generateSLD())
         f.close()
     except:
@@ -2239,7 +2242,12 @@ def saveLayerStyle(conf, inputs, outputs):
         except:
             layer.getClass(nClass).getStyle(mmStyle).angle = inputs["mmAngle"]["value"]
     if "mmSymb" in inputs and inputs["mmSymb"]["value"] != "":
-        layer.getClass(nClass).getStyle(mmStyle).symbolname = inputs["mmSymb"]["value"].replace("Symbol_", "")
+        try:
+            layer.getClass(nClass).getStyle(mmStyle).symbolname = inputs["mmSymb"]["value"].replace("Symbol_", "")
+        except:
+            layer.getClass(nClass).getStyle(mmStyle).updateFromString('STYLE SYMBOL "'+inputs["mmSymb"]["value"].replace("Symbol_", "")+'" END')
+
+        #layer.getClass(nClass).getStyle(mmStyle).symbolname = inputs["mmSymb"]["value"].replace("Symbol_", "")
         if inputs["mmSymb"]["value"] == "polygon_hatch":
             if layer.getClass(nClass).numstyles == 1:
                 layer.getClass(nClass).insertStyle(layer.getClass(nClass).getStyle(0).clone())
@@ -2361,9 +2369,9 @@ def saveLayerStyle(conf, inputs, outputs):
             createColorRamp(conf, m, layer);
     try:
         if "mmStep" in inputs:
-            f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_step" + inputs["mmStep"]["value"] + "_sld.xml", 'w')
+            f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_step" + inputs["mmStep"]["value"] + "_sld.xml", 'w', encoding='utf-8')
         else:
-            f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_sld.xml", 'w')
+            f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_sld.xml", 'w', encoding='utf-8')
         f.write(layer.generateSLD())
         f.close()
     except:
@@ -2387,7 +2395,7 @@ def createColorRamp(conf, m, layer, useTile=0):
     myMap = mapscript.mapObj(conf["main"]["dataPath"] + "/maps/project_" + conf["senv"]["last_map"] + ".map")
     myMap.save(conf["main"]["dataPath"] + "/maps/color_ramp_" + conf["senv"]["last_map"] + "_" + layer.name + ".map")
     myMap.save(conf["main"]["dataPath"] + "/maps/color_ramp_" + conf["senv"]["last_map"] + "_" + layer.name + "TOTO.map")
-    color_file = open(conf["main"]["tmpPath"] + "/color_" + conf["senv"]["last_map"] + "_" + layer.name + ".clr", "w+")
+    color_file = open(conf["main"]["tmpPath"] + "/color_" + conf["senv"]["last_map"] + "_" + layer.name + ".clr", "w+", encoding='utf-8')
     for i in range(0, layer.numclasses):
         exp = layer.getClass(i).getExpressionString()
         tmp = exp.split(" AND ")
@@ -2464,7 +2472,10 @@ def createColorRamp(conf, m, layer, useTile=0):
         l.data = None
         l.tileindex = value
     else:
-        l.data = value
+        try:
+            l.data = value
+        except Exception as e:
+            print(e,file=sys.stderr)
     m2.save(conf["main"]["dataPath"] + "/maps/color_ramp_" + conf["senv"]["last_map"] + "_" + layer.name + ".map")
 
 
@@ -2784,7 +2795,7 @@ def classifyMap0(conf, inputs, outputs):
     except Exception as e:
         try:
             k = list(inputs.keys())
-            print(e.message, file=sys.stderr)
+            print(e, file=sys.stderr)
 
             layer.clearProcessing()
             if k.count("processing") > 0:
@@ -2914,7 +2925,10 @@ def classifyMap0(conf, inputs, outputs):
 
             if layer.type == mapscript.MS_LAYER_POINT:
                 style.size = 15
-                style.symbolname = "circle"
+                try:
+                    style.symbolname = "circle"
+                except:
+                    style.updateFromString('STYLE SYMBOL "circle" END')
 
             setMetadata(layer, "mmName", inputs["field"]["value"])
             try:
@@ -3258,7 +3272,10 @@ def classifyMap(conf, inputs, outputs):
 
             if layer.type == mapscript.MS_LAYER_POINT:
                 style.size = 15
-                style.symbolname = "circle"
+                try:
+                    style.symbolname = "circle"
+                except:
+                    style.updateFromString('STYLE SYMBOL "circle" END')
 
             setMetadata(layer, "mmName", inputs["field"]["value"])
             try:
@@ -3576,10 +3593,10 @@ def addLabelLayer0(conf, inputs, outputs):
     l1.getClass(0).removeStyle(0)
     setMetadata(l1, "ows_srs", "EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
     m1.save(inputs["map"]["value"])
-    f = open(inputs["map"]["value"], "r")
+    f = open(inputs["map"]["value"], "r", encoding='utf-8')
     tmpStr = f.read().replace('MAP\n  EXTENT', 'MAP\n FONTSET "' + conf["main"]["dataPath"] + '/fonts/list.txt"\n  EXTENT')
     f.close()
-    f1 = open(inputs["map"]["value"], "w")
+    f1 = open(inputs["map"]["value"], "w", encoding='utf-8')
     f1.write(tmpStr)
     f1.close()
     # Required only by KelQuartier software
@@ -3725,16 +3742,16 @@ def setMapLayerProperties(conf, inputs, outputs):
         i = 0
         l.header = conf["main"]["dataPath"] + "/templates/" + l.name + "_" + inputs["map"]["value"] + "_header.html"
         try:
-            open(conf["main"]["dataPath"] + "/templates/" + l.name + "_" + inputs["map"]["value"] + "_header.html", "r")
+            open(conf["main"]["dataPath"] + "/templates/" + l.name + "_" + inputs["map"]["value"] + "_header.html", "r", encoding='utf-8')
         except:
-            f = open(conf["main"]["dataPath"] + "/templates/" + l.name + "_" + inputs["map"]["value"] + "_header.html", "w")
+            f = open(conf["main"]["dataPath"] + "/templates/" + l.name + "_" + inputs["map"]["value"] + "_header.html", "w", encoding='utf-8')
             f.write("<!-- MapServer Template -->\n<div>")
             f.close()
         l.footer = conf["main"]["dataPath"] + "/templates/" + l.name + "_" + inputs["map"]["value"] + "_footer.html"
         try:
-            open(conf["main"]["dataPath"] + "/templates/" + l.name + "_" + inputs["map"]["value"] + "_footer.html", "r")
+            open(conf["main"]["dataPath"] + "/templates/" + l.name + "_" + inputs["map"]["value"] + "_footer.html", "r", encoding='utf-8')
         except:
-            f = open(conf["main"]["dataPath"] + "/templates/" + l.name + "_" + inputs["map"]["value"] + "_footer.html", "w")
+            f = open(conf["main"]["dataPath"] + "/templates/" + l.name + "_" + inputs["map"]["value"] + "_footer.html", "w", encoding='utf-8')
             f.write("<!-- MapServer Template -->\n</div>")
             f.close()
         while i < l.numclasses:
@@ -3822,7 +3839,7 @@ def setMapLayerProperties(conf, inputs, outputs):
                     print(str(e),file=sys.stderr)
                     continue
             saveProjectMap(m0, conf["main"]["dataPath"] + "/maps/search_" + mf + "_" + lname + "_" + fval + ".map")
-            f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + fval + "_" + conf["senv"]["last_map"] + "_sld.xml", 'w')
+            f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + fval + "_" + conf["senv"]["last_map"] + "_sld.xml", 'w', encoding='utf-8')
             f.write(layer.generateSLD())
             f.close()
             m0 = mapscript.mapObj(conf["main"]["dataPath"] + "/maps/search_" + mf + "_" + lname + ".map")
@@ -4203,7 +4220,7 @@ def updateMapcacheCfg0(conf, inputs, outputs):
         return 3
 
     import lxml.etree as etree
-    doc = etree.fromstring(bytes(open(conf["mm"]["mapcacheCfg"], 'r').read(),"utf-8"))
+    doc = etree.fromstring(bytes(open(conf["mm"]["mapcacheCfg"], 'r', encoding='utf-8').read(),"utf-8"))
     root = doc.xpath('/mapcache')
     nodes = doc.xpath('/mapcache/source[@name="' + inputs["mmProjectName"]["value"] + '"]')
 
@@ -4245,7 +4262,7 @@ def updateMapcacheCfg(conf, inputs, outputs):
         return 3
 
     import lxml.etree as etree
-    doc =etree.fromstring(bytes(open(conf["mm"]["mapcacheCfg"], 'r').read(),"utf-8"))
+    doc =etree.fromstring(bytes(open(conf["mm"]["mapcacheCfg"], 'r', encoding='utf-8').read(),"utf-8"))
     root = doc.xpath('/mapcache')
     nodes = doc.xpath('/mapcache/source[@name="' + inputs["mmProjectName"]["value"] + '"]')
 
@@ -4310,7 +4327,7 @@ def saveNavPrivileges(conf, inputs, outputs):
 def getDescription(conf, m):
     description = ""
     try:
-        description = open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"], conf["main"]["tmpPath"])).read()
+        description = open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"], conf["main"]["tmpPath"]), encoding='utf-8').read()
     except:
         description = m.web.metadata.get("ows_abstract")
     return description
@@ -4318,7 +4335,7 @@ def getDescription(conf, m):
 
 def getShortDescription(conf, m):
     try:
-        description = open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"], conf["main"]["tmpPath"])).read().replace("\t", "")
+        description = open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"], conf["main"]["tmpPath"]), encoding='utf-8').read().replace("\t", "")
         # Extract text content from HTML (supposed to be welel formed
         # XML file)
         from xml.sax.handler import ContentHandler
@@ -4340,7 +4357,7 @@ def getShortDescription(conf, m):
         description = tmp.desc[:100]
     except Exception as e:
         print(e, file=sys.stderr)
-        description = open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"], conf["main"]["tmpPath"])).read().replace("\t", "")  # str(e)+" "+m.web.metadata.get("ows_abstract")[:100]
+        description = open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"], conf["main"]["tmpPath"]), encoding='utf-8').read().replace("\t", "")  # str(e)+" "+m.web.metadata.get("ows_abstract")[:100]
     return description
 
 
@@ -4455,13 +4472,20 @@ def savePublishMap(conf, inputs, outputs):
         import time, random
         cid = time.clock() + random.randrange(100000)
         cid = str(cid).replace(".", "_")
-        open(conf["main"]["tmpPath"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html", "w").write(inputs["mmDescription"]["value"].replace("&39;", "&#39;"))
-        setMetadata(m.web, "ows_abstract", conf["main"]["tmpUrl"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html")
+        try:
+            f=open(conf["main"]["tmpPath"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html", "w", encoding='utf-8')
+            f.write(inputs["mmDescription"]["value"].replace("&39;", "&#39;"))
+            setMetadata(m.web, "ows_abstract", conf["main"]["tmpUrl"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html")
+        except Exception as e:
+            print(e,file=sys.stderr)
     if "mmWMTSAttribution" in inputs:
         import time, random
         cid = time.clock() + random.randrange(100000)
         cid = str(cid).split(".")[0]
-        open(conf["main"]["tmpPath"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html", "w").write(inputs["mmWMTSAttribution"]["value"].replace("&39;", "&#39;"))
+        try:
+            open(conf["main"]["tmpPath"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html", "w", encoding='utf-8').write(inputs["mmWMTSAttribution"]["value"].replace("&39;", "&#39;"))
+        except Exception as e:
+            print(e,file=sys.stderr)
         setMetadata(m.web, "mmWMTSAttribution", conf["main"]["tmpUrl"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html")
     bt={"layers":"","url":"","attribution":""};
     if "mmWMTSBLURL" in inputs and "length" in inputs["mmWMTSBLURL"]:
@@ -4471,7 +4495,7 @@ def savePublishMap(conf, inputs, outputs):
             import time,random
             cid=time.clock()+random.randrange(100000)
             cid=str(cid).split(".")[0]
-            open(conf["main"]["tmpPath"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html","w").write(inputs["mmWMTSAttribution"]["value"][ii].replace("&39;","&#39;"))
+            open(conf["main"]["tmpPath"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html","w", encoding='utf-8').write(inputs["mmWMTSAttribution"]["value"][ii].replace("&39;","&#39;"))
             bt["attribution"]+=conf["main"]["tmpUrl"]+"/descriptions/desc_"+conf["senv"]["MMID"]+"_"+cid+".html"+";"
         setMetadata(m.web,"mmWMTSAttribution",bt["attribution"])
         setMetadata(m.web,"mmWMTSBLURL",bt["url"])
@@ -4640,11 +4664,11 @@ def readTemplate(conf, inputs, outputs):
     ext = inputs["ext"]["value"]
     if "click" in inputs and inputs["click"]["value"] == "true":
         try:
-            f = open(conf["main"]["dataPath"] + "/templates/click_" + inputs["layer"]["value"] + "_" + inputs["map"]["value"] + "_" + ext + ".html", "r")
+            f = open(conf["main"]["dataPath"] + "/templates/click_" + inputs["layer"]["value"] + "_" + inputs["map"]["value"] + "_" + ext + ".html", "r", encoding='utf-8')
         except:
-            f = open(conf["main"]["dataPath"] + "/templates/" + inputs["layer"]["value"] + "_" + inputs["map"]["value"] + "_" + ext + ".html", "r")
+            f = open(conf["main"]["dataPath"] + "/templates/" + inputs["layer"]["value"] + "_" + inputs["map"]["value"] + "_" + ext + ".html", "r", encoding='utf-8')
     else:
-        f = open(conf["main"]["dataPath"] + "/templates/" + inputs["layer"]["value"] + "_" + inputs["map"]["value"] + "_" + ext + ".html", "r")
+        f = open(conf["main"]["dataPath"] + "/templates/" + inputs["layer"]["value"] + "_" + inputs["map"]["value"] + "_" + ext + ".html", "r", encoding='utf-8')
     outputs["Result"]["value"] = f.read().replace("<!-- MapServer Template -->\n", "")
     return 3
 
@@ -4655,12 +4679,12 @@ def saveTemplate(conf, inputs, outputs):
     if "name" in inputs:
         ext = inputs["name"]["value"]
     if "click" in inputs and inputs["click"]["value"] == "true":
-        f = open(conf["main"]["dataPath"] + "/templates/click_" + inputs["layer"]["value"] + "_" + inputs["map"]["value"] + "_" + ext + ".html", "w")
+        f = open(conf["main"]["dataPath"] + "/templates/click_" + inputs["layer"]["value"] + "_" + inputs["map"]["value"] + "_" + ext + ".html", "w", encoding='utf-8')
         m = mapscript.mapObj(conf["main"]["dataPath"] + "/maps/project_" + inputs["map"]["value"] + ".map")
         setMetadata(m.getLayerByName(inputs["layer"]["value"]), "mmClick", "true")
         saveProjectMap(m, conf["main"]["dataPath"] + "/maps/project_" + inputs["map"]["value"] + ".map")
     else:
-        f = open(conf["main"]["dataPath"] + "/templates/" + inputs["layer"]["value"] + "_" + inputs["map"]["value"] + "_" + ext + ".html", "w")
+        f = open(conf["main"]["dataPath"] + "/templates/" + inputs["layer"]["value"] + "_" + inputs["map"]["value"] + "_" + ext + ".html", "w", encoding='utf-8')
     f.write("<!-- MapServer Template -->\n" + inputs['content']["value"].replace("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n", ""))
     f.close()
     outputs["Result"]["value"] = zoo._("Template saved")
@@ -4668,7 +4692,7 @@ def saveTemplate(conf, inputs, outputs):
 
 
 def getStyleForLayer(conf, inputs, outputs):
-    f = open(conf["main"]["dataPath"] + '/styles/' + inputs["layer"]["value"].name + '_' + conf["senv"]["last_map"] + "_sld.xml", 'w')
+    f = open(conf["main"]["dataPath"] + '/styles/' + inputs["layer"]["value"].name + '_' + conf["senv"]["last_map"] + "_sld.xml", 'w', encoding='utf-8')
     outputs["Result"]["value"] = f.read()
     return 3
 

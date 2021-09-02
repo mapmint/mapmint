@@ -268,16 +268,16 @@ CREATE TABLE revetements (
 -- Name: savedpath; Type: TABLE; Schema: mm; Owner: postgres; Tablespace: 
 --
 
-CREATE TABLE savedpath (
-    id serial PRIMARY KEY,
-    trace text,
-    name character varying(150),
-    id_user integer REFERENCES mm.users(id),
-    wkb_geometry geometry,
-    CONSTRAINT enforce_dims_wkb_geometry CHECK ((public.st_ndims(wkb_geometry) = 2)),
-    CONSTRAINT enforce_geotype_wkb_geometry CHECK (((public.geometrytype(wkb_geometry) = 'MULTIPOINT'::text) OR (wkb_geometry IS NULL))),
-    CONSTRAINT enforce_srid_wkb_geometry CHECK ((public.st_srid(wkb_geometry) = 4326))
-);
+-- CREATE TABLE savedpath (
+--     id serial PRIMARY KEY,
+--     trace text,
+--     name character varying(150),
+--     id_user integer REFERENCES mm.users(id),
+--     wkb_geometry geometry,
+--     CONSTRAINT enforce_dims_wkb_geometry CHECK ((public.st_ndims(wkb_geometry) = 2)),
+--     CONSTRAINT enforce_geotype_wkb_geometry CHECK (((public.geometrytype(wkb_geometry) = 'MULTIPOINT'::text) OR (wkb_geometry IS NULL))),
+--     CONSTRAINT enforce_srid_wkb_geometry CHECK ((public.st_srid(wkb_geometry) = 4326))
+-- );
 
 
 --

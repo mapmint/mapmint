@@ -798,11 +798,32 @@ int main( int nArgc, char ** papszArgv )
       nFIDToFetch = atoi(tmpMap->value);
     }
 
-    tmpMap=NULL;
-    tmpMap=getMapFromMaps(inputs,"sql","value");
-    if(tmpMap!=NULL && strncasecmp(tmpMap->value,"NULL",4)!=0){
-      pszSQLStatement = zStrdup(tmpMap->value);
-    }
+    /*map* pmTmpSql=getMapFromMaps(inputs,"sql","cache_file");
+    dumpMaps(inputs);
+    if(pmTmpSql!=NULL){
+      FILE* f0 = fopen (pmTmpSql->value, "rb");
+      if(f0!=NULL){
+	long flen;
+	char *fcontent;
+	fseek (f0, 0, SEEK_END);
+	flen = ftell (f0);
+	fseek (f0, 0, SEEK_SET);
+	fcontent = (char *) malloc ((flen + 1) * sizeof (char));
+	fread(fcontent,flen,1,f0);
+	fcontent[flen]=0;
+	fclose(f0);
+	pszSQLStatement=zStrdup(fcontent);
+	fprintf(stderr,"%s %d (%s)\n",__FILE__,__LINE__,fcontent);
+	free(fcontent);
+      }
+    }else{
+      pmTmpSql=getMapFromMaps(inputs,"sql","value");
+      if(pmTmpSql!=NULL && strncasecmp(pmTmpSql->value,"NULL",4)!=0){
+	pszSQLStatement = zStrdup(pmTmpSql->value);
+      }
+      }*/
+    pszSQLStatement = getValueFromMaps(inputs,"sql");
+    fprintf(stderr,"%s %d (%s)\n",__FILE__,__LINE__,pszSQLStatement);
 
     tmpMap=NULL;
     tmpMap=getMapFromMaps(inputs,"nln","value");
@@ -1772,9 +1793,11 @@ int main( int nArgc, char ** papszArgv )
             fprintf( stderr,  "-where clause ignored in combination with -sql.\n" );
         if( CSLCount(papszLayers) > 0 )
             fprintf( stderr,  "layer names ignored in combination with -sql.\n" );
-        
+	fprintf(stderr,"%s %d [%s]\n",__FILE__,__LINE__,pszSQLStatement);
+	fprintf(stderr,"%s %d %s\n",__FILE__,__LINE__,pszDialect);
         poResultSet = poDS->ExecuteSQL( pszSQLStatement, poSpatialFilter, 
                                         pszDialect );
+	fprintf(stderr,"%s %d [%s]\n",__FILE__,__LINE__,pszSQLStatement);
 
         if( poResultSet != NULL )
         {

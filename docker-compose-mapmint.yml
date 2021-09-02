@@ -19,7 +19,9 @@ services:
       - ./docker/.htaccess:/var/www/html/.htaccess
       - ./zoo-project/zoo-services/utils/open-api/templates/index.html:/var/www/index.html
       - ./zoo-project/zoo-services/utils/open-api/static:/var/www/html/static
-      - ./data:/usr/com/zoo-project/ftp/external
+      - ./data/share:/usr/com/zoo-project/ftp/external
+      - ./data/maps:/usr/com/zoo-project/maps
+      - ./data/public_maps:/usr/com/zoo-project/public_maps
       - ./tmp:/tmp
     depends_on:
       - pgbouncer

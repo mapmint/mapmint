@@ -3455,7 +3455,7 @@ define([
 		}	    
 	});
 
-
+	$("input[name='Distiller_form_type']").first().click();
 	console.log("Start Distiller");
 
     };

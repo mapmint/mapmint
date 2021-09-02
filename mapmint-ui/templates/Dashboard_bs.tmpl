@@ -325,23 +325,30 @@ $e
 #set msVers=$mapscript.MS_VERSION
 #except
 #set msVers=$zoo._("Unknown")
-#end try				    
+#end try
 #try
 #set gdalVers=$osgeo.gdal.__version__
 #except
 #set gdalVers=$zoo._("Unknown")
-#end try				    
+#end try
 #try
-#import sqlite3	
+#import osgeo.osr
+#set projVers=str($osgeo.osr.GetPROJVersionMajor())+"."+str($osgeo.osr.GetPROJVersionMinor())+"."+str($osgeo.osr.GetPROJVersionMicro())
+#except
+#set projVers=$zoo._("Unknown")
+#end try
+#try
+#import sqlite3
 #set sqliteVers=sqlite3.version
 #except
 #set sqliteVers=$zoo._("Unknown")
-#end try				    
+#end try
 #import sys
 #set pyvers=sys.version.split(" ")[0]
 #set softs=[
      ["MapServer",$msVers],
      ["GDAL",$gdalVers],
+     ["PROJ",$projVers],
      ["SQLite",$sqliteVers],
      ["Python",$pyvers],
      ["Server IP",$lip],

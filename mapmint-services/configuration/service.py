@@ -37,7 +37,7 @@ def GetConf(conf, inputs, outputs):
         res = conf[inputs["section"]["value"]]
         if inputs["section"]["value"] == "identification":
             try:
-                f = open(res["abstract"].replace(conf["main"]["tmpUrl"], conf["main"]["tmpPath"]), "rb")
+                f = open(res["abstract"].replace(conf["main"]["tmpUrl"], conf["main"]["tmpPath"]), "rb", encoding="utf-8")
                 res["abstract"] = f.read()
             except:
                 pass
@@ -54,7 +54,7 @@ def SaveConf(conf, inputs, outputs):
     i = 0
     envs = ["lenv", "senv", "renv", "cookies", "request"]
     try:
-        f = open(conf["lenv"]["cwd"].replace("\\", "/") + '/main.cfg', 'w')
+        f = open(conf["lenv"]["cwd"].replace("\\", "/") + '/main.cfg', 'w', encoding="utf-8")
         for a in conf:
             if envs.count(a) == 0:
                 if i > 0:
@@ -78,7 +78,7 @@ def SaveConf(conf, inputs, outputs):
                                         f.write(b + "=" + inputs[b]["value"] + "\n")
                                     else:
                                         f0 = open(conf["main"]["tmpPath"] + "/MainDescription" + conf["senv"][
-                                            "MMID"] + ".html", "w")
+                                            "MMID"] + ".html", "w", encoding="utf-8")
                                         f0.write(inputs[b]["value"])
                                         f0.close()
                                         f.write(b + "=" + conf["main"]["tmpUrl"] + "/MainDescription" + conf["senv"][
@@ -90,7 +90,7 @@ def SaveConf(conf, inputs, outputs):
                                             f.write(b + "=" + conf[a][b] + "\n")
                                         else:
                                             f0 = open(conf["main"]["tmpPath"] + "/MainDescription" + conf["senv"][
-                                                "MMID"] + ".html", "w")
+                                                "MMID"] + ".html", "w", encoding="utf-8")
                                             f0.write(conf[a][b])
                                             f0.close()
                                             f.write(
@@ -103,7 +103,7 @@ def SaveConf(conf, inputs, outputs):
                                 f.write(b + "=" + inputs[b]["value"] + "\n")
                             else:
                                 f0 = open(conf["main"]["tmpPath"] + "/MainDescription" + conf["senv"]["MMID"] + ".html",
-                                          "w")
+                                          "w", encoding="utf-8")
                                 f0.write(inputs[b]["value"])
                                 f.write(b + "=" + conf["main"]["tmpUrl"] + "/MainDescription" + conf["senv"][
                                     "MMID"] + ".html" + "\n")
