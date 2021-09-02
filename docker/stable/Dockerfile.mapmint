@@ -335,9 +335,9 @@ RUN set -ex \
     && cp /mapmint/template/data/symbols.sym /usr/com/zoo-project/symbols.sym \
     && mkdir /usr/com/zoo-project/templates \
     && ln -s /mapmint/mapmint-ui /var/www/html/ui \
-    && sed "s#mm/##g" -i /var/www/html/ui/.htaccess \
+    && sed "s:mm/::g" -i /var/www/html/ui/.htaccess \
     && ln -s /mapmint/public_map /var/www/html/pm \
-    && sed "s#mm/##g" -i /var/www/html/pm/assets/.htaccess \
+    && sed "s:mm/::g" -i /var/www/html/pm/assets/.htaccess \
     && cp /usr/bin/mapserv /usr/lib/cgi-bin/mapserv.cgi \
     && curl -o /usr/lib/cgi-bin/mapcache.xml http://geolabs.fr/dl/mapcache.xml \
     && mkdir /tmp/cache /usr/com/zoo-project/dirs /tmp/descriptions /var/www/html/pm/styles \
