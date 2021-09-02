@@ -38,7 +38,7 @@ jobs:
         run: |
           git clone https://github.com/ZOO-Project/ZOO-Project.git
           cd ZOO-Project
-          cp -r $GITHUB_WORKSPACE ./mapmint
+          git clone https://github.com/mapmint/mapmint
           cp mapmint/docker/stable/Dockerfile.mapmint .
           cp mapmint/docker-compose-mapmint.yml .
           docker build . --file Dockerfile --tag geolabs/mapmint:$GITHUB_SHA
