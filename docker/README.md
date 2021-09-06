@@ -59,7 +59,9 @@ In the previous section we described how to produce a working tree from which yo
 ```
 docker-compose up
 ```
-You are ready to access the MapMint instance if you have followed the commands in the right order as described above.
+
+## Welcome the MapMint
+You are ready to access the MapMint instance if you have followed the commands in the right order as described above. Now in your browser, head over to: http://localhost/ui/Dashboard_bs
 
 
 
