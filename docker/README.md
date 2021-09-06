@@ -22,8 +22,10 @@ For being able to use this Docker image, you will need to download the source co
 First clone the ZOO-Project GitHub repository
 ``` 
 git clone https://github.com/ZOO-Project/ZOO-Project.git
+cd ZOO-Project
 ```
-Then, clone the MapMint GitHub repository.
+
+Then, clone the MapMint GitHub repository (inside the ZOO-Project directory).
 ```
 git clone https://github.com/mapmint/mapmint
 ```
