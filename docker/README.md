@@ -63,7 +63,7 @@ docker-compose up
 ## Welcome the MapMint
 You are ready to access the MapMint instance if you have followed the commands in the right order as described above. Now in your browser, head over to: http://localhost/ui/Dashboard_bs
 
-
+![image](https://user-images.githubusercontent.com/59761275/132222079-444633f7-6d74-4343-b1d9-8df8107fb6db.png)
 
 
 
