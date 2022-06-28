@@ -287,6 +287,7 @@ ARG RUN_DEPS=" \
     python3-cssmin \
     python3-jsmin \
     python3-redis \
+    python3-rpy2 \
     gettext \
     locales \
     locales-all \
@@ -326,7 +327,7 @@ RUN set -ex \
     && ln -s /var/www/html/temp /var/www/html/tmp \
     && ln -s /usr/lib/x86_64-linux-gnu/saga/ /usr/lib/saga \
     && rm -rf /var/lib/apt/lists/* \
-    && pip3 install Cheetah3 rpy2 \
+    && pip3 install Cheetah3  \
     && sed "s:AllowOverride None:AllowOverride All:g" -i /etc/apache2/apache2.conf \
     && mkdir -p /tmp/statusInfos \
     && cp /mapmint/mapmint-services/ZOO-api.js /usr/lib/cgi-bin/ \
