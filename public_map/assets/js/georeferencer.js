@@ -414,7 +414,7 @@ define([
 	}).on('changeColor', function(ev) {
 	    console.log(ev.color.toHex());
 	    var reg=new RegExp("\\#","");
-	    $("#blcolpicker,#sbl").attr("src","http://placehold.it/24/"+ev.color.toHex().replace(reg,"")+"/"+ev.color.toHex().replace(reg,"")+"/");
+	    $("#blcolpicker,#sbl").attr("src","https://via.placeholder.com/24/"+ev.color.toHex().replace(reg,"")+"/"+ev.color.toHex().replace(reg,"")+"/");
 
 	    console.log($("#blcolpicker").attr("src"));
 	    zoo.execute({

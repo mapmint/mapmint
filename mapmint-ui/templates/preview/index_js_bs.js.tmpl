@@ -245,7 +245,7 @@ var oLayers={
 #end try
 	},     
 #end if
-	"rQuery": #if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $mms.getMetadata($m.getLayer($l),'mmQuery')=="true"#"$m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#,
+	"rQuery": #if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $mms.getMetadata($m.getLayer($l),'mmQuery')=="true"#"$(m.getLayer($l).data.replace($conf["main"]["dataPath"]+"/",""))"#else#-1#end if#,
 	"rQueryTitle": #if $mms.getMetadata($m.getLayer($l),'mmQueryTitle')#"$mms.getMetadata($m.getLayer($l),'mmQueryTitle')"#else#null#end if#,
 	"rQueryTooltip": #if $mms.getMetadata($m.getLayer($l),'mmQueryTooltip')#"$mms.getMetadata($m.getLayer($l),'mmQueryTooltip')"#else#null#end if#
      }
@@ -265,7 +265,7 @@ var pmapfiles={
 #if $cnt >0
     ,
 #end if
-     "$m.getLayer($l).name":[ "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($mms.getMetadata($m.getLayer($l),'mmFilterField') or $mms.getMetadata($m.getLayer($l),'mmZFilterField')) and 'filter' in $inputs.keys()#_"+System.iniFilterValue+"#end if##end if#.map","$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map","$mms.getMetadata($m.getLayer($l),"mmTitle")",#if $mms.getMetadata($m.getLayer($l),'mmMaxScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMaxScale')#else#100000000000000#end if#,#if $mms.getMetadata($m.getLayer($l),'mmMinScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMinScale')#else#0#end if#,#if $mms.getMetadata($m.getLayer($l),'mmExport')=="true"#true#else#false#end if#,#if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $mms.getMetadata($m.getLayer($l),'mmQuery')=="true"#"$(str(m.getLayer($l).data).replace($conf["main"]["dataPath"]+"/","")"#else#-1#end if#]
+     "$m.getLayer($l).name":[ "$conf["main"]["dataPath"]/public_maps/#if $m.getLayer($l).type==mapscript.MS_LAYER_RASTER and $m.getLayer($l).numclasses>1#color_ramp_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#else#search_$(conf["senv"]["last_map"])_$(m.getLayer($l).name)#if ($mms.getMetadata($m.getLayer($l),'mmFilterField') or $mms.getMetadata($m.getLayer($l),'mmZFilterField')) and 'filter' in $inputs.keys()#_"+System.iniFilterValue+"#end if##end if#.map","$conf["main"]["dataPath"]/public_maps/search_click_$(conf["senv"]["last_map"])_$(m.getLayer($l).name).map","$mms.getMetadata($m.getLayer($l),"mmTitle")",#if $mms.getMetadata($m.getLayer($l),'mmMaxScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMaxScale')#else#100000000000000#end if#,#if $mms.getMetadata($m.getLayer($l),'mmMinScale')!=None#$mms.getMetadata($m.getLayer($l),'mmMinScale')#else#0#end if#,#if $mms.getMetadata($m.getLayer($l),'mmExport')=="true"#true#else#false#end if#,#if $m.getLayer($l).type==$mapscript.MS_LAYER_RASTER  and $mms.getMetadata($m.getLayer($l),'mmQuery')=="true"#"$(str(m.getLayer($l).data).replace($conf["main"]["dataPath"]+"/",""))"#else#-1#end if#]
 #set $cnt+=1
 #end if
 #end for
