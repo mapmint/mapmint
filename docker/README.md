@@ -33,13 +33,13 @@ git clone https://github.com/mapmint/mapmint
 ## Load Docker Images
 Copy the file requied to load docker images
 ```
-cp mapmint/docker-compose.yml
+cp mapmint/docker-compose.yml .
 ```
 
 ## Create directories and a few files
 The following commands help in creating directories and a few files necessarily required during the runtime.
 ```
-mkdir data data/share data/maps data/public_maps tmp \
+mkdir data data/share data/dirs data/maps data/public_maps tmp \
     tmp/descriptions tmp/cache
 touch \
     tmp/MainDescriptionMM5f6ee5fe-0b04-11ec-97ff-0242c0a8e006.html

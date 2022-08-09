@@ -17,6 +17,7 @@ services:
       - ./zoo-project/zoo-services/utils/open-api/templates/index.html:/var/www/index.html
       - ./zoo-project/zoo-services/utils/open-api/static:/var/www/html/static
       - ./data/share:/usr/com/zoo-project/ftp/external
+      - ./data/dirs:/usr/com/zoo-project/ftp/dirs
       - ./data/maps:/usr/com/zoo-project/maps
       - ./data/public_maps:/usr/com/zoo-project/public_maps
       - ./tmp:/tmp
