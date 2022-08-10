@@ -1,0 +1,30 @@
+#
+# Base: Ubuntu 18.04 with updates and external packages
+#
+FROM ubuntu:bionic-20201119 AS libreoffice
+ARG DEBIAN_FRONTEND=noninteractive
+ARG BUILD_DEPS=" \
+    dirmngr \
+    gpg-agent \
+    software-properties-common \
+"
+ARG RUN_DEPS=" \
+    libcurl3-gnutls \
+    curl \
+    python3 \
+    strace \
+    net-tools \
+"
+RUN set -ex \
+    && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
+    \
+    && add-apt-repository ppa:libreoffice/ppa \
+    && apt install -y libreoffice \
+    \
+    && apt-get install -y $RUN_DEPS \
+    \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $BUILD_DEPS \
+    && rm -rf /var/lib/apt/lists/*
+
+CMD $(find /usr/ -name soffice | head -1) --nofirststartwizard --norestore --nocrashreport --headless --accept="socket,host=libreoffice,port=3662;urp" 
+
