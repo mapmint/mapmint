@@ -46,7 +46,7 @@ jobs:
           docker push geolabs/mapmint:$GITHUB_SHA
           docker push geolabs/mapmint
           docker build . --file mapmint/docker/stable/Dockerfile.lo --tag geolabs/libreoffice:$GITHUB_SHA
-          docker tag geolabs/libreoffice:$GITHUB_SHA geolabs/liibreoffice:latest
+          docker tag geolabs/libreoffice:$GITHUB_SHA geolabs/libreoffice:latest
           docker push geolabs/libreoffice:$GITHUB_SHA
           docker push geolabs/libreoffice
           rm -rf mapmint
