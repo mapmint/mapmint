@@ -514,3 +514,19 @@ BEGIN
 	RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE FUNCTION public.is_user(cid integer) RETURNS boolean
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+   res boolean;
+BEGIN
+  IF cid is null THEN
+    return true;
+  END IF;
+  SELECT count(*)>0 from mm.users where id=cid INTO res;
+  return res;
+END;
+$$;
+

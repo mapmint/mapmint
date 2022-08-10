@@ -8,7 +8,7 @@ services:
     volumes:
       - ./mapmint/docker/main.cfg:/usr/lib/cgi-bin/main.cfg
       - ./docker/oas.cfg:/usr/lib/cgi-bin/oas.cfg
-      - ./docker/default.conf:/etc/apache2/sites-available/000-default.conf
+      - ./mapmint/docker/default.conf:/etc/apache2/sites-available/000-default.conf
       - ./zoo-project/zoo-services/echo-py/cgi-env/echo_service.py:/usr/lib/cgi-bin/echo_service.py
       - ./zoo-project/zoo-services/echo-py/cgi-env/echo.zcfg:/usr/lib/cgi-bin/echo.zcfg
       - ./zoo-project/zoo-services/utils/open-api/server/publish.py:/usr/lib/cgi-bin/publish.py
@@ -21,11 +21,21 @@ services:
       - ./data/maps:/usr/com/zoo-project/maps
       - ./data/public_maps:/usr/com/zoo-project/public_maps
       - ./tmp:/tmp
+      - ./tmp:/var/www/html/temp
     depends_on:
       - pgbouncer
       - redis
     environment:
       - ZOO_REDIS_HOST=redis
+  libreoffice:
+    platform: linux/amd64
+    image: geolabs/libreoffice:latest
+    #build:
+    #  context: .
+    #  dockerfile: mapmint/docker/stable/Dockerfile.lo
+    volumes:
+      - ./mapmint/template/data/ftp/templates/:/usr/com/zoo-project/ftp/templates
+      - ./tmp:/var/www/html/temp
   websocketd:
     platform: linux/amd64
     build: ./docker/websocketd
