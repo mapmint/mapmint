@@ -3993,8 +3993,6 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators, rid=None, 
     script = "import sys\nimport shutil\nimport time\n"
     script += "import print.PaperMint as PaperMint\n"
     script += "pm=PaperMint.LOClient()\n"
-    script += "pm.setVar('tmpPath','"+conf["main"]["tmpPath"]+"')\n"
-    script += "pm.setVar('usid','"+conf["lenv"]["usid"]+"')\n"
     script += "pm.loadDoc('" + docPath + "')\n"
     #import json
     #script += "pm.setConf('"+ json.dumps(conf) +"')\n"

@@ -232,6 +232,10 @@ RUN set -ex \
     && make \
     && cp cgi-env/* /usr/lib/cgi-bin/ \
     && cd ../.. \
+    && cd ../zoo-services/ogr/ogr2ogr \
+    && make \
+    && cp cgi-env/* /usr/lib/cgi-bin/ \
+    && cd ../.. \
     \
     && cd ../zoo-services/gdal/ \
     && for i in contour dem grid profile translate warp ; do cd $i ; make && cp cgi-env/* /usr/lib/cgi-bin/ && cp cgi-env/* /zoo-project/mapmint/mapmint-services/raster-tools-src/cgi-env/; cp cgi-env/*zo /usr/lib/cgi-bin/${i}_service.zo ; cd .. ; done \
@@ -308,7 +312,7 @@ ARG RUN_DEPS=" \
 "
 
 # From zoo-kernel
-COPY --from=builder1 /usr/lib/cgi-bin/ /usr/lib/cgi-bin/
+#COPY --from=builder1 /usr/lib/cgi-bin/ /usr/lib/cgi-bin/
 COPY --from=builder1 /usr/local/lib/R/ /usr/local/lib/R/
 COPY --from=builder1 /usr/lib/libzoo_service.so.1.8 /usr/lib/libzoo_service.so.1.8
 COPY --from=builder1 /usr/lib/libzoo_service.so /usr/lib/libzoo_service.so
@@ -331,7 +335,7 @@ RUN set -ex \
     && apt-cache search gdal \
     \
     && curl -o /usr/com/zoo-project/mm.db http://geolabs.fr/dl/mm.db \
-    && sed "s=https://petstore.swagger.io/v2/swagger.json=http://localhost/ogc-api/api=g" -i /var/www/html/swagger-ui/dist/index.html \
+    && sed "s=https://petstore.swagger.io/v2/swagger.json=http://localhost/ogc-api/api=g" -i /var/www/html/swagger-ui/dist/* \
     && mv  /var/www/html/swagger-ui/dist  /var/www/html/swagger-ui/oapip \
     && ln -s /tmp/ /var/www/html/temp \
     && ln -s /var/www/html/temp /var/www/html/tmp \

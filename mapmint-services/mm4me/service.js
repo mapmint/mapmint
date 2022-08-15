@@ -274,7 +274,7 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": inputDSN,"type":"string"},
-	"q": {"value": sqlPartContent,"mimeType":"application/json"},
+	"q": {"value": sqlPartContent,"mimeType":"application/json","type": "complex"},
     }
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
@@ -383,7 +383,7 @@ function replayHistoryForTable(conf,obj,sqlResult,sqlContent,extra){
 	    var myInputs={
 		"dsoName": {"value": "","type":"string"},
 		"dstName": {"value": conf["senv"]["last_file"],"type":"string"},
-		"q": {"value": req,"type":"string"},
+		"q": {"value": req,"mimeType":"application/json","type": "complex"},
 	    }
 	    var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
 	    var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
@@ -901,15 +901,16 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	var myOutputs= {Result: { type: 'RawDataOutput', "mimeType": "application/json" }};
 	var myInputs={
 	    "append": {"value": "true","type":"string"},
-	    "InputDSN": {"value": inputDSN,"type":"string"},
+	    "InputDSN": {"value": inputDSN,"mimeType":"application/json"},
 	    "OutputDSN": {"value": dbFile,"type":"string"},
 	    "F": {"value": "SQLite","type":"string"},
 	    "nln": {"value": i,"type":"string"},
-	    "sql": {"value": "SELECT * FROM "+dbs[i]["table"]+" "+dbs[i]["clause"],"type":"string"},
+	    "sql": {"value": "SELECT * FROM "+dbs[i]["table"]+" "+dbs[i]["clause"],"mimeType":"application/json"},
 	}
 	if(cnt>0)
 	    myInputs["update"]={"value": "true","type":"string"};
 
+	alert(inputDSN);
 	indexesToCreate.push("CREATE INDEX "+i+"_idx ON "+i+" (id) ");
 	var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
 	var myExecuteResult=myProcess.Execute(myInputs,{});
@@ -918,7 +919,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	myInputs["OutputDSN"]={"value": dbFile0,"type":"string"};
 	var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-converter.Ogr2Ogr');
 	var myExecuteResult=myProcess.Execute(myInputs,{});
-	var myExecuteResult0=myExecuteResult;
+	var myExecuteResult1=myExecuteResult;
 	alert(myExecuteResult);
 	cnt+=1;
     }
@@ -931,7 +932,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile0,"type":"string"},
-	"q": {"value": req,"type":"string"},
+	"q": {"value": req,"mimeType":"application/json"},
     }
     var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult2=myProcess2.Execute(myInputs,myOutputs);
@@ -939,7 +940,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile,"type":"string"},
-	"q": {"value": req,"type":"string"},
+	"q": {"value": req,"mimeType":"application/json"},
     }
     var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult2=myProcess2.Execute(myInputs,myOutputs);
@@ -953,7 +954,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile,"type":"string"},
-	"q": {"value": req,"type":"string"},
+	"q": {"value": req,"mimeType":"application/json"},
     }
     var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult2=myProcess2.Execute(myInputs,myOutputs);
@@ -966,7 +967,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": inputDSN,"type":"string"},
-	"q": {"value": "SELECT name, (select clause from mm_tables.p_views where ptid=mm_tables.p_tables.id and id in (select vid from mm_tables.p_view_groups where gid in (select id from mm.groups where name in ('"+groups.join("','")+"'))) ) as restriction FROM "+dbs["mm4me_tables"]["table"]+" "+dbs["mm4me_tables"]["clause"],"type":"string"},
+	"q": {"value": "SELECT name, (select clause from mm_tables.p_views where ptid=mm_tables.p_tables.id and id in (select vid from mm_tables.p_view_groups where gid in (select id from mm.groups where name in ('"+groups.join("','")+"'))) ) as restriction FROM "+dbs["mm4me_tables"]["table"]+" "+dbs["mm4me_tables"]["clause"],"mimeType":"application/json"},
     }
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
@@ -1034,7 +1035,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	var myInputs={
 	    "dsoName": {"value": "","type":"string"},
 	    "dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile0,"type":"string"},
-	    "q": {"value": req,"type":"string"},
+	    "q": {"value": req,"mimeType":"application/json"},
 	};
 	var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
 	var myExecuteResult2=myProcess2.Execute(myInputs,myOutputs1);
@@ -1042,7 +1043,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	var myInputs={
 	    "dsoName": {"value": "","type":"string"},
 	    "dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile,"type":"string"},
-	    "q": {"value": req,"type":"string"},
+	    "q": {"value": req,"mimeType":"application/json"},
 	};
 	var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
 	var myExecuteResult2=myProcess2.Execute(myInputs,myOutputs1);
@@ -1074,7 +1075,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
     var myInputs={
 	"dsoName": {"value": "","type":"string"},
 	"dstName": {"value": inputDSN,"type":"string"},
-	"q": {"value": "SELECT split_part(value,';',3) as a FROM "+dbs["mm4me_edition_fields"]["table"]+" "+dbs["mm4me_edition_fields"]["clause"]+" AND ftype=6","type":"string"},
+	"q": {"value": "SELECT split_part(value,';',3) as a FROM "+dbs["mm4me_edition_fields"]["table"]+" "+dbs["mm4me_edition_fields"]["clause"]+" AND ftype=6","mimeType":"application/json"},
     }
     var myProcess = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
     var myExecuteResult=myProcess.Execute(myInputs,myOutputs);
@@ -1117,7 +1118,7 @@ function createSqliteDB4ME(conf,inputs,outputs){
 	var myInputs={
 	    "dsoName": {"value": "","type":"string"},
 	    "dstName": {"value": conf["main"]["tmpPath"]+"/"+dbFile0,"type":"string"},
-	    "q": {"value": req,"type":"string"},
+	    "q": {"value": req,"mimeType":"application/json"},
 	}
 	var myProcess2 = new ZOO.Process(conf["main"]["serverAddress"],'vector-tools.vectInfo');
 	var myExecuteResult2=myProcess2.Execute(myInputs,myOutputs1);
