@@ -1,7 +1,7 @@
 #
 # Base: Ubuntu 18.04 with updates and external packages
 #
-FROM ubuntu:bionic-20201119 AS libreoffice
+FROM ubuntu:18.04 AS libreoffice
 ARG DEBIAN_FRONTEND=noninteractive
 ARG BUILD_DEPS=" \
     dirmngr \
