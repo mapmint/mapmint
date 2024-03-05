@@ -194,7 +194,7 @@ COPY ./zoo-project/zoo-services ./zoo-project/zoo-services
 
 # From zoo-kernel
 COPY --from=builder1 /usr/lib/cgi-bin/ /usr/lib/cgi-bin/
-COPY --from=builder1 /usr/lib/libzoo_service.so.1.8 /usr/lib/libzoo_service.so.1.8
+COPY --from=builder1 /usr/lib/libzoo_service.so.* /usr/lib/
 COPY --from=builder1 /usr/lib/libzoo_service.so /usr/lib/libzoo_service.so
 COPY --from=builder1 /usr/com/zoo-project/ /usr/com/zoo-project/
 COPY --from=builder1 /usr/include/zoo/ /usr/include/zoo/
@@ -314,7 +314,7 @@ ARG RUN_DEPS=" \
 # From zoo-kernel
 #COPY --from=builder1 /usr/lib/cgi-bin/ /usr/lib/cgi-bin/
 COPY --from=builder1 /usr/local/lib/R/ /usr/local/lib/R/
-COPY --from=builder1 /usr/lib/libzoo_service.so.1.8 /usr/lib/libzoo_service.so.1.8
+COPY --from=builder1 /usr/lib/libzoo_service.so.* /usr/lib/
 COPY --from=builder1 /usr/lib/libzoo_service.so /usr/lib/libzoo_service.so
 COPY --from=builder1 /usr/com/zoo-project/ /usr/com/zoo-project/
 COPY --from=builder1 /usr/include/zoo/ /usr/include/zoo/
@@ -334,7 +334,7 @@ RUN set -ex \
     && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
     && apt-cache search gdal \
     \
-    && curl -o /usr/com/zoo-project/mm.db http://geolabs.fr/dl/mm.db \
+    && curl -o /usr/com/zoo-project/mm.db -L http://geolabs.fr/dl/mm.db \
     && sed "s=https://petstore.swagger.io/v2/swagger.json=http://localhost/ogc-api/api=g" -i /var/www/html/swagger-ui/dist/* \
     && mv  /var/www/html/swagger-ui/dist  /var/www/html/swagger-ui/oapip \
     && ln -s /tmp/ /var/www/html/temp \
@@ -359,21 +359,21 @@ RUN set -ex \
     && cp /usr/bin/mapserv /usr/lib/cgi-bin/mapserv.cgi \
     && cp /usr/lib/cgi-bin/mapcache /usr/lib/cgi-bin/mapcache.fcgi \
     && sed "s:+SymLinksIfOwnerMatch:+FollowSymLinks:g" -i /etc/apache2/conf-available/serve-cgi-bin.conf \
-    #&& curl -o /usr/lib/cgi-bin/mapcache.xml http://geolabs.fr/dl/mapcache.xml \
+    #&& curl -o /usr/lib/cgi-bin/mapcache.xml -L http://geolabs.fr/dl/mapcache.xml \
     && mkdir /tmp/cache /usr/com/zoo-project/dirs /tmp/descriptions /var/www/html/pm/styles \
     && chown www-data:www-data -R /tmp/cache /tmp/descriptions /mapmint/template/data/ /usr/com/zoo-project/ /usr/lib/cgi-bin/ /tmp/descriptions /var/www/html/pm/styles \
     && curl -o /usr/com/zoo-project/PostGIS/mmdb.xml https://raw.githubusercontent.com/mapmint/ansible-roles/gsoc/debian/mapmint/files/mmdb.xml \
     && sed "s:/var/run/postgresql/:pgbouncer:g;s:mmdb:zoo:g;s:postgres:zoo:g;s:nopassword:zoo:g" -i /usr/com/zoo-project/PostGIS/mmdb.xml \
     && sed "s:('encoding', None,:('encoding', 'utf-8',:g" -i /usr/local/lib/python3.6/dist-packages/Cheetah/Compiler.py \
     && cd /var/www/html/pm/  \
-    && curl -o style.zip http://geolabs.fr/dl/style.zip \
-    && curl -o libraries.zip http://geolabs.fr/dl/libraries.zip \
+    && curl -o style.zip -L http://geolabs.fr/dl/style.zip \
+    && curl -o libraries.zip -L http://geolabs.fr/dl/libraries.zip \
     && unzip style.zip \
     && unzip libraries.zip \
     && rm style.zip \
     && rm libraries.zip \
     && mkdir /usr/com/zoo-project/fonts /mapmint/mapmint-ui//img/slideshow/ /usr/com/zoo-project/public_maps/ \
-    && curl -o fonts.tar.bz2 http://geolabs.fr/dl/fonts.tar.bz2 \
+    && curl -o fonts.tar.bz2 -L http://geolabs.fr/dl/fonts.tar.bz2 \
     && tar -C /usr/com/zoo-project/fonts -xvf fonts.tar.bz2 \
     && rm fonts.tar.bz2 \
     && for i in /mapmint/mapmint-services/*; do ln -s $i /usr/lib/cgi-bin/ ; done \
