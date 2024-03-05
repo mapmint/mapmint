@@ -306,7 +306,7 @@ RUN set -ex \
     && apt-get update && apt-get install -y --no-install-recommends $RUN_DEPS \
     && apt-cache search gdal \
     \
-    && curl -o /usr/com/zoo-project/mm.db http://geolabs.fr/dl/mm.db \
+    && curl -o /usr/com/zoo-project/mm.db -L http://geolabs.fr/dl/mm.db \
     && sed "s=https://petstore.swagger.io/v2/swagger.json=http://localhost/ogc-api/api=g" -i /var/www/html/swagger-ui/dist/index.html \
     && mv  /var/www/html/swagger-ui/dist  /var/www/html/swagger-ui/oapip \
     && ln -s /tmp/ /var/www/html/temp \
@@ -325,13 +325,13 @@ RUN set -ex \
     && ln -s /mapmint/mapmint-ui /var/www/html/ui \
     && ln -s /mapmint/public_map /var/www/html/pm \
     && cp /usr/bin/mapserv /usr/lib/cgi-bin/mapserv.cgi \
-    && curl -o /usr/lib/cgi-bin/mapcache.xml http://geolabs.fr/dl/mapcache.xml \
+    && curl -o /usr/lib/cgi-bin/mapcache.xml -L http://geolabs.fr/dl/mapcache.xml \
     && mkdir /tmp/cache /usr/com/zoo-project/dirs /tmp/descriptions /var/www/html/pm/styles \
     && chown www-data:www-data -R /tmp/cache /tmp/descriptions /mapmint/template/data/ /usr/com/zoo-project/ /usr/lib/cgi-bin/ /tmp/descriptions /var/www/html/pm/styles \
     && curl -o /usr/com/zoo-project/PostGIS/mmdb.xml https://raw.githubusercontent.com/mapmint/ansible-roles/gsoc/debian/mapmint/files/mmdb.xml \
     && sed "s:/var/run/postgresql/:pgbouncer:g;s:mmdb:zoo:g;s:postgres:zoo:g;s:nopassword:zoo:g" -i /usr/com/zoo-project/PostGIS/mmdb.xml \
     && sed "s:('encoding', None,:('encoding', 'utf-8',:g" -i /usr/local/lib/python3.6/dist-packages/Cheetah/Compiler.py \
-    && curl -o fonts.tar.bz2 http://geolabs.fr/dl/fonts.tar.bz2 \
+    && curl -o fonts.tar.bz2 -L http://geolabs.fr/dl/fonts.tar.bz2 \
     && mkdir /usr/com/zoo-project/fonts /mapmint/mapmint-ui//img/slideshow/ /usr/com/zoo-project/public_maps/ \
     && tar -C /usr/com/zoo-project/fonts -xvf fonts.tar.bz2 \
     && for i in /mapmint/mapmint-services/*; do ln -s $i /usr/lib/cgi-bin/ ; done \
