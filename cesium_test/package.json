@@ -1,0 +1,43 @@
+{
+  "name": "cesiumjs-webpack-example",
+  "version": "1.0.0",
+  "description": "The minimal recomended setup for an app using Cesium with Webpack.",
+  "homepage": "https://cesium.com/platform/cesiumjs/",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Cesium GS, Inc.",
+    "url": "https://cesium.com"
+  },
+  "keywords": [
+    "cesium",
+    "CesiumJS",
+    "webpack",
+    "example"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CesiumGS/cesium-webpack-example.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "start": "webpack serve --config webpack.config.js --open"
+  },
+  "devDependencies": {
+    "cesium": "^1.84.0",
+    "copy-webpack-plugin": "^9.0.1",
+    "css-loader": "^6.2.0",
+    "csv-parser": "^3.0.0",
+    "html-webpack-plugin": "^5.3.2",
+    "stream-browserify": "^3.0.0",
+    "style-loader": "^3.2.1",
+    "url-loader": "^4.1.1",
+    "webpack": "^5.51.1",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.3.1"
+  },
+  "dependencies": {
+    "jquery": "^3.6.0",
+    "jquery-csv": "^1.0.21"
+  }
+}
