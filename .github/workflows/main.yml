@@ -41,7 +41,7 @@ jobs:
           git clone https://github.com/mapmint/mapmint
           cp mapmint/docker/stable/Dockerfile.mapmint .
           cp mapmint/docker-compose-mapmint.yml .
-          docker build . --file Dockerfile.mapmint --tag geolabs/mapmint:$GITHUB_SHA
+          docker build . --file mapmint/docker/stable/Dockerfile.mapmint --tag geolabs/mapmint:$GITHUB_SHA
           docker tag geolabs/mapmint:$GITHUB_SHA geolabs/mapmint:latest
           docker push geolabs/mapmint:$GITHUB_SHA
           docker push geolabs/mapmint
