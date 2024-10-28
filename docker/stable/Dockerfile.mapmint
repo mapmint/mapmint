@@ -90,7 +90,6 @@ ARG BUILD_DEPS=" \
     python3-dev \
     uuid-dev \
     pkgconf \
-    libdeflate-dev \    
     r-base-dev \
     libudunits2-dev \
 "
