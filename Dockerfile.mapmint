@@ -98,7 +98,8 @@ WORKDIR /zoo-project
 COPY . .
 
 RUN set -ex \
-    && apt-get update && apt-get install -y pkgconf libdeflate-dev && apt-get install -y --no-install-recommends $BUILD_DEPS \
+    && apt-get update && apt-get install -y pkgconf libdeflate-dev \
+    && apt-get install -y --no-install-recommends $BUILD_DEPS \
     \
     && make -C ./thirds/cgic206 libcgic.a \
     \
