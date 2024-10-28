@@ -32,5 +32,9 @@ MapMint is using numerous OSGeo softwares and bring them all together in a compr
 For information on how to setup MapMint, please refer to http://mapmint.github.io/userguide-fr/en/introduction/installmapmint.html.
 
 Workshop material available at: 
+ * https://mapmint.github.io/workshops/MapMint/2022/
  * http://geolabs.fr/dl/ws2019/
  * http://mapmint.github.io/workshops/MapMint/2018/
+
+Documentation available at:
+ * https://mapmint.github.io/userguide-fr/en/
