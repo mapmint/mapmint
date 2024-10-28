@@ -115,6 +115,12 @@ RUN set -ex \
     && locale-gen en_US.UTF-8 \    
     && for i in fr_FR it_IT ja_JP; do msgfmt locale/po/$i.po -o /usr/share/locale/$(echo $i | cut -d'_' -f1)/LC_MESSAGES/zoo-kernel.mo ; done\
     && for i in fi es zh_CN; do msgfmt locale/po/$i.po -o /usr/share/locale/$i/LC_MESSAGES/zoo-kernel.mo ; done \
+    && for i in fr_FR it_IT ja_JP; do \
+        locale-gen $i; \
+        localedef -i $i -c -f UTF-8 -A /usr/share/locale/locale.alias $i.UTF-8 ; \
+        mkdir -p /usr/share/locale/$(echo $i | cut -d'_' -f1)/LC_MESSAGES/;\
+        msgfmt locale/po/$i.po -o /usr/share/locale/$(echo $i | cut -d'_' -f1)/LC_MESSAGES/zoo-kernel.mo ;  \
+    done \
     && find /usr/share/locale -name "*mo" \
     # TODO: why not copied by 'make'?
     && cp zoo_loader.cgi main.cfg /usr/lib/cgi-bin/ \
@@ -272,8 +278,9 @@ WORKDIR /zoo-project
 RUN set -ex \
     && apt-get update && apt-get install -y --no-install-recommends $BUILD_DEPS \
     \
-    && git clone https://github.com/ZOO-Project/examples.git \
-    && git clone https://github.com/swagger-api/swagger-ui.git
+    && git clone --depth=1 https://github.com/fizzed/font-mfizz.git \
+    && git clone --depth=1 https://github.com/ZOO-Project/examples.git \
+    && git clone --depth=1 https://github.com/swagger-api/swagger-ui.git
 
 #
 # Runtime image with apache2.
@@ -328,6 +335,7 @@ COPY --from=builder2 /zoo-project/mapmint/ /mapmint/
 COPY --from=demos /zoo-project/examples/data/ /usr/com/zoo-project/
 COPY --from=demos /zoo-project/examples/ /var/www/html/
 COPY --from=demos /zoo-project/swagger-ui /var/www/html/swagger-ui
+COPY --from=demos /zoo-project/font-mfizz /var/www/html/font-mfizz
 COPY mapmint/docker/mapcache.xml /usr/lib/cgi-bin/mapcache.xml
 
 RUN set -ex \
@@ -337,6 +345,11 @@ RUN set -ex \
     && curl -o /usr/com/zoo-project/mm.db -L http://geolabs.fr/dl/mm.db \
     && sed "s=https://petstore.swagger.io/v2/swagger.json=http://localhost/ogc-api/api=g" -i /var/www/html/swagger-ui/dist/* \
     && mv  /var/www/html/swagger-ui/dist  /var/www/html/swagger-ui/oapip \
+    && locale-gen en_US.UTF-8 \ 
+    && for i in fr_FR it_IT ja_JP; do \
+        locale-gen $i; \
+        localedef -i $i -c -f UTF-8 -A /usr/share/locale/locale.alias $i.UTF-8 ; \
+    done \
     && ln -s /tmp/ /var/www/html/temp \
     && ln -s /var/www/html/temp /var/www/html/tmp \
     && ln -s /usr/lib/x86_64-linux-gnu/saga/ /usr/lib/saga \

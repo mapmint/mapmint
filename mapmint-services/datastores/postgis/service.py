@@ -6,6 +6,20 @@ import shutil
 import osgeo.ogr
 from lxml import etree
 
+def createConString(conf,inputs,outputs):
+    if not(conf["main"]["dbuser"] in conf):
+        return str(None)
+    xcontent = '<connection><dbname>' + conf[conf["main"]["dbuser"]]["dbname"] + '</dbname><user>' + \
+        conf[conf["main"]["dbuser"]]["user"] + '</user><password>' + \
+        conf[conf["main"]["dbuser"]]["password"] + '</password><host>' + \
+        conf[conf["main"]["dbuser"]]["host"] + '</host><port>' + \
+        conf[conf["main"]["dbuser"]]["port"] + '</port></connection>'
+    doc = etree.fromstring(xcontent)
+    styledoc = etree.parse(conf["main"]["dataPath"] + "/" + conf[conf["main"]["dbuser"]]["type" ]+ "/conn.xsl")
+    style = etree.XSLT(styledoc)
+    result = style(doc)
+    return str(result).replace(conf[conf["main"]["dbuser"]]["type"]+":","")
+
 
 def test(conf, inputs, outputs):
     xcontent = '<connection><dbname>' + inputs["dbname"]["value"] + '</dbname><user>' + inputs["user"][

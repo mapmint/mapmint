@@ -34,7 +34,7 @@
       <input name="oname" type="hidden" value="[name]" />
     </td>
     <td>
-      <select class="form-control" name="ftype">
+      <select class="form-control" style="width:98%" name="ftype">
 	#set res=$cur.execute("select id,name from mm_tables.ftypes where ftype='r' order by id")
 	#set res=$cur.fetchall()
 	#for i in range(len(res))
@@ -42,7 +42,7 @@
 	#end for
       </select>
     </td>
-    <td><textarea class="form-control" name="value">[value]</textarea></td>
+    <td><textarea style="width: 98%" class="form-control" name="value">[value]</textarea></td>
   </tr>
  </script>
 

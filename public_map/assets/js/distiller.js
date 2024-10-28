@@ -436,12 +436,24 @@ define([
 
     function displayVector(data,param,dsid,datasource){
 	console.log(data);
-	var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
+	var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_").replace(/ /g,"_");
 	var regs=[
 	    new RegExp("\\[srs\\]","g"),
 	    new RegExp("\\[encoding\\]","g")
 	];
-	$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().html('<div class="col-md-12">'+$("#dataSource_srs_template")[0].innerHTML.replace(regs[0],data.datasource.srs).replace(regs[1],data.datasource.encoding)+'</h4> <table id="DS_table_'+dsid+'_'+ldatasource+'" ></table></div>')
+	var srs=data.datasource.srs+"";
+	    console.log("STS = "+srs);
+	$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().html('<div class="col-md-12">'+$("#dataSource_srs_template")[0].innerHTML.replace(regs[0],srs).replace(regs[1],data.datasource.encoding)+'</h4> <table id="DS_table_'+dsid+'_'+ldatasource+'" ></table></div>');
+	if(srs=="(unknown)"){
+		console.log($(""));
+	    srs=$("#DS_"+dsid+"_"+ldatasource).find(".panel-heading").first().find("input").first().attr("data-srs").replace("+init=","");
+	    $("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().find(".srs_setting").each(function(){
+		    if(srs.toUpperCase()==$(this).attr("data-srs"))
+			    $("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().find("button.dropdown-toggle").first().html($("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().find("button.dropdown-toggle").first().html().replace(/\(unknown\)/g,$(this).text()));
+	    });
+		console.log($("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().find("button.dropdown-toggle").first().text());
+	}
+	$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().find("input").first().val($("#DS_"+dsid+"_"+ldatasource).find(".panel-heading").first().find("input").first().val());
 	if(!data.datasource.fields.field.length)
 	    data.datasource.fields.field=[data.datasource.fields.field];
 	var celem=$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").find("input[name=encoding]").next().children().first();
@@ -451,9 +463,96 @@ define([
 	});
 	var lcolumns=[];
 	for(var i in data.datasource.fields.field){
-	    console.log(data.datasource.fields.field);
+	    //console.log(data.datasource.fields.field);
 	    lcolumns.push({"data":data.datasource.fields.field[i].id,"name":data.datasource.fields.field[i].id,"title":data.datasource.fields.field[i].id});
 	}
+
+	$("#DS_"+dsid+"_"+ldatasource).find("form").find("input").each(function(){
+		if($(this).attr("placeholder")!=module.config().localizationStrings.distiller.data)
+			return;
+		$(this).parent().find("button").first().on("click",function(){
+			//alert("ok set "+$(this).parent().prev().val()+" for "+datasource);
+	var inputs=[
+		{"identifier": "datastore","value": dsid,"dataType": "string"},
+		{"identifier": "datasource","value": datasource,"dataType": "string"},
+		{"identifier": "data","value": $(this).parent().prev().val(),"mimeType": "text/plain"}
+	];
+        zoo.execute({
+            identifier: "mapfile.setData",
+            type: "POST",
+            dataInputs: inputs,
+            dataOutputs: [
+                {"identifier":"Result"},
+            ],
+            success: function(data){
+                console.log("SUCCESS");
+            },
+            error: function(data){
+                $(".notifications").notify({
+                    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+                    type: 'danger',
+                }).show();
+            }
+        });
+
+			return true;
+		});
+	});
+
+
+	$("#DS_"+dsid+"_"+ldatasource).find("a.srs_setting").each(function(){
+		$(this).on("click",function(){
+			//alert("ok set "+$(this).attr('data-srs')+" for "+datasource);
+	var inputs=[
+		{"identifier": "datastore","value": dsid,"dataType": "string"},
+		{"identifier": "datasource","value": datasource,"dataType": "string"},
+		{"identifier": "srs","value": $(this).attr('data-srs'),"dataType": "string"}
+	];
+        zoo.execute({
+            identifier: "mapfile.setSrs",
+            type: "POST",
+            dataInputs: inputs,
+            dataOutputs: [
+                {"identifier":"Result"},
+            ],
+            success: function(data){
+                console.log("SUCCESS");
+            },
+            error: function(data){
+                $(".notifications").notify({
+                    message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+                    type: 'danger',
+                }).show();
+            }
+        });
+
+			return true;
+		});
+	});
+
+	/*var inputs=[
+		{"identifier": "map","value": dsid+"ds_ows.map","dataType": "string"},
+		{"identifier": "layer","value": datasource,"dataType": "string"},
+		{"identifier": "fullPath","value": "true","dataType": "string"},
+	];
+        zoo.execute({
+            identifier: "mapfile.getMapLayersInfos",
+            type: "POST",
+            dataInputs: inputs,
+            dataOutputs: [
+                {"identifier":"Result"},
+            ],
+            success: function(){
+                console.log("SUCCESS");
+		    console.log(arguments);
+            },
+            error: function(){
+                $(".notifications").notify({
+                    message: { text: arguments[0]["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+                    type: 'danger',
+                }).show();
+            }
+        });*/
 
 	var cnt=0;
 	var ldata=data;
@@ -528,9 +627,16 @@ define([
 		    var data=[];
 		    if(!obj.FeatureCollection.featureMember.length)
 			obj.FeatureCollection.featureMember=[obj.FeatureCollection.featureMember];
+			var iCnt=0;
 		    for(var i in obj.FeatureCollection.featureMember){
+			    if(!obj.FeatureCollection.featureMember[i][lcolumns[0].name])
+				    obj.FeatureCollection.featureMember[i][lcolumns[0].name]=data.length+1;
 			data.push(obj.FeatureCollection.featureMember[i]);
+			    try{
 			data[data.length-1]["fid"]=dsid+"_"+datasource+"_"+(obj.FeatureCollection.featureMember[i][lcolumns[0].name].replace(/\./g,"__").replace(/:/g,"__"));
+			    }catch(e){
+				    data[data.length-1]["fid"]=dsid+"_"+datasource+"_"+data.length;
+			    }
 		    }
 
 		    var opts={
@@ -543,7 +649,6 @@ define([
 		    fnCallback(opts);
 
 		    $('#DS_table_'+dsid+'_'+ldatasource).find(".selected").removeClass("selected");
-		    
 		    if(ldata.datasource.featureCount==0){
 			$('#DS_table_'+dsid+'_'+ldatasource).DataTable().clear();
 		    }
@@ -1353,7 +1458,7 @@ define([
 			{"identifier":"Result","type":"raw"},
 		    ],
 		    success: function(data){
-			console.log("SUCCESS");
+			console.log("SUCCESS "+dsid);
 			$("#DS_"+dsid).find(".panel-body").first().prepend(data);
 			$("#DS_"+dsid).find(".panel-body").first().find("#pg_schema").change(function(){
 			    console.log("Schema changed to "+$(this).val());
@@ -1362,7 +1467,7 @@ define([
 			$("#DS_"+dsid).find(".panel-body").first().find("#pg_table").change(function(){
 			    console.log("Table changed to "+$(this).val());
 			    var cval=$(this).val();
-			    var cvalid=$(this).val().replace(/\./g,"_").replace(/:/g,"_");
+			    var cvalid=$(this).val().replace(/\./g,"_").replace(/:/g,"_").replace(/ /g,"_");
 			    zoo.execute({
 				identifier: "datastores.postgis.getTableDescription",
 				type: "POST",
@@ -1524,7 +1629,8 @@ define([
 		    };
 		    var vmappings={
 			"postgis": "PostGIS",
-			"mysql": "MySQL"
+			"mysql": "MySQL",
+			"mssql": "MSSQL"
 		    };
 		    $("nav").find(".mmdatastore").each(function(){
 			if($(this).attr("data-store-name")==dsid){
@@ -2730,7 +2836,7 @@ define([
 	"select": function(data,param,dsid,datasource,geometryType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
-		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
+		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_").replace(/ /g,"_");
 		e.preventDefault();
 		if(!Datastores["DS_"+dsid+"_"+ldatasource])
 		    Datastores["DS_"+dsid+"_"+ldatasource]=(geometryType=="raster"?"raster":"vector");
@@ -2781,13 +2887,13 @@ define([
 	"privileges": function(data,param,dsid,datasource,geometryType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
-		bindPrivileges(dsid+"_"+datasource.replace(/\./g,"_").replace(/:/g,"_"),"datasourcePrivileges",param,geometryType,datasource);
+		bindPrivileges(dsid+"_"+datasource.replace(/\./g,"_").replace(/:/g,"_").replace(/ /g,"_"),"datasourcePrivileges",param,geometryType,datasource);
 	    });
 	},
 	"preview": function(data,param,dsid,datasource,geometryType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
-		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
+		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_").replace(/ /g,"_");
 		if($(obj).is("a")){
 		    e.preventDefault();
 		    e.stopPropagation();
@@ -2855,7 +2961,7 @@ define([
 	"otb": function(data,param,dsid,datasource,geometryType,obj){
 	    $(obj).off("click");
 	    $(obj).click(function(e){
-		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
+		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_").replace(/ /g,"_");
 		e.preventDefault();
 		zoo.getCapabilities({
 		    success: function(data){
@@ -3013,7 +3119,7 @@ define([
 	    $(obj).click(function(e){
 		e.preventDefault();
 		console.log(geometryType);
-		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
+		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_").replace(/ /g,"_");
 
 		var initial=!$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().find('#vectorProcessing').length;
 
@@ -3086,7 +3192,7 @@ define([
 	    $(obj).off("click");
 	    $(obj).click(function(e){
 		e.preventDefault();
-		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
+		var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_").replace(/ /g,"_");
 		var initial=$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().hasClass("in");
 		if( $(obj).children().first().hasClass("fa-toggle-down") && initial){
 		    initial=!initial;
@@ -3229,38 +3335,143 @@ define([
     }
 
     function doOnLoadDataSource(param,dsid,datasource,geometryType,ldata,originType,data){
-        var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
-	$("#DS_"+dsid+"_"+ldatasource).find(".panel").first().removeClass("panel-warning").addClass("panel-default");
-	$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().html("").collapse();
-	$("#DS_"+dsid+"_"+ldatasource).find(".panel-heading").first().find("button,a").each(function(){
-	    if($(this).attr("data-mmaction"))
-		try{
-		    DSSetupCallBacks[$(this).attr("data-mmaction")](data,param,dsid,datasource,geometryType,this,ldata);
-		}catch(e){
-		    console.log("CallBack issue ("+$(this).attr("data-mmaction")+"): "+e);
+        var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_").replace(/ /g,"_");
+		$("#DS_"+dsid+"_"+ldatasource).find(".panel").first().removeClass("panel-warning").addClass("panel-default");
+		$("#DS_"+dsid+"_"+ldatasource).find(".panel-body").first().html("").collapse();
+		$("#DS_"+dsid+"_"+ldatasource).find(".panel-heading").first().find("button,a").each(function(){
+			if($(this).attr("data-mmaction"))
+			try{
+				DSSetupCallBacks[$(this).attr("data-mmaction")](data,param,dsid,datasource,geometryType,this,ldata);
+			}catch(e){
+				console.log("CallBack issue ("+$(this).attr("data-mmaction")+"): "+e);
+			}
+		});
+		window.setTimeout(function(){
+			$("#DS_"+dsid+"_"+ldatasource).find('[data-toggle="tooltip"]').tooltip({container: 'body'});
+
+			$("#DS_"+dsid+"_"+ldatasource).find(".panel-heading").first().find("a.geodatatype").each(function(){
+				console.log($(this));
+				$(this).on("click",function(){
+			var inputs=[
+					{"identifier": "dst","value": dsid,"dataType": "string"},
+					{"identifier": "dso","value": datasource,"dataType": "string"},
+					{"identifier": "geoType","value": $(this).attr('data-geotype'),"dataType": "string"}
+			];
+
+			zoo.execute({
+				identifier: "mapfile.setGeometryType",
+				type: "POST",
+				dataInputs: inputs,
+				dataOutputs: [
+					{"identifier":"Result"},
+				],
+				success: function(data){
+					console.log("SUCCESS");
+				},
+				error: function(data){
+					$(".notifications").notify({
+						message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+						type: 'danger',
+					}).show();
+				}
+			});
+					return true;
+				});
+				console.log($(this));
+			});
+
+		},50);
+		if(data!=null){
+			var font="";
+			if(data.datasource.geometry.indexOf("Polygon")>=0)
+			font="mm mm-polygon";
+			else{
+			if(data.datasource.geometry.indexOf("Line String")>=0)
+				font="mm mm-line";
+			else{
+				font="mm mm-point";
+			}
+			}
+			$("#DS_"+dsid+"_"+ldatasource).find('.fa-question').removeClass("fa fa-question").addClass(font);
+			console.log(data);
 		}
-	});
-	window.setTimeout(function(){
-	    $("#DS_"+dsid+"_"+ldatasource).find('[data-toggle="tooltip"]').tooltip({container: 'body'});
-	},50);
-	if(data!=null){
-	    var font="";
-	    if(data.datasource.geometry.indexOf("Polygon")>=0)
-		font="mm mm-polygon";
-	    else{
-		if(data.datasource.geometry.indexOf("Line String")>=0)
-		    font="mm mm-line";
-		else{
-		    font="mm mm-point";
-		}
-	    }
-	    $("#DS_"+dsid+"_"+ldatasource).find('.fa-question').removeClass("fa fa-question").addClass(font);
-	}
     }
-    
+
+	function fecthLayerInfo(dsId,layer,param,ldatasource,geometryType,ldata,originType){
+		var dsid=dsId;
+		var datasource=layer;
+		window["raster_query_"+layer]=function(){
+			var tmp=zoo.getRequest({
+				identifier: "vector-tools.mmExtractVectorInfo",
+				dataInputs: [
+					{"identifier":"dataSource","value":dsId,"dataType":"string"},
+					{"identifier":"layer","value":layer,"dataType":"string"},
+					{   
+						"identifier":"geometry",
+						"mimeType":"application/json",
+						"value": "sVal1"
+					}
+				],
+				dataOutputs: [
+					{"identifier":"Result","type":"raw"}
+				],
+				type: 'POST',
+				storeExecuteResponse: false
+			});
+			return tmp.data;
+		};
+		zoo.execute({
+				identifier: "mapfile.getMapLayersInfos",
+				dataInputs: [
+					{"identifier":"map","value":dsId+"ds_ows.map","dataType":"string"},
+					{"identifier":"layer","value":layer,"dataType":"string"},
+					{"identifier":"fullPath","value":"true","dataType":"string"},
+					{
+						"identifier":"initialInformations",
+						"mimeType":"application/json",
+						"href": zoo.url,
+						"method": "POST",
+						"headers": [
+							{ key: "Content-Type", value: "text/xml"},
+							{ key: "Cookie", value: "_MMID"}
+						],
+						"complexPayload_callback": "raster_query_"+layer
+					}
+				],
+				dataOutputs: [
+					{"identifier":"Result","mimeType": "text/xml", "type":"raw"}
+				],
+				type: 'POST',
+				storeExecuteResponse: false,
+			success: function(data){
+				if(data.datasource.size && !data.datasource.origin){
+					$("#DS_"+dsid+"_"+ldatasource).find(".panel-heading").first().find("button,a").each(function(){
+						if($(this).attr("data-mmaction")=="georeference"){
+							$(this).removeClass("hide");
+							$("#DS_"+dsid+"_"+ldatasource).find(".panel-heading").first().find("button,a").each(function(){
+								if($(this).attr("data-mmaction")=="open")
+									$(this).addClass("hide");
+							});
+						}
+					});
+				}
+				doOnLoadDataSource(param,dsid,datasource,geometryType,ldata,originType,data);
+			},
+			error: function(data){
+				console.log("ERROR");
+				$(".notifications").notify({
+					message: { text: data["ExceptionReport"]["Exception"]["ExceptionText"].toString() },
+					type: 'danger',
+				}).show();
+			}
+
+		});
+	}
+
     function loadDataSource(param,dsid,datasource,geometryType,ldata,originType){
 	console.log(originType);
-	var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_");
+	var ldatasource=datasource.replace(/\./g,"_").replace(/:/g,"_").replace(/ /g,"_");
+	//    fecthLayerInfo((originType[0]=="W"?originType+":":"")+param,datasource,param,ldatasource,geometryType,ldata,originType);
 	zoo.execute({
 	    identifier: "vector-tools.mmExtractVectorInfo",
 	    type: "POST",
@@ -3329,15 +3540,28 @@ define([
 		    for(i in data.datasource.layer){
 			var reg=new RegExp("\\[datasource\\]","g");
 			var reg1=new RegExp("\\[font\\]","g");
+			var reg2=new RegExp("\\[data\\]","g");
+			var reg3=new RegExp("\\[srs\\]","g");
 			if(data.datasource.layer[i].geometry=="raster"){
 			    font="fa fa-image";
 			}
 			else{
-			    font="fa fa-question";
+			    if(data.datasource.layer[i].geometry=="Polygon"){
+				font="mm mm-polygon";
+			    }
+			    else{
+				    if(data.datasource.layer[i].geometry=="Point"){
+					    font="mm mm-point";
+				    }
+				    else
+					    font="mm mm-line";
+			    }
+			    //font="fa fa-question";
 			}
 			console.log("FONT !! "+font);
 			console.log(data.datasource.layer[i].name.replace(/\./g,"_").replace(/\:/g,"_"));
-			$("#DS_"+localDSId).find(".panel-body").first().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg,(localDataType=="WMS"?data.datasource.layer[i].label:data.datasource.layer[i].name))).attr("id","DS_"+localDSId+"_"+data.datasource.layer[i].name.replace(/\./g,"_").replace(/:/g,"_")));
+			$("#DS_"+localDSId).find(".panel-body").first().append($($("#dataSource_template")[0].innerHTML.replace(reg1,font).replace(reg2,data.datasource.layer[i].data).replace(reg3,data.datasource.layer[i].srs).replace(reg,(localDataType=="WMS"?data.datasource.layer[i].label:data.datasource.layer[i].name))).attr("id","DS_"+localDSId+"_"+data.datasource.layer[i].name.replace(/\./g,"_").replace(/:/g,"_").replace(/ /g,"_")));
+
 			console.log(localDataType);
 			if(localDataType!="WMS")
 			    loadDataSource(param,localDSId,data.datasource.layer[i].name,data.datasource.layer[i].geometry,data,localDataType);

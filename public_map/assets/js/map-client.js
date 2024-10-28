@@ -86,6 +86,7 @@ define([
 	console.log($(window).height()- $('.navbar-header').height() - (2*$('.nav-tabs').height()) - $('#mmcdts').height() - 30);
 	var theight= $(window).height() - ((3*$('.navbar-header').height()) + $('#mmcdts').height() + 35);
 	$('.baselayers,.tree-container,.info-container,.sources-container').height(theight);
+	$(".tree-container").height(theight-100);
     }
 
     function setMapHeight(){
@@ -922,6 +923,7 @@ define([
 
 	var transformer = ol.proj.getTransform('EPSG:4326', 'EPSG:3857');
 	original_extent=ol.extent.applyTransform(original_extent, transformer);
+	original_max_extent=ol.extent.applyTransform(original_max_extent, transformer);
 
 	
 	var controls = [
@@ -944,7 +946,7 @@ define([
 	  new ol.control.FullScreen()
 	  ];*/
 	var optionals={
-	    "zoomtomaxextent": new ol.control.ZoomToExtent({"label":"E","extent":original_extent}),
+	    "zoomtomaxextent": new ol.control.ZoomToExtent({"label":"E","extent":original_max_extent}),
 	    "MousePosition": new ol.control.MousePosition({
 		undefinedHTML: 'outside',
 		projection: 'EPSG:4326',
@@ -992,7 +994,7 @@ define([
 		rotate: true
 	    }).extend([new ol.interaction.DragPan({kinetic: null})]),//ol.interaction.defaults({shiftDragZoom: false}) ,
 	    view: new ol.View({
-		extent: original_extent,
+		extent: original_max_extent,
 		center: [0, 0],
 		zoom: 2
 	    }),
@@ -1651,7 +1653,7 @@ define([
 		}),
 		stroke: new ol.style.Stroke({
 		    color: '#ffcc33',
-		    width: 2
+		    width: 4 
 		}),
 		image: new ol.style.Circle({
 		    radius: 7,

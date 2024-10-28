@@ -206,6 +206,7 @@ requirejs.config({
             translationUrl: "https://cdn.datatables.net/plug-ins/1.10.10/i18n/#if $conf["main"]["language"] in myCorrespondances.keys()#$myCorrespondances[$conf["main"]["language"]]#else#$myCorrespondances["en-US"]#end if#",
 	    localizationStrings:{
 	        tables: {
+			 tuple_loaded: "$zoo._("Tuple loaded")",
 			    none: "$zoo._("None")"
 		},
 		dataTables: {
@@ -216,7 +217,7 @@ requirejs.config({
 		},
 		manager: {
 			 id: "$zoo._("Id")",
-			     legend: "$zoo._("Legend")",
+			 legend: "$zoo._("Legend")",
 			 name: "$zoo._("Name")",
 		}
             },		    

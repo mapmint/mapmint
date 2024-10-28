@@ -278,6 +278,10 @@ def printMap(conf, inputs, outputs):
 
     # Replace the Background Map image in the document template if any
     print("OK", file=sys.stderr)
+    try:
+        bgMap=str(inputs["bgMap"]["value"].decode('utf-8'))
+    except:
+        bgMap=str(inputs["bgMap"]["value"])
     if "bgMap" in inputs:
         print("OK", file=sys.stderr)
         nl = mapscript.layerObj(m)
@@ -287,7 +291,7 @@ def printMap(conf, inputs, outputs):
  TYPE RASTER
  UNITS METERS
  STATUS ON
- DATA "''' + str(inputs["bgMap"]["value"]) + '''"
+ DATA "''' + bgMap + '''"
  PROCESSING "RESAMPLE=AVERAGE"
  PROJECTION 
    "init=epsg:900913"

@@ -13,7 +13,7 @@
     $ftmpl.printLine({"id":"port","name":$zoo._("Port")})
     $ftmpl.printLine({"id":"user","name":$zoo._("Login")})
     $ftmpl.printLine({"id":"password","name":$zoo._("Password"),"type":"password"})
-    $ftmpl.printLine({"id":"type","name":$zoo._("Type"),"type":"select","options":["PostGIS","MySQL"]})
+    $ftmpl.printLine({"id":"type","name":$zoo._("Type"),"type":"select","options":$conf["mm"]["supportedDbs"].split(',')})
     $ftmpl.printLine({"id":"dbname","name":$zoo._("Database")})
     $ftmpl.printButton({"id":"test","name":$zoo._("Test")}) 
     $ftmpl.printButton({"id":"add","name":$zoo._("Add")}) 

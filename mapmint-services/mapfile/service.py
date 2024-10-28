@@ -141,10 +141,26 @@ def searchByName(conf, inputs, outputs):
 
 def setGeometryType(conf, inputs, outputs):
     import mapscript
-    mapfile = mapscript.mapObj(inputs["dst"]["value"] + "/ds_ows.map")
+    mapfile=None
+    mappath=None
+    try:
+        mapfile = mapscript.mapObj(inputs["dst"]["value"] + "/ds_ows.map")
+        mappath = inputs["dst"]["value"] + "/ds_ows.map"
+    except:
+        print(inputs,file=sys.stderr)
+        supportedDbs=conf["mm"]["supportedDbs"].split(",")#+["WMS","WFS","dirs"]
+        for i in range(len(supportedDbs)):
+            try:
+                mapfile = mapscript.mapObj(conf["main"]["dataPath"]+"/"+supportedDbs[i]+"/"+inputs["dst"]["value"] + "ds_ows.map")
+                mappath = conf["main"]["dataPath"]+"/"+supportedDbs[i]+"/"+inputs["dst"]["value"] + "ds_ows.map"
+                break
+            except Exception as e:
+                print(e,file=sys.stderr)
+    if mapfile is None:
+        return zoo.SERVICE_FAILED
     lay = mapfile.getLayerByName(inputs["dso"]["value"])
     lay.type = int(inputs["geoType"]["value"])
-    mapfile.save(inputs["dst"]["value"] + "/ds_ows.map")
+    mapfile.save(mappath)
     outputs["Result"]["value"] = zoo._("Geometry Type Updated")
     return zoo.SERVICE_SUCCEEDED
 
@@ -300,7 +316,7 @@ def openInManager(conf, inputs, outputs):
     try:
         m = mapscript.mapObj(mapfile)
     except:
-        for i in ["PostGIS", "MySQL", "WFS", "WMS"]:
+        for i in conf["mm"]["supportedDbs"].split(',')+["WFS", "WMS"]:
             try:
                 mapfile = conf["main"]["dataPath"] + "/" + i + "/" + inputs["dstn"]["value"].replace("WFS:", "").replace("WMS:", "") + "ds_ows.map"
                 m = mapscript.mapObj(mapfile)
@@ -323,6 +339,7 @@ def openInManager(conf, inputs, outputs):
             setMetadata(l, "ows_srs", "EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
             setMetadata(l, "mm_group", "Group")
             setMetadata(l, "mmDSTN", inputs["dstn"]["value"])
+            setMetadata(l, "mmDSON", l.name)
         i -= 1
 
     setMetadata(m.web, "mm_group_0", "Layers")
@@ -358,7 +375,7 @@ def refreshLayerInfo(conf, inputs, outputs):
     try:
         m = mapscript.mapObj(mapfile)
     except:
-        for i in ["PostGIS", "MySQL", "WFS", "WMS"]:
+        for i in conf["mm"]["supportedDbs"].split(',')+["WFS", "WMS"]:
             try:
                 mapfile = conf["main"]["dataPath"] + "/" + i + "/" + dstn.replace("WFS:", "").replace("WMS:", "") + "ds_ows.map"
                 m = mapscript.mapObj(mapfile)
@@ -397,7 +414,7 @@ def listDataSource(conf, inputs, outputs):
     try:
         m = mapscript.mapObj(mapfile)
     except:
-        for i in ["PostGIS", "MySQL", "WFS", "WMS"]:
+        for i in conf["mm"]["supportedDbs"].split(',')+[ "WFS", "WMS"]:
             try:
                 mapfile = conf["main"]["dataPath"] + "/" + i + "/" + inputs["name"]["value"].replace("WFS:", "").replace("WMS:", "") + "ds_ows.map"
                 m = mapscript.mapObj(mapfile)
@@ -438,7 +455,7 @@ def mmDataStoreHasMap(conf, inputs, outputs):
         m = mapscript.mapObj(mapfile)
     except Exception as e:
         print("mmDataStoreHasMap "+str(e), file=sys.stderr)
-        for i in ["PostGIS", "MySQL", "WFS", "WMS"]:
+        for i in conf["mm"]["supportedDbs"].split(',')+["WFS", "WMS"]:
             try:
                 mapfile = conf["main"]["dataPath"] + "/" + i + "/" + inputs["dataStore"]["value"].replace("WFS:", "").replace("WMS:", "") + "ds_ows.map"
                 m = mapscript.mapObj(mapfile)
@@ -524,7 +541,7 @@ def mmVectorInfo2MapPy(conf, inputs, outputs):
     except Exception as e:
         print(e, file=sys.stderr)
         m00 = None
-        for i in ["PostGIS", "MySQL", "WFS", "WMS"]:
+        for i in conf["mm"]["supportedDbs"].split(',')+[ "WFS", "WMS"]:
             try:
                 wmsGetCapDocument = None
                 layersList = None
@@ -676,6 +693,13 @@ def mmVectorInfo2MapPy(conf, inputs, outputs):
             node1.text=val
             node.append(node1)
 
+            node2 = E.data()
+            node2.text = j.data
+            node3 = E.srs()
+            node3.text = j.getProjection()
+            node.append(node2)
+            node.append(node3)
+
             if j.connectiontype == mapscript.MS_WMS or j.metadata.get("mmWMS") == "true":
                 node1 = E.label()
                 node1.text=j.metadata.get('ows_title')
@@ -751,7 +775,7 @@ def _loadMapForDs(conf, inputs, outputs):
             m2 = mapscript.mapObj(mapfile)
             mc = True
         except:
-            for i in ["PostGIS", "MySQL", "WFS", "WMS"]:
+            for i in conf["mm"]["supportedDbs"].split(',')+[ "WFS", "WMS"]:
                 try:
                     mapfile = conf["main"]["dataPath"] + "/" + i + "/" + inputs["dstName"]["value"].replace("WFS:", "").replace("WMS:", "") + "ds_ows.map"
                     m2 = mapscript.mapObj(mapfile)
@@ -766,6 +790,7 @@ def _loadMapForDs(conf, inputs, outputs):
                 demo = m2.getLayer(i).clone()
                 setMetadata(demo, "mm_group", inputs["dsgName"]["value"])
                 setMetadata(demo, "mmDSTN", inputs["dstName"]["value"])
+                setMetadata(demo, "mmDSON", inputs["dsoName"]["value"])
                 setMetadata(demo, "ows_srs", "EPSG:4326 EPSG:900913 EPSG:3857 EPSG:900914")
                 m1.insertLayer(demo)
     m1.setProjection("EPSG:4326")
@@ -2624,7 +2649,7 @@ def classifyMap0(conf, inputs, outputs):
     import vector_tools.vectSql as vt
     layer = m.getLayerByName(inputs["layer"]["value"])
     if "stepField" in inputs:
-        lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": "SELECT DISTINCT " + inputs["stepField"]["value"] + " as c FROM " + layer.data + " ORDER BY " + inputs["stepField"]["value"] + " ASC"}}
+        lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": "SELECT DISTINCT " + inputs["stepField"]["value"] + " as c FROM " + getMetadata(layer,"mmDSON") + " ORDER BY " + inputs["stepField"]["value"] + " ASC"}}
         vt.vectInfo(conf, lInputs, outputs)
         ll = json.loads(outputs["Result"]["value"])
         linputs = inputs.copy()
@@ -2745,7 +2770,7 @@ def classifyMap0(conf, inputs, outputs):
     if layer.type != mapscript.MS_LAYER_RASTER and "mmMExpr" in inputs and inputs["mmMExpr"]["value"] != "":
         cond = " WHERE " + inputs["mmMExpr"]["value"].replace("\"[", "").replace("]\"", "")
         cond = cond.replace("[", "").replace("]", "")
-    lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": "SELECT " + inputs["field"]["value"] + ', count(*) as title FROM "' + layer.data + '" GROUP BY ' + inputs["field"]["value"] + " ORDER BY " + inputs["field"]["value"] + " ASC"},
+    lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": "SELECT " + inputs["field"]["value"] + ', count(*) as title FROM "' + getMetadata(layer,"mmDSON") + '" GROUP BY ' + inputs["field"]["value"] + " ORDER BY " + inputs["field"]["value"] + " ASC"},
                "dialect": {"value": "sqlite"}}
 
     rClass = False
@@ -3454,7 +3479,7 @@ def saveLabel(conf, inputs, outputs):
         return 3
 
     if "label" in inputs and "value" in inputs["label"] and inputs["label"]["value"] != "GRID" and inputs["label"]["value"] != "":
-        layer.labelitem = inputs["label"]["value"]
+        layer.labelitem = inputs["label"]["value"][0:10]
 
     j = layer.numclasses - 1
     while j >= 0:
@@ -3631,15 +3656,95 @@ def addLabelLayer(conf, inputs, outputs):
     outputs["Result"]["value"] = zoo._("Map saved")
     return zoo.SERVICE_SUCCEEDED
 
-
-def getMapLayersInfo(conf, inputs, outputs):
+def getMapLayersInfos(conf, inputs, outputs):
     import mapscript
+    import json
+    import defusedxml.sax
+    import defusedxml.ElementTree
+    document=None
+    root_element=None
+    if "initialInformations" in inputs:
+        document=defusedxml.ElementTree.parse(inputs["initialInformations"]["cache_file"])
+        root_element = document.getroot()
+    print(inputs, file=sys.stderr)
     if "fullPath" in inputs and inputs["fullPath"]["value"] == "true":
         m = None
         try:
             m = mapscript.mapObj(inputs["map"]["value"])
         except:
-            for i in ["PostGIS", "MySQL", "WFS", "WMS"]:
+            for i in conf["mm"]["supportedDbs"].split(',') + ["WFS", "WMS"]:
+                try:
+                    mapfile = conf["main"]["dataPath"] + "/" + i + "/" + inputs["map"]["value"].replace("WFS:", "").replace("WMS:", "")
+                    m = mapscript.mapObj(mapfile)
+                except:
+                    pass
+        if m is None:
+            conf["lenv"]["message"] = "Unable to load the mapfile."
+            return zoo.SERVICE_FAILED
+    else:
+        m = mapscript.mapObj(conf["main"]["dataPath"] + "/maps/project_" + inputs["map"]["value"] + ".map")
+    if inputs["layer"]["value"] == "-1":
+        l = m.getLayer(0)
+    else:
+        l = m.getLayerByName(inputs["layer"]["value"])
+    if l.type != mapscript.MS_LAYER_RASTER:
+        ltype="POLYGON"
+        if l.type == mapscript.MS_LAYER_POINT:
+            ltype="POINT"
+        else:
+            if l.type == mapscript.MS_LAYER_LINE:
+                ltype="LINE"
+        if not ("fullPath" in inputs):
+            if l.connection is not None and conf["mm"]["supportedDbsAbrev"].split(',').count( l.connection[0:2])==0 :
+                outputs["Result"]["value"] = str([l.getProjection(),ltype, l.data])
+            else:
+                if l.data is not None:
+                    lres = l.data
+                else:
+                    lres = l.tileindex
+                outputs["Result"]["value"] = str([l.getProjection(),ltype,l.metadata.get("mmDSTN"), lres])
+        else:
+            if root_element is not None:
+                new_element = defusedxml.ElementTree.fromstring("<fdata>"+l.data+"</fdata>")
+                root_element.append(new_element)
+                new_element = defusedxml.ElementTree.fromstring("<fsrs>"+ltype+"</fsrs>")
+                root_element.append(new_element)
+                new_element = defusedxml.ElementTree.fromstring("<fgeodatatype>"+ltype+"</fgeodatatype>")
+                root_element.append(new_element)
+                document.write(inputs["initialInformations"]["cache_file"])
+                outputs["Result"]["generated_file"]=inputs["initialInformations"]["cache_file"]
+            else:
+                outputs["Result"]["value"] = str([l.getProjection(),ltype,l.data])
+                outputs["Result"]["mimeType"] = "application/json"
+    else:
+        data = ""
+        tmpA = l.data.split("/")
+        ltype="RASTER"
+        j = 0
+        for i in tmpA:
+            if i != "" and j + 1 != len(tmpA):
+
+                if sys.platform == 'win32':
+                    if data != "":
+                        data += "/"
+                    data += i
+                else:
+                    data += "/" + i
+            j += 1
+        import gdal
+        gf = gdal.Open(l.data)
+        outputs["Result"]["value"] = str([l.getProjection(),ltype, l.data, gf.GetDriver().ShortName])
+    return zoo.SERVICE_SUCCEEDED
+
+def getMapLayersInfo(conf, inputs, outputs):
+    import mapscript
+    print(inputs, file=sys.stderr)
+    if "fullPath" in inputs and inputs["fullPath"]["value"] == "true":
+        m = None
+        try:
+            m = mapscript.mapObj(inputs["map"]["value"])
+        except:
+            for i in conf["mm"]["supportedDbs"].split(',') + ["WFS", "WMS"]:
                 try:
                     mapfile = conf["main"]["dataPath"] + "/" + i + "/" + inputs["map"]["value"].replace("WFS:", "").replace("WMS:", "")
                     m = mapscript.mapObj(mapfile)
@@ -3657,7 +3762,7 @@ def getMapLayersInfo(conf, inputs, outputs):
         l = m.getLayerByName(inputs["layer"]["value"])
     if l.type != mapscript.MS_LAYER_RASTER:
         if not ("fullPath" in inputs):
-            if l.connection is not None and l.connection[0:3] != "PG:" and l.connection[0:3] != "MySQL:":
+            if l.connection is not None and conf["mm"]["supportedDbsAbrev"].split(',').count( l.connection[0:2])==0 :
                 outputs["Result"]["value"] = str([l.connection, l.data])
             else:
                 if l.data is not None:
@@ -3702,6 +3807,8 @@ def setMapLayerProperties(conf, inputs, outputs):
     m = mapscript.mapObj(conf["main"]["dataPath"] + "/maps/project_" + inputs["map"]["value"] + ".map")
     l = m.getLayerByName(inputs["layer"]["value"])
     l.name = inputs["ln"]["value"];
+    if "data" in inputs:
+        l.data=inputs["data"]["value"]
     setMetadata(m.web, "wms_feature_info_mime_type", "text/html")
     setMetadata(l, "ows_name", inputs["ln"]["value"])
     if "3D" in conf["main"] and conf["main"]["3D"] == "true" and inputs["lfly"]["value"] != "":
@@ -3770,9 +3877,9 @@ def setMapLayerProperties(conf, inputs, outputs):
         import vector_tools.vectSql as vt
         layer = m0.getLayer(0)
         if layer.metadata.get('mmFilterField'):
-            sql = "SELECT DISTINCT " + layer.metadata.get('mmFilterField') + " FROM " + layer.data + " ORDER BY " + layer.metadata.get('mmFilterField') + " ASC"
+            sql = "SELECT DISTINCT " + layer.metadata.get('mmFilterField') + " FROM " + getMetadata(layer,"mmDSON") + " ORDER BY " + layer.metadata.get('mmFilterField') + " ASC"
         else:
-            sql = "SELECT DISTINCT " + layer.metadata.get('mmZFilterField') + " FROM " + layer.data + " ORDER BY " + layer.metadata.get('mmZFilterField') + " ASC"
+            sql = "SELECT DISTINCT " + layer.metadata.get('mmZFilterField') + " FROM " + getMetadata(layer,"mmDSON") + " ORDER BY " + layer.metadata.get('mmZFilterField') + " ASC"
 
         lInputs = {"encoding": {"value": layer.encoding}, "dsoName": {"value": layer.name}, "dstName": {"value": layer.connection}, "q": {"value": sql}}
         output1 = {"Result": {"value": ""}}
@@ -3820,6 +3927,8 @@ def setMapLayerProperties(conf, inputs, outputs):
                 geometryName="GEOMETRY"
                 if layer.connection.count("PG:")>0:
                     geometryName="WKB_GEOMETRY"
+                if layer.connection.count("MSSQL:")>0:
+                    geometryName="Shape"
                 inputs1={
                         "dsoName": {"value": layer.data},
                         "dstName": {"value": layer.connection},
@@ -4600,7 +4709,10 @@ def savePublishMap(conf, inputs, outputs):
             setMetadata(m.getLayer(i), "gml_exclude_items", "all")
             setMetadata(m.getLayer(i), "wms_include_items", m.getLayer(i).metadata.get('mmGFIFields'))
             setMetadata(m.getLayer(i), "wms_exclude_items", "all")
-    correctExtent(m)
+    try:
+        correctExtent(m)
+    except:
+        print("extent issue",file=sys.stderr)
     saveProjectMap(m, destMapfile)
 
     import shutil
@@ -4916,6 +5028,55 @@ def getLayers(conf, inputs, outputs):
     outputs["Result"]["value"] = json.dumps(layers)
     return zoo.SERVICE_SUCCEEDED
 
+def setData(conf,inputs,outputs):
+    import mapscript
+    m = None
+    mappath = None
+    try:
+        m = mapscript.mapObj(conf["main"]["dataPath"] + "/dirs/" + inputs["datastore"]["value"] + "/ds_ows.map")
+        mappath = conf["main"]["dataPath"] + "/dirs/" + inputs["datastore"]["value"] + "/ds_ows.map"
+    except Exception as e:
+        supportedDbs=conf["mm"]["supportedDbs"].split(",")+["WMS","WFS","dirs"]
+        for i in range(len(supportedDbs)):
+            try:
+                m = mapscript.mapObj(conf["main"]["dataPath"] + "/" + supportedDbs[i] + "/" + inputs["datastore"]["value"] + "ds_ows.map")
+                mappath = conf["main"]["dataPath"] + "/" + supportedDbs[i] + "/" + inputs["datastore"]["value"] + "ds_ows.map"
+            except Exception as e :
+                print(e,file=sys.stderr)
+
+    if m is None:
+        return zoo.SERVICE_FAILED
+    l=m.getLayerByName(inputs["datasource"]["value"])
+    l.data=inputs["data"]["value"]
+    #l.updateFromString("LAYER PROJECTION \"init="+inputs["srs"]["value"].lower()+"\" END END")
+    m.save(mappath)
+    outputs["Result"]["value"] = zoo._("Map saved")
+    return zoo.SERVICE_SUCCEEDED
+
+def setSrs(conf,inputs,outputs):
+    import mapscript
+    m = None
+    mappath = None
+    try:
+        m = mapscript.mapObj(conf["main"]["dataPath"] + "/dirs/" + inputs["datastore"]["value"] + "/ds_ows.map")
+        mappath = conf["main"]["dataPath"] + "/dirs/" + inputs["datastore"]["value"] + "/ds_ows.map"
+    except Exception as e:
+        supportedDbs=conf["mm"]["supportedDbs"].split(",")+["WMS","WFS","dirs"]
+        for i in range(len(supportedDbs)):
+            try:
+                m = mapscript.mapObj(conf["main"]["dataPath"] + "/" + supportedDbs[i] + "/" + inputs["datastore"]["value"] + "ds_ows.map")
+                mappath = conf["main"]["dataPath"] + "/" + supportedDbs[i] + "/" + inputs["datastore"]["value"] + "ds_ows.map"
+            except Exception as e :
+                print(e,file=sys.stderr)
+
+    if m is None:
+        return zoo.SERVICE_FAILED
+    l=m.getLayerByName(inputs["datasource"]["value"])
+    l.setProjection(inputs["srs"]["value"].lower())
+    #l.updateFromString("LAYER PROJECTION \"init="+inputs["srs"]["value"].lower()+"\" END END")
+    m.save(mappath)
+    outputs["Result"]["value"] = zoo._("Map saved")
+    return zoo.SERVICE_SUCCEEDED
 
 def generatePreview(conf, m):
     import mapscript, urllib.request, urllib.error, urllib.parse

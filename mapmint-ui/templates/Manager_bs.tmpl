@@ -109,11 +109,14 @@ MapMint: $mmodule
 #set res=json.loads($outputs1["Result"]["value"])
 	   <select id="select-datastore" name="selectDatastore" class="select-window form-control" onchange="app.refreshDatasources()">
 	     <option value="-1">$zoo._("Choose a Data Store")</option>
-#for i in ('WMS','WFS','Directories','MySQL','PostGIS')
-#if $res and $i in $res.keys()
-	     <option disabled="true" style="font-weight: bold;color: #111">$zoo._($i)</option>
+#set dbs=['WMS','WFS','Directories']+$conf["mm"]["supportedDbs"].split(',')
+#for i in range(len(dbs))
+#*('WMS','WFS','Directories','MySQL','PostGIS',"MSSQL")
+*#
+#if $res and $dbs[$i] in $res.keys()
+	     <option disabled="true" style="font-weight: bold;color: #111">$zoo._($dbs[$i])</option>
 #set li=0
-#for j in $res[$i]
+#for j in $res[$dbs[$i]]
 	     <option value="#if $i=="WFS"#WFS:#end if##if $i=="WMS"#WMS:#end if#$j["name"]" >$j["name"]</option>
 #set $li+=1
 #end for

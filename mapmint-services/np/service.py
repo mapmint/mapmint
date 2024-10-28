@@ -230,7 +230,11 @@ def isFavoriteMap(conf, inputs, outputs):
     con = auth.getCon(conf)
     cur = con.conn.cursor()
     tprefix = auth.getPrefix(conf)
-    req = "SELECT count(*) from " + tprefix + "favoris WHERE map='" + conf["senv"]["last_map"] + "' and u_id=(SELECT id from " + tprefix + "users WHERE login='" + conf["senv"]["login"] + "')"
+    if con.dbtype=="ODBC":
+        req = "SELECT count(*) from " + tprefix + "favoris WHERE CAST(map as varchar(max))='" + conf["senv"]["last_map"] + "' and u_id=(SELECT id from " + tprefix + "users WHERE login='" + conf["senv"]["login"] + "')"
+    else:
+        req = "SELECT count(*) from " + tprefix + "favoris WHERE map='" + conf["senv"]["last_map"] + "' and u_id=(SELECT id from " + tprefix + "users WHERE login='" + conf["senv"]["login"] + "')"
+    print(req,file=sys.stderr)
     res = cur.execute(req)
     vals = cur.fetchone()
     if vals is not None and vals[0] > 0:
@@ -885,7 +889,10 @@ def saveRepportSettings(conf, inputs, outputs):
 def fetchPrimaryKey(cur, tblName):
     # Extract informations about Primary key or fallback to default "ogc_fid"
     import datastores.postgis.pgConnection as pg
-    cur.execute(pg.getDesc(cur, tblName))
+    try:
+        cur.execute(pg.getDesc(cur, tblName))
+    except:
+        cur.execute(pg.getDescMSSQL(cur, tblName))
     vals = cur.fetchall()
     cfield = None
     for i in range(0, len(vals)):
@@ -1321,7 +1328,12 @@ def listThemes(cur, prefix, group='public', clause=None, clause1=None):
 def listExtent(conf, cur, tbl):
     import datastores.directories.service as ds
     import os
-    req0 = "select id, title as text, replace(replace(replace(ST_Extent(ST_transform(wkb_geometry,3857))::text,' ',','),'BOX(',''),')','') as ext from " + tbl + " group by id order by id desc"
+    if "senv" in conf:
+        print(conf["senv"],file=sys.stderr)
+    if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+        req0 = "select id, title, CONCAT( CAST(geom.STPointN(1).STX as varchar),',',CAST(geom.STPointN(1).STY as varchar),',',CAST(geom.STPointN(3).STX as varchar),',',CAST(geom.STPointN(3).STY as varchar)) as extent from (select *, wkb_geometry.STEnvelope() as geom from " + tbl + ") as foo"
+    else:
+        req0 = "select id, title as text, replace(replace(replace(ST_Extent(ST_transform(wkb_geometry,3857))::text,' ',','),'BOX(',''),')','') as ext from " + tbl + " group by id order by id desc"
     print("\n+++++++REQ0 === " + req0, file=sys.stderr)
     res = cur.execute(req0)
     vals = cur.fetchall()
@@ -1329,9 +1341,28 @@ def listExtent(conf, cur, tbl):
     for i in range(0, len(vals)):
         # elems+=[{"id": vals[i][0],"text":vals[i][1],"ext":vals[i][2],"size":ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+str(vals[i][0])+".db"))}]
         try:
-            elems += [{"id": vals[i][0], "text": vals[i][1], "ext": vals[i][2],
-                       "size": ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"] + "/tiles/mmTiles-g-" + str(vals[i][0]) + ".db"))}]  # elems[len(elems)-1]["size"]=ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+str(vals[i][0])+".db")
+            if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                coords=vals[i][2].split(',')
+                import mapscript
+                myShape1=mapscript.pointObj(float(coords[0]),float(coords[1]))
+                ret=myShape1.project(mapscript.projectionObj("epsg:4326"),mapscript.projectionObj("epsg:3857"))
+                print("RESULT projection: "+str(ret),file=sys.stderr)
+                myShape2=mapscript.pointObj(float(coords[2]),float(coords[3]))
+                ret=myShape2.project(mapscript.projectionObj("epsg:4326"),mapscript.projectionObj("epsg:3857"))
+                print("RESULT projection: "+str(ret),file=sys.stderr)
+                values=str(myShape1.x)+','+str(myShape1.y)+','+str(myShape2.x)+','+str(myShape2.y)
+                try:
+                    elems += [{"id": vals[i][0], "text": vals[i][1], "ext": values,
+                        "size": ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"] + "/tiles/mmTiles-g-" + str(vals[i][0]) + ".db"))}]
+                except:
+                    elems += [{"id": vals[i][0], "text": vals[i][1], "ext": values,
+                        "size": "0Mb"}]
+            else:
+                elems += [{"id": vals[i][0], "text": vals[i][1], "ext": vals[i][2],
+                    "size": ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"] + "/tiles/mmTiles-g-" + str(vals[i][0]) + ".db"))}]
+                # elems[len(elems)-1]["size"]=ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+str(vals[i][0])+".db")
         except Exception as e:
+            print(e,file=sys.stderr)
             elems += [{"id": vals[i][0], "text": vals[i][1], "ext": vals[i][2], "size": "0Mb"}]
         # try:
         #    elems[len(elems)-1]["size"]=ds.getFormatedSize(os.path.getsize(conf["main"]["tmpPath"]+"/tiles/mmTiles-g-"+str(vals[i][0])+".db")
@@ -2130,10 +2161,26 @@ def getTableElements(conf, con, cur, res, att, tbl, col):
     import json
     hasTheme = False
     try:
-        req = "select *,array(select tid from mm_tables.p_" + tbl + "_themes where mm_tables.p_" + tbl + "s.id=mm_tables.p_" + tbl + "_themes." + col + "),array(select gid from mm_tables.p_" + tbl + "_groups where mm_tables.p_" + tbl + "s.id=mm_tables.p_" + tbl + "_groups." + col + ") from mm_tables.p_" + tbl + "s where ptid=" + \
-              res["id"] + ";"
+        if con.dbtype=="ODBC":
+            req = "select *," + \
+                    "displayname1 = " + \
+                    "    CONCAT('[',STUFF((SELECT DISTINCT CONCAT(', ' , tid) " + \
+                    "           FROM mm_tables.p_"+tbl+"_themes  " + \
+                    "           where mm_tables.p_"+tbl+"s.id=mm_tables.p_"+tbl+"_themes."+ col + \
+                    "           FOR XML PATH('')), 1, 2, ''),']'), " + \
+                    "displayname2 = " + \
+                    "   CONCAT('[', STUFF((SELECT DISTINCT CONCAT(', ' , gid) " + \
+                    "           FROM mm_tables.p_"+tbl+"_groups  " + \
+                    "      where mm_tables.p_"+tbl+"s.id=mm_tables.p_"+tbl+"_groups."+ col + \
+                    "          FOR XML PATH('')), 1, 2, ''),']')" + \
+                    "        from mm_tables.p_"+tbl+"s where ptid="+res["id"]+";"
+
+        else:
+            req = "select *,array(select tid from mm_tables.p_" + tbl + "_themes where mm_tables.p_" + tbl + "s.id=mm_tables.p_" + tbl + "_themes." + col + "),array(select gid from mm_tables.p_" + tbl + "_groups where mm_tables.p_" + tbl + "s.id=mm_tables.p_" + tbl + "_groups." + col + ") from mm_tables.p_" + tbl + "s where ptid=" + \
+                res["id"] + ";"
+        print(req,file=sys.stderr)
         cur.execute(req)
-        con.conn.commit()
+        #con.conn.commit()
         hasTheme = True
     except:
         con.conn.commit()
@@ -2142,7 +2189,7 @@ def getTableElements(conf, con, cur, res, att, tbl, col):
         print(str(col), file=sys.stderr)
         req = "select *,array((select gid from mm_tables.p_" + tbl + "_groups where mm_tables.p_" + tbl + "s.id=mm_tables.p_" + tbl + "_groups." + col + ")) from mm_tables.p_" + tbl + "s where ptid=" + res["id"] + ";"
         cur.execute(req)
-        con.conn.commit()
+        #con.conn.commit()
     res1 = cur.fetchall()
     res[att] = []
     for j in range(len(res1)):
@@ -2158,9 +2205,10 @@ def getTableElements(conf, con, cur, res, att, tbl, col):
         vals = cur.fetchall()
         values1 = {}
         print(tres1, file=sys.stderr)
+        print(tres2, file=sys.stderr)
         for k in range(len(tres2)):
             print(tres2[k][2], file=sys.stderr)
-            if tres2[k][2] == "bytea":
+            if tres2[k][2] == "bytea" or tres2[k][2] == "varbinary":
                 try:
                     obj = unpackFile(conf, tmp[k])
                     values1[tres2[k][1]] = obj["name"]
@@ -2168,15 +2216,28 @@ def getTableElements(conf, con, cur, res, att, tbl, col):
                     try:
                         values1[tres2[k][1]] = str(tmp[k].decode('utf-8'))
                     except:
-                        values1[tres2[k][1]] = str(tmp[k])
+                        try:
+                            values1[tres2[k][1]] = str(tmp[k].replace("\\\\","\\"))
+                            print(str(tmp[k].replace("\\\\","\\")),file=sys.stderr)
+                        except Exception as e:
+                            #print(e,file=sys.stderr)
+                            values1[tres2[k][1]] = str(tmp[k])
             else:
                 try:
                     values1[tres2[k][1]] = str(tmp[k].decode('utf-8'))
-                except:
-                    values1[tres2[k][1]] = str(tmp[k])
+                    #print(str(tmp[k].replace("\\\\","\\")),file=sys.stderr) 
+                except Exception as e:
+                    #print(e,file=sys.stderr)
+                    try:
+                        values1[tres2[k][1]] = str(tmp[k].replace("\\\\","\\"))
+                        print(str(tmp[k].replace("\\\\","\\"))+"\n",file=sys.stderr)
+                    except Exception as e:
+                        #print(e,file=sys.stderr)
+                        values1[tres2[k][1]] = str(tmp[k])
         if hasTheme:
             values1["themes"] = str(tmp[len(tres2)])
-            values1["groups"] = str(tmp[len(tres2) + 1])
+            if len(tmp)>len(tres2) + 1:
+                values1["groups"] = str(tmp[len(tres2) + 1])
         else:
             values1["groups"] = str(tmp[len(tres2)])
         for l in range(len(vals)):
@@ -2185,7 +2246,10 @@ def getTableElements(conf, con, cur, res, att, tbl, col):
                 try:
                     lfields[tres1[k][1]] = str(vals[l][k].decode('utf-8')).decode('utf-8')
                 except:
-                    lfields[tres1[k][1]] = str(vals[l][k])
+                    try:
+                        lfields[tres1[k][1]] = str(vals[l][k].replace("\\\\","\\"))
+                    except:
+                        lfields[tres1[k][1]] = str(vals[l][k])
             values += [lfields]
         res[att] += [{"fields": values, "view": values1}]
 
@@ -2253,11 +2317,19 @@ def details(conf, inputs, outputs):
             import datastores.postgis.pgConnection as pg
             outputs0 = [{"Result": {"value": ""}}, {"Result": {"value": ""}}, {"Result": {"value": ""}}, {"Result": {"value": ""}}, {"Result": {"value": ""}}]
             tres = pg.getTableDescription(conf, {"dataStore": {"value": conf["main"]["dbuserName"]}, "table": inputs["table"], "clause": {"value": "id='" + inputs["id"]["value"] + "'"}}, outputs0[0])
+            print("TableDescription",file=sys.stderr) 
+            print(outputs0[0]["Result"]["value"],file=sys.stderr)
+            outputs1 = [{"Result": {"value": ""}}]
             tres = pg.getTableContent(conf, {"dataStore": {"value": conf["main"]["dbuserName"]}, "table": inputs["table"], "clause": {"value": "id='" + inputs["id"]["value"] + "'"}}, outputs0[1])
+            print("TableContent",file=sys.stderr)
+            print(outputs0[1]["Result"]["value"],file=sys.stderr)
             desc = json.loads(outputs0[0]["Result"]["value"])
             content = json.loads(outputs0[1]["Result"]["value"])
             res = {}
+            print(outputs0[1]["Result"]["value"],file=sys.stderr)
             for i in range(0, len(desc)):
+                print(desc[i][1], file=sys.stderr)
+                print(content,file=sys.stderr)
                 res[str(desc[i][1])] = content["rows"][0]["cell"][i]
                 print(desc[i][1], file=sys.stderr)
             if inputs["table"]["value"] == '"mm_tables"."importers"':
@@ -2342,9 +2414,24 @@ def details(conf, inputs, outputs):
             if inputs["table"]["value"] == '"mm_tables"."p_tables"':
                 # print(res['name'], file=sys.stderr)
                 getTableElements(conf, con, cur, res, "mmEdits", "edition", "eid")
+                print("************* REPORTS *****\n",file=sys.stderr)
                 getTableElements(conf, con, cur, res, "mmReports", "report", "rid")
                 tres = pg.getTableDescription(conf, {"dataStore": {"value": conf["main"]["dbuserName"]}, "table": {"value": res["name"]}}, outputs0[2])
-                req = "select *,ARRAY(select tid from mm_tables.p_view_themes where mm_tables.p_views.id=mm_tables.p_view_themes.vid),ARRAY(select gid from mm_tables.p_view_groups where mm_tables.p_views.id=mm_tables.p_view_groups.vid) from mm_tables.p_views where ptid=" + res["id"] + ";"
+                if con.dbtype=="ODBC":
+                    req = "select *," + \
+                            " displayname1 = " + \
+                            " CONCAT('[',STUFF((SELECT DISTINCT CONCAT(', ' , tid)" + \
+                            "        FROM mm_tables.p_view_themes " + \
+                            "      where mm_tables.p_views.id=mm_tables.p_view_themes.vid " + \
+                            "          FOR XML PATH('')), 1, 2, ''),']')," + \
+                            "displayname2 =  " + \
+                            "    CONCAT('[',STUFF((SELECT DISTINCT CONCAT(', ' , gid) " + \
+                            "           FROM mm_tables.p_view_groups  " + \
+                            "      where mm_tables.p_views.id=mm_tables.p_view_groups.vid " + \
+                            "          FOR XML PATH('')), 1, 2, ''),']') " + \
+                            "from mm_tables.p_views where ptid=" + res["id"] + ";"
+                else:
+                    req = "select *,ARRAY(select tid from mm_tables.p_view_themes where mm_tables.p_views.id=mm_tables.p_view_themes.vid),ARRAY(select gid from mm_tables.p_view_groups where mm_tables.p_views.id=mm_tables.p_view_groups.vid) from mm_tables.p_views where ptid=" + res["id"] + ";"
                 cur.execute(req)
                 res1 = cur.fetchall()
                 res["mmViews"] = []
@@ -2458,8 +2545,8 @@ def previewDoc(conf, inputs, outputs):
     vals = cur.fetchall()
     rvals = [[""], [], []]
     for i in range(0, len(vals)):
-        rvals[1] += [vals[i][2]]
-        rvals[2] += [[vals[i][3]]]
+        rvals[1] += [vals[i][2].replace("\\","")]
+        rvals[2] += [[vals[i][3].replace("\\","")]]
     fields = []
     # Load the map
     import mapscript
@@ -2524,7 +2611,7 @@ def previewDoc(conf, inputs, outputs):
         # print("fields: \n"+json.dumps([lfields]+tvals[1]), file=sys.stderr)
         script += "pm.addTable(\"[_table_]\"," + json.dumps([lfields] + tvals[1]) + ")\n"
         script += 'pm.searchAndReplaceImage("[_map_]","' + savedImage + '")\n'
-        script += "pm.statThis(\"[_diag_]\"," + json.dumps(rvals) + ")\n"
+        script += "pm.statThis(\"[_diag_]\"," + json.dumps(rvals).replace("\\","") + ")\n"
 
         reqSuffix = ""
         if "tid" in inputs:
@@ -2831,7 +2918,7 @@ def printOdt(conf, script, process, idx, id, cid, f_out, typ=None, tid=None, ste
                                 cur.execute(req0)
                                 lvals1 = cur.fetchall()
                                 if lvals1 is not None:
-                                    script += "pm.statThis(\"[_" + i + "_]\"," + json.dumps(lvals1).replace("null", zoo._("None")) + ")\n"
+                                    script += "pm.statThis(\"[_" + i + "_]\"," + json.dumps(lvals1).replace("null", zoo._("None")).replace("\\","") + ")\n"
                             if lvals[1] == 5:
                                 req0 = "SELECT description FROM " + tprefix + "indicators WHERE id=" + idx
                                 cur.execute(req0)
@@ -3274,13 +3361,19 @@ def insert(conf, inputs, outputs):
             tbl = vals[0]
             try:
                 #res = cur.execute("ALTER TABLE " + tbl + " ADD COLUMN uid int4 references mm.users(id);")
-                res = cur.execute("ALTER TABLE " + tbl + " ADD COLUMN uid int4 CHECK(is_user(uid));")
+                if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and  conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                    res = cur.execute("ALTER TABLE " + tbl + " ADD uid integer CHECK(dbo.is_user(uid)=1)")
+                else:
+                    res = cur.execute("ALTER TABLE " + tbl + " ADD COLUMN uid int4 CHECK(is_user(uid));")
             except Exception as e:
                 print("Add column failed: " + str(e), file=sys.stderr)
                 pass
             con.conn.commit()
             if tbl.count("mm_ghosts.") == 0:
-                req = "SELECT generate_create_ghost_table_statement('" + vals[0] + "')"
+                if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                    req = "SELECT dbo.generate_create_ghost_table_statement('" + vals[0] + "')"
+                else:
+                    req = "SELECT generate_create_ghost_table_statement('" + vals[0] + "')"
                 res = cur.execute(req)
                 vals = cur.fetchone()
                 try:
@@ -3314,12 +3407,16 @@ def insert(conf, inputs, outputs):
             # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
             if "id" not in inputs:
                 print("OK ", file=sys.stderr)
+                print("OK 1 "+columns[i], file=sys.stderr)
                 col_sufix += columns[i]
                 print("OK ", file=sys.stderr)
                 print(str(inputs[columns[i]]["value"]), file=sys.stderr)
                 if columns[i] == "file":
                     content = packFile(conf, conf["main"]["tmpPath"] + "/data_tmp_1111" + conf["senv"]["MMID"] + "/" + inputs[columns[i]]["value"], columns[i])
-                    val_sufix += "%s"
+                    if con.dbtype=="ODBC":
+                        val_sufix += "?"
+                    else:
+                        val_sufix += "%s"
                 else:
                     value_ext=adapt(inputs[columns[i]]["value"])
                     value_ext.encoding="utf-8"
@@ -3328,7 +3425,10 @@ def insert(conf, inputs, outputs):
                 if columns[i] == "file":
                     content = packFile(conf, conf["main"]["tmpPath"] + "/data_tmp_1111" + conf["senv"]["MMID"] + "/" + inputs[columns[i]]["value"], columns[i])
                     # print(content, file=sys.stderr)
-                    col_sufix += columns[i] + "=%s"
+                    if con.dbtype=="ODBC":
+                        col_sufix += columns[i] + "=?"
+                    else:
+                        col_sufix += columns[i] + "=%s"
                 else:
                     try:
                         if len(inputs[columns[i]]["value"]) == 0 or inputs[columns[i]]["value"] == "NULL":
@@ -3348,10 +3448,17 @@ def insert(conf, inputs, outputs):
         if len(columns) > 0:
             # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
             if "id" not in inputs:
-                req = "INSERT INTO " + inputs["table"]["value"] + " (" + col_sufix + ") VALUES (" + (val_sufix) + ") RETURNING id"
+                if con.dbtype=="ODBC":
+                    req = "INSERT INTO " + inputs["table"]["value"] + " (" + col_sufix + ") OUTPUT Inserted.ID VALUES (" + (val_sufix) + ") "
+                else:
+                    req = "INSERT INTO " + inputs["table"]["value"] + " (" + col_sufix + ") VALUES (" + (val_sufix) + ") RETURNING id"
                 print(req.encode('utf-8'), file=sys.stderr)
                 if content is not None:
-                    cur.execute(req, (psycopg2.Binary(content),))
+                    if con.dbtype=="ODBC":
+                        import pyodbc
+                        cur.execute(req.replace("file","_file"), (pyodbc.Binary(content),))
+                    else:
+                        cur.execute(req, (psycopg2.Binary(content),))
                 else:
                     cur.execute(req)
                 cid = str(cur.fetchone()[0])
@@ -3360,7 +3467,11 @@ def insert(conf, inputs, outputs):
                 req = "UPDATE " + inputs["table"]["value"] + " set " + col_sufix + " WHERE " + val_sufix
                 print(req.encode('utf-8'), file=sys.stderr)
                 if content is not None:
-                    cur.execute(req, (psycopg2.Binary(content),))
+                    if con.dbtype=="ODBC":
+                        import pyodbc
+                        cur.execute(req.replace("file","_file"), (pyodbc.Binary(content),))
+                    else:
+                        cur.execute(req, (psycopg2.Binary(content),))
                 else:
                     cur.execute(req)
                 cid = inputs["id"]["value"]
@@ -3443,7 +3554,10 @@ def clientDelete(conf, inputs, outputs):
         req = "SELECT name FROM mm_tables.p_tables WHERE id=" + inputs["tableId"]["value"]
         cur.execute(req)
         val = cur.fetchone()
-        req = pg.getDesc(cur, val[0])
+        if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            req = pg.getDescMSSQL(cur, val[0])
+        else:
+            req = pg.getDesc(cur, val[0])
         cur.execute(req)
         vals = cur.fetchall()
         cId = None
@@ -3497,7 +3611,21 @@ def recoverFileFromHex(conf, inputs, outputs):
         try:
             # print(bin_string.encode('utf-8'), file=sys.stderr)
             cur = con.conn.cursor()
-            cur.execute("UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=ST_SetSRID(ST_GeometryFromText('" + str(bin_string,"utf-8") + "'),4326) WHERE id=" + inputs["id"]["value"])
+            if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                import mapscript
+                feature = mapscript.shapeObj()
+                feature = feature.fromWKT(str(bin_string,"utf-8").replace(',',' '))
+                feature.project(mapscript.projectionObj("epsg:4326"),mapscript.projectionObj("epsg:32631"))
+                if "pkey" in inputs:
+                    pkey=inputs["pkey"]["value"]
+                else:
+                    pkey=fetchPrimaryKey(cur, inputs["table"]["value"])
+                print(dir(feature),file=sys.stderr)
+                print(" ** PKEY: "+ pkey + " " + inputs["pkey"]["value"],file=sys.stderr)
+                print("UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=geometry::STGeomFromText('" + feature.toWKT() + "',"+(conf["main"]["crs"].replace("epsg:",""))+") WHERE "+pkey+"=" + inputs["id"]["value"],file=sys.stderr)
+                cur.execute("UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=geometry::STGeomFromText('" + feature.toWKT() + "',"+(conf["main"]["crs"].replace("epsg:",""))+") WHERE "+pkey+"=" + inputs["id"]["value"])
+            else:
+                cur.execute("UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=ST_SetSRID(ST_GeometryFromText('" + str(bin_string,"utf-8") + "'),4326) WHERE id=" + inputs["id"]["value"])
             con.conn.commit()
             return zoo.SERVICE_SUCCEEDED
         except Exception as e:
@@ -3513,7 +3641,14 @@ def saveUploadedFile(conf, inputs, outputs):
     con.connect()
     cur = con.conn.cursor()
     content = packFile(conf, inputs["file"]["value"], inputs["field"]["value"])
-    cur.execute("UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=%s WHERE id=" + inputs["id"]["value"], (psycopg2.Binary(content),))
+    print(content,file=sys.stderr)
+    if con.dbtype=="ODBC":
+        import pyodbc
+        print(("UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=? WHERE id=" + inputs["id"]["value"]).replace("file","_file"),file=sys.stderr)
+        req="UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=? WHERE id=" + inputs["id"]["value"]
+        cur.execute(req.replace("file","_file"), (pyodbc.Binary(content),))
+    else:
+        cur.execute("UPDATE " + inputs["table"]["value"] + " set " + inputs["field"]["value"] + "=%s WHERE id=" + inputs["id"]["value"], (psycopg2.Binary(content),))
     con.conn.commit()
     if inputs["file"]["value"].count('mdb'):
         import os, subprocess
@@ -3600,8 +3735,12 @@ def clientInsert(conf, inputs, outputs):
     #    conf["lenv"]["message"] = zoo._("Unable to identify your parameter as a table")
     #    return zoo.SERVICE_FAILED
     try:
-        req = "SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.ftypes,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_edition_fields.ftype=mm_tables.ftypes.id and not(mm_tables.ftypes.basic) and mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=" + \
-              inputs["editId"]["value"] + " and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + inputs["tableId"]["value"] + " and mm.groups.id in (SELECT id from mm.groups where " + splitGroup(conf) + ")) as a ORDER BY a.id"
+        if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            req = "SELECT * FROM (SELECT mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype) as tt,mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.ftypes,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_edition_fields.ftype=mm_tables.ftypes.id and (mm_tables.ftypes.basic=0) and mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=" + \
+                    inputs["editId"]["value"] + " and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + inputs["tableId"]["value"] + " and mm.groups.id in (SELECT id from mm.groups where " + splitGroup(conf) + ")) as a ORDER BY a.id"
+        else:
+            req = "SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.ftypes,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_edition_fields.ftype=mm_tables.ftypes.id and not(mm_tables.ftypes.basic) and mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=" + \
+                    inputs["editId"]["value"] + " and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + inputs["tableId"]["value"] + " and mm.groups.id in (SELECT id from mm.groups where " + splitGroup(conf) + ")) as a ORDER BY a.id"
         print(req, file=sys.stderr)
         res = cur.execute(req)
         originalColumns = cur.fetchall()
@@ -3625,7 +3764,7 @@ def clientInsert(conf, inputs, outputs):
         print(columns, file=sys.stderr)
         cnt = 0
         for i in range(len(columns)):
-            if specialFields.count(columns[i]) == 0:
+            if specialFields.count(columns[i]) == 0 and columns[i].count("untitled")==0 and columns[i].count("unamed")==0 :
                 print(columns[i], file=sys.stderr)
                 if cnt > 0:
                     col_sufix += ","
@@ -3678,7 +3817,7 @@ def clientInsert(conf, inputs, outputs):
                         val_ext.encoding="utf-8"
                         col_sufix += columns[i] + "=" +str(val_ext)
                 cnt += 1
-            else:
+            elif columns[i].count("unamed")==0:
                 hasElement = False
                 if dcols[specialFields.index(columns[i])]["type"] == "tbl_list":
                     if cnt > 0:
@@ -3694,17 +3833,24 @@ def clientInsert(conf, inputs, outputs):
                         col_sufix += columns[i] + "=" + str(val_ext)
                 else:
                     if dcols[specialFields.index(columns[i])]["type"] == "geometry":
-                        tmp = tableName.split(".")
-                        req = "select srid from geometry_columns WHERE f_table_schema='" + tmp[0] + "' AND f_table_name='" + tmp[1] + "'"
-                        res = cur.execute(req)
-                        vals0 = cur.fetchone()
-                        if i > 0:
-                            col_sufix += ","
-                            val_sufix += ","
-                        col_sufix += columns[i]
-                        geo_ext=adapt(tuple[columns[i]])
-                        geo_ext.encoding="utf-8"
-                        val_sufix += "ST_SetSRID(ST_GeometryFromText(" + str(geo_ext) + ")," + str(vals0[0]) + ")"
+                        if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                            print(dcols[specialFields.index(columns[i])],file=sys.stderr)
+                            import mapscript
+                            myShape=mapscript.shapeObj.fromWKT()
+                            myShape.project(mapscript.projectionObj("epsg:4326"),mapscript.projectionObj(lObj[1]))
+                            val_sufix += "STGeomFromText("+ myShape.toWKT() +")"
+                        else:
+                            tmp = tableName.split(".")
+                            req = "select srid from geometry_columns WHERE f_table_schema='" + tmp[0] + "' AND f_table_name='" + tmp[1] + "'"
+                            res = cur.execute(req)
+                            vals0 = cur.fetchone()
+                            if i > 0:
+                                col_sufix += ","
+                                val_sufix += ","
+                            col_sufix += columns[i]
+                            geo_ext=adapt(tuple[columns[i]])
+                            geo_ext.encoding="utf-8"
+                            val_sufix += "ST_SetSRID(ST_GeometryFromText(" + str(geo_ext) + ")," + str(vals0[0]) + ")"
                     else:
                         if dcols[specialFields.index(columns[i])]["type"] == "varchar(32)":
                             import manage_users.manage_users as mu
@@ -3729,7 +3875,10 @@ def clientInsert(conf, inputs, outputs):
             print("VALS", file=sys.stderr)
             val_sufix = val_sufix.replace("'NULL'", "NULL")
             print(val_sufix, file=sys.stderr)
-            req = "INSERT INTO " + tableName + " (" + col_sufix + ") VALUES (" + val_sufix + ") RETURNING " + str(pkey)
+            if con.dbtype=="ODBC":
+                req = "INSERT INTO " + tableName + " (" + col_sufix + ") OUTPUT Inserted."+str(pkey)+" VALUES (" + val_sufix + ") " 
+            else:
+                req = "INSERT INTO " + tableName + " (" + col_sufix + ") VALUES (" + val_sufix + ") RETURNING " + str(pkey)
             print("VALS", file=sys.stderr)
             print(req.encode("utf-8"), file=sys.stderr)
             cur.execute(req)
@@ -3748,7 +3897,7 @@ def clientInsert(conf, inputs, outputs):
             cur.execute(req)
             cid = inputs["id"]["value"]
         for i in range(len(dcols)):
-            print("+++++" + str(dcols[i]), file=sys.stderr)
+            print("+++++ 00 --- " + str(dcols[i]), file=sys.stderr)
             # print("+++++"+str(dvals[i]), file=sys.stderr)
             if dcols[i]["type"] == "geometry_reference":
                 # cur.execute("UPDATE "+tableName+" set "+dcols[i]["name"]+"=%s WHERE "+pkey+"="+cid,(psycopg2.Integer(),))
@@ -3775,7 +3924,10 @@ def clientInsert(conf, inputs, outputs):
                             if "id" not in inputs and feat is not None and cnt>0:
                                 val_sufix = val_sufix.replace("'NULL'", "NULL")
                                 print("INSERT INTO " + tableName + " (" + col_sufix + ") VALUES (" + val_sufix + ") RETURNING " + str(pkey),file=sys.stderr)
-                                req = "INSERT INTO " + tableName + " (" + col_sufix + ") VALUES (" + val_sufix + ") RETURNING " + str(pkey)
+                                if con.dbtype=="ODBC":
+                                    req = "INSERT INTO " + tableName + " (" + col_sufix + ") OUTPUT Inserted."+str(pkey)+" VALUES (" + val_sufix + ") "
+                                else:
+                                    req = "INSERT INTO " + tableName + " (" + col_sufix + ") VALUES (" + val_sufix + ") RETURNING " + str(pkey)
                                 cur.execute(req)
                                 cid = str(cur.fetchone()[0])
                             print("+++++ OM +++++ [" + str(geometry)+"]", file=sys.stderr)
@@ -3818,15 +3970,33 @@ def clientInsert(conf, inputs, outputs):
                     print("+++++ OM +++++" + str(geometry), file=sys.stderr)
                     if str(geometry).count("POINT")>0:
                         if dcols[i]["value"] != "":
-                            cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_Transform(ST_SetSRID((ST_GeometryFromText('" + str(geometry) + "')),4326),"+(dcols[i]["value"].replace("EPSG:",""))+") WHERE " + pkey + "=" + cid, ())
+                            if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                                tmp=dcols[i]["value"].split(";")
+                                import mapscript
+                                myShape=mapscript.shapeObj.fromWKT(geometry)
+                                myShape.project(mapscript.projectionObj("epsg:4326"),mapscript.projectionObj(tmp[1]))
+                                #val_sufix += "STGeomFromText("+ myShape.toWKT() +")"
+                                cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=geometry::STGeomFromText('" + str(myShape.toWKT()) + "',"+(tmp[1].replace("epsg:",""))+") WHERE " + pkey + "=" + cid, ())
+                            else:
+                                cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_Transform(ST_SetSRID((ST_GeometryFromText('" + str(geometry) + "')),4326),"+(dcols[i]["value"].replace("EPSG:",""))+") WHERE " + pkey + "=" + cid, ())
                         else:
                             cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_SetSRID((ST_GeometryFromText('" + str(geometry) + "')),4326) WHERE " + pkey + "=" + cid, ())
                     else:
                         if dcols[i]["value"] != "":
-                            print("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_Transform(ST_SetSRID(ST_Multi(ST_GeometryFromText('" + str(geometry) + "')),4326),"+(dcols[i]["value"].replace("EPSG:",""))+") WHERE " + pkey + "=" + cid,file=sys.stderr)
-                            cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_Transform(ST_SetSRID(ST_Multi(ST_GeometryFromText('" + str(geometry) + "')),4326),"+(dcols[i]["value"].replace("EPSG:",""))+") WHERE " + pkey + "=" + cid, ())
+                            if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                                tmp=dcols[i]["value"].split(";")
+                                import mapscript
+                                myShape=mapscript.shapeObj.fromWKT(geometry)
+                                myShape.project(mapscript.projectionObj("epsg:4326"),mapscript.projectionObj(tmp[1]))
+                                #val_sufix += "STGeomFromText("+ myShape.toWKT() +")"
+                                cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=geometry::STGeomFromText('" + str(myShape.toWKT()) + "',"+(tmp[1].replace("epsg:",""))+") WHERE " + pkey + "=" + cid, ())
+                            else:
+                                print("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_Transform(ST_SetSRID(ST_Multi(ST_GeometryFromText('" + str(geometry) + "')),4326),"+(dcols[i]["value"].replace("EPSG:",""))+") WHERE " + pkey + "=" + cid,file=sys.stderr)
+                                #cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_Transform(ST_SetSRID(ST_Multi(ST_GeometryFromText('" + str(geometry) + "')),4326),"+(dcols[i]["value"].replace("EPSG:",""))+") WHERE " + pkey + "=" + cid, ())
+                                cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_Transform(ST_SetSRID((ST_GeometryFromText('" + str(geometry) + "')),4326),"+(dcols[i]["value"].replace("EPSG:",""))+") WHERE " + pkey + "=" + cid, ())
                         else:
-                            cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_SetSRID(ST_Multi(ST_GeometryFromText('" + str(geometry) + "')),4326) WHERE " + pkey + "=" + cid, ())
+                            #cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_SetSRID(ST_Multi(ST_GeometryFromText('" + str(geometry) + "')),4326) WHERE " + pkey + "=" + cid, ())
+                            cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=ST_SetSRID((ST_GeometryFromText('" + str(geometry) + "')),4326) WHERE " + pkey + "=" + cid, ())
 
             if dcols[i]["type"] == "varchar(32)":
                 print(dcols[i], file=sys.stderr)
@@ -3841,7 +4011,11 @@ def clientInsert(conf, inputs, outputs):
                 try:
                     content = packFile(conf, tuple[dcols[i]["name"]], dcols[i]["name"])
                     print(content, file=sys.stderr)
-                    cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=%s WHERE " + pkey + "=" + cid, (psycopg2.Binary(content),))
+                    if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                        import pyodbc
+                        cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=? WHERE " + pkey + "=" + cid, (pyodbc.Binary(content),))
+                    else:
+                        cur.execute("UPDATE " + tableName + " set " + dcols[i]["name"] + "=%s WHERE " + pkey + "=" + cid, (psycopg2.Binary(content),))
                 except Exception as e:
                     print(e, file=sys.stderr)
 
@@ -3883,7 +4057,7 @@ def replaceFilter(conf,value):
         result=result.replace("[_senv_"+a+"_]",conf["senv"][a])
     return result
 
-def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators, rid=None, rName=None):
+def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators=None, rid=None, rName=None):
     import json
     try:
         req = "SELECT name from mm_tables.p_tables where id=" + tableId
@@ -3898,13 +4072,21 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators, rid=None, 
             clause = " AND mm_tables.p_reports.id = " + rid
         else:
             clause = ""
-        req = "SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + clause + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
-              conf["senv"]["id"] + "') order by mm_tables.p_reports.id asc"
+        if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            req = "SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports._file,mm_tables.p_reports.clause,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + clause + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
+                    conf["senv"]["id"] + "') order by mm_tables.p_reports.id asc"
+        else:
+            req = "SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + clause + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
+                    conf["senv"]["id"] + "') order by mm_tables.p_reports.id asc"
     else:
         rName_ext=adapt(rName)
         rName_ext.encoding="utf-8"
-        req = "SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
-              conf["senv"]["id"] + "') and mm_tables.p_reports.name=" + str(rName_ext) + " order by mm_tables.p_reports.id asc"
+        if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            req = "SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports._file,mm_tables.p_reports.clause,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
+                    conf["senv"]["id"] + "') and mm_tables.p_reports.name=" + str(rName_ext) + " order by mm_tables.p_reports.id asc"
+        else:
+            req = "SELECT mm_tables.p_reports.id,mm_tables.p_reports.name,mm_tables.p_reports.file,mm_tables.p_reports.clause,mm_tables.p_reports.element FROM mm_tables.p_reports,mm.groups,mm_tables.p_report_groups where mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
+                    conf["senv"]["id"] + "') and mm_tables.p_reports.name=" + str(rName_ext) + " order by mm_tables.p_reports.id asc"
     print(req, file=sys.stderr)
     res = cur.execute(req)
     ovals0 = cur.fetchall()
@@ -3912,9 +4094,14 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators, rid=None, 
     if len(ovals0) == 0:
         conf["lenv"]["message"] = zoo._("Unable to find any report for the current element")
         return None
-    req = "SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_report_fields.name) mm_tables.p_report_fields.rid as rid,mm_tables.p_report_fields.id,mm_tables.p_report_fields.name,(select code from mm_tables.ftypes where mm_tables.ftypes.id=mm_tables.p_report_fields.ftype),mm_tables.p_report_fields.value FROM mm_tables.p_reports,mm_tables.p_report_fields,mm.groups,mm_tables.p_report_groups where mm_tables.p_reports.id=mm_tables.p_report_fields.rid and mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
-          conf["senv"]["id"] + "') and mm_tables.p_reports.id=" + str(ovals0[0][0]) + ") as a ORDER BY a.id"
+    if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+        req = "SELECT * FROM (SELECT mm_tables.p_report_fields.rid as rid,mm_tables.p_report_fields.id,mm_tables.p_report_fields.name,(select code from mm_tables.ftypes where mm_tables.ftypes.id=mm_tables.p_report_fields.ftype) as code,mm_tables.p_report_fields.value FROM mm_tables.p_reports,mm_tables.p_report_fields,mm.groups,mm_tables.p_report_groups where mm_tables.p_reports.id=mm_tables.p_report_fields.rid and mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
+                conf["senv"]["id"] + "') and mm_tables.p_reports.id=" + str(ovals0[0][0]) + ") as a ORDER BY a.id"
+    else:
+        req = "SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_report_fields.name) mm_tables.p_report_fields.rid as rid,mm_tables.p_report_fields.id,mm_tables.p_report_fields.name,(select code from mm_tables.ftypes where mm_tables.ftypes.id=mm_tables.p_report_fields.ftype),mm_tables.p_report_fields.value FROM mm_tables.p_reports,mm_tables.p_report_fields,mm.groups,mm_tables.p_report_groups where mm_tables.p_reports.id=mm_tables.p_report_fields.rid and mm.groups.id=mm_tables.p_report_groups.gid and mm_tables.p_reports.id=mm_tables.p_report_groups.rid and ptid=" + tableId + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + \
+                conf["senv"]["id"] + "') and mm_tables.p_reports.id=" + str(ovals0[0][0]) + ") as a ORDER BY a.id"
     print(req, file=sys.stderr)
+    print("SQL",file=sys.stderr)
     res = cur.execute(req)
     vals0 = cur.fetchall()
     rcolumns = []
@@ -3943,7 +4130,10 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators, rid=None, 
                 clause += " AND " + buildClause(filters,operators)
             else:
                 clause = buildClause(filters,operators)
-        rfields = rfields.replace("[_CLAUSE_]", clause)
+        if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            rfields = rfields.replace("[_CLAUSE_]", clause.replace("true","1=1"))
+        else:
+            rfields = rfields.replace("[_CLAUSE_]", clause)
         # rreq="SELECT DISTINCT "+rfields+" from "+tableName+" where "+clause
         rreq = "SELECT " + rfields
     else:
@@ -3951,12 +4141,22 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators, rid=None, 
             clause = buildClause(filters,operators)
         else:
             clause=""
-        rfields = rfields.replace("[_CLAUSE_]", clause)
-        print("*********** [" + str(clause) + "] ***********", file=sys.stderr)
-        if clause!="":
-            rreq = "SELECT " + rfields + " from " + tableName + " where id=" + cid + " AND " + ovals0[0][3] + " AND " + clause
+        if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            rfields = rfields.replace("[_CLAUSE_]", clause.replace("true","1=1"))
         else:
-            rreq = "SELECT " + rfields + " from " + tableName + " where id=" + cid + " AND " + ovals0[0][3]
+            rfields = rfields.replace("[_CLAUSE_]", clause)
+        print("*********** [" + str(clause) + "] ***********", file=sys.stderr)
+        pKey=fetchPrimaryKey(cur,tableName)
+        if clause!="":
+            if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                rreq = "SELECT " + rfields + " from " + tableName + " where " + pKey + "=" + cid + " AND " + ovals0[0][3] + " AND " + clause.replace("true","1=1")
+            else:
+                rreq = "SELECT " + rfields + " from " + tableName + " where "+ pKey +"=" + cid + " AND " + ovals0[0][3] + " AND " + clause
+        else:
+            if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                rreq = "SELECT " + rfields + " from " + tableName + " where "+ pKey +"=" + cid + " AND " + ovals0[0][3].replace("true","1=1")
+            else:
+                rreq = "SELECT " + rfields + " from " + tableName + " where "+ pKey +"=" + cid + " AND " + ovals0[0][3]
     print(" *$*$*$ RREQ "+rreq, file=sys.stderr)
     print(vals0, file=sys.stderr)
     res = cur.execute(rreq)
@@ -3993,6 +4193,8 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators, rid=None, 
     script = "import sys\nimport shutil\nimport time\n"
     script += "import print.PaperMint as PaperMint\n"
     script += "pm=PaperMint.LOClient()\n"
+    #script += "pm.setVar('tmpPath','"+conf["main"]["tmpPath"]+"')\n"
+    #script += "pm.setVar('usid','"+conf["lenv"]["usid"]+"')\n"
     script += "pm.loadDoc('" + docPath + "')\n"
     #import json
     #script += "pm.setConf('"+ json.dumps(conf) +"')\n"
@@ -4028,14 +4230,19 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators, rid=None, 
                 else:
                     if vals0[i][3] == "sql_array":
                         print("*** 0 ***" + str(rvals[rcnt]), file=sys.stderr)
-                        print("*** 1 ***" + str(rvals[rcnt]).replace("'{", "[").replace("}'", "]"), file=sys.stderr)
-                        script += "pm.addTable('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(rvals[rcnt]).replace("'{", "[").replace("}'", "]"))).replace(", null", "") + ")\n"
+                        print("*** 1 ***" + str(rvals[rcnt]).replace("'{", "[").replace("}'", "]").replace("{", "[").replace("}", "]").replace('\\\\',''), file=sys.stderr)
+                        cval1=str(rvals[rcnt]).replace("'{", "[").replace("}'", "]").replace("{", "[").replace("}", "]").replace('\\\\','')
+                        print("*** 2 ***" + str(cval1),file=sys.stderr)
+                        try:
+                            script += "pm.addTable('[_" + vals0[i][2] + "_]'," + json.dumps(eval(cval1)).replace(", null", "") + ")\n"
+                        except:
+                            script += "pm.addTable('[_" + vals0[i][2] + "_]'," + json.dumps(cval1).replace(", null", "") + ")\n"
                         rcnt += 1
                     else:
                         if vals0[i][3] == "diagram":
                             try:
                                 # script+="pm.statThis('[_"+vals0[i][2]+"_]',"+json.dumps(eval(unicode(str(rvals[rcnt]),"utf-8").replace("'{","[").replace("}'","]")),ensure_ascii=False)+")\ntime.sleep(0.01)\n"
-                                script += "pm.statThis('[_" + vals0[i][2] + "_]'," + str(rvals[rcnt]).replace("'{", "[").replace("}'", "]") + ")\ntime.sleep(1)\n"
+                                script += "pm.statThis('[_" + vals0[i][2] + "_]'," + str(rvals[rcnt]).replace("'{", "[").replace("}'", "]").replace("\\","").replace("\n","") + ")\ntime.sleep(1)\n"
                                 script += "print('" + vals0[i][2] + "',file=sys.stderr)\nsys.stderr.flush()\ntime.sleep(1)\n"
                             except Exception as e:
                                 print("ERROR 0 !", file=sys.stderr)
@@ -4043,7 +4250,7 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators, rid=None, 
                                 # sys.setdefaultencoding('utf8')
                                 # print(rvals[rcnt].encode('utf-8'), file=sys.stderr)
                                 try:
-                                    script += "pm.statThis('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(rvals[rcnt]).replace("'{", "[").replace("}'", "]"))) + ")\ntime.sleep(0.01)\n"
+                                    script += "pm.statThis('[_" + vals0[i][2] + "_]'," + json.dumps(eval(str(rvals[rcnt]).replace("'{", "[").replace("}'", "]").replace("\\","").replace("\n",""))) + ")\ntime.sleep(0.01)\n"
                                     script += "print('" + vals0[i][2] + "',file=sys.stderr)\nsys.stderr.flush()\n"
                                 except Exception as e:
                                     print("ERROR 1 !", file=sys.stderr)
@@ -4053,31 +4260,41 @@ def _clientPrint(conf, inputs, cur, tableId, cid, filters, operators, rid=None, 
                         else:
                             if vals0[i][3] == "multiple_doc":
                                 tmp = postDocuments[pcnt].split(';')
-                                print(tmp, file=sys.stderr)
-                                f = fetchPrimaryKey(cur, tableName)
-                                f1 = fetchPrimaryKey(cur, tmp[1])
-                                tmp_ext=adapt(tmp[1])
-                                tmp_ext.encoding="utf-8"
-                                req1 = "(SELECT id from mm_tables.p_tables where name=" + str(tmp_ext) + ")"
-                                req = "SELECT " + f1 + "::text from " + tmp[1] + " WHERE " + tmp[0] + "=(select " + f + " from " + tableName + " where " + f + "=" + cid + " AND " + ovals0[0][3] + ")"
-                                if len(tmp) == 4:
-                                    req += " ORDER BY " + tmp[3]
-                                cur.execute(req)
-                                lvals = cur.fetchall()
-                                for j in range(len(lvals)):
-                                    ldocs = _clientPrint(conf, inputs, cur, req1, lvals[j][0], filters, operators, rid, tmp[2])
-                                    print(ldocs, file=sys.stderr)
-                                    print(conf["lenv"]["message"], file=sys.stderr)
-                                    # if j==0:
-                                    script += "pm.goToWord('[_" + vals0[i][2] + "_]')\n"
-                                    script += "from com.sun.star.text.ControlCharacter import PARAGRAPH_BREAK, LINE_BREAK\n"
-                                    script += "pm.doc.Text.insertControlCharacter( pm.cursor, PARAGRAPH_BREAK , 0 )\n"
-                                    script += 'pm.doc.Text.insertString( pm.cursor, "[_' + vals0[i][2] + '_]" , 0 )\n'
-                                    script += "pm.doc.Text.insertControlCharacter( pm.cursor, PARAGRAPH_BREAK , 0 )\n"
-                                    script += "pm.insertDoc(\"" + ldocs[0] + "\")\n"
-                                    if j + 1 == len(lvals):
-                                        script += "pm.searchAndReplace('[_" + vals0[i][2] + "_]',\"\")\n"
-                                pcnt += 1
+                                print("**** TMP **** "+str(tmp), file=sys.stderr)
+                                if len(tmp)>=2:
+                                    f = fetchPrimaryKey(cur, tableName)
+                                    f1 = fetchPrimaryKey(cur, tmp[1])
+                                    tmp_ext=adapt(tmp[1])
+                                    tmp_ext.encoding="utf-8"
+                                    req1 = "(SELECT id from mm_tables.p_tables where CAST(name as varchar)=" + str(tmp_ext) + ")"
+                                    req = "SELECT CAST(" + f1 + " as varchar) from " + tmp[1] + " WHERE " + tmp[0] + "=(select " + f + " from " + tableName + " where " + f + "=" + cid + " AND " + ovals0[0][3] + ")"
+                                    if len(tmp) == 4:
+                                        req += " ORDER BY " + tmp[3] + " desc" 
+                                    print(req,file=sys.stderr)
+                                    if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                                        cur.execute(req.replace("true","1=1"))
+                                    else:
+                                        cur.execute(req)
+                                    lvals = cur.fetchall()
+                                    for j in range(len(lvals)):
+                                        ldocs = _clientPrint(conf, inputs, cur, req1, lvals[j][0], filters, operators, rid, tmp[2])
+                                        print(ldocs, file=sys.stderr)
+                                        print(conf["lenv"]["message"], file=sys.stderr)
+                                        # if j==0:
+                                        script += "pm.goToWord('[_" + vals0[i][2] + "_]')\n"
+                                        script += "pm.insertDoc(\"" + ldocs[0] + "\")\n"
+                                        script += 'pm.doc.Text.insertString( pm.cursor, "[_' + vals0[i][2] + '_]\\n" , 0 )\n'
+                                        #script += 'pm.doc.Text.insertString( pm.cursor, "[_' + vals0[i][2] + '_]" , 0 )\n'
+                                        #script += "from com.sun.star.text.ControlCharacter import PARAGRAPH_BREAK, LINE_BREAK\n"
+                                        #script += "pm.doc.Text.insertControlCharacter( pm.cursor, PARAGRAPH_BREAK , 0 )\n"
+                                        #script += "pm.doc.Text.insertControlCharacter( pm.cursor, LINE_BREAK , 0 )\n"
+                                        #script += "pm.searchAndReplace('[_" + vals0[i][2] + "_]',\"\")\n"
+                                        #script += 'pm.doc.Text.insertString( pm.cursor, "[_' + vals0[i][2] + '_]" , 0 )\n'
+                                        #script += "pm.doc.Text.insertControlCharacter( pm.cursor, LINE_BREAK , 0 )\n"
+                                        #script += "pm.doc.Text.insertControlCharacter( pm.cursor, PARAGRAPH_BREAK , 0 )\n"
+                                        if j + 1 == len(lvals):
+                                            script += "pm.searchAndReplace('[_" + vals0[i][2] + "_]',\"\")\n"
+                                    pcnt += 1
                             else:
                                 toAppend=""
                                 tmp=json.loads(inputs["filter_labels"]["value"])
@@ -4169,7 +4386,7 @@ def clientView(conf, inputs, outputs):
     ovals = cur.fetchall()
     tableId = ovals[0][0]
     print(ovals, file=sys.stderr)
-    req = "SELECT * FROM (SELECT DISTINCT ON(mm_tables.p_edition_fields.name) mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where mm_tables.ftypes.id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.value,mm_tables.p_edition_fields.edition FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + \
+    req = "SELECT * FROM (SELECT  mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select code from mm_tables.ftypes where mm_tables.ftypes.id=mm_tables.p_edition_fields.ftype) as tt,mm_tables.p_edition_fields.value,mm_tables.p_edition_fields.edition FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + \
           inputs["tableId"]["value"] + " and mm.groups.id in (SELECT id_group from mm.user_group where mm.user_group.id_user='" + conf["senv"]["id"] + "') and (mm_tables.p_editions.step=-2 or mm_tables.p_editions.step>=0 )) as a ORDER BY a.id"
     print(" -------- 1 -------- ", file=sys.stderr)
     print(req, file=sys.stderr)
@@ -4191,15 +4408,24 @@ def clientView(conf, inputs, outputs):
         if vals[i][3] == "tbl_linked":
             components = vals[i][4].split(';')
             print(components, file=sys.stderr)
-            rcolumns += ["(SELECT ARRAY(SELECT " + components[1] + " FROM " + components[2] + " WHERE " + components[0] + "=" + tableName + ".id)) as " + vals[i][2]]
+            if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                rcolumns += ["(SELECT (SELECT " + components[1] + " FROM " + components[2] + " WHERE " + components[0] + "=" + tableName + ".id)) as " + vals[i][2]]
+            else:
+                rcolumns += ["(SELECT ARRAY(SELECT " + components[1] + " FROM " + components[2] + " WHERE " + components[0] + "=" + tableName + ".id)) as " + vals[i][2]]
         else:
             if vals[i][3] == "bytea":
                 files[vals[i][2]] = 1
             if vals[i][3] == "geometry":
                 if vals[i][4]!="":
-                    rcolumns += ["ST_AsText(ST_Transform(" + vals[i][2] + ",4326)) as " + vals[i][2]]
+                    if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                        rcolumns += ["\""+vals[i][2]+"\".STAsText() as " + vals[i][2]]
+                    else:
+                        rcolumns += ["ST_AsText(ST_Transform(" + vals[i][2] + ",4326)) as " + vals[i][2]]
                 else:
-                    rcolumns += ["ST_AsText(" + vals[i][2] + ") as " + vals[i][2]]
+                    if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                        rcolumns += ["\""+vals[i][2]+"\".STAsText() as " + vals[i][2]]
+                    else:
+                        rcolumns += ["ST_AsText(" + vals[i][2] + ") as " + vals[i][2]]
             else:
                 if vals[i][3] != "link" and vals[i][3] != "tbl_link" and vals[i][2].count("unamed") == 0:
                     if vals[i][5]:
@@ -4207,7 +4433,10 @@ def clientView(conf, inputs, outputs):
                             if vals[i][3] == "date":
                                 rcolumns += [vals[i][2] + "::text"]
                             else:
-                                rcolumns += ["split_part((" + vals[i][2] + "::timestamp AT TIME ZONE 'Z')::text,' ',1)||'T'||split_part(split_part((" + vals[i][2] + "::timestamp AT TIME ZONE 'Z')::text,' ',2),':',1)||':'||split_part(split_part((" + vals[i][2] + "::timestamp AT TIME ZONE 'Z')::text,' ',2),':',2)"]
+                                if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+                                    rcolumns += ["CAST(CAST(" + vals[i][2] + " as datetimeoffset) as varchar)"]
+                                else:
+                                    rcolumns += ["split_part((" + vals[i][2] + "::timestamp AT TIME ZONE 'Z')::text,' ',1)||'T'||split_part(split_part((" + vals[i][2] + "::timestamp AT TIME ZONE 'Z')::text,' ',2),':',1)||':'||split_part(split_part((" + vals[i][2] + "::timestamp AT TIME ZONE 'Z')::text,' ',2),':',2)"]
                         else:
                             rcolumns += [vals[i][2]]
                     else:
@@ -4231,10 +4460,10 @@ def clientView(conf, inputs, outputs):
     print(" ------- 2 --------- ", file=sys.stderr)
     res = cur.execute(rreq)
     rvals = cur.fetchone()
-    restrictedTypes = ["Date", "Boolean", "Reference"]
+    restrictedTypes = ["Datetime", "Date", "Boolean", "Reference"]
     for i in range(len(ovals)):
         fres[ovals[i][0]] = {}
-        req = "SELECT * FROM (SELECT mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select name from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype),mm_tables.p_edition_fields.dependencies, mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=" + str(
+        req = "SELECT * FROM (SELECT mm_tables.p_edition_fields.edition as eid,mm_tables.p_edition_fields.id,mm_tables.p_edition_fields.name,(select name from mm_tables.ftypes where id=mm_tables.p_edition_fields.ftype) as tt ,mm_tables.p_edition_fields.dependencies, mm_tables.p_edition_fields.value FROM mm_tables.p_editions,mm_tables.p_edition_fields,mm.groups,mm_tables.p_edition_groups where mm_tables.p_editions.id=mm_tables.p_edition_fields.eid and mm.groups.id=mm_tables.p_edition_groups.gid and mm_tables.p_editions.id=" + str(
             ovals[i][0]) + " and mm_tables.p_editions.id=mm_tables.p_edition_groups.eid and ptid=" + inputs["tableId"]["value"] + " and mm.groups.id in (SELECT id from mm.groups where " + splitGroup(conf) + ")) as a ORDER BY a.id"
         print(" ------- 3 --------- ", file=sys.stderr)
         print(req, file=sys.stderr)
@@ -4246,7 +4475,15 @@ def clientView(conf, inputs, outputs):
             print("\n ***** START --  "+str(columns),file=sys.stderr)
             print("\n ***** START --  "+str(rvals),file=sys.stderr)
             # TODO: confirm assumption: "files" is a Python 3 dictionary object
-            if cvals[j][2] in files:
+            if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL" and cvals[j][3]=="Geometry":
+                print("Geometry",file=sys.stderr)
+                lObj=cvals[j][5].split(";")
+                myWkt=rvals[columns.index(cvals[j][2])]
+                import mapscript 
+                myShape=mapscript.shapeObj.fromWKT(myWkt)
+                myShape.project(mapscript.projectionObj(lObj[1]),mapscript.projectionObj("epsg:4326"))
+                fres[ovals[i][0]][cvals[j][1]] = myShape.toWKT()
+            elif cvals[j][2] in files:
                 if rvals[rcolumns.index(cvals[j][2])] is not None:
                     file = unpackFile(conf, rvals[rcolumns.index(cvals[j][2])])
                     fres[ovals[i][0]][cvals[j][1]] = {"type": "bytes", "filename": file["name"], "fileurl": file["name"].replace(conf["main"]["tmpPath"], conf["main"]["tmpUrl"])}
@@ -4343,7 +4580,7 @@ def clientView(conf, inputs, outputs):
                                 con.conn.commit()
                                 fres[ovals[i][0]][cvals[j][1]] = str(rvals[columns.index(cvals[j][2])])
                         else:
-                            if cvals[j][3]=="Date":
+                            if cvals[j][3]=="Date" or cvals[j][3]=="Datetime":
                                 fres[ovals[i][0]][cvals[j][1]] = str(rvals[columns.index(cvals[j][2])])
                             else:
                                 fres[ovals[i][0]][cvals[j][1]] = rvals[columns.index(cvals[j][2])]
@@ -4396,6 +4633,7 @@ def clientView(conf, inputs, outputs):
 
 def buildClause(filters,operators=None):
     res = ""
+    print(" ******* *FILTER "+str(filters),file=sys.stderr)
     for i in range(len(filters)):
         if res != "":
             res += " " + filters[i]["linkClause"] + " "
@@ -4420,7 +4658,8 @@ def buildClause(filters,operators=None):
                     except:
                         filters_ext=adapt(filters[i][lkeys[k]].replace("*", "%"))
                         filters_ext.encoding="utf-8"
-                        tres += "( " + lkeys[k] + "::varchar LIKE " + str(filters_ext) + " ) "
+                        #tres += "( " + lkeys[k] + "::varchar LIKE " + str(filters_ext) + " ) "
+                        tres += "( CAST(" + lkeys[k] + " as varchar) LIKE " + str(filters_ext) + " ) "
             print(tres, file=sys.stderr)
         res += " ( " + tres + " ) "
     print(res, file=sys.stderr)
@@ -4432,12 +4671,22 @@ def buildClause(filters,operators=None):
 
 def parseClause(conf,clause):
     if clause is None:
-        return "true"
+        if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            return "1=1"
+        else:
+            return "true"
     else:
         for i in conf["senv"]:
             clause=clause.replace("[_senv_"+i+"_]",str(conf["senv"][i]))
         print(" ------ CLAUSE: "+clause,file=sys.stderr)
-        return clause
+        print(" ------ CLAUSE: "+conf["main"]["dbuser"],file=sys.stderr)
+        print(" ------ CLAUSE: "+str("type" in conf[conf["main"]["dbuser"]]),file=sys.stderr)
+        if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL" and clause=="true":
+            print("MSSQL",file=sys.stderr)
+            return "1=1"
+        else:
+            print("NO MSSQL",file=sys.stderr)
+            return clause
 
 def clientViewTable(conf, inputs, outputs):
     import json
@@ -4447,36 +4696,49 @@ def clientViewTable(conf, inputs, outputs):
     fres = {}
     try:
         req = "SELECT (select name from mm_tables.p_tables where id=ptid),name,clause from mm_tables.p_views where id=" + inputs["table"]["value"]
+        print(req,file=sys.stderr)
         res = cur.execute(req)
+        print(req,file=sys.stderr)
         vals = cur.fetchone()
+        print(req,file=sys.stderr)
         table = vals[0]
         name = vals[1]
+        print(req,file=sys.stderr)
         clause = parseClause(conf,vals[2])
+        print(req,file=sys.stderr)
         print("**** "+clause,file=sys.stderr)
         import datastores.postgis.pgConnection as pg
-        cur.execute(pg.getDesc(cur, table))
+        if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            print(req,file=sys.stderr)
+            cur.execute(pg.getDescMSSQL(cur, table))
+        else:
+            print(req,file=sys.stderr)
+            cur.execute(pg.getDesc(cur, table))
         defs = cur.fetchall()
 
     except Exception as e:
         conf["lenv"]["message"] = zoo._("Unable to identify your parameter as a View Id: ") + req + str(e)
         return zoo.SERVICE_FAILED
-    req = "SELECT mm_tables.p_view_fields.id,mm_tables.p_view_fields.alias,mm_tables.p_view_fields.value,mm_tables.p_view_fields.view,mm_tables.p_view_fields.search,mm_tables.p_view_fields.class,mm_tables.p_view_fields.name FROM mm_tables.p_views,mm_tables.p_view_fields where mm_tables.p_views.id=mm_tables.p_view_fields.vid and mm_tables.p_view_fields.view and mm_tables.p_views.id=" + \
+    req=None
+    if conf["main"]["dbuser"] in conf and "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+        req = "SELECT mm_tables.p_view_fields.id,mm_tables.p_view_fields.alias,mm_tables.p_view_fields.value,mm_tables.p_view_fields.visible,mm_tables.p_view_fields.search,mm_tables.p_view_fields.class,mm_tables.p_view_fields.name FROM mm_tables.p_views,mm_tables.p_view_fields where mm_tables.p_views.id=mm_tables.p_view_fields.vid and mm_tables.p_view_fields.visible=1 and mm_tables.p_views.id=" + inputs["table"]["value"]
+    else:
+        req = "SELECT mm_tables.p_view_fields.id,mm_tables.p_view_fields.alias,mm_tables.p_view_fields.value,mm_tables.p_view_fields.visible,mm_tables.p_view_fields.search,mm_tables.p_view_fields.class,mm_tables.p_view_fields.name FROM mm_tables.p_views,mm_tables.p_view_fields where mm_tables.p_views.id=mm_tables.p_view_fields.vid and mm_tables.p_view_fields.visible and mm_tables.p_views.id=" + \
           inputs["table"]["value"]
     classifiers = ["asc", "desc"]
     values = []
     classifier = ""
+    print(req,file=sys.stderr)
     res = cur.execute(req)
     vals = cur.fetchall()
     for i in range(len(vals)):
         values += [vals[i][2]]
         if vals[i][5] is not None:
             classifier = table + "." + vals[i][6] + " " + classifiers[(vals[i][5] - 1)]
-    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
     if "sortname" in inputs:
         for i in range(len(vals)):
             if vals[i][6] == inputs["sortname"]["value"]:
                 classifier = table + "." + vals[i][6] + " " + inputs["sortorder"]["value"]
-    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
     if "filters" in inputs:
         filters = json.loads(inputs["filters"]["value"])
         try:
@@ -4489,9 +4751,9 @@ def clientViewTable(conf, inputs, outputs):
             else:
                 clause = buildClause(filters,operators)
     req1 = "SELECT count(*) FROM " + table + " WHERE " + clause
+    print(req1,file=sys.stderr)
     res = cur.execute(req1)
     fres["total"] = cur.fetchone()[0]
-    # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
     if "page" in inputs:
         fres["page"] = inputs["page"]["value"]
     else:
@@ -4502,7 +4764,7 @@ def clientViewTable(conf, inputs, outputs):
     print("****** " + str(cid), file=sys.stderr)
     print("******* " + str(clause), file=sys.stderr)
     print("******* " + str(classifier), file=sys.stderr)
-    req1 = "SELECT " + (",".join(values + [cid])) + " FROM " + table + " WHERE " + clause + " ORDER BY " + classifier + " LIMIT " + inputs["limit"]["value"] + " OFFSET " + inputs["offset"]["value"]
+    req1 = "SELECT " + (",".join(values + [cid])) + " FROM " + table + " WHERE " + clause + " ORDER BY " + classifier + " " + con.writeLimit(inputs["offset"]["value"],inputs["limit"]["value"]) #" LIMIT " + inputs["limit"]["value"] + " OFFSET " + inputs["offset"]["value"]
     if "force" in inputs and inputs["force"]["value"]=="true":
         outputs["Result"]["value"]=json.dumps(req1)
         return zoo.SERVICE_SUCCEEDED
@@ -4726,11 +4988,15 @@ def massiveImport(conf, inputs, outputs):
         # isReference ?
         reqInsertTemp_1 = "INSERT INTO " + tname_1 + " (" + cattr
         if vals[i][7] and not (vals[i][6]):
-            reqInsertTemp_1 += ", fkey) (SELECT *," + str(cid) + " from " + tname + ")"
+            reqInsertTemp_1 += ", fkey) "
+            if con.dbtype=="ODBC":
+                reqInsertTemp_1 += " OUTPUT Inserted.ID "
+            reqInsertTemp_1 += " (SELECT *," + str(cid) + " from " + tname + ")"
         else:
             reqInsertTemp_1 += ") (SELECT * from " + tname + ")"
         if vals[i][6]:
-            reqInsertTemp_1 += " RETURNING id"
+            if con.dbtype!="ODBC":
+                reqInsertTemp_1 += " RETURNING id"
         print("******* 0 *********", file=sys.stderr)
         # print(reqTemp, file=sys.stderr)
         print("******* 1 *********", file=sys.stderr)

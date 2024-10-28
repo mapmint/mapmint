@@ -39,10 +39,10 @@ MapMint: $mmodule
   <li class="active">
    <a href="#settings"><i class="fa fa-database fa-fw"></i> $zoo._("Databases") <span class="fa arrow"></span></a>
    <ul class="nav nav-third-level">
-#set classes0=["icon-mysql","icon-postgres-alt","fa-folder-open","wms","wfs"]
-#set classes1=["fa-database","fa-database","fa-folder","wms","wfs"]
+#set classes0=["icon-postgres-alt","icon-mysql","icon-mssql","fa-folder-open","wms","wfs"]
+#set classes1=["fa-database","fa-database","fa-database","fa-folder","wms","wfs"]
 #set cnt=0
-#for i in ["MySQL","PostGIS"]
+#for i in $conf["mm"]["supportedDbs"].split(',')
      <li class="active">
        <a class="mmaction" role="tab" href="#distDataSources" data-toggle="tab"><i class="fa $classes0[$cnt] fa-fw"></i> $i 
 #if $i in $dirStr.keys()
@@ -156,7 +156,7 @@ MapMint: $mmodule
 #set b=eval($loutputs["Result"]["value"])
 #from datastores.postgis.service import displayJson
 #set dbs=[]
-#for i in ('PostGIS','MySQL')
+#for i in $conf["mm"]["supportedDbs"].split(',')
 #set l1outputs={"Result":{"value":""}}
 #set linputs=$inputs
 #set $linputs["type"]={"value":$i}
@@ -294,7 +294,18 @@ MapMint: $mmodule
   <div class="col-lg-12">
     <div class="panel panel-warning">
       <div class="panel-heading">
-	<span><i class="[font] fa-fw" ></i> [datasource]
+        <input type="hidden" name="data" value="[data]" data-srs="[srs]" />
+        <span class="dropdown">
+          <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false"><i class="fa-fw [font]"></i><span class="caret"></span></button>
+          <ul class="dropdown-menu">
+#set iCnt=0
+#for i in ["POINT","LINE","POLYGON"]
+            <li><a href="#none" class="geodatatype" data-geotype="$iCnt">$i</a></li>
+#set $iCnt+=1
+#end for
+          </ul>
+        </span>
+	<!-- <span><i class="[font] fa-fw" ></i> --> [datasource]
         <div class="pull-right">
 	  <div class="btn-group">
 #for i in $objs
@@ -357,7 +368,12 @@ MapMint: $mmodule
 #set cur=con.connect()
 #set cur=con.conn.cursor()
 
+#if "type" in $conf[$conf["main"]["dbuser"]] and $conf[$conf["main"]["dbuser"]]["type"]=="MSSQL"
+#set req="SELECT id,CAST(name AS varchar) as name from mm_tables.ftypes where ftype='e' and basic=1 order by name"
+#else
 #set req="SELECT id,name from mm_tables.ftypes where ftype='e' and basic order by name"
+#end if
+
 #set res=$cur.execute($req)
 #set svals=$cur.fetchall()
 #for i in range(len(svals))
@@ -487,7 +503,30 @@ $(Template(file=$conf["main"]["templatesPath"]+"/Distiller/Projection_bs.html",s
 </script>
 
 <script type="template/text" id="dataSource_srs_template">
-<span class="col-sm-2">$zoo._("SRS:") [srs]</span>
+<span class="col-sm-5">$zoo._("SRS:") 
+  <span class="dropdown">
+    <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false"> [srs] <span class="caret"></span></button>
+    <ul class="dropdown-menu">
+#import sqlite3
+#set conn = sqlite3.connect($conf['main']['dblink'])
+#set c = $conn.cursor()
+#set i=$c.execute(" SELECT code,name FROM spatial_ref_sys WHERE fav")
+#set a=$c.fetchall()
+#for i in $a
+      <li><a class="srs_setting" data-srs="$i[0]">$i[1]</a></li>
+#end for
+    </ul>
+  </span>
+<form class="form-inline pull-right">
+<label class="control-label">$zoo._("Data section")</label>
+<div class="input-group">
+  <input class="form-control" name="data" type="text" placeholder="$zoo._("Data")" />
+  <span class="input-group-btn">
+    <button class="btn btn-default" type="button">$zoo._("Update")</button>
+  </span>
+</div>
+</form>
+</span>
 <form class="form-inline pull-right">
 <label class="control-label">$zoo._("Encoding:")</label>
 <div class="input-group">

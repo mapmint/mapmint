@@ -335,9 +335,16 @@ define([
     }
 
     function setSymbol(elem,value){
+	try{
 	elem.find(".symbolsList").find("li#"+value).each(function(){
 	    changeSymbol($(this));
 	});
+	}catch(e){
+		elem.find(".symbolsList").find("li").each(function(){
+			if($(this).attr("id")==value)
+				changeSymbol($(this));
+		});
+	}
     }
 
     var cbindings={
@@ -2310,7 +2317,9 @@ define([
 		"filter": "_f",
 		"zfilter": "zf",
 		"search": "s",
-		"squery": "sq"
+		"squery": "sq",
+		"data": "data"
+
 	    };
 	    console.log(myLocation);
 	    var params=[];
@@ -2588,11 +2597,15 @@ define([
 	$('.mm-scale').click(function(){
 	    var view = map.getView();
 	    var coords = view.getCenter();
-	    var resolution = view.getResolution();    
-	    var projection = view.getProjection();
-	    var resolutionAtCoords = projection.getPointResolution(resolution, coords);
-	    $(this).parent().prev().val(Math.round(resolutionAtCoords*0.3937*156543.04));
+		console.log(view);
+	    //var resolution = view.getResolution();    
+	    //var projection = view.getProjection();
+	    //var resolutionAtCoords = getPointResolution(projection,resolution, coords);
+	    //$(this).parent().prev().val(Math.round(resolutionAtCoords*0.3937*156543.04));
 	    //$(this).parent().prev().val(resolution*0.3937*156543.04);
+	    var zoomLevels=[491520000,245760000,122880000,61440000,30720000,15360000,7680000,3840000,1920000,960000,480000,240000,120000,60000,30000,15000,7500,3750,1875];
+		console.log(Number((view.getZoom()).toFixed(1)));
+	    $(this).parent().prev().val(zoomLevels[Number((view.getZoom()).toFixed(0))]);
 	});
 
 	$('#blcolpicker').colorpicker({

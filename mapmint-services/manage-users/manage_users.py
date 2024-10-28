@@ -11,6 +11,9 @@ import re
 from psycopg2.extensions import *
 psycopg2.extensions.register_type(psycopg2.extensions.UNICODE)
 
+
+
+
 def mm_md5(c):
     h = hashlib.new('ripemd160')
     h.update(c.encode("utf-8"))
@@ -93,9 +96,39 @@ class manage_users:
                 self.desc = pg.getDesc(self.cur, self.prefix + "users")
                 return True
             except Exception as e:
-                print("Manage_users: "+str(e), file=sys.stderr)
-                return False
+                try:
+                    # Handle ODBC connection
+                    import datastores.postgis.service as pg
+                    import pyodbc
+                    import authenticate.service as auth
+                    self.paramstyle = "qmark"
+                    self.conString=pg.createConString(self.conf,None,None)
+                    self.conn = pyodbc.connect(self.conString)
+                    self.cur = self.conn.cursor()
+                    self.now="CURRENT_TIMESTAMP"
+                    self.dbtype = "ODBC"
+                    self.prefix = auth.getPrefix(conf)
+                    import datastores.postgis.pgConnection as pg
+                    self.desc = pg.getDescMSSQL(self.cur, self.prefix + "users")
+                    #self.conn.setdecoding(pyodbc.SQL_CHAR, encoding='latin-1')
+                    #self.conn.setencoding(encoding='latin-1')
+                    return True
+                except Exception as e:
+                    print("Manage_users: "+str(e), file=sys.stderr)
+                    return False
         return True
+
+    def writeLimit(self,offset,limit):
+        loffset=offset
+        llimit=limit
+        if loffset is None:
+            loffset="0"
+        if llimit is None:
+            llimit="1000000"
+        if self.dbtype=="ODBC":
+            return "OFFSET "+str(loffset)+" ROWS FETCH NEXT "+str(llimit)+" ROW ONLY"
+        else:
+            return "LIMIT "+str(llimit)+" OFFSET "+str(loffset)
 
     def close(self):
         try:
@@ -136,7 +169,7 @@ class manage_users:
                     params[i] = req[1][i]["value"]
         try:
             self.cur.execute(req[0], params)
-            self.conn.commit()
+            #self.conn.commit()
         except Exception as e:
             print("ERROR SQL: " + req[0], file=sys.stderr)
             print("ERROR SQL: " + str(e), file=sys.stderr)

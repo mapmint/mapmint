@@ -26,7 +26,7 @@
 #set elements=eval($outputs["Result"]["value"])
 <div>
 <label for="tdso">$zoo._("Datastore:")</label>
-<select id="tdso" onchange="var hasVal=false;for(var i=this.selectedIndex;i>=0;i--) if(this.options[i].value=='PostGIS') {hasVal=true;var opt=\$('#tdso_format')[0].options;for(var j=0;j<opt.length;j++) {if(opt[j].value!='PostgreSQL') opt[j].disabled=true;};\$('#tdso_format').val('PostgreSQL');\$('#tdso_format').attr('disabled', true);}; if(!hasVal) {var opt=\$('#tdso_format')[0].options;for(var j=0;j<opt.length;j++){if(opt[j].value=='PostgreSQL') opt[j].disabled=true; else opt[j].disabled=false;};\$('#tdso_format').removeAttr('disabled');\$('#tdso_format').val('ESRI Shapefile');}">
+<select id="tdso" onchange="var dbs=[['PostGIS','PostgreSQL'],['MySQL','MySQL'],['MSSQL','MSSQLSpatial']]; var hasVal=false;for(var i=this.selectedIndex;i>=0;i--) for(var k=0;k<dbs.length;k++)  if(this.options[i].value==dbs[k][0]) {hasVal=true;var opt=\$('#tdso_format')[0].options;for(var j=0;j<opt.length;j++) {if(opt[j].value!=dbs[k][1]) opt[j].disabled=true;};\$('#tdso_format').val(dbs[k][1]);\$('#tdso_format').attr('disabled', true);alert('ok');break;}; if(!hasVal) {var opt=\$('#tdso_format')[0].options;for(var j=0;j<opt.length;j++) for(var k=0;k<dbs.length;k++) {if(opt[j].value==dbs[k][1]) opt[j].disabled=true; else opt[j].disabled=false;};\$('#tdso_format').removeAttr('disabled');\$('#tdso_format').val('ESRI Shapefile');}">
 #for ij in $elements
 #if $ij!="WFS"
 <option disabled="true" style="font-weight: bold;color: #111">$ij</option>

@@ -191,6 +191,9 @@ requirejs.config({
 #set myCorrespondances={"fr-FR":"French.json","en-US":"English.json"}
             translationUrl: "https://cdn.datatables.net/plug-ins/1.10.10/i18n/#if $conf["main"]["language"] in myCorrespondances.keys()#$myCorrespondances[$conf["main"]["language"]]#else#$myCorrespondances["en-US"]#end if#",
 	    localizationStrings:{
+                distiller: {
+			data: "$zoo._("Data")"
+		},
 	        tables: {
 			    none: "$zoo._("None")"
 		},

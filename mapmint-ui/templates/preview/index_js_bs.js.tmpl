@@ -33,6 +33,11 @@ var attributionsWMTS='$val';
 #end if
 
 
+#if $mms.getMetadata($m.web,"max_minx")
+var original_max_extent=[$mms.getMetadata($m.web,"max_minx"),$mms.getMetadata($m.web,"max_miny"),$mms.getMetadata($m.web,"max_maxx"),$mms.getMetadata($m.web,"max_maxy")];
+#else
+var original_max_extent=[-179.9,-89.9,179.9,89.9];
+#end if
 #if $mms.getMetadata($m.web,"default_minx")
 var original_extent=[$mms.getMetadata($m.web,"default_minx"),$mms.getMetadata($m.web,"default_miny"),$mms.getMetadata($m.web,"default_maxx"),$mms.getMetadata($m.web,"default_maxy")];
 #else

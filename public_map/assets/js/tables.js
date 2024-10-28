@@ -335,7 +335,7 @@ define([
 			(data.mmViews[id].fields[i].class!="None"?"":'style="display:none"'),
 			(data.mmViews[id].fields[i].class=="1"?"selected='selected'":""),
 			(data.mmViews[id].fields[i].class=="2"?"selected='selected'":""),
-			(data.mmViews[id].fields[i].view=="True"?"checked=checked":""),
+			(data.mmViews[id].fields[i].visible=="True"?"checked=checked":""),
 			(data.mmViews[id].fields[i].search=="True"?"checked=checked":""),
 			(data.mmViews[id].fields[i].name!=null?data.mmViews[id].fields[i].name:data.mmViews[id].fields[i].alias),
 			data.mmViews[id].fields[i].alias,
@@ -524,6 +524,8 @@ define([
     function loadAReport(data,id){
 	var ebody="";
 	console.log(!data.mmReports[id]);
+	console.log(data.mmReports);
+	console.log(id);
 	$("#tables_report_id").val("-1");
 	$("#tables_report_title").val("");
 	$("#tables_report_clause").val("");
@@ -597,9 +599,16 @@ define([
 		}
 		console.log($("#tables_report_"+i));
 	    }
+	    if(data.mmReports[id].view.file){
 	    var tmp=data.mmReports[id].view.file.split('/');
 	    var reg=new RegExp(module.config().tmpPath,"g");
 	    $("#documents_afile_link").attr('href',data.mmReports[id].view.file.replace(reg,module.config().tmpUrl));
+	    }
+	    else{
+		    var tmp=data.mmReports[id].view._file.split('/');
+		    var reg=new RegExp(module.config().tmpPath,"g");
+	    	    $("#documents_afile_link").attr('href',data.mmReports[id].view._file.replace(reg,module.config().tmpUrl));
+	    }
 	    $("#documents_afile_link").html(tmp[tmp.length-1]);
 	    for(var i=0;i<data.mmReports[id].fields.length;i++){
 		console.log(data.mmReports[id].fields[i]);
@@ -620,6 +629,7 @@ define([
 		    ]
 		);
 	    }
+	    //}
 	    $("#mm_report_table_display").html(managerTools.generateFromTemplate($("#report_template")[0].innerHTML,["tbody"],[ebody]));
 	    var i=0;
 	    $("#mm_report_table_display").find("select[name=ftype]").each(function(){
@@ -766,7 +776,7 @@ define([
 		    managerTools.generateFromTemplate($("#view_table_line_c1_template")[0].innerHTML,['order','asc','desc','orderType'],["","","",'style="display:none"']),
 		    managerTools.generateFromTemplate($("#view_table_line_c2_template")[0].innerHTML,['display'],[""]),
 		    managerTools.generateFromTemplate($("#view_table_line_c3_template")[0].innerHTML,['search'],[""]),
-		    managerTools.generateFromTemplate($("#view_table_line_c4_template")[0].innerHTML,['name'],["unamed_"+nbItem[0]]),
+		    managerTools.generateFromTemplate($("#view_table_line_c4_template")[0].innerHTML,['name'],["unamed_"+nbItem[0]]).replace(/hidden/g,"text"),
 		    managerTools.generateFromTemplate($("#view_table_line_c5_template")[0].innerHTML,['label'],["Label "+nbItem[0]]),
 		    managerTools.generateFromTemplate($("#view_table_line_c6_template")[0].innerHTML,['value'],["Value "+nbItem[0]]),
 		    managerTools.generateFromTemplate($("#view_table_line_c7_template")[0].innerHTML,['width'],["20%"])
@@ -777,8 +787,8 @@ define([
 		[
 		    managerTools.generateFromTemplate($("#edition_c0_template")[0].innerHTML,['id'],[nbItem[1]]),
 		    managerTools.generateFromTemplate($("#edition_c1_template")[0].innerHTML,['display'],[""]),
-		    managerTools.generateFromTemplate($("#edition_c2_template")[0].innerHTML,['name'],["unamed__"+nbItem[1]]),
-		    managerTools.generateFromTemplate($("#edition_c3_template")[0].innerHTML,['name'],["unalmed"+nbItem[1]]),
+		    managerTools.generateFromTemplate($("#edition_c2_template")[0].innerHTML,['name'],["unamed_"+nbItem[1]]),
+		    managerTools.generateFromTemplate($("#edition_c3_template")[0].innerHTML,['name'],["unamed_"+nbItem[1]]),
 		    managerTools.generateFromTemplate($("#edition_c4_template")[0].innerHTML,['label'],["Label "+nbItem[1]]),
 		    managerTools.generateFromTemplate($("#edition_c5_template")[0].innerHTML,['label'],["Label "+nbItem[1]]),
 		    managerTools.generateFromTemplate($("#edition_c6_template")[0].innerHTML,['value'],["Value "+nbItem[1]])
@@ -1047,7 +1057,7 @@ define([
 			{"identifier":"limit","value":llimit[1],"dataType":"int"},
 			{"identifier":"page","value":page,"dataType":"int"},
 			{"identifier":"sortorder","value":llimit[3],"dataType":"string"},
-			{"identifier":"search","value":llimit[llimit.length-1],"dataType":"string"},
+			{"identifier":"search","value":(llimit[llimit.length-1]!="desc"?llimit[llimit.length-1]:""),"dataType":"string"},
 			{"identifier":"sortname","value":(closestproperties.split(",")[llimit[2]]),"dataType":"string"},
 			{"identifier":"fields","value":closestproperties.replace(/,msGeometry/g,""),"dataType":"string"}
 		    ],
@@ -1679,8 +1689,10 @@ define([
 		    obj['name']=$(this).val();
 		});
 		$(this).find("input[type=text],textarea").each(function(){
+		    if($(this).attr('name')!="oname"){
 		    obj[$(this).attr('name')]=$(this).val();
 		    console.log($(this));
+		    }
 		});
 		$(this).find("input[type=checkbox]").each(function(){
 		    if($(this).attr('name')!="order")

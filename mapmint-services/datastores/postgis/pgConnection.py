@@ -42,11 +42,19 @@ class pgConnection:
         self.conf = conf
 
     def parseConf(self):
-        doc = etree.parse(self.conf["main"]["dataPath"] + "/PostGIS/" + self.dbfile + ".xml")
-        styledoc = etree.parse(self.conf["main"]["dataPath"] + "/PostGIS/conn.xsl")
-        style = etree.XSLT(styledoc)
+        try:
+            doc = etree.parse(self.conf["main"]["dataPath"] + "/PostGIS/" + self.dbfile + ".xml")
+            styledoc = etree.parse(self.conf["main"]["dataPath"] + "/PostGIS/conn.xsl")
+            style = etree.XSLT(styledoc)
+        except:
+            doc = etree.parse(self.conf["main"]["dataPath"] + "/MSSQL/" + self.dbfile + ".xml")
+            styledoc = etree.parse(self.conf["main"]["dataPath"] + "/MSSQL/conn.xsl")
+            style = etree.XSLT(styledoc)
         res = style(doc)
-        self.db_string = str(res).replace("PG: ", "")
+        if "type" in self.conf[self.conf["main"]["dbuser"]]:
+            self.db_string = str(res).replace(self.conf[self.conf["main"]["dbuser"]]["type"]+":" ,"")
+        else:
+            self.db_string = str(res).replace("PG: ", "")
 
     def connect(self):
         try:
@@ -54,14 +62,39 @@ class pgConnection:
             self.cur = self.conn.cursor()
             return True
         except Exception as e:
-            self.conf["lenv"]["message"] = "Unable to connect: " + str(e)
-            return False
+            try:
+                import pyodbc
+                self.conn = pyodbc.connect(self.db_string)
+                self.cur = self.conn.cursor() 
+                return True
+            except Exception as e:
+                self.conf["lenv"]["message"] = "Unable to connect: " + str(e)
+                return False
+
+    def writeLimit(self,offset,limit):
+        loffset=offset
+        llimit=limit
+        if loffset is None:
+            loffset="0"
+        if llimit is None:
+            llimit="1000000"
+        if "type" in self.conf[self.conf["main"]["dbuser"]] and self.conf[self.conf["main"]["dbuser"]]["type"]=="MSSQL":
+            return "OFFSET "+str(loffset)+" ROWS FETCH NEXT "+str(llimit)+" ROW ONLY"
+        else:
+            return "LIMIT "+str(llimit)+" OFFSET "+str(loffset)
 
     def execute(self, req):
         try:
             self.ex = self.cur.execute(req)
             if req.count("SELECT") > 0 or req.count("select") > 0:
-                return self.cur.fetchall()
+                res=self.cur.fetchall()
+                toReturn=[]
+                for i in range(len(res)):
+                    itoReturn=[]
+                    for j in range(len(res[i])):
+                        itoReturn+=[res[i][j]]
+                    toReturn+=[itoReturn]
+                return toReturn
             else:
                 return True
         except Exception as e:
@@ -73,8 +106,13 @@ def listSchemas(conf, inputs, outputs):
     db = pgConnection(conf, inputs["dataStore"]["value"])
     db.parseConf()
     if db.connect():
-        res = db.execute(
-            "select nspname as schema from pg_namespace WHERE nspname NOT LIKE 'information_schema' AND nspname NOT LIKE 'pg_%' ORDER BY nspname")
+        res=None
+        if "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            res = db.execute(
+                    "select name from sys.schemas order by name")
+        else:
+            res = db.execute(
+                    "select nspname as schema from pg_namespace WHERE nspname NOT LIKE 'information_schema' AND nspname NOT LIKE 'pg_%' ORDER BY nspname")
         if res:
             outputs["Result"]["value"] = json.dumps(res)
         return zoo.SERVICE_SUCCEEDED
@@ -91,10 +129,16 @@ def listTables(conf, inputs, outputs):
     db = pgConnection(conf, inputs["dataStore"]["value"])
     db.parseConf()
     if db.connect():
-        req = "select schemaname||'.'||tablename as tablename, tablename as display from pg_tables WHERE schemaname NOT LIKE 'information_schema' AND schemaname NOT LIKE 'pg_%' AND tablename NOT LIKE 'spatial_ref_sys' AND  tablename NOT LIKE 'geometry_columns' "
-        if "schema" in inputs:
-            req += "AND schemaname='" + inputs["schema"]["value"] + "'"
-        req += " ORDER BY schemaname||'.'||tablename"
+        if "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            req = "select SCHEMA_NAME(schema_id) + '.' + name as tablename, name as display from sys.tables"
+            if "schema" in inputs:
+                req += " WHERE SCHEMA_NAME(schema_id) = '"+ inputs["schema"]["value"] +"'"
+            req += " ORDER BY CONCAT(schema_id , '.') + name"
+        else:
+            req = "select schemaname||'.'||tablename as tablename, tablename as display from pg_tables WHERE schemaname NOT LIKE 'information_schema' AND schemaname NOT LIKE 'pg_%' AND tablename NOT LIKE 'spatial_ref_sys' AND  tablename NOT LIKE 'geometry_columns' "
+            if "schema" in inputs:
+                req += "AND schemaname='" + inputs["schema"]["value"] + "'"
+            req += " ORDER BY schemaname||'.'||tablename"
         res = db.execute(req)
         outputs["Result"]["value"] = json.dumps(res)
         return zoo.SERVICE_SUCCEEDED
@@ -120,6 +164,37 @@ def listTablesAndViews(conf, inputs, outputs):
     else:
         print("Unable to connect", file=sys.stderr)
         return zoo.SERVICE_FAILED
+
+
+def getDescMSSQL(cur,table):
+    tmp = table.split('.')
+    if len(tmp) == 1:
+        tmp1 = tmp[0]
+        tmp = ["public", tmp1];
+    req = "select " + \
+        "       col.column_id-1 as \"Pos\", " + \
+        "       col.name as \"Name\"," + \
+        "       TYPE_NAME(col.system_type_id) +" + \
+        "       case when TYPE_NAME(col.system_type_id)='varchar' then CONCAT('(', col.max_length) +')' else '' end  as \"Type\", " + \
+        "       case when col.is_identity=1 then 'PRI' else case when fk.object_id is not null then 'FOR' else null end end as \"Key1\", " + \
+        "       schema_name(pk_tab.schema_id) + '.' + pk_tab.name as ref_table," + \
+        "       pk_col.name as ref_column_name " + \
+        "from sys.tables tab" + \
+        "     inner join sys.columns col " + \
+        "      on col.object_id = tab.object_id" + \
+        "     left outer join sys.foreign_key_columns fk_cols" + \
+        "      on fk_cols.parent_object_id = tab.object_id" + \
+        "        and fk_cols.parent_column_id = col.column_id" + \
+        "     left outer join sys.foreign_keys fk" +\
+        "      on fk.object_id = fk_cols.constraint_object_id" + \
+        "     left outer join sys.tables pk_tab" + \
+        "      on pk_tab.object_id = fk_cols.referenced_object_id" + \
+        "     left outer join sys.columns pk_col" + \
+        "      on pk_col.column_id = fk_cols.referenced_column_id " + \
+        "        and pk_col.object_id = fk_cols.referenced_object_id " + \
+        "WHERE tab.name='"+ tmp[1] +"' and schema_name(tab.schema_id)='"+ tmp[0] +"' " + \
+        "order by schema_name(tab.schema_id) + '.' + tab.name, col.column_id "
+    return req
 
 
 def getDesc(cur, table):
@@ -175,13 +250,16 @@ def getTableDescription(conf, inputs, outputs):
     db.parseConf()
     if db.connect():
         tmp = inputs["table"]["value"].split('.')
-        req = getDesc(db.cur, inputs["table"]["value"])
+        if "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            req = getDescMSSQL(db.cur, inputs["table"]["value"])
+        else:
+            req = getDesc(db.cur, inputs["table"]["value"])
         res = db.execute(req)
         if res != False and len(res) > 0:
             outputs["Result"]["value"] = json.dumps(res)
             return zoo.SERVICE_SUCCEEDED
         else:
-            print("unable to run request " + req, file=sys.stderr)
+            print(" ---- unable to run request " + req, file=sys.stderr)
             return zoo.SERVICE_FAILED
     else:
         print("Unable to connect", file=sys.stderr)
@@ -248,7 +326,7 @@ def getTableContent(conf, inputs, outputs):
             for i in range(0, len(tmp)):
                 if cnt > 0:
                     req += " OR "
-                req += tmp[i][1] + "::varchar like '%" + inputs["search"]["value"] + "%'"
+                req += " CAST("+ tmp[i][1] + " as varchar) like '%" + inputs["search"]["value"] + "%'"
                 cnt += 1
         res = db.execute(req)
         if res != False:
@@ -267,18 +345,40 @@ def getTableContent(conf, inputs, outputs):
             for i in range(0, len(tmp)):
                 if cnt > 0:
                     req += " OR "
-                req += tmp[i][1] + "::varchar like '%" + inputs["search"]["value"] + "%'"
+                req += " CAST(" + tmp[i][1] + " as varchar) like '%" + inputs["search"]["value"] + "%'"
                 cnt += 1
         if "sortname" in inputs and inputs["sortname"]["value"] != "NULL":
-            req += " ORDER BY " + inputs["sortname"]["value"] + " " + inputs["sortorder"]["value"]
-        if "limit" in inputs and inputs["limit"]["value"] != "NULL":
-            if "page" in inputs and inputs["page"]["value"] != "":
-                req += " OFFSET " + str((int(inputs["page"]["value"]) - 1) * int(inputs["limit"]["value"]))
-                page = inputs["page"]["value"]
-            req += " LIMIT " + inputs["limit"]["value"]
+            hasOrder=False
+            for k in range(len(tmp)):
+                if tmp[k][1]==inputs["sortname"]["value"] and tmp[k][2].count("text")>0:
+                    req += " ORDER BY CAST(" + inputs["sortname"]["value"] + " as varchar) " + inputs["sortorder"]["value"]
+                    hasOrder=True
+                    break
+            if not(hasOrder):
+                req += " ORDER BY " + inputs["sortname"]["value"] + " " + inputs["sortorder"]["value"]
+        if "type" in conf[conf["main"]["dbuser"]] and conf[conf["main"]["dbuser"]]["type"]=="MSSQL":
+            if not("sortname" in inputs) or inputs["sortname"]["value"] == "NULL":
+                req += " ORDER BY " + tmp[0][1]
+            if "limit" in inputs and inputs["limit"]["value"] != "NULL":
+                if "page" in inputs and inputs["page"]["value"] != "":
+                    req += " OFFSET " + str((int(inputs["page"]["value"]) - 1) * int(inputs["limit"]["value"])) + " ROW "
+                    page = inputs["page"]["value"]
+                else:
+                    req += " OFFSET 0 ROW "
+                req += " FETCH NEXT "+ inputs["limit"]["value"] +" ROWS ONLY "
+            else:
+                page = 1
+                req += " OFFSET 0 ROW FETCH NEXT 10 ROWS ONLY "
         else:
-            page = 1
-            req += " LIMIT 10"
+            if "limit" in inputs and inputs["limit"]["value"] != "NULL":
+                if "page" in inputs and inputs["page"]["value"] != "":
+                    req += " OFFSET " + str((int(inputs["page"]["value"]) - 1) * int(inputs["limit"]["value"]))
+                    page = inputs["page"]["value"]
+                req += " LIMIT " + inputs["limit"]["value"]
+            else:
+                page = 1
+                req += " LIMIT 10"
+        print(req,file=sys.stderr)
         res = db.execute(req)
         if res != False:
             rows = []
@@ -301,7 +401,7 @@ def getTableContent(conf, inputs, outputs):
             outputs["Result"]["value"] = json.dumps({"page": page, "total": total, "rows": rows}, ensure_ascii=False)
             return zoo.SERVICE_SUCCEEDED
         else:
-            print("unable to run request", file=sys.stderr)
+            print(" ----- unable to run request", file=sys.stderr)
             return zoo.SERVICE_FAILED
     else:
         print("Unable to connect", file=sys.stderr)
@@ -425,7 +525,7 @@ def getTableContent1(conf, inputs, outputs):
             outputs["Result"]["value"] = json.dumps({"page": page, "total": total, "rows": rows}, ensure_ascii=False)
             return zoo.SERVICE_SUCCEEDED
         else:
-            print("unable to run request", file=sys.stderr)
+            print(" ------ unable to run request", file=sys.stderr)
             return zoo.SERVICE_FAILED
     else:
         print("Unable to connect", file=sys.stderr)
