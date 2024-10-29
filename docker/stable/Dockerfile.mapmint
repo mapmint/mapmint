@@ -35,7 +35,7 @@ RUN set -ex \
     && add-apt-repository ppa:ubuntugis/ppa \
     && add-apt-repository ppa:libreoffice/ppa \
     && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 \
-    && add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/' \
+    && add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/' \
     \
     && apt-get install -y $RUN_DEPS \
     && curl -o libmozjs185-1.0_1.8.5-1.0.0+dfsg-7_amd64.deb http://launchpadlibrarian.net/309343863/libmozjs185-1.0_1.8.5-1.0.0+dfsg-7_amd64.deb \
