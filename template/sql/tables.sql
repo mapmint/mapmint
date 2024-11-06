@@ -96,7 +96,7 @@ CREATE TABLE  mm_tables.p_view_fields (
     alias text,
     vid integer REFERENCES mm_tables.p_views(id) ON DELETE CASCADE,
     value text,
-    view boolean,
+    visible boolean,
     search boolean,
     class integer REFERENCES mm_tables.fclasses(id) ON DELETE CASCADE,
     name text,
