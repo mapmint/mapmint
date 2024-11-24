@@ -12,6 +12,7 @@ import sys, os
 
 import uno
 import sys
+import zoo
 
 from unohelper import Base, systemPathToFileUrl, absolutize
 

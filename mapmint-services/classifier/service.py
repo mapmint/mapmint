@@ -43,7 +43,7 @@ def write_png_in_mem(outputs, width, height, rgb_func):
         try:
             out["Result"]["value"] += data
         except Exception as e:
-            print(e,file=sys.stderr)
+            zoo.error(str(e))
             out["Result"]["value"] += bytes(data,"utf-8")
         checksum0 =bytes( myCRC32(chunk_type),"utf-8") #zlib.crc32(chunk_type) & 0xffffffff
         checksum1 = zlib.crc32(data, int(myCRC32(chunk_type))) & 0xffffffff
@@ -51,7 +51,7 @@ def write_png_in_mem(outputs, width, height, rgb_func):
         try:
             out["Result"]["value"] += struct.pack("!L", int(checksum))
         except Exception as e:
-            print(e,file=sys.stderr)
+            zoo.error(str(e))
 
 
 
@@ -143,7 +143,7 @@ def _discretise(data, nbc, method):
         try:
             data[i] = float(tmp[i])
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             data[i] = 0.0000066
     jenksData = robjects.FloatVector(data)
     ci = robjects.r.classIntervals

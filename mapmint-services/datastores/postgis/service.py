@@ -59,12 +59,12 @@ def load(conf, inputs, outputs):
                     values += '"' + str(j)  + '": "' + i.text + '"'
                     cnt += 1
             except Exception as e:
-                print(str(e),file=sys.stderr)
+                zoo.error(str(e))
                 values += '"' + j + '": ""'
                 cnt += 1
                 pass
     except Exception as e:
-        print(e, file=sys.stderr)
+        zoo.error(str(e))
         conf["lenv"]["message"] = zoo._("Unable to parse the file")
         return 4
     outputs["Result"]["value"] = values + ', "name": "' + inputs["name"]["value"] + '", "stype": "' + inputs["type"][
@@ -157,7 +157,7 @@ def displayJson(conf, inputs, outputs):
             j += 1;
             res["sub_elements"] += [{"name": t.replace(".xml", ""), "type": inputs["type"]["value"]}]
         except Exception as e:
-            print(str(e), file=sys.stderr)
+            zoo.error(str(e))
             continue
 
     import json

@@ -8,18 +8,17 @@ import zoo
 
 
 def load(conf, inputs, outputs):
-    # print(conf, file=sys.stderr)
     # To define
     values = "{"
     try:
         import os
         pl = inputs["name"]["value"].split(":")
-        print(pl, file=sys.stderr)
-        print(conf["main"]["dataPath"] + "/" + pl[0].upper() + "/" + pl[1], file=sys.stderr)
+        zoo.info(str(pl))
+        zoo.info(conf["main"]["dataPath"] + "/" + pl[0].upper() + "/" + pl[1])
         if os.path.exists(conf["main"]["dataPath"] + "/" + pl[0].upper() + "/" + pl[1] + ".txt"):
             values += '"name": "' + pl[1] + '"'
     except Exception as e:
-        print(e, file=sys.stderr)
+        zoo.error(str(e))
         conf["lenv"]["message"] = zoo._("Unable to parse the file")
         return 4
     outputs["Result"]["value"] = values + ', "link": "' + inputs["name"]["value"] + '", "stype": "' + pl[0] + '"' + "}"
@@ -97,12 +96,8 @@ def display(conf, inputs, outputs):
     default_dir = conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/"
     original_dir = conf["main"]["dataPath"] + "/" + inputs["type"]["value"] + "/"
     label_dir = ""
-    # print(conf["main"]["dataPath"]+"/PostGIS/", file=sys.stderr)
-    # print(original_dir, file=sys.stderr)
-    # print(inputs["dir"]["value"], file=sys.stderr)
     try:
         tmp = os.listdir(original_dir)
-        # print(tmp, file=sys.stderr)
     except:
         return 4
     try:
