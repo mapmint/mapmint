@@ -2321,7 +2321,7 @@ def details(conf, inputs, outputs):
             zoo.info(outputs0[1]["Result"]["value"])
             for i in range(0, len(desc)):
                 zoo.info(desc[i][1])
-                zoo.info(content)
+                zoo.info(str(content))
                 res[str(desc[i][1])] = content["rows"][0]["cell"][i]
                 zoo.info(desc[i][1])
             if inputs["table"]["value"] == '"mm_tables"."importers"':

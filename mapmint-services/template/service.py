@@ -38,7 +38,7 @@ def display(conf, inputs, outputs):
     toLoad = None
     if tmpName[0] == "load":
         tmpName[0] = "public"
-        print("TMPNAME: " + str(tmpName) + str(len(tmpName) == 3), file=sys.stderr)
+        zoo.info("TMPNAME: " + str(tmpName) + str(len(tmpName) == 3))
         if len(tmpName) == 2:
             tmpName.remove(tmpName[0])
             inputs["tmpl"]["value"] = tmpName[0]
@@ -50,14 +50,14 @@ def display(conf, inputs, outputs):
                     toLoad = str(shortInteger.unShortURL(conf, tmpName[2]))
                     tmpName.remove(tmpName[2])
                 except Exception as e:
-                    print(str(e), file=sys.stderr)
+                    zoo.error(str(e))
                     tmpName.remove(tmpName[1])
                     pass
             else:
                 for i in range(1, len(tmpName) - 1):
                     tmpName.remove(tmpName[1])
-                print("TMPNAME: " + str(tmpName), file=sys.stderr)
-        print("TMPNAME: " + str(tmpName) + str(len(tmpName) == 3), file=sys.stderr)
+                zoo.info("TMPNAME: " + str(tmpName))
+        zoo.info("TMPNAME: " + str(tmpName) + str(len(tmpName) == 3))
     if tmpName[0] == "public":
         import time
         # TODO: confirm assumption: "conf" and conf['senv'] are Python 3 dictionary objects
@@ -68,7 +68,7 @@ def display(conf, inputs, outputs):
             else:
                 nameSpace["project"] = ""
         else:
-            print(conf["senv"], file=sys.stderr)
+            zoo.info(conf["senv"])
             hasValue = False
             for j in range(1, len(tmpName)):
                 if tmpName[1] != "":
@@ -89,7 +89,7 @@ def display(conf, inputs, outputs):
                 mapfile = os.readlink(mapfile)
             lastMap = mapfile.replace(conf["main"]["dataPath"], "").replace("/public_maps/project_", "").replace(".map", "").replace("\\??\\", "")
             verif = not ("senv" in conf)
-            print(verif, file=sys.stderr)
+            zoo.info(str(verif))
             if verif:
                 conf["senv"] = {}
                 conf["senv"]["MMID"] = "MM" + str(time.time()).split(".")[0]
@@ -107,12 +107,12 @@ def display(conf, inputs, outputs):
             conf["senv"]["tmpl"] = inputs["tmpl"]["value"]
             if verif:
                 conf["lenv"]["cookie"] = "MMID=" + conf["senv"]["MMID"] + "; path=/"
-            print("+++++++++++++++++++++++", file=sys.stderr)
-            print(conf["senv"]["last_map"], file=sys.stderr)
+            zoo.info("+++++++++++++++++++++++")
+            zoo.info(conf["senv"]["last_map"])
 
         except Exception as e:
-            print("+++++++++++++++++++++++", file=sys.stderr)
-            print(e, file=sys.stderr)
+            zoo.error("+++++++++++++++++++++++")
+            zoo.error(str(e))
             # TODO: confirm assumption: "conf" is a Python 3 dictionary object
             # if list(conf.keys()).count('senv') > 0:
             if 'senv' in conf:
@@ -184,7 +184,6 @@ def display(conf, inputs, outputs):
         if "force" not in inputs:
             try:
                 tmpl = __import__(inputs["tmpl"]["value"].lower() + ".service")
-                # print(dir(tmpl), file=sys.stderr)
                 tmpl.service.displayHTML(conf, inputs, outputs)
                 t = outputs["Result"]["value"]
             except:
@@ -192,7 +191,7 @@ def display(conf, inputs, outputs):
             try:
                 t = Template(file=conf["main"]["templatesPath"] + "/" + inputs["tmpl"]["value"] + ".tmpl", searchList=nameSpace)
             except Exception as e:
-                print("ERROR => " + str(e), file=sys.stderr)
+                zoo.error("ERROR => " + str(e))
                 page = "/error_bs.tmpl"
                 nameSpace["errorMsg"] = e
                 t = Template(file=conf["main"]["templatesPath"] + page, searchList=nameSpace)
@@ -321,7 +320,7 @@ def compress(conf, inputs, outputs):
                     try:
                         inputs["file"]["value"] += open(conf["main"]["publicationPath"] + "/" + filenames[i]).read() + "\n"
                     except Exception as e:
-                        print(e, file=sys.stderr)
+                        zoo.error(str(e))
                         pass
 
     if inputs["type"]["value"].lower() == "js" and inputs["filename"]["value"].count("css") == 0:

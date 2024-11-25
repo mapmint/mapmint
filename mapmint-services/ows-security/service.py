@@ -82,15 +82,12 @@ def checkEntityPriv(conf, con, prefix, server, service, entity, priv, token):
         fields += tmp[i]
     try:
         req = "SELECT " + fields + " from " + prefix + "servers," + prefix + "layer_privileges, " + prefix + "tokens WHERE tokens.id_group=layer_privileges.id_group AND id_protocol=(SELECT id from " + prefix + "protocols where name='" + service.upper() + "') AND layer_privileges.entity='" + entity + "' AND layer_privileges.id_server=servers.id and name='" + server + "' AND value='" + token + "';"
-        # print(req, file=sys.stderr)
         con.cur.execute(req)
         vals = con.cur.fetchone()
-        # print(vals, file=sys.stderr)
         if vals is not None:
-            # print(vals[0], file=sys.stderr)
             return vals[0]
     except Exception as e:
-        print(e, file=sys.stderr)
+        zoo.error(str(e))
     return True
 
 
@@ -122,7 +119,7 @@ def BasicRewrite(conf, inputs, outputs):
         # outputs["Result"]["value"]=inputs["Query"]["value"].replace(sUrl,conf["main"]["owsSecurityUrl"]+"?server="+inputs["server"]["value"]+"&amp;token="+inputs["token"]["value"])
         outputs["Result"]["value"] = inputs["Query"]["value"].replace(sUrl, conf["main"]["owsSecurityUrl"] + inputs["token"]["value"] + "/" + inputs["server"]["value"] + "/").replace('<AccessConstraints>none</AccessConstraints>',
                                                                                                                                                                                        '<wms:AccessConstraints xmlns:wms="http://www.opengis.net/wms" xmlns:ows_security="http://www.opengis.net/security/1.0" xmlns:ows="http://www.opengis.net/ows/1.1">https://www.opengis.net/def/security/1.0/cc/wms130</wms:AccessConstraints>')
-        print('<wms:AccessConstraints xmlns:wms="http://www.opengis.net/wms" xmlns:ows_security="http://www.opengis.net/security/1.0" xmlns:ows="http://www.opengis.net/ows/1.1">https://www.opengis.net/def/security/1.0/cc/wms130</wms:AccessConstraints>', file=sys.stderr)
+        zoo.info('<wms:AccessConstraints xmlns:wms="http://www.opengis.net/wms" xmlns:ows_security="http://www.opengis.net/security/1.0" xmlns:ows="http://www.opengis.net/ows/1.1">https://www.opengis.net/def/security/1.0/cc/wms130</wms:AccessConstraints>')
         outputs["Result"]["mimeType"] = inputs["Query"]["fmimeType"]
     return zoo.SERVICE_SUCCEEDED
 
@@ -179,7 +176,7 @@ def addWSSCSParam(conf, inputs, outputs):
     import json
     outputs["Result"]["value"] = outputs["Result"]["value"].replace('GetSchemaExtension"', 'GetSchemaExtension http://www.opengis.net/security/1.0 http://rs.tb13.secure-dimensions.de/schemas/ExtendedSecurityCapabilities.xsd" xmlns:xlink="http://www.w3.org/1999/xlink"')
     currentRequest = json.loads(inputs["original"]["value"])
-    print(currentRequest, file=sys.stderr)
+    zoo.info(str(currentRequest))
     request = {}
     # TODO: confirm assumption: "currentRequest" is a Python 3 dictionary object
     # for i in list(currentRequest.keys()):
@@ -208,10 +205,10 @@ def addWSSCSParam(conf, inputs, outputs):
         context0 = etree.XML(outputs["Result"]["value"])
         requests = context0.xpath("/*/*/*[name()='Request']/*")
         strToReplace = ""
-        print(requests, file=sys.stderr)
+        zoo.info(str(requests))
         for i in requests:
             name = i.xpath("name()")
-            print(name, file=sys.stderr)
+            zoo.info(str(name))
             protected = ["getmap", "getfeatureinfo"]
             if protected.count(name.lower()) > 0:
                 strToReplace += '<ows:Operation name="' + name + '"><ows:DCP><ows:HTTP><ows:Get xlink:type="simple" xlink:href="' + conf["main"]["owsSecurityUrl"] + inputs["token"]["value"] + "/" + inputs["server"][
@@ -234,10 +231,10 @@ def addWSSCSParam(conf, inputs, outputs):
         outputs["Result"]["value"] = outputs["Result"]["value"].replace('<ows:AccessConstraints>none</ows:AccessConstraints>', '<ows:AccessConstraints>https://www.opengis.net/def/security/1.0/cc/owsCommon</ows:AccessConstraints>')
         context0 = etree.XML(outputs["Result"]["value"])
         # root=context0.getroot()
-        print("******", file=sys.stderr)
-        print(context0, file=sys.stderr)
-        print(context0.attrib, file=sys.stderr)
-        print("******", file=sys.stderr)
+        zoo.info("******")
+        zoo.info(str(context0))
+        zoo.info(str(context0.attrib))
+        zoo.info("******")
         #
         if outputs["Result"]["value"].count("http://www.opengis.net/ows/1.1") > 0:
             owsSchema = "http://www.opengis.net/ows/1.1"
@@ -246,15 +243,15 @@ def addWSSCSParam(conf, inputs, outputs):
         requests = context0.xpath("/*/*/*[name()='ows:Operation']/*")
         # if len(requests)==0:
         #    requests=context0.xpath("/*/*[name()='ows:Operation']/*")
-        print(requests, file=sys.stderr)
+        zoo.info(str(requests))
         for j in requests:
             name = j.xpath("name()")
             requestName = j.xpath("./..")[0].attrib['name']
             if name == "ows:DCP":
                 inrequests = j.xpath("./*/*")
                 for k in inrequests:
-                    print(k, file=sys.stderr)
-                    print(k.attrib, file=sys.stderr)
+                    zoo.info(str(k))
+                    zoo.info(str(k.attrib))
                     names = ['urn:ogc:def:security:1.0:https', 'urn:ogc:def:security:1.0:cors', 'urn:ogc:def:security:1.0:exception-handling']
                     for i in names:
                         elem = etree.Element('{' + owsSchema + '}Constraint', dict(name=i))
@@ -273,7 +270,7 @@ def addWSSCSParam(conf, inputs, outputs):
                             elem.append(c1elem)
                             # etree.SubElement(elem,'{http://www.opengis.net/ows}Meaning')
                             k.append(elem)
-            print(name, file=sys.stderr)
+            zoo.info(str(name))
         outputs["Result"]["value"] = etree.tostring(context0, pretty_print=True)
 
 
@@ -281,9 +278,6 @@ def SecureResponse(conf, inputs, outputs):
     c = auth.getCon(conf)
     prefix = auth.getPrefix(conf)
     sUrl = getUrl(conf, c, prefix, inputs["server"]["value"])
-    # print(" ** ", file=sys.stderr)
-    # print(inputs, file=sys.stderr)
-    # print(" ** ", file=sys.stderr)
 
     if sUrl is None:
         conf["lenv"]["message"] = zoo._("No server found.")
@@ -312,32 +306,32 @@ def SecureResponse(conf, inputs, outputs):
             else:
                 context0 = etree.iterparse(StringIO(etree.tostring(elem)), events=('end',), tag='{*}Name')
             for event, elem in context0:
-                print(elem.text.encode('utf-8'), file=sys.stderr)
+                zoo.info(srt(elem.text.encode('utf-8')))
                 if not (checkEntityPriv(conf, c, prefix, inputs["server"]["value"], inputs["service"]["value"], elem.text.encode('utf-8'), "r", inputs["token"]["value"])):
                     toRemove += [elem.text.encode('utf-8')]
         except Exception as e:
-            print(e, file=sys.stderr)
-            print('%s <=> %s' % (elem.tag, elem.text), file=sys.stderr)
+            zoo.error(str(e))
+            zoo.error('%s <=> %s' % (elem.tag, elem.text))
         elem.clear()
         while elem.getprevious() is not None:
             del elem.getparent()[0]
 
     doc = etree.fromstring(inputs["Query"]["value"].replace('<?xml version="1.0" encoding="utf-8"?>\n', ''))
     nsp = doc.nsmap
-    print(toRemove, file=sys.stderr)
+    zoo.error(str(toRemove))
     if len(toRemove) > 0:
         for i in range(0, len(toRemove)):
             try:
                 elems = doc.xpath('//' + inputs["service"]["value"].lower() + ':' + vals[0] + '/ows:' + lName + '[text()="' + toRemove[i] + '"]',
                                   namespaces=doc.nsmap)
             except Exception as e:
-                print(doc.nsmap, file=sys.stderr)
-                print(e, file=sys.stderr)
+                zoo.error(str(doc.nmap))
+                zoo.error(str(e))
                 elems = doc.xpath('//*[text()="' + toRemove[i] + '"]')
             for a in elems:
                 a.getparent().getparent().remove(a.getparent())
                 break
-    print(inputs["original"], file=sys.stderr)
+    zoo.info(inputs["original"])
     # outputs["Result"]["value"]=etree.tostring(doc).replace(sUrl,conf["main"]["owsSecurityUrl"]+"?server="+inputs["server"]["value"]+"&amp;token="+inputs["token"]["value"])
     outputs["Result"]["value"] = etree.tostring(doc).replace(sUrl + "&amp;", conf["main"]["owsSecurityUrl"] + inputs["token"]["value"] + "/" + inputs["server"]["value"] + "/?")
     addWSSCSParam(conf, inputs, outputs)
@@ -368,7 +362,7 @@ def checkDataStorePriv(conf, con, prefix, server, service, priv, token):
         else:
             return True
     except Exception as e:
-        print(e, file=sys.stderr)
+        zoo.info(str(e))
     return False
 
 
@@ -422,23 +416,23 @@ def SecureAccess(conf, inputs, outputs):
     if myAutorizedGroups.count('public') == 0 and not (q is None or q["request"].upper() == "GETCAPABILITIES" or q["request"].upper() == "GETLEGENDGRAPHIC") and not (tryIdentifyUser(conf, inputs["user"]["value"], inputs["password"]["value"])):
         conf["lenv"]["message"] = zoo._("You are not allowed to access the ressource using this user / password!")
         conf["lenv"]["status_code"] = "401 Unauthorized"
-        print(conf["lenv"], file=sys.stderr)
+        zoo.info(conf["lenv"])
         return zoo.SERVICE_FAILED
     # TODO: confirm assumption: "conf" is a Python 3 dictionary object
     # if list(conf.keys()).count("senv") == 0:
     if "senv" not in conf:
         conf["senv"] = {"group": getGroupFromToken(c, prefix, inputs["token"]["value"])}
     else:
-        print(conf["senv"], file=sys.stderr)
+        zoo.info(conf["senv"])
     try:
         myCurrentGroups = conf["senv"]["group"].split(',')
     except Exception as e:
         myCurrentGroups = []
     isAuthorized = False
-    print(" ****** ", file=sys.stderr)
-    print(myCurrentGroups, file=sys.stderr)
-    print(myAutorizedGroups, file=sys.stderr)
-    print(" ****** ", file=sys.stderr)
+    zoo.error(" ****** ")
+    zoo.error(str(myCurrentGroups))
+    zoo.error(str(myAutorizedGroups))
+    zoo.error(" ****** ")
     for i in range(len(myCurrentGroups)):
         if myAutorizedGroups.count(myCurrentGroups[i]) > 0:
             isAuthorized = True
@@ -448,9 +442,9 @@ def SecureAccess(conf, inputs, outputs):
         conf["lenv"]["status_code"] = "403 Forbidden"
         return zoo.SERVICE_FAILED
     if myCookies is not None:
-        print(" ** COOKIES", file=sys.stderr)
-        print(myCookies, file=sys.stderr)
-        print(" ** COOKIES", file=sys.stderr)
+        zoo.info(" ** COOKIES")
+        zoo.info(str(myCookies))
+        zoo.info(" ** COOKIES")
     sUrl = getUrl(conf, c, prefix, inputs["server"]["value"])
     secureQuery = \
         '<wps:Execute service="WPS" version="1.0.0" xmlns:wps="http://www.opengis.net/wps/1.0.0" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wps/1.0.0 ../wpsExecute_request.xsd">' + \
@@ -501,9 +495,9 @@ def SecureAccess(conf, inputs, outputs):
         if sUrl is None:
             return zoo.SERVICE_FAILED
     except Exception as e:
-        print(frameinfo.filename, get_linenumber(), file=sys.stderr)
-        print(e, file=sys.stderr)
-    print(" +++++++++++++++++++ " + inputs["Query"]["mimeType"], file=sys.stderr)
+        zoo.error(frameinfo.filename, get_linenumber())
+        zoo.error(str(e))
+    zoo.error(" +++++++++++++++++++ " + inputs["Query"]["mimeType"])
     if inputs["Query"]["mimeType"] == "application/json":
         import json
         q = json.loads(inputs["Query"]["value"])
@@ -565,7 +559,6 @@ def SecureAccess(conf, inputs, outputs):
             lvalues = list(response.headers.values())
             useDefault = True
             for i in range(0, len(lkeys)):
-                # print(" --------- KEY : "+lkeys[i], file=sys.stderr)
                 if "content-type" == lkeys[i]:  # and lvalues[i].count("text/")==0:
                     useDefault = False
                     outputs["Result"]["mimeType"] = lvalues[i]
@@ -573,7 +566,6 @@ def SecureAccess(conf, inputs, outputs):
                     break
             if useDefault:
                 outputs["Result"]["mimeType"] = "text/xml"
-            # print(dir(response), file=sys.stderr)
             # outputs["Result"]["mimeType"]="text/xml"
             response.close()
             # TODO: confirm assumption: "conf" is a Python 3 dictionary object
@@ -583,7 +575,7 @@ def SecureAccess(conf, inputs, outputs):
             return zoo.SERVICE_SUCCEEDED
         else:
             if vals[1] < 0:
-                print("Should treat before requesting the server", file=sys.stderr)
+                zoo.info("Should treat before requesting the server")
                 sUrl1 = ""
                 # TODO: confirm assumption: "q" is a Python 3 dictionary object
                 # for i in list(q.keys()):
@@ -610,7 +602,7 @@ def SecureAccess(conf, inputs, outputs):
                     sUrl1 = sUrl + "&amp;" + sUrl1
                 else:
                     sUrl1 = sUrl + "?" + sUrl1
-                print(sUrl1, file=sys.stderr)
+                zoo.info(str(sUrl1))
 
                 xmlQuery = secureQuery.replace("[_oquery_]", '<wps:ComplexData mimeType="application/json"><![CDATA[' + inputs["Query"]["value"] + ']]></wps:ComplexData>') \
                     .replace("[_server_]", inputs["server"]["value"]) \
@@ -631,7 +623,6 @@ def SecureAccess(conf, inputs, outputs):
                 lvalues = list(response.headers.values())
                 useDefault = True
                 for i in range(0, len(lkeys)):
-                    # print(" --------- KEY : "+lkeys[i]+" "+lvalues[i], file=sys.stderr)
                     if "content-type" == lkeys[i]:  # and lvalues[i].count("text/")==0:
                         useDefault = False
                         outputs["Result"]["mimeType"] = lvalues[i]
@@ -691,7 +682,7 @@ def SecureAccess(conf, inputs, outputs):
             return zoo.SERVICE_SUCCEEDED
         else:
             if vals[1] < 0:
-                print("Should treat before requesting the server", file=sys.stderr)
+                zoo.info("Should treat before requesting the server")
                 sUrl1 = ""
                 if doc.attrib["service"].upper() == "WFS":
                     expr = "//*[@" + vals[2] + "]"
