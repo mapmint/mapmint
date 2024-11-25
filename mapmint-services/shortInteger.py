@@ -1,6 +1,7 @@
 import random
 import psycopg2
 import authenticate.service as auth
+import zoo
 
 # generate a random bit order
 # you'll need to save this mapping permanently, perhaps just hardcode it
