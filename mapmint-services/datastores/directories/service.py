@@ -94,7 +94,7 @@ def removeDS(conf, inputs, outputs):
         return 4
     tmpStr = ""
     for i in tmp:
-        print(i, file=sys.stderr)
+        zoo.error(str(i))
         if i.count(inputs["dso"]["value"]) > 0:
             try:
                 os.unlink(original_dir + "/" + i)
@@ -127,9 +127,6 @@ def display(conf, inputs, outputs):
     status = "closed"
     if 'state' in inputs and 'value' in inputs["state"]:
         status = inputs["state"]["value"]
-    # print( conf["main"]["dataPath"]+"/dirs/", file=sys.stderr)
-    # print( original_dir, file=sys.stderr)
-    # print( inputs["dir"]["value"], file=sys.stderr)
     try:
         tmp = mmListDir(original_dir)
     except:
@@ -158,19 +155,18 @@ def display(conf, inputs, outputs):
         suffix = ""
     for t in tmp:
         try:
-            # print(original_dir+t, file=sys.stderr)
             open(original_dir + t)
             hasValue = False
         except:
             i += 1
             dsn = original_dir + t + "/"
-            print(dsn, file=sys.stderr)
+            zoo.error(str(dns))
             try:
                 priv = mm_access.checkDataStorePriv(conf, dsn, "r") and mm_access.checkDataStorePriv(conf, dsn, "x")
             except Exception as e:
                 priv = False
-                print(e, file=sys.stderr)
-            print(priv, file=sys.stderr)
+                zoo.error(str(e))
+            zoo.error(str(priv))
             if os.access(original_dir + t, os.X_OK) and len(t.split('.')) == 1:
                 j += 1
                 hasValue = True
@@ -321,8 +317,6 @@ def load(conf, inputs, outputs):
     a = inputs["name"]["value"]
     a = a.replace("__", "/")
     b = a[1:len(a) - 1].split("/")
-    # print( a[0:len(a)-1], file=sys.stderr)
-    # print( b[len(b)-1], file=sys.stderr)
     outputs["Result"]["value"] = json.dumps({"name": b[len(b) - 1], "link": os.readlink(a[0:len(a) - 1])})
     return zoo.SERVICE_SUCCEEDED
 
@@ -337,8 +331,6 @@ def details(conf, inputs, outputs):
     a = inputs["name"]["value"]
     a = a.replace("__", "/")
     b = a[1:len(a)].split("/")
-    # print( a[0:len(a)-1], file=sys.stderr)
-    # print( b[len(b)-1], file=sys.stderr)
     link = os.readlink(a).replace("//", "/")
     if link[len(link) - 1] == "/":
         link = link[0:len(link) - 1]

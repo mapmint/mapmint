@@ -321,6 +321,7 @@ def clogIn(conf, inputs, outputs):
         sql = " UPDATE " + prefix + "users set last_con=" + con.now + " WHERE login=[_login_]"
         con.pexecute_req([sql, {"login": {"value": inputs['login']['value'], "format": "s"}}])
         conn.commit()
+        # zoo.info(str(conf["senv"]))
         # print( str(conf["senv"]), file=sys.stderr)
         return zoo.SERVICE_SUCCEEDED
     else:
@@ -391,7 +392,7 @@ def getGroup(conf, con, login):
                 res += a[i][j]
         return res
     except Exception as e:
-        print(zoo._("Error when processing SQL query: ") + str(e), file=sys.stderr)
+        zoo.error(zoo._("Error when processing SQL query: ") + str(e))
         return None
 
 
@@ -445,7 +446,7 @@ def logIn(conf, inputs, outputs):
         # table content.
         c.execute(con.desc)
         desc = c.fetchall()
-        print(str(conf["senv"]), file=sys.stderr)
+        zoo.info(str(conf["senv"]))
         for i in desc:
             if isinstance(a[0][i[0]], int):
                 conf["senv"][i[1]] = str(a[0][i[0]])
@@ -468,7 +469,7 @@ def logIn(conf, inputs, outputs):
             conf["senv"]["isTrial"] = "false"
 
         outputs["Result"]["value"] = zoo._("User ") + str(conf["senv"]["login"]) + zoo._(" authenticated")
-        print("SENV: "+str(conf["senv"]), file=sys.stderr)
+        zoo.info("SENV: "+str(conf["senv"]))
         sql = " UPDATE " + prefix + "users set last_con=" + con.now + " WHERE login=[_login_]"
         con.pexecute_req([sql, {"login": {"value": inputs["login"]["value"], "format": "s"}}])
         conn.commit()
@@ -476,7 +477,7 @@ def logIn(conf, inputs, outputs):
             try:
                 loginFlux(conf, h)
             except Exception as e:
-                print(str(e),file=sys.stderr)
+                zoo.error(str(e))
                 pass
         return zoo.SERVICE_SUCCEEDED
     else:

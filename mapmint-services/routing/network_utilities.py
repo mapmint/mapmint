@@ -27,7 +27,7 @@ def createNetwork(conf, inputs, outputs):
     import shapely
     import shapely.wkt
 
-    print("Extract geometries", file=sys.stderr)
+    zoo.info("Extract geometries")
     geometry1 = []
     ds = osgeo.ogr.Open(inputs["InputEntity1"]["value"])
     lyr = ds.GetLayer(0)
@@ -38,7 +38,7 @@ def createNetwork(conf, inputs, outputs):
         feat = lyr.GetNextFeature()
     ds.Destroy()
 
-    print("Extract geometries", file=sys.stderr)
+    zoo.info("Extract geometries")
     geometry2 = []
     ds = osgeo.ogr.Open(inputs["InputEntity2"]["value"])
     lyr = ds.GetLayer(0)
@@ -50,10 +50,9 @@ def createNetwork(conf, inputs, outputs):
     ds.Destroy()
 
     # geometry1=extractInputs(conf,inputs["InputEntity1"])
-    # print(inputs["InputEntity2"]["value"][len(inputs["InputEntity2"]["value"])-100:len(inputs["InputEntity2"]["value"])-1], file=sys.stderr)
     # geometry2=extractInputs(conf,inputs["InputEntity2"])
 
-    print("Extracted geometries", file=sys.stderr)
+    zoo.info("Extracted geometries")
 
     i = 0
     if "offset" in inputs:
@@ -102,7 +101,7 @@ def createNetwork(conf, inputs, outputs):
             nb = toto.GetGeometryCount()
             for k in range(0, nb):
                 tmp = toto.GetGeometryRef(k)
-                print(str(i) + ' ' + str(k) + ' ' + ' ' + tmp.ExportToWkt(), file=sys.stderr)
+                zoo.info(str(i) + ' ' + str(k) + ' ' + ' ' + tmp.ExportToWkt())
                 current += [tmp.Clone()]
         else:
             current = [toto]
@@ -122,31 +121,26 @@ def createNetwork(conf, inputs, outputs):
                     current0[0].Destroy()
                 if intersection is not None and not (intersection.IsEmpty()):
 
-                    # print(current0[0], file=sys.stderr)
-                    # print(intersection, file=sys.stderr)
-                    # print(current0[0].Intersection(intersection), file=sys.stderr)
-                    # print(intersection.Intersection(current0[0]), file=sys.stderr)
                     hasValue = True
-                    # print(str(i)+' '+str(j)+' '+str(o)+' '+intersection.GetGeometryName(), file=sys.stderr)
 
                     # CREATE SET OF INTERSECTING GEOMETRIES
                     current1 = []
                     if intersection.GetGeometryType() == 4:
                         nb = intersection.GetGeometryCount()
-                        print("NB POINTS: " + str(nb), file=sys.stderr)
+                        zoo.info("NB POINTS: " + str(nb))
                         # tmp0=intersection.Clone()
                         for k in range(0, nb):
                             current1 += [intersection.GetGeometryRef(k).Clone()]
                     else:
                         if intersection.GetGeometryName() == "LINESTRING":
-                            print(ecurrent1, file=sys.stderr)
+                            zoo.info(str(ecurrent1))
                             current1 += [intersection.GetPoint_2D(), intersection.GetPoint_2D(intersection.GetPointCount() - 1)]
                         else:
                             if intersection.GetGeometryName() == "MULTILINESTRING":
                                 nb = intersection.GetGeometryCount()
                                 for k in range(0, nb):
                                     tmp = intersection.GetGeometryRef(k)
-                                    print(str(i) + ' ' + str(k) + ' ' + ' ' + tmp.ExportToWkt(), file=sys.stderr)
+                                    zoo.info(str(i) + ' ' + str(k) + ' ' + ' ' + tmp.ExportToWkt())
                                     current1 += [tmp.StartPoint(), tmp.EndPoint()]
                             else:
                                 current1 += [intersection.Clone()]
@@ -154,17 +148,11 @@ def createNetwork(conf, inputs, outputs):
                     # CREATE SET OF SPLITTED LINES
                     length1 = len(current1)
                     for q in range(0, length1):
-                        print(str(q) + " current0 length: " + str(len(current0)), file=sys.stderr)
+                        zoo.info(str(q) + " current0 length: " + str(len(current0)))
                         for r in range(0, len(current0)):
-                            # print(str(q)+" "+str(r)+" "+str(q), file=sys.stderr)
-                            # print(str(r)+" "+str(q)+" Intersection "+str(current0[r].Intersection(current1[q]))+" "+str(current0[r].Intersects(current1[q]))+" "+str(current0[r].Touches(current1[q])), file=sys.stderr)
-                            # print(current0[r], file=sys.stderr)
-                            # print(current1[q], file=sys.stderr)
                             line = shapely.wkt.loads(current0[r].ExportToWkt())
                             point = shapely.wkt.loads(current1[q].ExportToWkt())
-                            # print(" LINE INTERSECTS POINT " + str(line.intersects(point)), file=sys.stderr)
-                            # print(" POINT INTERSECTS LINE " + str(point.intersects(line)), file=sys.stderr)
-                            print(" POINT Distance LINE " + str(point.distance(line)), file=sys.stderr)
+                            zoo.info(" POINT Distance LINE " + str(point.distance(line)))
                             if point.distance(line) > 0.000001:
                                 continue
                             else:
@@ -174,19 +162,19 @@ def createNetwork(conf, inputs, outputs):
                                         current0[r] = osgeo.ogr.CreateGeometryFromWkt(titi[0].wkt)
                                         current0 += [osgeo.ogr.CreateGeometryFromWkt(titi[1].wkt)]
                                     except Exception as e:
-                                        print("Error occurs: " + str(e), file=sys.stderr)
-                                    print("Line splited", file=sys.stderr)
+                                        zoo.error("Error occurs: " + str(e))
+                                    zoo.error("Line splited")
                                     break
                                 except Exception as e:
-                                    print("Unable to split thie line: " + str(e), file=sys.stderr)
+                                    zoo.error("Unable to split thie line: " + str(e))
                                     pass
-                    print("Current0: " + str(len(current0)), file=sys.stderr)
+                    zoo.info("Current0: " + str(len(current0)))
                     current[o] = current0[0].Clone()
                     current0[0].Destroy()
                     for oo in range(1, len(current0)):
                         current += [current0[oo].Clone()]
                         current0[oo].Destroy()
-                    print("Current: " + str(len(current)), file=sys.stderr)
+                    zoo.info("Current: " + str(len(current)))
                     rgeometries += [tmp]
 
                 o += 1
@@ -199,10 +187,9 @@ def createNetwork(conf, inputs, outputs):
                 feat.SetGeometryDirectly(current[m].Clone())
                 # tmpStr+="\n********\n"+feat.ExportToJson()
                 lyr.CreateFeature(feat)
-            print("\n********\nFeature " + str(i) + " was splitted in " + str(len(current)), file=sys.stderr)
-            # print(str(i)+" "+str(m)+" LINE : "+tmpStr, file=sys.stderr)
+            zoo.info("\n********\nFeature " + str(i) + " was splitted in " + str(len(current)))
         if not (hasValue):
-            print(str(i) + " not intersecting", file=sys.stderr)
+            zoo.info(str(i) + " not intersecting")
             rgeometries1 += [geometry1[i].Clone()]
             lyr.CreateFeature(geometry1[i].Clone())
         geometry1[i].Destroy()
@@ -213,5 +200,5 @@ def createNetwork(conf, inputs, outputs):
         i += 1
     ds.Destroy()
     # outputResult(conf,outputs["Result"],rgeometries)
-    print("/outputResult", file=sys.stderr)
+    zoo.info("/outputResult")
     return 3

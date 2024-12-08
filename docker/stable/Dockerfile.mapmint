@@ -34,7 +34,7 @@ RUN set -ex \
     && add-apt-repository ppa:osgeolive/release-12.0 \
     && add-apt-repository ppa:ubuntugis/ppa \
     && add-apt-repository ppa:libreoffice/ppa \
-    && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 \
+    && APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 \
     && add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/' \
     \
     && apt-get install -y $RUN_DEPS \
@@ -390,6 +390,8 @@ RUN set -ex \
     && curl -o fonts.tar.bz2 -L http://geolabs.fr/dl/fonts.tar.bz2 \
     && tar -C /usr/com/zoo-project/fonts -xvf fonts.tar.bz2 \
     && rm fonts.tar.bz2 \
+    && rm /var/log/apache2/error.log \
+    && ln -s /dev/stdout /var/log/apache2/error.log \
     && for i in /mapmint/mapmint-services/*; do ln -s $i /usr/lib/cgi-bin/ ; done \
     && chown www-data:www-data -R /tmp/statusInfos /usr/com/zoo-project /mapmint/mapmint-ui//img/slideshow/ \
     && a2enmod cgi rewrite

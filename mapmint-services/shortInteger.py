@@ -1,6 +1,7 @@
 import random
 import psycopg2
 import authenticate.service as auth
+import zoo
 
 # generate a random bit order
 # you'll need to save this mapping permanently, perhaps just hardcode it
@@ -64,7 +65,7 @@ def unShortURL(conf, c):
         if len(res) == 0:
             raise
     except Exception as e:
-        print(str(e), file=sys.stderr)
+        zoo.error(str(e))
         raise
     d = debase(c)
     e = decode(d)
@@ -84,4 +85,3 @@ def shortURL(a):
 #    e = decode(d)
 #    while len(c) < 7:
 #        c = ' ' + c
-#    print('%6d %6d %s %6d %6d' % (a, b, c, d, e))

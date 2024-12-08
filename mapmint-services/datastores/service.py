@@ -124,7 +124,7 @@ def list(conf, inputs, outputs):
                 if dbs.test(conf, li, outputs) == 3:
                     elements[i] += [{"name": a["name"]}]
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             pass
 
     import json
@@ -227,7 +227,7 @@ def options(conf, inputs, outputs):
                      {"tmpl": {"value": "Manager/AddLayer"}, "dstn": dstnStr, "elements": elements, "dsList": dsList,
                       "groups": levels, "inputs": inputs}, outputs)
     except Exception as e:
-        print(e, file=sys.stderr)
+        zoo.error(str(e))
     return zoo.SERVICE_SUCCEEDED
 
 
@@ -239,13 +239,13 @@ def listDataSource(conf, inputs, outputs):
     try:
         m = mapscript.mapObj(mapfile)
     except Exception as e:
-        print(e, file=sys.stderr)
+        zoo.error(str(e))
         for i in ["PostGIS", "MySQL"]:
             try:
                 mapfile = conf["main"]["dataPath"] + "/" + i + "/" + inputs["dstn"]["value"] + "ds_ows.map"
                 m = mapscript.mapObj(mapfile)
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 pass
         if m is None:
             conf["lenv"]["message"] = zoo._("Unable to open the mapfile")
@@ -261,7 +261,7 @@ def listDataSource(conf, inputs, outputs):
             outputs["Result"]["value"] += "{'name': '" + j.name + "'}"
             cnt += 1
         else:
-            print(j.name + "not readable", file=sys.stderr)
+            zoo.info(j.name + "not readable")
     outputs["Result"]["value"] += "]"
     return zoo.SERVICE_SUCCEEDED
 

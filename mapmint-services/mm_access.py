@@ -50,7 +50,7 @@ def checkMapPriv(conf, map):
 
 
 def checkLayerPriv(conf, map, layer, typ):
-    print("LAYER " + str(layer), file=sys.stderr)
+    zoo.info("LAYER " + str(layer))
     if len(typ) > 1:
         ctypes = []
         for i in range(0, len(typ)):
@@ -98,7 +98,6 @@ def checkDataStorePriv(conf, ds, priv):
         priv0 = f.read()
         f.close()
     except:
-        # print("Unable to load the following file "+str(path)+".mmpriv", file=sys.stderr)
         return True
     privs = priv0.split("\n")
     privf = []

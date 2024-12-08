@@ -11,6 +11,7 @@ from twisted.web.http_headers import Headers
 import sys, json, urllib.parse
 import urllib.request, urllib.error, urllib.parse
 import cgi
+import zoo
 
 
 class HelloResource(resource.Resource):
@@ -80,14 +81,14 @@ class HelloResource(resource.Resource):
         self.setDefaultHeaders(request)
         import json
         # ip, port = self.transport.socket.getpeername()
-        print(dir(request), file=sys.stderr)  # protocol.transport.getPeer()
-        print(request.getHeader("x-real-ip"), file=sys.stderr)
-        print(request.path, file=sys.stderr)
-        print(request.transport.getPeer().host, file=sys.stderr)
-        print(request.getUser(), file=sys.stderr)
-        print(request.getPassword(), file=sys.stderr)
+        zoo.info(dir(request))
+        zoo.info(request.getHeader("x-real-ip"))
+        zoo.info(str(request.path))
+        zoo.info(request.transport.getPeer().host)
+        zoo.info(request.getUser())
+        zoo.info(request.getPassword())
         rcontent = request.path.split('/')
-        print(rcontent, file=sys.stderr)
+        zoo.info(str(rcontent))
         parsed_path = request.args
         self.reparse(parsed_path)
         # TODO: confirm assumption: "parsed_path" is a Python 3 dictionary object
@@ -130,8 +131,8 @@ class HelloResource(resource.Resource):
             log.msg(response.info())
             lkeys = list(response.headers.keys())
             lvalues = list(response.headers.values())
-            print(lkeys, file=sys.stderr)
-            print(lvalues, file=sys.stderr)
+            zoo.info(str(lkeys))
+            zoo.info(str(lvalues))
             for i in range(0, len(lkeys)):
                 if "transfer-encoding" != lkeys[i]:
                     request.setHeader(lkeys[i], lvalues[i])
@@ -162,14 +163,14 @@ class HelloResource(resource.Resource):
             req = urllib.request.Request(url=self.SecureAccessUrl,
                                          data=res,
                                          headers={'Content-Type': 'text/xml'})
-            print(res, file=sys.stderr)
+            zoo.info(str(res))
             response = urllib.request.urlopen(req)
-            print(request.headers, file=sys.stderr)
+            zoo.info(str(request.headers))
             log.msg(response.info())
             log.msg(res)
             return response.read()
         except Exception as e:
-            print("ERROR: " + str(e), file=sys.stderr)
+            zoo.error("ERROR: " + str(e))
             log.msg(req)
             return '<html><body>You submitted the following request which is not supported: %s</body></html>\n' % (pquery,)
 

@@ -69,7 +69,7 @@ def preview(conf, inputs, outputs):
         resolution = "16"
         if "res" in inputs:
             resolution = inputs["res"]["value"]
-        print(conf["oo"]["ghostscript"] + " -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dNOPAUSE -dBATCH -sDEVICE=png16m -r" + resolution + " -sOutputFile=" + filename + " " + inputs["file"]["value"] + " 2> " + conf["main"]["tmpPath"] + "/polux.log > " + conf["main"]["tmpPath"] + "/polux1.log", file=sys.stderr)
+            zoo.info(conf["oo"]["ghostscript"] + " -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dNOPAUSE -dBATCH -sDEVICE=png16m -r" + resolution + " -sOutputFile=" + filename + " " + inputs["file"]["value"] + " 2> " + conf["main"]["tmpPath"] + "/polux.log > " + conf["main"]["tmpPath"] + "/polux1.log")
         os.system(conf["oo"]["ghostscript"] + " -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -dNOPAUSE -dBATCH -sDEVICE=png16m -r" + resolution + " -sOutputFile=" + filename + " " + inputs["file"]["value"] + " 2> " + conf["main"]["tmpPath"] + "/polux.log > " + conf["main"]["tmpPath"] + "/polux1.log")
         error_msg += open(conf["main"]["tmpPath"] + "/polux1.log", "r").read()
     except Exception as e:
@@ -88,18 +88,18 @@ def printMap(conf, inputs, outputs):
     if list(conf.keys()).count("oo") > 0 and list(conf["oo"].keys()).count("external") > 0 and conf["oo"]["external"] == "true":
         from subprocess import Popen, PIPE
         import json
-        print("Start", file=sys.stderr)
+        zoo.info("Start")
         sys.stderr.flush()
         #err_log = file(conf["main"]["tmpPath"] + '/tmp_err_log_file', 'w', 0)
         err_log = open(conf["main"]["tmpPath"] + '/tmp_err_log_file', 'w')
         os.dup2(err_log.fileno(), sys.stderr.fileno())
         process = Popen([conf["oo"]["path"]], stdin=PIPE, stdout=PIPE)
-        print("Started", file=sys.stderr)
+        zoo.info("Started")
         script = ""
         if "prescr" in conf["senv"]:
             script += conf["senv"]["prescr"]
         script += "import pp.PaperMint as PaperMint\n"
-        print("PaperMint) imported", file=sys.stderr)
+        zoo.info("PaperMint) imported")
     else:
         import PaperMint
 
@@ -149,7 +149,7 @@ def printMap(conf, inputs, outputs):
     layers = inputs["layers"]["value"].split(",")
     layerNames = []
     script0 = ""
-    print("LAYERS:" + str(layers), file=sys.stderr)
+    zoo.info("LAYERS:" + str(layers))
     nblayer = 0
     for i in layers:
         if i != "":
@@ -157,7 +157,7 @@ def printMap(conf, inputs, outputs):
             if layer is None:
                 break
             layer.status = mapscript.MS_ON
-            print(layer.metadata.get("mmIcon"), file=sys.stderr)
+            zoo.info(layer.metadata.get("mmIcon"))
             try:
                 lname = layer.metadata.get("ows_title")
             except:
@@ -172,7 +172,7 @@ def printMap(conf, inputs, outputs):
                     else:
                         layerNames += [" " + layer.name]
                 except Exception as e:
-                    print(e, file=sys.stderr)
+                    zoo.error(str(e))
                     if layer.metadata.get("mmIcon"):
                         try:
                             layerNames += ["[_" + layer.name + "_] " + lname]
@@ -196,7 +196,7 @@ def printMap(conf, inputs, outputs):
                         toAppend += [layer.getClass(k).name]
                 layerNames += toAppend
             nblayer += 1
-    print(script0, file=sys.stderr)
+    zoo.info(str(script0))
     # We should use a BoundingBoxData here rather than simple string.
     ext = inputs["ext"]["value"].split(',')
 
@@ -205,8 +205,6 @@ def printMap(conf, inputs, outputs):
     if "profile" in inputs:
         import json
         tmp = json.loads(inputs["profile"]["value"])
-        # print(tmp, file=sys.stderr)
-        # print(tmp["features"][0]["geometry"]["coordinates"], file=sys.stderr)
         # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
         # if list(inputs.keys()).count("profileLayer") > 0:
         if "profileLayer" in inputs:
@@ -256,15 +254,14 @@ def printMap(conf, inputs, outputs):
         import math
         n0 = math.log((((20037508.34 * 2) * csize[0]) / (256 * (float(ext[2]) - float(ext[0])))), 2)
         m0 = math.log(((20037508.34 * csize[1]) / (256 * (float(ext[3]) - float(ext[1])))), 2)
-        print("+++++++++++++++++++++++++++++++++++++", file=sys.stderr)
+        zoo.info("+++++++++++++++++++++++++++++++++++++")
         if n0 > m0:
             zl = n0
-            print(n0, file=sys.stderr)
+            zoo.info(str(n0))
         else:
             zl = m0
-            print(m0, file=sys.stderr)
-            # print(inputs["zoom"]["value"], file=sys.stderr)
-        print("+++++++++++++++++++++++++++++++++++++", file=sys.stderr)
+            zoo.info(str(m0))
+        zoo.info("+++++++++++++++++++++++++++++++++++++")
     else:
         zl = int(float(inputs["zoom"]["value"]))
 
@@ -272,20 +269,20 @@ def printMap(conf, inputs, outputs):
     m.setExtent(float(ext[0]) + delta, float(ext[1]) + delta, float(ext[2]) - delta, float(ext[3]) - delta)
 
     # Fix size
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     m.setSize(csize[0], csize[1])
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
 
     # Replace the Background Map image in the document template if any
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     try:
         bgMap=str(inputs["bgMap"]["value"].decode('utf-8'))
     except:
         bgMap=str(inputs["bgMap"]["value"])
     if "bgMap" in inputs:
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
         nl = mapscript.layerObj(m)
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
         nl.updateFromString('''LAYER 
  NAME "BaseLayerMap" 
  TYPE RASTER
@@ -297,13 +294,13 @@ def printMap(conf, inputs, outputs):
    "init=epsg:900913"
  END
 END''')
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
         ordon = ()
         ordon += ((m.numlayers - 1),)
         for a in range(0, m.numlayers - 1):
             ordon += (a,)
         m.setLayerOrder(ordon)
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
 
     if "lat" in inputs:
         nl1 = mapscript.layerObj(m)
@@ -329,18 +326,18 @@ END''')
         feature = feature.fromWKT("POINT(" + inputs["lat"]["value"] + " " + inputs["lon"]["value"] + ")")
 
     # Draw the image and save it
-    print("Draw", file=sys.stderr)
+    zoo.info("Draw")
     i = m.draw()
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     import time
     savedImage = conf["main"]["tmpPath"] + "/print_" + conf["senv"]["MMID"] + "_" + str(time.clock()).split(".")[1] + ".png"
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     try:
         os.unlink(savedImage)
     except:
         pass
     i.save(savedImage)
-    print("OK image was drawn", file=sys.stderr)
+    zoo.error("OK image was drawn")
 
     if list(conf.keys()).count("oo") > 0 and list(conf["oo"].keys()).count("external") > 0 and conf["oo"]["external"] == "true":
         script += 'pm.searchAndReplaceImage("Map","' + savedImage + '")\n'
@@ -364,13 +361,13 @@ END''')
         script += 'pm.saveDoc("' + docPath1 + '")\n'
         script += 'pm.unloadDoc("' + docPath + '")\n'
         try:
-            print("Run 0", file=sys.stderr)
-            print(script, file=sys.stderr)
+            zoo.info("Run 0")
+            zoo.info(str(script))
             process.stdin.write(bytes(script,"utf-8"))
-            print("Run 1", file=sys.stderr)
+            zoo.info("Run 1")
             sys.stderr.flush()
             process.stdin.close()
-            print("Run 2", file=sys.stderr)
+            zoo.info("Run 2")
             sys.stderr.flush()
             process.wait()
             conf["lenv"]["message"] = str(process.stdout.readline())
@@ -412,7 +409,7 @@ def printOnlyMap(conf, inputs, outputs):
     layers = inputs["layers"]["value"].split(",")
     layerNames = []
     script0 = ""
-    print("LAYERS:" + str(layers), file=sys.stderr)
+    zoo.info("LAYERS:" + str(layers))
     nblayer = 0
     for i in layers:
         if i != "":
@@ -421,7 +418,7 @@ def printOnlyMap(conf, inputs, outputs):
                 break
             layer.status = mapscript.MS_ON
             nblayer += 1
-    print(script0, file=sys.stderr)
+    zoo.info(str(script0))
     # We should use a BoundingBoxData here rather than simple string.
     ext = inputs["ext"]["value"].split(',')
 
@@ -430,15 +427,14 @@ def printOnlyMap(conf, inputs, outputs):
         import math
         n0 = math.log((((20037508.34 * 2) * csize[0]) / (256 * (float(ext[2]) - float(ext[0])))), 2)
         m0 = math.log(((20037508.34 * csize[1]) / (256 * (float(ext[3]) - float(ext[1])))), 2)
-        print("+++++++++++++++++++++++++++++++++++++", file=sys.stderr)
+        zoo.info("+++++++++++++++++++++++++++++++++++++")
         if n0 > m0:
             zl = n0
-            print(n0, file=sys.stderr)
+            zoo.info(str(n0))
         else:
             zl = m0
-            print(m0, file=sys.stderr)
-            # print(inputs["zoom"]["value"], file=sys.stderr)
-        print("+++++++++++++++++++++++++++++++++++++", file=sys.stderr)
+            zoo.info(str(m0))
+        zoo.info("+++++++++++++++++++++++++++++++++++++")
     else:
         zl = int(float(inputs["zoom"]["value"]))
 
@@ -446,16 +442,16 @@ def printOnlyMap(conf, inputs, outputs):
     m.setExtent(float(ext[0]) + delta, float(ext[1]) + delta, float(ext[2]) - delta, float(ext[3]) - delta)
 
     # Fix size
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     m.setSize(csize[0], csize[1])
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
 
     # Replace the Background Map image in the document template if any
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     if "bgMap" in inputs:
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
         nl = mapscript.layerObj(m)
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
         nl.updateFromString('''LAYER 
  NAME "BaseLayerMap" 
  TYPE RASTER
@@ -467,21 +463,21 @@ def printOnlyMap(conf, inputs, outputs):
    "init=epsg:900913"
  END
 END''')
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
         ordon = ()
         ordon += ((m.numlayers - 1),)
         for a in range(0, m.numlayers - 1):
             ordon += (a,)
         m.setLayerOrder(ordon)
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
 
     # Draw the image and save it
-    print("Draw", file=sys.stderr)
+    zoo.info("Draw")
     i = m.draw()
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     import time
     savedImage = conf["main"]["tmpPath"] + "/print_" + conf["lenv"]["usid"] + "_" + str(time.clock()).split(".")[1] + ".png"
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     try:
         os.unlink(savedImage)
     except:

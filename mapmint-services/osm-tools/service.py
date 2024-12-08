@@ -44,14 +44,14 @@ def createShpFromOSMP(conf, inputs, outputs):
         else:
             if len(nodes[i].xpathEval('@v')[0].getContent()) > fields[cc]:
                 fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
-    print(fields, file=sys.stderr)
+    zoo.info(str(fields))
 
     # Create Datasource
     drv = osgeo.ogr.GetDriverByName("ESRI Shapefile")
-    print(dir(drv), file=sys.stderr)
+    zoo.info(dir(drv))
     ds = drv.CreateDataSource(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp")
 
-    print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp", file=sys.stderr)
+    zoo.info(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp")
     lyr = ds.CreateLayer(inputs["dson"]["value"], None, osgeo.ogr.wkbPoint)
 
     # Create Fields
@@ -78,9 +78,9 @@ def createShpFromOSMP(conf, inputs, outputs):
         # for j in list(fields.keys()):
         for j in fields.keys():
             tmp = nodes[i].xpathEval('tag[@k=\'' + j + '\']')
-            print(tmp, file=sys.stderr)
+            zoo.info(str(tmp))
             if len(tmp) > 0:
-                print(tmp[0].xpathEval('@v')[0].getContent(), file=sys.stderr)
+                zoo.info(tmp[0].xpathEval('@v')[0].getContent())
                 feat.SetField(j.replace(":", "_")[:10], tmp[0].xpathEval('@v')[0].getContent())
         pt = osgeo.ogr.Geometry(osgeo.ogr.wkbPoint)
         pt.SetPoint_2D(0, float(nodes[i].xpathEval('@lon')[0].getContent()), float(nodes[i].xpathEval('@lat')[0].getContent()))
@@ -92,7 +92,7 @@ def createShpFromOSMP(conf, inputs, outputs):
     ds = None
 
     try:
-        print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map", file=sys.stderr)
+        zoo.info(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map")
         os.unlink(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map")
     except:
         pass
@@ -110,7 +110,7 @@ def createShpFromOSML(conf, inputs, outputs):
     fields = {}
     for i in range(len(nodes)):
         cc = nodes[i].xpathEval('@k')
-        print(cc, file=sys.stderr)
+        zoo.info(str(cc))
         if cc is not None and len(cc) > 0:
             cc = cc[0].getContent()
             # TODO: confirm assumption: "fields" is a Python 3 dictionary object
@@ -120,13 +120,13 @@ def createShpFromOSML(conf, inputs, outputs):
             else:
                 if len(nodes[i].xpathEval('@v')[0].getContent()) > fields[cc]:
                     fields[cc] = len(nodes[i].xpathEval('@v')[0].getContent())
-    print(fields, file=sys.stderr)
+    zoo.info(str(fields))
 
     # Create Datasource
     drv = osgeo.ogr.GetDriverByName("ESRI Shapefile")
     ds = drv.CreateDataSource(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp")
 
-    print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp", file=sys.stderr)
+    zoo.info(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/" + inputs["dson"]["value"] + ".shp")
     lyr = ds.CreateLayer(inputs["dson"]["value"], None, osgeo.ogr.wkbLineString)
 
     # Create Fields
@@ -153,7 +153,7 @@ def createShpFromOSML(conf, inputs, outputs):
         # for j in list(fields.keys()):
         for j in fields.keys():
             tmp = nodes[i].xpathEval('tag[@k=\'' + j + '\']')
-            print(tmp, file=sys.stderr)
+            zoo.info(str(tmp))
             if len(tmp) > 0:
                 print(tmp[0].xpathEval('@v')[0].getContent(), file=sys.stderr)
                 feat.SetField(j.replace(":", "_")[:10], tmp[0].xpathEval('@v')[0].getContent())
@@ -162,7 +162,7 @@ def createShpFromOSML(conf, inputs, outputs):
         for j in nodes1:
             ref = j.xpathEval('@ref')[0].getContent()
             nd = doc.xpathEval("/osm/node[@id='" + ref + "']")
-            print(ref + " " + str(nd), file=sys.stderr)
+            zoo.info(ref + " " + str(nd))
             if len(nd) > 0:
                 line.AddPoint_2D(float(nd[0].xpathEval('@lon')[0].getContent()), float(nd[0].xpathEval('@lat')[0].getContent()))
         feat.SetGeometry(line)
@@ -173,7 +173,7 @@ def createShpFromOSML(conf, inputs, outputs):
     ds = None
 
     try:
-        print(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map", file=sys.stderr)
+        zoo.info(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map")
         os.unlink(conf["main"]["dataPath"] + "/dirs/" + inputs["dstn"]["value"] + "/ds_ows.map")
     except:
         pass

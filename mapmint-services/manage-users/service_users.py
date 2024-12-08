@@ -104,7 +104,7 @@ def getTableFeatures(conf, inputs, outputs):
         outputs["Result"]["value"] = json.dumps({"total": total, "rows": rows})
         return zoo.SERVICE_SUCCEEDED
     else:
-        print("unable to run request", file=sys.stderr)
+        zoo.info("unable to run request")
         return zoo.SERVICE_FAILED
 
 
@@ -118,7 +118,7 @@ def getTableContent(conf, inputs, outputs):
         req = pg.getDesc(c.cur, auth.getPrefix(conf) + inputs["table"]["value"])
     res1 = c.cur.execute(req)
     res = c.cur.fetchall()
-    print(res, file=sys.stderr)
+    zoo.info(str(res))
     fields = []
     pkey = 0
     pfield = "id"
@@ -182,7 +182,7 @@ def getTableContent(conf, inputs, outputs):
         outputs["Result"]["value"] = json.dumps({"page": page, "total": total, "rows": rows})
         return zoo.SERVICE_SUCCEEDED
     else:
-        print("unable to run request", file=sys.stderr)
+        zoo.info("unable to run request")
         return zoo.SERVICE_FAILED
 
 
@@ -209,10 +209,10 @@ def requestGroup(conf, inputs, outputs):
                 req = "INSERT INTO " + prefix + "groups (name,description,adm) VALUES('" + inputs["name"][
                     "value"] + "','" + inputs["desc"]["value"] + "',0)"
     if inputs["type"]["value"] != "insert" and "user" in inputs:
-        print(inputs["user"], file=sys.stderr)
+        zoo.info(inputs["user"])
 
     c = auth.getCon(conf)
-    print(req, file=sys.stderr)
+    zoo.info(str(req))
     c.cur.execute(req)
     c.conn.commit()
     c.close()
@@ -340,8 +340,8 @@ def AddUser(conf, inputs, outputs):
             try:
                 user = json.loads(inputs["user"]["value"])
             except Exception as e:
-                print(inputs["user"]["value"], file=sys.stderr)
-                print(e, file=sys.stderr)
+                zoo.error(inputs["user"]["value"])
+                zoo.error(str(e))
                 conf["lenv"]["message"] = zoo._("invalid user parameter: ") + inputs["user"]["value"]
                 return 4
             for (i, j) in user.items():
@@ -447,7 +447,7 @@ def UpdateGroup(conf, inputs, outputs):
                 gdesc=adapt(group["description"])
                 gdesc.encoding="utf-8"
                 req = req % (gname,gdesc)
-        print(req, file=sys.stderr)
+        zoo.info(str(req))
         c.cur.execute(req)
         c.conn.commit()
         c.close()
@@ -469,8 +469,8 @@ def UpdateUser(conf, inputs, outputs):
             user = json.loads(inputs["set"]["value"])
         except Exception as e:
             user = {}
-            print(inputs["set"]["value"], file=sys.stderr)
-            print(e, file=sys.stderr)
+            zoo.error(inputs["set"]["value"])
+            zoo.error(str(e))
             conf["lenv"]["message"] = zoo._("invalid set parameter :") + inputs["set"]["value"]
             return 4
 
@@ -490,7 +490,7 @@ def UpdateUser(conf, inputs, outputs):
                 try:
                     c.cur.execute("DELETE FROM " + prefix + "users WHERE login='" + userl + "'")
                 except Exception as e:
-                    print(e, file=sys.stderr)
+                    zoo.error(str(e))
                     pass
                 c.conn.commit()
                 tmpStr = zoo._('User succcessfully %s')
@@ -505,9 +505,9 @@ def UpdateUser(conf, inputs, outputs):
                 tmpStr = zoo._('User succcessfully %s')
                 tmpStr = tmpStr % (inputs["type"]["value"] + 'd')
                 outputs["Result"]["value"] = tmpStr
-                print(inputs["group"]["value"], file=sys.stderr)
+                zoo.info(inputs["group"]["value"])
                 if "group" in inputs and inputs["group"]["value"] != "NULL":
-                    print(inputs["group"], file=sys.stderr)
+                    zoo.info(inputs["group"])
                     try:
                         c.cur.execute(
                             "DELETE FROM " + prefix + "user_group where id_user=(select id from " + prefix + "users where login='" + userl + "')")
@@ -548,11 +548,11 @@ def UpdateUser(conf, inputs, outputs):
 def linkGroupToUser(conf, c, prefix, gname, login):
     try:
         req = "INSERT INTO " + prefix + "user_group (id_user,id_group) VALUES ((SELECT id from " + prefix + "users where login='" + login + "' limit 1),(SELECT id from " + prefix + "groups where name='" + gname + "'))"
-        print(req, file=sys.stderr)
+        zoo.info(str(req))
         c.cur.execute(req)
         c.conn.commit()
         return True
     except Exception as e:
-        print(" ERROR When updating the groups: " +str(e), file=sys.stderr)
+        zoo.error(" ERROR When updating the groups: " +str(e))
         conf["lenv"]["message"] = zoo._("Error occured: ") + str(e)
         return False

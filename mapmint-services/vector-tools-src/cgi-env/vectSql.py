@@ -77,7 +77,7 @@ def vectInfo(conf, inputs, outputs):
 
     pszSQLStatement = inputs["q"]["value"]
     pszDataSource = inputs["dstName"]["value"]
-    print(inputs,file=sys.stderr)
+    zoo.info(str(inputs))
     # TODO: confirm assumption: "inputs" is a Python 3 dictionary object
     # if list(inputs.keys()).count("dialect") > 0 and pszDataSource.count("dbname") == 0:
     if "dialect" in inputs and inputs["dialect"]["value"]!="NULL":# and pszDataSource.count("dbname") == 0:
@@ -100,8 +100,8 @@ def vectInfo(conf, inputs, outputs):
     # /*      Report failure                                                  */
     # /* -------------------------------------------------------------------- */
     if poDS is None:
-        print("FAILURE:\n" \
-              "Unable to open datasource `%s' with the following drivers." % pszDataSource, file=sys.stderr)
+        zoo.info("FAILURE:\n" \
+              "Unable to open datasource `%s' with the following drivers." % pszDataSource)
         conf["lenv"]["message"] = "FAILURE:\n" \
                                   "Unable to open datasource `%s' with the following drivers." % pszDataSource
         for iDriver in range(ogr.GetDriverCount()):
@@ -123,13 +123,13 @@ def vectInfo(conf, inputs, outputs):
         nRepeatCount = 0  # // skip layer reporting.
 
         if papszLayers is not None:
-            print("layer names ignored in combination with -sql.", file=sys.stderr)
+            zoo.info("layer names ignored in combination with -sql.")
 
         poResultSet = poDS.ExecuteSQL(pszSQLStatement, poSpatialFilter,
                                       pszDialect)
 
         if poResultSet is None:
-            print((("failed to run the following SQL statement: %s!") % pszSQLStatement), file=sys.stderr)
+            zoo.info((("failed to run the following SQL statement: %s!") % pszSQLStatement))
             return 4
 
         if poResultSet is not None:
@@ -150,7 +150,7 @@ def vectInfo(conf, inputs, outputs):
                     poLayer = poDS.GetLayer(iLayer)
 
                     if poLayer is None:
-                        print(("FAILURE: Couldn't fetch advertised layer %d!" % iLayer), file=sys.stderr)
+                        zoo.info(("FAILURE: Couldn't fetch advertised layer %d!" % iLayer))
                         return 1
 
                     if not bAllLayers:
@@ -159,7 +159,7 @@ def vectInfo(conf, inputs, outputs):
                         if poLayer.GetLayerDefn().GetGeomType() != ogr.wkbUnknown:
                             line = line + " (%s)" % ogr.GeometryTypeToName(poLayer.GetLayerDefn().GetGeomType())
 
-                        print(line, file=sys.stderr)
+                        zoo.info(str(line))
                     else:
                         if iRepeat != 0:
                             poLayer.ResetReading()
@@ -176,7 +176,7 @@ def vectInfo(conf, inputs, outputs):
 
                     if poLayer is None:
                         myStr=("FAILURE: Couldn't fetch requested layer %s!" % papszIter)
-                        print(myStr, file=sys.stderr)
+                        zoo.info(str(myStr))
                         return 1
 
                     if iRepeat != 0:
@@ -200,7 +200,7 @@ def vectInfo(conf, inputs, outputs):
 # /************************************************************************/
 
 def Usage():
-    print("Usage: ogrinfo [--help-general] [-ro] [-q] [-where restricted_where]\n"
+    zoo.info("Usage: ogrinfo [--help-general] [-ro] [-q] [-where restricted_where]\n"
           "               [-spat xmin ymin xmax ymax] [-fid fid]\n"
           "               [-sql statement] [-al] [-so] [-fields={YES/NO}]\n"
           "               [-geom={YES/NO/SUMMARY}][--formats]\n"
@@ -240,7 +240,7 @@ def ReportOnLayer(inputs, res, poLayer, pszWHERE, poSpatialFilter, options):
 
         poFeature = poLayer.GetFeature(nFetchFID)
         if poFeature is None:
-            print(("Unable to locate feature id %d on this layer." % nFetchFID), file=sys.stderr)
+            zoo.info(("Unable to locate feature id %d on this layer." % nFetchFID))
 
         else:
             DumpReadableFeature(inputs, res, poFeature, options)
@@ -274,7 +274,7 @@ def DumpReadableFeature(inputs, res, poFeature, options=None):
     if poFeature.GetStyleString() is not None:
 
         if 'DISPLAY_STYLE' not in options or EQUAL(options['DISPLAY_STYLE'], 'yes'):
-            print("  Style = %s" % GetStyleString(), file=sys.stderr)
+            zoo.info("  Style = %s" % GetStyleString())
 
     poGeometry = poFeature.GetGeometryRef()
     if poGeometry is not None:
@@ -294,7 +294,7 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
         eType = poGeometry.GetGeometryType()
         if eType == ogr.wkbLineString or eType == ogr.wkbLineString25D:
             line = line + ("%d points" % poGeometry.GetPointCount())
-            print(line, file=sys.stderr)
+            zoo.info(str(line))
         elif eType == ogr.wkbPolygon or eType == ogr.wkbPolygon25D:
             nRings = poGeometry.GetGeometryCount()
             if nRings == 0:
@@ -310,7 +310,7 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
                         poRing = poGeometry.GetGeometryRef(ir + 1)
                         line = line + ("%d points" % poRing.GetPointCount())
                     line = line + ")"
-            print(line, file=sys.stderr)
+            zoo.info(str(line))
 
         elif eType == ogr.wkbMultiPoint or \
                 eType == ogr.wkbMultiPoint25D or \
@@ -322,7 +322,7 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
                 eType == ogr.wkbGeometryCollection25D:
 
             line = line + "%d geometries:" % poGeometry.GetGeometryCount()
-            print(line, file=sys.stderr)
+            zoo.info(str(line))
             for ig in range(poGeometry.GetGeometryCount()):
                 subgeom = poGeometry.GetGeometryRef(ig)
                 from sys import version_info
@@ -332,12 +332,12 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
                     exec('print("",)')
                 DumpReadableGeometry(subgeom, pszPrefix, options)
         else:
-            print(line, file=sys.stderr)
+            zoo.info(str(line))
 
     elif 'DISPLAY_GEOMETRY' not in options or EQUAL(options['DISPLAY_GEOMETRY'], 'yes') \
             or EQUAL(options['DISPLAY_GEOMETRY'], 'WKT'):
 
-        print(("%s%s" % (pszPrefix, poGeometry.ExportToWkt())), file=sys.stderr)
+        zoo.info(("%s%s" % (pszPrefix, poGeometry.ExportToWkt())))
 
     return
 
@@ -345,7 +345,7 @@ def DumpReadableGeometry(poGeometry, pszPrefix, options):
 if __name__ == '__main__':
     version_num = int(gdal.VersionInfo('VERSION_NUM'))
     if version_num < 1800:  # because of ogr.GetFieldTypeName
-        print('ERROR: Python bindings of GDAL 1.8.0 or later required')
+        zoo.info('ERROR: Python bindings of GDAL 1.8.0 or later required')
         sys.exit(1)
 
     sys.exit(main(sys.argv))

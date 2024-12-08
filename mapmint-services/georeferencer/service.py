@@ -99,7 +99,7 @@ def loadGCP(conf, inputs, outputs):
         destSR = osgeo.osr.SpatialReference()
         destSR.ImportFromEPSG(4326)
         srTrans = osgeo.osr.CoordinateTransformation(srcSR, destSR)
-        print(srTrans, file=sys.stderr)
+        zoo.info(str(srTrans))
     f = open(conf["main"]["dataPath"] + "/georeferencer_maps/" + inputs["dso"]["value"] + "/" + inputs["file"][
         "value"] + ".csv", "r")
     res = []
@@ -209,7 +209,7 @@ def saveGeorefProject(conf, inputs, outputs):
                     conf["main"]["dataPath"] + "/georeferencer_maps/" + inputs["map"]["value"] + "/*.csv"):
                 shutil.copy2(name, conf["main"]["dataPath"] + "/georeferencer_maps/" + inputs["dso"]["value"])
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             pass
         m.save(conf["main"]["dataPath"] + "/georeferencer_maps/project_" + inputs["dso"]["value"] + ".map")
     outputs["Result"]["value"] = zoo._("Georeference Project saved")
@@ -227,7 +227,7 @@ def saveGCPAsCSV(conf, inputs, outputs):
         "value"] + ".csv", "w")
     if "gcp" in inputs:
         for i in range(0, len(inputs["gcp"]["value"])):
-            print(inputs["gcp"]["value"][i], file=sys.stderr)
+            zoo.info(inputs["gcp"]["value"][i])
             f.write(inputs["gcp"]["value"][i].replace(",", ";") + "\n")
     f.close()
     m = mapscript.mapObj(conf["main"]["dataPath"] + "/georeferencer_maps/project_" + inputs["dso"]["value"] + ".map")

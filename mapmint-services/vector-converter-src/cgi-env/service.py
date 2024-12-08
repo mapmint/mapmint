@@ -80,7 +80,7 @@ def doZip(conf, inputs, outputs):
     try:
         os.remove(conf["main"]["tmpPath"] + "/" + inputs["dstn"]["value"])
     except Exception as e:
-        print(e, file=sys.stderr)
+        zoo.error(str(e))
         pass
     d = zipfile.ZipFile(conf["main"]["tmpPath"] + "/" + inputs["dstn"]["value"], 'w')
     rpath = conf["main"]["tmpPath"]

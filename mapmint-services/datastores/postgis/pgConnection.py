@@ -117,7 +117,7 @@ def listSchemas(conf, inputs, outputs):
             outputs["Result"]["value"] = json.dumps(res)
         return zoo.SERVICE_SUCCEEDED
     else:
-        print("Unable to connect", file=sys.stderr)
+        zoo.info("Unable to connect")
         return zoo.SERVICE_FAILED
 
 
@@ -144,7 +144,7 @@ def listTables(conf, inputs, outputs):
         return zoo.SERVICE_SUCCEEDED
     # return zoo.SERVICE_SUCCEEDED
     else:
-        print("Unable to connect", file=sys.stderr)
+        zoo.info("Unable to connect")
         return zoo.SERVICE_FAILED
 
 
@@ -162,7 +162,7 @@ def listTablesAndViews(conf, inputs, outputs):
             outputs["Result"]["value"] = json.dumps(res)
             return zoo.SERVICE_SUCCEEDED
     else:
-        print("Unable to connect", file=sys.stderr)
+        zoo.info("Unable to connect")
         return zoo.SERVICE_FAILED
 
 
@@ -259,10 +259,10 @@ def getTableDescription(conf, inputs, outputs):
             outputs["Result"]["value"] = json.dumps(res)
             return zoo.SERVICE_SUCCEEDED
         else:
-            print(" ---- unable to run request " + req, file=sys.stderr)
+            zoo.info(" ---- unable to run request " + req)
             return zoo.SERVICE_FAILED
     else:
-        print("Unable to connect", file=sys.stderr)
+        zoo.info("Unable to connect")
         return zoo.SERVICE_FAILED
 
 
@@ -378,7 +378,7 @@ def getTableContent(conf, inputs, outputs):
             else:
                 page = 1
                 req += " LIMIT 10"
-        print(req,file=sys.stderr)
+        zoo.info(str(req))
         res = db.execute(req)
         if res != False:
             rows = []
@@ -388,7 +388,7 @@ def getTableContent(conf, inputs, outputs):
                     try:
                         tmp = str(res[i][k].decode('utf-8'))
                     except Exception as e:
-                        print(e, file=sys.stderr)
+                        zoo.error(str(e))
                         tmp = str(res[i][k])
                     res0 += [str(tmp)]
                 if len(geom) > 0:
@@ -401,10 +401,10 @@ def getTableContent(conf, inputs, outputs):
             outputs["Result"]["value"] = json.dumps({"page": page, "total": total, "rows": rows}, ensure_ascii=False)
             return zoo.SERVICE_SUCCEEDED
         else:
-            print(" ----- unable to run request", file=sys.stderr)
+            zoo.info(" ----- unable to run request")
             return zoo.SERVICE_FAILED
     else:
-        print("Unable to connect", file=sys.stderr)
+        zoo.info("Unable to connect")
         return zoo.SERVICE_FAILED
 
 
@@ -512,7 +512,7 @@ def getTableContent1(conf, inputs, outputs):
                     try:
                         tmp = str(res[i][k].decode('utf-8'))
                     except Exception as e:
-                        print(e, file=sys.stderr)
+                        zoo.error(str(e))
                         tmp = str(res[i][k])
                     res0 += [str(tmp)]
                     if len(geom) > 0:
@@ -525,10 +525,10 @@ def getTableContent1(conf, inputs, outputs):
             outputs["Result"]["value"] = json.dumps({"page": page, "total": total, "rows": rows}, ensure_ascii=False)
             return zoo.SERVICE_SUCCEEDED
         else:
-            print(" ------ unable to run request", file=sys.stderr)
+            zoo.info(" ------ unable to run request")
             return zoo.SERVICE_FAILED
     else:
-        print("Unable to connect", file=sys.stderr)
+        zoo.info("Unable to connect")
         return zoo.SERVICE_FAILED
 
 
