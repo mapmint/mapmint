@@ -60,7 +60,7 @@ def getRoutingLayer(conf):
 
 
 def parseDb(dbp):
-    print(auth.parseDb(dbp), file=sys.stderr)
+    zoo.info(auth.parseDb(dbp))
     return auth.parseDb(dbp)
 
 
@@ -109,7 +109,7 @@ def loadRoute(conf, inputs, outputs):
     points = []
     j = 0
     for i in res:
-        print(i, file=sys.stderr)
+        zoo.info(str(i))
         points += [json.loads(i[1])]
         j += 1
 
@@ -123,7 +123,7 @@ def removeRoute(conf, inputs, outputs):
         os.remove(conf["main"]["dataPath"] + "/Paths/Saved_Result_" + inputs["trace"]["value"] + ".map")
         os.remove(conf["main"]["dataPath"] + "/Paths/Saved_ZOO_DATA_Result_" + inputs["trace"]["value"] + ".json")
     except Exception as e:
-        print(e, file=sys.stderr)
+        zoo.error(str(e))
     res = []
     conn = psycopg2.connect(parseDb(conf["velodb"]))
     cur = conn.cursor()
@@ -203,7 +203,7 @@ def savePOIUser(conf, inputs, outputs):
     inputs["content"]["value"] = inputs["content"]["value"].replace("'", "''")
     if "point" in inputs and inputs["point"]["value"] != "NULL":
         points = "(SELECT setSRID(GeometryFromText('POINT(" + inputs["point"]["value"].replace(",", " ") + ")'),4326) as geom)"
-        print(points, file=sys.stderr)
+        zoo.info(str(points))
         cur.execute("INSERT INTO actualites (title,content,id_user,cat,type_incident,geom) VALUES ('" + inputs["title"]["value"] + "','" + inputs["content"]["value"] + "',(SELECT id from velo.users where login='" + conf["senv"]["login"] + "')," + inputs["type"]["value"] + "," + inputs["type_incident"][
             "value"] + ",(" + points + "))")
     else:
@@ -211,8 +211,7 @@ def savePOIUser(conf, inputs, outputs):
             "INSERT INTO actualites (title,content,id_user,lon,lat,cat,type_incident) VALUES ('" + inputs["title"]["value"] + "','" + inputs["content"]["value"] + "',(SELECT id from velo.users where login='" + conf["senv"]["login"] + "')," + inputs["long"]["value"] + "," + inputs["lat"]["value"] + "," + inputs["type"][
                 "value"] + "," + inputs["type_incident"]["value"] + ")")
     conn.commit()
-    print("DEBUG", file=sys.stderr)
-    # print(inputs["point"]["value"], file=sys.stderr)
+    zoo.info("DEBUG")
 
     outputs["Result"]["value"] = zoo._("Your news was successfully inserted.")
     return zoo.SERVICE_SUCCEEDED
@@ -252,10 +251,10 @@ def saveRoute(conf, inputs, outputs):
 
 
 def saveRouteForUser(conf, inputs, outputs):
-    print("DEBUG 0000", file=sys.stderr)
+    zoo.info("DEBUG 0000")
     saveRoute(conf, inputs, outputs)
 
-    print("DEBUG", file=sys.stderr)
+    zoo.info("DEBUG")
     idtrace = outputs["Result"]["value"].replace(conf["main"]["applicationAddress"] + "load/" + conf["senv"]["last_map"] + "/", "")
     conn = psycopg2.connect(parseDb(conf["velodb"]))
     cur = conn.cursor()
@@ -265,14 +264,14 @@ def saveRouteForUser(conf, inputs, outputs):
             points += " UNION "
         points += "(SELECT setSRID(GeometryFromText('POINT(" + i.replace(",", " ") + ")'),4326) as geom)"
     points += ") as t"
-    print(points, file=sys.stderr)
+    zoo.info(str(points))
     if "user" in inputs:
         cur.execute("INSERT INTO velo.savedpath (trace,name,id_user,wkb_geometry) VALUES ('" + idtrace + "','" + inputs["name"]["value"] + "',NULL,(" + points + "))")
     else:
         cur.execute("INSERT INTO velo.savedpath (trace,name,id_user,wkb_geometry) VALUES ('" + idtrace + "','" + inputs["name"]["value"] + "',(SELECT id from velo.users where login='" + conf["senv"]["login"] + "'),(" + points + "))")
     conn.commit()
-    print("DEBUG", file=sys.stderr)
-    print(inputs["point"]["value"], file=sys.stderr)
+    zoo.info("DEBUG")
+    zoo.info(inputs["point"]["value"])
 
     outputs["Result"]["value"]
     return zoo.SERVICE_SUCCEEDED
@@ -280,7 +279,7 @@ def saveRouteForUser(conf, inputs, outputs):
 
 def saveContext(conf, inputs, outputs):
     import shortInteger, time, sqlite3
-    print("DEBUG 0000", file=sys.stderr)
+    zoo.info("DEBUG 0000")
     conn = sqlite3.connect(conf['main']['dblink'])
     cur = conn.cursor()
     newNameId = str(time.time()).split('.')[0]
@@ -294,7 +293,7 @@ def saveContext(conf, inputs, outputs):
     else:
         layers += inputs["layers"]["value"]
     req = "INSERT INTO contexts (name,layers,ext) VALUES ('" + name + "','" + layers + "','" + inputs["extent"]["value"] + "')"
-    print(req, file=sys.stderr)
+    zoo.info(str(req))
     cur.execute(req)
     conn.commit()
     outputs["Result"]["value"] = conf["main"]["applicationAddress"] + "public/" + conf["senv"]["last_map"] + ";c=" + name
@@ -337,14 +336,14 @@ def computeDistanceAlongLine(conf, inputs, outputs):
     import osgeo.gdal
     import os
     geom = osgeo.ogr.CreateGeometryFromJson(inputs["line"]["value"])
-    print(geom, file=sys.stderr)
+    zoo.info(str(geom))
     points = geom.GetPoints()
     res = []
     for i in range(0, len(points) - 1):
         poi0 = osgeo.ogr.CreateGeometryFromWkt('POINT(' + str(points[i][0]) + '  ' + str(points[i][1]) + ')')
         poi1 = osgeo.ogr.CreateGeometryFromWkt('POINT(' + str(points[i + 1][0]) + '  ' + str(points[i + 1][1]) + ')')
 
-        print(dir(poi0.Distance(poi1)), file=sys.stderr)
+        zoo.info(dir(poi0.Distance(poi1)))
         res += [poi0.Distance(poi1)]
     outputs["Result"]["value"] = json.dumps(res)
     drv = osgeo.ogr.GetDriverByName("GeoJSON")
@@ -358,23 +357,23 @@ def computeDistanceAlongLine(conf, inputs, outputs):
     feat.SetGeometry(geom)
     lyr.CreateFeature(feat)
     ds.Destroy()
-    print("OK1", file=sys.stderr)
+    zoo.info("OK1")
     vsiFile = osgeo.gdal.VSIFOpenL("/vsimem//store" + conf["lenv"]["sid"] + "0.json", "r")
-    print("OK2", file=sys.stderr)
+    zoo.info("OK2")
     i = 0
-    print(str(vsiFile), file=sys.stderr)
+    zoo.info(str(vsiFile))
     osgeo.gdal.VSIFSeekL(vsiFile, 0, os.SEEK_END)
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     while osgeo.gdal.VSIFSeekL(vsiFile, 0, os.SEEK_END) > 0:
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
         i += 1
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     fileSize = osgeo.gdal.VSIFTellL(vsiFile)
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     osgeo.gdal.VSIFSeekL(vsiFile, 0, os.SEEK_SET)
     outputs["Result"]["value"] = osgeo.gdal.VSIFReadL(fileSize, 1, vsiFile)
     osgeo.gdal.Unlink("/vsimem/store" + conf["lenv"]["sid"] + "0.json")
-    print(outputs["Result"]["value"], file=sys.stderr)
+    zoo.info(outputs["Result"]["value"])
     return zoo.SERVICE_SUCCEEDED
 
 
@@ -385,7 +384,7 @@ def splitLine(conf, inputs, outputs):
     geom = osgeo.ogr.CreateGeometryFromJson(inputs["line"]["value"]).ExportToWkt()
     tmp = geom.split("(")[1].split(")")[0]
     geom = tmp.split(",")
-    print(geom, file=sys.stderr)
+    zoo.info(str(geom))
     sPc = inputs["startPoint"]["value"].split(",")
     # sP=shapely.wkt.loads('POINT('+sPc[0]+' '+sPc[1]+')')
     ePc = inputs["endPoint"]["value"].split(",")
@@ -400,10 +399,10 @@ def splitLine(conf, inputs, outputs):
             break
         if isStarted:
             res += [toto]
-        print(geom[i], file=sys.stderr)
-        print(sPc, file=sys.stderr)
-        print(ePc, file=sys.stderr)
-        print("******", file=sys.stderr)
+        zoo.info(geom[i])
+        zoo.info(str(sPc))
+        zoo.info(str(ePc))
+        zoo.info("******")
 
     geometryRes = osgeo.ogr.Geometry(osgeo.ogr.wkbLineString25D)
     for i in range(0, len(res)):
@@ -462,10 +461,10 @@ def doDDPolygon(conf, inputs, outputs):
 def findNearestEdge(table, cur, lonlat):
     sql = "with index_query as (  select   ogc_fid as gid, source, target, " + the_geom + ", st_distance(" + the_geom + ", 'SRID=4326;POINT(" + lonlat[0] + " " + lonlat[1] + ")') as distance  from " + table + " WHERE " + the_geom + " && 'BOX3D(" + str(float(lonlat[0]) - 0.001) + " " + str(
         float(lonlat[1]) - 0.001) + ", " + str(float(lonlat[0]) + 0.001) + " " + str(float(lonlat[1]) + 0.001) + ")'::box3d) select * from index_query order by distance limit 1;"
-    print("DEBUG MSG: " + str(sql), file=sys.stderr)
+    zoo.info("DEBUG MSG: " + str(sql))
     cur.execute(sql)
     res = cur.fetchall()
-    print("DEBUG MSG: " + str(res), file=sys.stderr)
+    zoo.info("DEBUG MSG: " + str(res))
     return {"gid": res[0][0], "source": res[0][1], "target": res[0][2], "the_geom": res[0][3]}
 
 
@@ -518,12 +517,9 @@ def computeRoute(table, cur, startEdge, endEdge, method, conf, inputs):
     # Update all other tuples to correct order
     sqlUpdateAll = sqlUpdateEnd + sqlUpdateFirst + "UPDATE " + tblName + " set length=st_length(geojson) WHERE gid!=" + str(startEdge['gid']) + ";"
 
-    # print(sql, file=sys.stderr)
     cur.execute(sql)
     cur.execute(sqlUpdateFirst)
     cur.execute(sqlUpdateEnd)
-    # print(sqlUpdateFirst, file=sys.stderr)
-    # print(sqlUpdateEnd, file=sys.stderr)
 
     # Build the first segment from the starting point to the first edge
     sql1 = "select 0 as gid, ST_AsGeoJSON(st_geometryFromText('LINESTRING(' || " + str(inputs["startPoint"]["value"][0]) + " || ' ' || " + str(
@@ -531,7 +527,6 @@ def computeRoute(table, cur, startEdge, endEdge, method, conf, inputs):
         inputs["startPoint"]["value"][0]) + " || ' '|| " + str(inputs["startPoint"]["value"][
                                                                    1]) + " || ', '||st_x(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||' '||st_y(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||')')),'Inconnu','Inconnu',0 from (SELECT *, ST_line_locate_point(st_linemerge(geojson), st_setsrid(st_geometryFromText('POINT('|| " + str(
         inputs["startPoint"]["value"][0]) + " ||' '|| " + str(inputs["startPoint"]["value"][1]) + " || ')'),4326)) as location from " + tblName + " WHERE gid=" + str(startEdge['gid']) + ") As initialLocation limit 1"
-    # print(sql1, file=sys.stderr)
 
     # Build the last segment from last edge to the end point
     sql2 = "select 100000000000 as gid, ST_AsGeoJSON(st_geometryFromText('LINESTRING( ' || " + str(inputs["endPoint"]["value"][0]) + " || ' '|| " + str(
@@ -539,7 +534,6 @@ def computeRoute(table, cur, startEdge, endEdge, method, conf, inputs):
         inputs["endPoint"]["value"][0]) + " || ' '|| " + str(inputs["endPoint"]["value"][
                                                                  1]) + " || ', '||st_x(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||' '||st_y(ST_Line_Interpolate_Point(st_linemerge(geojson),location))||')')),'Inconnu','Inconnu',100000000000 from (SELECT *, ST_line_locate_point(st_linemerge(geojson), st_setsrid(st_geometryFromText('POINT('|| " + str(
         inputs["endPoint"]["value"][0]) + " ||' '|| " + str(inputs["endPoint"]["value"][1]) + " || ')'),4326)) as location from " + tblName + " WHERE gid=" + str(endEdge['gid']) + " ) As finalLocation"
-    # print(sql2, file=sys.stderr)
 
     # Build the final query as conmbinaison of the previous ones
     # sql+="SELECT * FROM ("+sql1+") as foo0;";
@@ -551,7 +545,6 @@ def computeRoute(table, cur, startEdge, endEdge, method, conf, inputs):
     # sql+=""+sql2+";"
     # sql+="SELECT * FROM ("+sql1+") as foo0 UNION (SELECT row_number, oldtable.* FROM (select foo.* from (SELECT gid,ST_AsGeoJSON(st_linemerge(geojson)), name, length FROM tmp_route"+conf["senv"]["MMID"]+") as foo) AS oldtable CROSS JOIN generate_series(1, (SELECT COUNT(*) FROM tmp_route"+conf["senv"]["MMID"]+")) AS row_number) UNION ("+sql2+")"
 
-    # print(sql, file=sys.stderr)
 
     result = {"type": "FeatureCollection", "features": []}
     cnt = 1
@@ -561,7 +554,7 @@ def computeRoute(table, cur, startEdge, endEdge, method, conf, inputs):
     # res1=[]
 
     for i in res1:
-        print("I: " + str(i), file=sys.stderr)
+        zoo.info("I: " + str(i))
         try:
             tmp = str(i[2])
         except:
@@ -609,7 +602,7 @@ def computeRouteUnion(inputs, cur, startEdge, endEdge, method):
             sql = "SELECT max(" + table + ".gid), ST_AsGeoJSON(ST_LineMerge(ST_Union(" + table + ".the_geom))) AS geojson, sum(length(" + table + ".the_geom)) AS length FROM " + table + ", (SELECT edge_id as gid FROM shortest_path('SELECT gid as id,source,target,CASE WHEN tbllink=1 THEN length/2 ELSE length*2 END as cost from  " + table + "'," + str(
                 startEdge['source']) + "," + str(endEdge['target']) + ",false,false)) as rt WHERE " + table + ".gid=rt.gid "
         sql = "SELECT max(rt.gid), ST_AsGeoJSON(ST_LineMerge(ST_Union(rt.the_geom))) AS geojson, sum(length(rt.the_geom)) AS length FROM " + table + ", (SELECT gid, the_geom FROM dijkstra_sp_delta('" + table + "'," + str(startEdge['source']) + "," + str(endEdge['target']) + ",1)) as rt WHERE " + table + ".gid=rt.gid ;"
-    print(sql, file=sys.stderr)
+    zoo.info(str(sql))
 
     cur.execute(sql)
     res = cur.fetchall()
@@ -625,9 +618,9 @@ def computeRouteUnion(inputs, cur, startEdge, endEdge, method):
 def do(conf, inputs, outputs):
     rl = getRoutingLayer(conf)
     table = rl.data
-    print(rl.data, file=sys.stderr)
-    print(rl.connection, file=sys.stderr)
-    print(dir(getRoutingLayer(conf)), file=sys.stderr)
+    zoo.info(str(rl.data))
+    zoo.info(str(rl.connection))
+    zoo.info(dir(getRoutingLayer(conf)))
     conn = psycopg2.connect(rl.connection.replace("PG: ", ""))  # parseDb(conf["velodb"]))
     cur = conn.cursor()
     startpointInitial = ''.join(inputs["startPoint"]["value"])
@@ -642,25 +635,25 @@ def do(conf, inputs, outputs):
 
         endpointInitial = "".join(inputs["endPoint"]["value"])
 
-        print(endpointInitial + " " + startpointInitial, file=sys.stderr)
+        zoo.info(endpointInitial + " " + startpointInitial)
 
         startpointInitial = startpointInitial.split(',')
 
         res = {"type": "FeatureCollection", "features": []}
         while i < len(startpointInitial):
-            print("Etape " + str(i), file=sys.stderr)
+            zoo.info("Etape " + str(i))
             inputs["startPoint"]["value"] = [startpointInitial[i], startpointInitial[i + 1]]
-            print(str(inputs["startPoint"]["value"]), file=sys.stderr)
+            zoo.info(str(inputs["startPoint"]["value"]))
             startEdge = findNearestEdge(table, cur, inputs["startPoint"]["value"])
-            print(str(i + 3) + " " + str(len(startpointInitial)), file=sys.stderr)
+            zoo.info(str(i + 3) + " " + str(len(startpointInitial)))
             if i + 3 < len(startpointInitial):
                 inputs["endPoint"]["value"] = [startpointInitial[i + 2], startpointInitial[i + 3]]
-                print(str(inputs["endPoint"]["value"]), file=sys.stderr)
+                zoo.info(str(inputs["endPoint"]["value"]))
                 endEdge = findNearestEdge(table, cur, inputs["endPoint"]["value"])
             else:
-                print(str(inputs["endPoint"]["value"]), file=sys.stderr)
+                zoo.info(str(inputs["endPoint"]["value"]))
                 inputs["endPoint"]["value"] = endpointInitial.split(',')
-                print(str(inputs["endPoint"]["value"]), file=sys.stderr)
+                zoo.info(str(inputs["endPoint"]["value"]))
                 endEdge = findNearestEdge(table, cur, inputs["endPoint"]["value"])
             inputs["cnt"] = {"value": str(i)}
             tmp = computeRoute(table, cur, startEdge, endEdge, "SPD", conf, inputs)
@@ -677,12 +670,12 @@ def doUnion(conf, inputs, outputs):
     startpointInitial = ''.join(inputs["startPoint"]["value"])
     inputs["startPoint"]["value"] = inputs["startPoint"]["value"].split(',')
     if len(inputs["startPoint"]["value"]) == 2:
-        print(str(inputs), file=sys.stderr)
+        zoo.info(str(inputs))
         startEdge = findNearestEdge(table, cur, inputs["startPoint"]["value"])
-        print(str(inputs), file=sys.stderr)
+        zoo.info(str(inputs))
         inputs["endPoint"]["value"] = inputs["endPoint"]["value"].split(',')
         endEdge = findNearestEdge(cur, inputs["endPoint"]["value"])
-        print(str(inputs), file=sys.stderr)
+        zoo.info(str(inputs))
         res = computeRouteUnion(inputs, cur, startEdge, endEdge, "SPD")
         outputs["Result"]["value"] = json.dumps(res)
     else:
@@ -690,29 +683,29 @@ def doUnion(conf, inputs, outputs):
 
         endpointInitial = "".join(inputs["endPoint"]["value"])
 
-        print(endpointInitial + " " + startpointInitial, file=sys.stderr)
+        zoo.info(endpointInitial + " " + startpointInitial)
 
         startpointInitial = startpointInitial.split(',')
 
         res = {"type": "FeatureCollection", "features": []}
         while i < len(startpointInitial):
-            print("Etape " + str(i), file=sys.stderr)
+            zoo.info("Etape " + str(i))
             inputs["startPoint"]["value"] = [startpointInitial[i], startpointInitial[i + 1]]
-            print(str(inputs["startPoint"]["value"]), file=sys.stderr)
+            zoo.info(str(inputs["startPoint"]["value"]))
             startEdge = findNearestEdge(cur, inputs["startPoint"]["value"])
-            print(str(i + 3) + " " + str(len(startpointInitial)), file=sys.stderr)
+            zoo.info(str(i + 3) + " " + str(len(startpointInitial)))
             if i + 3 < len(startpointInitial):
                 inputs["endPoint"]["value"] = [startpointInitial[i + 2], startpointInitial[i + 3]]
-                print(str(inputs["endPoint"]["value"]), file=sys.stderr)
+                zoo.info(str(inputs["endPoint"]["value"]))
                 endEdge = findNearestEdge(cur, inputs["endPoint"]["value"])
             else:
-                print(str(inputs["endPoint"]["value"]), file=sys.stderr)
+                zoo.info(str(inputs["endPoint"]["value"]))
                 inputs["endPoint"]["value"] = endpointInitial.split(',')
-                print(str(inputs["endPoint"]["value"]), file=sys.stderr)
+                zoo.info(str(inputs["endPoint"]["value"]))
                 endEdge = findNearestEdge(cur, inputs["endPoint"]["value"])
             inputs["cnt"] = {"value": str(i)}
             tmp = computeRouteUnion(cur, startEdge, endEdge, "SPD")
-            print(str(tmp), file=sys.stderr)
+            zoo.info(str(tmp))
             if len(res["features"]) == 0:
                 res["features"] += tmp["features"];
             else:
@@ -746,15 +739,15 @@ def printRoute(conf, inputs, outputs):
     if list(conf.keys()).count("oo") > 0 and list(conf["oo"].keys()).count("external") > 0 and conf["oo"]["external"] == "true":
         from subprocess import Popen, PIPE
         import json
-        print("Start", file=sys.stderr)
+        zoo.info("Start")
         sys.stderr.flush()
         err_log = file(conf["main"]["tmpPath"] + '/tmp_err_log_file', 'w', 0)
         os.dup2(err_log.fileno(), sys.stderr.fileno())
         process = Popen([conf["oo"]["path"]], stdin=PIPE, stdout=PIPE)
-        print("Started", file=sys.stderr)
+        zoo.info("Started")
         script = "import  sys\nimport print.PaperMint as PaperMint\n"
-        print("PaperMint imported", file=sys.stderr)
-        print(script, file=sys.stderr)
+        zoo.info("PaperMint imported")
+        zoo.info(str(script))
     else:
         import PaperMint
     sizes = {
@@ -792,20 +785,20 @@ def printRoute(conf, inputs, outputs):
     # Add overlay layers
     mo = mapscript.mapObj(inputs["olayers"]["value"].replace(conf["main"]["mapserverAddress"] + "?map=", ""))
     l0 = mo.getLayer(0).clone()
-    print("+++++++++++++++++++++++++++", file=sys.stderr)
-    print(m.numlayers, file=sys.stderr)
+    zoo.info("+++++++++++++++++++++++++++")
+    zoo.info(str(m.numlayers))
     m.insertLayer(l0)
     m.getLayer(m.numlayers - 1).status = mapscript.MS_ON
-    print(m.numlayers, file=sys.stderr)
-    print("+++++++++++++++++++++++++++", file=sys.stderr)
+    zoo.info(str(m.numlayers))
+    zoo.info("+++++++++++++++++++++++++++")
 
     # Set activated layers to on and generate legend icons
     layers = inputs["layers"]["value"].split(",")
     layers += [mo.getLayer(0).name]
-    print(layers, file=sys.stderr)
+    zoo.info(str(layers))
     layerNames = []
     for i in range(0, len(layers)):
-        print(layers[i], file=sys.stderr)
+        zoo.info(layers[i])
         layer = m.getLayerByName(layers[i])
         if layer is None:
             i += 1
@@ -855,9 +848,9 @@ def printRoute(conf, inputs, outputs):
             zl = int(n0)
         else:
             zl = int(m0)
-        print("+++++++++++++++++++++++++++++++++++++", file=sys.stderr)
-        print(zl, file=sys.stderr)
-        print("+++++++++++++++++++++++++++++++++++++", file=sys.stderr)
+        zoo.info("+++++++++++++++++++++++++++++++++++++")
+        zoo.info(str(zl))
+        zoo.info("+++++++++++++++++++++++++++++++++++++")
     else:
         zl = int(inputs["zoom"]["value"])
 
@@ -867,16 +860,16 @@ def printRoute(conf, inputs, outputs):
     m.setExtent(float(ext[0]) + delta, float(ext[1]) + delta, float(ext[2]) - delta, float(ext[3]) - delta)
 
     # Fix size
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     m.setSize(csize[0], csize[1])
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
 
     # Replace the Background Map image in the document template if any
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     if "bgMap" in inputs:
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
         nl = mapscript.layerObj(m)
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
         nl.updateFromString('''LAYER 
  NAME "BaseLayerMap" 
  TYPE RASTER
@@ -888,19 +881,18 @@ def printRoute(conf, inputs, outputs):
    "init=epsg:900913"
  END
 END''')
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
         ordon = ()
         ordon += ((m.numlayers - 1),)
         for a in range(0, m.numlayers - 1):
             ordon += (a,)
         m.setLayerOrder(ordon)
-        print("OK", file=sys.stderr)
+        zoo.info("OK")
 
     if 'profile' in inputs:
         import json
         tmp = json.loads(inputs["profile"]["value"])
         distances = json.loads(tmp["features"][0]["properties"]["distance"])
-        # print(tmp["features"][0]["geometry"]["coordinates"], file=sys.stderr)
         rvals = [[zoo._("Profile")], [], []]
         totald = 0
         for i in range(0, len(distances)):
@@ -919,25 +911,25 @@ END''')
             rvals0 += [[geoms[ij].GetField(2), geoms[ij].GetField(3), parseDistance(geoms[ij].GetField(1) * 111120), "[_route_danger_]"]]
 
     # Draw the image and save it
-    print("Draw", file=sys.stderr)
+    zoo.info("Draw")
     i = m.draw()
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     import time
     savedImage = conf["main"]["tmpPath"] + "/print_" + conf["senv"]["MMID"] + "_" + str(time.clock()).split(".")[1] + ".png"
-    print("OK", file=sys.stderr)
+    zoo.info("OK")
     try:
         os.unlink(savedImage)
     except:
         pass
-    print("OK", file=sys.stderr)
+    zoo.error("OK")
     i.save(savedImage)
-    print("OK", file=sys.stderr)
+    zoo.error("OK")
 
     # Set activated layers to on
     # layers=inputs["layers"]["value"].split(",")
     script0 = ""
     for i in range(0, len(layers)):
-        print(layers[i], file=sys.stderr)
+        zoo.info(layers[i])
         layer = m.getLayerByName(layers[i])
         if layer is None:
             i += 1
@@ -951,7 +943,7 @@ END''')
         if layer.numclasses == 1:
             lm.getLayer(0).status = mapscript.MS_ON
             lsavedImage = conf["main"]["tmpPath"] + "/print_" + conf["senv"]["MMID"] + "_" + str(time.clock()).split(".")[1] + ".png"
-            print("OK", file=sys.stderr)
+            zoo.info("OK")
             try:
                 os.unlink(lsavedImage)
             except:
@@ -973,7 +965,7 @@ END''')
                 for j in range(k + 1, lm.numlayers):
                     lm.getLayer(j).status = mapscript.MS_OFF
                 lsavedImage = conf["main"]["tmpPath"] + "/print_" + conf["senv"]["MMID"] + "_" + str(time.clock()).split(".")[1] + ".png"
-                print("OK", file=sys.stderr)
+                zoo.info("OK")
                 try:
                     os.unlink(lsavedImage)
                 except:
@@ -1014,12 +1006,12 @@ END''')
         script += 'pm.saveDoc("' + docPath + '")\n'
         script += 'pm.unloadDoc("' + conf["main"]["dataPath"] + '/ftp/templates/' + tmpl + '")\n'
         try:
-            print("Run0", file=sys.stderr)
-            print(script, file=sys.stderr)
+            zoo.info("Run0")
+            zoo.info(str(script))
             process.stdin.write(script)
-            print("Run1", file=sys.stderr)
+            zoo.info("Run1")
             process.stdin.close()
-            print("Run2", file=sys.stderr)
+            zoo.info("Run2")
             process.wait()
             conf["lenv"]["message"] = str(process.stdout.readline())
             sys.stderr.flush()

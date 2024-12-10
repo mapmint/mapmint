@@ -23,7 +23,10 @@ __declspec(dllexport)
     map* tmpMap=getMapFromMaps(inputs,"ttf","value");
     char ttfFile[1024];
     sprintf(ttfFile,"%s/fonts/%s",tmpMap4Path->value,tmpMap->value);
-    fprintf(stderr,"File to open : %s\n",ttfFile);
+    char* pcaMessage=(char*) malloc((18+strlen(ttfFile))*sizeof(char));
+    sprintf(pcaMessage,"File to open : %s",ttfFile);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     error = FT_New_Face( library, ttfFile, 0, &face ); 
     if ( error == FT_Err_Unknown_File_Format ){ 
       setMapInMaps(conf,"lenv","message","Error unknow format");

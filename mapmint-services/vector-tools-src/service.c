@@ -203,7 +203,10 @@ __declspec(dllexport)
     map *tmpP=getMapFromMaps(conf,"main","dataPath");
     map *tmp=getMapFromMaps(inputs,"dataSource","value");
     if(tmp!=NULL){
-      fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	  char* pcaMessage=(char*) malloc((13+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+      sprintf(pcaMessage,"MAP : %s %d ",__FILE__,__LINE__);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       fflush(stderr);
       char *tmpDataSource=strdup(tmp->value);
       char *pszDataDir;
@@ -213,26 +216,47 @@ __declspec(dllexport)
       sprintf(type,"PostGIS");
       int dirp = open( pszDataDir , O_RDONLY );
       if(dirp<0){
-	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	char* pcaMessage=(char*) malloc((13+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+	sprintf(pcaMessage,"MAP : %s %d ",__FILE__,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	fflush(stderr);
 	//pszDataDir=NULL;
 	//free(pszDataDir);
 	pszDataDir=(char*)malloc((strlen(tmpDataSource)+strlen(tmpP->value)+12)*sizeof(char));
 	sprintf(pszDataDir,"%s/MySQL/%s.xml",tmpP->value,tmpDataSource);
 	//pszDataDir[(strlen(tmpDataSource)+strlen(tmpP->value)+12)]=0;
-	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	char* pcaMessage=(char*) malloc((13+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+	sprintf(pcaMessage,"MAP : %s %d ",__FILE__,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	fflush(stderr);
-	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	char* pcaMessage=(char*) malloc((13+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+	sprintf(pcaMessage,"MAP : %s %d ",__FILE__,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	fflush(stderr);
-	fprintf(stderr,"MAP : %s %d %s \n",__FILE__,__LINE__,pszDataDir);
+	char* pcaMessage=(char*) malloc((16+strlen(__FILE__)+strlen(__LINE__)+strlen(pszDataDir))*sizeof(char));
+	sprintf(pcaMessage,"MAP : %s %d %s ",__FILE__,__LINE__,pszDataDir);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	fflush(stderr);
-	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	char* pcaMessage=(char*) malloc((13+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+	sprintf(pcaMessage,"MAP : %s %d ",__FILE__,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	fflush(stderr);
 	sprintf(type,"MySQL");
-	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	char* pcaMessage=(char*) malloc((13+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+	sprintf(pcaMessage,"MAP : %s %d ",__FILE__,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	fflush(stderr);
 	dirp = open( pszDataDir , O_RDONLY );
-	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	char* pcaMessage=(char*) malloc((13+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+	sprintf(pcaMessage,"MAP : %s %d ",__FILE__,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	fflush(stderr);
       }
       //fprintf(stderr,"MAP : %s %s %d %d \n",__FILE__,__LINE__,pszDataDir,dirp);
@@ -240,14 +264,23 @@ __declspec(dllexport)
       char *res=NULL;
       struct dirent *dp;
       if(dirp>=0){
-	fprintf(stderr,"MAP : %s %d \n",__FILE__,__LINE__);
+	char* pcaMessage=(char*) malloc((13+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+	sprintf(pcaMessage,"MAP : %s %d ",__FILE__,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	fflush(stderr);
 	close(dirp);
-	fprintf(stderr,"XML FOUND \n");
+	char* pcaMessage=(char*) malloc((11)*sizeof(char));
+	sprintf(pcaMessage,"XML FOUND ");
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	xsltStylesheetPtr cur = NULL;
 	xmlDocPtr doc, res;
 	char *xslFileName;
-	fprintf(stderr,"XML FOUND %s \n",tmpP->value);
+	char* pcaMessage=(char*) malloc((14)*sizeof(char));
+	sprintf(pcaMessage,"XML FOUND %s ",tmpP->value);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	xslFileName=(char*)malloc((strlen(tmpP->value)+18)*sizeof(char));
 	sprintf(xslFileName,"%s/%s/conn.xsl",tmpP->value,type);
 	cur = xsltParseStylesheetFile(BAD_CAST xslFileName);
@@ -257,20 +290,29 @@ __declspec(dllexport)
 	int buffersize;
 	xsltSaveResultToString(&xmlbuff, &buffersize, res, cur);
 	pszDataSource = strdup((char*)xmlbuff);
-	fprintf(stderr,"%s\n",pszDataSource);
+	char* pcaMessage=(char*) malloc((3+strlen(pszDataSource))*sizeof(char));
+	sprintf(pcaMessage,"%s",pszDataSource);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	free(xmlbuff);
 	isPg=1;
       }
       else{
 	if(strncasecmp(tmpDataSource,"WFS",3)==0){
-	  fprintf(stderr,"\n\n** %s **\n\n",tmpDataSource);
+	  char* pcaMessage=(char*) malloc((17+strlen(tmpDataSource))*sizeof(char));
+	  sprintf(pcaMessage,"\n\n** %s **\n\n",tmpDataSource);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  char* pszDataDir=(char*)malloc((strlen(tmpP->value)+strlen(strstr(tmp->value,":")+1)+17)*sizeof(char));
 	  sprintf(pszDataDir,"%s/WFS/%s.txt",tmpP->value,strstr(tmp->value,":")+1);  
 	  setMapInMaps(inputs,"wxsMap","value",strstr(tmp->value,":")+1);
 
 	  int dirp = open( pszDataDir , O_RDONLY );
 	  int nn;
-	  fprintf(stderr,"DATADIR %s %i \n",pszDataDir,dirp);
+	  char* pcaMessage=(char*) malloc((15+strlen(pszDataDir)+strlen(dirp))*sizeof(char));
+	  sprintf(pcaMessage,"DATADIR %s %i ",pszDataDir,dirp);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  struct stat results;
 	  if (stat(pszDataDir, &results) == 0){
 	    char *xbuff=(char*)malloc(results.st_size+1);
@@ -284,11 +326,17 @@ __declspec(dllexport)
 		map* tmpMap=getMapFromMaps(inputs,"dataSource","value");
 		free(tmpMap->value);
 		tmpMap->value=strdup(pszDataSource);
-		fprintf(stderr, "DS: (%s)\n", pszDataSource);
+		char* pcaMessage=(char*) malloc((9+strlen(pszDataSource))*sizeof(char));
+		sprintf(pcaMessage, "DS: (%s)", pszDataSource);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 		isWxs=1;
 	      }
 	  }else{
-	    fprintf(stderr,"Unable to load %s DataStore.",type);
+		char* pcaMessage=(char*) malloc((29+strlen(type))*sizeof(char));
+	    sprintf(pcaMessage,"Unable to load %s DataStore.",type);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	  }
 
 	  //setMapInMaps(conf,"lenv","message","WFS not yet supported");
@@ -305,7 +353,10 @@ __declspec(dllexport)
 	  }
 	  if(tmpD!=NULL)
 	    while ((dp = readdir(tmpD)) != NULL){
-	      fprintf(stderr,":> %s,%s\n",dp->d_name,tmpDataSource);
+	      char* pcaMessage=(char*) malloc((9+strlen(tmpDataSource))*sizeof(char));
+	      sprintf(pcaMessage,":> %s,%s",dp->d_name,tmpDataSource);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	      if(strstr(dp->d_name,tmpDataSource)!=NULL){
 		pszDataSource=(char *)malloc((strlen(tmpP->value)+strlen(dp->d_name)+8)*sizeof(char));
 #ifndef WIN32
@@ -330,7 +381,10 @@ __declspec(dllexport)
       setMapInMaps(conf,"lenv","message","Data Source not found");
       return SERVICE_FAILED;
     }
-    fprintf(stderr,"MAP : %s\n",pszDataSource);
+	char* pcaMessage=(char*) malloc((9+strlen(pszDataSource))*sizeof(char));
+    sprintf(pcaMessage,"MAP : %s",pszDataSource);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 
     char* iniPszDataSource=strdup(pszDataSource);
     /* -------------------------------------------------------------------- */
@@ -359,32 +413,59 @@ __declspec(dllexport)
     }
     setMapInMaps(conf,"main","mapfile",mapPath);
 
-    fprintf(stderr,"Load Mapfile %s %d\n",mapPath,__LINE__);
+    char* pcaMessage=(char*) malloc((19+strlen(mapPath)+strlen(__LINE__))*sizeof(char));
+    sprintf(pcaMessage,"Load Mapfile %s %d",mapPath,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
     mapObj* myMap=msLoadMap(mapPath,NULL);
     if(myMap==NULL){
       mapfilePath->value[strlen(mapfilePath->value)-strlen(strrchr(mapfilePath->value,'/'))]=0;
       sprintf(mapPath,"%s/ds_ows.map",mapfilePath->value);
-      fprintf(stderr,"Load Mapfile %s %d\n",mapPath,__LINE__);
+	  char* pcaMessage=(char*) malloc((19+strlen(mapPath)+strlen(__LINE__))*sizeof(char));
+      sprintf(pcaMessage,"Load Mapfile %s %d",mapPath,__LINE__);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       myMap=msLoadMap(mapPath,NULL);
       if(myMap==NULL){
-	fprintf(stderr,"Unable to load mapfile %d !!\n\n",__LINE__);
+	char* pcaMessage=(char*) malloc((29+strlen(__LINE__))*sizeof(char));
+	sprintf(pcaMessage,"Unable to load mapfile %d !!",__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
       }
     }
     dumpMaps(inputs);
-    fprintf(stderr,"Load Mapfile %s %d\n",mapPath,__LINE__);
+	char* pcaMessage=(char*) malloc((19+strlen(mapPath)+strlen(__LINE__))*sizeof(char));
+    sprintf(pcaMessage,"Load Mapfile %s %d",mapPath,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
     map* layerName=getMapFromMaps(inputs,"layer","value");
-    fprintf(stderr,"Load Mapfile %s %d\n",mapPath,__LINE__);
+	char* pcaMessage=(char*) malloc((19+strlen(mapPath)+strlen(__LINE__))*sizeof(char));
+    sprintf(pcaMessage,"Load Mapfile %s %d",mapPath,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
     layerObj* myLayer=NULL;
     if(layerName!=NULL){
-      fprintf(stderr,"Load Mapfile %s %d\n",mapPath,__LINE__);
+	  char* pcaMessage=(char*) malloc((19+strlen(mapPath)+strlen(__LINE__))*sizeof(char));
+      sprintf(pcaMessage,"Load Mapfile %s %d",mapPath,__LINE__);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       if(myMap!=NULL){
-	fprintf(stderr,"Load Layer %s %d\n",layerName->value,myMap->numlayers);
+    char* pcaMessage=(char*) malloc((17)*sizeof(char));
+	sprintf(pcaMessage,"Load Layer %s %d",layerName->value,myMap->numlayers);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	layerObj* myLayer=myMap->layers[msGetLayerIndex(myMap,layerName->value)];
-	fprintf(stderr,"Load Layer %s %d\n",layerName->value,myLayer->type);
+	char* pcaMessage=(char*) malloc((17)*sizeof(char));
+	sprintf(pcaMessage,"Load Layer %s %d",layerName->value,myLayer->type);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	//fprintf(stderr,"LAYER TYPE %d\n",myLayer->type);
         
 	if(myLayer->type!=3 || myLayer->tileindex!=NULL){
-	  fprintf(stderr,"LAYER CONNECTION %s\n",myLayer->connection);
+	  char* pcaMessage=(char*) malloc((20)*sizeof(char));
+	  sprintf(pcaMessage,"LAYER CONNECTION %s",myLayer->connection);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  if(isPg<0 && isWxs<0){
 	    free(mapPath);
 	    mapPath=(char*)malloc((strlen(iniPszDataSource)+13)*sizeof(char));
@@ -402,13 +483,19 @@ __declspec(dllexport)
 	  isJson=1;
 	}
 	else{
-	  fprintf(stderr,"Should treat raster from here !!\n");
+	  char* pcaMessage=(char*) malloc((33)*sizeof(char));
+	  sprintf(pcaMessage,"Should treat raster from here !!");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  gdalinfo(conf,outputs,myLayer->data);
 	  isRaster=1;
 	}
       }
     }
-    fprintf(stderr,"Load Mapfile %s %d\n",mapPath,__LINE__);
+	char* pcaMessage=(char*) malloc((19+strlen(mapPath)+strlen(__LINE__))*sizeof(char));
+    sprintf(pcaMessage,"Load Mapfile %s %d",mapPath,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 
     if(isRaster<0){
     const char *pszWHERE = NULL;
@@ -445,7 +532,10 @@ __declspec(dllexport)
 	  tmp2[strlen(tmp2)-strlen(strstr(tmp2,"."))]=0;
 	  char *tmp3=strdup(tmp2);
 	  papszLayers = CSLAddString( papszLayers, tmp3 );
-	  fprintf(stderr,tmp3);
+	  char* pcaMessage=(char*) malloc((strlen(tmp3))*sizeof(char));
+	  sprintf(pcaMessage,tmp3);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  free(tmp3);
 	}
       }
@@ -479,7 +569,10 @@ __declspec(dllexport)
 	}
 	
 	//sprintf(pszSQLStatement,"SELECT * FROM \"%s\" ORDER BY %s %s",papszLayers[0],mmField,mmOrder);
-	fprintf(stderr,"SQL (%s)\n",pszSQLStatement);
+	char* pcaMessage=(char*) malloc((9+strlen(pszSQLStatement))*sizeof(char));
+	sprintf(pcaMessage,"SQL (%s)",pszSQLStatement);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	free(mmField);
 	free(mmOrder);
       }
@@ -709,7 +802,10 @@ __declspec(dllexport)
     map* mapfilePath=getMapFromMaps(inputs,"dataSource","value");
     char* mapPath=(char*)malloc((strlen(mapfilePath->value)+11)*sizeof(char));
     sprintf(mapPath,"%sds_ows.map",mapfilePath->value);
-    fprintf(stderr,"Save Mapfile %s\n",mapPath);
+	char* pcaMessage=(char*) malloc((16+strlen(mapPath))*sizeof(char));
+    sprintf(pcaMessage,"Save Mapfile %s",mapPath);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 
     /*
      * Create an empty map, set name, default size and extent
@@ -759,7 +855,10 @@ __declspec(dllexport)
 
     outputFormatObj *o3=msCreateDefaultOutputFormat(NULL,"GDAL/GTiff","tiff");
     if(!o3)
-      fprintf(stderr,"Unable to initialize GDAL driver !\n");
+	  char* pcaMessage=(char*) malloc((35)*sizeof(char));
+      sprintf(pcaMessage,"Unable to initialize GDAL driver !");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
     else{
       o3->imagemode=MS_IMAGEMODE_BYTE;
       o3->inmapfile=MS_TRUE;  
@@ -769,7 +868,10 @@ __declspec(dllexport)
 
     outputFormatObj *o4=msCreateDefaultOutputFormat(NULL,"GDAL/AAIGRID","grd");
     if(!o4)
-      fprintf(stderr,"Unable to initialize GDAL driver !\n");
+	  char* pcaMessage=(char*) malloc((35)*sizeof(char));
+      sprintf(pcaMessage,"Unable to initialize GDAL driver !");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
     else{
       o4->imagemode=MS_IMAGEMODE_INT16;
       o4->inmapfile=MS_TRUE;  
@@ -780,7 +882,10 @@ __declspec(dllexport)
 #ifdef USE_CAIRO
     outputFormatObj *o5=msCreateDefaultOutputFormat(NULL,"CAIRO/PNG","cairopng");
     if(!o5)
-      fprintf(stderr,"Unable to initialize CAIRO driver !\n");
+	  char* pcaMessage=(char*) malloc((36)*sizeof(char));
+      sprintf(pcaMessage,"Unable to initialize CAIRO driver !");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
     else{
       o5->imagemode=MS_IMAGEMODE_RGBA;
       o5->transparent=MS_TRUE;
@@ -808,7 +913,10 @@ __declspec(dllexport)
 	if((vMap=getMap(correspondance,_cursor->name))!=NULL){
 	  if (msInsertHashTable(&(myMap->web.metadata), vMap->value, _cursor->value) == NULL){
 #ifdef DEBUGMS
-	    fprintf(stderr,"Unable to add metadata");
+        char* pcaMessage=(char*) malloc((23)*sizeof(char));
+	    sprintf(pcaMessage,"Unable to add metadata");
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 #endif
 	    return SERVICE_FAILED;
 	  }
@@ -823,13 +931,19 @@ __declspec(dllexport)
      */
     if (msInsertHashTable(&(myMap->web.metadata), "ows_rootlayer_name", "ZOO_Project_Layer") == NULL){
 #ifdef DEBUGMS
-      fprintf(stderr,"Unable to add metadata");
+      char* pcaMessage=(char*) malloc((22)*sizeof(char));
+      sprintf(pcaMessage,"Unable to add metadata");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 #endif
       return SERVICE_FAILED;
     }
     if (msInsertHashTable(&(myMap->web.metadata), "ows_rootlayer_title", "ZOO_Project_Layer") == NULL){
 #ifdef DEBUGMS
-      fprintf(stderr,"Unable to add metadata");
+      char* pcaMessage=(char*) malloc((23)*sizeof(char));
+      sprintf(pcaMessage,"Unable to add metadata");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 #endif
       return SERVICE_FAILED;
     }
@@ -840,7 +954,10 @@ __declspec(dllexport)
      */
     if (msInsertHashTable(&(myMap->web.metadata), "ows_enable_request", "*") == NULL){
 #ifdef DEBUGMS
-      fprintf(stderr,"Unable to add metadata");
+      char* pcaMessage=(char*) malloc((23)*sizeof(char));
+      sprintf(pcaMessage,"Unable to add metadata");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 #endif
       return SERVICE_FAILED;
     }
@@ -885,30 +1002,54 @@ __declspec(dllexport)
 	  sprintf(type,"MySQL");
 	  dirp = open( pszDataDir , O_RDONLY );
 	}
-	fprintf(stderr,"\n\n\nDEBUG %s\n",pszDataDir);
+	char* pcaMessage=(char*) malloc((15+strlen(pszDataDir))*sizeof(char));
+	sprintf(pcaMessage,"\n\n\nDEBUG %s",pszDataDir);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	char *res=NULL;
 	struct dirent *dp;
 	if(dirp>=0){
 	  close(dirp);
-	  fprintf(stderr,"XML FOUND \n");
+	  char* pcaMessage=(char*) malloc((11)*sizeof(char));
+	  sprintf(pcaMessage,"XML FOUND ");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  xsltStylesheetPtr cur = NULL;
 	  xmlDocPtr doc, res;
 	  char *xslFileName;
-	  fprintf(stderr,"XML FOUND %s \n",tmpP->value);
+	  char* pcaMessage=(char*) malloc((14)*sizeof(char));
+	  sprintf(pcaMessage,"XML FOUND %s ",tmpP->value);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  xslFileName=(char*)malloc((strlen(tmpP->value)+18)*sizeof(char));
 	  sprintf(xslFileName,"%s/%s/conn.xsl",tmpP->value,type);
-	  fprintf(stderr,"%s \n",xslFileName);
+	  char* pcaMessage=(char*) malloc((4+strlen(xslFileName))*sizeof(char));
+	  sprintf(pcaMessage,"%s ",xslFileName);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  cur = xsltParseStylesheetFile(BAD_CAST xslFileName);
-	  fprintf(stderr,"%s \n",xslFileName);
+	  char* pcaMessage=(char*) malloc((4+strlen(xslFileName))*sizeof(char));
+	  sprintf(stderr,"%s ",xslFileName);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  doc = xmlParseFile(pszDataDir);
-	  fprintf(stderr,"%s \n",xslFileName);
+	  char* pcaMessage=(char*) malloc((4+strlen(xslFileName))*sizeof(char));
+	  sprintf(pcaMessage,"%s ",xslFileName);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  res = xsltApplyStylesheet(cur, doc, NULL);
-	  fprintf(stderr,"%s \n",xslFileName);
+	  char* pcaMessage=(char*) malloc((4+strlen(xslFileName))*sizeof(char));
+	  sprintf(pcaMessage,"%s ",xslFileName);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  xmlChar *xmlbuff;
 	  int buffersize;
 	  xsltSaveResultToString(&xmlbuff, &buffersize, res, cur);
 	  pszDataSource = strdup((char*)xmlbuff);
-	  fprintf(stderr,"%s\n",pszDataSource);
+	  char* pcaMessage=(char*) malloc((3+strlen(pszDataSource))*sizeof(char));
+	  sprintf(pcaMessage,"%s",pszDataSource);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  free(xmlbuff);
 	  isPg=1;
 	}
@@ -923,7 +1064,10 @@ __declspec(dllexport)
 	    return SERVICE_FAILED;
 	  }
 	  while ((dp = readdir(tmpD)) != NULL){
-	    fprintf(stderr,":> %s,%s (%s)\n",dp->d_name,tmpDataSource,strstr(tmpDataSource,dp->d_name));
+		char* pcaMessage=(char*) malloc((14+strlen(dp->d_name)+strlen(tmpDataSource)+strlen(strstr(tmpDataSource,dp->d_name)))*sizeof(char));
+	    sprintf(pcaMessage,":> %s,%s (%s)",dp->d_name,tmpDataSource,strstr(tmpDataSource,dp->d_name));
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	    if(strstr(tmpDataSource,dp->d_name)!=NULL){
 	      pszDataSource=(char *)malloc((strlen(tmpP->value)+strlen(dp->d_name)+8)*sizeof(char));
 #ifndef WIN32
@@ -936,7 +1080,10 @@ __declspec(dllexport)
 		if(test0!=NULL)
 		  pszDataSource=strdup(tmpDataSource);
 	      }
-	      fprintf(stderr,"DATA SOURCE : %s\n",tmpDataSource);
+		  char* pcaMessage=(char*) malloc((17+strlen(tmpDataSource))*sizeof(char));
+	      sprintf(pcaMessage,"DATA SOURCE : %s",tmpDataSource);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	    }
 	  }
 	  if(pszDataSource==NULL){
@@ -955,12 +1102,18 @@ __declspec(dllexport)
 	
 	if(isWxs>0){
 	  // WFS
-	  fprintf(stderr,"TYPE %s \n",type);
+	  char* pcaMessage=(char*) malloc((9+strlen(type))*sizeof(char));
+	  sprintf(pcaMessage,"TYPE %s ",type);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  char* pszDataDir=(char*)malloc((strlen(type)+strlen(tmpP->value)+strlen(strstr(tmp->value,":")+1)+14)*sizeof(char));
 	  sprintf(pszDataDir,"%s/%s/%s.txt",tmpP->value,type,strstr(tmp->value,":")+1);	  
 	  int dirp = open( pszDataDir , O_RDONLY );
 	  int nn;
-	  fprintf(stderr,"DATADIR %s %i \n",pszDataDir,dirp);
+	  char* pcaMessage=(char*) malloc((15+strlen(pszDataDir)+strlen(dirp))*sizeof(char));
+	  sprintf(pcaMessage,"DATADIR %s %i ",pszDataDir,dirp);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  struct stat results;
 	  if (stat(pszDataDir, &results) == 0){
 	    char *xbuff=(char*)malloc(results.st_size+1);
@@ -974,10 +1127,16 @@ __declspec(dllexport)
 		map* tmpMap=getMapFromMaps(inputs,"dataSource","value");
 		free(tmpMap->value);
 		tmpMap->value=strdup(pszDataSource);
-		fprintf(stderr, "DS: (%s)\n", pszDataSource);
+		char* pcaMessage=(char*) malloc((9+strlen(pszDataSource))*sizeof(char));
+		sprintf(pcaMessage, "DS: (%s)", pszDataSource);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	      }
 	  }else{
-	    fprintf(stderr,"Unable to load %s DataStore.",type);
+		char* pcaMessage=(char*) malloc((29+strlen(type))*sizeof(char));
+	    sprintf(pcaMessage,"Unable to load %s DataStore.",type);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	  }
 	}
       }
@@ -986,28 +1145,43 @@ __declspec(dllexport)
       setMapInMaps(conf,"lenv","message","Data Source not found");
       return SERVICE_FAILED;
     }
-    fprintf(stderr,"MAP : %s\n",pszDataSource);
+	char* pcaMessage=(char*) malloc((9+strlen(pszDataSource))*sizeof(char));
+    sprintf(pcaMessage,"MAP : %s",pszDataSource);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
     map *tmp1=getMapFromMaps(inputs,"layer","value");
     if(tmp1!=NULL)
       papszLayers = CSLAddString( papszLayers, tmp1->value );
     else{
       if(strncmp(tmp->value,"WFS",3)!=0 && strncmp(tmp->value,"WMS",3)!=0){
-	fprintf(stderr,"%s\n",tmp->value);
+	char* pcaMessage=(char*) malloc((3+strlen(tmp->value))*sizeof(char));
+	sprintf(pcaMessage,"%s",tmp->value);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	char *tmp4=strrchr(tmp->value,'/');
-	fprintf(stderr,"tmp4 %s\n",tmp4);
+	char* pcaMessage=(char*) malloc((8+strlen(tmp4))*sizeof(char));
+	sprintf(pcaMessage,"tmp4 %s",tmp4);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	if(tmp4!=NULL && strlen(tmp4) > 1){
 	  char *tmp2=strrchr(tmp->value,'/')+1;
 	  if(strstr(tmp2,".")!=NULL){
 	    tmp2[strlen(tmp2)-strlen(strstr(tmp2,"."))]=0;
 	    char *tmp3=strdup(tmp2);
 	    papszLayers = CSLAddString( papszLayers, tmp3 );
-	    fprintf(stderr,"TMP3 %s\n",tmp3);
+		char* pcaMessage=(char*) malloc((8+strlen(tmp3))*sizeof(char));
+	    sprintf(pcaMessage,"TMP3 %s",tmp3);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	    free(tmp3);
 	  }
 	}
       }
     }
-    fprintf(stderr,"DATASOURCE %s %d : %s\n",__FILE__,__LINE__,pszDataSource);
+	char* pcaMessage=(char*) malloc((22+strlen(__FILE__)+strlen(__LINE__)+strlen(pszDataSource))*sizeof(char));
+    sprintf(pcaMessage,"DATASOURCE %s %d : %s",__FILE__,__LINE__,pszDataSource);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 
     tmp1=getMapFromMaps(inputs,"getFeatures","value");
     if(tmp1!=NULL){
@@ -1038,7 +1212,10 @@ __declspec(dllexport)
 	  sprintf(pszSQLStatement,"SELECT * FROM %s ORDER BY %s %s",papszLayers[0],mmField,mmOrder);
 	}
 	//sprintf(pszSQLStatement,"SELECT * FROM \"%s\" ORDER BY %s %s",papszLayers[0],mmField,mmOrder);
-	fprintf(stderr,"SQL (%s)\n",pszSQLStatement);
+	char* pcaMessage=(char*) malloc((9+strlen(pszSQLStatement))*sizeof(char));
+	sprintf(pcaMessage,"SQL (%s)",pszSQLStatement);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	free(mmField);
 	free(mmOrder);
       }
@@ -1076,7 +1253,10 @@ __declspec(dllexport)
     /* -------------------------------------------------------------------- */
     if( poDS == NULL )
       {
-	fprintf(stderr,"ERROR OCCURS %s\n",pszDataSource);
+	char* pcaMessage=(char*) malloc((16+strlen(pszDataSource))*sizeof(char));
+	sprintf(pcaMessage,"ERROR OCCURS %s",pszDataSource);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	goto TRYGDAL;
       }
 
@@ -1090,10 +1270,16 @@ __declspec(dllexport)
 	tmp=poDS->GetDriver();
 #if GDAL_VERSION_MAJOR >= 2
       xmlAddChild(n1,xmlNewText(BAD_CAST tmp->GetDescription()));
-      fprintf(stderr,"Driver Name: %s\n",BAD_CAST tmp->GetDescription());      
+	  char* pcaMessage=(char*) malloc((16+strlen(BAD_CAST tmp->GetDescription()))*sizeof(char));
+      sprintf(pcaMessage,"Driver Name: %s",BAD_CAST tmp->GetDescription());      
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 #else
       xmlAddChild(n1,xmlNewText(BAD_CAST tmp->GetName()));
-      fprintf(stderr,"Driver Name: %s\n",BAD_CAST tmp->GetName());
+	  char* pcaMessage=(char*) malloc((16+strlen(BAD_CAST tmp->GetName()))*sizeof(char));
+      sprintf(pcaMessage,"Driver Name: %s",BAD_CAST tmp->GetName());
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 #endif
       xmlAddChild(n,n1);
     }
@@ -1136,7 +1322,10 @@ __declspec(dllexport)
 		sprintf( tmp,
 			 _ss("Fetch layer %d!\n"),
 			 iLayer );
-		fprintf(stderr,"MSG: %s",tmp);
+		char* pcaMessage=(char*) malloc((8+strlen(tmp))*sizeof(char));
+		sprintf(pcaMessage,"MSG: %s",tmp);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 
                 if( poLayer == NULL )
 		  {
@@ -1152,7 +1341,10 @@ __declspec(dllexport)
 		  {
                     if( iRepeat != 0 )
 		      poLayer->ResetReading();
-		    fprintf(stderr,"MSG: %s",tmp);
+			char* pcaMessage=(char*) malloc((8+strlen(tmp))*sizeof(char));
+		    sprintf(pcaMessage,"MSG: %s",tmp);
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 		    /*
 #if GDAL_VERSION_MAJOR >= 2
 		    if(strcasecmp(poDriver->GetDescription(),"ESRI Shapefile")==0)
@@ -1167,9 +1359,15 @@ __declspec(dllexport)
 					  pszDialect );
 					  }*/
 
-		fprintf(stderr,"MSG: %s",tmp);
+        char* pcaMessage=(char*) malloc((8+strlen(tmp))*sizeof(char));
+		sprintf(pcaMessage,"MSG: %s",tmp);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
                     ReportOnLayer4Map( pszDataSource, poLayer, pszWHERE, poSpatialFilter, myMap, conf , NULL);
-		fprintf(stderr,"MSG: %s",tmp);
+		char* pcaMessage=(char*) malloc((8+strlen(tmp))*sizeof(char))
+		sprintf(pcaMessage,"MSG: %s",tmp);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 
 		    xmlNodePtr n0=xmlNewNode(NULL,BAD_CAST "layer");
 		    xmlNodePtr n1=xmlNewNode(NULL,BAD_CAST "name");
@@ -1234,13 +1432,19 @@ __declspec(dllexport)
 
     if(isWxs>0){
       int nlayer=myMap->numlayers;
-      fprintf(stderr,"Layer num %d\n",nlayer);
+	  char* pcaMessage=(char*) malloc((13+strlen(nlayer))*sizeof(char));
+      sprintf(pcaMessage,"Layer num %d",nlayer);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       int i=0;
       for(i=0;i<nlayer;i++){
 	layerObj *l=GET_LAYER(myMap,i);
 	char* tmp=strdup(strstr(pszDataSource,":")+1);
 	//msConnectLayer(l,MS_WFS,tmp);
-	fprintf(stderr,"Layer name %s\n",l->name);
+	char* pcaMessage=(char*) malloc((14+strlen(l->name))*sizeof(char));
+	sprintf(pcaMessage,"Layer name %s",l->name);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	msInsertHashTable(&(l->metadata), "wfs_typename", l->name);
 	msInsertHashTable(&(l->metadata), "wfs_version", "1.0.0");
 	free(tmp);
@@ -1259,7 +1463,10 @@ __declspec(dllexport)
        * Raster data
        */
       mapfilePath=getMapFromMaps(inputs,"dataSource","value");
-      fprintf(stderr,"%s  \n",mapfilePath->value);
+	  char* pcaMessage=(char*) malloc((5+strlen(mapfilePath->value))*sizeof(char));
+      sprintf(pcaMessage,"%s  ",mapfilePath->value);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       DIR *dirp = opendir(mapfilePath->value);
       int res=0;
       if(dirp==NULL){
@@ -1280,9 +1487,15 @@ __declspec(dllexport)
 	      for( i = 1; i<CSLCount(papszMetadata) && papszMetadata[i] != NULL; i+=2 ){
 
 		if(strstr(papszMetadata[i-1],"_NAME")!=NULL)
-		  fprintf( stderr,"URL  %s\n", papszMetadata[i-1] );
+		  char* pcaMessage=(char*) malloc((8+strlen(papszMetadata[i-1]))*sizeof(char));
+		  sprintf( pcaMessage,"URL  %s", papszMetadata[i-1] );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 		if(strstr(papszMetadata[i],"_DESC")!=NULL)
-		  fprintf( stderr,"DESC  %s\n", papszMetadata[i] );
+		  char* pcaMessage=(char*) malloc((9+(papszMetadata[i]))*sizeof(char));
+		  sprintf( pcaMessage,"DESC  %s", papszMetadata[i] );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 		
 		if(msGrowMapLayers(myMap)==NULL){
 		  return -1;
@@ -1331,7 +1544,10 @@ __declspec(dllexport)
 		xmlAddChild(n2,n3);
 		xmlAddChild(n2,n4);
 		xmlAddChild(n,n2);
-		fprintf(stderr,"RASTER FOUND %s\n",tmp->name);
+		char* pcaMessage=(char*) malloc((16+strlen(tmp->name))*sizeof(char));
+		sprintf(pcaMessage,"RASTER FOUND %s",tmp->name);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	      }
 	    }
 	  }
@@ -1347,7 +1563,10 @@ __declspec(dllexport)
 	struct dirent *dp;
 	while ((dp = readdir(dirp)) != NULL){
 	  if(strcmp(dp->d_name,"..")!=0 && strcmp(dp->d_name,".")!=0){
-	    fprintf(stderr,"%s : %s \n",mapfilePath->value,dp->d_name);
+		char* pcaMessage=(char*) malloc((9+strlen(mapfilePath->value)+strlen(dp->d_name))*sizeof(char));
+	    sprintf(pcaMessage,"%s : %s ",mapfilePath->value,dp->d_name);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	    fflush(stderr);
 	    char* fname=(char*)malloc((2+strlen(dp->d_name)+strlen(mapfilePath->value))*sizeof(char));
 #ifndef WIN32
@@ -1383,7 +1602,10 @@ __declspec(dllexport)
 	      }
 #endif
 	      if( poDS != NULL){
-		fprintf(stderr,"Successfully tried to open OGR DataSource %s => %d\n",tmp->content->value,res);
+		char* pcaMessage=(char*) malloc((51+strlen(tmp->content->value)+strlen(res))*sizeof(char));
+		sprintf(pcaMessage,"Successfully tried to open OGR DataSource %s => %d",tmp->content->value,res);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 		
 		
 		for( int iRepeat = 0; iRepeat < nRepeatCount; iRepeat++ )
@@ -1479,16 +1701,25 @@ __declspec(dllexport)
 		hasValue=1;
 	      }
 	      else{
-		fprintf(stderr,"Before Gdal %d \n",res);
+		char* pcaMessage=(char*) malloc((15+strlen(res))*sizeof(char));
+		sprintf(pcaMessage,"Before Gdal %d ",res);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 		//dumpMaps(conf);
 		map *storage=getMap(tmp->content,"storage");
-		fprintf(stderr,"Before Gdal %d \n",res);
+		char* pcaMessage=(char*) malloc((16+strlen(res))*sizeof(char));
+		sprintf(pcaMessage,"Before Gdal %d ",res);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 		addToMap(tmp->content,"title",dp->d_name);
 		addToMap(tmp->content,"abstract",dp->d_name);
 		if(hasValue!=1 && res!=1 && (storage!=NULL && strcasecmp(dp->d_name,"ds_ows.map")!=0 && strstr(dp->d_name,".aux.xml")==NULL)){
 		  res=tryGdal(conf,tmp,myMap);
 		}
-		fprintf(stderr,"After Gdal %d \n",res);
+		char* pcaMessage=(char*) malloc((15+strlen(res))*sizeof(char));
+		sprintf(pcaMessage,"After Gdal %d ",res);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	      }
 	    }
 	    }
@@ -1502,7 +1733,10 @@ __declspec(dllexport)
 	    xmlAddChild(n1,xmlNewText(BAD_CAST "raster"));
 	    xmlAddChild(n2,n1);
 	    xmlAddChild(n,n2);
-	    fprintf(stderr,"RASTER FOUND %s\n",tmp->name);
+		char* pcaMessage=(char*) malloc((16+strlen(tmp->name))*sizeof(char));
+	    sprintf(pcaMessage,"RASTER FOUND %s",tmp->name);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	  }
 	  freeMaps(&tmp);
 	  free(tmp);
@@ -1526,33 +1760,54 @@ __declspec(dllexport)
     setMapInMaps(outputs,"Result","value",(char*)xmlb);
     xmlFreeDoc(resDoc);
 
-    fprintf(stderr,"MAPFILE TO SAVE !\n");    
+    char* pcaMessage=(char*) malloc((18)*sizeof(char));
+    sprintf(pcaMessage,"MAPFILE TO SAVE !");
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
     if(isPg>0 || isWxs>0){
       char *tmp1=strdup(mapPath);
       free(mapPath);
       map* tmpMap1=getMapFromMaps(conf,"main","dataPath");
       mapPath=(char*)malloc((strlen(tmpMap1->value)+strlen(tmp1)+strlen(type)+4+1)*sizeof(char));
-      fprintf(stderr,"MAPFILE TO SAVE %s !\n",tmp1);    
+	  char* pcaMessage=(char*) malloc((21+strlen(tmp1))*sizeof(char));
+      sprintf(pcaMessage,"MAPFILE TO SAVE %s !",tmp1);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       if(isWxs>0)
 	sprintf(mapPath,"%s/%s/%s",tmpMap1->value,type,strstr(tmp1,":")+1);
       else
 	sprintf(mapPath,"%s/%s/%s",tmpMap1->value,type,tmp1);
-      fprintf(stderr,"MAPFILE TO SAVE %s\n",mapPath);
+      char* pcaMessage=(char*) malloc((19+strlen(mapPath))*sizeof(char));
+      sprintf(pcaMessage,"MAPFILE TO SAVE %s",mapPath);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       free(tmp1);
     }
     struct stat mstat;
     int s=stat(mapPath,&mstat);
     if(s<0){
       myMap->mappath=zStrdup(mapPath);
-      fprintf(stderr,"END! %s %d \n",__FILE__,__LINE__);
+	  char* pcaMessage=(char*) malloc((12+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+      sprintf(pcaMessage,"END! %s %d ",__FILE__,__LINE__);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       msSaveMap(myMap,mapPath);
-      fprintf(stderr,"END! %s %d \n",__FILE__,__LINE__);
+	  char* pcaMessage=(char*) malloc((12+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+      sprintf(pcaMessage,"END! %s %d ",__FILE__,__LINE__);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       //msFreeMap(myMap);
     }
 
-    fprintf(stderr,"END! %s %d \n",__FILE__,__LINE__);
+    char* pcaMessage=(char*) malloc((12+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+    sprintf(pcaMessage,"END! %s %d ",__FILE__,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
     //OGRCleanupAll();
-    fprintf(stderr,"END! %s %d \n",__FILE__,__LINE__);
+	char* pcaMessage=(char*) malloc((12+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+    sprintf(pcaMessage,"END! %s %d ",__FILE__,__LINE__);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
     return SERVICE_SUCCEEDED;
   }
 
@@ -1649,39 +1904,60 @@ __declspec(dllexport)
 	      xmin = ogExt.MinX ;
 	      ymin = ogExt.MinY;
 	      if( poCT == NULL || !poCT->Transform( 1, &xmin, &ymin ) )
-		fprintf(stderr, "Transformation failed x/y.\n" );
+		char* pcaMessage=(char*) malloc((27)*sizeof(char));
+		sprintf(pcaMessage, "Transformation failed x/y." );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	      else{
 		xmin = ogExt.MinY ;
 		ymin = ogExt.MinX;
 		if( poCT == NULL || !poCT->Transform( 1, &ymin, &xmin ) )
-		  fprintf(stderr, "Transformation failed y/x.\n" );
+		  char* pcaMessage=(char*) malloc((27)*sizeof(char));
+		  sprintf(pcaMessage, "Transformation failed y/x." );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 		else
-		  fprintf( stderr, "\n\n(%f,%f) -> (%f,%f)\n\n", 
+		  char* pcaMessage=(char*) malloc((27+strlen(ogExt.MinX)+strlen(ogExt.MinY)+strlen(xmin)+strlen(ymin))*sizeof(char));
+		  sprintf( pcaMessage, "\n\n(%f,%f) -> (%f,%f)\n\n", 
 			   ogExt.MinX,
 			   ogExt.MinY,
 			   xmin, ymin );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	      }
 	      xmax = ogExt.MaxX ;
 	      ymax = ogExt.MaxY;
 	      if( poCT == NULL || !poCT->Transform( 1, &xmax, &ymax ) )
-		fprintf(stderr, "Transformation failed x/y.\n" );
+		char* pcaMessage=(char*) malloc((27)*sizeof(char));
+		sprintf(pcaMessage, "Transformation failed x/y." );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	      else{
 		xmax = ogExt.MaxY ;
 		ymax = ogExt.MaxX;
 		if( poCT == NULL || !poCT->Transform( 1, &xmax, &ymax ) )
-		  fprintf(stderr, "Transformation failed y/x.\n" );
+		  char* pcaMessage=(char*) malloc((27)*sizeof(char));
+		  sprintf(pcaMessage, "Transformation failed y/x." );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 		else
-		  fprintf( stderr, "\n\n(%f,%f) -> (%f,%f)\n\n", 
+		  char* pcaMessage=(char*) malloc((27+strlen(ogExt.MaxX)+strlen(ogExt.MaxY)+strlen(xmax)+strlen(ymax))*sizeof(char));
+		  sprintf( pcaMessage, "\n\n(%f,%f) -> (%f,%f)\n\n", 
 			   ogExt.MaxX,
 			   ogExt.MaxY,
 			   xmax, ymax );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	      }
 	      map* tmpMapPath=getMapFromMaps(conf,"main","mapserverAddress");
 	      char* mapPath=(char*)malloc((strlen(tmpMapPath->value)+strlen(pszDataSource)+11)*sizeof(char));
 	      sprintf(mapPath,"%sds_ows.map",pszDataSource);
 	      
 	      
-	      fprintf(stderr,"%s?map=%s&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=%f,%f,%f,%f&SRS=EPSG:4326&WIDTH=1024&HEIGHT=1024&LAYERS=%s\n",tmpMapPath->value,mapPath,xmin,ymin,xmax,ymax,layerName);
+		  char* pcaMessage=(char*) malloc((126+strlen(tmpMapPath->value)+strlen(mapPath)+strlen(xmin)+strlen(ymin)+strlen(xmax)+strlen(ymax)+strlen(layerName))*sizeof(char));
+	      sprintf(pcaMessage,"%s?map=%s&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=%f,%f,%f,%f&SRS=EPSG:4326&WIDTH=1024&HEIGHT=1024&LAYERS=%s",tmpMapPath->value,mapPath,xmin,ymin,xmax,ymax,layerName);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 
 	      int maxWidth=512;
 	      int maxHeight=359;
@@ -1698,9 +1974,18 @@ __declspec(dllexport)
 		height=qValue*deltaY;
 	      }
 #ifdef DEBUGMS
-	      fprintf(stderr,"deltaX : %.15f \ndeltaY : %.15f\n",deltaX,deltaY);
-	      fprintf(stderr,"qWidth : %.15f \nqHeight : %.15f\n",qWidth,qHeight);
-	      fprintf(stderr,"qWidth : %.15f \nqHeight : %.15f\n",width,height);
+          char* pcaMessage=(char*) malloc((32+strlen(deltaX)+strlen(deltaY))*sizeof(char));
+	      sprintf(pcaMessage,"deltaX : %.15f \ndeltaY : %.15f",deltaX,deltaY);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
+		  char* pcaMessage=(char*) malloc((33+strlen(qWidth)+strlen(qHeight))*sizeof(char));
+	      sprintf(pcaMessage,"qWidth : %.15f \nqHeight : %.15f",qWidth,qHeight);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
+		  char* pcaMessage=(char*) malloc((33+strlen(width)+strlen(height))*sizeof(char));
+	      sprintf(pcaMessage,"qWidth : %.15f \nqHeight : %.15f",width,height);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 #endif
 	      
 	      char tmpStr[2048];
@@ -1711,7 +1996,10 @@ __declspec(dllexport)
 	      sprintf(tmpStr,"%s?map=%s&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=%f,%f,%f,%f&SRS=EPSG:4326&WIDTH=%f&HEIGHT=%f&LAYERS=%s\n",tmpMapPath->value,tmpMap->value,xmin,ymin,xmax,ymax,width,height,poDefn->GetName());
 	      */
 	      sprintf(tmpStr,"%s?map=%s&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=%f,%f,%f,%f&SRS=EPSG:4326&WIDTH=%f&HEIGHT=%f&LAYERS=%s\n",tmpMapPath->value,tmpMap->value,ymin,xmin,ymax,xmax,width,height,layerName);
-	      fprintf(stderr,"SRS : %s\n",tmpStr);
+		  char* pcaMessage=(char*) malloc((9+strlen(tmpStr))*sizeof(char));
+	      sprintf(pcaMessage,"SRS : %s",tmpStr);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 
 	      n2=xmlNewNode(NULL,BAD_CAST "previewLink");
 	      xmlAddChild(n2,xmlNewText(BAD_CAST tmpStr));
@@ -1734,21 +2022,33 @@ __declspec(dllexport)
 	      xmin = ogExt.MinX ;
 	      ymin = ogExt.MinY;
 	      if( poCT == NULL || !poCT->Transform( 1, &xmin, &ymin ) )
-		fprintf(stderr, "Transformation failed.\n" );
+		char* pcaMessage=(char*) malloc((23)*sizeof(char));
+		sprintf(pcaMessage, "Transformation failed." );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	      else
-		fprintf( stderr, "\n\n(%f,%f) -> (%f,%f)\n\n", 
+		char* pcaMessage=(char*) malloc((27+strlen(ogExt.MinX)+strlen(ogExt.MinY)+strlen(xmin)+strlen(ymin))*sizeof(char));
+		sprintf( pcaMessage, "\n\n(%f,%f) -> (%f,%f)\n\n", 
 			 ogExt.MinX,
 			 ogExt.MinY,
 			 xmin, ymin );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	      xmax = ogExt.MaxX ;
 	      ymax = ogExt.MaxY;
 	      if( poCT == NULL || !poCT->Transform( 1, &xmax, &ymax ) )
-		fprintf(stderr, "Transformation failed.\n" );
+		char* pcaMessage=(char*) malloc((23)*sizeof(char));
+		sprintf(pcaMessage, "Transformation failed." );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	      else
-		fprintf( stderr, "\n\n(%f,%f) -> (%f,%f)\n\n", 
+		char* pcaMessage=(char*) malloc((27+strlen(ogExt.MaxX)+strlen(ogExt.MaxY)+strlen(xmax)+strlen(ymax))*sizeof(char));
+		sprintf( pcaMessage, "\n\n(%f,%f) -> (%f,%f)\n\n", 
 			 ogExt.MaxX,
 			 ogExt.MaxY,
 			 xmax, ymax );
+	    ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	  
 	      char* mapPath=(char*)malloc((strlen(pszDataSource)+11)*sizeof(char));
 	      sprintf(mapPath,"%sds_ows.map",pszDataSource);
@@ -1769,9 +2069,18 @@ __declspec(dllexport)
 		height=qValue*deltaY;
 	      }
 #ifdef DEBUGMS
-	      fprintf(stderr,"deltaX : %.15f \ndeltaY : %.15f\n",deltaX,deltaY);
-	      fprintf(stderr,"qWidth : %.15f \nqHeight : %.15f\n",qWidth,qHeight);
-	      fprintf(stderr,"qWidth : %.15f \nqHeight : %.15f\n",width,height);
+          char* pcaMessage=(char*) malloc((32+strlen(deltaX)+strlen(deltaY))*sizeof(char)); 
+	      sprintf(pcaMessage,"deltaX : %.15f \ndeltaY : %.15f",deltaX,deltaY);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
+		  char* pcaMessage=(char*) malloc((33+strlen(qWidth)+strlen(qHeight))*sizeof(char));
+	      sprintf(pcaMessage,"qWidth : %.15f \nqHeight : %.15f",qWidth,qHeight);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
+		  char* pcaMessage=(char*) malloc((33+strlen(width)+strlen(height))*sizeof(char));
+	      sprintf(pcaMessage,"qWidth : %.15f \nqHeight : %.15f",width,height);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 #endif
 	      
 	      char tmpStr[2048];
@@ -1792,11 +2101,17 @@ __declspec(dllexport)
 	  }
 	  
 	}
-      fprintf(stderr,"pszWKT %s\n",pszWKT);	  
+	  char* pcaMessage=(char*) malloc((10+strlen(pszWKT))*sizeof(char));
+      sprintf(pcaMessage,"pszWKT %s",pszWKT);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       n1=xmlNewNode(NULL,BAD_CAST "srs");
       xmlAddChild(n1,xmlNewText(BAD_CAST pszWKT));
       xmlAddChild(n,n1);
-      fprintf(stderr,"pszWKT %s\n",pszWKT);	  
+	  char* pcaMessage=(char*) malloc((10+strlen(pszWKT))*sizeof(char));
+      sprintf(pcaMessage,"pszWKT %s",pszWKT);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 
 
       if (poLayer->GetExtent(&oExt, TRUE) == OGRERR_NONE)
@@ -1839,7 +2154,10 @@ __declspec(dllexport)
 	  sprintf(tmpStr,"%s?map=%s&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=%f,%f,%f,%f&SRS=EPSG:4326&WIDTH=%f&HEIGHT=%f&LAYERS=%s\n",tmpMapPath->value,tmpMap->value,oExt.MinY,oExt.MinX,oExt.MaxY,oExt.MaxX,width,height,poDefn->GetName());
 	  else*/
 	    sprintf(tmpStr,"%s?map=%s&SERVICE=WMS&VERSION=1.0.0&REQUEST=GetMap&FORMAT=png&BBOX=%f,%f,%f,%f&SRS=EPSG:4326&WIDTH=%f&HEIGHT=%f&LAYERS=%s",tmpMapPath->value,tmpMap->value,oExt.MinX,oExt.MinY,oExt.MaxX,oExt.MaxY,width,height,layerName);
-	  fprintf(stderr,"previewLink *%s* %d\n",tmpStr,(pszWKT!=NULL && strncasecmp(pszWKT,"EPSG:4326",9)!=0));	  
+	  char* pcaMessage=(char*) malloc((20+strlen(tmpStr)+strlen((pszWKT!=NULL && strncasecmp(pszWKT,"EPSG:4326",9)!=0)))*sizeof(char));
+	  sprintf(pcaMessage,"previewLink *%s* %d",tmpStr,(pszWKT!=NULL && strncasecmp(pszWKT,"EPSG:4326",9)!=0));
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  n2=xmlNewNode(NULL,BAD_CAST "previewLink");
 	  xmlAddChild(n2,xmlNewText(BAD_CAST tmpStr));
 	  xmlAddChild(n,n2);
@@ -1894,12 +2212,18 @@ __declspec(dllexport)
 	char* ows_encoding=myMap->layers[i]->encoding;//msLookupHashTable(&(myMap->layers[i]->metadata), "ows_encoding");
 	if(encoding!=NULL){
 	  for(i=0;i<myMap->numlayers;i++){
-	    fprintf(stderr,"layer %s => %s\n",myMap->layers[i]->name,ows_encoding);
+		char* pcaMessage=(char*) malloc((15+strlen(myMap->layers[i]->name)+strlen(ows_encoding))*sizeof(char));
+	    sprintf(pcaMessage,"layer %s => %s",myMap->layers[i]->name,ows_encoding);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	    if(strcmp(myMap->layers[i]->name,poLayer->GetName())==0){
 	      myMap->layers[i]->encoding=strdup(encoding->value);
 	      //msInsertHashTable(&(myMap->layers[i]->metadata),"ows_encoding",encoding->value);
 	      ows_encoding=myMap->layers[i]->encoding;//msLookupHashTable(&(myMap->layers[i]->metadata), "ows_encoding");
-	      fprintf(stderr,"layer %s => %s\n",myMap->layers[i]->name,ows_encoding);
+		  char* pcaMessage=(char*) malloc((15+strlen(myMap->layers[i]->name)+strlen(ows_encoding))*sizeof(char));
+	      sprintf(pcaMessage,"layer %s => %s",myMap->layers[i]->name,ows_encoding);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	    }
 	  }
 	}
@@ -1964,11 +2288,17 @@ __declspec(dllexport)
        * Add a new layer set name, data
        */
       if(msGrowMapLayers(m)==NULL){
-	fprintf(stderr,"Unable to add layer");
+	char* pcaMessage=(char*) malloc((20)*sizeof(char));
+	sprintf(pcaMessage,"Unable to add layer");
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	return;
       }
       if(initLayer((m->layers[m->numlayers]), m) == -1){
-	fprintf(stderr,"Unable to init layer");
+	char* pcaMessage=(char*) malloc((21)*sizeof(char));
+	sprintf(pcaMessage,"Unable to init layer");
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	return;
       }
       
@@ -1978,7 +2308,10 @@ __declspec(dllexport)
 	myLayer->name = strdup(poDefn->GetName());
       else
 	myLayer->name = strdup(lay->name);
-      fprintf(stderr,"LAYER NAME: %s\n",myLayer->name);
+      char* pcaMessage=(char*) malloc((15+strlen(myLayer->name))*sizeof(char));
+      sprintf(pcaMessage,"LAYER NAME: %s",myLayer->name);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       if(strncasecmp(myLayer->name,"tile_",4)==0){
 	myLayer->tileindex = (char*)malloc((strlen(pszDataSource)+strlen(myLayer->name)+5+1)*sizeof(char));
 	sprintf(myLayer->tileindex,"%s/%s.shp",pszDataSource,myLayer->name);
@@ -2005,7 +2338,10 @@ __declspec(dllexport)
 	    char  *tmp=strdup(strstr(pszDataSource,":")+1);
 	    myLayer->connection = strdup(tmp);
 	    msConnectLayer(myLayer,MS_WFS,tmp);
-	    fprintf(stderr,"WFS %s\n",tmp);
+		char* pcaMessage=(char*) malloc((7+strlen(tmp))*sizeof(char));
+	    sprintf(pcaMessage,"WFS %s",tmp);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	    free(tmp);
 	  }
 	  else{
@@ -2027,7 +2363,10 @@ __declspec(dllexport)
 	    case wkbPoint25D:
 	    case wkbMultiPoint25D:
 #ifdef DEBUGMS
-	      fprintf(stderr,"%s %s POINT DataSource Layer \n",pszDataSource,myLayer->data);
+          char* pcaMessage=(char*) malloc((30+strlen(pszDataSource)+strlen(myLayer->data))*sizeof(char));
+	      sprintf(pcaMessage,"%s %s POINT DataSource Layer ",pszDataSource,myLayer->data);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 #endif
 	      myLayer->type = MS_LAYER_POINT;
 	      break;
@@ -2036,7 +2375,10 @@ __declspec(dllexport)
 	    case wkbLineString25D:
 	    case wkbMultiLineString25D:
 #ifdef DEBUGMS
-	      fprintf(stderr,"%s %s LINE DataSource Layer \n",pszDataSource,myLayer->data);
+          char* pcaMessage=(char*) malloc((29+strlen(pszDataSource)+strlen(myLayer->data))*sizeof(char));
+	      sprintf(pcaMessage,"%s %s LINE DataSource Layer ",pszDataSource,myLayer->data);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 #endif
 	      myLayer->type = MS_LAYER_LINE;
 	      break;
@@ -2045,7 +2387,10 @@ __declspec(dllexport)
 	    case wkbPolygon25D:
 	    case wkbMultiPolygon25D:
 #ifdef DEBUGMS
-	      fprintf(stderr,"%s %s POLYGON DataSource Layer \n",pszDataSource,myLayer->data);
+          char* pcaMessage=(char*) malloc((32+strlen(pszDataSource)+strlen(myLayer->data))*sizeof(char));
+	      sprintf(pcaMessage,"%s %s POLYGON DataSource Layer ",pszDataSource,myLayer->data);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 #endif
 	      myLayer->type = MS_LAYER_POLYGON;
 	      break;
@@ -2078,32 +2423,50 @@ __declspec(dllexport)
 	  xmin = ogExt.MinX ;
 	  ymin = ogExt.MinY;
 	  if( poCT == NULL || !poCT->Transform( 1, &xmin, &ymin ) )
-	    fprintf(stderr, "Transformation failed.\n" );
+	    char* pcaMessage=(char*) malloc((23)*sizeof(char));
+	    sprintf(pcaMessage, "Transformation failed." );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	  else{
 	    xmin = ogExt.MinY;
 	    ymin = ogExt.MinX;	    
 	    if( poCT == NULL || !poCT->Transform( 1, &xmin, &ymin ) )
-	      fprintf(stderr, "Transformation failed.\n" );
+		  char* pcaMessage=(char*) malloc((23)*sizeof(char));
+	      sprintf(pcaMessage, "Transformation failed." );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	    else
-	      fprintf( stderr, "\n\n(%f,%f) -> (%f,%f)\n\n", 
+		  char* pcaMessage=(char*) malloc((27+strlen(ogExt.MinX)+strlen(ogExt.MinY)+strlen(xmin)+strlen(ymin))*sizeof(char));
+	      sprintf( pcaMessage, "\n\n(%f,%f) -> (%f,%f)\n\n", 
 		       ogExt.MinX,
 		       ogExt.MinY,
 		       xmin, ymin );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	  }
 	  xmax = ogExt.MaxX ;
 	  ymax = ogExt.MaxY;
 	  if( poCT == NULL || !poCT->Transform( 1, &xmax, &ymax ) )
-	    fprintf(stderr, "Transformation failed.\n" );
+	    char* pcaMessage=(char*) malloc((23)*sizeof(char));
+	    sprintf(pcaMessage, "Transformation failed." );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	  else{
 	    xmax = ogExt.MaxY;
 	    ymax = ogExt.MaxX;
 	    if( poCT == NULL || !poCT->Transform( 1, &xmax, &ymax ) )
-	      fprintf(stderr, "Transformation failed.\n" );
-	    else	  
-	      fprintf( stderr, "\n\n(%f,%f) -> (%f,%f)\n\n", 
+		  char* pcaMessage=(char*) malloc((23)*sizeof(char));
+	      sprintf(pcaMessage, "Transformation failed." );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
+	    else	
+		  char* pcaMessage=(char*) malloc((27+strlen(ogExt.MaxX)+strlen(ogExt.MaxY)+strlen(xmax)+strlen(ymax))*sizeof(char));
+	      sprintf( pcaMessage, "\n\n(%f,%f) -> (%f,%f)\n\n", 
 		       ogExt.MaxX,
 		       ogExt.MaxY,
 		       xmax, ymax );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	  }
 	  map* tmpMapPath=getMapFromMaps(conf,"main","mapserverAddress");
 	  char* mapPath=(char*)malloc((strlen(tmpMapPath->value)+strlen(pszDataSource)+11)*sizeof(char));
@@ -2128,7 +2491,10 @@ __declspec(dllexport)
       OGREnvelope ogExt;
       if (OGR_L_GetExtent(poLayer,&ogExt, TRUE) == OGRERR_NONE){
 	if(strncasecmp(pszDataSource,"WFS",3)==0){
-	  fprintf(stderr,"WFS FOUND !!\n");
+	  char* pcaMessage=(char*) malloc((13)*sizeof(char));
+	  sprintf(pcaMessage,"WFS FOUND !!");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  msLayerSetExtent(myLayer,ogExt.MinY,ogExt.MinX,ogExt.MaxY,ogExt.MaxX);
 	}
 	else
@@ -2151,7 +2517,10 @@ __declspec(dllexport)
 	msInsertHashTable(&(myLayer->metadata), "gml_include_items", "all");
 	msInsertHashTable(&(myLayer->metadata), "gml_types", "auto");
 	const char *fid=OGR_L_GetFIDColumn(poLayer);
-	fprintf(stderr,"FID COLUMN %s ! \n",fid);
+	char* pcaMessage=(char*) malloc((17+strlen(fid))*sizeof(char));
+	sprintf(pcaMessage,"FID COLUMN %s ! ",fid);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	int hasFid=-1;
 	if(strlen(fid)==0){
 	  OGRFeatureDefnH def=OGR_L_GetLayerDefn(poLayer);
@@ -2160,7 +2529,10 @@ __declspec(dllexport)
 	    OGRFieldDefnH fdef=OGR_FD_GetFieldDefn(def,fIndex);
 	    if(hasFid<0)
 	      fid=OGR_Fld_GetNameRef(fdef);
-	    fprintf(stderr,"FID COLUMN %s ! \n",fid);
+		char* pcaMessage=(char*) malloc((17+strlen(fid))*sizeof(char));
+	    sprintf(pcaMessage,"FID COLUMN %s ! ",fid);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	    if(strcasestr(fid,"id")!=NULL){
 	      hasFid=1;
 	      break;
@@ -2320,7 +2692,10 @@ __declspec(dllexport)
 	nbFeature++;
       }
     }
-    fprintf(stderr,"exit %s DataSource Layer \n",pszDataSource);
+	char* pcaMessage=(char*) malloc((26+strlen(pszDataSource))*sizeof(char));
+    sprintf(pcaMessage,"exit %s DataSource Layer ",pszDataSource);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
   }
 
 
@@ -2424,9 +2799,12 @@ __declspec(dllexport)
     
     if( hDataset == NULL )
       {
-        fprintf( stderr,
-                 "gdalinfo failed - unable to open '%s'.\n",
+		char* pcaMessage=(char*) malloc((39+strlen(pszFilename))*sizeof(char));
+        sprintf( pcaMessage,
+                 "gdalinfo failed - unable to open '%s'.",
                  pszFilename );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 
         //CSLDestroy( argv );
         CSLDestroy( papszExtraMDDomains );
@@ -2465,10 +2843,13 @@ __declspec(dllexport)
 	  }
         else
 	  {
-            fprintf( stderr,
+		    char* pcaMessage=(char*) malloc((75+strlen(nSubdataset)+strlen(nSubdatasets))*sizeof(char));
+            sprintf( pcaMessage,
                      "gdalinfo warning: subdataset %d of %d requested. "
-                     "Reading the main dataset.\n",
+                     "Reading the main dataset.",
                      nSubdataset, nSubdatasets );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 
 	  }
       }
@@ -2506,12 +2887,18 @@ __declspec(dllexport)
             char	*pszPrettyWkt = NULL;
 
             OSRExportToPrettyWkt( hSRS, &pszPrettyWkt, FALSE );
-            fprintf( stderr, "Coordinate System is:\n%s\n", pszPrettyWkt );
+			char* pcaMessage=(char*) malloc((26+strlen(pszPrettyWkt))*sizeof(char));
+            sprintf( pcaMessage, "Coordinate System is:\n%s", pszPrettyWkt );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
             CPLFree( pszPrettyWkt );
 	  }
         else
-	  fprintf( stderr, "Coordinate System is `%s'\n",
+	  char* pcaMessage=(char*) malloc((26+strlen(GDALGetProjectionRef( hDataset )))*sizeof(char));
+	  sprintf( pcaMessage, "Coordinate System is `%s'",
 		   GDALGetProjectionRef( hDataset ) );
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 
         OSRDestroySpatialReference( hSRS );
       }
@@ -2571,12 +2958,18 @@ __declspec(dllexport)
                 char	*pszPrettyWkt = NULL;
 
                 OSRExportToPrettyWkt( hSRS, &pszPrettyWkt, FALSE );
-                fprintf( stderr, "GCP Projection = \n%s\n", pszPrettyWkt );
+				char* pcaMessage=(char*) malloc((22+strlen(pszPrettyWkt))*sizeof(char));
+                sprintf( pcaMessage, "GCP Projection = \n%s", pszPrettyWkt );
+				ZOO_DEBUG(pcaMessage);
+				free(pcaMessage);
                 CPLFree( pszPrettyWkt );
 	      }
             else
-	      fprintf( stderr,"GCP Projection = %s\n",
+		  char* pcaMessage=(char*) malloc((20+strlen(GDALGetGCPProjection( hDataset )))*sizeof(char));
+	      sprintf( pcaMessage,"GCP Projection = %s",
 		       GDALGetGCPProjection( hDataset ) );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 
             OSRDestroySpatialReference( hSRS );
 	  }
@@ -2587,11 +2980,14 @@ __declspec(dllexport)
             
             psGCP = GDALGetGCPs( hDataset ) + i;
 
-            fprintf( stderr, "GCP[%3d]: Id=%s, Info=%s\n"
-		     "          (%.15g,%.15g) -> (%.15g,%.15g,%.15g)\n", 
+            char* pcaMessage=(char*) malloc((71+strlen(i)+strlen(psGCP->pszId)+strlen(psGCP->pszInfo)+strlen(psGCP->dfGCPPixel)+strlen(psGCP->dfGCPLine)+strlen(psGCP->dfGCPX)+strlen(psGCP->dfGCPY)+strlen(psGCP->dfGCPZ))*sizeof(char));
+            sprintf( pcaMessage, "GCP[%3d]: Id=%s, Info=%s"
+		     "          (%.15g,%.15g) -> (%.15g,%.15g,%.15g)", 
 		     i, psGCP->pszId, psGCP->pszInfo, 
 		     psGCP->dfGCPPixel, psGCP->dfGCPLine, 
 		     psGCP->dfGCPX, psGCP->dfGCPY, psGCP->dfGCPZ );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 	  }
       }
 
@@ -2653,10 +3049,16 @@ __declspec(dllexport)
     papszMetadata = (bShowMetadata) ? GDALGetMetadata( hDataset, "GEOLOCATION" ) : NULL;
     if( bShowMetadata && CSLCount(papszMetadata) > 0 )
       {
-        fprintf( stderr,"Geolocation:\n" );
+		char* pcaMessage=(char*) malloc((13)*sizeof(char));
+        sprintf( pcaMessage,"Geolocation:" );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
         for( i = 0; papszMetadata[i] != NULL; i++ )
 	  {
-            fprintf( stderr,"  %s\n", papszMetadata[i] );
+		    char* pcaMessage=(char*) malloc((5+strlen(papszMetadata[i]))*sizeof(char));
+            sprintf( pcaMessage,"  %s", papszMetadata[i] );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 	  }
       }
 
@@ -2666,10 +3068,16 @@ __declspec(dllexport)
     papszMetadata = (bShowMetadata) ? GDALGetMetadata( hDataset, "RPC" ) : NULL;
     if( bShowMetadata && CSLCount(papszMetadata) > 0 )
       {
-        fprintf( stderr,"RPC Metadata:\n" );
+		char* pcaMessage=(char*) malloc((14)*sizeof(char));
+        sprintf( pcaMessage,"RPC Metadata:" );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
         for( i = 0; papszMetadata[i] != NULL; i++ )
 	  {
-            fprintf( stderr,"  %s\n", papszMetadata[i] );
+		    char* pcaMessage=(char*) malloc((5+strlen(papszMetadata[i]))*sizeof(char));
+            sprintf( pcaMessage,"  %s", papszMetadata[i] );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 	  }
       }
 
@@ -2747,20 +3155,31 @@ __declspec(dllexport)
             int   nCount;
 
             nCount = GDALGetRandomRasterSample( hBand, 10000, afSample );
-            fprintf( stderr,"Got %d samples.\n", nCount );
+			char* pcaMessage=(char*) malloc((16+strlen(nCount))*sizeof(char));
+            sprintf( pcaMessage,"Got %d samples.", nCount );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 	  }
         
         GDALGetBlockSize( hBand, &nBlockXSize, &nBlockYSize );
-        fprintf( stderr, "Band %d Block=%dx%d Type=%s, ColorInterp=%s\n", iBand+1,
+		char* pcaMessage=(char*) malloc((44+strlen(iBand+1)+strlen(nBlockXSize)+strlen(nBlockYSize)+strlen(GDALGetDataTypeName(
+				     GDALGetRasterDataType(hBand)))+strlen(GDALGetColorInterpretationName(
+						GDALGetRasterColorInterpretation(hBand))))*sizeof(char));
+        sprintf( pcaMessage, "Band %d Block=%dx%d Type=%s, ColorInterp=%s", iBand+1,
 		 nBlockXSize, nBlockYSize,
 		 GDALGetDataTypeName(
 				     GDALGetRasterDataType(hBand)),
 		 GDALGetColorInterpretationName(
 						GDALGetRasterColorInterpretation(hBand)) );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 
         if( GDALGetDescription( hBand ) != NULL 
             && strlen(GDALGetDescription( hBand )) > 0 )
-	  fprintf( stderr,"  Description = %s\n", GDALGetDescription(hBand) );
+	  char* pcaMessage=(char*) malloc((19+strlen(GDALGetDescription(hBand)))*sizeof(char));
+	  sprintf( pcaMessage,"  Description = %s", GDALGetDescription(hBand) );
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 
         dfMin = GDALGetRasterMinimum( hBand, &bGotMin );
         dfMax = GDALGetRasterMaximum( hBand, &bGotMax );
@@ -2805,12 +3224,18 @@ __declspec(dllexport)
 
         eErr = GDALGetRasterStatistics( hBand, bApproxStats, bStats, 
                                         &dfMin, &dfMax, &dfMean, &dfStdDev );
-	fprintf(stderr,"loop over %d Band : %.3f %.3f %.3f %.3f\n",GDALGetRasterCount( hDataset ),dfMin, dfMax, dfMean, dfStdDev);
+	char* pcaMessage=(char*) malloc((40+strlen(GDALGetRasterCount( hDataset ))+strlen(dfMin)+strlen(dfMax)+strlen(dfMean)+strlen(dfStdDev))*sizeof(char));
+	sprintf(pcaMessage,"loop over %d Band : %.3f %.3f %.3f %.3f",GDALGetRasterCount( hDataset ),dfMin, dfMax, dfMean, dfStdDev);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 
         if( eErr == CE_None )
 	  {
-            fprintf( stderr, "  Minimum=%.3f, Maximum=%.3f, Mean=%.3f, StdDev=%.3f\n",
+		    char* pcaMessage=(char*) malloc((53+strlen(dfMin)+strlen(dfMax)+strlen(dfMean)+strlen(dfStdDev))*sizeof(char));
+            sprintf( pcaMessage, "  Minimum=%.3f, Maximum=%.3f, Mean=%.3f, StdDev=%.3f",
 		     dfMin, dfMax, dfMean, dfStdDev );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 	  }
 
         if( bReportHistograms )
@@ -2820,7 +3245,10 @@ __declspec(dllexport)
             eErr = GDALGetDefaultHistogram( hBand, &dfMin, &dfMax, 
                                             &nBucketCount, &panHistogram, 
                                             TRUE, NULL, NULL );
-	    fprintf(stderr,"Error : %d\n",eErr);
+		char* pcaMessage=(char*) malloc((11+strlen(eErr))*sizeof(char));
+	    sprintf(pcaMessage,"Error : %d",eErr);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
             if( eErr == CE_None )
 	      {
                 int iBucket;
@@ -2861,26 +3289,40 @@ __declspec(dllexport)
 
         if ( bComputeChecksum)
 	  {
-            fprintf( stderr, "  Checksum=%d\n",
+		    char* pcaMessage=(char*) malloc((14+strlen(GDALChecksumImage(hBand, 0, 0,
+				       GDALGetRasterXSize(hDataset),
+				       GDALGetRasterYSize(hDataset))))*sizeof(char));
+            sprintf( pcaMessage, "  Checksum=%d",
 		     GDALChecksumImage(hBand, 0, 0,
 				       GDALGetRasterXSize(hDataset),
 				       GDALGetRasterYSize(hDataset)));
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 	  }
 
         dfNoData = GDALGetRasterNoDataValue( hBand, &bGotNodata );
         if( bGotNodata )
 	  {
             if (CPLIsNan(dfNoData))
-	      fprintf( stderr,"  NoData Value=nan\n" );
+		  char* pcaMessage=(char*) malloc((19)*sizeof(char));
+	      sprintf( pcaMessage,"  NoData Value=nan" );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
             else
-	      fprintf( stderr,"  NoData Value=%.18g\n", dfNoData );
+		  char* pcaMessage=(char*) malloc((21+strlen(dfNoData))*sizeof(char));
+	      sprintf( pcaMessage,"  NoData Value=%.18g", dfNoData );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	  }
 
         if( GDALGetOverviewCount(hBand) > 0 )
 	  {
             int		iOverview;
 
-            fprintf( stderr, "  Overviews: " );
+            char* pcaMessage=(char*) malloc((14)*sizeof(char));
+            sprintf( pcaMessage, "  Overviews: " );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
             for( iOverview = 0; 
                  iOverview < GDALGetOverviewCount(hBand);
                  iOverview++ )
@@ -2889,30 +3331,48 @@ __declspec(dllexport)
                 const char *pszResampling = NULL;
 
                 if( iOverview != 0 )
-		  fprintf( stderr, ", " );
+		  char* pcaMessage=(char*) malloc((3)*sizeof(char));
+		  sprintf( pcaMessage, ", " );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 
                 hOverview = GDALGetOverview( hBand, iOverview );
                 if (hOverview != NULL)
 		  {
-                    fprintf( stderr, "%dx%d", 
+			        char* pcaMessage=(char*) malloc((6+strlen(GDALGetRasterBandXSize( hOverview ))+strlen(GDALGetRasterBandYSize( hOverview )))*sizeof(char));
+                    sprintf( pcaMessage, "%dx%d", 
 			     GDALGetRasterBandXSize( hOverview ),
 			     GDALGetRasterBandYSize( hOverview ) );
+				    ZOO_DEBUG(pcaMessage);
+					free(pcaMessage);
 
                     pszResampling = 
 		      GDALGetMetadataItem( hOverview, "RESAMPLING", "" );
 
                     if( pszResampling != NULL 
                         && EQUALN(pszResampling,"AVERAGE_BIT2",12) )
-		      fprintf( stderr,"*" );
+			  char* pcaMessage=(char*) malloc((2)*sizeof(char));
+		      sprintf( pcaMessage,"*" );
+			  ZOO_DEBUG(pcaMessage);
+			  free(pcaMessage);
 		  }
                 else
-		  fprintf( stderr, "(null)" );
+		  char* pcaMessage=(char*) malloc((7)*sizeof(char));
+		  sprintf( pcaMessage, "(null)" );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	      }
-            fprintf( stderr, "\n" );
+		    char* pcaMessage=(char*) malloc((3)*sizeof(char));
+            sprintf( pcaMessage, "\n" );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 
             if ( bComputeChecksum)
 	      {
-                fprintf( stderr, "  Overviews checksum: " );
+			    char* pcaMessage=(char*) malloc((23)*sizeof(char));
+                sprintf( pcaMessage, "  Overviews checksum: " );
+				ZOO_DEBUG(pcaMessage);
+				free(pcaMessage);
                 for( iOverview = 0; 
 		     iOverview < GDALGetOverviewCount(hBand);
 		     iOverview++ )
@@ -2920,24 +3380,41 @@ __declspec(dllexport)
                     GDALRasterBandH	hOverview;
 
                     if( iOverview != 0 )
-		      fprintf( stderr, ", " );
+			  char* pcaMessage=(char*) malloc((3)*sizeof(char));
+		      sprintf( pcaMessage, ", " );
+			  ZOO_DEBUG(pcaMessage);
+			  free(pcaMessage);
 
                     hOverview = GDALGetOverview( hBand, iOverview );
                     if (hOverview)
-		      fprintf( stderr, "%d",
+			  char* pcaMessage=(char*) malloc((3+strlen(GDALChecksumImage(hOverview, 0, 0,
+						 GDALGetRasterBandXSize(hOverview),
+						 GDALGetRasterBandYSize(hOverview))))*sizeof(char));
+		      sprintf( pcaMessage, "%d",
 			       GDALChecksumImage(hOverview, 0, 0,
 						 GDALGetRasterBandXSize(hOverview),
 						 GDALGetRasterBandYSize(hOverview)));
+			  ZOO_DEBUG(pcaMessage);
+			  free(pcaMessage);
                     else
-		      fprintf( stderr, "(null)" );
+			  char* pcaMessage=(char*) malloc((7)*sizeof(char));
+		      sprintf( pcaMessage, "(null)" );
+			  ZOO_DEBUG(pcaMessage);
+			  free(pcaMessage);
 		  }
-                fprintf( stderr, "\n" );
+		        char* pcaMessage=(char*) malloc((3)*sizeof(char));
+                sprintf( pcaMessage, "\n" );
+				ZOO_DEBUG(pcaMessage);
+				free(pcaMessage);
 	      }
 	  }
 
         if( GDALHasArbitraryOverviews( hBand ) )
 	  {
-            fprintf( stderr, "  Overviews: arbitrary\n" );
+		    char* pcaMessage=(char*) malloc((23)*sizeof(char));
+            sprintf( pcaMessage, "  Overviews: arbitrary" );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 	  }
         
         nMaskFlags = GDALGetMaskFlags( hBand );
@@ -2945,23 +3422,44 @@ __declspec(dllexport)
 	  {
             GDALRasterBandH hMaskBand = GDALGetMaskBand(hBand) ;
 
-            fprintf( stderr, "  Mask Flags: " );
+            char* pcaMessage=(char*) malloc((15)*sizeof(char));
+            sprintf( pcaMessage, "  Mask Flags: " );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
             if( nMaskFlags & GMF_PER_DATASET )
-	      fprintf( stderr, "PER_DATASET " );
+		  char* pcaMessage=(char*) malloc((13)*sizeof(char));
+	      sprintf( pcaMessage, "PER_DATASET " );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
             if( nMaskFlags & GMF_ALPHA )
-	      fprintf( stderr, "ALPHA " );
+		  char* pcaMessage=(char*) malloc((7)*sizeof(char));
+	      sprintf( pcaMessage, "ALPHA " );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
             if( nMaskFlags & GMF_NODATA )
-	      fprintf( stderr, "NODATA " );
+		  char* pcaMessage=(char*) malloc((8)*sizeof(char));
+	      sprintf( pcaMessage, "NODATA " );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
             if( nMaskFlags & GMF_ALL_VALID )
-	      fprintf( stderr, "ALL_VALID " );
-            fprintf( stderr, "\n" );
+		  char* pcaMessage=(char*) malloc((11)*sizeof(char));
+	      sprintf( pcaMessage, "ALL_VALID " );
+          ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
+		    char* pcaMessage=(char*) malloc((3)*sizeof(char));
+            sprintf( pcaMessage, "\n" );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 
             if( hMaskBand != NULL &&
                 GDALGetOverviewCount(hMaskBand) > 0 )
 	      {
                 int		iOverview;
-
-                fprintf( stderr, "  Overviews of mask band: " );
+               
+			    char* pcaMessage=(char*) malloc((27)*sizeof(char));
+                sprintf( pcaMessage, "  Overviews of mask band: " );
+				ZOO_DEBUG(pcaMessage);
+				free(pcaMessage);
                 for( iOverview = 0; 
                      iOverview < GDALGetOverviewCount(hMaskBand);
                      iOverview++ )
@@ -2969,20 +3467,32 @@ __declspec(dllexport)
                     GDALRasterBandH	hOverview;
 
                     if( iOverview != 0 )
-		      fprintf( stderr, ", " );
+			  char* pcaMessage=(char*) malloc((3)*sizeof(char));
+		      sprintf( pcaMessage, ", " );
+			  ZOO_DEBUG(pcaMessage);
+			  free(pcaMessage);
 
                     hOverview = GDALGetOverview( hMaskBand, iOverview );
-                    fprintf( stderr, "%dx%d", 
+					char* pcaMessage=(char*) malloc((6+strlen(GDALGetRasterBandXSize( hOverview ))+strlen(GDALGetRasterBandYSize( hOverview )))*sizeof(char));
+                    sprintf( pcaMessage, "%dx%d", 
 			     GDALGetRasterBandXSize( hOverview ),
 			     GDALGetRasterBandYSize( hOverview ) );
+				    ZOO_DEBUG(pcaMessage);
+					free(pcaMessage);
 		  }
-                fprintf( stderr, "\n" );
+		        char* pcaMessage=(char*) malloc((3)*sizeof(char));
+                sprintf( pcaMessage, "\n" );
+				ZOO_DEBUG(pcaMessage);
+				free(pcaMessage);
 	      }
 	  }
 
         if( strlen(GDALGetRasterUnitType(hBand)) > 0 )
 	  {
-            fprintf( stderr, "  Unit Type: %s\n", GDALGetRasterUnitType(hBand) );
+		    char* pcaMessage=(char*) malloc((16+strlen(GDALGetRasterUnitType(hBand)))*sizeof(char));
+            sprintf( pcaMessage, "  Unit Type: %s", GDALGetRasterUnitType(hBand) );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 	  }
 
         if( GDALGetRasterCategoryNames(hBand) != NULL )
@@ -2990,34 +3500,55 @@ __declspec(dllexport)
             char **papszCategories = GDALGetRasterCategoryNames(hBand);
             int i;
 
-            fprintf( stderr, "  Categories:\n" );
+            char* pcaMessage=(char*) malloc((14)*sizeof(char));
+            sprintf( pcaMessage, "  Categories:" );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
             for( i = 0; papszCategories[i] != NULL; i++ )
-	      fprintf( stderr, "    %3d: %s\n", i, papszCategories[i] );
+		  char* pcaMessage=(char*) malloc((12+strlen(i)+strlen(papszCategories[i]))*sizeof(char));
+	      sprintf( pcaMessage, "    %3d: %s", i, papszCategories[i] );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	  }
 
         if( GDALGetRasterScale( hBand, &bSuccess ) != 1.0 
             || GDALGetRasterOffset( hBand, &bSuccess ) != 0.0 )
-	  fprintf( stderr, "  Offset: %.15g,   Scale:%.15g\n",
+	  char* pcaMessage=(char*) malloc((31+strlen(GDALGetRasterOffset( hBand, &bSuccess ))+strlen(GDALGetRasterScale( hBand, &bSuccess )))*sizeof(char));
+	  sprintf( pcaMessage, "  Offset: %.15g,   Scale:%.15g",
 		   GDALGetRasterOffset( hBand, &bSuccess ),
 		   GDALGetRasterScale( hBand, &bSuccess ) );
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 
         papszMetadata = (bShowMetadata) ? GDALGetMetadata( hBand, NULL ) : NULL;
         if( bShowMetadata && CSLCount(papszMetadata) > 0 )
 	  {
-            fprintf( stderr, "  Metadata:\n" );
+		    char* pcaMessage=(char*) malloc((12)*sizeof(char));
+            sprintf( pcaMessage, "  Metadata:" );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
             for( i = 0; papszMetadata[i] != NULL; i++ )
 	      {
-                fprintf( stderr, "    %s\n", papszMetadata[i] );
+			    char* pcaMessage=(char*) malloc((7+strlen(papszMetadata[i]))*sizeof(char));
+                sprintf( pcaMessage, "    %s", papszMetadata[i] );
+				ZOO_DEBUG(pcaMessage);
+				free(pcaMessage);
 	      }
 	  }
 
         papszMetadata = (bShowMetadata) ? GDALGetMetadata( hBand, "IMAGE_STRUCTURE" ) : NULL;
         if( bShowMetadata && CSLCount(papszMetadata) > 0 )
 	  {
-            fprintf( stderr, "  Image Structure Metadata:\n" );
+		    char* pcaMessage=(char*) malloc((28)*sizeof(char));
+            sprintf( pcaMessage, "  Image Structure Metadata:" );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
             for( i = 0; papszMetadata[i] != NULL; i++ )
 	      {
-                fprintf( stderr, "    %s\n", papszMetadata[i] );
+			    char* pcaMessage=(char*) malloc((7+strlen(papszMetadata[i]))*sizeof(char));
+                sprintf( pcaMessage, "    %s", papszMetadata[i] );
+				ZOO_DEBUG(pcaMessage);
+				free(pcaMessage);
 	      }
 	  }
 

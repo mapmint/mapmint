@@ -65,7 +65,7 @@ def updateAllExtentForMainDB(conf,inputs,outputs):
                         res[len(res)-1]["layer"]+=[l.name]
                     tmp=refreshLayerInfo(conf,{"map":{"value":files[i].replace(conf["main"]["dataPath"],"").replace("project_","").replace(".map","")},"layer":{"value":l.name}},outputs)
         except Exception as e:
-            print(e,file=sys.stderr)
+            zoo.error(str(e))
             continue
     import json
     outputs["Result"]["value"]=json.dumps(res)
@@ -115,8 +115,6 @@ def issue(conf, inputs, outputs):
         # myMap=mapscript.mapObj(conf["main"]["dataPath"]+"/maps/project_"+inputs["map"]["value"]+".map")
         myMap = mapscript.mapObj("/tmp/toto1.map")
         myMap.save("/tmp/toto.map")
-        # print(dir(myMap), file=sys.stderr)
-        # print(myMap.save(conf["main"]["dataPath"]+"/maps/debug_issue_project_"+inputs["map"]["value"]+".map"), file=sys.stderr)
     outputs["Result"]["value"] = conf["main"]["dataPath"] + "/maps/debug_issue_project_" + inputs["map"]["value"] + ".map"
     return zoo.SERVICE_SUCCEEDED
 
@@ -147,7 +145,7 @@ def setGeometryType(conf, inputs, outputs):
         mapfile = mapscript.mapObj(inputs["dst"]["value"] + "/ds_ows.map")
         mappath = inputs["dst"]["value"] + "/ds_ows.map"
     except:
-        print(inputs,file=sys.stderr)
+        zoo.error(str(inputs))
         supportedDbs=conf["mm"]["supportedDbs"].split(",")#+["WMS","WFS","dirs"]
         for i in range(len(supportedDbs)):
             try:
@@ -155,7 +153,7 @@ def setGeometryType(conf, inputs, outputs):
                 mappath = conf["main"]["dataPath"]+"/"+supportedDbs[i]+"/"+inputs["dst"]["value"] + "ds_ows.map"
                 break
             except Exception as e:
-                print(e,file=sys.stderr)
+                zoo.error(str(e))
     if mapfile is None:
         return zoo.SERVICE_FAILED
     lay = mapfile.getLayerByName(inputs["dso"]["value"])
@@ -454,7 +452,7 @@ def mmDataStoreHasMap(conf, inputs, outputs):
     try:
         m = mapscript.mapObj(mapfile)
     except Exception as e:
-        print("mmDataStoreHasMap "+str(e), file=sys.stderr)
+        zoo.error("mmDataStoreHasMap "+str(e))
         for i in conf["mm"]["supportedDbs"].split(',')+["WFS", "WMS"]:
             try:
                 mapfile = conf["main"]["dataPath"] + "/" + i + "/" + inputs["dataStore"]["value"].replace("WFS:", "").replace("WMS:", "") + "ds_ows.map"
@@ -489,11 +487,11 @@ def createVectorTileIndexLayer(conf, layer):
             lines = [osgeo.ogr.wkbLineString, osgeo.ogr.wkbLineString25D, osgeo.ogr.wkbMultiLineString, osgeo.ogr.wkbMultiLineString25D]
             points = [osgeo.ogr.wkbPoint, osgeo.ogr.wkbPoint25D, osgeo.ogr.wkbMultiPoint, osgeo.ogr.wkbMultiPoint25D]
             tmpStr = layer.connection + layer.data + ".shp"
-            print(tmpStr, file=sys.stderr)
+            zoo.info(str(tmpStr))
             layer.data = None
             layer.tileindex = tmpStr
-            print(" ++++++++++++++++++++++++++++++++++++", file=sys.stderr)
-            print(obj[0]["LOCATION"].split(',')[0], file=sys.stderr)
+            zoo.info(" ++++++++++++++++++++++++++++++++++++")
+            zoo.info(obj[0]["LOCATION"].split(',')[0])
             layer.connection = None
             layer.connectiontype = -1
             if points.count(geometryType) > 0:
@@ -508,9 +506,9 @@ def createVectorTileIndexLayer(conf, layer):
                         layer.type = mapscript.MS_LAYER_LINE
                         layer.updateFromString("LAYER STYLE COLOR 123 123 123 OUTLINE COLOR 0 0 0 WIDTH 1.0 OUTLINEWIDTH 2.0 END END")
             layer.tileitem = "LOCATION"
-            print(" ++++++++++++++++++++++++++++++++++++", file=sys.stderr)
-            print(obj[0]["LOCATION"].split(',')[0], file=sys.stderr)
-            print(layer.tileindex, file=sys.stderr)
+            zoo.info(" ++++++++++++++++++++++++++++++++++++")
+            zoo.info(obj[0]["LOCATION"].split(',')[0])
+            zoo.info(str(layer.tileindex))
             return True
         else:
             return False
@@ -539,7 +537,7 @@ def mmVectorInfo2MapPy(conf, inputs, outputs):
                     setMetadata(m.getLayer(i), "ows_srs", m.getLayer(i).metadata.get("ows_srs") + " EPSG:3857 EPSG:900914 EPSG:900913")
         m.save(mapfile)
     except Exception as e:
-        print(e, file=sys.stderr)
+        zoo.error(str(e))
         m00 = None
         for i in conf["mm"]["supportedDbs"].split(',')+[ "WFS", "WMS"]:
             try:
@@ -658,13 +656,13 @@ def mmVectorInfo2MapPy(conf, inputs, outputs):
                                     # l.setConnectionType(mapscript.MS_RASTER,"")
                                     l.data = fName
                                 except Exception as e:
-                                    print(e, file=sys.stderr)
+                                    zoo.error(str(e))
                         except Exception as e:
-                            print(e, file=sys.stderr)
+                            zoo.error(str(e))
                     m.save(mapfile)
                     m = mapscript.mapObj(mapfile)
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 pass
 
         if m is None:
@@ -1295,8 +1293,8 @@ def createLegend0(conf, inputs, outputs):
                 try:
                     tmpImage.write(mapPath + "/" + img_name)
                 except Exception as e:
-                    print("Failed to save: "+mapPath + "/" + img_name, file=sys.stderr)
-                    print(str(e), file=sys.stderr)
+                    zoo.error("Failed to save: "+mapPath + "/" + img_name)
+                    zoo.error(str(e))
             i += 1
 
     try:
@@ -1735,7 +1733,7 @@ def createLegend(conf, inputs, outputs):
                 try:
                     tmpImage.write(mapPath + "/" + img_name)
                 except Exception as e:
-                    print("Failed to save: "+mapPath + "/" + img_name, file=sys.stderr)
+                    zoo.error("Failed to save: "+mapPath + "/" + img_name,)
             i += 1
 
     try:
@@ -1796,7 +1794,7 @@ def listMap(conf, inputs, outputs):
             try:
                 mTime = time.strftime(str(conf["mm"]["dateFormat"]), time.localtime(os.path.getmtime(conf["main"]["dataPath"] + "/" + prefix + "maps/" + i)))
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 mTime = time.strftime(str(conf["mm"]["dateFormat"]), time.localtime(os.path.getmtime(conf["main"]["dataPath"] + "/" + prefix + "maps/" + i)))
             try:
                 locale.setlocale(locale.LC_ALL, oloc)
@@ -1846,7 +1844,7 @@ def saveMap(conf, inputs, outputs):
                         f.write(layer.generateSLD())
                         f.close()
                     except:
-                        print("Unable to create the file: " + conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_sld.xml", file=sys.stderr)
+                        zoo.error("Unable to create the file: " + conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + conf["senv"]["last_map"] + "_sld.xml")
 
                     for j in range(1, m.getLayer(i).numclasses):
                         m.getLayer(i).removeClass(m.getLayer(i).numclasses - 1)
@@ -1897,23 +1895,23 @@ def addGroup(conf, inputs, outputs):
 def saveLayerStyle0(conf, inputs, outputs):
     import mapscript
     mapPath = conf["main"]["dataPath"] + "/maps"
-    print(mapPath,file=sys.stderr)
+    zoo.info(str(mapPath))
     if "prefix" in inputs:
         mapPath = conf["main"]["dataPath"] + "/" + inputs["prefix"]["value"] + "_maps"
-    print(mapPath,file=sys.stderr)
+        zoo.info(str(mapPath))
     if "mmStep" in inputs:
-        print(inputs["mmStep"],file=sys.stderr)
+        zoo.info(inputs["mmStep"])
         m = mapscript.mapObj(mapPath + "/timeline_" + inputs["map"]["value"] + "_" + inputs["layer"]["value"].replace(".", "_") + "_step" + inputs["mmStep"]["value"] + ".map")
     else:
         if inputs["map"]["value"].count(conf["main"]["dataPath"]) > 0:
-            print(inputs["map"]["value"],file=sys.stderr)
+            zoo.info(inputs["map"]["value"])
             m = mapscript.mapObj(inputs["map"]["value"])
         else:
-            print(mapPath + "/project_" + inputs["map"]["value"] + ".map",file=sys.stderr)
+            zoo.info(mapPath + "/project_" + inputs["map"]["value"] + ".map")
             m = mapscript.mapObj(mapPath + "/project_" + inputs["map"]["value"] + ".map")
     layer = m.getLayerByName(inputs["layer"]["value"])
-    print(layer,file=sys.stderr)
-    print(inputs["layer"]["value"],file=sys.stderr)
+    zoo.info(str(layer))
+    zoo.info(inputs["layer"]["value"])
 
     try:
         noColor = False
@@ -2344,7 +2342,7 @@ def saveLayerStyle(conf, inputs, outputs):
             try:
                 layer.setOpacity(int(inputs["opacity"]["value"]))
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 try:
                     layer.updateFromString("LAYER COMPOSITE OPACITY " + inputs["opacity"]["value"] + " END END")
                 except:
@@ -2473,7 +2471,7 @@ def createColorRamp(conf, m, layer, useTile=0):
         try:
             shutil.rmtree(conf["main"]["dataPath"] + "/" + conf["senv"]["last_map"] + "_" + layer.name)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             pass
         shutil.move(conf["main"]["tmpPath"] + "/" + conf["senv"]["last_map"] + "_" + layer.name, conf["main"]["dataPath"] + "/" + conf["senv"]["last_map"] + "_" + layer.name)
         test = conf["main"]["dataPath"] + '/tile_' + conf["senv"]["last_map"] + '_' + layer.name + '*'
@@ -2500,7 +2498,7 @@ def createColorRamp(conf, m, layer, useTile=0):
         try:
             l.data = value
         except Exception as e:
-            print(e,file=sys.stderr)
+            zoo.error(str(e))
     m2.save(conf["main"]["dataPath"] + "/maps/color_ramp_" + conf["senv"]["last_map"] + "_" + layer.name + ".map")
 
 
@@ -2754,7 +2752,7 @@ def classifyMap0(conf, inputs, outputs):
         try:
             cur.execute("DROP VIEW indexes.view_idx_" + cid)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             con.conn.commit()
         try:
             con.conn.commit()
@@ -2762,7 +2760,7 @@ def classifyMap0(conf, inputs, outputs):
             layer.data = "indexes.view_idx_" + cid
             layerName = layer.data
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             con.conn.commit()
         con.conn.commit()
 
@@ -2813,14 +2811,14 @@ def classifyMap0(conf, inputs, outputs):
         try:
             tmp = eval(outputs["Result"]["value"])
         except Exception as e:
-            print("** ERROR **", file=sys.stderr)
-            print(str(e), file=sys.stderr)
+            zoo.error("** ERROR **")
+            zoo.error(str(e))
             conf["lenv"]["message"] = zoo._("Unable to execute the request. ") + str(e)
             return zoo.SERVICE_FAILED
     except Exception as e:
         try:
             k = list(inputs.keys())
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
 
             layer.clearProcessing()
             if k.count("processing") > 0:
@@ -2915,7 +2913,7 @@ def classifyMap0(conf, inputs, outputs):
         try:
             colspan = (float(tmp[0]["max"]) - float(tmp[0]["min"])) / float(nbClasses)
         except Exception as e:
-            print(str(e), file=sys.stderr)
+            zoo.error(str(e))
             pass
     if rClass:
         nbClasses = len(classif)
@@ -3004,7 +3002,7 @@ def classifyMap0(conf, inputs, outputs):
                                 if j != "title":
                                     tmpClass.setExpression('( "[' + j + ']" = "' + tmp[i][j] + '" ' + precond + ' )')
                     except Exception as e:
-                        print(e, file=sys.stderr)
+                        zoo.error(str(e))
                         iEnc = layer.encoding
                         oEnc = m.web.metadata.get("ows_encoding")
                         try:
@@ -3017,7 +3015,7 @@ def classifyMap0(conf, inputs, outputs):
                             setMetadata(layer, "mmFAS", "true")
                             setMetadata(layer, "mmFASF", inputs["mmFASF"]["value"])
                         except Exception as e:
-                            print(e, file=sys.stderr)
+                            zoo.error(str(e))
                     else:
                         try:
                             layer.metadata.remove("mmFAS")
@@ -3035,7 +3033,7 @@ def classifyMap0(conf, inputs, outputs):
                             tmpClass.name += " (" + str(tmp[i][j]) + " " + zoo._("item") + ")"
 
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             pass
         i += 1
 
@@ -3131,7 +3129,7 @@ def classifyMap(conf, inputs, outputs):
         try:
             cur.execute("DROP VIEW indexes.view_idx_" + cid)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             con.conn.commit()
         try:
             con.conn.commit()
@@ -3139,7 +3137,7 @@ def classifyMap(conf, inputs, outputs):
             layer.data = "indexes.view_idx_" + cid
             layerName = layer.data
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             con.conn.commit()
         con.conn.commit()
 
@@ -3183,7 +3181,7 @@ def classifyMap(conf, inputs, outputs):
     except Exception as e:
         try:
             k = list(inputs.keys())
-            print(e.message, file=sys.stderr)
+            zoo.error(str(e.message))
 
             if inputs["mmType"]["value"] != "uniqVal":
                 if k.count("min") == 0:
@@ -3343,7 +3341,7 @@ def classifyMap(conf, inputs, outputs):
                             except:
                                 tmpClass.setExpression('( "[' + j + ']" = ' + json.dumps(tmp[i][j]) + ' ' + precond + ' )')
                     except Exception as e:
-                        print(e, file=sys.stderr)
+                        zoo.error(str(e))
                         iEnc = layer.encoding
                         oEnc = m.web.metadata.get("ows_encoding")
                         tmpClass.setExpression('( "[' + j + ']" = "' + tmp[i][j].decode(oEnc).encode(iEnc) + '" ' + precond + ' )')
@@ -3353,7 +3351,7 @@ def classifyMap(conf, inputs, outputs):
                             setMetadata(layer, "mmFAS", "true")
                             setMetadata(layer, "mmFASF", inputs["mmFASF"]["value"])
                         except Exception as e:
-                            print(e, file=sys.stderr)
+                            zoo.error(str(e))
                     else:
                         try:
                             layer.metadata.remove("mmFAS")
@@ -3363,7 +3361,7 @@ def classifyMap(conf, inputs, outputs):
                     setMetadata(layer, "mmName", tmp[i][j])
                     tmpClass.name = tmp[i][j]
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             pass
         i += 1
     if l.type == mapscript.MS_LAYER_RASTER and nbClasses > 1:
@@ -3486,7 +3484,7 @@ def saveLabel(conf, inputs, outputs):
         try:
             layer.getClass(j).removeLabel(0)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
 
         if not ("label" in inputs) or not ("value" in inputs["label"]):
             j -= 1
@@ -3517,7 +3515,7 @@ def saveLabel(conf, inputs, outputs):
             try:
                 angle = float(inputs["angle"]["value"])
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 angle = inputs["angle"]["value"]
             if angle == 0:
                 if inputs["label"]["value"] != "GRID":
@@ -3548,11 +3546,11 @@ def saveLabel(conf, inputs, outputs):
             try:
                 layer.getClass(j).removeLabel(0)
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
             try:
                 layer.getClass(j).addLabel(l)
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
         j -= 1
 
     if "fullPath" in inputs and inputs["fullPath"]["value"] == "true":
@@ -3650,7 +3648,7 @@ def addLabelLayer(conf, inputs, outputs):
     try:
         m.insertLayer(l, m.getLayerByName(inputs["layer"]["value"]).index + 1)
     except Exception as e:
-        print(e, file=sys.stderr)
+        zoo.error(str(e))
         m.insertLayer(l)
     m.save(conf["main"]["dataPath"] + "/maps/project_" + inputs["omap"]["value"] + ".map")
     outputs["Result"]["value"] = zoo._("Map saved")
@@ -3666,7 +3664,7 @@ def getMapLayersInfos(conf, inputs, outputs):
     if "initialInformations" in inputs:
         document=defusedxml.ElementTree.parse(inputs["initialInformations"]["cache_file"])
         root_element = document.getroot()
-    print(inputs, file=sys.stderr)
+    zoo.info(str(inputs))
     if "fullPath" in inputs and inputs["fullPath"]["value"] == "true":
         m = None
         try:
@@ -3738,7 +3736,7 @@ def getMapLayersInfos(conf, inputs, outputs):
 
 def getMapLayersInfo(conf, inputs, outputs):
     import mapscript
-    print(inputs, file=sys.stderr)
+    zoo.info(str(inputs))
     if "fullPath" in inputs and inputs["fullPath"]["value"] == "true":
         m = None
         try:
@@ -3938,14 +3936,14 @@ def setMapLayerProperties(conf, inputs, outputs):
                 outputs1={"Result": {"mimType": "application/json"}}
                 res=vt.vectInfo(conf, inputs1, outputs1)
                 import json
-                print(outputs1["Result"]["value"],file=sys.stderr)
+                zoo.info(outputs1["Result"]["value"])
                 try:
                     values=json.loads(outputs1["Result"]["value"])[0]  
-                    print(str(values),file=sys.stderr)
+                    zoo.info(str(values))
                     layer.setExtent(float(values["minx"]),float(values["miny"]),float(values["maxx"]),float(values["maxy"]))
                     m0.setExtent(float(values["minx"]),float(values["miny"]),float(values["maxx"]),float(values["maxy"]))
                 except Exception as e:
-                    print(str(e),file=sys.stderr)
+                    zoo.error(str(e))
                     continue
             saveProjectMap(m0, conf["main"]["dataPath"] + "/maps/search_" + mf + "_" + lname + "_" + fval + ".map")
             f = open(conf["main"]["publicationPath"] + '/styles/' + layer.name + '_' + fval + "_" + conf["senv"]["last_map"] + "_sld.xml", 'w', encoding='utf-8')
@@ -3993,7 +3991,7 @@ def initMintMapfile(conf, m, mf, lname):
     if m.getLayer(0):
         while i < m.getLayer(0).numclasses:
             m.getLayer(0).getClass(i).template = conf["main"]["dataPath"] + "/templates/click_" + l.name + "_" + mf + "_tmpl.html"
-            print(l.getClass(i).template, file=sys.stderr)
+            zoo.info((l.getClass(i).template))
             i += 1
         saveProjectMap(m, conf["main"]["dataPath"] + "/maps/search_click_" + mf + "_" + lname + ".map")
 
@@ -4012,7 +4010,7 @@ def removeLayer(conf, inputs, outputs):
 
 
 def setLayerScale(conf, inputs, outputs):
-    print(inputs,file=sys.stderr)
+    zoo.info(str(inputs))
     if "isArray" in inputs["st"]:
         for i in range(0, len(inputs["st"]["value"])):
             input0 = {}
@@ -4022,9 +4020,9 @@ def setLayerScale(conf, inputs, outputs):
             output1 = outputs
             input0["st"] = {"value": inputs["st"]["value"][i][:3].title()}
             input0["sv"] = {"value": inputs["sv"]["value"][i]}
-            print(input0,file=sys.stderr)
-            print(inputs["sv"]["value"],file=sys.stderr)
-            print(inputs["st"]["value"],file=sys.stderr)
+            zoo.info(str(input0))
+            zoo.info(inputs["sv"]["value"])
+            zoo.info(inputs["st"]["value"])
             if inputs["st"]["value"][i][3:] == "Display":
                 res = _setLayerScale(conf, input0, outputs)
             else:
@@ -4154,7 +4152,7 @@ def doGroupLists0(mmGroups, layers, groups, i):
             try:
                 doGroupLists0(mmGroups, layers, groups["children"][0][j], i + 1)
             except Exception as e:
-                print("*** Error: " + str(e), file=sys.stderr)
+                zoo.error("*** Error: " + str(e))
         if i == 1 and mmGroups[i + 1][len(mmGroups[i + 1]) - 1] != ';':
             mmGroups[i + 1] += ',|' + groups["id"] + ";"
     else:
@@ -4465,7 +4463,7 @@ def getShortDescription(conf, m):
         xml.sax.parseString("<xml>".encode("utf-8") + h.unescape(description.replace('<br>', '<br/>').decode('utf-8')).encode("utf-8") + "</xml>".encode("utf-8"), tmp)
         description = tmp.desc[:100]
     except Exception as e:
-        print(e, file=sys.stderr)
+        zoo.error(str(e))
         description = open(m.web.metadata.get("ows_abstract").replace(conf["main"]["tmpUrl"], conf["main"]["tmpPath"]), encoding='utf-8').read().replace("\t", "")  # str(e)+" "+m.web.metadata.get("ows_abstract")[:100]
     return description
 
@@ -4530,7 +4528,7 @@ def saveLegendIcons(conf, m):
                 lm = mapscript.mapObj(conf["main"]["dataPath"] + "/public_maps/map4legend_" + conf["senv"]["last_map"] + "_" + layer.name + ".map")
                 saveLegendIconsForLayer(conf, m, lm, layer, i)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             continue
 
 
@@ -4586,7 +4584,7 @@ def savePublishMap(conf, inputs, outputs):
             f.write(inputs["mmDescription"]["value"].replace("&39;", "&#39;"))
             setMetadata(m.web, "ows_abstract", conf["main"]["tmpUrl"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html")
         except Exception as e:
-            print(e,file=sys.stderr)
+            zoo.error(str(e))
     if "mmWMTSAttribution" in inputs:
         import time, random
         cid = time.clock() + random.randrange(100000)
@@ -4594,7 +4592,7 @@ def savePublishMap(conf, inputs, outputs):
         try:
             open(conf["main"]["tmpPath"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html", "w", encoding='utf-8').write(inputs["mmWMTSAttribution"]["value"].replace("&39;", "&#39;"))
         except Exception as e:
-            print(e,file=sys.stderr)
+            zoo.error(str(e))
         setMetadata(m.web, "mmWMTSAttribution", conf["main"]["tmpUrl"] + "/descriptions/desc_" + conf["senv"]["MMID"] + "_" + cid + ".html")
     bt={"layers":"","url":"","attribution":""};
     if "mmWMTSBLURL" in inputs and "length" in inputs["mmWMTSBLURL"]:
@@ -4712,7 +4710,7 @@ def savePublishMap(conf, inputs, outputs):
     try:
         correctExtent(m)
     except:
-        print("extent issue",file=sys.stderr)
+        zoo.error("extent issue")
     saveProjectMap(m, destMapfile)
 
     import shutil
@@ -5042,7 +5040,7 @@ def setData(conf,inputs,outputs):
                 m = mapscript.mapObj(conf["main"]["dataPath"] + "/" + supportedDbs[i] + "/" + inputs["datastore"]["value"] + "ds_ows.map")
                 mappath = conf["main"]["dataPath"] + "/" + supportedDbs[i] + "/" + inputs["datastore"]["value"] + "ds_ows.map"
             except Exception as e :
-                print(e,file=sys.stderr)
+                zoo.error(str(e))
 
     if m is None:
         return zoo.SERVICE_FAILED
@@ -5067,7 +5065,7 @@ def setSrs(conf,inputs,outputs):
                 m = mapscript.mapObj(conf["main"]["dataPath"] + "/" + supportedDbs[i] + "/" + inputs["datastore"]["value"] + "ds_ows.map")
                 mappath = conf["main"]["dataPath"] + "/" + supportedDbs[i] + "/" + inputs["datastore"]["value"] + "ds_ows.map"
             except Exception as e :
-                print(e,file=sys.stderr)
+                zoo.error(str(e))
 
     if m is None:
         return zoo.SERVICE_FAILED

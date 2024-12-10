@@ -145,7 +145,10 @@ __declspec(dllexport)
 	    if(strncasecmp(pszFormat,"JPEG",4)==0)
 	      ext="jpg";
       sprintf((char*)pszDest,"%s/%s.%s",tempPath,tmpMap->value,ext);
-      fprintf(stderr,"DEBUG pszDest : %s\n",pszDest);
+      char* pcaMessage=(char*) malloc((19+strlen(pszDest))*sizeof(char));
+      sprintf(pcaMessage,"DEBUG pszDest : %s",pszDest);
+      ZOO_DEBUG(pcaMessage);
+      free(pcaMessage);
     }
     tmpMap=NULL;
     tmpMap=getMapFromMaps(inputs,"ProjWin","value");
@@ -168,8 +171,14 @@ __declspec(dllexport)
 	  dfLRY = atof(t);
 	  break;
 	}
-	fprintf(stderr,"%s\n\n",t);
-	fprintf(stderr,"%f - %f - %f - %f\n\n",dfULX,dfULY,dfLRX,dfLRY);
+  char* pcaMessage=(char*) malloc((3+strlen(t))*sizeof(char));
+	sprintf(pcaMessage,"%s",t);
+  ZOO_DEBUG(pcaMessage);
+  free(pcaMessage);
+  char* pcaMessage=(char*) malloc((18+strlen(dfULX)+strlen(dfULY)+strlen(dfLRX)+strlen(dfLRY))*sizeof(char));
+	sprintf(pcaMessage,"%f - %f - %f - %f",dfULX,dfULY,dfLRX,dfLRY);
+  ZOO_DEBUG(pcaMessage);
+  free(pcaMessage);
 	t=strtok(NULL,",");
 	cnt++;
       }
@@ -180,8 +189,11 @@ __declspec(dllexport)
       OGRSpatialReference oOutputSRS;
       if( oOutputSRS.SetFromUserInput( tmpMap->value ) != OGRERR_NONE )
 	{
-	  fprintf( stderr, "Failed to process SRS definition: %s\n", 
+    char* pcaMessage=(char*) malloc((37)*sizeof(char));
+	  sprintf( pcaMessage, "Failed to process SRS definition: %s", 
 		   tmpMap->value );
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
 	    /**
 	     * Avoiding GDALDestroyDriverManager() call
 	     */
@@ -206,14 +218,20 @@ __declspec(dllexport)
       
       if( eOutputType == GDT_Unknown )
 	{
-	  fprintf( stderr, "Unknown output pixel type: %s\n", tmpMap->value );
+    char* pcaMessage=(char*) malloc((30)*sizeof(char));
+	  sprintf( pcaMessage, "Unknown output pixel type: %s", tmpMap->value );
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
 	  /**
 	   * Avoiding GDALDestroyDriverManager() call
 	   */
 	  return 4;
 	}
     }
-    fprintf(stderr,"==%s %s %s %==\n",pszFormat,pszSource,pszDest);
+    char* pcaMessage=(char*) malloc((15+strlen(pszFormat)+strlen(pszSource)+strlen(pszDest))*sizeof(char));
+    sprintf(pcaMessage,"==%s %s %s %==",pszFormat,pszSource,pszDest);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     fflush(stderr);
 
     tmpMap=getMapFromMaps(inputs,"OutSize","value");
@@ -222,11 +240,17 @@ __declspec(dllexport)
       pszOXSize=strdup(tmpMap->value);
       pszOXSize[strlen(tmpMap->value)-strlen(temp)]=0;
       pszOYSize=strdup(temp+1);
-      fprintf(stderr,"pszOSize %s %s",pszOXSize,pszOYSize);
+      char* pcaMessage=(char*) malloc((15+strlen(pszOXSize)+strlen(pszOYSize))*sizeof(char));
+      sprintf(pcaMessage,"pszOSize %s %s",pszOXSize,pszOYSize);
+      ZOO_DEBUG(pcaMessage);
+      free(pcaMessage);
     }
 
     if( pszDest == NULL ){
-	fprintf(stderr,"exit line 416");
+  char* pcaMessage=(char*) malloc((14)*sizeof(char));
+	sprintf(pcaMessage,"exit line 416");
+  ZOO_DEBUG(pcaMessage);
+  free(pcaMessage);
 	fflush(stderr);
 	/**
 	 * Avoiding GDALDestroyDriverManager() call
@@ -236,7 +260,10 @@ __declspec(dllexport)
 
     if ( strcmp(pszSource, pszDest) == 0)
       {
-        fprintf(stderr, "Source and destination datasets must be different.\n");
+        char* pcaMessage=(char*) malloc((51)*sizeof(char));
+        sprintf(pcaMessage, "Source and destination datasets must be different.");
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
 	fflush(stderr);
 	/**
 	 * Avoiding GDALDestroyDriverManager() call
@@ -248,13 +275,20 @@ __declspec(dllexport)
     /*      Attempt to open source file.                                 */
     /* ----------------------------------------------------------------- */
 
-    fprintf(stderr,"dataSource %s\n",pszSource);
+    char* pcaMessage=(char*) malloc((14+strlen(pszSource))*sizeof(char));
+    sprintf(pcaMessage,"dataSource %s",pszSource);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     hDataset = GDALOpenShared( pszSource, GA_ReadOnly );
     
     if( hDataset == NULL ){
-        fprintf( stderr,
-                 "GDALOpen failed - %d\n%s\n",
+        
+        char* pcaMessage=(char*) malloc((25+strlen(CPLGetLastErrorNo())+strlen(CPLGetLastErrorMsg()))*sizeof(char));
+        sprintf( pcaMessage,
+                 "GDALOpen failed - %d\n%s",
                  CPLGetLastErrorNo(), CPLGetLastErrorMsg() );
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
 	fflush(stderr);
 	/**
 	 * Avoiding GDALDestroyDriverManager() call
@@ -269,8 +303,11 @@ __declspec(dllexport)
         && CSLCount(GDALGetMetadata( hDataset, "SUBDATASETS" )) > 0 
         && GDALGetRasterCount(hDataset) == 0 )
       {
-        fprintf( stderr,
-                 "Input file contains subdatasets. Please, select one of them for reading.\n" );
+        char* pcaMessage=(char*) malloc((73)*sizeof(char));
+        sprintf( pcaMessage,
+                 "Input file contains subdatasets. Please, select one of them for reading." );
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
 	fflush(stderr);
         GDALClose( hDataset );
 	/**
@@ -333,7 +370,10 @@ __declspec(dllexport)
     if( nBandCount == 0 ){
         nBandCount = GDALGetRasterCount( hDataset );
         if( nBandCount == 0 ){
-            fprintf( stderr, "Input file has no bands, and so cannot be translated.\n" );
+            char* pcaMessage=(char*) malloc((54)*sizeof(char));
+            sprintf( pcaMessage, "Input file has no bands, and so cannot be translated." );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
 	    fflush(stderr);
 	    /**
 	     * Avoiding GDALDestroyDriverManager() call
@@ -351,9 +391,12 @@ __declspec(dllexport)
 	  {
             if( panBandList[i] < 1 || panBandList[i] > GDALGetRasterCount(hDataset) )
 	      {
-                fprintf( stderr, 
-                         "Band %d requested, but only bands 1 to %d available.\n",
+                char* pcaMessage=(char*) malloc((53+strlen(panBandList[i])+strlen(GDALGetRasterCount(hDataset)))*sizeof(char));
+                sprintf( pcaMessage, 
+                         "Band %d requested, but only bands 1 to %d available.",
                          panBandList[i], GDALGetRasterCount(hDataset) );
+                ZOO_DEBUG(pcaMessage);
+                free(pcaMessage);
 		fflush(stderr);
 		/**
 		 * Avoiding GDALDestroyDriverManager() call
@@ -381,9 +424,12 @@ __declspec(dllexport)
         GDALGetGeoTransform( hDataset, adfGeoTransform );
 
         if( adfGeoTransform[2] != 0.0 || adfGeoTransform[4] != 0.0 ){
-            fprintf( stderr, 
-                     "The -projwin option was used, but the geotransform is\n"
-                     "rotated.  This configuration is not supported.\n" );
+            char* pcaMessage=(char*) malloc((100)*sizeof(char));
+            sprintf( pcaMessage, 
+                     "The -projwin option was used, but the geotransform is"
+                     "rotated.  This configuration is not supported." );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             GDALClose( hDataset );
             CPLFree( panBandList );
 	    fflush(stderr);
@@ -402,21 +448,27 @@ __declspec(dllexport)
         anSrcWin[3] = (int) ((dfLRY - dfULY) / adfGeoTransform[5] + 0.5);
 
         if( !bQuiet )
-	  fprintf( stdout, 
-		   "Computed -srcwin %d %d %d %d from projected window.\n",
+    char* pcaMessage=(char*) malloc((52+strlen(anSrcWin[0])+strlen(anSrcWin[1])+strlen(anSrcWin[2])+strlen(anSrcWin[3]))*sizeof(char));
+	  sprintf( pcaMessage, 
+		   "Computed -srcwin %d %d %d %d from projected window.",
 		   anSrcWin[0], 
 		   anSrcWin[1], 
 		   anSrcWin[2], 
 		   anSrcWin[3] );
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
         
         if( anSrcWin[0] < 0 || anSrcWin[1] < 0 
             || anSrcWin[0] + anSrcWin[2] > GDALGetRasterXSize(hDataset) 
             || anSrcWin[1] + anSrcWin[3] > GDALGetRasterYSize(hDataset) )
 	  {
-            fprintf( stderr, 
-                     "Computed -srcwin falls outside raster size of %dx%d.\n",
+            char* pcaMessage=(char*) malloc((53+strlen(GDALGetRasterXSize(hDataset))+strlen(GDALGetRasterYSize(hDataset)))*sizeof(char));
+            sprintf( pcaMessage, 
+                     "Computed -srcwin falls outside raster size of %dx%d.",
                      GDALGetRasterXSize(hDataset), 
                      GDALGetRasterYSize(hDataset) );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             return 4;
 	  }
       }
@@ -429,15 +481,18 @@ __declspec(dllexport)
         || anSrcWin[0] + anSrcWin[2] > GDALGetRasterXSize(hDataset) 
         || anSrcWin[1] + anSrcWin[3] > GDALGetRasterYSize(hDataset) )
       {
-        fprintf( stderr, 
-                 "-srcwin %d %d %d %d falls outside raster size of %dx%d\n"
-                 "or is otherwise illegal.\n",
+        char* pcaMessage=(char*) malloc((79+strlen(anSrcWin[0])+strlen(anSrcWin[1])+strlen(anSrcWin[2])+strlen(anSrcWin[3])+strlen(GDALGetRasterXSize(hDataset))+strlen(GDALGetRasterYSize(hDataset)))*sizeof(char));
+        sprintf( pcaMessage, 
+                 "-srcwin %d %d %d %d falls outside raster size of %dx%d"
+                 "or is otherwise illegal.",
                  anSrcWin[0],
                  anSrcWin[1],
                  anSrcWin[2],
                  anSrcWin[3],
                  GDALGetRasterXSize(hDataset), 
                  GDALGetRasterYSize(hDataset) );
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
         return 4;
       }
 
@@ -459,12 +514,18 @@ __declspec(dllexport)
                 || GDALGetMetadataItem( hDriver, GDAL_DCAP_CREATECOPY,
                                         NULL ) != NULL )
 	      {
-                fprintf( stderr, "  %s: %s\n",
+                char* pcaMessage=(char*) malloc((9+strlen(GDALGetDriverShortName( hDriver  ))+strlen(GDALGetDriverLongName( hDriver )))*sizeof(char));
+                sprintf( pcaMessage, "  %s: %s",
                         GDALGetDriverShortName( hDriver  ),
                         GDALGetDriverLongName( hDriver ) );
+                ZOO_DEBUG(pcaMessage);
+                free(pcaMessage);
 	      }
 	  }
-        fprintf( stderr,"\n" );
+        char* pcaMessage=(char*) malloc((3)*sizeof(char));
+        sprintf( pcaMessage,"\n" );
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
         
         GDALClose( hDataset );
         CPLFree( panBandList );
@@ -520,7 +581,10 @@ __declspec(dllexport)
 	
 	return SERVICE_SUCCEEDED;
       }
-    fprintf(stderr,"==%s %s %s %==\n",pszFormat,pszSource,pszDest);
+    char* pcaMessage=(char*) malloc((15+strlen(pszFormat)+strlen(pszSource)+strlen(pszDest))*sizeof(char));
+    sprintf(pcaMessage,"==%s %s %s %==",pszFormat,pszSource,pszDest);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     fflush(stderr);
 
     /* ----------------------------------------------------------------- */
@@ -538,7 +602,10 @@ __declspec(dllexport)
         nOYSize = (int) ((pszOYSize[strlen(pszOYSize)-1]=='%' 
                           ? atof(pszOYSize)/100*anSrcWin[3] : atoi(pszOYSize)));
       }
-    fprintf(stderr,"==%s %s %s %==\n",pszFormat,pszSource,pszDest);
+    char* pcaMessage=(char*) malloc((15+strlen(pszFormat)+strlen(pszSource)+strlen(pszDest))*sizeof(char));
+    sprintf(pcaMessage,"==%s %s %s %==",pszFormat,pszSource,pszDest);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     fflush(stderr);
 
     /* ================================================================= */
@@ -635,7 +702,10 @@ __declspec(dllexport)
     /* ----------------------------------------------------------------- */
     poVDS->SetMetadata( ((GDALDataset*)hDataset)->GetMetadata() );
     AttachMetadata( (GDALDatasetH) poVDS, papszMetadataOptions );
-    fprintf(stderr,"Transfer generally applicable metadata.\n");
+    char* pcaMessage=(char*) malloc((40)*sizeof(char));
+    sprintf(pcaMessage,"Transfer generally applicable metadata.");
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     fflush(stderr);
 
     /* ----------------------------------------------------------------- */
@@ -672,7 +742,10 @@ __declspec(dllexport)
 			 hDataset)->GetRasterBand(panBandList[0]);
             if (poSrcBand->GetColorTable() == NULL)
 	      {
-                fprintf(stderr, "Error : band %d has no color table\n", panBandList[0]);
+                char* pcaMessage=(char*) malloc((35+strlen(panBandList[0]))*sizeof(char));
+                sprintf(pcaMessage, "Error : band %d has no color table", panBandList[0]);
+                ZOO_DEBUG(pcaMessage);
+                free(pcaMessage);
                 GDALClose( hDataset );
                 CPLFree( panBandList );
 		fflush(stderr);
@@ -770,11 +843,17 @@ __declspec(dllexport)
     /* ----------------------------------------------------------------- */
     /*      Write to the output file using CopyCreate().                 */
     /* ----------------------------------------------------------------- */
-    fprintf(stderr,"DEBUG pszDest %s\n",pszDest);
+    char* pcaMessage=(char*) malloc((17+strlen(pszDest))*sizeof(char));
+    sprintf(pcaMessage,"DEBUG pszDest %s",pszDest);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     hOutDS = GDALCreateCopy( hDriver, pszDest, (GDALDatasetH) poVDS,
                              bStrict, papszCreateOptions, 
                              pfnProgress, NULL );
-    fprintf(stderr,"DEBUG pszDest %s\n",pszDest);
+    char* pcaMessage=(char*) malloc((17+strlen(pszDest))*sizeof(char));
+    sprintf(pcaMessage,"DEBUG pszDest %s",pszDest);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     fflush(stderr);
 
     if( hOutDS != NULL )

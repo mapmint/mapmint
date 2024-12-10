@@ -6,6 +6,7 @@ import random
 import string
 import smtplib
 import re
+import zoo
 
 
 from psycopg2.extensions import *
@@ -48,7 +49,6 @@ def is_ftable(value):
         return True
     else:
         return False
-
 
 def check_group_params(param, valeur):
     tab_reg = {}
@@ -114,7 +114,7 @@ class manage_users:
                     #self.conn.setencoding(encoding='latin-1')
                     return True
                 except Exception as e:
-                    print("Manage_users: "+str(e), file=sys.stderr)
+                    zoo.error("Manage_users: "+str(e))
                     return False
         return True
 
@@ -134,7 +134,7 @@ class manage_users:
         try:
             self.conn.close()
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             return False
         return True
 
@@ -143,7 +143,7 @@ class manage_users:
             self.cur.execute(req)
             self.conn.commit()
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             self.conn.commit()
             return False
         return True
@@ -171,15 +171,15 @@ class manage_users:
             self.cur.execute(req[0], params)
             #self.conn.commit()
         except Exception as e:
-            print("ERROR SQL: " + req[0], file=sys.stderr)
-            print("ERROR SQL: " + str(e), file=sys.stderr)
+            zoo.error("ERROR SQL: " + req[0])
+            zoo.error("ERROR SQL: " + str(e))
             self.conn.commit()
             return False
         return True
 
     def is_admin(self, login):
         groups = self.get_groups_user_by_login(login)
-        print("GROUPS " + str(groups), file=sys.stderr)
+        zoo.info("GROUPS " + str(groups))
         for g in groups:
             if (g[1] == 'admin'):
                 return True
@@ -195,7 +195,7 @@ class manage_users:
         try:
             self.cur.execute(req)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             return None
         return self.cur.fetchall()
 
@@ -204,7 +204,7 @@ class manage_users:
         try:
             self.cur.execute(req)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             return None
         return self.cur.fetchone()
 
@@ -213,7 +213,7 @@ class manage_users:
         try:
             self.cur.execute(req)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             return None
         return self.cur.fetchone()
 
@@ -230,7 +230,6 @@ class manage_users:
         cle_s = ",".join(cle)
         val_s = ",".join(['\'%s\'' % (i) for i in val])
         req = 'insert into ' + self.prefix + 'users (%s) values (%s)' % (cle_s, val_s)
-        # print(req, file=sys.stderr)
         return self.execute_req(req)
 
     def update_user_by_id(self, d_user, id_user):
@@ -275,7 +274,7 @@ class manage_users:
         try:
             self.cur.execute(req)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             return None
         return self.cur.fetchone()
 
@@ -288,7 +287,7 @@ class manage_users:
         try:
             self.cur.execute(req)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             return None
         return self.cur.fetchall()
 
@@ -297,7 +296,7 @@ class manage_users:
         try:
             self.cur.execute(req)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             return None
         return self.cur.fetchone()
 
@@ -327,18 +326,18 @@ class manage_users:
         try:
             self.cur.execute(req)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             return None
         return self.cur.fetchall()
 
     def get_groups_user_by_login(self, login, order='name', sort='asc'):
         req = 'select groups.id , groups.name from ' + self.prefix + 'groups, ' + self.prefix + 'user_group  where user_group.id_group = groups.id and user_group.id_user = (select id from ' + self.prefix + 'users where login = \'%s\')  order by %s %s' % (
         login, order, sort)
-        print(req, file=sys.stderr)
+        zoo.info(str(req))
         try:
             self.cur.execute(req)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             return None
         return self.cur.fetchall()
 
@@ -348,7 +347,7 @@ class manage_users:
         try:
             self.cur.execute(req)
         except Exception as e:
-            print(e, file=sys.stderr)
+            zoo.error(str(e))
             return None
         return self.cur.fetchall()
 

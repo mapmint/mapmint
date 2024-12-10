@@ -33,7 +33,7 @@ def getForm(conf, inputs, outputs):
     dirs = []
     j = 0
     for i in range(0, len(elements["Directories"])):
-        print(elements["Directories"][i]["name"] + " rwx", file=sys.stderr)
+        zoo.info(elements["Directories"][i]["name"] + " rwx")
         if mm_access.checkDataStorePriv(conf, elements["Directories"][i]["name"], "rwx"):
             dirs += [elements["Directories"][i]["name"]]
         j += 1
@@ -47,7 +47,7 @@ def getForm(conf, inputs, outputs):
 
 def saveOnServer(conf, inputs, outputs):
     import shutil
-    print("************ ok1 " + str(inputs), file=sys.stderr)
+    zoo.info("************ ok1 " + str(inputs))
     # TODO: confirm assumption: "conf" is a Python 3 dictionary object
     # if list(conf.keys()).count("senv") > 0:
     if "senv" in conf:
@@ -57,16 +57,16 @@ def saveOnServer(conf, inputs, outputs):
     try:
         shutil.os.mkdir(dir)
     except Exception as e:
-        print(str(e), file=sys.stderr)
+        zoo.error(str(e))
         pass
     field = "file"
     if "filename" in inputs:
         field = inputs["filename"]["value"]
-    print("************ ok2 " + str(inputs), file=sys.stderr)
+    zoo.info("************ ok2 " + str(inputs))
     tmp = inputs[field]["lref"].split("/")
-    print("************ ok3 " + str(inputs), file=sys.stderr)
+    zoo.info("************ ok3 " + str(inputs))
     outFileName = dir + "/" + tmp[len(tmp) - 1]
-    print("************ ok4 " + str(inputs), file=sys.stderr)
+    zoo.info"************ ok4 " + str(inputs)
     shutil.move(inputs[field]["lref"], outFileName);
     # TODO: confirm assumption: "conf" is a Python 3 dictionary object
     # if list(conf.keys()).count("senv") > 0:
@@ -76,25 +76,25 @@ def saveOnServer(conf, inputs, outputs):
         # import mmsession
         # mmsession.save(conf)
         # conf["lenv"]["cookie"]="MMID=MM"+conf["senv"]["MMID"]+"; path=/"
-        print("************ XXX " + str(conf["senv"]), file=sys.stderr)
-    print("************ ok5 " + str(outFileName), file=sys.stderr)
+        zoo.info("************ XXX " + str(conf["senv"]))
+    zoo.info("************ ok5 " + str(outFileName))
     outputs["Result"]["value"] = "Your " + tmp[len(tmp) - 1] + " file was uploaded on the server"
-    print("************ ok6 " + str(inputs), file=sys.stderr)
+    zoo.info("************ ok6 " + str(inputs))
     return 3
 
 
 def saveOnServer0(conf, inputs, outputs):
     import shutil, json
-    print("ok1 INPUTS " + str(inputs), file=sys.stderr)
-    print("ok1 " + str(conf), file=sys.stderr)
+    zoo.info("ok1 INPUTS " + str(inputs))
+    zoo.info("ok1 " + str(conf))
     dir = conf["main"]["tmpPath"] + "/data_tmp_1111" + conf["senv"]["MMID"]
     try:
         shutil.os.mkdir(dir)
     except Exception as e:
-        print(str(e), file=sys.stderr)
+        zoo.error(str(e))
         pass
     field = "file"
-    print(inputs, file=sys.stderr)
+    zoo.info(str(inputs))
     if "filename" in inputs:
         field = inputs["filename"]["value"]
     tmp = inputs[field]["lref"].split("/")
@@ -123,11 +123,11 @@ def checkFile(conf, inputs, outputs):
         tmp1 = tmp[i].split(".")
         t = None
         for j in range(0, len(accepted)):
-            print("Accepted / tmp1", file=sys.stderr)
-            print(anames, file=sys.stderr)
-            print(tmp1, file=sys.stderr)
+            zoo.info("Accepted / tmp1")
+            zoo.info(str(anames))
+            zoo.info(str(tmp1))
             if tmp1[0] == anames[j].split(".")[0]:
-                print("OK", file=sys.stderr)
+                zoo.info("OK")
                 t = "OK"
                 break
         if t is None:
@@ -146,7 +146,7 @@ def checkFile(conf, inputs, outputs):
 
     k = 0
     i = len(deleted) - 1
-    print(str(deleted) + " " + str(dnames), file=sys.stderr)
+    zoo.info(str(deleted) + " " + str(dnames))
     while i >= 0:
         for j in range(0, len(accepted)):
             if len(dnames) > i and anames[j].split(".")[0] == dnames[i].split(".")[0]:
@@ -166,7 +166,7 @@ def checkFile(conf, inputs, outputs):
 
     acceptedList = []
     for i in range(0, len(accepted)):
-        print(i, file=sys.stderr)
+        zoo.info(str(i))
         # try:
         shutil.move(dir + "/" + tmp[accepted[i]], conf["main"]["dataPath"] + "/dirs/" + inputs["dest"]["value"] + "/" + tmp[accepted[i]])
         acceptedList += [tmp[accepted[i]]]

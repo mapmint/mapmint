@@ -28,7 +28,7 @@ def getAllSymbolsForTTF(conf, inputs, outputs):
     import mapscript
     import sys, os
     mapfile = conf["main"]["dataPath"] + "/maps/project_" + inputs["map"]["value"] + ".map"
-    print(mapfile, file=sys.stderr)
+    zoo.info(str(mapfile))
     m = mapscript.mapObj(mapfile)
     for i in range(0, m.numlayers):
         m.removeLayer(0)
@@ -89,7 +89,6 @@ def getAllSymbolsForTTF(conf, inputs, outputs):
                 cnt += 1
                 # tmpImage=tmpClass.createLegendIcon(m,layer,32,32)
                 # tmpImage.write(conf["main"]["dataPath"]+"/maps/"+img_name)
-                # print(conf["main"]["dataPath"]+"/maps/"+img_name, file=sys.stderr)
         i += 1
     m.save(mapfile)
 
@@ -116,7 +115,7 @@ def addSymbolToOrig(conf, inputs, outputs):
                 else:
                     newContent += a
             else:
-                print(a[:len(a) - 5], file=sys.stderr)
+                zoo.info(a[:len(a) - 5])
                 newContent += 'SYMBOL\n' + a[:len(a) - 5]
             i += 1
     t = Template(file=conf["main"]["templatesPath"] + "/Manager/Styler/Symbols.sym.tmpl", searchList={"conf": conf, "inputs": inputs, "outputs": outputs})

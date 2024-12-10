@@ -60,7 +60,7 @@ def raster_copy(s_fh, s_xoff, s_yoff, s_xsize, s_ysize, s_band_n,
             nodata)
 
     if verbose != 0:
-        print(('Copy %d,%d,%d,%d to %d,%d,%d,%d.' \
+        zoo.info(('Copy %d,%d,%d,%d to %d,%d,%d,%d.' \
                % (s_xoff, s_yoff, s_xsize, s_ysize,
                   t_xoff, t_yoff, t_xsize, t_ysize)))
 
@@ -85,7 +85,7 @@ def raster_copy_with_nodata(s_fh, s_xoff, s_yoff, s_xsize, s_ysize, s_band_n,
         import Numeric
 
     if verbose != 0:
-        print(('Copy %d,%d,%d,%d to %d,%d,%d,%d.' \
+        zoo.info(('Copy %d,%d,%d,%d to %d,%d,%d,%d.' \
                % (s_xoff, s_yoff, s_xsize, s_ysize,
                   t_xoff, t_yoff, t_xsize, t_ysize)))
 
@@ -161,12 +161,12 @@ class file_info:
         return 1
 
     def report(self):
-        print(('Filename: ' + self.filename))
-        print(('File Size: %dx%dx%d' \
+        zoo.info(('Filename: ' + self.filename))
+        zoo.info(('File Size: %dx%dx%d' \
                % (self.xsize, self.ysize, self.bands)))
-        print(('Pixel Size: %f x %f' \
+        zoo.info(('Pixel Size: %f x %f' \
                % (self.geotransform[1], self.geotransform[5])))
-        print(('UL:(%f,%f)   LR:(%f,%f)' \
+        zoo.info(('UL:(%f,%f)   LR:(%f,%f)' \
                % (self.ulx, self.uly, self.lrx, self.lry)))
 
     def copy_into(self, t_fh, s_band=1, t_band=1, nodata_arg=None):
@@ -244,13 +244,13 @@ class file_info:
 
 # =============================================================================
 def Usage():
-    print('Usage: gdal_merge.py [-o out_filename] [-of out_format] [-co NAME=VALUE]*')
-    print('                     [-ps pixelsize_x pixelsize_y] [-tap] [-separate] [-q] [-v] [-pct]')
-    print('                     [-ul_lr ulx uly lrx lry] [-init "value [value...]"]')
-    print('                     [-n nodata_value] [-a_nodata output_nodata_value]')
-    print('                     [-ot datatype] [-createonly] input_files')
-    print('                     [--help-general]')
-    print('')
+    zoo.info('Usage: gdal_merge.py [-o out_filename] [-of out_format] [-co NAME=VALUE]*')
+    zoo.info('                     [-ps pixelsize_x pixelsize_y] [-tap] [-separate] [-q] [-v] [-pct]')
+    zoo.info('                     [-ul_lr ulx uly lrx lry] [-init "value [value...]"]')
+    zoo.info('                     [-n nodata_value] [-a_nodata output_nodata_value]')
+    zoo.info('                     [-ot datatype] [-createonly] input_files')
+    zoo.info('                     [--help-general]')
+    zoo.info('')
 
 
 # =============================================================================
@@ -301,13 +301,13 @@ def Gdal_Merge(conf, inputs, outputs):
     else:
         import mapscript
         m = mapscript.mapObj(conf["main"]["dataPath"] + "/dirs/" + inputs["dst"]["value"] + "/ds_ows.map")
-        print(inputs["dso"]["value"], file=sys.stderr)
+        zoo.info(inputs["dso"]["value"])
         for i in range(0, len(inputs["dso"]["value"])):
             l = m.getLayerByName(inputs["dso"]["value"][i])
             if l is not None:
                 names.append(l.data)
-    print(out_file, file=sys.stderr)
-    print(str(names), file=sys.stderr)
+    zoo.info(str(out_file))
+    zoo.info(str(names))
 
     '''
     while i < len(argv):
@@ -505,8 +505,8 @@ def Gdal_Merge(conf, inputs, outputs):
             continue
 
         if verbose != 0:
-            print("")
-            print(("Processing file %5d of %5d, %6.3f%% completed." \
+            zoo.info("")
+            zoo.info(("Processing file %5d of %5d, %6.3f%% completed." \
                    % (fi_processed + 1, len(file_infos),
                       fi_processed * 100.0 / len(file_infos))))
             fi.report()

@@ -54,7 +54,7 @@ def Get(conf, inputs, outputs):
                 try:
                     m = json.loads(inputs["search"]["value"])
                 except Exception as e:
-                    print(e, file=sys.stderr)
+                    zoo.error(str(e))
                     conf["lenv"]["message"] = "invalid search parameter :" + inputs["search"]["value"]
                     return 4
                 try:
@@ -65,7 +65,7 @@ def Get(conf, inputs, outputs):
                     for k in m.keys():
                         clause = clause + ' and %s="%s"' % (m[k])
                 except Exception as e:
-                    print(e, file=sys.stderr)
+                    zoo.error(str(e))
                     conf["lenv"]["message"] = "invalid sql clause request :" + inputs["search"]["value"]
                     return 4
 
@@ -74,13 +74,13 @@ def Get(conf, inputs, outputs):
                 conn = sqlite3.connect(conf['main']['dblink'])
                 cur = conn.cursor()
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 conf["lenv"]["message"] = 'SQLITE Error : ' + repr(e)
                 return 4
             try:
                 cur.execute(req)
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 conf["lenv"]["message"] = 'SQL Error'
                 return 4
             outputs["Result"]["value"] = json.dumps(cur.fetchall())
@@ -105,14 +105,14 @@ def Add(conf, inputs, outputs):
             try:
                 row = json.loads(inputs["row"]["value"])
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 conf["lenv"]["message"] = "invalid row parameter :" + inputs["row"]["value"]
                 return 4
             try:
                 conn = sqlite3.connect(conf['main']['dblink'])
                 cur = conn.cursor()
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 conf["lenv"]["message"] = 'SQLITE Error'
                 return 4
             l = row.popitem()
@@ -128,7 +128,7 @@ def Add(conf, inputs, outputs):
                 cur.execute(req)
                 conn.commit()
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 conf["lenv"]["message"] = 'SQLITE Error : ' + repr(e)
                 return 4
 
@@ -151,20 +151,20 @@ def Update(conf, inputs, outputs):
             try:
                 set_arg = json.loads(inputs["set"]["value"])
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 conf["lenv"]["message"] = "invalid set parameter :" + inputs["set"]["value"]
                 return 4
             try:
                 search_arg = json.loads(inputs["search"]["value"])
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 conf["lenv"]["message"] = "invalid search parameter :" + inputs["search"]["value"]
                 return 4
             try:
                 conn = sqlite3.connect(conf['main']['dblink'])
                 cur = conn.cursor()
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 conf["lenv"]["message"] = 'SQLITE Error'
                 return 4
             l = set_arg.popitem()
@@ -184,7 +184,7 @@ def Update(conf, inputs, outputs):
                 cur.execute(req)
                 conn.commit()
             except Exception as e:
-                print(e, file=sys.stderr)
+                zoo.error(str(e))
                 conf["lenv"]["message"] = 'SQLITE Error : ' + repr(e)
                 return 4
             tc = conn.total_changes

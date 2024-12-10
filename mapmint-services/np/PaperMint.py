@@ -12,6 +12,7 @@ import sys, os
 
 import uno
 import sys
+import zoo
 
 from unohelper import Base, systemPathToFileUrl, absolutize
 
@@ -75,7 +76,7 @@ class LOClient:
             self.table = None
             self.filterOptions = None
         except Exception as e:
-            print('Unable to connect to the MapMint Document Server for the following reasons:\n' + str(e), file=sys.stderr)
+            zoo.error('Unable to connect to the MapMint Document Server for the following reasons:\n' + str(e))
 
     def setConf(self,conf):
         import json
@@ -85,7 +86,7 @@ class LOClient:
         self.conf[name]=value
 
     def createDoc(self, name):
-        print(name, file=sys.stderr)
+        zoo.info(str(name))
         parts = name.split('.')
         propFich = PropertyValue("Hidden", 0, True, 0),
         self.doc = self.desktop.loadComponentFromURL(
@@ -107,7 +108,7 @@ class LOClient:
             if self.filterOptions is not None:
                 tmp = name.split('/')
                 tmp = tmp[len(tmp) - 1].split('.')
-                print(tmp, file=sys.stderr)
+                zoo.info(str(tmp))
                 propFich = (
                     PropertyValue("Hidden", 0, True, 0),
                     PropertyValue("FilterName", 0, self.outputFormat["ODS"][tmp[len(tmp) - 1].lower()][1], 0),
@@ -118,12 +119,11 @@ class LOClient:
             doc = 0
             try:
                 self.doc = self.desktop.loadComponentFromURL(addressDoc, "_blank", 0, propFich)
-                # print(self.doc,file=sys.stderr)
                 tmp = name.split('/')
                 self.format = tmp[len(tmp) - 1].split('.')[1].upper()
                 self.docList[name] = [self.doc, self.format, addressDoc]
             except Exception as e:
-                print('Unable to open the file for the following reasons:\n' + str(e), file=sys.stderr)
+                zoo.error('Unable to open the file for the following reasons:\n' + str(e))
                 return None
 
     def unloadDoc(self, name):
@@ -156,11 +156,11 @@ class LOClient:
         @param name Document filename
         """
         tmp = name.split('/')
-        print("********" + str(tmp) + "**********", file=sys.stderr)
+        zoo.info("********" + str(tmp) + "**********")
         tmp = tmp[len(tmp) - 1].split('.')
-        print("********" + tmp[len(tmp) - 1] + "**********", file=sys.stderr)
-        print(self.format, file=sys.stderr)
-        print(self.outputFormat[self.format][tmp[len(tmp) - 1]], file=sys.stderr)
+        zoo.info("********" + tmp[len(tmp) - 1] + "**********")
+        zoo.info(self.format)
+        zoo.info(self.outputFormat[self.format][tmp[len(tmp) - 1]])
         prop1Fich = (
             PropertyValue("FilterName", 0, self.outputFormat[self.format][tmp[len(tmp) - 1]][1], 0),
             PropertyValue("Overwrite", 0, True, 0)
@@ -180,14 +180,14 @@ class LOClient:
             for j in range(self.jmin, self.doc.TextTables.getByIndex(i).getColumns().getCount()):
                 for k in range(self.kmin, self.doc.TextTables.getByIndex(i).getRows().getCount()):
                     if (self.doc.TextTables.getByIndex(i).getCellByPosition(j, k).String.count(word) > 0):
-                        print("OK FOUND !", file=sys.stderr)
+                        zoo.info("OK FOUND !")
                         self.text = self.doc.TextTables.getByIndex(i).getCellByPosition(j, k).Text
                         self.cursor = self.text.createTextCursor()
                         # if self.vcursor is None:
                         self.vcursor = self.doc.CurrentController.ViewCursor
                         self.cursor.gotoStart(False)
                         self.cursor.gotoEnd(True)
-                        print("***********\n" + self.cursor.String, file=sys.stderr)
+                        zoo.info("***********\n" + self.cursor.String)
                         # self.cursor.goRight(self.text.String.index(word)-1,False)
                         # else:
                         #	self.vcursor.gotoRange(self.se[0],False)
@@ -195,7 +195,7 @@ class LOClient:
                         # self.vcursor.gotoEnd(True)
                         self.iposition = self.vcursor.getPosition()
                         self.se = [self.vcursor.getStart(), self.vcursor.getEnd()]
-                        print(self.vcursor.getPosition(), file=sys.stderr)
+                        zoo.info(self.vcursor.getPosition())
                         # if self.cursor.String.count(word):
                         cpos = self.text.String.index(word)
                         # self.cursor.gotoStart(False)
@@ -204,7 +204,7 @@ class LOClient:
                         self.cursor.gotoStart(False)
                         self.cursor.goRight(cpos + (1 * self.nbc), False)
                         self.cursor.goRight(len(word), True)
-                        print(self.cursor.String, file=sys.stderr)
+                        zoo.info(self.cursor.String)
                         self.cursor.String = ""
                         # self.cursor.goRight(self.text.String.index(word)-1,False)
                         # self.cursor.goRight(self.text.String.index(word)+len(word),False)
@@ -248,7 +248,7 @@ class LOClient:
                     self.cursor.gotoRange(tmp, 0)
                     return True
                 except:
-                    print("Cannot find the string " + word, file=sys.stderr)
+                    zoo.error("Cannot find the string " + word)
                     return False
             else:
                 return False
@@ -269,15 +269,15 @@ class LOClient:
         # objSearch.SearchCaseSensitive = False
         # objSearch.SearchWords = False
         # objSearch.ReplaceString = new
-        print(oDrawPage.Count, file=sys.stderr)
+        zoo.info(str(oDrawPage.Count))
         i = 0
         for x in [0]:
-            print(x, file=sys.stderr)
+            zoo.info(str(x))
             oFound = oDrawPage.getByIndex(x)
             oFound.GraphicURL = self.loadImage(new[i], new[i])
             i += 1
         for x in [2, 3, 4]:
-            print(x, file=sys.stderr)
+            zoo.info(str(x))
             oFound = oDrawPage.getByIndex(x)
             oShape = oFound.Text
             # self.doc.CurrentController.Select(oShape)
@@ -285,21 +285,20 @@ class LOClient:
             i += 1
 
         tmp = oDrawPage.findAll(objSearch)
-        print("+++++++++++++++", file=sys.stderr)
-        print(tmp.Count, file=sys.stderr)
-        print("+++++++++++++++", file=sys.stderr)
+        zoo.info("+++++++++++++++")
+        zoo.info(str(tmp.Count))
+        zoo.info("+++++++++++++++")
         for x in range(tmp.Count):
-            print(x, file=sys.stderr)
+            zoo.info(str(x))
             oFound = tmp(x)
             oShape = oFound.Text
-            print(oShape.String, file=sys.stderr)
-            print(oFound.String, file=sys.stderr)
+            zoo.info(str(oShape.String))
+            zoo.info(str(oFound.String))
             self.doc.CurrentController.Select(oShape)
             oShape.String = new
 
-        print(tmp, file=sys.stderr)
+        zoo.info(str(tmp))    
         # tmp = oDrawPage.findFirst(objSearch)
-        # print(oDrawPage.replaceAll(objSearch),file=sys.stderr)
         # return tmp
 
     def searchAndReplace(self, orig, new, first=False):
@@ -329,7 +328,6 @@ class LOClient:
         """
         d = self.doc.getGraphicObjects()
         if d.hasByName(name):
-            # print(str(d.getByName(name).GraphicURL),file=sys.stderr)
             d.getByName(name).GraphicURL = self.loadImage(image_name, image_name)
             try:
                 self.doc.DrawPage.add(d.getByName(name))
@@ -359,7 +357,7 @@ class LOClient:
         try:
             oBitmaps.insertByName(image_name, systemPathToFileUrl(image_file))
         except Exception as e:
-            print(": > " + e.Message, file=sys.stderr)
+            zoo.error(": > " + e.Message)
         return oBitmaps.getByName(image_name)
 
     def loadImageG(self, image_name, image_file):
@@ -369,7 +367,7 @@ class LOClient:
         try:
             oBitmaps.insertByName(image_name, systemPathToFileUrl(image_file))
         except Exception as e:
-            print(": > " + e.Message, file=sys.stderr)
+            zoo.error(": > " + e.Message)
         return oBitmaps.getByName(image_name)
 
     def insertImageAt(self, image_name, image_file, uniq=False):
@@ -381,7 +379,7 @@ class LOClient:
         try:
             image_url = self.loadImage(image_name, image_file)
         except:
-            print( image_name, file=sys.stderr)
+            zoo.error(str(image_name))
             return -1
         self.imin = 0
         self.jmin = 0
@@ -389,27 +387,26 @@ class LOClient:
         while self.searchInTableWithContext(image_name):
             # self.vcursor.gotoStart(False)
             # self.vcursor.gotoEnd(True)
-            print("++++++++++++++++++", file=sys.stderr)
-            print(image_name, file=sys.stderr)
-            print(self.vcursor, file=sys.stderr)
-            print("++++++++++++++++++", file=sys.stderr)
+            zoo.info("++++++++++++++++++")
+            zoo.info(str(image_name))
+            zoo.info(str(self.vcursor))
+            zoo.info("++++++++++++++++++")
             # if self.vcursor.String is not None and self.vcursor.String.count(image_name)>0:
             #    cpos=self.vcursor.String.index(image_name)
             #    self.vcursor.gotoStart(False)
             #    self.vcursor.goRight(cpos,False)
             # self.vcursor.goRight(len(image_name),True)
-            print("++++++++++++++++++", file=sys.stderr)
-            # print(self.vcursor.String,file=sys.stderr)
-            print("++++++++++++++++++", file=sys.stderr)
+            zoo.info("++++++++++++++++++")
+            zoo.info("++++++++++++++++++")
             # self.cursor.gotoRange(self.vcursor,False)
             # self.vcursor.setString("")
             self.insertImage(image_url, vposition="43")
             self.nbc += 1
             return 1
+        
         while self.goToWord(image_name):
             self.insertImage(image_url)
             self.searchAndReplace(image_name, "", True)
-            # print(cnt,file=sys.stderr)
             sys.stderr.flush()
             cnt += 1
             if uniq:
@@ -424,12 +421,9 @@ class LOClient:
         myObject = myObjects.getByName(diagName)
         diagram = myObject.getEmbeddedObject()
         dat = diagram.Data
-        # print(str(diagram.getData()),file=sys.stderr)
 
-        # print(str(data[0]),file=sys.stderr)
         dat.setColumnDescriptions(tuple(data[1]))
         dat.setRowDescriptions(tuple(data[0]))
-        # print(str(data[2]),file=sys.stderr)
         lstData = []
         try:
             for i in range(0, len(data[2])):
@@ -450,12 +444,9 @@ class LOClient:
         myObject = myObjects.getByName(diagName)
         diagram = myObject.getEmbeddedObject()
         dat = diagram.Data
-        # print(str(diagram.getData()),file=sys.stderr)
 
-        # print(str(data[0]),file=sys.stderr)
         dat.setColumnDescriptions(tuple(data[0]))
         dat.setRowDescriptions(tuple(data[1]))
-        # print(str(data[2]),file=sys.stderr)
         lstData = []
         for i in range(0, len(data[2])):
             lstData.append(tuple(data[2][i]))
@@ -464,8 +455,8 @@ class LOClient:
         self.loadDoc(imgName.replace(".png", ".html"))
         d = self.doc.getGraphicObjects()
         myFile = d.getByName(diagName).GraphicURL
-        print(myFile, file=sys.stderr)
-        print(imgName.replace(".png", ".html"), file=sys.stderr)
+        zoo.info(str(myFile))
+        zoo.info(imgName.replace(".png", ".html"))
         shutil.copy(myFile.replace("file://", ""), imgName)
 
     def addParagraph(self, pName, pData):
@@ -500,7 +491,7 @@ class LOClient:
             #try:
             #    text.insertString(self.cursor, unicode(i + "", 'utf-8'), 0)
             except Exception as e:
-                print(str(e),file=sys.stderr)
+                zoo.error(str(e))
                 text.insertString(self.cursor, i, 0)
             text.insertControlCharacter(self.cursor, LINE_BREAK, 0)
             #if cnt + 1 < len(pData):
@@ -636,14 +627,12 @@ class LOClient:
         if self.cursor is None:
             self.getCursor()
         tmp = self.goToWord(name)
-        # print(tmp, file=sys.stderr)
         # self.cursor=tmp
         for i in elem:
             # self.cursor.NumberingType=CIRCLE_NUMBER
             self.cursor.NumberingStyleName = "List 1"
             self.cursor.NumberingLevel = 0
             # self.cursor.NumberingStyleName="Numbering "+str(1)
-            # print(i,file=sys.stderr)
             if isinstance(i, (frozenset, list, set, tuple,)):
                 self.text.insertString(self.cursor, i[0], 0)
                 self.text.insertControlCharacter(self.cursor, PARAGRAPH_BREAK, 0)
