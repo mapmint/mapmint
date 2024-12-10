@@ -108,7 +108,10 @@ __declspec(dllexport)
       index_filename = (char*) malloc((strlen(tmpMap->value)+strlen(tmpMap1->value)+strlen(tmpMap2->value)+12)*sizeof(char));
       sprintf(index_filename,"%s/dirs/%s/%s.shp",tmpMap2->value,tmpMap1->value,tmpMap->value);
     }
-    fprintf(stderr,"Filename %s\n",index_filename);
+    char* pcaMessage=(char*) malloc((12+strlen(index_filename))*sizeof(char));
+    sprintf(pcaMessage,"Filename %s",index_filename);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     /* -------------------------------------------------------------------- */
     /*      Open or create the target shapefile and DBF file.               */
     /* -------------------------------------------------------------------- */
@@ -136,7 +139,10 @@ __declspec(dllexport)
         OGRSFDriverH hDriver;
         const char* pszDriverName = "ESRI Shapefile";
 
-        fprintf( stderr,"Creating new index file...\n" );
+        char* pcaMessage=(char*) malloc((27)*sizeof(char));
+        sprintf( pcaMessage,"Creating new index file..." );
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
         hDriver = OGRGetDriverByName( pszDriverName );
         if( hDriver == NULL )
 	  {
@@ -183,7 +189,10 @@ __declspec(dllexport)
 		if (hDS0)
 		  {
 		    const char* pszWKT = GDALGetProjectionRef(hDS0);
-		    fprintf(stderr,"SRS %s \n",pszWKT);
+        char* pcaMessage=(char*) malloc((8+strlen(pszWKT))*sizeof(char));
+		    sprintf(pcaMessage,"SRS %s ",pszWKT);
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
 		    if (pszWKT != NULL && pszWKT[0] != '\0')
 		      {
 			if (hSpatialRef)
@@ -266,8 +275,11 @@ __declspec(dllexport)
         current_path = CPLGetCurrentDir();
         if (current_path == NULL)
 	  {
-            fprintf( stderr, "This system does not support the CPLGetCurrentDir call. "
-		     "The option -write_absolute_path will have no effect\n");
+          char* pcaMessage=(char*) malloc((108)*sizeof(char));
+          sprintf( pcaMessage, "This system does not support the CPLGetCurrentDir call. "
+		     "The option -write_absolute_path will have no effect");
+          ZOO_DEBUG(pcaMessage);
+          free(pcaMessage);
             write_absolute_path = FALSE;
 	  }
       }
@@ -323,8 +335,11 @@ __declspec(dllexport)
 	  {
             if (EQUAL(fileNameToWrite, existingFilesTab[i]))
 	      {
-                fprintf(stderr, "File %s is already in tileindex. Skipping it.\n",
+                char* pcaMessage=(char*) malloc((46+strlen(fileNameToWrite))*sizeof(char));
+                sprintf(pcaMessage, "File %s is already in tileindex. Skipping it.",
                         fileNameToWrite);
+                ZOO_DEBUG(pcaMessage);
+                free(pcaMessage);
                 break;
 	      }
 	  }
@@ -337,8 +352,11 @@ __declspec(dllexport)
         hDS = GDALOpen( argv, GA_ReadOnly );
         if( hDS == NULL )
 	  {
-            fprintf( stderr, "Unable to open %s, skipping.\n", 
+            char* pcaMessage=(char*) malloc((29+strlen(argv))*sizeof(char));
+            sprintf( pcaMessage, "Unable to open %s, skipping.", 
                      argv );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             CPLFree(fileNameToWrite);
 	    continue;
 	  }
@@ -349,10 +367,13 @@ __declspec(dllexport)
             && adfGeoTransform[3] == 0.0
             && ABS(adfGeoTransform[5]) == 1.0 )
 	  {
-            fprintf( stderr, 
-                     "It appears no georeferencing is available for\n"
-                     "`%s', skipping.\n", 
+            char* pcaMessage=(char*) malloc((61+strlen(argv))*sizeof(char));
+            sprintf( pcaMessage, 
+                     "It appears no georeferencing is available for"
+                     "`%s', skipping.", 
                      argv );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             GDALClose( hDS );
             CPLFree(fileNameToWrite);
             continue;
@@ -369,10 +390,13 @@ __declspec(dllexport)
                  EQUAL(projectionRef, alreadyExistingProjectionRef) == 0) ||
                 (projectionRefNotNull != alreadyExistingProjectionRefNotNull))
 	      {
-                fprintf(stderr, "Warning : %s is not using the same projection system as "
+                char* pcaMessage=(char*) malloc((164+strlen(argv))*sizeof(char));
+                sprintf(pcaMessage, "Warning : %s is not using the same projection system as "
 			"other files in the tileindex. This may cause problems when "
-			"using it in MapServer for example.%s\n", argv,
+			"using it in MapServer for example.%s", argv,
 			(skip_different_projection) ? " Skipping it" : "");
+                ZOO_DEBUG(pcaMessage);
+                free(pcaMessage);
                 if (skip_different_projection)
 		  {
                     CPLFree(fileNameToWrite);
@@ -437,7 +461,10 @@ __declspec(dllexport)
 
         if( OGR_L_CreateFeature( hLayer, hFeature ) != OGRERR_NONE )
 	  {
-	    fprintf( stderr, "Failed to create feature in shapefile.\n" );
+      char* pcaMessage=(char*) malloc((39)*sizeof(char));
+	    sprintf( pcaMessage, "Failed to create feature in shapefile." );
+      ZOO_DEBUG(pcaMessage);
+      free(pcaMessage);
 	    break;
 	  }
 

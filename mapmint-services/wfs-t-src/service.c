@@ -33,7 +33,10 @@ extern "C" {
 	Sleep(10);
 #endif
 	istat = stat(lockOnMap4Layer, &file_status);
-	fprintf(stderr,"waiting for %s",lockOnMap4Layer);
+	char* pcaMessage=(char*) malloc((15+strlen(lockOnMap4Layer))*sizeof(char));
+	sprintf(pcaMessage,"waiting for %s",lockOnMap4Layer);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	continue;
       }else{
 	//create the file !!
@@ -63,13 +66,22 @@ __declspec(dllexport)
  
     int hasLock=-1;
     map* tmp=getMapFromMaps(inputs,"MapFile","value");
-    fprintf(stderr,"[ZOO-WFS-T:Service]>>Mapfile : %s\n",tmp->value);
+	char* pcaMessage=(char*) malloc((34+strlen(tmp->value))*sizeof(char));
+    sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Mapfile : %s",tmp->value);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
     mapObj *mymap = msLoadMap(tmp->value, NULL);
     char *mname=strdup(tmp->value);
     char *lname=NULL;
     msApplyDefaultSubstitutions(mymap);
-    fprintf(stderr,"[ZOO-WFS-T:Service]>>Shape Path : %s\n",mymap->shapepath);
-    fprintf(stderr,"[ZOO-WFS-T:Service]>>Map Path : %s\n",mymap->mappath);
+	char* pcaMessage=(char*) malloc((37+strlen(mymap->shapepath))*sizeof);
+    sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Shape Path : %s",mymap->shapepath);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
+	char* pcaMessage=(char*) malloc((35+strlen(mymap->mappath))*sizeof(char));
+    sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Map Path : %s",mymap->mappath);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
     tmp=getMapFromMaps(inputs,"Request","value");
     xmlInitParser();
     xmlDocPtr resDoc = xmlNewDoc(BAD_CAST "1.0");
@@ -82,7 +94,10 @@ __declspec(dllexport)
     ns_xsi=xmlNewNs(n,BAD_CAST "http://www.w3.org/2001/XMLSchema-instance",BAD_CAST "xsi");
     xmlNewProp(n,BAD_CAST "xsi:schemaLocation",BAD_CAST "http://www.opengis.net/wfs http://www.opengis.net//wfs/1.0.0/WFS-transaction.xsd");
     xmlNewProp(n,BAD_CAST "version",BAD_CAST "1.0.0");
-    fprintf(stderr,"DEBUG (%s)",tmp->value);
+	char* pcaMessage=(char*) malloc((11+strlen(tmp->value))*sizeof(char));
+    sprintf(pcaMessage,"DEBUG (%s)",tmp->value);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
     xmlDocPtr doc = xmlParseMemory(tmp->value,strlen(tmp->value));
     xmlBufferPtr xmlbuff;
     int buffersize;
@@ -93,7 +108,10 @@ __declspec(dllexport)
     xpathCtx = xmlXPathNewContext(doc);
     xpathObj = xmlXPathEvalExpression(BAD_CAST xpathExpr,xpathCtx);
     if(!xpathObj->nodesetval){
-      fprintf( stderr,"[ZOO-WFS-T:Service]>>Request parsing failed.");
+	  char* pcaMessage=(char*) malloc((45)*sizeof(char));
+      sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Request parsing failed.");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
       return SERVICE_FAILED;
     }
     xmlbuff=xmlBufferCreate();
@@ -112,25 +130,43 @@ __declspec(dllexport)
 	  while(tmpx->type!=XML_ELEMENT_NODE)
 	    tmpx=tmpx->next;
 	  if(mylayer==NULL){
-	    fprintf(stderr,"[ZOO-WFS-T:Service]>>Mylayer Name %s\n",tmpx->name);
+		char* pcaMessage=(char*) malloc((37+strlen(tmpx->name))*sizeof(char));
+	    sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Mylayer Name %s",tmpx->name);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	    mylayer=mymap->layers[msGetLayerIndex(mymap,(char*)tmpx->name)];
-	    fprintf(stderr,"[ZOO-WFS-T:Service]>>Layer Type %s + %s + %d + %d (\"%s\")\n",mylayer->plugin_library,mylayer->plugin_library_original,mylayer->connectiontype,mylayer->type,mylayer->connection);
+		char* pcaMessage=(char*) malloc((59+strlen(mylayer->plugin_library)+strlen(mylayer->plugin_library_original)+strlen(mylayer->connectiontype)+strlen(mylayer->type)+strlen(mylayer->connection))*sizeof(char));
+	    sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Layer Type %s + %s + %d + %d (\"%s\")",mylayer->plugin_library,mylayer->plugin_library_original,mylayer->connectiontype,mylayer->type,mylayer->connection);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	    //featureid=msLookupHashTable(&mylayer->metadata,"gml_featureid");
 	    featureid=msLookupHashTable(&mylayer->metadata,"ows_featureid");
-	    fprintf( stderr,"[ZOO-WFS-T:Service]>>FeatureId Field : %s.\n",featureid);
+		char* pcaMessage=(char*) malloc((43+strlen(featureid))*sizeof(char));
+	    sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>FeatureId Field : %s.",featureid);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	    char tmpDS[1024];
 	    sprintf(tmpDS,"%s%s%s",mymap->mappath,mymap->shapepath,mylayer->connection);
-	    fprintf( stderr,"[ZOO-WFS-T:Service]>>Trying to open %s.",tmpDS);
+		char* pcaMessage=(char*) malloc((40+strlen(tmpDS))*sizeof(char));
+	    sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Trying to open %s.",tmpDS);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	    hDS = OGROpen( tmpDS, TRUE, NULL );
 	    if( hDS == NULL ){
 	      /**
 	       * Need to create an error message here rather than returning service_failed !
 	       */
-	      fprintf( stderr,"[ZOO-WFS-T:Service]>>Open %s failed : %s.",tmpDS,CPLGetLastErrorMsg());
+		  char* pcaMessage=(char*) malloc((42+strlen(tmpDS)+strlen(CPLGetLastErrorMsg()))*sizeof(char));
+	      sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Open %s failed : %s.",tmpDS,CPLGetLastErrorMsg());
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	      OGRReleaseDataSource( hDS );
 	      return SERVICE_FAILED;
 	    }else
-	      fprintf( stderr,"[ZOO-WFS-T:Service]>>Open %s successfully.\n",tmpDS );
+		  char* pcaMessage=(char*) malloc((43+strlen(tmpDS))*sizeof(char));
+	      sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Open %s successfully.",tmpDS );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	    olayer=OGR_DS_GetLayer(hDS,0);
 	  }
 	  OGR_L_ResetReading(olayer);
@@ -148,11 +184,17 @@ __declspec(dllexport)
 		while(inode->type==XML_TEXT_NODE)
 		  inode=inode->next;
 		if(xmlNodeDump(xmlbuff,doc,inode,0,1)<=0){
-		  fprintf(stderr,"[ZOO-WFS-T:Service]>>Error dumping the geometry node");
+		  char* pcaMessage=(char*) malloc((53)*sizeof(char));
+		  sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Error dumping the geometry node");
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 		  return SERVICE_FAILED;
 		}
 		content = xmlBufferContent(xmlbuff);
-		fprintf(stderr,"[ZOO-WFS-T:Service]>>Insert field value : %s=%s\n",cnode->name,content);
+		char* pcaMessage=(char*) malloc((48+strlen(cnode->name)+strlen(content))*sizeof(char));
+		sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Insert field value : %s=%s",cnode->name,content);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 		char *geomContent=(char*)malloc((xmlStrlen(content)+1)*sizeof(char));
 		sprintf(geomContent,"%s",content);
 		hGeometry = OGR_G_CreateFromGML(geomContent);
@@ -160,7 +202,10 @@ __declspec(dllexport)
 		OGR_G_DestroyGeometry(hGeometry);
 	      }
 	      else{
-		fprintf(stderr,"[ZOO-WFS-T:Service]>>Insert field value : %s=%s\n",cnode->name,cnode->children->content);
+		char* pcaMessage=(char*) malloc((48+strlen(cnode->name)+strlen(cnode->children->content))*sizeof(char));
+		sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Insert field value : %s=%s",cnode->name,cnode->children->content);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 		OGRFeatureDefnH hFDefn;
 		int iField;
 		OGRGeometryH hGeometry;
@@ -170,27 +215,45 @@ __declspec(dllexport)
 		char *ctmp=(char*)malloc((xmlStrlen(cctmp)+1)*sizeof(char));
 		sprintf(ctmp,"%s",cctmp);
 		ctmp[xmlStrlen(cctmp)]=0;
-		fprintf( stderr,"[ZOO-WFS-T:Service]>>Field %d : %s = %s\n", fid,cnode->name,ctmp );
+		char* pcaMessage=(char*) malloc((40+strlen(fid)+strlen(cnode->name)+strlen(ctmp))*sizeof(char));
+		sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Field %d : %s = %s", fid,cnode->name,ctmp );
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 		if(fid>=0){
 		  OGRFieldDefnH hFieldDefn = OGR_FD_GetFieldDefn( hFDefn,fid);
 		  if( OGR_Fld_GetType(hFieldDefn) == OFTInteger ){
 		    OGR_F_SetFieldInteger( hFeature, fid, atoi(ctmp));
-		    fprintf( stderr,"[ZOO-WFS-T:Service]>>Integer : %s = %d\n", ctmp,atoi(ctmp) );
+			char* pcaMessage=(char*) malloc((39+strlen(ctmp)+strlen(atoi(ctmp)))*sizeof(char));
+		    sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Integer : %s = %d", ctmp,atoi(ctmp) );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 		  }
 		  else if( OGR_Fld_GetType(hFieldDefn) == OFTReal ){
 		    OGR_F_SetFieldDouble( hFeature, fid, atof(ctmp));
-		    fprintf( stderr,"[ZOO-WFS-T:Service]>>Double : %s = %3f\n", ctmp,atof(ctmp) );
+			char* pcaMessage=(char*) malloc((39+strlen(ctmp)+strlen(atof(ctmp)))*sizeof(char));
+		    sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Double : %s = %3f", ctmp,atof(ctmp) );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 		  }
 		  else if( OGR_Fld_GetType(hFieldDefn) == OFTString ){
 		    OGR_F_SetFieldString( hFeature, fid, ctmp);
-		    fprintf( stderr,"[ZOO-WFS-T:Service]>>String : %s = %s\n", ctmp,ctmp );
+			char* pcaMessage=(char*) malloc((38+strlen(ctmp)+strlen(ctmp))*sizeof(char));
+		    sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>String : %s = %s", ctmp,ctmp );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 		  }
 		  else
-		    fprintf( stderr,"[ZOO-WFS-T:Service]>>Unsupported field type : %s = \"%s\"\n", OGR_Fld_GetNameRef(hFieldDefn),cctmp );
+		    char* pcaMessage=(char*) malloc((58+strlen(OGR_Fld_GetNameRef(hFieldDefn))+strlen(cctmp))*sizeof(char));
+		    sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Unsupported field type : %s = \"%s\"", OGR_Fld_GetNameRef(hFieldDefn),cctmp );
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 		}
 		else{
-		  OGR_F_SetFID( hFeature, atoi(ctmp));		  
-		  fprintf( stderr,"[ZOO-WFS-T:Service]>>Unsupported field name : %s \n", cnode->name );
+		  OGR_F_SetFID( hFeature, atoi(ctmp));
+		  char* pcaMessage=(char*) malloc((50+strlen(cnode->name))*sizeof(char));  
+		  sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Unsupported field name : %s ", cnode->name );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 		}
 	      }
 	    }
@@ -198,7 +261,10 @@ __declspec(dllexport)
 	  }
 	  if( OGR_L_CreateFeature( olayer, hFeature )!= OGRERR_NONE )
 	    {
-	      fprintf( stderr,"Failed to create feature in datasource.\n" );
+		  char* pcaMessage=(char*) malloc((40)*sizeof(char));
+	      sprintf( pcaMessage,"Failed to create feature in datasource." );
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	      return SERVICE_FAILED;
 	    }
 	  xmlNodePtr n2=xmlNewNode(ns_ogc, BAD_CAST "FeatureId");
@@ -206,7 +272,10 @@ __declspec(dllexport)
 	  sprintf(sfid,"%s.%s",mylayer->name,OGR_F_GetFieldAsString( hFeature, OGR_F_GetFieldIndex(hFeature,featureid)));
 	  xmlNewProp(n2,BAD_CAST "fid",BAD_CAST sfid);
 	  xmlAddChild(n1,n2);
-	  fprintf(stderr,"<ogc:FeatureId fid=\"%s.%s\"/>",mylayer->name,OGR_F_GetFieldAsString( hFeature, OGR_F_GetFieldIndex(hFeature,featureid)));
+	  char* pcaMessage=(char*) malloc((31+strlen(mylayer->name)+strlen(OGR_F_GetFieldAsString( hFeature, OGR_F_GetFieldIndex(hFeature,featureid))))*sizeof(char));
+	  sprintf(pcaMessage,"<ogc:FeatureId fid=\"%s.%s\"/>",mylayer->name,OGR_F_GetFieldAsString( hFeature, OGR_F_GetFieldIndex(hFeature,featureid)));
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  OGR_F_Destroy( hFeature );
 	  //xmlFree(n2);
 	  tmpx=tmpx->next;	  
@@ -225,42 +294,66 @@ __declspec(dllexport)
 	map *properties=NULL;
 	lname=(char*)malloc((xmlStrlen(xmlGetProp(tmpx,BAD_CAST "typeName"))+1)*sizeof(char));
 	sprintf(lname,"%s",(char*)xmlGetProp(tmpx,BAD_CAST "typeName"));
-	fprintf(stderr,"[ZOO-WFS-T:Service]>>Layer Name %s\n",lname);
+	char* pcaMessage=(char*) malloc((35+strlen(lname))*sizeof(char*));
+	sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Layer Name %s",lname);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	if(hasLock<0){
 	  getLockOnMap4Layer(mname,lname);
 	  hasLock=1;
 	}
 	lid=msGetLayerIndex(mymap,lname);
-	fprintf(stderr,"[ZOO-WFS-T:Service]>>Layer Name %s , id : %d\n",lname,lid);
+	char* pcaMessage=(char*) malloc((45+strlen(lname)+strlen(lid))*sizeof(char));
+	sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Layer Name %s , id : %d",lname,lid);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	mylayer=GET_LAYER(mymap,lid);
 	rectObj ext;
 	msOWSGetLayerExtent(mymap,mylayer,"MO",&ext);
 	mylayer->status=MS_ON;
 
-     	fprintf(stderr,"[ZOO-WFS-T:Service]>>Layer (%d) Type %s + %s + %d + %d (\"%s\")\n",lid,mylayer->plugin_library,mylayer->plugin_library_original,mylayer->connectiontype,mylayer->type,mylayer->connection);
+        char* pcaMessage=(char*) malloc((64+strlen(lid)+strlen(mylayer->plugin_library)+strlen(mylayer->plugin_library_original)+strlen(mylayer->connectiontype)+strlen(mylayer->type)+strlen(mylayer->connection))*sizeof(char));
+     	sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Layer (%d) Type %s + %s + %d + %d (\"%s\")",lid,mylayer->plugin_library,mylayer->plugin_library_original,mylayer->connectiontype,mylayer->type,mylayer->connection);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	//featureid=msLookupHashTable(&mylayer->metadata,"gml_featureid");
 	featureid=msLookupHashTable(&mylayer->metadata,"ows_featureid");
 
-	fprintf( stderr,"[ZOO-WFS-T:Service]>>FeatureId Field : %s.\n",featureid);
+    char* pcaMessage=(char*) malloc((43+strlen(featureid))*sizeof(char));
+	sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>FeatureId Field : %s.",featureid);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	//char tmpDS[1024];
 	/*char *tmpDS=(char*)malloc((strlen(mymap->mappath)+strlen(mymap->shapepath)+strlen(mylayer->connection)+1)*sizeof(char));
 	  sprintf(tmpDS,"%s%s%s",mymap->mappath,mymap->shapepath,mylayer->connection);*/
 	/*char tmpDS[1024];
 	char *tmpDS=(char*)malloc((strlen(mylayer->connection)+strlen(mylayer->connection)+1)*/
-	fprintf( stderr,"[ZOO-WFS-T:Service]>>Trying to open %s.",mylayer->connection,mylayer->data);
+	char* pcaMessage=(char*) malloc((40+strlen(mylayer->connection)+strlen(mylayer->data))*sizeof(char));
+	sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Trying to open %s.",mylayer->connection,mylayer->data);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	hDS = OGROpen( mylayer->connection, TRUE, NULL );
 	if( hDS == NULL ) {
 	  /**
 	   * Need to create an error message here rather than returning service_failed !
 	   */
-	  fprintf( stderr,"[ZOO-WFS-T:Service]>>Open %s failed : %s.",mylayer->connection,CPLGetLastErrorMsg());
+	  char* pcaMessage=(char*) malloc((42+strlen(mylayer->connection)+strlen(CPLGetLastErrorMsg()))*sizeof(char));
+	  sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Open %s failed : %s.",mylayer->connection,CPLGetLastErrorMsg());
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  return SERVICE_FAILED;
 	}else
-	  fprintf( stderr,"[ZOO-WFS-T:Service]>>Open from %s %s successfully.\n",mylayer->connection , lname);
+	  char* pcaMessage=(char*) malloc((51+strlen(mylayer->connection)+strlen(lname))*sizeof(char));
+	  sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Open from %s %s successfully.",mylayer->connection , lname);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 
 	olayer=OGR_DS_GetLayerByName(hDS,lname);
 	if(olayer==NULL){
-	  fprintf(stderr,"Layer not found !!");
+	  char* pcaMessage=(char*) malloc((19)*sizeof(char));
+	  sprintf(pcaMessage,"Layer not found !!");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	}
 	OGR_L_ResetReading(olayer);
 	OGRFeatureH hFeature;
@@ -272,20 +365,35 @@ __declspec(dllexport)
 	tmpx=tmpx->children;
 	char *fclause=NULL;
 	while(tmpx!=NULL){
-	  fprintf(stderr,"Starting %d\n",tmpx==NULL);
+	  char* pcaMessage=(char*) malloc((12+strlen(tmpx==NULL))*sizeof(char));
+	  sprintf(pcaMessage,"Starting %d",tmpx==NULL);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  if(tmpx->type==XML_ELEMENT_NODE)
-	    fprintf(stderr,"%s\n",tmpx->name);
+	    char* pcaMessage=(char*) malloc((3+strlen(tmpx->name))*sizeof(char));
+	    sprintf(pcaMessage,"%s",tmpx->name);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	  while(tmpx!=NULL && tmpx->type!=XML_ELEMENT_NODE)
 	    tmpx=tmpx->next;
-	  fprintf(stderr,"Starting %d\n",tmpx==NULL);
+	  char* pcaMessage=(char*) malloc((12+strlen(tmpx==NULL))*sizeof(char));
+	  sprintf(pcaMessage,"Starting %d",tmpx==NULL);
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  if(tmpx==NULL)
 	    break;
 	  if(tmpx->type==XML_ELEMENT_NODE)
-	    fprintf(stderr,"%s\n",tmpx->name);
+	    char* pcaMessage=(char*) malloc((3+strlen(tmpx->name))*sizeof(char));
+	    sprintf(pcaMessage,"%s",tmpx->name);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	  if(xmlStrcasecmp(tmpx->name,BAD_CAST "Filter")==0){
 	    xmlBufferEmpty(xmlbuff);
 	    if(xmlNodeDump(xmlbuff,doc,tmpx,0,0)<=0){
-	      fprintf(stderr,"[ZOO-WFS-T:Service]>>Error dumping the filter node");
+		  char* pcaMessage=(char*) malloc((51)*sizeof(char));
+	      sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Error dumping the filter node");
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	      return SERVICE_FAILED;
 	    }
 	    const xmlChar *content = xmlBufferContent(xmlbuff);
@@ -295,11 +403,17 @@ __declspec(dllexport)
 	    FilterEncodingNode *fen=FLTParseFilterEncoding(realfilter);
 	    mylayer->maxfeatures = -1;
 	    //layer->startindex = -1;
-	    fprintf(stderr,"[ZOO-WFS-T:Service]>>Filter on %s : %s (%d-%d)\n",mylayer->name,realfilter,lid,FLTValidFilterNode(fen));
+		char* pcaMessage=(char*) malloc((47+strlen(mylayer->name)+strlen(realfilter)+strlen(lid)+strlen(FLTValidFilterNode(fen)))*sizeof(char));
+	    sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Filter on %s : %s (%d-%d)",mylayer->name,realfilter,lid,FLTValidFilterNode(fen));
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 
 	    if (!fen) {
 	      // Need to output exception response
-	      fprintf(stderr,"[ZOO-WFS-T:Service]>>FilterNode is null !\n",content);
+		  char* pcaMessage=(char*) malloc((42+strlen(content))*sizeof(char));
+	      sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>FilterNode is null !",content);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	      return SERVICE_FAILED;
 	    }
 
@@ -312,15 +426,24 @@ __declspec(dllexport)
 	    if( FLTApplyFilterToLayer(fen, mymap, lid) != MS_SUCCESS ) 
 	      {
 		errorObj *ms_error = msGetErrorObj();
-		fprintf(stderr, "[ZOO-WFS-T:Service]>> FLTApplyFilterToLayer() result : %s\n",ms_error->message);
+		char* pcaMessage=(char*) malloc((58+strlen(ms_error->message))*sizeof(char));
+		sprintf(pcaMessage, "[ZOO-WFS-T:Service]>> FLTApplyFilterToLayer() result : %s",ms_error->message);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 		
 		if(ms_error->code != MS_NOTFOUND)
 		  {
-		    fprintf(stderr, "[ZOO-WFS-T:Service]>> FLTApplyFilterToLayer() failed \n");
+			char* pcaMessage=(char*) malloc((54)*sizeof(char));
+		    sprintf(pcaMessage, "[ZOO-WFS-T:Service]>> FLTApplyFilterToLayer() failed ");
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 		  }
 	      }
 	    int j=0;
-	    fprintf(stderr,"[ZOO-WFS-T:Service]>>Filter NumResult : %d\n",mylayer->resultcache->numresults);
+		char* pcaMessage=(char*) malloc((43+strlen(mylayer->resultcache->numresults))*sizeof(char));
+	    sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Filter NumResult : %d",mylayer->resultcache->numresults);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	    for(j=0;j<mylayer->resultcache->numresults;j++){
 	      shapeObj shape;
 	      msInitShape(&shape);
@@ -337,8 +460,14 @@ __declspec(dllexport)
 		sprintf(fclause,"%s OR %s=%s",stmp,featureid,shape.values[fid]);
 		free(stmp);
 	      }
-	      fprintf(stderr,"[ZOO-WFS-T:Service]>>FCLAUSE %s\n",fclause);
-	      fprintf(stderr,"[ZOO-WFS-T:Service]>>FeatureId (%s-%d) value : %s\n",featureid,fid,shape.values[fid]);
+		  char* pcaMessage=(char*) malloc((32+strlen(fclause))*sizeof(char));
+	      sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>FCLAUSE %s",fclause);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
+		  char* pcaMessage=(char*) malloc((50+strlen(featureid)+strlen(fid)+strlen(shape.values[fid]))*sizeof(char));
+	      sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>FeatureId (%s-%d) value : %s",featureid,fid,shape.values[fid]);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	    }
 	    FLTFreeFilterEncodingNode(fen);
 	    fen=NULL;
@@ -347,30 +476,48 @@ __declspec(dllexport)
 	    xmlNodePtr inode=tmpx->children;
 	    char *name;
 	    while(inode!=NULL){
-	      fprintf(stderr,"[ZOO-WFS-T:Service]>> Type: %d (%d)\n",inode->type,XML_ELEMENT_NODE);
+		  char* pcaMessage=(char*) malloc((36+strlen(inode->type)+strlen(XML_ELEMENT_NODE))*sizeof(char));
+	      sprintf(pcaMessage,"[ZOO-WFS-T:Service]>> Type: %d (%d)",inode->type,XML_ELEMENT_NODE);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 	      while(inode->type!=XML_ELEMENT_NODE)
 		inode=inode->next;
 	      if(xmlStrcasecmp(inode->name,BAD_CAST "Name")==0){
 		name=strdup((char*)inode->children->content);
-		fprintf(stderr,"[ZOO-WFS-T:Service]>>Name: %s\n",inode->children->content);
+		char* pcaMessage=(char*) malloc((30+strlen(inode->children->content))*sizeof(char));
+		sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Name: %s",inode->children->content);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 	      }
 	      if(xmlStrcasecmp(inode->name,BAD_CAST "Value")==0){
 
 		xmlNodePtr inode1=xmlFirstElementChild(inode);
-		fprintf(stderr,"[ZOO-WFS-T:Service]>>(%s) Value: %s %d==%d\n",name,inode->children->content,inode->children->type,XML_ELEMENT_NODE);
+		char* pcaMessage=(char*) malloc((43+strlen(name)+strlen(inode->children->content)+strlen(inode->children->type)+strlen(XML_ELEMENT_NODE))*sizeof(char));
+		sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>(%s) Value: %s %d==%d",name,inode->children->content,inode->children->type,XML_ELEMENT_NODE);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 		
 		char *value;
 		if(inode->children->type!=XML_ELEMENT_NODE && strncmp("msGeometry",name,10)!=0)
 		  value=strdup((char*)inode->children->content);
 		else{
-		  fprintf(stderr,"DEBUG %d\n",xmlNodeDump(xmlbuff,doc,xmlFirstElementChild(inode),0,1));
+		  char* pcaMessage=(char*) malloc((9+strlen(xmlNodeDump(xmlbuff,doc,xmlFirstElementChild(inode),0,1)))*sizeof(char));
+		  sprintf(pcaMessage,"DEBUG %d",xmlNodeDump(xmlbuff,doc,xmlFirstElementChild(inode),0,1));
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 		  if(xmlNodeDump(xmlbuff,doc,inode->children,0,1)<=0){
-		    fprintf(stderr,"[ZOO-WFS-T:Service]>>Error dumping the geometry node");
+			char* pcaMessage=(char*) malloc((53)*sizeof(char));
+		    sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Error dumping the geometry node");
+			ZOO_DEBUG(pcaMessage);
+			free(pcaMessage);
 		    return SERVICE_FAILED;
 		  }
 		  const xmlChar *content;
 		  content = xmlBufferContent(xmlbuff);
-		  fprintf(stderr,"[ZOO-WFS-T:Service]>>Updated Geometry value : %s=%s\n",inode->children->name,content);
+		  char* pcaMessage=(char*) malloc((52+strlen(inode->children->name)+strlen(content))*sizeof(char));
+		  sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Updated Geometry value : %s=%s",inode->children->name,content);
+		  ZOO_DEBUG(pcaMessage);
+		  free(pcaMessage);
 		  value=(char*)malloc((xmlStrlen(content)+1)*sizeof(char));
 		  sprintf(value,"%s",content);
 		}
@@ -394,9 +541,15 @@ __declspec(dllexport)
 	}
 
 
-	fprintf(stderr,"[ZOO-WFS-T:Service]>>Starting (%s)!\n",fclause);
+    char* pcaMessage=(char*) malloc((36+strlen(fclause))*sizeof(char));
+	sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Starting (%s)!",fclause);
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	if(fclause!=NULL && OGR_L_SetAttributeFilter(olayer,fclause)==OGRERR_NONE){
-	  fprintf(stderr,"[ZOO-WFS-T:Service]>>Starting!\n");
+	  char* pcaMessage=(char*) malloc((31)*sizeof(char));
+	  sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Starting!");
+	  ZOO_DEBUG(pcaMessage);
+	  free(pcaMessage);
 	  OGR_L_ResetReading(olayer);
 	  if(strcasecmp("Delete",rtype)==0){
 	    while( (hFeature = OGR_L_GetNextFeature(olayer)) != NULL ){
@@ -415,7 +568,10 @@ __declspec(dllexport)
 		  OGR_F_SetGeometry( hFeature, hGeometry );
 		  OGR_G_DestroyGeometry(hGeometry);
 		}
-		fprintf( stderr,"[ZOO-WFS-T:Service]>>Update : %s(%d) = %s\n", tmap->name,fid, tmap->value);
+		char* pcaMessage=(char*) malloc((42+strlen(tmap->name)+strlen(fid)+strlen(tmap->value))*sizeof(char));
+		sprintf( pcaMessage,"[ZOO-WFS-T:Service]>>Update : %s(%d) = %s", tmap->name,fid, tmap->value);
+		ZOO_DEBUG(pcaMessage);
+		free(pcaMessage);
 		tmap=tmap->next;
 	      }
 	      OGR_L_SetFeature(olayer,hFeature);
@@ -423,7 +579,10 @@ __declspec(dllexport)
 	    OGR_F_Destroy(hFeature);
 	  }
 	}
-	fprintf(stderr,"[ZOO-WFS-T:Service]>>Finishing!\n");
+	char* pcaMessage=(char*) malloc((32)*sizeof(char));
+	sprintf(pcaMessage,"[ZOO-WFS-T:Service]>>Finishing!");
+	ZOO_DEBUG(pcaMessage);
+	free(pcaMessage);
 	free(fclause);
 	fclause=NULL;
 	freeMap(&properties);

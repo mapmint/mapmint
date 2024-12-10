@@ -144,12 +144,15 @@ void CheckDestDataSourceNameConsistency(const char* pszDestFilename,
     {
         if (EQUAL(pszDestExtension, apszExtensions[i][0]) && !EQUAL(pszDriverName, apszExtensions[i][1]))
         {
-            fprintf(stderr,
-                    "Warning: The target file has a '%s' extension, which is normally used by the %s driver,\n"
-                    "but the requested output driver is %s. Is it really what you want ?\n",
+            char* pcaMessage=(char*) malloc((155+strlen(pszDestExtension)+strlen(apszExtensions[i][1])+strlen(pszDriverName))*sizeof(char));
+            sprintf(pcaMessage,
+                    "Warning: The target file has a '%s' extension, which is normally used by the %s driver,"
+                    "but the requested output driver is %s. Is it really what you want ?",
                     pszDestExtension,
                     apszExtensions[i][1],
                     pszDriverName);
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             break;
         }
     }
@@ -159,11 +162,14 @@ void CheckDestDataSourceNameConsistency(const char* pszDestFilename,
         if (EQUALN(pszDestFilename, apszBeginName[i][0], strlen(apszBeginName[i][0])) &&
             !EQUAL(pszDriverName, apszBeginName[i][1]))
         {
-            fprintf(stderr,
-                    "Warning: The target file has a name which is normally recognized by the %s driver,\n"
-                    "but the requested output driver is %s. Is it really what you want ?\n",
+            char* pcaMessage=(char*) malloc((151+strlen(apszBeginName[i][1])+strlen(pszDriverName))*sizeof(char));
+            sprintf(pcaMessage,
+                    "Warning: The target file has a name which is normally recognized by the %s driver, "
+                    "but the requested output driver is %s. Is it really what you want ?",
                     apszBeginName[i][1],
                     pszDriverName);
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             break;
         }
     }
@@ -217,7 +223,10 @@ static OGRGeometry* LoadGeometry( const char* pszDS,
         
     if (poLyr == NULL)
     {
-        fprintf( stderr, "Failed to identify source layer from datasource.\n" );
+        char* pcaMessage=(char*) malloc((49)*sizeof(char));
+        sprintf( pcaMessage, "Failed to identify source layer from datasource." );
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
 #if GDAL_VERSION_MAJOR < 2
         OGRDataSource::DestroyDataSource(poDS);
 #endif
@@ -252,7 +261,10 @@ static OGRGeometry* LoadGeometry( const char* pszDS,
             }
             else
             {
-                fprintf( stderr, "ERROR: Geometry not of polygon type.\n" );
+                char* pcaMessage=(char*) malloc((37)*sizeof(char));
+                sprintf( pcaMessage, "ERROR: Geometry not of polygon type." );
+                ZOO_DEBUG(pcaMessage);
+                free(pcaMessage);
                 OGRGeometryFactory::destroyGeometry(poGeom);
                 OGRFeature::DestroyFeature(poFeat);
                 if( pszSQL != NULL )
@@ -693,7 +705,10 @@ int main( int nArgc, char ** papszArgv )
     int          bExplodeCollections = FALSE;
     const char  *pszZField = NULL;
 
-    fprintf(stderr,"Hello OGR2OGR\n\n");
+    char* pcaMessage=(char*) malloc((14)*sizeof(char));
+    sprintf(pcaMessage,"Hello OGR2OGR");
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     /* Check strict compilation and runtime library version as we use C++ API */
 #ifndef ZOO_SERVICE
     if (! GDAL_CHECK_VERSION("ogr2ogr"))
@@ -823,7 +838,10 @@ int main( int nArgc, char ** papszArgv )
       }
       }*/
     pszSQLStatement = getValueFromMaps(inputs,"sql");
-    fprintf(stderr,"%s %d (%s)\n",__FILE__,__LINE__,pszSQLStatement);
+    char* pcaMessage=(char*) malloc((11+strlen(__FILE__)+strlen(__LINE__)+strlen(pszSQLStatement))*sizeof(char));
+    sprintf(pcaMessage,"%s %d (%s)",__FILE__,__LINE__,pszSQLStatement);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
 
     tmpMap=NULL;
     tmpMap=getMapFromMaps(inputs,"nln","value");
@@ -870,8 +888,11 @@ int main( int nArgc, char ** papszArgv )
 		  eGType = wkbMultiPolygon25D;
 	  else	  
 	  {
-		  fprintf( stderr, "-nlt %s: type not recognised.\n", 
+          char* pcaMessage=(char*) malloc((30)*sizeof(char));
+		  sprintf( pcaMessage, "-nlt %s: type not recognised.", 
 			  tmpMap->value );
+          ZOO_DEBUG(pcaMessage);
+          free(pcaMessage);
 		  exit( 1 );
 	  }
     }
@@ -923,8 +944,14 @@ int main( int nArgc, char ** papszArgv )
           dfLRY = atof(t);
           break;
         }
-        fprintf(stderr,"%s\n\n",t);
-        fprintf(stderr,"%f - %f - %f - %f\n\n",dfULX,dfULY,dfLRX,dfLRY);
+        char* pcaMessage=(char*) malloc((3+strlen(t))*sizeof(char));
+        sprintf(pcaMessage,"%s",t);
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
+        char* pcaMessage=(char*) malloc((18+strlen(dfULX)+strlen(dfULY)+strlen(dfLRX)+strlen(dfLRY))*sizeof(char));
+        sprintf(pcaMessage,"%f - %f - %f - %f",dfULX,dfULY,dfLRX,dfLRY);
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
         t=strtok(NULL,",");
         cnt++;
       }
@@ -982,7 +1009,10 @@ int main( int nArgc, char ** papszArgv )
 	}
     }
 
-    fprintf(stderr,"DataStore: %s \n",pszDataSource);
+    char* pcaMessage=(char*) malloc((15+strlen(pszDataSource))*sizeof(char));
+    sprintf(pcaMessage,"DataStore: %s ",pszDataSource);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     tmpMap=NULL;
     tmpMap=getMapFromMaps(inputs,"InputDSTN","value");
     if(tmpMap!=NULL && strncasecmp(tmpMap->value,"NULL",4)!=0){
@@ -1023,7 +1053,10 @@ int main( int nArgc, char ** papszArgv )
       eGeomOp = SIMPLIFY_PRESERVE_TOPOLOGY;
       dfGeomOpParam = atof(tmpMap->value);
     }
-    fprintf(stderr,"Message %s\n",pszDestDataSource);
+    char* pcaMessage=(char*) malloc((11+strlen(pszDestDataSource))*sizeof(char));
+    sprintf(pcaMessage,"Message %s",pszDestDataSource);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
 
 
 #else
@@ -1123,8 +1156,11 @@ int main( int nArgc, char ** papszArgv )
                 eGType = OGRFromOGCGeomType(osGeomName);
                 if (eGType == wkbUnknown)
                 {
-                    fprintf( stderr, "-nlt %s: type not recognised.\n",
+                    char* pcaMessage=(char*) malloc((30+strlen(papszArgv[iArg+1]))*sizeof(char));
+                    sprintf( pcaMessage, "-nlt %s: type not recognised.",
                             papszArgv[iArg+1] );
+                    ZOO_DEBUG(pcaMessage);
+                    free(pcaMessage);
                     exit( 1 );
                 }
             }
@@ -1225,8 +1261,11 @@ int main( int nArgc, char ** papszArgv )
                 }
                 else
                 {
-                    fprintf(stderr, "Unhandled type for fieldtypeasstring option : %s\n",
+                    char* pcaMessage=(char*) malloc((49+strlen(*iter))*sizeof(char));
+                    sprintf(pcaMessage, "Unhandled type for fieldtypeasstring option : %s",
                             *iter);
+                    ZOO_DEBUG(pcaMessage);
+                    free(pcaMessage);
                     Usage();
                 }
                 iter ++;
@@ -1269,7 +1308,10 @@ int main( int nArgc, char ** papszArgv )
                 OGRGeometryFactory::createFromWkt(&pszTmp, NULL, &poClipSrc);
                 if (poClipSrc == NULL)
                 {
-                    fprintf( stderr, "FAILURE: Invalid geometry. Must be a valid POLYGON or MULTIPOLYGON WKT\n\n");
+                    char* pcaMessage=(char*) malloc((71)*sizeof(char));
+                    sprintf( pcaMessage, "FAILURE: Invalid geometry. Must be a valid POLYGON or MULTIPOLYGON WKT");
+                    ZOO_DEBUG(pcaMessage);
+                    free(pcaMessage);
                     Usage();
                 }
                 iArg ++;
@@ -1327,7 +1369,10 @@ int main( int nArgc, char ** papszArgv )
                 OGRGeometryFactory::createFromWkt(&pszTmp, NULL, &poClipDst);
                 if (poClipDst == NULL)
                 {
-                    fprintf( stderr, "FAILURE: Invalid geometry. Must be a valid POLYGON or MULTIPOLYGON WKT\n\n");
+                    char* pcaMessage=(char*) malloc((71)*sizeof(char));
+                    sprintf( pcaMessage, "FAILURE: Invalid geometry. Must be a valid POLYGON or MULTIPOLYGON WKT");
+                    ZOO_DEBUG(pcaMessage);
+                    free(pcaMessage);
                     Usage();
                 }
                 iArg ++;
@@ -1401,7 +1446,10 @@ int main( int nArgc, char ** papszArgv )
       setMapInMaps(conf,"lenv","message","FAILURE: cannot use -preserve_fid and -explodecollections at the same time\n\n");
       return SERVICE_FAILED;
 #else
-      fprintf( stderr, "FAILURE: cannot use -preserve_fid and -explodecollections at the same time\n\n" );
+      char* pcaMessage=(char*) malloc((75)*sizeof(char));
+      sprintf( pcaMessage, "FAILURE: cannot use -preserve_fid and -explodecollections at the same time" );
+      ZOO_DEBUG(pcaMessage);
+      free(pcaMessage);
       Usage();
 #endif
     }
@@ -1415,7 +1463,10 @@ int main( int nArgc, char ** papszArgv )
 	  setMapInMaps(conf,"lenv","message","FAILURE: cannot load source clip geometry");
 	  return SERVICE_FAILED;
 #else
-            fprintf( stderr, "FAILURE: cannot load source clip geometry\n\n" );
+            char* pcaMessage=(char*) malloc((42)*sizeof(char));
+            sprintf( pcaMessage, "FAILURE: cannot load source clip geometry" );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             Usage();
 #endif
         }
@@ -1431,8 +1482,11 @@ int main( int nArgc, char ** papszArgv )
 		       "bounding box, WKT string or datasource must be specified");
 	  return SERVICE_FAILED;
 #else
-            fprintf( stderr, "FAILURE: -clipsrc must be used with -spat option or a\n"
-                             "bounding box, WKT string or datasource must be specified\n\n");
+            char* pcaMessage=(char*) malloc((110)*sizeof(char));
+            sprintf( pcaMessage, "FAILURE: -clipsrc must be used with -spat option or a"
+                             "bounding box, WKT string or datasource must be specified");
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             Usage();
 #endif
         }
@@ -1447,13 +1501,19 @@ int main( int nArgc, char ** papszArgv )
 	  setMapInMaps(conf,"lenv","message","FAILURE: cannot load dest clip geometry");
 	  return SERVICE_FAILED;
 #else
-            fprintf( stderr, "FAILURE: cannot load dest clip geometry\n\n" );
+            char* pcaMessage=(char*) malloc((40)*sizeof(char));
+            sprintf( pcaMessage, "FAILURE: cannot load dest clip geometry" );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             Usage();
 #endif
         }
     }
 
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
+    char* pcaMessage=(char*) malloc((6+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+    sprintf(pcaMessage,"%s %d",__FILE__,__LINE__);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
 
 /* -------------------------------------------------------------------- */
 /*      Open data source.                                               */
@@ -1489,20 +1549,29 @@ int main( int nArgc, char ** papszArgv )
 	setMapInMaps(conf,"lenv","message",tmp);
 	return SERVICE_FAILED;
 #else
-        fprintf( stderr, "FAILURE:\n"
-                "Unable to open datasource `%s' with the following drivers.\n",
+        char* pcaMessage=(char*) malloc((67+strlen(pszDataSource))*sizeof(char));
+        sprintf( pcaMessage, "FAILURE:"
+                "Unable to open datasource `%s' with the following drivers.",
                 pszDataSource );
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
 
         for( int iDriver = 0; iDriver < poR->GetDriverCount(); iDriver++ )
         {
-            fprintf( stderr, "  -> %s\n", poR->GetDriver(iDriver)->GetName() );
+            char* pcaMessage=(char*) malloc((8)*sizeof(char));
+            sprintf( pcaMessage, "  -> %s", poR->GetDriver(iDriver)->GetName() );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
         }
 
         exit( 1 );
 #endif
     }
 
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
+    char* pcaMessage=(char*) malloc((6+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+    sprintf(pcaMessage,"%s %d",__FILE__,__LINE__);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     
 /* -------------------------------------------------------------------- */
 /*      Try opening the output datasource as an existing, writable      */
@@ -1515,7 +1584,10 @@ int main( int nArgc, char ** papszArgv )
     OGRSFDriver          *poDriver = NULL;
 #endif
     int                  bCloseODS = TRUE;
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
+    char* pcaMessage=(char*) malloc((6+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+    sprintf(pcaMessage,"%s %d",__FILE__,__LINE__);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
 
     if( bUpdate )
     {
@@ -1553,10 +1625,13 @@ int main( int nArgc, char ** papszArgv )
 			       "name must be different from an existing layer.");
 		  return SERVICE_FAILED;
 #else
-                    fprintf( stderr,
+                    char* pcaMessage=(char*) malloc((150)*sizeof(char));
+                    sprintf( pcaMessage,
                              "ERROR: -nln name must be specified combined with "
                              "a single source layer name,\nor a -sql statement, and "
-                             "name must be different from an existing layer.\n");
+                             "name must be different from an existing layer.");
+                    ZOO_DEBUG(pcaMessage);
+                    free(pcaMessage);
                     exit(1);
 #endif
                 }
@@ -1603,9 +1678,12 @@ int main( int nArgc, char ** papszArgv )
 #ifdef ZOO_SERVICE
 	      setMapInMaps(conf,"lenv","message","Unable to open existing output datasource.");
 #else
-                fprintf( stderr, "FAILURE:\n"
-                        "Unable to open existing output datasource `%s'.\n",
+                char* pcaMessage=(char*) malloc((56+strlen(pszDestDataSource))*sizeof(char));
+                sprintf( pcaMessage, "FAILURE:"
+                        "Unable to open existing output datasource `%s'.",
                         pszDestDataSource );
+                ZOO_DEBUG(pcaMessage);
+                free(pcaMessage);
                 exit( 1 );
 #endif
             }
@@ -1616,8 +1694,11 @@ int main( int nArgc, char ** papszArgv )
 	  setMapInMaps(conf,"lenv","message","WARNING: Datasource creation options ignored since an existing datasource"
 		       "being updated.");
 #else
-            fprintf( stderr, "WARNING: Datasource creation options ignored since an existing datasource\n"
-                    "         being updated.\n" );
+            char* pcaMessage=(char*) malloc((97)*sizeof(char));
+            sprintf( pcaMessage, "WARNING: Datasource creation options ignored since an existing datasource"
+                    "         being updated." );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
 #endif
         }
     }
@@ -1652,12 +1733,21 @@ int main( int nArgc, char ** papszArgv )
 	  setMapInMaps(conf,"lenv","message",tmp);
 	  return SERVICE_FAILED;
 #else
-            fprintf( stderr, "Unable to find driver `%s'.\n", pszFormat );
-            fprintf( stderr,  "The following drivers are available:\n" );
+            char* pcaMessage=(char*) malloc((28+strlen(pszFormat))*sizeof(char));
+            sprintf( pcaMessage, "Unable to find driver `%s'.", pszFormat );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
+            char* pcaMessage=(char*) malloc((37)*sizeof(char));
+            sprintf( pcaMessage,  "The following drivers are available:" );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
         
             for( iDriver = 0; iDriver < poR->GetDriverCount(); iDriver++ )
             {
-                fprintf( stderr,  "  -> `%s'\n", poR->GetDriver(iDriver)->GetName() );
+                char* pcaMessage=(char*) malloc((10)*sizeof(char));
+                sprintf( pcaMessage,  "  -> `%s'", poR->GetDriver(iDriver)->GetName() );
+                ZOO_DEBUG(pcaMessage);
+                free(pcaMessage);
             }
             exit( 1 );
 #endif
@@ -1675,8 +1765,11 @@ int main( int nArgc, char ** papszArgv )
 		  pszFormat);
 	  return SERVICE_FAILED;
 #else
-            fprintf( stderr,  "%s driver does not support data source creation.\n",
+            char* pcaMessage=(char*) malloc((49+strlen(pszFormat))*sizeof(char));
+            sprintf( pcaMessage,  "%s driver does not support data source creation.",
                     pszFormat );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             exit( 1 );
 #endif
         }
@@ -1734,8 +1827,11 @@ int main( int nArgc, char ** papszArgv )
 		  pszFormat, pszDestDataSource );
 	  return SERVICE_FAILED;
 #else
-            fprintf( stderr,  "%s driver failed to create %s\n", 
+            char* pcaMessage=(char*) malloc((30+strlen(pszFormat)+strlen(pszDestDataSource))*sizeof(char));
+            sprintf( pcaMessage,  "%s driver failed to create %s", 
                     pszFormat, pszDestDataSource );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             exit( 1 );
 #endif
         }
@@ -1754,8 +1850,11 @@ int main( int nArgc, char ** papszArgv )
 	  sprintf(tmp,"Failed to process SRS definition: %s",pszOutputSRSDef);
 	  return SERVICE_FAILED;
 #else
-            fprintf( stderr,  "Failed to process SRS definition: %s\n", 
+            char* pcaMessage=(char*) malloc((37+strlen(pszOutputSRSDef))*sizeof(char));
+            sprintf(pcaMessage,  "Failed to process SRS definition: %s", 
                     pszOutputSRSDef );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             exit( 1 );
 #endif
         }
@@ -1775,8 +1874,11 @@ int main( int nArgc, char ** papszArgv )
 		  pszSourceSRSDef);
 	  return SERVICE_FAILED;
 #else
-            fprintf( stderr,  "Failed to process SRS definition: %s\n", 
+            char* pcaMessage=(char*) malloc((37+strlen(pszSourceSRSDef))*sizeof(char));
+            sprintf( pcaMessage,  "Failed to process SRS definition: %s", 
                     pszSourceSRSDef );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             exit( 1 );
 #endif
         }
@@ -1790,14 +1892,29 @@ int main( int nArgc, char ** papszArgv )
         OGRLayer *poResultSet;
 
         if( pszWHERE != NULL )
-            fprintf( stderr,  "-where clause ignored in combination with -sql.\n" );
+            char* pcaMessage=(char*) malloc((48)*sizeof(char));
+            sprintf( pcaMessage,  "-where clause ignored in combination with -sql." );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
         if( CSLCount(papszLayers) > 0 )
-            fprintf( stderr,  "layer names ignored in combination with -sql.\n" );
-	fprintf(stderr,"%s %d [%s]\n",__FILE__,__LINE__,pszSQLStatement);
-	fprintf(stderr,"%s %d %s\n",__FILE__,__LINE__,pszDialect);
+            char* pcaMessage=(char*) malloc((46)*sizeof(char));
+            sprintf( pcaMessage,  "layer names ignored in combination with -sql." );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
+    char* pcaMessage=(char*) malloc((11+strlen(__FILE__)+strlen(__LINE__)+strlen(pszSQLStatement))*sizeof(char));
+	sprintf(pcaMessage,"%s %d [%s]",__FILE__,__LINE__,pszSQLStatement);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
+    char* pcaMessage=(char*) malloc((9+strlen(__FILE__)+strlen(__LINE__)+strlen(pszDialect))*sizeof(char));
+	sprintf(pcaMessage,"%s %d %s",__FILE__,__LINE__,pszDialect);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
         poResultSet = poDS->ExecuteSQL( pszSQLStatement, poSpatialFilter, 
                                         pszDialect );
-	fprintf(stderr,"%s %d [%s]\n",__FILE__,__LINE__,pszSQLStatement);
+    char* pcaMessage=(char*) malloc((11+strlen(__FILE__)+strlen(__LINE__)+strlen(pszSQLStatement))*sizeof(char));
+	sprintf(pcaMessage,"%s %d [%s]",__FILE__,__LINE__,pszSQLStatement);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
 
         if( poResultSet != NULL )
         {
@@ -1810,7 +1927,10 @@ int main( int nArgc, char ** papszArgv )
 	      if( !poResultSet->TestCapability( ODrCCreateDataSource ) )
 #endif
                 {
-                    fprintf( stderr, "Progress turned off as fast feature count is not available.\n");
+                    char* pcaMessage=(char*) malloc((60)*sizeof(char));
+                    sprintf( pcaMessage, "Progress turned off as fast feature count is not available.");
+                    ZOO_DEBUG(pcaMessage);
+                    free(pcaMessage);
                     bDisplayProgress = FALSE;
                 }
                 else
@@ -1910,8 +2030,11 @@ int main( int nArgc, char ** papszArgv )
 #ifdef ZOO_SERVICE
 		  return SERVICE_FAILED;
 #else
-                    fprintf( stderr, "FAILURE: Couldn't fetch advertised layer %d!\n",
+                    char* pcaMessage=(char*) malloc((45+strlen(iLayer))*sizeof(char));
+                    sprintf( pcaMessage, "FAILURE: Couldn't fetch advertised layer %d!",
                             iLayer );
+                    ZOO_DEBUG(pcaMessage);
+                    free(pcaMessage);
                     exit( 1 );
 #endif
                 }
@@ -1935,8 +2058,11 @@ int main( int nArgc, char ** papszArgv )
 
                 if( poLayer == NULL )
                 {
-                    fprintf( stderr, "FAILURE: Couldn't fetch requested layer '%s'!\n",
+                    char* pcaMessage=(char*) malloc((46+strlen(papszLayers[iLayer]))*sizeof(char));
+                    sprintf( pcaMessage, "FAILURE: Couldn't fetch requested layer '%s'!",
                              papszLayers[iLayer] );
+                    ZOO_DEBUG(pcaMessage);
+                    free(pcaMessage);
                     if (!bSkipFailures)
 #ifdef ZOO_SERVICE
 		      return SERVICE_FAILED;
@@ -1986,7 +2112,10 @@ int main( int nArgc, char ** papszArgv )
             {
                 if( poLayer->SetAttributeFilter( pszWHERE ) != OGRERR_NONE )
                 {
-                    fprintf( stderr, "FAILURE: SetAttributeFilter(%s) failed.\n", pszWHERE );
+                    char* pcaMessage=(char*) malloc((40+strlen(pszWHERE)));
+                    sprintf( stderr, "FAILURE: SetAttributeFilter(%s) failed.", pszWHERE );
+                    ZOO_DEBUG(pcaMessage);
+                    free(pcaMessage);
                     if (!bSkipFailures)
 #ifdef ZOO_SERVICE
 		      return SERVICE_FAILED;
@@ -2002,8 +2131,10 @@ int main( int nArgc, char ** papszArgv )
             if (bDisplayProgress)
             {
                 if (!poLayer->TestCapability(OLCFastFeatureCount))
-                {
-                    fprintf( stderr, "Progress turned off as fast feature count is not available.\n");
+                {   char* pcaMessage=(char*) malloc((60)*sizeof(char));
+                    sprintf( pcaMessage, "Progress turned off as fast feature count is not available.");
+                    ZOO_DEBUG(pcaMessage);
+                    free(pcaMessage);
                     bDisplayProgress = FALSE;
                 }
                 else
@@ -2141,9 +2272,15 @@ int main( int nArgc, char ** papszArgv )
     
 #ifdef ZOO_SERVICE
     setMapInMaps(outputs,"Result","value",(char*)pszwebDestData);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
+    char* pcaMessage=(char*) malloc((6+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+    sprintf(pcaMessage,"%s %d",__FILE__,__LINE__);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     free(pszwebDestData);
-    fprintf(stderr,"%s %d\n",__FILE__,__LINE__);
+    char* pcaMessage=(char*) malloc((6+strlen(__FILE__)+strlen(__LINE__))*sizeof(char));
+    sprintf(pcaMessage,"%s %d",__FILE__,__LINE__);
+    ZOO_DEBUG(pcaMessage);
+    free(pcaMessage);
     return SERVICE_SUCCEEDED;
 #else
     return 0;
@@ -2368,8 +2505,11 @@ static int TranslateLayer(
 
         if( poSourceSRS == NULL )
         {
-            fprintf( stderr, "Can't transform coordinates, source layer has no\n"
-                    "coordinate system.  Use -s_srs to set one.\n" );
+            char* pcaMessage=(char*) malloc((91)*sizeof(char));
+            sprintf( pcaMessage, "Can't transform coordinates, source layer has no"
+                    "coordinate system.  Use -s_srs to set one." );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
 #ifdef ZOO_SERVICE
 	      return SERVICE_FAILED;
 #else
@@ -2385,16 +2525,25 @@ static int TranslateLayer(
         {
             char        *pszWKT = NULL;
 
-            fprintf( stderr, "Failed to create coordinate transformation between the\n"
-                   "following coordinate systems.  This may be because they\n"
-                   "are not transformable, or because projection services\n"
-                   "(PROJ.4 DLL/.so) could not be loaded.\n" );
+            char* pcaMessage=(char*) malloc((200)*sizeof(char));
+            sprintf( pcaMessage, "Failed to create coordinate transformation between the"
+                   "following coordinate systems.  This may be because they"
+                   "are not transformable, or because projection services"
+                   "(PROJ.4 DLL/.so) could not be loaded." );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             
             poSourceSRS->exportToPrettyWkt( &pszWKT, FALSE );
-            fprintf( stderr,  "Source:\n%s\n", pszWKT );
+            char* pcaMessage=(char*) malloc((12+strlen(pszWKT))*sizeof(char));
+            sprintf( pcaMessage,  "Source:\n%s", pszWKT );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             
             poOutputSRS->exportToPrettyWkt( &pszWKT, FALSE );
-            fprintf( stderr,  "Target:\n%s\n", pszWKT );
+            char* pcaMessage=(char*) malloc((12+strlen(pszWKT))*sizeof(char));
+            sprintf( pcaMessage,  "Target:\n%s", pszWKT );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
 #ifdef ZOO_SERVICE
 	      return SERVICE_FAILED;
 #else
@@ -2420,7 +2569,10 @@ static int TranslateLayer(
         }
         else
         {
-            fprintf(stderr, "-wrapdateline option only works when reprojecting to a geographic SRS\n");
+            char* pcaMessage=(char*) malloc((70)*sizeof(char));
+            sprintf(pcaMessage, "-wrapdateline option only works when reprojecting to a geographic SRS");
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
         }
     }
 /* -------------------------------------------------------------------- */
@@ -2469,8 +2621,11 @@ static int TranslateLayer(
     {
         if( poDstDS->DeleteLayer( iLayer ) != OGRERR_NONE )
         {
-            fprintf( stderr, 
-                     "DeleteLayer() failed when overwrite requested.\n" );
+            char* pcaMessage=(char*) malloc((47)*sizeof(char));
+            sprintf( pcaMessage, 
+                     "DeleteLayer() failed when overwrite requested." );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             CSLDestroy(papszTransformOptions);
             return FALSE;
         }
@@ -2513,9 +2668,12 @@ static int TranslateLayer(
 
         if( !poDstDS->TestCapability( ODsCCreateLayer ) )
         {
-            fprintf( stderr, 
+            char* pcaMessage=(char*) malloc((61+strlen(pszNewLayerName))*sizeof(char));
+            sprintf( pcaMessage, 
               "Layer %s not found, and CreateLayer not supported by driver.", 
                      pszNewLayerName );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             return FALSE;
         }
 
@@ -2539,17 +2697,23 @@ static int TranslateLayer(
 /* -------------------------------------------------------------------- */
     else if( !bAppend )
     {
-        fprintf( stderr, "FAILED: Layer %s already exists, and -append not specified.\n"
-                "        Consider using -append, or -overwrite.\n",
+        char* pcaMessage=(char*) malloc((106+strlen(pszNewLayerName))*sizeof(char));
+        sprintf( pcaMessage, "FAILED: Layer %s already exists, and -append not specified."
+                "        Consider using -append, or -overwrite.",
                 pszNewLayerName );
+        ZOO_DEBUG(pcaMessage);
+        free(pcaMessage);
         return FALSE;
     }
     else
     {
         if( CSLCount(papszLCO) > 0 )
         {
-            fprintf( stderr, "WARNING: Layer creation options ignored since an existing layer is\n"
-                    "         being appended to.\n" );
+            char* pcaMessage=(char*) malloc((94)*sizeof(char));
+            sprintf( pcaMessage, "WARNING: Layer creation options ignored since an existing layer is"
+                    "         being appended to." );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
         }
     }
 
@@ -2628,8 +2792,11 @@ static int TranslateLayer(
             }
             else
             {
-                fprintf( stderr, "Field '%s' not found in source layer.\n", 
+                char* pcaMessage=(char*) malloc((38+strlen(papszSelFields[iField]))*sizeof(char));
+                sprintf( pcaMessage, "Field '%s' not found in source layer.", 
                         papszSelFields[iField] );
+                ZOO_DEBUG(pcaMessage);
+                free(pcaMessage);
                 if( !bSkipFailures )
                 {
                     VSIFree(panMap);
@@ -2743,7 +2910,10 @@ static int TranslateLayer(
         /* layer for each source field */
         if (poDstFDefn == NULL)
         {
-            fprintf( stderr, "poDstFDefn == NULL.\n" );
+            char* pcaMessage=(char*) malloc((20)*sizeof(char));
+            sprintf( pcaMessage, "poDstFDefn == NULL." );
+            ZOO_DEBUG(pcaMessage);
+            free(pcaMessage);
             VSIFree(panMap);
             CSLDestroy(papszTransformOptions);
             return FALSE;
@@ -2909,8 +3079,11 @@ static int TranslateLayer(
                         if( nGroupTransactions )
                             poDstLayer->CommitTransaction();
 
-                        fprintf( stderr, "Failed to reproject feature %d (geometry probably out of source or destination SRS).\n",
+                        char* pcaMessage=(char*) malloc((85)*sizeof(char));
+                        sprintf( pcaMessage, "Failed to reproject feature %d (geometry probably out of source or destination SRS).",
                                 (int) poFeature->GetFID() );
+                        ZOO_DEBUG(pcaMessage);
+                        free(pcaMessage);
                         if( !bSkipFailures )
                         {
                             OGRFeature::DestroyFeature( poFeature );
